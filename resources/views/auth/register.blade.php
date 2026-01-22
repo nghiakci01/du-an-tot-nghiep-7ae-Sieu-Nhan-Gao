@@ -1,66 +1,96 @@
-@extends('auth.layouts.auth')
+@extends('layouts.app')
 
 @section('title', 'Đăng ký')
 
 @section('content')
-    <div class="card-back">
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
-            <div class="center-wrap">
-                <div class="section text-center">
-                    <h4 class="mb-4 pb-3">Đăng ký</h4>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">{{ __('Đăng ký') }}</div>
 
-                    <div class="form-group">
-                        <input type="text" name="name" class="form-style @error('name') is-invalid @enderror"
-                            autocomplete="name" placeholder="Họ và tên" value="{{ old('name') }}" required>
-                        <i class="input-icon uil uil-user"></i>
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('register') }}">
+                            @csrf
 
-                        @error('name')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
+                            <div class="row mb-3">
+                                <label for="name"
+                                    class="col-md-4 col-form-label text-md-end">{{ __('Họ và tên') }}</label>
+
+                                <div class="col-md-6">
+                                    <input id="name" type="text"
+                                        class="form-control @error('name') is-invalid @enderror" name="name"
+                                        value="{{ old('name') }}" required autocomplete="name" autofocus>
+
+                                    @error('name')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for="email"
+                                    class="col-md-4 col-form-label text-md-end">{{ __('Email') }}</label>
+
+                                <div class="col-md-6">
+                                    <input id="email" type="email"
+                                        class="form-control @error('email') is-invalid @enderror" name="email"
+                                        value="{{ old('email') }}" required autocomplete="email">
+
+                                    @error('email')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for="password"
+                                    class="col-md-4 col-form-label text-md-end">{{ __('Mật khẩu') }}</label>
+
+                                <div class="col-md-6">
+                                    <input id="password" type="password"
+                                        class="form-control @error('password') is-invalid @enderror" name="password"
+                                        required autocomplete="new-password">
+
+                                    @error('password')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for="password-confirm"
+                                    class="col-md-4 col-form-label text-md-end">{{ __('Xác nhận mật khẩu') }}</label>
+
+                                <div class="col-md-6">
+                                    <input id="password-confirm" type="password" class="form-control"
+                                        name="password_confirmation" required autocomplete="new-password">
+                                </div>
+
+                                <div class="col-md-6 offset-md-4">
+                                    <a class="btn btn-link" href="{{ route('login') }}">
+                                        {{ __('Bạn đã có tài khoản') }}
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="row mb-0">
+                                <div class="col-md-6 offset-md-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        {{ __('Đăng kí') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-
-                    <div class="form-group mt-2">
-                        <input type="email" name="email" class="form-style @error('email') is-invalid @enderror"
-                            placeholder="Email" value="{{ old('email') }}" required autocomplete="email">
-                        <i class="input-icon uil uil-at"></i>
-
-                        @error('email')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group mt-2">
-                        <input type="password" name="password" class="form-style @error('password') is-invalid @enderror"
-                            placeholder="Mật khẩu" required autocomplete="new-password">
-                        <i class="input-icon uil uil-lock-alt"></i>
-
-                        @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group mt-2">
-                        <input type="password"  id="password-confirm" name="password_confirmation"  class="form-style"
-                            placeholder="Xác nhận mật khẩu"required autocomplete="new-password">
-                        <i class="input-icon uil uil-lock-alt"></i>
-
-                        @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <button type="submit" class="btn mt-4">Đăng ký</button>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 @endsection
