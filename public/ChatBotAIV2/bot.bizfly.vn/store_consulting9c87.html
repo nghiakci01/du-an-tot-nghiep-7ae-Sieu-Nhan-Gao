@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<!-- Mirrored from bot.bizfly.vn/store_consulting.html?utm_source=Website&utm_medium=Trangchu&utm_campaign=trangdemo-bizchatai by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 23 Jan 2026 14:52:50 GMT -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tư vấn bán hàng - BizChatAI</title>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Montserrat', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      box-sizing: border-box;
+      background-image: url('images/store_consulting.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 12px;
+      min-height: 100vh;
+      width: 100vw;
+      box-sizing: border-box;
+    }
+    .header {
+      background: rgba(255,255,255,0.9);
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-bottom: 12px;
+    }
+    .header-inner {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 60px 20px 60px;
+      box-sizing: border-box;
+    }
+    .header-left {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .logo {
+      height: 38px;
+      width: 176px;
+      display: block;
+    }
+    .header-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: #000;
+      margin-top: 14px;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .header-right {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      padding-top: 4px;
+    }
+    .phone-icon {
+      width: 32px;
+      height: 32px;
+      display: block;
+    }
+    .hotline {
+      font-weight: 600;
+      font-size: 16px;
+      color: #333;
+      font-family: 'Montserrat', Arial, sans-serif;
+      width: 189px;
+    }
+    .hotline span {
+      font-weight: 400;
+      color: #333;
+    }
+    .hotline .purple {
+      color: #511d9a;
+      font-weight: 600;
+    }
+    .main-iframe {
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      width: 1020px;
+      flex: 1;
+      margin-top: 0;
+      margin-bottom: 0;
+      position: relative;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      border: 1px solid #fff;
+    }
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      width: 740px;
+      max-width: 100%;
+    }
+    .main-title {
+      font-family: 'SVN-Gilroy', 'Montserrat', Arial, sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: #000;
+      margin-bottom: 0;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .main-desc {
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 16px;
+      color: #333;
+      text-align: center;
+      width: 100%;
+      line-height: 24px;
+      margin-bottom: 0;
+    }
+    .try-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 9px;
+      width: 100%;
+      justify-content: center;
+    }
+    .try-line {
+      flex: 1;
+      height: 2px;
+      min-width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .try-text {
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 14px;
+      color: #666;
+      font-weight: 300;
+      text-align: center;
+      white-space: nowrap;
+      line-height: 24px;
+    }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+    .button-row {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      width: 100%;
+    }
+    .booking-btn {
+      background: #fff;
+      border-radius: 60px;
+      border: 1px solid rgba(81,29,154,0.1);
+      flex: 1;
+      padding: 10px 0;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 16px;
+      color: #511d9a;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .booking-btn:hover {
+      background: #f3eaff;
+    }
+    .ask-box {
+      background: #fff;
+      border-radius: 100px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      height: 79px;
+      width: 940px;
+      max-width: 100%;
+      padding: 23px 30px;
+      box-sizing: border-box;
+      margin: 0 auto;
+      margin-top: 24px;
+      border: none;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    .ask-text {
+      font-family: 'SVN-Gilroy', 'Montserrat', Arial, sans-serif;
+      font-size: 16px;
+      color: #555;
+      white-space: nowrap;
+    }
+    .ask-icon {
+      width: 36px;
+      height: 36px;
+      display: block;
+    }
+    .footer-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      width: 675px;
+      max-width: 100%;
+      margin: 0 auto;
+      margin-top: 12px;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+    .footer-title {
+      font-family: 'SVN-Gilroy', 'Montserrat', Arial, sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: #000;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .footer-btn-row {
+      display: flex;
+      flex-direction: row;
+      gap: 19px;
+      width: 100%;
+      justify-content: center;
+    }
+    .footer-btn-close {
+      display: none;
+    }
+    .footer-btn-primary {
+      background: #511d9a;
+      color: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'SVN-Gilroy', 'Montserrat', Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      border: none;
+      width: 214px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+    .footer-btn-secondary {
+      background: #fff;
+      color: #511d9a;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'SVN-Gilroy', 'Montserrat', Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      border: 1.5px solid #511d9a;
+      width: 211px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+    .powder-by{
+        height: 24px;
+        width: fit-content;
+        margin: 8px auto;
+        display: none; /* Hide by default on desktop */
+        .text{
+            line-height: 24px;
+            font-size: 12px;
+            vertical-align: bottom;
+            margin-right: 8px;
+            color:#00000080;
+        }
+        img{
+            width: 96px;
+            height: 24px;
+        }
+    }
+    #bg-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      background-image: url('images/store_consulting.png');
+      background-size: cover;
+      background-position: center;
+      pointer-events: none;
+    }
+    @media (max-width: 1100px) {
+      .main-box, .ask-box { width: 98vw; }
+      .main-content { width: 98vw; }
+      .main-iframe { 
+        width: 90%;
+      }
+      #bg-image {
+        display: none;
+      }
+    }
+    @media (max-width: 800px) {
+      .main-box, .ask-box, .footer-box { width: 100vw; padding: 0; }
+      .main-content { width: 100vw; }
+      .header-inner { padding: 12px 10px 20px 10px; }
+      #bg-image {
+        display: none;
+      }
+    }
+    /* Mobile header styles */
+    @media (max-width: 768px) {
+      body {
+        background-image: none;
+        background-color: #ffffff;
+      }
+      #bg-image {
+        display: none;
+      }
+      .header-inner {
+        padding: 12px 16px;
+        flex-direction: column;
+        align-items: center;
+      }
+      .header-left {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .logo {
+        height: 32px;
+        width: auto;
+      }
+      .header-title {
+        margin-top: 0;
+        font-size: 14px;
+        white-space: normal;
+        text-align: center;
+        max-width: 280px;
+      }
+      .header-right {
+        display: none; /* Hide header-right on mobile */
+      }
+      .hotline {
+        width: auto;
+      }
+      .main-iframe {
+        width: 100%;
+        border-radius: 0;
+        margin: 0;
+        border: none;
+        flex: 0 1 auto;
+        height: 70vh; /* Set fixed height for mobile */
+        max-height: 600px;
+      }
+      .container {
+        padding: 0;
+        min-height: auto;
+        height: auto;
+      }
+      /* Footer mobile styles */
+      .footer-box {
+        width: 90%;
+        border-radius: 16px;
+        padding: 16px;
+        margin-top: 0;
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 0px;
+        background-color: #F8F8F8;
+        position: relative;
+      }
+      .footer-btn-close {
+        position: absolute;
+        display: block;
+        top: 8px;
+        right: 8px;
+        border: none;
+        background: none;
+        cursor: pointer;
+      }
+      .footer-btn-close svg {
+        transition: transform 0.3s ease;
+      }
+      .footer-btn-close.active svg {
+        transform: rotate(180deg);
+      }
+      .footer-title {
+        font-size: 14px;
+        line-height: 1.5;
+        text-align: left;
+        white-space: normal;
+        max-width: 300px;
+      }
+      .footer-btn-row {
+        display: flex;
+        justify-content: flex-start;
+        transition: opacity 0.3s, max-height 0.3s ease;
+        overflow: hidden;
+        max-height: 100px;
+      }
+      .footer-btn-row.hidden {
+        max-height: 0;
+        opacity: 0;
+        margin: 0;
+        padding: 0;
+      }
+      .footer-btn-primary, 
+      .footer-btn-secondary {
+        margin-top: 12px;
+        width: 100%;
+        padding: 8px 16px;
+        font-size: 11px;
+        border-radius: 6px;
+        width: auto;
+        flex-shrink: 0;
+      }
+      /* Powered-by mobile styles */
+      .powder-by {
+        display: block; /* Show on mobile */
+        margin: 8px auto;
+        padding: 0 16px;
+      }
+      .powder-by .text {
+        font-size: 11px;
+        line-height: 20px;
+      }
+      .powder-by img {
+        width: 80px;
+        height: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="bg-image"></div>
+  <div class="container">
+    <div class="header">
+      <div class="header-inner">
+        <div class="header-left">
+          <img class="logo" src="images/logo_BizflyChat.svg" alt="BizChatAI logo">
+          <span class="header-title">Trợ lý ảo hỗ trợ tư vấn bán hàng</span>
+        </div>
+        <div class="header-right">
+          <span class="phone-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect x="0.5" y="0.5" width="31" height="31" rx="15.5" stroke="#511D9A" stroke-opacity="0.3"/>
+              <path d="M18.291 10.867C18.9924 11.0035 19.637 11.3459 20.1424 11.8503C20.6477 12.3546 20.9907 12.998 21.1276 13.6981M18.291 8C19.7483 8.16158 21.1072 8.81291 22.1446 9.84704C23.182 10.8812 23.8363 12.2367 24 13.6909M23.2819 19.4105V21.5607C23.2827 21.7603 23.2417 21.9579 23.1616 22.1408C23.0815 22.3237 22.964 22.4879 22.8166 22.6228C22.6692 22.7578 22.4952 22.8605 22.3058 22.9244C22.1163 22.9884 21.9156 23.0121 21.7164 22.9942C19.5067 22.7545 17.384 22.0009 15.5191 20.7938C13.784 19.6934 12.313 18.2251 11.2104 16.4934C9.99681 14.6235 9.24154 12.4947 9.00583 10.2792C8.98788 10.081 9.01148 9.88127 9.07513 9.69267C9.13877 9.50407 9.24106 9.33076 9.37549 9.18378C9.50992 9.0368 9.67353 8.91937 9.85592 8.83896C10.0383 8.75855 10.2355 8.71693 10.4349 8.71674H12.5892C12.9377 8.71332 13.2756 8.83649 13.5398 9.06331C13.8041 9.29012 13.9767 9.6051 14.0254 9.94953C14.1164 10.6376 14.285 11.3133 14.5281 11.9636C14.6247 12.2201 14.6456 12.4989 14.5884 12.7669C14.5311 13.035 14.398 13.281 14.205 13.4759L13.293 14.3861C14.3152 16.1805 15.8038 17.6663 17.6016 18.6866L18.5136 17.7763C18.7089 17.5836 18.9554 17.4508 19.2239 17.3936C19.4925 17.3365 19.7718 17.3574 20.0288 17.4538C20.6804 17.6964 21.3573 17.8648 22.0467 17.9555C22.3956 18.0046 22.7142 18.18 22.9419 18.4483C23.1696 18.7165 23.2906 19.059 23.2819 19.4105Z" stroke="#511D9A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="hotline"><span>Hotline:</span> <span class="purple">1900 63 64 65</span></span>
+        </div>
+      </div>
+    </div>
+    <iframe class="main-iframe" src="chat_web_box/index0f19.html?id=2034&amp;bot_id=72024&amp;group_id=2219&amp;project=a39b5f0a-6a91-47de-946b-34e706422482&amp;email=&amp;username=&amp;name=&amp;open=1&amp;language_box_bizfly=vi&amp;color_custom_bizfly=&amp;is_formGPT=1&amp;full_size=1" width="100%" height="100%" style="border: none;"></iframe>
+    <div class="footer-box">
+      <button class="footer-btn-close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect width="16" height="16" fill="white" fill-opacity="0.01"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M3.3442 6.56859C3.54566 6.3537 3.88317 6.34282 4.09805 6.54427L7.99995 10.2023L11.9018 6.54427C12.1168 6.34282 12.4542 6.3537 12.6557 6.56859C12.8571 6.78348 12.8462 7.121 12.6314 7.32245L8.36472 11.3225C8.15957 11.5148 7.84034 11.5148 7.63518 11.3225L3.36852 7.32245C3.15363 7.121 3.14275 6.78348 3.3442 6.56859Z" fill="#333333"/>
+        </svg>
+      </button>
+      <div class="footer-title">Giành lợi thế trên cuộc đua chinh phục khách hàng với BizChatAI ngay!</div>
+      <div class="footer-btn-row">
+        <a href="https://bizfly.vn/giai-phap/form-consulting-chatbot.html?utm_source=Website&amp;utm_medium=Trang_Demo&amp;utm_campaign=dung-thu-usecase" target="_blank" class="footer-btn-primary">Đăng ký tư vấn</a>
+        <a href="https://bizfly.vn/giai-phap/chat-bot-ai.html?utm_source=Website&amp;utm_medium=Trang_Demo&amp;utm_campaign=dung-thu-usecase" target="_blank" class="footer-btn-secondary">Khám phá giải pháp</a>
+      </div>
+    </div>
+    <div class="powder-by" >
+      <span class="text">Một sản phẩm của</span>
+      <img src="images/logo-bizfly-vccorp.svg" alt="">
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Function to generate random string for username that will never duplicate
+      function generateRandomString(length = 20) {
+        const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        const timestamp = Date.now().toString();
+        
+        // Use part of the timestamp to ensure uniqueness
+        let result = timestamp.slice(-10);
+        
+        // Fill the rest with random characters
+        const remainingLength = length - result.length;
+        for (let i = 0; i < remainingLength; i++) {
+          result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        
+        return result;
+      }
+
+      // Function to update iframe src with username
+      function updateIframeSrc(username) {
+        const iframe = document.querySelector('.main-iframe');
+        if (iframe) {
+          const currentSrc = iframe.src;
+          const srcUrl = new URL(currentSrc.html);
+          
+          // Update the username and name parameters
+          srcUrl.searchParams.set('username', username);
+          srcUrl.searchParams.set('name', username);
+          
+          // Set the updated URL back to the iframe
+          iframe.src = srcUrl.toString();
+        }
+      }
+      
+      // Function to adjust iframe height based on screen size
+      function adjustIframeHeight() {
+        const iframe = document.querySelector('.main-iframe');
+        if (iframe) {
+          if (window.innerWidth <= 768) {
+            // On mobile, set a fixed height that fits within viewport
+            const viewportHeight = window.innerHeight;
+            const headerHeight = document.querySelector('.header')?.offsetHeight || 0;
+            const footerHeight = document.querySelector('.footer-box')?.offsetHeight || 0;
+            
+            // Calculate available space (subtract header, footer, powered-by, and some padding)
+            const poweredByHeight = document.querySelector('.powder-by')?.offsetHeight || 0;
+            const availableHeight = viewportHeight - headerHeight - footerHeight - poweredByHeight - 44;
+            
+            // Set iframe height to available space, but not more than 600px
+            iframe.style.height = Math.min(availableHeight, 600) + 'px';
+          } else {
+            // On desktop, use flex for full height
+            iframe.style.height = '';
+          }
+        }
+      }
+
+      // Get URL parameters first
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlUsername = urlParams.get('username');
+      
+      if (urlUsername) {
+        // If username is in URL, use it and save to local storage
+        const userInfo = {
+          username: urlUsername,
+          name: `Khách #${urlUsername}`
+        };
+        updateIframeSrc(urlUsername);
+      } else {
+        // Check if username exists in local storage
+        const storedUserInfo = localStorage.getItem('bookingUserInfo');
+        
+        if (storedUserInfo) {
+          // If username exists in local storage, use it
+          const userInfo = JSON.parse(storedUserInfo);
+          updateIframeSrc(userInfo.username);
+        } else {
+          // Generate new random username
+          const randomUsername = generateRandomString();
+          const userInfo = {
+            username: randomUsername,
+            name: `Khách #${randomUsername}`
+          };
+          
+          // Save to local storage
+          localStorage.setItem('bookingUserInfo', JSON.stringify(userInfo));
+          
+          // Update iframe src
+          updateIframeSrc(randomUsername);
+        }
+      }
+      
+      // Toggle footer button row
+      const closeBtn = document.querySelector('.footer-btn-close');
+      const footerBtnRow = document.querySelector('.footer-btn-row');
+      
+      if (closeBtn && footerBtnRow) {
+        closeBtn.addEventListener('click', function() {
+          footerBtnRow.classList.toggle('hidden');
+          closeBtn.classList.toggle('active');
+          
+          // Re-adjust iframe height when footer changes size
+          setTimeout(adjustIframeHeight, 300);
+        });
+      }
+      
+      // Adjust height on load and window resize
+      adjustIframeHeight();
+      window.addEventListener('resize', adjustIframeHeight);
+      
+      // Adjust height when iframe content loads
+      const iframe = document.querySelector('.main-iframe');
+      if (iframe) {
+        iframe.addEventListener('load', adjustIframeHeight);
+      }
+    });
+  </script>
+</body>
+
+<!-- Mirrored from bot.bizfly.vn/store_consulting.html?utm_source=Website&utm_medium=Trangchu&utm_campaign=trangdemo-bizchatai by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 23 Jan 2026 14:52:51 GMT -->
+</html> 
