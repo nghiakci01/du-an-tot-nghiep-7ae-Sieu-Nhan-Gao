@@ -30,5 +30,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     
     Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
     Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
+    Route::resource('users', App\Http\Controllers\Admin\UserController::class);
 
 });

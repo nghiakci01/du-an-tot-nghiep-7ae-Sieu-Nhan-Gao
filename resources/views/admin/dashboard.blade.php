@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
 @section('content')
-        <!-- <div class="row"> -->
-          <div class="col-12">
+<div class="row">
+  <div class="col-12">
             <div class="card welcome-banner bg-blue-800">
               <div class="card-body">
                 <div class="row">
@@ -909,7 +909,7 @@
               </div>
             </div>
           </div>
-        <!-- </div> -->
+</div>
 @endsection
 
 @section('scripts')
