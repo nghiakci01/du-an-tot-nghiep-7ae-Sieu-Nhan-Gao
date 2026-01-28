@@ -45,7 +45,7 @@ class CategoryController extends Controller
 
         Category::create($data);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category created successfully.');
+        return redirect()->route('admin.categories.index')->with('success', 'Danh mục đã được tạo thành công.');
     }
 
     /**
@@ -76,7 +76,7 @@ class CategoryController extends Controller
 
         $category->update($data);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');
+        return redirect()->route('admin.categories.index')->with('success', 'Danh mục đã được cập nhật thành công.');
     }
 
     /**
@@ -85,11 +85,11 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         if ($category->children()->count() > 0) {
-            return redirect()->route('admin.categories.index')->with('error', 'Cannot delete category with sub-categories.');
+            return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục có danh mục con.');
         }
         
         if ($category->products()->count() > 0) {
-             return redirect()->route('admin.categories.index')->with('error', 'Cannot delete category with products.');
+             return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục có chứa sản phẩm.');
         }
 
         if ($category->image) {
@@ -98,6 +98,6 @@ class CategoryController extends Controller
 
         $category->delete();
 
-        return redirect()->route('categories.index')->with('success', 'Category deleted successfully.');
+        return redirect()->route('admin.categories.index')->with('success', 'Danh mục đã được xóa thành công.');
     }
 }

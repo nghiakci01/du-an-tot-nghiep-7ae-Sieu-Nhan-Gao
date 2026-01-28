@@ -45,7 +45,7 @@
       id="main-style-link"
     />
     <script src="{{ asset('admin-assets') }}/js/tech-stack.js"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+    {{-- <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
@@ -71,7 +71,7 @@
     <script
       defer="defer"
       src="https://phpstack-207002-5085356.cloudwaysapps.com/pixel/"
-    ></script>
+    ></script> --}}
     <link rel="stylesheet" href="{{ asset('admin-assets') }}/css/style-preset.css" /></head
   ><!-- [Head] end --><!-- [Body] Start -->
   <body
@@ -634,7 +634,7 @@
               </ul>
             </li>
             <li class="pc-item pc-caption">
-              <label data-feather="Forms">Forms</label>
+              <label data-feather="file-text">Forms</label>
               <svg class="pc-icon">
                 <use xlink:href="#custom-element-plus"></use>
               </svg>
@@ -2983,25 +2983,25 @@
       </div>
     </div>
     <!-- [Page Specific JS] start -->
-    <script
+    {{-- <script
       data-cfasync="false"
       src="../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"
-    ></script>
+    ></script> --}}
     <!-- [Page Specific JS] end --><!-- Required Js -->
     <script src="{{ asset('admin-assets') }}/js/plugins/popper.min.js"></script>
     <script src="{{ asset('admin-assets') }}/js/plugins/simplebar.min.js"></script>
     <script src="{{ asset('admin-assets') }}/js/plugins/bootstrap.min.js"></script>
-    <script src="{{ asset('admin-assets') }}/js/plugins/i18next.min.js"></script>
-    <script src="{{ asset('admin-assets') }}/js/plugins/i18nextHttpBackend.min.js"></script>
+    {{-- <script src="{{ asset('admin-assets') }}/js/plugins/i18next.min.js"></script>
+    <script src="{{ asset('admin-assets') }}/js/plugins/i18nextHttpBackend.min.js"></script> --}}
     <script src="{{ asset('admin-assets') }}/js/icon/custom-font.js"></script>
     <script src="{{ asset('admin-assets') }}/js/script.js"></script>
     <script src="{{ asset('admin-assets') }}/js/theme.js"></script>
-    <script src="{{ asset('admin-assets') }}/js/multi-lang.js"></script>
+    {{-- <script src="{{ asset('admin-assets') }}/js/multi-lang.js"></script> --}}
     <script src="{{ asset('admin-assets') }}/js/plugins/feather.min.js"></script>
-    <script
+    {{-- <script
       defer="defer"
       src="https://fomo.codedthemes.com/pixel/CDkpF1sQ8Tt5wpMZgqRvKpQiUhpWE3bc"
-    ></script>
+    ></script> --}}
 
     <script>
       layout_change("light");
@@ -3021,13 +3021,13 @@
     <script>
       main_layout_change("vertical");
     </script>
-    <script
+    {{-- <script
       defer
       src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
       integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
       data-cf-beacon='{"version":"2024.11.0","token":"db59679aec724f808b8e535e8076f80c","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
       crossorigin="anonymous"
-    ></script>
+    ></script> --}}
     @yield('scripts')
   </body>
   <!-- [Body] end -->
