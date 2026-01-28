@@ -165,12 +165,21 @@
                 <use xlink:href="#custom-presentation-chart"></use>
               </svg>
             </li>
+            @if(auth()->user()->isAdmin())
             <li class="pc-item">
               <a href="{{ route('admin.categories.index') }}" class="pc-link">
                 <span class="pc-micon">
                   <i class="ti ti-list"></i>
                 </span>
                 <span class="pc-mtext">Danh mục</span>
+              </a>
+            </li>
+            <li class="pc-item">
+              <a href="{{ route('admin.orders.index') }}" class="pc-link">
+                <span class="pc-micon">
+                  <i class="ti ti-shopping-cart"></i>
+                </span>
+                <span class="pc-mtext">Đơn hàng</span>
               </a>
             </li>
             <li class="pc-item">
@@ -181,6 +190,16 @@
                 <span class="pc-mtext">Sản phẩm</span>
               </a>
             </li>
+            @endif
+            <li class="pc-item">
+              <a href="{{ route('admin.stock.index') }}" class="pc-link">
+                <span class="pc-micon">
+                  <i class="ti ti-archive"></i>
+                </span>
+                <span class="pc-mtext">Quản lý Kho</span>
+              </a>
+            </li>
+            @if(auth()->user()->isAdmin())
             <li class="pc-item">
               <a href="{{ route('admin.users.index') }}" class="pc-link">
                 <span class="pc-micon">
@@ -189,6 +208,7 @@
                 <span class="pc-mtext">Người dùng</span>
               </a>
             </li>
+            @endif
             <li class="pc-item pc-caption">
               <label data-i18n="Widget">Widget</label>
               <svg class="pc-icon">
