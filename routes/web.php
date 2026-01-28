@@ -18,6 +18,10 @@ Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::clas
 Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
 Auth::routes();
 
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])->name('account.index');
+});
+
 // Admin Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', function () {

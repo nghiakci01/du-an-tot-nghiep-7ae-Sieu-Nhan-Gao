@@ -93,28 +93,98 @@
                         <div class="col-lg-10 col-md-10">
                             <div class="middel_right_info">
                                 <div class="search_bar">
-                                    <form action="{{ route('shop') }}" method="GET" style="border: 1px solid #ddd; border-radius: 50px;">
+                                    <form action="{{ route('shop') }}" method="GET">
                                         <input placeholder="Search entire store here..." type="text" name="search">
                                         <button type="submit"><i class="ion-ios-search-strong"></i></button>
                                     </form>
                                 </div>
                                 <div class="top_right text-right">
                                     <ul>
-                                       @guest
-                                           <li class="top_links"><a href="{{ route('login') }}"><i class="ion-android-person"></i> Đăng nhập / Đăng ký</a></li>
-                                       @else
-                                           <li class="top_links"><a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
-                                                <ul class="dropdown_links">
-                                                    <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a></li>
+                                      <li class="language"><a href="#"><img src="{{ asset('frontend-assets/img/logo/en-gb.png') }}" alt=""> en-gb <i class="ion-chevron-down"></i></a>
+                                            <ul class="dropdown_language">
+                                                <li><a href="#"><img src="{{ asset('frontend-assets/img/logo/cigar.jpg') }}" alt=""> French</a></li>
+                                                <li><a href="#"><img src="{{ asset('frontend-assets/img/logo/language2.png') }}" alt="">German</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="currency"><a href="#">USD <i class="ion-chevron-down"></i></a>
+                                            <ul class="dropdown_currency">
+                                                <li><a href="#">EUR</a></li>
+                                                <li><a href="#">BRL</a></li>
+                                            </ul>
+                                        </li>
+                                       <li class="top_links"><a href="#"><i class="ion-android-person"></i> My Account <i class="ion-chevron-down"></i></a>
+                                            <ul class="dropdown_links">
+                                                <li><a href="#">My Wish List </a></li>
+                                                <li><a href="{{ route('account.index') }}">My Account </a></li>
+                                                @auth
+                                                    @if(Auth::user()->isAdmin())
+                                                        <li><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                                    @endif
+                                                    <li><a href="#">Compare Products</a></li>
+                                                    <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sign Out</a></li>
                                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-                                                </ul>
-                                            </li> 
-                                       @endguest
+                                                @else
+                                                    <li><a href="{{ route('login') }}">Sign In</a></li>
+                                                    <li><a href="#">Compare Products</a></li>
+                                                @endauth
+                                            </ul>
+                                        </li> 
+                                        
                                     </ul>
                                 </div>   
 
                                 <div class="cart_link">
                                     <a href="{{ route('cart.index') }}"><i class="fa fa-shopping-basket"></i>{{ count((array) session('cart')) }} item(s)</a>
+                                    <!--mini cart-->
+                                     <div class="mini_cart">
+                                        @if(session('cart'))
+                                            @php $total = 0; @endphp
+                                            @foreach(session('cart') as $id => $details)
+                                                @php $total += $details['price'] * $details['quantity']; @endphp
+                                                <div class="cart_item top">
+                                                   <div class="cart_img">
+                                                       <a href="#"><img src="{{ $details['image'] ?? asset('frontend-assets/img/s-product/product.jpg') }}" alt=""></a>
+                                                   </div>
+                                                    <div class="cart_info">
+                                                        <a href="#">{{ $details['name'] }}</a>
+            
+                                                        <span>{{ $details['quantity'] }}x ${{ $details['price'] }}</span>
+                
+                                                    </div>
+                                                    <div class="cart_remove">
+                                                        <a href="#"><i class="ion-android-close"></i></a>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                            <div class="cart__table">
+                                                <table>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="text-left">Sub-Total :</td>
+                                                            <td class="text-right">${{ $total }}</td>
+                                                        </tr>
+                                                     
+                                                        <tr>
+                                                            <td class="text-left">Total :</td>
+                                                            <td class="text-right">${{ $total }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @else
+                                            <div class="cart_item">
+                                                <p>Your cart is empty.</p>
+                                            </div>
+                                        @endif
+                                    
+                                    <div class="cart_button view_cart">
+                                        <a href="{{ route('cart.index') }}">View Cart</a>
+                                    </div>
+                                    <div class="cart_button checkout">
+                                        <a href="{{ route('checkout.index') }}">Checkout</a>
+                                    </div>
+                                    </div>
+                                    <!--mini cart end-->
                                 </div>
                             </div>
                         </div>  
@@ -154,7 +224,7 @@
                                                 <li><a href="portfolio-details.html">portfolio details</a></li>
                                                 <li><a href="{{ route('cart.index') }}">cart</a></li>
                                                 <li><a href="checkout.html">Checkout</a></li>
-                                                <li><a href="my-account.html">my account</a></li>
+                                                <li><a href="{{ route('account.index') }}">my account</a></li>
                                             </ul>
                                         </li>
                                         <li><a href="#">Product Types</a>
@@ -191,7 +261,8 @@
                                         <li><a href="services.html">services</a></li>
                                         <li><a href="faq.html">Frequently Questions</a></li>
                                         <li><a href="{{ route('login') }}">login</a></li>
-                                        <li><a href="my-account.html">my account</a></li>
+                                        <li><a href="{{ route('register') }}">register</a></li>
+                                        <li><a href="{{ route('account.index') }}">my account</a></li>
                                         <li><a href="wishlist.html">Wishlist</a></li>
                                         <li><a href="404.html">Error 404</a></li>
                                         <li><a href="compare.html">compare</a></li>
