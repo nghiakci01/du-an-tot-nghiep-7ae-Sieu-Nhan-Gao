@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
-class AdminMiddleware
+class AdminOnlyMiddleware
 {
     /**
      * Handle an incoming request.
@@ -16,10 +16,10 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->isStaff())) {
+        if (Auth::check() && Auth::user()->isAdmin()) {
             return $next($request);
         }
 
-        return redirect('/')->with('error', 'Bạn không có quyền truy cập trang quản trị.');
+        return abort(403, 'Hành động này chỉ dành cho Quản trị viên tối cao.');
     }
 }

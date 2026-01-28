@@ -22,7 +22,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])->name('account.index');
 });
 
-// Admin Routes
+// Admin & Staff Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
@@ -30,6 +30,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     
     Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
     Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
-    Route::resource('users', App\Http\Controllers\Admin\UserController::class);
-
+    Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
+    
+    // Stock Management
+    Route::get('stock', [App\Http\Controllers\Admin\StockController::class, 'index'])->name('stock.index');
+    Route::post('stock/update', [App\Http\Controllers\Admin\StockController::class, 'update'])->name('stock.update');
+    
+    // Admin Only Routes
+    Route::middleware(['admin.only'])->group(function () {
+        Route::resource('users', App\Http\Controllers\Admin\UserController::class);
+    });
 });
