@@ -103,8 +103,14 @@
                                        @guest
                                            <li class="top_links"><a href="{{ route('login') }}"><i class="ion-android-person"></i> Đăng nhập / Đăng ký</a></li>
                                        @else
-                                           <li class="top_links"><a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
+                                           <li class="top_links">
+                                               <a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
                                                 <ul class="dropdown_links">
+                                                    @if(Auth::user()->isAdmin())
+                                                        <li><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                                    @else
+                                                        <li><a href="{{ route('account.index') }}">My Account</a></li>
+                                                    @endif
                                                     <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a></li>
                                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                                                 </ul>
@@ -154,7 +160,7 @@
                                                 <li><a href="portfolio-details.html">portfolio details</a></li>
                                                 <li><a href="{{ route('cart.index') }}">cart</a></li>
                                                 <li><a href="checkout.html">Checkout</a></li>
-                                                <li><a href="my-account.html">my account</a></li>
+                                                <li><a href="{{ route('account.index') }}">my account</a></li>
                                             </ul>
                                         </li>
                                         <li><a href="#">Product Types</a>
@@ -191,7 +197,8 @@
                                         <li><a href="services.html">services</a></li>
                                         <li><a href="faq.html">Frequently Questions</a></li>
                                         <li><a href="{{ route('login') }}">login</a></li>
-                                        <li><a href="my-account.html">my account</a></li>
+                                        <li><a href="{{ route('register') }}">register</a></li>
+                                        <li><a href="{{ route('account.index') }}">my account</a></li>
                                         <li><a href="wishlist.html">Wishlist</a></li>
                                         <li><a href="404.html">Error 404</a></li>
                                         <li><a href="compare.html">compare</a></li>
