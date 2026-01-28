@@ -28,16 +28,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         return view('admin.dashboard');
     })->name('dashboard');
     
-    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
-    Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
-    Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
-    
-    // Stock Management
-    Route::get('stock', [App\Http\Controllers\Admin\StockController::class, 'index'])->name('stock.index');
-    Route::post('stock/update', [App\Http\Controllers\Admin\StockController::class, 'update'])->name('stock.update');
-    
     // Admin Only Routes
     Route::middleware(['admin.only'])->group(function () {
+        Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+        Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
+        Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
     });
+    
+    // Admin & Staff Routes (Stock only)
+    Route::get('stock', [App\Http\Controllers\Admin\StockController::class, 'index'])->name('stock.index');
+    Route::post('stock/update', [App\Http\Controllers\Admin\StockController::class, 'update'])->name('stock.update');
 });

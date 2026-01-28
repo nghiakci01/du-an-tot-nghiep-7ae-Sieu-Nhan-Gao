@@ -33,7 +33,9 @@
                                 <th>Sản phẩm</th>
                                 <th>Phân loại / SKU</th>
                                 <th width="200">Số lượng tồn</th>
+                                @if(auth()->user()->isAdmin())
                                 <th>Cập nhật</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -58,11 +60,14 @@
                                         <td>
                                             <input type="number" class="form-control form-control-sm stock-input" 
                                                    data-id="{{ $variant->id }}" 
-                                                   value="{{ $variant->stock_quantity }}" min="0">
+                                                   value="{{ $variant->stock_quantity }}" min="0" 
+                                                   {{ auth()->user()->isStaff() ? 'readonly' : '' }}>
                                         </td>
+                                        @if(auth()->user()->isAdmin())
                                         <td>
                                             <button class="btn btn-primary btn-sm update-stock-btn" data-id="{{ $variant->id }}">Lưu</button>
                                         </td>
+                                        @endif
                                     </tr>
                                     @endforeach
                                 @else

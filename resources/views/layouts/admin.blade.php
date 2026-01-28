@@ -165,6 +165,7 @@
                 <use xlink:href="#custom-presentation-chart"></use>
               </svg>
             </li>
+            @if(auth()->user()->isAdmin())
             <li class="pc-item">
               <a href="{{ route('admin.categories.index') }}" class="pc-link">
                 <span class="pc-micon">
@@ -189,6 +190,7 @@
                 <span class="pc-mtext">Sản phẩm</span>
               </a>
             </li>
+            @endif
             <li class="pc-item">
               <a href="{{ route('admin.stock.index') }}" class="pc-link">
                 <span class="pc-micon">
