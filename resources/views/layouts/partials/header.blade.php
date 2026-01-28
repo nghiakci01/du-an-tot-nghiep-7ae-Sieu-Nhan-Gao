@@ -101,7 +101,7 @@
                                 <div class="top_right text-right">
                                     <ul>
                                        @guest
-                                           <li class="top_links"><a href="{{ route('login') }}"><i class="ion-android-person"></i> Đăng nhập / Đăng ký</a></li>
+                                           <li><a href="{{ route('login') }}"><i class="ion-android-person"></i> Đăng nhập / Đăng ký</a></li>
                                        @else
                                            <li class="top_links">
                                                <a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
