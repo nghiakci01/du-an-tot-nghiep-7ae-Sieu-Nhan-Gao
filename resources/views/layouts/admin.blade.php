@@ -181,6 +181,14 @@
                 <span class="pc-mtext">Sản phẩm</span>
               </a>
             </li>
+            <li class="pc-item">
+              <a href="{{ route('admin.users.index') }}" class="pc-link">
+                <span class="pc-micon">
+                  <i class="ti ti-users"></i>
+                </span>
+                <span class="pc-mtext">Người dùng</span>
+              </a>
+            </li>
             <li class="pc-item pc-caption">
               <label data-i18n="Widget">Widget</label>
               <svg class="pc-icon">
