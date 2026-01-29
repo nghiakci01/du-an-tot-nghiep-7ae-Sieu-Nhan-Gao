@@ -32,3 +32,31 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
 
 });
+
+// Test Route for Gemini Chatbot
+Route::get('/test-gemini', function () {
+    $chatService = app(\App\Services\ChatService::class);
+    
+    $tests = [
+        'Xin chào, bạn có thể giúp gì cho tôi?' => 'Simple Greeting',
+        'Có sản phẩm laptop không?' => 'Product Query (RAG)',
+        'Cho tôi xem sản phẩm iPhone' => 'Specific Product Search',
+    ];
+    
+    $results = [];
+    foreach ($tests as $question => $testName) {
+        $response = $chatService->generateResponse($question);
+        $results[] = [
+            'test' => $testName,
+            'question' => $question,
+            'response' => $response
+        ];
+    }
+    
+    return view('test-gemini', compact('results'));
+});
+
+// Quick Test Route
+Route::get('/quick-test', function () {
+    return view('quick-test');
+});

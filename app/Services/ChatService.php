@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Log;
 class ChatService
 {
     protected $apiKey;
-    protected $baseUrl = 'https://api.openai.com/v1/chat/completions';
+    protected $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 
     public function __construct()
     {
-        $this->apiKey = config('services.openai.key');
+        $this->apiKey = config('services.gemini.key');
     }
 
     /**
@@ -52,12 +52,12 @@ class ChatService
     }
 
     /**
-     * Gửi câu hỏi + context lên OpenAI
+     * Gửi câu hỏi + context lên Gemini AI
      */
     public function generateResponse(string $userMessage): string
     {
         if (!$this->apiKey) {
-            return "Lỗi: Chưa cấu hình OpenAI API Key.";
+            return "Lỗi: Chưa cấu hình Gemini API Key.";
         }
 
         // 1. Lấy context
@@ -71,22 +71,52 @@ class ChatService
             "Nếu trong Context không có, hãy nói khéo là bạn không tìm thấy thông tin và đề nghị khách liên hệ hotline." .
             "\n\nCONTEXT:\n" . ($context ?: "Không tìm thấy sản phẩm cụ thể liên quan.");
 
+        // 3. Kết hợp system prompt và user message
+        $fullPrompt = $systemPrompt . "\n\nCâu hỏi của khách hàng: " . $userMessage;
+
         try {
-            $response = Http::withToken($this->apiKey)
-                ->timeout(30)
-                ->post($this->baseUrl, [
-                    'model' => 'gpt-3.5-turbo', // Hoặc gpt-4o-mini
-                    'messages' => [
-                        ['role' => 'system', 'content' => $systemPrompt],
-                        ['role' => 'user', 'content' => $userMessage],
+            // Gemini API request format
+            $response = Http::timeout(30)
+                ->post($this->baseUrl . '?key=' . $this->apiKey, [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                [
+                                    'text' => $fullPrompt
+                                ]
+                            ]
+                        ]
                     ],
-                    'temperature' => 0.7,
+                    'generationConfig' => [
+                        'temperature' => 0.7,
+                        'maxOutputTokens' => 1000,
+                    ]
                 ]);
 
             if ($response->successful()) {
-                return $response->json('choices.0.message.content') ?? 'Xin lỗi, tôi không thể trả lời ngay lúc này.';
+                $data = $response->json();
+                
+                // Parse Gemini response
+                if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+                    return $data['candidates'][0]['content']['parts'][0]['text'];
+                }
+                
+                return 'Xin lỗi, tôi không thể trả lời ngay lúc này.';
             } else {
-                Log::error("OpenAI API Error: " . $response->body());
+                $errorBody = $response->json();
+                Log::error("Gemini API Error: " . $response->body());
+                
+                // Check for specific error codes
+                $statusCode = $response->status();
+                
+                if ($statusCode === 403) {
+                    return "Xin lỗi, hệ thống AI chatbot tạm thời không khả dụng do vấn đề API key. Vui lòng liên hệ quản trị viên.";
+                }
+                
+                if ($statusCode === 429) {
+                    return "Xin lỗi, hệ thống đang quá tải. Vui lòng thử lại sau ít phút.";
+                }
+                
                 return "Hệ thống đang bận, vui lòng thử lại sau.";
             }
         } catch (\Exception $e) {
