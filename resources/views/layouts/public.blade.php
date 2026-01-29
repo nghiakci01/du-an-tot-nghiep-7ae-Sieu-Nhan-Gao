@@ -45,6 +45,9 @@
 
 
 
+
+@include('partials.chatbot-widget')
+
 </body>
 
 
