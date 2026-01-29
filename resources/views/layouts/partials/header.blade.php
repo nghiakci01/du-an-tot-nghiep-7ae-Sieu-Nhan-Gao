@@ -24,6 +24,9 @@
                     @else
                     <li class="top_links"><a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
                         <ul class="dropdown_links">
+                            @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
+                                <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? 'Dashboard' : 'Staff' }}</a></li>
+                            @endif
                             <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a></li>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                         </ul>
@@ -117,8 +120,8 @@
                                                 <li><a href="#">My Wish List </a></li>
                                                 <li><a href="{{ route('account.index') }}">My Account </a></li>
                                                 @auth
-                                                    @if(Auth::user()->isAdmin())
-                                                        <li><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                                    @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
+                                                        <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? 'Dashboard' : 'Staff' }}</a></li>
                                                     @endif
                                                     <li><a href="#">Compare Products</a></li>
                                                     <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sign Out</a></li>
