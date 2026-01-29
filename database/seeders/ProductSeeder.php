@@ -37,7 +37,14 @@ class ProductSeeder extends Seeder
                 'description' => 'Váy hoa nhẹ nhàng cho mùa hè.',
                 'price' => 350000,
                 'is_active' => true,
+                'image' => 'products/IwtktEFiLgAbezYA4i8TUFhc3jy7v0i4jmlnuX0S.png',
             ],
+        ];
+
+        // Update existing products in array just for consistency (or handled in merge below)
+        foreach ($products as &$p) {
+            $p['image'] = 'products/IwtktEFiLgAbezYA4i8TUFhc3jy7v0i4jmlnuX0S.png';
+        }
         ];
 
         foreach ($products as $product) {
@@ -63,6 +70,24 @@ class ProductSeeder extends Seeder
             DB::table('product_variants')->insert(array_map(function ($variant) {
                 return array_merge($variant, ['created_at' => now(), 'updated_at' => now()]);
             }, $variants));
+
+            // Add Product Images
+            DB::table('product_images')->insert([
+                [
+                    'product_id' => $productId,
+                    'image_path' => 'products/IwtktEFiLgAbezYA4i8TUFhc3jy7v0i4jmlnuX0S.png',
+                    'is_primary' => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'product_id' => $productId,
+                    'image_path' => 'products/a5cWz47edUEV9oIEl6LCyM48xpA7jbvKbzquliLg.png',
+                    'is_primary' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            ]);
         }
     }
 }
