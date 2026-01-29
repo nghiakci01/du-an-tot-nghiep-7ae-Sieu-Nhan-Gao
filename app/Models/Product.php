@@ -15,6 +15,7 @@ class Product extends Model
         'category_id',
         'name',
         'slug',
+        'short_description',
         'description',
         'price',
         'is_active',
@@ -34,5 +35,15 @@ class Product extends Model
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class);
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 }
