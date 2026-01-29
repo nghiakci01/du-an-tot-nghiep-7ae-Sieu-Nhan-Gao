@@ -84,4 +84,20 @@ class CartController extends Controller
             session()->flash('success', 'Sản phẩm đã được xóa khỏi giỏ hàng');
         }
     }
+
+    public function clearCart()
+    {
+        session()->forget('cart');
+        return redirect()->route('cart.index')->with('success', 'Giỏ hàng đã được xóa');
+    }
+
+    public function getCartCount()
+    {
+        $cart = session()->get('cart', []);
+        $count = 0;
+        foreach($cart as $item) {
+            $count += $item['quantity'];
+        }
+        return response()->json(['count' => $count]);
+    }
 }
