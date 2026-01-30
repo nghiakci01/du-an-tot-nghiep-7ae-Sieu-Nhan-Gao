@@ -66,11 +66,18 @@
                         @enderror
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="description" class="form-label">Mô tả</label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3">{{ old('description') }}</textarea>
-                         @error('description')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <label for="description" class="form-label">Mô tả <small class="text-muted">(Tối đa 5000 ký tự)</small></label>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="5000">{{ old('description') }}</textarea>
+                        <div class="d-flex justify-content-between mt-1">
+                            <div>
+                                @error('description')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <small class="text-muted">
+                                <span id="char-count">0</span> / 5000 ký tự
+                            </small>
+                        </div>
                     </div>
                     <div class="col-md-12 mb-3">
                         <div class="form-check form-switch">
@@ -212,6 +219,20 @@
                 }
             }
         });
+
+        // Character counter for description
+        const descTextarea = document.getElementById('description');
+        const charCount = document.getElementById('char-count');
+        
+        if (descTextarea && charCount) {
+            // Update on load
+            charCount.textContent = descTextarea.value.length;
+            
+            // Update on input
+            descTextarea.addEventListener('input', function() {
+                charCount.textContent = this.value.length;
+            });
+        }
     });
 </script>
 @endsection
