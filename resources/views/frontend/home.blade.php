@@ -88,34 +88,6 @@
 </div>
 <!--slider area end-->
 
-<!--new products section start-->
-<section class="product_section womens_product product_section_six" style="padding-top: 60px;">
-    <div class="container-fluid">
-        <div class="row">   
-            <div class="col-12">
-               <div class="section_title">
-                   <h2>Sản phẩm mới</h2>
-                   <p>Những sản phẩm mới nhất vừa được cập nhật</p>
-               </div>
-            </div> 
-        </div>    
-        <div class="product_area"> 
-            <div class="product_container">
-                <div class="product_column5" style="margin-left: -15px; margin-right: -15px;">
-                    @forelse($newProducts as $product)
-                        @include('frontend.partials.product-card', ['product' => $product])
-                    @empty
-                        <div class="col-12 text-center">
-                            <p>Chưa có sản phẩm mới nào</p>
-                        </div>
-                    @endforelse
-                </div> 
-            </div>
-        </div>
-    </div>
-</section>
-<!--new products section end-->
-
 
 <!--product section area start-->
 <section class="product_section womens_product product_section_six">
@@ -159,6 +131,34 @@
        </div>  
     </div>
 
+    <!--new products section start-->
+<section class="product_section womens_product product_section_six" style="padding-top: 60px;">
+    <div class="container-fluid">
+        <div class="row">   
+            <div class="col-12">
+               <div class="section_title">
+                   <h2>Sản phẩm mới</h2>
+                   <p>Những sản phẩm mới nhất vừa được cập nhật</p>
+               </div>
+            </div> 
+        </div>    
+        <div class="product_area"> 
+            <div class="product_container">
+                <div class="product_column5" style="margin-left: -15px; margin-right: -15px;">
+                    @forelse($newProducts as $product)
+                        @include('frontend.partials.product-card', ['product' => $product])
+                    @empty
+                        <div class="col-12 text-center">
+                            <p>Chưa có sản phẩm mới nào</p>
+                        </div>
+                    @endforelse
+                </div> 
+            </div>
+        </div>
+    </div>
+</section>
+<!--new products section end-->
+
 <!--Instagram area start--> 
 <section class="instagram_area instagram_six">
     <div class="container-fluid">
@@ -166,7 +166,7 @@
            <div class="col-12">
                <div class="section_title">
                    <h2>Follow us On Instagram</h2>
-                   <p>Contemporary, minimal and modern designs embody the Lavish Alice handwriting</p>
+                   <p>Theo dõi chúng tôi để cập nhật xu hướng thời trang mới nhất</p>
                </div>
            </div>
        </div>
@@ -221,12 +221,12 @@
                            </div>
                        </div>
                    </div>
-               </div>
+                </div>
                 <div class="col-12">
                    <div class="text_follow">
                        <a href="#">#Follow us on Instagram</a>
                    </div>
-               </div>
+                </div>
             </div>
        </div>
     </div>
