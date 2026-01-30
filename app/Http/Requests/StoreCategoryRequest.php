@@ -22,9 +22,27 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:categories,name',
-            'parent_id' => 'nullable|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'name' => 'required|string|max:50|unique:categories,name',
+            'parent_id' => [
+                'nullable',
+                'exists:categories,id',
+                function ($attribute, $value, $fail) {
+                    if ($value) {
+                        $parent = \App\Models\Category::find($value);
+                        // Kiểm tra parent đã có parent chưa (tức là đang ở cấp 2)
+                        if ($parent && $parent->parent_id !== null) {
+                            $fail('Không thể tạo danh mục cấp 3. Chỉ cho phép 2 cấp danh mục.');
+                        }
+                    }
+                },
+            ],
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048', // 2MB
+                'dimensions:min_width=400,min_height=400,max_width=1200,max_height=1200',
+            ],
         ];
     }
 
@@ -38,12 +56,13 @@ class StoreCategoryRequest extends FormRequest
         return [
             'name.required' => 'Tên danh mục không được để trống.',
             'name.string' => 'Tên danh mục phải là chuỗi ký tự.',
-            'name.max' => 'Tên danh mục không được vượt quá 255 ký tự.',
+            'name.max' => 'Tên danh mục không được vượt quá 50 ký tự.',
             'name.unique' => 'Tên danh mục này đã tồn tại.',
             'parent_id.exists' => 'Danh mục cha không hợp lệ.',
             'image.image' => 'Tệp tải lên phải là hình ảnh.',
-            'image.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif, svg.',
-            'image.max' => 'Kích thước hình ảnh không được vượt quá 2MB.',
+            'image.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, webp.',
+            'image.max' => 'Kích thước file không được vượt quá 2MB.',
+            'image.dimensions' => 'Kích thước ảnh phải từ 400x400px đến 1200x1200px.',
         ];
     }
 }

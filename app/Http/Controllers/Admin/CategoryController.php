@@ -65,6 +65,14 @@ class CategoryController extends Controller
         $data = $request->validated();
         $data['slug'] = Str::slug($data['name']);
 
+        // Kiểm tra nếu danh mục đang có children và muốn đổi thành child
+        if ($request->filled('parent_id') && $category->children()->count() > 0) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Không thể chuyển danh mục có danh mục con thành danh mục con.');
+        }
+
         if ($request->hasFile('image')) {
             // Delete old image
             if ($category->image) {
