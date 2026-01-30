@@ -66,15 +66,45 @@
                                 <img src="{{ asset('storage/' . $product->image) }}" alt="Current Image" width="100">
                             </div>
                         @endif
-                        <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image">
-                        <small class="text-muted">Để trống nếu không thay đổi.</small>
+                        <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp">
+                        <small class="text-muted d-block">Để trống nếu không thay đổi.</small>
+                        <small class="text-muted">Tối thiểu 400x400px, tối đa 10MB</small>
                         @error('image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="description" class="form-label">Mô tả <small class="text-muted">(Tối đa 5000 ký tự)</small></label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="5000">{{ old('description', $product->description) }}</textarea>
+                        <label for="gallery_images" class="form-label">Ảnh Gallery (Tối đa 6 ảnh)</label>
+                        
+                        @if($product->images->count() > 0)
+                            <div class="mb-3">
+                                <label class="d-block">Ảnh hiện tại:</label>
+                                <div class="d-flex gap-2 flex-wrap" id="existing-gallery">
+                                    @foreach($product->images as $img)
+                                        <div class="position-relative" data-image-id="{{ $img->id }}">
+                                            <img src="{{ asset('storage/' . $img->image_path) }}" width="100" class="border rounded">
+                                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 delete-gallery-img" 
+                                                    data-id="{{ $img->id }}" style="padding: 0 5px; font-size: 12px;">×</button>
+                                            <small class="d-block text-center">{{ $loop->iteration }}</small>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                        
+                        <input type="file" class="form-control @error('gallery_images.*') is-invalid @enderror" 
+                               id="gallery_images" name="gallery_images[]" multiple 
+                               accept="image/jpeg,image/png,image/jpg,image/gif,image/webp">
+                        <small class="text-muted d-block">Thêm ảnh mới (sẽ được thêm vào gallery hiện có)</small>
+                        <small class="text-muted">Tối thiểu 400x400px, tối đa 10MB/ảnh</small>
+                        @error('gallery_images.*')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div id="gallery-preview" class="mt-3 d-flex gap-2 flex-wrap"></div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="description" class="form-label">Mô tả <small class="text-muted">(Tối đa 500 ký tự)</small></label>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="500">{{ old('description', $product->description) }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('description')
@@ -82,7 +112,7 @@
                                 @enderror
                             </div>
                             <small class="text-muted">
-                                <span id="char-count">0</span> / 5000 ký tự
+                                <span id="char-count">0</span> / 500 ký tự
                             </small>
                         </div>
                     </div>
@@ -256,6 +286,71 @@
                 charCount.textContent = this.value.length;
             });
         }
+
+        // Gallery images preview
+        const galleryInput = document.getElementById('gallery_images');
+        const galleryPreview = document.getElementById('gallery-preview');
+        
+        if (galleryInput && galleryPreview) {
+            galleryInput.addEventListener('change', function(e) {
+                galleryPreview.innerHTML = '';
+                const files = Array.from(e.target.files);
+                const existingCount = document.querySelectorAll('#existing-gallery > div').length;
+                
+                if (existingCount + files.length > 6) {
+                    alert(`Tối đa 6 ảnh gallery. Hiện có ${existingCount} ảnh, chỉ có thể thêm ${6 - existingCount} ảnh nữa`);
+                    this.value = '';
+                    return;
+                }
+                
+                files.forEach((file, index) => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const div = document.createElement('div');
+                            div.className = 'position-relative';
+                            div.innerHTML = `
+                                <img src="${e.target.result}" width="100" class="border rounded">
+                                <small class="d-block text-center">Mới ${index + 1}</small>
+                            `;
+                            galleryPreview.appendChild(div);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+        }
+
+        // Delete gallery image
+        document.querySelectorAll('.delete-gallery-img').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (confirm('Xóa ảnh này khỏi gallery?')) {
+                    const imageId = this.dataset.id;
+                    const imageDiv = this.closest('[data-image-id]');
+                    
+                    // Send AJAX request to delete
+                    fetch(`/admin/products/gallery/${imageId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            imageDiv.remove();
+                        } else {
+                            alert('Lỗi khi xóa ảnh');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Lỗi khi xóa ảnh');
+                    });
+                }
+            });
+        });
     });
 </script>
 @endsection

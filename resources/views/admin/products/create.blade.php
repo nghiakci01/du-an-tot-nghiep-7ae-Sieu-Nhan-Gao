@@ -60,14 +60,26 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="image" class="form-label">Hình ảnh</label>
-                        <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image">
+                        <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp">
+                        <small class="text-muted">Tối thiểu 400x400px, tối đa 10MB</small>
                         @error('image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="description" class="form-label">Mô tả <small class="text-muted">(Tối đa 5000 ký tự)</small></label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="5000">{{ old('description') }}</textarea>
+                        <label for="gallery_images" class="form-label">Ảnh Gallery (Tối đa 6 ảnh)</label>
+                        <input type="file" class="form-control @error('gallery_images.*') is-invalid @enderror" 
+                               id="gallery_images" name="gallery_images[]" multiple 
+                               accept="image/jpeg,image/png,image/jpg,image/gif,image/webp">
+                        <small class="text-muted">Tối thiểu 400x400px, tối đa 10MB/ảnh</small>
+                        @error('gallery_images.*')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div id="gallery-preview" class="mt-3 d-flex gap-2 flex-wrap"></div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="description" class="form-label">Mô tả <small class="text-muted">(Tối đa 500 ký tự)</small></label>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="500">{{ old('description') }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('description')
@@ -75,7 +87,7 @@
                                 @enderror
                             </div>
                             <small class="text-muted">
-                                <span id="char-count">0</span> / 5000 ký tự
+                                <span id="char-count">0</span> / 500 ký tự
                             </small>
                         </div>
                     </div>
@@ -231,6 +243,39 @@
             // Update on input
             descTextarea.addEventListener('input', function() {
                 charCount.textContent = this.value.length;
+            });
+        }
+
+        // Gallery images preview
+        const galleryInput = document.getElementById('gallery_images');
+        const galleryPreview = document.getElementById('gallery-preview');
+        
+        if (galleryInput && galleryPreview) {
+            galleryInput.addEventListener('change', function(e) {
+                galleryPreview.innerHTML = '';
+                const files = Array.from(e.target.files);
+                
+                if (files.length > 6) {
+                    alert('Tối đa 6 ảnh gallery');
+                    this.value = '';
+                    return;
+                }
+                
+                files.forEach((file, index) => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const div = document.createElement('div');
+                            div.className = 'position-relative';
+                            div.innerHTML = `
+                                <img src="${e.target.result}" width="100" class="border rounded">
+                                <small class="d-block text-center">${index + 1}</small>
+                            `;
+                            galleryPreview.appendChild(div);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
             });
         }
     });
