@@ -29,7 +29,7 @@ class HomeController extends Controller
         $newProducts = Product::where('is_active', true)
                               ->with('category')
                               ->latest()
-                              ->take(8)
+                              ->take(12)
                               ->get();
 
         return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts'));

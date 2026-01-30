@@ -3,7 +3,7 @@
     if (!$product) return;
 @endphp
 
-<div class="col-lg-3">
+<div class="{{ $columnClass ?? 'col-lg-3' }}">
     <div class="single_product">
         <div class="product_thumb">
             <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
