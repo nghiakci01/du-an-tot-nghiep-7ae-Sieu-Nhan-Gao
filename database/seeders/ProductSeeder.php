@@ -32,7 +32,7 @@ class ProductSeeder extends Seeder
             ['name' => 'Túi Tote Canvas Trơn', 'category_id' => 5, 'price' => 150000],
             ['name' => 'Mũ Lưỡi Trai Snapback', 'category_id' => 5, 'price' => 180000],
             ['name' => 'Thắt Lưng Da Cao Cấp', 'category_id' => 5, 'price' => 350000],
-            ['name' => 'Kính Mát Aviator', 'category_id' => 5, 'price' => 250000],
+            ['name' => 'Kính Mát Aviator', 'category_id' => 5, 'price' => 250000]
         ];
 
         foreach ($products as $productData) {
