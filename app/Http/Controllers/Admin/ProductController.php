@@ -35,6 +35,7 @@ class ProductController extends Controller
             $data = $request->except('variants');
             $data['slug'] = Str::slug($data['name']) . '-' . uniqid(); // Ensure unique slug
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
+            $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
             if ($request->hasFile('image')) {
                 $path = $request->file('image')->store('products', 'public');
@@ -57,6 +58,17 @@ class ProductController extends Controller
                         'color' => $variantData['color'],
                         'stock_quantity' => $variantData['stock_quantity'],
                         'sku' => $sku,
+                    ]);
+                }
+            }
+
+            // Handle gallery images
+            if ($request->hasFile('gallery_images')) {
+                foreach ($request->file('gallery_images') as $index => $image) {
+                    $path = $image->store('products/gallery', 'public');
+                    $product->images()->create([
+                        'image_path' => $path,
+                        'sort_order' => $index
                     ]);
                 }
             }
@@ -85,6 +97,7 @@ class ProductController extends Controller
             $data = $request->except('variants');
             $data['slug'] = Str::slug($data['name']) . '-' . $product->id;
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
+            $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
             if ($request->hasFile('image')) {
                 if ($product->image) {
@@ -131,6 +144,22 @@ class ProductController extends Controller
                 }
             }
 
+            // Handle gallery images
+            if ($request->hasFile('gallery_images')) {
+                $currentCount = $product->images()->count();
+                $newCount = count($request->file('gallery_images'));
+                
+                if ($currentCount + $newCount <= 6) {
+                    foreach ($request->file('gallery_images') as $index => $image) {
+                        $path = $image->store('products/gallery', 'public');
+                        $product->images()->create([
+                            'image_path' => $path,
+                            'sort_order' => $currentCount + $index
+                        ]);
+                    }
+                }
+            }
+
             DB::commit();
             return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
 
@@ -157,6 +186,25 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('admin.products.index')->with('error', 'Error deleting product.');
+        }
+    }
+
+    public function deleteGalleryImage($imageId)
+    {
+        try {
+            $image = \App\Models\ProductImage::findOrFail($imageId);
+            
+            // Delete file from storage
+            if (Storage::disk('public')->exists($image->image_path)) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+            
+            // Delete database record
+            $image->delete();
+            
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 }

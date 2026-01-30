@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_images', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->string('image_path');
-            $table->boolean('is_primary')->default(false);
-            $table->timestamps();
+        Schema::table('products', function (Blueprint $table) {
+            $table->boolean('is_featured')->default(false)->after('is_active');
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_images');
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn('is_featured');
+        });
     }
 };

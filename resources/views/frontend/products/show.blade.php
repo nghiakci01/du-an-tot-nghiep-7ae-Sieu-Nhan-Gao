@@ -76,9 +76,6 @@
                             <div class="product_price">
                                 <span class="current_price">{{ number_format($product->price) }} đ</span>
                             </div>
-                            <div class="product_desc">
-                                <p>{!! nl2br(e($product->short_description ?? $product->description)) !!}</p>
-                            </div>
 
                             @if($product->variants->count() > 0)
                                 @php
@@ -254,7 +251,7 @@
                         </div>
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="info" role="tabpanel" >
-                                <div class="product_info_content">
+                                <div class="product_info_content" style="max-height: 400px; overflow-y: auto;">
                                     <p>{!! nl2br(e($product->description)) !!}</p>
                                 </div>    
                             </div>

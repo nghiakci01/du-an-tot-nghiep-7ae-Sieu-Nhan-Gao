@@ -36,6 +36,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
         Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
+        Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
     });
     
     // Admin & Staff Routes (Stock only)

@@ -19,11 +19,13 @@ class Product extends Model
         'description',
         'price',
         'is_active',
+        'is_featured',
         'image',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
         'price' => 'decimal:2',
     ];
 
@@ -39,7 +41,7 @@ class Product extends Model
 
     public function images(): HasMany
     {
-        return $this->hasMany(ProductImage::class);
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
     public function reviews(): HasMany
