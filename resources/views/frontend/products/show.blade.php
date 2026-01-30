@@ -76,9 +76,6 @@
                             <div class="product_price">
                                 <span class="current_price">{{ number_format($product->price) }} đ</span>
                             </div>
-                            <div class="product_desc">
-                                <p>{!! nl2br(e($product->short_description ?? $product->description)) !!}</p>
-                            </div>
 
                             @if($product->variants->count() > 0)
                                 @php
