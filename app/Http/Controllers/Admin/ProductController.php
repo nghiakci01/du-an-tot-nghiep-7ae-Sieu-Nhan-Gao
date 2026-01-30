@@ -35,6 +35,7 @@ class ProductController extends Controller
             $data = $request->except('variants');
             $data['slug'] = Str::slug($data['name']) . '-' . uniqid(); // Ensure unique slug
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
+            $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
             if ($request->hasFile('image')) {
                 $path = $request->file('image')->store('products', 'public');
@@ -85,6 +86,7 @@ class ProductController extends Controller
             $data = $request->except('variants');
             $data['slug'] = Str::slug($data['name']) . '-' . $product->id;
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
+            $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
             if ($request->hasFile('image')) {
                 if ($product->image) {
