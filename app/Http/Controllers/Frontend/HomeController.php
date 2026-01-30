@@ -31,7 +31,6 @@ class HomeController extends Controller
                               ->latest()
                               ->take(12)
                               ->get();
-
         return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts'));
     }
 }
