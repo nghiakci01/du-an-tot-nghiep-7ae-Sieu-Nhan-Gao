@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductVariant;
 
 class ProductSeeder extends Seeder
 {
@@ -12,82 +15,74 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        // Assuming category IDs 1-5 exist
+        // Lấy category theo slug
+        $aoThunNam = Category::where('slug', 'ao-thun')->first();
+        $vayDamNu = Category::where('slug', 'vay-dam')->first();
+
+        // Nếu không tìm thấy category thì srr skip hoặc tạo mới (tùy logic, ở đây assume có rồi từ CategorySeeder)
+        // Tuy nhiên tốt nhất là check null
+        if (!$aoThunNam || !$vayDamNu) {
+             $this->command->error('Categories not found. Please run CategorySeeder first.');
+             return;
+        }
+
         $products = [
             [
-                'category_id' => 3, // Áo Thun Nam
+                'category_id' => $aoThunNam->id,
                 'name' => 'Áo Thun Basic Trắng',
                 'slug' => 'ao-thun-basic-trang',
                 'description' => 'Áo thun cotton 100% thoáng mát.',
                 'price' => 150000,
                 'is_active' => true,
+                'variants' => [
+                    ['size' => 'S', 'color' => 'Trắng', 'stock_quantity' => 10, 'sku' => 'TS-W-S'],
+                    ['size' => 'M', 'color' => 'Trắng', 'stock_quantity' => 20, 'sku' => 'TS-W-M'],
+                    ['size' => 'L', 'color' => 'Trắng', 'stock_quantity' => 15, 'sku' => 'TS-W-L'],
+                ]
             ],
              [
-                'category_id' => 3, // Áo Thun Nam
+                'category_id' => $aoThunNam->id,
                 'name' => 'Áo Thun Basic Đen',
                 'slug' => 'ao-thun-basic-den',
                 'description' => 'Áo thun đen phong cách.',
                 'price' => 150000,
                 'is_active' => true,
+                'variants' => [
+                    ['size' => 'S', 'color' => 'Đen', 'stock_quantity' => 10, 'sku' => 'TS-B-S'],
+                    ['size' => 'M', 'color' => 'Đen', 'stock_quantity' => 20, 'sku' => 'TS-B-M'],
+                ]
             ],
             [
-                'category_id' => 5, // Váy Đầm Nữ
+                'category_id' => $vayDamNu->id,
                 'name' => 'Váy Hoa Nhí Vintage',
                 'slug' => 'vay-hoa-nhi-vintage',
                 'description' => 'Váy hoa nhẹ nhàng cho mùa hè.',
                 'price' => 350000,
                 'is_active' => true,
-                'image' => 'products/IwtktEFiLgAbezYA4i8TUFhc3jy7v0i4jmlnuX0S.png',
+                'variants' => [] // Add variants if needed
             ],
         ];
 
-        // Update existing products in array just for consistency (or handled in merge below)
-        foreach ($products as &$p) {
-            $p['image'] = 'products/IwtktEFiLgAbezYA4i8TUFhc3jy7v0i4jmlnuX0S.png';
-        }
-        ];
+        foreach ($products as $data) {
+            $variants = $data['variants'];
+            unset($data['variants']);
 
-        foreach ($products as $product) {
-            $productId = DB::table('products')->insertGetId(array_merge($product, [
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]));
+            $product = Product::firstOrCreate(
+                ['slug' => $data['slug']],
+                $data
+            );
 
-            // Add variants
-            $variants = [
-                ['product_id' => $productId, 'size' => 'S', 'color' => 'Trắng', 'stock_quantity' => 10, 'sku' => 'TS-W-S-' . $productId],
-                ['product_id' => $productId, 'size' => 'M', 'color' => 'Trắng', 'stock_quantity' => 20, 'sku' => 'TS-W-M-' . $productId],
-                ['product_id' => $productId, 'size' => 'L', 'color' => 'Trắng', 'stock_quantity' => 15, 'sku' => 'TS-W-L-' . $productId],
-            ];
-             // Adjust SKU for second product to avoid duplication if loop runs quickly or similar names
-             if ($product['slug'] == 'ao-thun-basic-den') {
-                 $variants = [
-                    ['product_id' => $productId, 'size' => 'S', 'color' => 'Đen', 'stock_quantity' => 10, 'sku' => 'TS-B-S-' . $productId],
-                    ['product_id' => $productId, 'size' => 'M', 'color' => 'Đen', 'stock_quantity' => 20, 'sku' => 'TS-B-M-' . $productId],
-                ];
-             }
-
-            DB::table('product_variants')->insert(array_map(function ($variant) {
-                return array_merge($variant, ['created_at' => now(), 'updated_at' => now()]);
-            }, $variants));
-
-            // Add Product Images
-            DB::table('product_images')->insert([
-                [
-                    'product_id' => $productId,
-                    'image_path' => 'products/IwtktEFiLgAbezYA4i8TUFhc3jy7v0i4jmlnuX0S.png',
-                    'is_primary' => true,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-                [
-                    'product_id' => $productId,
-                    'image_path' => 'products/a5cWz47edUEV9oIEl6LCyM48xpA7jbvKbzquliLg.png',
-                    'is_primary' => false,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            ]);
+            // Create variants
+            foreach ($variants as $variant) {
+                // Ensure unique SKU per variant
+                ProductVariant::firstOrCreate(
+                    ['sku' => $variant['sku'] . '-' . $product->id], 
+                    array_merge($variant, [
+                        'product_id' => $product->id,
+                        'sku' => $variant['sku'] . '-' . $product->id // update SKU to include product ID as per original logic if needed, or just keep unique SKU
+                    ])
+                );
+            }
         }
     }
 }
