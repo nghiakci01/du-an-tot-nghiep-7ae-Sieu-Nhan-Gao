@@ -33,6 +33,17 @@ class AppServiceProvider extends ServiceProvider
                      $categories = Category::whereNull('parent_id')->take(6)->get();
                      $view->with('categories', $categories);
                 }
+
+                // Share chatbot settings
+                $chatbotEnabled = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_enabled', 3600, function () {
+                    return \App\Models\ChatbotSetting::where('key', 'chatbot_enabled')->first()?->value ?? '0';
+                });
+                $chatbotMode = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_mode', 3600, function () {
+                    return \App\Models\ChatbotSetting::where('key', 'chatbot_mode')->first()?->value ?? 'rules';
+                });
+
+                $view->with('chatbot_enabled', $chatbotEnabled == '1');
+                $view->with('chatbot_mode', $chatbotMode);
             });
         } catch (\Exception $e) {
             // Log or ignore if DB connection fails during boot (e.g. composer install)

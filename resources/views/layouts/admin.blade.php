@@ -199,6 +199,14 @@
                 <span class="pc-mtext">Quản lý Kho</span>
               </a>
             </li>
+            <li class="pc-item">
+              <a href="{{ route('admin.chat.index') }}" class="pc-link">
+                <span class="pc-micon">
+                  <i class="ti ti-messages"></i>
+                </span>
+                <span class="pc-mtext">Hỗ trợ khách hàng</span>
+              </a>
+            </li>
             @if(auth()->user()->isAdmin())
             <li class="pc-item">
               <a href="{{ route('admin.users.index') }}" class="pc-link">
@@ -208,6 +216,14 @@
                 <span class="pc-mtext">Người dùng</span>
               </a>
             </li>
+            <li class="pc-item">
+                <a href="{{ route('admin.settings.chatbot') }}" class="pc-link">
+                  <span class="pc-micon">
+                    <i class="ti ti-settings"></i>
+                  </span>
+                  <span class="pc-mtext">Cấu hình Chatbot</span>
+                </a>
+              </li>
             @endif
             <li class="pc-item pc-caption">
               <label data-i18n="Widget">Widget</label>
