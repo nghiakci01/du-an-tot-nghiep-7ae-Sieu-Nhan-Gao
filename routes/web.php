@@ -26,6 +26,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 // Public Chatbot Route (Moved from API to Web to access Session)
 Route::post('/api/chat/send', [App\Http\Controllers\Api\ChatController::class, 'sendMessage'])->name('api.chat.send');
+Route::get('/api/chat/messages', [App\Http\Controllers\Api\ChatController::class, 'getMessages'])->name('api.chat.messages');
 
 // Admin & Staff Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {

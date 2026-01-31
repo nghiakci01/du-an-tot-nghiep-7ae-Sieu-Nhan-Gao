@@ -3,6 +3,107 @@
 @section('title', 'Chi tiết hội thoại')
 
 @section('content')
+<style>
+    .chat-container-admin {
+        height: calc(100vh - 250px);
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    .chat-messages-admin {
+        flex: 1;
+        padding: 30px;
+        overflow-y: auto;
+        background-color: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .msg-wrapper {
+        display: flex;
+        flex-direction: column;
+        max-width: 70%;
+    }
+    .msg-wrapper.user {
+        align-self: flex-start;
+    }
+    .msg-wrapper.staff {
+        align-self: flex-end;
+        align-items: flex-end;
+    }
+    .msg-wrapper.bot {
+        align-self: flex-start;
+        opacity: 0.8;
+    }
+    .msg-bubble {
+        padding: 12px 18px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.5;
+        position: relative;
+    }
+    .user .msg-bubble {
+        background: white;
+        color: #1a1a1a;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+    .staff .msg-bubble {
+        background: linear-gradient(135deg, #7146ce 0%, #9063f2 100%);
+        color: white;
+        border-bottom-right-radius: 4px;
+        box-shadow: 0 5px 15px rgba(113, 70, 206, 0.2);
+    }
+    .bot .msg-bubble {
+        background: #eef2ff;
+        color: #4338ca;
+        border: 1px dashed #c7d2fe;
+        border-bottom-left-radius: 4px;
+    }
+    .msg-info {
+        font-size: 10px;
+        color: #94a3b8;
+        margin-top: 5px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .chat-input-admin {
+        padding: 25px;
+        background: white;
+        border-top: 1px solid #f1f5f9;
+    }
+    .admin-input-group {
+        display: flex;
+        gap: 15px;
+    }
+    .admin-input-group input {
+        border-radius: 12px;
+        padding: 12px 20px;
+        border: 2px solid #f1f5f9;
+        transition: all 0.3s;
+    }
+    .admin-input-group input:focus {
+        border-color: #7146ce;
+        box-shadow: 0 0 0 4px rgba(113, 70, 206, 0.1);
+    }
+    .btn-send-admin {
+        background: #7146ce;
+        color: white;
+        border-radius: 12px;
+        padding: 0 25px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-send-admin:hover {
+        background: #5b36af;
+        transform: translateY(-2px);
+    }
+</style>
+
 <div class="page-header">
     <div class="page-block">
         <div class="row align-items-center">
@@ -15,7 +116,7 @@
             </div>
             <div class="col-md-12">
                 <div class="page-header-title">
-                    <h2 class="mb-0">Hội thoại: {{ substr($sessionId, 0, 8) }}</h2>
+                    <h2 class="mb-0">Hội thoại với {{ substr($sessionId, 0, 8) }}</h2>
                 </div>
             </div>
         </div>
@@ -23,29 +124,32 @@
 </div>
 
 <div class="row">
-    <div class="col-md-8 mx-auto">
-        <div class="card">
-            <div class="card-header">
-                <h5>Lịch sử tin nhắn</h5>
-            </div>
-            <div class="card-body chat-scroll" style="height: 450px; overflow-y: auto;">
+    <div class="col-md-10 mx-auto">
+        <div class="chat-container-admin">
+            <div class="chat-messages-admin" id="admin-chat-box">
                 @foreach($messages as $msg)
-                    <div class="mb-3 d-flex {{ $msg->sender_type == 'user' ? 'justify-content-start' : 'justify-content-end' }}">
-                        <div class="p-3 rounded {{ $msg->sender_type == 'user' ? 'bg-light text-dark' : 'bg-primary text-white' }}" style="max-width: 75%;">
-                            <p class="mb-1">{{ $msg->message }}</p>
-                            <small class="opacity-75 d-block text-end" style="font-size: 0.7rem;">
-                                {{ $msg->sender_type == 'user' ? 'Khách' : ($msg->sender_type == 'bot' ? 'Bot' : 'Bạn') }} - {{ $msg->created_at->format('H:i') }}
-                            </small>
+                    <div class="msg-wrapper {{ $msg->sender_type }}">
+                        <div class="msg-bubble">
+                            {{ $msg->message }}
+                        </div>
+                        <div class="msg-info">
+                            @if($msg->sender_type == 'user')
+                                KHÁCH HÀNG • {{ $msg->created_at->format('H:i') }}
+                            @elseif($msg->sender_type == 'bot')
+                                AI ASSISTANT • {{ $msg->created_at->format('H:i') }}
+                            @else
+                                NHÂN VIÊN • {{ $msg->created_at->format('H:i') }}
+                            @endif
                         </div>
                     </div>
                 @endforeach
             </div>
-            <div class="card-footer">
+            <div class="chat-input-admin">
                 <form action="{{ route('admin.chat.reply', $sessionId) }}" method="POST">
                     @csrf
-                    <div class="input-group">
-                        <input type="text" name="message" class="form-control" placeholder="Nhập tin nhắn trả lời..." required>
-                        <button class="btn btn-primary" type="submit">Gửi</button>
+                    <div class="admin-input-group">
+                        <input type="text" name="message" class="form-control" placeholder="Nhập câu trả lời cho khách hàng..." required autocomplete="off">
+                        <button class="btn btn-send-admin" type="submit">Gửi tin nhắn</button>
                     </div>
                 </form>
             </div>
@@ -55,9 +159,9 @@
 
 @section('scripts')
 <script>
-    // Scroll to bottom on load
-    const chatScroll = document.querySelector('.chat-scroll');
-    chatScroll.scrollTop = chatScroll.scrollHeight;
+    // Scroll to bottom
+    const box = document.getElementById('admin-chat-box');
+    box.scrollTop = box.scrollHeight;
 </script>
 @endsection
 @endsection

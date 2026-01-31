@@ -10,12 +10,25 @@ class ChatManagementController extends Controller
 {
     public function index()
     {
-        // Get unique sessions with last message
+        // Get unique sessions with last message and unread count
         $conversations = ChatMessage::select('session_id', 'user_id', \DB::raw('MAX(created_at) as last_activity'))
-            ->with('user')
+            ->with(['user'])
             ->groupBy('session_id', 'user_id')
             ->orderBy('last_activity', 'desc')
             ->paginate(15);
+
+        // Attach last message and unread count manually to each conversation (or use a smarter query)
+        foreach ($conversations as $chat) {
+            $lastMsg = ChatMessage::where('session_id', $chat->session_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            $chat->last_message = $lastMsg ? $lastMsg->message : '';
+            $chat->unread_count = ChatMessage::where('session_id', $chat->session_id)
+                ->where('sender_type', 'user')
+                ->where('is_read', false)
+                ->count();
+        }
 
         return view('admin.chat.index', compact('conversations'));
     }

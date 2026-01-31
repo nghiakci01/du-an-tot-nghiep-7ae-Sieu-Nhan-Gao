@@ -53,4 +53,25 @@ class ChatController extends Controller
             'type' => $result['type'] ?? 'text' // 'text' or 'products'
         ]);
     }
+
+    public function getMessages(Request $request)
+    {
+        $sessionId = $request->session()->getId();
+        
+        $messages = \App\Models\ChatMessage::where('session_id', $sessionId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'messages' => $messages->map(function($msg) {
+                return [
+                    'text' => $msg->message,
+                    'isUser' => $msg->sender_type === 'user',
+                    'sender_type' => $msg->sender_type,
+                    'time' => $msg->created_at->format('H:i'),
+                ];
+            })
+        ]);
+    }
 }

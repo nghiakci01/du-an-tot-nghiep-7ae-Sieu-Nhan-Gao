@@ -194,6 +194,16 @@
         border: none;
         border-bottom-left-radius: 4px;
     }
+    .message-wrapper.staff .message-box {
+        background: var(--primary-gradient);
+        color: white;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 4px 12px rgba(113, 70, 206, 0.2);
+    }
+    .message-wrapper.staff {
+        align-self: flex-start;
+        align-items: flex-start;
+    }
     .message-time {
         font-size: 10px;
         color: #9ca3af;
@@ -455,7 +465,7 @@
         <!-- Messages Area -->
         <div class="chat-messages" id="chat-messages">
             <template x-for="(msg, index) in messages" :key="index">
-                <div :class="['message-wrapper', msg.isUser ? 'user' : 'bot']">
+                <div :class="['message-wrapper', msg.isUser ? 'user' : (msg.sender_type === 'staff' ? 'staff' : 'bot')]">
                     <div class="message-box">
                         <!-- Text Message -->
                         <p x-show="!msg.products || msg.products.length === 0" 
@@ -563,19 +573,64 @@
         return {
             isOpen: false,
             isFullscreen: false,
-            messages: [
-                {
-                    text: "Xin chào! 👋 Chào mừng bạn đến với Reid Fashion. Tôi giúp được gì cho bạn?",
-                    isUser: false,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    quickActions: ['Hàng mới về 🆕', 'Khuyến mãi 🔥', 'Áo thun', 'Váy đầm', 'Liên hệ']
-                }
-            ],
+            messages: [],
             newMessage: '',
             isLoading: false,
 
-            initChat() {
-                console.log('Chatbot intialized (Inline Styles)');
+            async initChat() {
+                console.log('Chatbot initialized (History Sync Enabled)');
+                
+                // Fetch existing history
+                await this.pollMessages();
+                
+                // If no messages, show greeting (or if last message is very old)
+                if (this.messages.length === 0) {
+                    this.messages.push({
+                        text: "Xin chào! 👋 Chào mừng bạn đến với Reid Fashion. Tôi giúp được gì cho bạn?",
+                        isUser: false,
+                        sender_type: 'bot',
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        quickActions: ['Hàng mới về 🆕', 'Khuyến mãi 🔥', 'Áo thun', 'Váy đầm', 'Liên hệ']
+                    });
+                }
+
+                // Start polling for new messages (staff replies)
+                setInterval(() => {
+                    if (this.isOpen) {
+                        this.pollMessages();
+                    }
+                }, 5000); // Poll every 5 seconds
+            },
+
+            async pollMessages() {
+                try {
+                    const response = await fetch('/api/chat/messages');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.status === 'success') {
+                            // Check if server has more messages than local
+                            if (data.messages.length > this.messages.length) {
+                                // Update messages while preserving local product state if possible
+                                // For simplicity, we'll sync the list
+                                const oldLength = this.messages.length;
+                                this.messages = data.messages.map((m, idx) => {
+                                    // Preserve products if they exist locally
+                                    const localMsg = this.messages[idx];
+                                    return {
+                                        ...m,
+                                        products: localMsg ? localMsg.products : []
+                                    };
+                                });
+                                
+                                if (this.messages.length > oldLength) {
+                                    this.scrollToBottom();
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Polling failed', e);
+                }
             },
 
             toggle() {
