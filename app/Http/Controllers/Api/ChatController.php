@@ -22,9 +22,27 @@ class ChatController extends Controller
         ]);
 
         $message = $request->input('message');
+        $sessionId = $request->session()->getId();
+        $userId = auth()->id();
+
+        // 1. Save user message
+        \App\Models\ChatMessage::create([
+            'session_id' => $sessionId,
+            'user_id' => $userId,
+            'message' => $message,
+            'sender_type' => 'user'
+        ]);
         
-        // Get structured response from ChatService
+        // 2. Get structured response from ChatService
         $result = $this->chatService->generateResponse($message);
+
+        // 3. Save bot reply
+        \App\Models\ChatMessage::create([
+            'session_id' => $sessionId,
+            'user_id' => $userId,
+            'message' => $result['message'],
+            'sender_type' => 'bot'
+        ]);
 
         return response()->json([
             'status' => 'success',

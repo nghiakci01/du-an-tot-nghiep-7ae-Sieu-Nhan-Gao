@@ -42,6 +42,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Admin & Staff Routes (Stock only)
     Route::get('stock', [App\Http\Controllers\Admin\StockController::class, 'index'])->name('stock.index');
     Route::post('stock/update', [App\Http\Controllers\Admin\StockController::class, 'update'])->name('stock.update');
+
+    // Chatbot Management (Admin & Staff)
+    Route::prefix('chat')->name('chat.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ChatManagementController::class, 'index'])->name('index');
+        Route::get('/{sessionId}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'show'])->name('show');
+        Route::post('/{sessionId}/reply', [\App\Http\Controllers\Admin\ChatManagementController::class, 'reply'])->name('reply');
+    });
+
+    // Chatbot Settings (Admin only)
+    Route::middleware(['admin.only'])->group(function () {
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/chatbot', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'index'])->name('chatbot');
+            Route::post('/chatbot', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'update'])->name('chatbot.update');
+            Route::post('/chatbot/test', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'testConnection'])->name('chatbot.test');
+        });
+    });
 });
 
 // Test Route for Gemini Chatbot
