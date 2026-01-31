@@ -47,35 +47,35 @@ class ChatService
         $messageLower = mb_strtolower($message);
         
         // 1. Check for greeting
-        if ($this->isMatch($messageLower, ['chào', 'hello', 'hi', 'xin chào'])) {
+        if ($this->matchesPattern($messageLower, ['chào', 'hello', 'hi', 'xin chào'])) {
             return $this->textResponse($this->getSetting('greeting_message', 'Xin chào! Tôi có thể giúp gì cho bạn?'));
         }
         
         // 2. Check for help
-        if ($this->isMatch($messageLower, ['help', 'trợ giúp', 'hỗ trợ', 'hướng dẫn'])) {
+        if ($this->matchesPattern($messageLower, ['help', 'trợ giúp', 'hỗ trợ', 'hướng dẫn'])) {
             return $this->textResponse("Tôi có thể giúp bạn:\n• Tìm sản phẩm (VD: 'Tìm iPhone')\n• Xem danh mục (VD: 'Danh mục')\n• Thông tin liên hệ (VD: 'Hotline')");
         }
         
         // 3. Check for contact info
-        if ($this->isMatch($messageLower, ['hotline', 'liên hệ', 'số điện thoại', 'sđt', 'email'])) {
+        if ($this->matchesPattern($messageLower, ['hotline', 'liên hệ', 'số điện thoại', 'sđt', 'email'])) {
             $hotline = $this->getSetting('hotline', '1900-xxxx');
             $email = $this->getSetting('email', 'support@electronicsstore.com');
             return $this->textResponse("Bạn có thể liên hệ với chúng tôi qua:\n📞 Hotline: {$hotline}\n📧 Email: {$email}");
         }
         
         // 4. Check for category list
-        if ($this->isMatch($messageLower, ['danh mục', 'loại sản phẩm', 'có những gì'])) {
+        if ($this->matchesPattern($messageLower, ['danh mục', 'loại sản phẩm', 'có những gì'])) {
             $categories = Category::pluck('name')->toArray();
             return $this->textResponse("Hiện tại chúng tôi có các danh mục sản phẩm: " . implode(', ', $categories));
         }
         
         // 5. Check for gratitude
-        if ($this->isMatch($messageLower, ['cảm ơn', 'thanks', 'thank you', 'tks'])) {
+        if ($this->matchesPattern($messageLower, ['cảm ơn', 'thanks', 'thank you', 'tks'])) {
             return $this->textResponse("Không có chi! Rất vui được hỗ trợ bạn. 😊");
         }
 
         // 6. Check for simple closing
-        if ($this->isMatch($messageLower, ['tạm biệt', 'bye', 'hẹn gặp lại'])) {
+        if ($this->matchesPattern($messageLower, ['tạm biệt', 'bye', 'hẹn gặp lại'])) {
             return $this->textResponse("Tạm biệt! Chúc bạn một ngày tốt lành! 👋 Hẹn gặp lại bạn sớm!");
         }
         
@@ -214,6 +214,7 @@ class ChatService
         
         $foundProducts = collect([]);
         if (!empty($keywords)) {
+            // Search exact or partial name
             $foundProducts = Product::where('is_active', true)
                 ->where(function($q) use ($keywords) {
                     foreach ($keywords as $keyword) {
@@ -223,28 +224,50 @@ class ChatService
                 ->limit(5)
                 ->get();
 
+            // RAG fallback: If no products found, find products in related categories
+            if ($foundProducts->isEmpty()) {
+                $categoryKeywords = $keywords;
+                $foundProducts = Product::where('is_active', true)
+                    ->whereHas('category', function($q) use ($categoryKeywords) {
+                        foreach ($categoryKeywords as $kw) {
+                            $q->orWhere('name', 'LIKE', "%{$kw}%");
+                        }
+                    })
+                    ->limit(3)
+                    ->get();
+            }
+
             if ($foundProducts->isNotEmpty()) {
-                $productContext = "DƯỚI ĐÂY LÀ DANH SÁCH SẢN PHẨM THỰC TẾ TRONG KHO (HÃY DÙNG ĐỂ TRẢ LỜI):\n";
+                $productContext = "DANH SÁCH SẢN PHẨM HIỆN CÓ ĐỂ TƯ VẤN:\n";
                 foreach ($foundProducts as $p) {
                     $price = number_format($p->price);
-                    $productContext .= "- {$p->name} (Giá: {$price} VND, Tình trạng: " . ($p->quantity > 0 ? 'Còn hàng' : 'Hết hàng') . ")\n";
+                    $productContext .= "- {$p->name} (Giá: {$price} VND, " . ($p->quantity > 0 ? 'Sẵn hàng' : 'Liên hệ đặt trước') . "). Đặc điểm: {$p->short_description}\n";
                 }
             } else {
-                $productContext = "Không tìm thấy sản phẩm nào khớp với từ khóa trong kho.";
+                // Last resort: provide some popular items
+                $popularProducts = Product::where('is_active', true)->where('is_featured', true)->limit(3)->get();
+                if ($popularProducts->isNotEmpty()) {
+                    $productContext = "KHÔNG TÌM THẤY TÊN CHÍNH XÁC, NHƯNG ĐÂY LÀ CÁC MẪU ĐANG BÁN CHẠY:\n";
+                    foreach ($popularProducts as $p) {
+                         $productContext .= "- {$p->name} (Giá: " . number_format($p->price) . " VND)\n";
+                    }
+                    $foundProducts = $popularProducts;
+                }
             }
         }
         // ----------------------------------------
 
         $instruction = $this->getSetting('system_instruction', 
-            "Bạn là nhân viên bán hàng thời trang chuyên nghiệp, thân thiện và ngắn gọn.\n" .
-            "[QUY TẮC QUAN TRỌNG]:\n" .
-            "1. Chỉ trả lời tối đa 3 câu.\n" .
-            "2. Tập trung vào bán hàng, không chào hỏi dài dòng.\n" .
-            "3. Nếu có thông tin sản phẩm ở trên, hãy dùng nó để tư vấn chính xác.\n" .
-            "4. Giọng điệu hào hứng, dùng emoji phù hợp (👗, 👠, 🛍️).\n" .
+            "Mục tiêu: Bạn là 'Trợ lý ảo Reid' - chuyên viên tư vấn thời trang cao cấp, chuyên nghiệp và tận tâm.\n\n" .
+            "[QUY TẮC PHẢN HỒI]:\n" .
+            "1. Chỉ trả lời dựa trên danh sách sản phẩm THỰC TẾ được cung cấp bên dưới.\n" .
+            "2. Nếu không có sản phẩm chính xác khách tìm, ĐỪNG nói 'không có' rồi thôi. Hãy gợi ý các sản phẩm cùng danh mục hoặc cùng loại (VD: Khách tìm hoodie không có, hãy gợi ý Áo khoác hoặc Áo Tee).\n" .
+            "3. Trình bày rõ ràng: Tên sản phẩm, đặc điểm nổi bật, và giá.\n" .
+            "4. Cuối mỗi gợi ý sản phẩm, hãy hướng dẫn khách click vào hình ảnh hoặc link 'Xem chi tiết'.\n" .
+            "5. Luôn giữ thái độ lịch sự, chuyên nghiệp, dùng emoji phù hợp (✨, 👕, 🛍️).\n\n" .
             "[THÔNG TIN CỬA HÀNG]:\n" .
             "- Hotline: {hotline}\n" .
-            "- Danh mục: {categories}"
+            "- Danh mục kinh doanh: {categories}"
         );
         
         // Thay thế các biến

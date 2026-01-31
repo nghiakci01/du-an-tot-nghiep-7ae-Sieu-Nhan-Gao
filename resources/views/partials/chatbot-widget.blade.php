@@ -7,12 +7,13 @@
 
     .chatbot-widget {
         font-family: 'Libre Franklin', sans-serif;
-        --primary-color: #ff6a28;
-        --primary-gradient: linear-gradient(135deg, #ff6a28 0%, #ff9f43 100%);
+        --primary-color: #7146ce; /* Purple color from BizChatAI image */
+        --primary-gradient: linear-gradient(135deg, #7146ce 0%, #9063f2 100%);
         --secondary-color: #242424;
         --bg-color: #ffffff;
-        --light-grey: #f8f9fa;
-        --shadow-lg: 0 10px 40px -10px rgba(0,0,0,0.15);
+        --light-grey: #f4f6f9;
+        --shadow-lg: 0 15px 50px -12px rgba(0,0,0,0.1);
+        --border-radius: 24px;
     }
     .chat-container {
         position: fixed;
@@ -24,16 +25,15 @@
         align-items: flex-end;
     }
     .chat-window {
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(12px);
-        border-radius: 20px;
+        background: #ffffff;
+        border-radius: var(--border-radius);
         box-shadow: var(--shadow-lg);
-        width: 380px;
-        height: 550px;
+        width: 400px;
+        height: 600px;
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.5);
+        border: 1px solid #edeff2;
         margin-bottom: 20px;
         transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         transform-origin: bottom right;
@@ -59,13 +59,31 @@
         }
     }
     .chat-header {
-        background: var(--primary-gradient);
-        padding: 20px;
+        background: #ffffff;
+        padding: 16px 20px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        color: white;
-        box-shadow: 0 4px 15px rgba(255, 106, 40, 0.2);
+        color: #1a1a1a;
+        border-bottom: 1px solid #f0f2f5;
+    }
+    .chat-header .chat-avatar {
+        background: #f0ebff;
+        color: var(--primary-color);
+    }
+    .chat-header .chat-title h3 {
+        color: #1a1a1a;
+    }
+    .chat-header .chat-title p {
+        color: #6b7280;
+    }
+    .chat-header .chat-close {
+        color: #9ca3af;
+        background: transparent;
+    }
+    .chat-header .chat-close:hover {
+        background: #f3f4f6;
+        color: #1f2937;
     }
     .chat-header-info {
         display: flex;
@@ -89,14 +107,13 @@
         font-weight: 700;
         font-size: 16px;
         margin: 0;
-        color: white;
+        color: #1a1a1a;
         letter-spacing: 0.5px;
     }
     .chat-title p {
         font-size: 12px;
-        opacity: 0.9;
         margin: 0;
-        color: white;
+        color: #6b7280;
         display: flex;
         align-items: center;
         gap: 4px;
@@ -107,21 +124,20 @@
         background-color: #4ade80;
         border-radius: 50%;
     }
-    .chat-close {
-        background: rgba(255,255,255,0.2);
-        border: none;
-        color: white;
-        cursor: pointer;
+    .chat-header .chat-close {
+        color: #9ca3af;
+        background: transparent;
         width: 32px;
         height: 32px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background 0.2s;
+        transition: all 0.2s;
     }
-    .chat-close:hover {
-        background: rgba(255,255,255,0.3);
+    .chat-header .chat-close:hover {
+        background: #f3f4f6;
+        color: #1f2937;
     }
     .chat-messages {
         flex: 1;
@@ -170,11 +186,12 @@
         background: var(--primary-gradient);
         color: white;
         border-bottom-right-radius: 4px;
+        box-shadow: 0 4px 12px rgba(113, 70, 206, 0.2);
     }
     .message-wrapper.bot .message-box {
-        background-color: white;
-        color: #374151;
-        border: 1px solid #f3f4f6;
+        background-color: #f8f9fa;
+        color: #1f2937;
+        border: none;
         border-bottom-left-radius: 4px;
     }
     .message-time {
@@ -184,7 +201,7 @@
         font-weight: 500;
     }
     .chat-input-area {
-        padding: 16px;
+        padding: 20px;
         background: white;
         border-top: 1px solid #f3f4f6;
     }
@@ -192,16 +209,16 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        background: #f3f4f6;
-        padding: 6px;
+        background: #ffffff;
+        padding: 8px 8px 8px 20px;
         border-radius: 30px;
-        border: 1px solid transparent;
-        transition: all 0.2s;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
     }
     .chat-form:focus-within {
-        background: white;
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(255, 106, 40, 0.1);
+        box-shadow: 0 4px 20px rgba(113, 70, 206, 0.1);
     }
     .chat-input {
         flex: 1;
@@ -213,7 +230,7 @@
         color: #374151;
     }
     .chat-send-btn {
-        background: var(--primary-gradient);
+        background: var(--primary-color);
         color: white;
         width: 36px;
         height: 36px;
@@ -224,7 +241,7 @@
         align-items: center;
         justify-content: center;
         transition: transform 0.2s;
-        box-shadow: 0 2px 6px rgba(255, 106, 40, 0.3);
+        box-shadow: 0 4px 10px rgba(113, 70, 206, 0.3);
     }
     .chat-send-btn:hover {
         transform: scale(1.05);
@@ -234,56 +251,76 @@
         cursor: not-allowed;
     }
     
-    /* Product Cards */
+    /* Product List Design */
     .product-cards {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
         margin-top: 12px;
     }
-    .chat-window.fullscreen .product-cards {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
-    }
     .product-card {
-        background: white;
-        border: 1px solid #f3f4f6;
-        border-radius: 12px;
+        background: #ffffff;
+        border: 1px solid #f0f2f5;
+        border-radius: 16px;
+        display: flex; /* Horizontal Layout */
         overflow: hidden;
         transition: all 0.3s;
-        cursor: pointer;
         text-decoration: none;
         color: inherit;
-        display: block;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        padding: 10px;
+        gap: 12px;
     }
     .product-card:hover {
-        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-        transform: translateY(-3px);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
         border-color: var(--primary-color);
     }
     .product-card-image {
-        width: 100%;
-        height: 110px;
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
         object-fit: cover;
     }
     .product-card-body {
-        padding: 10px;
+        padding: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     .product-card-title {
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 600;
-        margin: 0 0 6px 0;
-        color: #374151;
-        line-height: 1.4;
-        height: 34px;
+        margin-bottom: 4px;
+        height: auto;
+    }
+    .product-card-description {
+        font-size: 11px;
+        color: #6b7280;
+        margin-bottom: 6px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
         overflow: hidden;
     }
+    .product-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
     .product-card-price {
-        font-size: 13px;
+        font-size: 14px;
         font-weight: 700;
         color: var(--primary-color);
-        margin: 0;
+    }
+    .view-detail-btn {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
 
     /* Toggle Button */
@@ -295,7 +332,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 25px rgba(255, 106, 40, 0.4);
+        box-shadow: 0 8px 25px rgba(113, 70, 206, 0.3);
         cursor: pointer;
         transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border: none;
@@ -360,7 +397,7 @@
         background: var(--primary-gradient);
         color: white;
         transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(255, 106, 40, 0.3);
+        box-shadow: 0 4px 10px rgba(113, 70, 206, 0.2);
     }
     .chat-footer {
         text-align: center;
@@ -428,19 +465,25 @@
                         <!-- Message with Products -->
                         <template x-if="msg.products && msg.products.length > 0">
                             <div>
-                                <p x-text="msg.text" style="white-space: pre-wrap; margin: 0 0 8px 0;"></p>
+                                <p x-text="msg.text" style="white-space: pre-wrap; margin: 0 0 12px 0;"></p>
                                 <div class="product-cards">
                                     <template x-for="product in msg.products" :key="product.id">
                                         <a :href="product.url" class="product-card" target="_blank">
                                             <img :src="product.image" :alt="product.name" class="product-card-image">
                                             <div class="product-card-body">
                                                 <h4 class="product-card-title" x-text="product.name"></h4>
-                                                <p class="product-card-price" x-text="product.price_formatted"></p>
+                                                <p class="product-card-description" x-text="product.description"></p>
+                                                <div class="product-card-footer">
+                                                    <p class="product-card-price" x-text="product.price_formatted"></p>
+                                                    <span class="view-detail-btn">
+                                                        Xem chi tiết
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </a>
                                     </template>
                                 </div>
-                            </div>
                             </div>
                         </template>
 

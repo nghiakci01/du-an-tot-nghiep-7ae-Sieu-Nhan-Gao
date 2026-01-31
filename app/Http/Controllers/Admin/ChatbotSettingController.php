@@ -32,12 +32,17 @@ class ChatbotSettingController extends Controller
 
         $data = $request->except('_token');
         
-        // Handle checkbox (if not checked, it's 0)
+        // Handle checkbox (if not checked, Laravel request doesn't include it)
         $data['chatbot_enabled'] = $request->has('chatbot_enabled') ? '1' : '0';
 
         foreach ($data as $key => $value) {
-            ChatbotSetting::updateOrCreate(['key' => $key], ['value' => $value]);
+            ChatbotSetting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
             Cache::forget("chatbot_setting_{$key}");
+            
+            // Special case for enabled status which might be used in providers
+            if ($key === 'chatbot_enabled') {
+                 Cache::forget('chatbot_enabled'); 
+            }
         }
 
         return redirect()->back()->with('success', 'Cập nhật cấu hình Chatbot thành công!');
