@@ -31,8 +31,12 @@
         <form action="{{ route('admin.settings.chatbot.update') }}" method="POST">
             @csrf
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5>Cấu hình chung</h5>
+                    <div class="form-check form-switch mr-3">
+                        <input class="form-check-input" type="checkbox" name="chatbot_enabled" id="chatbot_enabled" value="1" {{ ($settings['chatbot_enabled'] ?? '0') == '1' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="chatbot_enabled">Kích hoạt Chatbot</label>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">

@@ -276,7 +276,9 @@
             <div class="h-14.5 hidden lg:block"></div>
         @endif
 
-        @include('partials.chatbot-widget')
+        @if($chatbot_enabled)
+            @include('partials.chatbot-widget')
+        @endif
     </body>
 
 </html>

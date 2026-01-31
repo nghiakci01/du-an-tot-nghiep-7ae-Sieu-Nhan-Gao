@@ -46,7 +46,9 @@
 
 
 
-@include('partials.chatbot-widget')
+@if($chatbot_enabled)
+    @include('partials.chatbot-widget')
+@endif
 
 </body>
 

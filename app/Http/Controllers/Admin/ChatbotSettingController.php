@@ -18,6 +18,7 @@ class ChatbotSettingController extends Controller
     public function update(Request $request)
     {
         $request->validate([
+            'chatbot_enabled' => 'nullable|in:1,0',
             'chatbot_mode' => 'required|in:rules,ai',
             'ai_provider' => 'required|in:gemini,openai',
             'greeting_message' => 'required|string',
@@ -30,6 +31,9 @@ class ChatbotSettingController extends Controller
         ]);
 
         $data = $request->except('_token');
+        
+        // Handle checkbox (if not checked, it's 0)
+        $data['chatbot_enabled'] = $request->has('chatbot_enabled') ? '1' : '0';
 
         foreach ($data as $key => $value) {
             ChatbotSetting::updateOrCreate(['key' => $key], ['value' => $value]);

@@ -1789,7 +1789,9 @@
 <script src="{{ asset('frontend-assets') }}/js/main.js"></script>
 
 <!-- Chatbot Widget -->
-@include('partials.chatbot-widget')
+@if($chatbot_enabled)
+    @include('partials.chatbot-widget')
+@endif
 
 </body>
 
