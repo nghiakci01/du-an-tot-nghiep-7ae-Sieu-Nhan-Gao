@@ -278,10 +278,11 @@ class ChatService
         $foundProducts = collect([]);
         if (!empty($keywords)) {
             // Search exact or partial name
+            // Search exact or partial name - Using AND for higher precision
             $foundProducts = Product::where('is_active', true)
                 ->where(function($q) use ($keywords) {
                     foreach ($keywords as $keyword) {
-                        $q->orWhere('name', 'LIKE', "%{$keyword}%");
+                        $q->where('name', 'LIKE', "%{$keyword}%");
                     }
                 })
                 ->limit(5)
@@ -293,7 +294,7 @@ class ChatService
                 $foundProducts = Product::where('is_active', true)
                     ->whereHas('category', function($q) use ($categoryKeywords) {
                         foreach ($categoryKeywords as $kw) {
-                            $q->orWhere('name', 'LIKE', "%{$kw}%");
+                            $q->where('name', 'LIKE', "%{$kw}%");
                         }
                     })
                     ->limit(3)
@@ -307,7 +308,6 @@ class ChatService
                     $productContext .= "- {$p->name} (Giá: {$price} VND, " . ($p->quantity > 0 ? 'Sẵn hàng' : 'Liên hệ đặt trước') . "). Đặc điểm: {$p->short_description}\n";
                 }
             }
-        }
         }
         // ----------------------------------------
 
@@ -521,9 +521,9 @@ class ChatService
     {
         $words = explode(' ', $message);
         $words = array_filter($words, function($word) {
-            // Tighten search: ignore very short words and common Vietnamese fillers
-            $stopWords = ['của', 'này', 'kia', 'đó', 'phẩm', 'shop', 'cửa', 'hàng', 'mua', 'xem', 'cho', 'với'];
-            return mb_strlen($word) >= 3 && !in_array(mb_strtolower($word), $stopWords);
+            // Tighten search: ignore very short words (now 2 min) and common Vietnamese fillers
+            $stopWords = ['của', 'này', 'kia', 'đó', 'phẩm', 'shop', 'cửa', 'hàng', 'mua', 'xem', 'cho', 'với', 'tại', 'vào', 'một', 'những', 'các'];
+            return mb_strlen($word) >= 2 && !in_array(mb_strtolower($word), $stopWords);
         });
         
         if (empty($words)) {
@@ -532,8 +532,9 @@ class ChatService
         
         $products = Product::where('is_active', true)
             ->where(function($q) use ($words) {
+                // Using AND instead of OR for nonsensical queries to not trigger on single word matches
                 foreach ($words as $word) {
-                    $q->orWhere('name', 'LIKE', "%{$word}%");
+                    $q->where('name', 'LIKE', "%{$word}%");
                 }
             })
             ->limit(4)
@@ -553,20 +554,24 @@ class ChatService
      */
     private function extractKeywords(string $message): array
     {
-        $stopWords = ['có', 'không', 'bán', 'tìm', 'giá', 'bao', 'nhiêu', 'của', 'là', 'về', 'cho', 'và', 'được', 'cái', 'này', 'kia', 'đó', 'phẩm', 'shop', 'cửa', 'hàng', 'mua', 'xem', 'với', 'tại'];
+        $stopWords = [
+            'có', 'không', 'bán', 'tìm', 'giá', 'bao', 'nhiêu', 'của', 'là', 'về', 'cho', 'và', 'được', 
+            'cái', 'này', 'kia', 'đó', 'phẩm', 'shop', 'cửa', 'hàng', 'mua', 'xem', 'với', 'tại', 
+            'hỏi', 'cho', 'biết', 'thế', 'nào', 'đâu', 'ở', 'gì', 'nào', 'mình', 'bạn', 'em', 'anh', 'chị'
+        ];
         
-        $words = explode(' ', $message);
+        $words = explode(' ', mb_strtolower($message));
         $keywords = [];
         
         foreach ($words as $word) {
             $word = trim($word);
-            // Tighten: ignore common fillers and very short words
-            if (mb_strlen($word) >= 3 && !in_array($word, $stopWords)) {
+            // Support 2-character Vietnamese words (áo, quần, ví...) while excluding stop words
+            if (mb_strlen($word) >= 2 && !in_array($word, $stopWords)) {
                 $keywords[] = $word;
             }
         }
         
-        return $keywords;
+        return array_values(array_unique($keywords));
     }
     
     /**

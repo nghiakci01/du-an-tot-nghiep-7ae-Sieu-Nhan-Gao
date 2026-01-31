@@ -693,6 +693,9 @@
                             products: data.products || [],
                             type: data.type || 'text'
                         });
+                    } else if (data.is_muted) {
+                        // Bot is muted, do nothing, just stop loading
+                        console.log('Bot is muted for this session.');
                     } else {
                         throw new Error('No reply');
                     }

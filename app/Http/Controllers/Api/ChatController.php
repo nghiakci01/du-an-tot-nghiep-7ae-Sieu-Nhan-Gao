@@ -35,7 +35,19 @@ class ChatController extends Controller
             'sender_type' => 'user'
         ]);
         
-        // 2. Get structured response from ChatService
+        // 2. Check if Bot is enabled for this session
+        $chatSession = \App\Models\ChatSession::where('session_id', $sessionId)->first();
+        $isBotEnabled = $chatSession ? $chatSession->is_bot_enabled : true;
+
+        if (!$isBotEnabled) {
+            return response()->json([
+                'status' => 'success',
+                'reply' => null, // No bot reply
+                'is_muted' => true
+            ]);
+        }
+
+        // 3. Get structured response from ChatService
         $result = $this->chatService->generateResponse($message);
 
         // 3. Save bot reply

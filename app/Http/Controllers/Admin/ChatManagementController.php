@@ -45,9 +45,30 @@ class ChatManagementController extends Controller
             ->where('sender_type', 'user')
             ->update(['is_read' => true]);
 
+        // Get user if exists
         $user = $messages->where('user_id', '!=', null)->where('sender_type', 'user')->first()?->user;
 
-        return view('admin.chat.show', compact('messages', 'sessionId', 'user'));
+        // Get session info for bot muting
+        $chatSession = \App\Models\ChatSession::firstOrCreate(
+            ['session_id' => $sessionId],
+            ['is_bot_enabled' => true]
+        );
+
+        return view('admin.chat.show', compact('messages', 'sessionId', 'user', 'chatSession'));
+    }
+
+    public function toggleBot($sessionId)
+    {
+        $chatSession = \App\Models\ChatSession::firstOrCreate(
+            ['session_id' => $sessionId],
+            ['is_bot_enabled' => true]
+        );
+
+        $chatSession->is_bot_enabled = !$chatSession->is_bot_enabled;
+        $chatSession->save();
+
+        $status = $chatSession->is_bot_enabled ? 'đã bật' : 'đã tắt';
+        return redirect()->back()->with('success', "Chatbot tự động {$status} cho hội thoại này!");
     }
 
     public function reply(Request $request, $sessionId)
