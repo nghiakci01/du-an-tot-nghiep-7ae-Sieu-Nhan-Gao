@@ -1787,7 +1787,8 @@
 <!-- Main JS -->
 <script src="{{ asset('frontend-assets') }}/js/main.js"></script>
 
-
+<!-- Chatbot Widget -->
+@include('partials.chatbot-widget')
 
 </body>
 

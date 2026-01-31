@@ -148,6 +148,55 @@
     .chat-send-btn:hover {
         background-color: #3e1675;
     }
+    
+    /* Product Cards */
+    .product-cards {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 12px;
+    }
+    .product-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.2s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    .product-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    .product-card-image {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        background: #f3f4f6;
+    }
+    .product-card-body {
+        padding: 8px;
+    }
+    .product-card-title {
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        line-height: 1.3;
+    }
+    .product-card-price {
+        font-size: 14px;
+        font-weight: 700;
+        color: #511d9a;
+        margin: 0;
+    }
     .chat-send-btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
@@ -267,7 +316,28 @@
             <template x-for="(msg, index) in messages" :key="index">
                 <div :class="['message-wrapper', msg.isUser ? 'user' : 'bot']">
                     <div class="message-box">
-                        <p x-text="msg.text" style="white-space: pre-wrap; margin: 0;"></p>
+                        <!-- Text Message -->
+                        <p x-show="!msg.products || msg.products.length === 0" 
+                           x-text="msg.text" 
+                           style="white-space: pre-wrap; margin: 0;"></p>
+                        
+                        <!-- Message with Products -->
+                        <template x-if="msg.products && msg.products.length > 0">
+                            <div>
+                                <p x-text="msg.text" style="white-space: pre-wrap; margin: 0 0 8px 0;"></p>
+                                <div class="product-cards">
+                                    <template x-for="product in msg.products" :key="product.id">
+                                        <a :href="product.url" class="product-card" target="_blank">
+                                            <img :src="product.image" :alt="product.name" class="product-card-image">
+                                            <div class="product-card-body">
+                                                <h4 class="product-card-title" x-text="product.name"></h4>
+                                                <p class="product-card-price" x-text="product.price_formatted"></p>
+                                            </div>
+                                        </a>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                     <p class="message-time" 
                        :style="{ textAlign: msg.isUser ? 'right' : 'left' }"
@@ -377,10 +447,17 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
                         },
                         body: JSON.stringify({ message: text })
                     });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        console.error('API Error:', response.status, errorData);
+                        throw new Error(`Server error: ${response.status}`);
+                    }
 
                     const data = await response.json();
 
@@ -388,7 +465,9 @@
                         this.messages.push({
                             text: data.reply,
                             isUser: false,
-                            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                            products: data.products || [],
+                            type: data.type || 'text'
                         });
                     } else {
                         throw new Error('No reply');

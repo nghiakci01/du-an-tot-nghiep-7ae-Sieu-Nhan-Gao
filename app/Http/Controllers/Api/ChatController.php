@@ -23,11 +23,14 @@ class ChatController extends Controller
 
         $message = $request->input('message');
         
-        $response = $this->chatService->generateResponse($message);
+        // Get structured response from ChatService
+        $result = $this->chatService->generateResponse($message);
 
         return response()->json([
             'status' => 'success',
-            'reply' => $response
+            'reply' => $result['message'],
+            'products' => $result['products'] ?? [], // Product cards data
+            'type' => $result['type'] ?? 'text' // 'text' or 'products'
         ]);
     }
 }
