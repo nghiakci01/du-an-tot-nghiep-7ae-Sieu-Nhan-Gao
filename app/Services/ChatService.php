@@ -21,52 +21,61 @@ class ChatService
         });
     }
 
-    /**
-     * Rule-based or AI chatbot based on settings
-     */
-    public function generateResponse(string $userMessage): array
+    public function generateResponse(string $message): array
     {
         $mode = $this->getSetting('chatbot_mode', 'rules');
-        $message = trim($userMessage);
 
-        if ($mode === 'gemini') {
-            return $this->generateGeminiResponse($message);
+        if ($mode === 'rules') {
+            return $this->generateRuleResponse($message);
         }
 
-        $messageLower = strtolower($message);
+        // Handle legacy 'gemini' mode as 'ai'
+        $provider = $this->getSetting('ai_provider', 'gemini');
+
+        if ($provider === 'openai') {
+            return $this->generateOpenAIResponse($message);
+        }
+
+        return $this->generateGeminiResponse($message);
+    }
+
+    /**
+     * Rule-based response logic (existing logic moved here)
+     */
+    private function generateRuleResponse(string $message): array
+    {
+        $messageLower = mb_strtolower($message);
         
-        // 1. Greeting patterns
-        if ($this->matchesPattern($messageLower, ['xin chào', 'chào', 'hello', 'hi', 'hey'])) {
-            return $this->textResponse($this->getGreeting());
+        // 1. Check for greeting
+        if ($this->isMatch($messageLower, ['chào', 'hello', 'hi', 'xin chào'])) {
+            return $this->textResponse($this->getSetting('greeting_message', 'Xin chào! Tôi có thể giúp gì cho bạn?'));
         }
         
-        // 2. Product search patterns
-        if ($this->matchesPattern($messageLower, ['có', 'bán', 'tìm', 'search', 'find'])) {
-            return $this->searchProducts($messageLower);
+        // 2. Check for help
+        if ($this->isMatch($messageLower, ['help', 'trợ giúp', 'hỗ trợ', 'hướng dẫn'])) {
+            return $this->textResponse("Tôi có thể giúp bạn:\n• Tìm sản phẩm (VD: 'Tìm iPhone')\n• Xem danh mục (VD: 'Danh mục')\n• Thông tin liên hệ (VD: 'Hotline')");
         }
         
-        // 3. Price inquiry patterns
-        if ($this->matchesPattern($messageLower, ['giá', 'bao nhiêu', 'price', 'cost', 'tiền'])) {
-            return $this->getPriceInfo($messageLower);
+        // 3. Check for contact info
+        if ($this->isMatch($messageLower, ['hotline', 'liên hệ', 'số điện thoại', 'sđt', 'email'])) {
+            $hotline = $this->getSetting('hotline', '1900-xxxx');
+            $email = $this->getSetting('email', 'support@electronicsstore.com');
+            return $this->textResponse("Bạn có thể liên hệ với chúng tôi qua:\n📞 Hotline: {$hotline}\n📧 Email: {$email}");
         }
         
-        // 4. Category inquiry
-        if ($this->matchesPattern($messageLower, ['loại', 'danh mục', 'category', 'phân loại'])) {
-            return $this->textResponse($this->getCategoryInfo());
+        // 4. Check for category list
+        if ($this->isMatch($messageLower, ['danh mục', 'loại sản phẩm', 'có những gì'])) {
+            $categories = Category::pluck('name')->toArray();
+            return $this->textResponse("Hiện tại chúng tôi có các danh mục sản phẩm: " . implode(', ', $categories));
         }
         
-        // 5. Help/Support patterns
-        if ($this->matchesPattern($messageLower, ['giúp', 'help', 'hỗ trợ', 'support', 'tư vấn'])) {
-            return $this->textResponse($this->getHelp());
+        // 5. Check for gratitude
+        if ($this->isMatch($messageLower, ['cảm ơn', 'thanks', 'thank you', 'tks'])) {
+            return $this->textResponse("Không có chi! Rất vui được hỗ trợ bạn. 😊");
         }
-        
-        // 6. Thank you patterns
-        if ($this->matchesPattern($messageLower, ['cảm ơn', 'thanks', 'thank you', 'cám ơn'])) {
-            return $this->textResponse("Rất vui được hỗ trợ bạn! 😊 Nếu cần thêm thông tin gì, đừng ngần ngại hỏi nhé!");
-        }
-        
-        // 7. Goodbye patterns
-        if ($this->matchesPattern($messageLower, ['tạm biệt', 'bye', 'goodbye', 'hẹn gặp lại'])) {
+
+        // 6. Check for simple closing
+        if ($this->isMatch($messageLower, ['tạm biệt', 'bye', 'hẹn gặp lại'])) {
             return $this->textResponse("Tạm biệt! Chúc bạn một ngày tốt lành! 👋 Hẹn gặp lại bạn sớm!");
         }
         
@@ -76,8 +85,12 @@ class ChatService
             return $productResult;
         }
         
-        // 9. Default response with suggestions
-        return $this->textResponse($this->getDefaultResponse());
+        // 9. Default response with suggestions (Fallback)
+        $fallback = $this->getSetting('fallback_message', 'Tôi chưa hiểu rõ yêu cầu của bạn. Vui lòng liên hệ hotline {hotline} để được hỗ trợ!');
+        $hotline = $this->getSetting('hotline', '1900-xxxx');
+        $fallback = str_replace('{hotline}', $hotline, $fallback);
+        
+        return $this->textResponse($fallback);
     }
 
     /**
@@ -85,6 +98,7 @@ class ChatService
      */
     private function generateGeminiResponse(string $message): array
     {
+        // Prioritize finding a key explicitly for Gemini, or fallback to generic AI key
         $apiKey = $this->getSetting('gemini_api_key');
 
         if (!$apiKey) {
@@ -92,21 +106,27 @@ class ChatService
         }
 
         try {
-            $context = $this->getAiContext();
+            $context = $this->getAiContext($message);
+            $fullPrompt = $context . "\n\nUser Question: " . $message;
             
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
+            // Updated to use 'gemini-flash-latest' and 'v1beta' based on successful diagnostics
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={$apiKey}";
+
+            $response = \Illuminate\Support\Facades\Http::withOptions([
+                'curl' => [
+                    CURLOPT_SSL_VERIFYPEER => true,
+                    CURLOPT_SSL_VERIFYHOST => 2,
+                ],
+                'timeout' => 30,
+            ])->withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post("https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={$apiKey}", [
+            ])->post($url, [
                 'contents' => [
                     [
                         'parts' => [
-                            ['text' => $context . "\n\nUser: " . $message]
+                            ['text' => $fullPrompt]
                         ]
                     ]
-                ],
-                'generationConfig' => [
-                    'temperature' => 0.7,
-                    'maxOutputTokens' => 800,
                 ]
             ]);
 
@@ -117,7 +137,7 @@ class ChatService
             }
 
             Log::error("Gemini API Error: " . $response->body());
-            return $this->textResponse("Có lỗi khi kết nối với AI. Vui lòng thử lại sau! 🤖");
+            return $this->textResponse("Có lỗi khi kết nối với AI (Gemini). Vui lòng thử lại sau! 🤖");
 
         } catch (\Exception $e) {
             Log::error("Gemini Service Exception: " . $e->getMessage());
@@ -125,23 +145,103 @@ class ChatService
         }
     }
 
+    private function generateOpenAIResponse(string $message): array
+    {
+        $apiKey = $this->getSetting('openai_api_key');
+
+        if (!$apiKey) {
+            return $this->textResponse("Chưa cấu hình OpenAI API Key. Vui lòng liên hệ Admin! 🤖");
+        }
+
+        try {
+            $context = $this->getAiContext($message);
+            
+            $response = \Illuminate\Support\Facades\Http::withOptions([
+                'curl' => [
+                    CURLOPT_SSL_VERIFYPEER => true,
+                    CURLOPT_SSL_VERIFYHOST => 2,
+                ],
+                'timeout' => 30,
+            ])->withHeaders([
+                'Authorization' => "Bearer {$apiKey}",
+                'Content-Type' => 'application/json',
+            ])->post("https://api.openai.com/v1/responses", [
+                'model' => 'gpt-3.5-turbo',
+                'instructions' => $context,
+                'input' => $message,
+                'temperature' => 0.7,
+                'max_output_tokens' => 800,
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                // v1/responses structure: output[0].content[0].text
+                $responseText = $data['output'][0]['content'][0]['text'] ?? "Tôi không nhận được phản hồi từ OpenAI. 😅";
+                return $this->textResponse($responseText);
+            }
+
+            Log::error("OpenAI API Error: " . $response->body());
+            return $this->textResponse("Có lỗi khi kết nối với AI (OpenAI). Vui lòng thử lại sau! 🤖");
+
+        } catch (\Exception $e) {
+            Log::error("OpenAI Service Exception: " . $e->getMessage());
+            return $this->textResponse("Hệ thống AI OpenAI đang gặp sự cố nhỏ. 😅");
+        }
+    }
+
     /**
      * Get context for AI (Product list, Shop info, etc.)
      */
-    private function getAiContext(): string
+    private function getAiContext(string $userMessage = ''): string
     {
         $categories = Category::pluck('name')->toArray();
         $hotline = $this->getSetting('hotline', '1900-xxxx');
         $email = $this->getSetting('email', 'support@electronicsstore.com');
         
-        $context = "Bạn là trợ lý ảo hỗ trợ khách hàng của Electronics Store.\n";
-        $context .= "Thông tin cửa hàng:\n";
-        $context .= "- Hotline: {$hotline}\n";
-        $context .= "- Email: {$email}\n";
-        $context .= "- Danh mục sản phẩm: " . implode(', ', $categories) . ".\n\n";
-        $context .= "Hãy trả lời khách hàng một cách thân thiện, chuyên nghiệp và ngắn gọn bằng tiếng Việt. Nếu khách hàng hỏi về sản phẩm không có trong danh mục, hãy hướng dẫn họ liên hệ hotline.";
+        // --- RAG: Intelligent Product Context ---
+        $productContext = "";
+        $keywords = $this->extractKeywords($userMessage);
         
-        return $context;
+        if (!empty($keywords)) {
+            $products = Product::where('is_active', true)
+                ->where(function($q) use ($keywords) {
+                    foreach ($keywords as $keyword) {
+                        $q->orWhere('name', 'LIKE', "%{$keyword}%");
+                    }
+                })
+                ->limit(5)
+                ->get();
+
+            if ($products->isNotEmpty()) {
+                $productContext = "DƯỚI ĐÂY LÀ DANH SÁCH SẢN PHẨM THỰC TẾ TRONG KHO (HÃY DÙNG ĐỂ TRẢ LỜI):\n";
+                foreach ($products as $p) {
+                    $price = number_format($p->price);
+                    $productContext .= "- {$p->name} (Giá: {$price} VND, Tình trạng: " . ($p->quantity > 0 ? 'Còn hàng' : 'Hết hàng') . ")\n";
+                }
+            } else {
+                $productContext = "Không tìm thấy sản phẩm nào khớp với từ khóa trong kho.";
+            }
+        }
+        // ----------------------------------------
+
+        $instruction = $this->getSetting('system_instruction', 
+            "Bạn là nhân viên bán hàng thời trang chuyên nghiệp, thân thiện và ngắn gọn.\n" .
+            "[QUY TẮC QUAN TRỌNG]:\n" .
+            "1. Chỉ trả lời tối đa 3 câu.\n" .
+            "2. Tập trung vào bán hàng, không chào hỏi dài dòng.\n" .
+            "3. Nếu có thông tin sản phẩm ở trên, hãy dùng nó để tư vấn chính xác.\n" .
+            "4. Giọng điệu hào hứng, dùng emoji phù hợp (👗, 👠, 🛍️).\n" .
+            "[THÔNG TIN CỬA HÀNG]:\n" .
+            "- Hotline: {hotline}\n" .
+            "- Danh mục: {categories}"
+        );
+        
+        // Thay thế các biến
+        $instruction = str_replace('{hotline}', $hotline, $instruction);
+        $instruction = str_replace('{email}', $email, $instruction);
+        $instruction = str_replace('{categories}', implode(', ', $categories), $instruction);
+        
+        return $instruction . "\n\n" . $productContext;
     }
     
     /**

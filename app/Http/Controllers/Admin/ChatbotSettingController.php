@@ -18,12 +18,15 @@ class ChatbotSettingController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'chatbot_mode' => 'required|in:rules,gemini',
+            'chatbot_mode' => 'required|in:rules,ai',
+            'ai_provider' => 'required|in:gemini,openai',
             'greeting_message' => 'required|string',
             'fallback_message' => 'required|string',
             'hotline' => 'required|string',
             'email' => 'required|email',
+            'system_instruction' => 'required|string',
             'gemini_api_key' => 'nullable|string',
+            'openai_api_key' => 'nullable|string',
         ]);
 
         $data = $request->except('_token');
@@ -38,7 +41,8 @@ class ChatbotSettingController extends Controller
 
     public function testConnection(Request $request)
     {
-        $apiKey = $request->input('gemini_api_key');
+        $provider = $request->input('ai_provider');
+        $apiKey = $request->input('api_key');
 
         if (!$apiKey) {
             return response()->json([
@@ -47,44 +51,65 @@ class ChatbotSettingController extends Controller
             ]);
         }
 
+        if ($provider === 'gemini') {
+            return $this->testGemini($apiKey);
+        } elseif ($provider === 'openai') {
+            return $this->testOpenAI($apiKey);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Nhà cung cấp không hợp lệ!']);
+    }
+
+    private function testGemini($apiKey)
+    {
         try {
-            $response = \Illuminate\Support\Facades\Http::post("https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={$apiKey}", [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => 'Hello, respond with "OK" if you are working.']
-                        ]
-                    ]
-                ]
+            $response = \Illuminate\Support\Facades\Http::withOptions([
+                'curl' => [
+                    CURLOPT_SSL_VERIFYPEER => true,
+                    CURLOPT_SSL_VERIFYHOST => 2,
+                ],
+                'timeout' => 30,
+            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={$apiKey}", [
+                'contents' => [['parts' => [['text' => 'Hello']]]]
             ]);
 
             if ($response->successful()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Kết nối thành công! Gemini AI đang hoạt động tốt. ✅'
-                ]);
+                return response()->json(['success' => true, 'message' => 'Kết nối Gemini thành công! ✅']);
             }
 
             $error = $response->json()['error']['message'] ?? 'Lỗi không xác định';
-            $status = $response->status();
-            
-            $suggestion = "";
-            if ($status == 400 && str_contains($error, 'API key not valid')) {
-                $suggestion = " (API Key không hợp lệ)";
-            } elseif ($status == 429) {
-                $suggestion = " (Quá hạn mức hoặc hết credit)";
+            return response()->json(['success' => false, 'message' => "Gemini: {$error} (Mã: {$response->status()})"]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Lỗi Gemini: ' . $e->getMessage()]);
+        }
+    }
+
+    private function testOpenAI($apiKey)
+    {
+        try {
+            $response = \Illuminate\Support\Facades\Http::withOptions([
+                'curl' => [
+                    CURLOPT_SSL_VERIFYPEER => true,
+                    CURLOPT_SSL_VERIFYHOST => 2,
+                ],
+                'timeout' => 30,
+            ])->withHeaders([
+                'Authorization' => "Bearer {$apiKey}",
+                'Content-Type' => 'application/json',
+            ])->post("https://api.openai.com/v1/chat/completions", [
+                'model' => 'gpt-3.5-turbo',
+                'messages' => [['role' => 'user', 'content' => 'Hello']],
+                'max_tokens' => 20
+            ]);
+
+            if ($response->successful()) {
+                return response()->json(['success' => true, 'message' => 'Kết nối OpenAI thành công! ✅']);
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => "Kết nối thất bại: {$error}{$suggestion} ❌ (Mã lỗi: {$status})"
-            ]);
-
+            $error = $response->json()['error']['message'] ?? 'Lỗi không xác định';
+            return response()->json(['success' => false, 'message' => "OpenAI: {$error} (Mã: {$response->status()})"]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Lỗi kết nối hệ thống: ' . $e->getMessage()
-            ]);
+            return response()->json(['success' => false, 'message' => 'Lỗi OpenAI: ' . $e->getMessage()]);
         }
     }
 }

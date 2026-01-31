@@ -21,6 +21,8 @@ class ChatController extends Controller
             'message' => 'required|string|max:1000',
         ]);
 
+        \Illuminate\Support\Facades\Log::info("ChatController hit: " . $request->input('message'));
+
         $message = $request->input('message');
         $sessionId = $request->session()->getId();
         $userId = auth()->id();
