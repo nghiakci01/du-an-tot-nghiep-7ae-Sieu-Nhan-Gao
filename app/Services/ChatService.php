@@ -58,6 +58,57 @@ class ChatService
     {
         $messageLower = mb_strtolower($message);
         
+        // 0. Check for custom keyword rules from settings (High Priority)
+        $customRulesJson = $this->getSetting('keyword_rules', '[]');
+        $customRules = json_decode($customRulesJson, true);
+        
+        if (is_array($customRules)) {
+            foreach ($customRules as $rule) {
+                if (!empty($rule['keyword']) && !empty($rule['response'])) {
+                    // Split keywords by comma if multiple provided
+                    $keywords = array_map(function($kw) {
+                        return mb_strtolower(trim($kw));
+                    }, explode(',', $rule['keyword']));
+                    
+                    if ($this->matchesPattern($messageLower, $keywords)) {
+                        $responseText = $rule['response'];
+                        $products = [];
+
+                        // Replace standard tags
+                        $responseText = str_replace('{hotline}', $this->getSetting('hotline', '1900-xxxx'), $responseText);
+                        $responseText = str_replace('{email}', $this->getSetting('email', 'support@example.com'), $responseText);
+                        
+                        if (str_contains($responseText, '{categories}')) {
+                            $categories = \App\Models\Category::pluck('name')->toArray();
+                            $responseText = str_replace('{categories}', implode(', ', $categories), $responseText);
+                        }
+
+                        // Handle {product} tag
+                        if (str_contains($responseText, '{product}')) {
+                            // Use the first keyword to search for products
+                            $searchKeyword = $keywords[0];
+                            $productResponse = $this->intelligentProductSearch($searchKeyword);
+                            
+                            if ($productResponse && !empty($productResponse['products'])) {
+                                $products = $productResponse['products'];
+                                // Replace {product} with a generic term or actual product name if only one
+                                $replacement = count($products) === 1 ? $products[0]['name'] : "sản phẩm";
+                                $responseText = str_replace('{product}', $replacement, $responseText);
+                            } else {
+                                $responseText = str_replace('{product}', "sản phẩm", $responseText);
+                            }
+                        }
+
+                        return [
+                            'message' => $responseText,
+                            'products' => $products,
+                            'type' => 'text'
+                        ];
+                    }
+                }
+            }
+        }
+        
         // 1. Check for greeting
         if ($this->matchesPattern($messageLower, ['chào', 'hello', 'hi', 'xin chào'])) {
             return $this->textResponse($this->getSetting('greeting_message', 'Xin chào! Tôi có thể giúp gì cho bạn?'));
@@ -255,17 +306,8 @@ class ChatService
                     $price = number_format($p->price);
                     $productContext .= "- {$p->name} (Giá: {$price} VND, " . ($p->quantity > 0 ? 'Sẵn hàng' : 'Liên hệ đặt trước') . "). Đặc điểm: {$p->short_description}\n";
                 }
-            } else {
-                // Last resort: provide some popular items
-                $popularProducts = Product::where('is_active', true)->where('is_featured', true)->limit(3)->get();
-                if ($popularProducts->isNotEmpty()) {
-                    $productContext = "KHÔNG TÌM THẤY TÊN CHÍNH XÁC, NHƯNG ĐÂY LÀ CÁC MẪU ĐANG BÁN CHẠY:\n";
-                    foreach ($popularProducts as $p) {
-                         $productContext .= "- {$p->name} (Giá: " . number_format($p->price) . " VND)\n";
-                    }
-                    $foundProducts = $popularProducts;
-                }
             }
+        }
         }
         // ----------------------------------------
 
@@ -479,7 +521,9 @@ class ChatService
     {
         $words = explode(' ', $message);
         $words = array_filter($words, function($word) {
-            return strlen($word) > 2;
+            // Tighten search: ignore very short words and common Vietnamese fillers
+            $stopWords = ['của', 'này', 'kia', 'đó', 'phẩm', 'shop', 'cửa', 'hàng', 'mua', 'xem', 'cho', 'với'];
+            return mb_strlen($word) >= 3 && !in_array(mb_strtolower($word), $stopWords);
         });
         
         if (empty($words)) {
@@ -509,14 +553,15 @@ class ChatService
      */
     private function extractKeywords(string $message): array
     {
-        $stopWords = ['có', 'không', 'bán', 'tìm', 'giá', 'bao', 'nhiêu', 'của', 'là', 'về', 'cho', 'và', 'được'];
+        $stopWords = ['có', 'không', 'bán', 'tìm', 'giá', 'bao', 'nhiêu', 'của', 'là', 'về', 'cho', 'và', 'được', 'cái', 'này', 'kia', 'đó', 'phẩm', 'shop', 'cửa', 'hàng', 'mua', 'xem', 'với', 'tại'];
         
         $words = explode(' ', $message);
         $keywords = [];
         
         foreach ($words as $word) {
             $word = trim($word);
-            if (strlen($word) > 2 && !in_array($word, $stopWords)) {
+            // Tighten: ignore common fillers and very short words
+            if (mb_strlen($word) >= 3 && !in_array($word, $stopWords)) {
                 $keywords[] = $word;
             }
         }

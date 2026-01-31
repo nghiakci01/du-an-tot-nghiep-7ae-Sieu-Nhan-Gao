@@ -97,6 +97,42 @@
             </div>
 
             <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Quản lý từ khóa (Keyword Rules)</h5>
+                    <button type="button" class="btn btn-sm btn-success" id="add-keyword-rule">
+                        <i class="ti ti-plus me-1"></i> Thêm quy tắc
+                    </button>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Khi khách hàng nhắn tin khớp với từ khóa, Chatbot sẽ trả lời bằng câu văn bản tương ứng. Hệ thống sẽ kiểm tra theo thứ tự từ trên xuống dưới.</p>
+                    <div class="alert alert-info border-0 shadow-none py-2 px-3 mb-3" style="background: rgba(var(--bs-info-rgb), 0.1);">
+                        <small class="fw-bold d-block mb-1 text-info"><i class="ti ti-info-circle me-1"></i> Các thẻ động (Dynamic Tags) hỗ trợ:</small>
+                        <div class="d-flex flex-wrap gap-3">
+                            <code class="text-primary small" title="Hiện danh sách sản phẩm liên quan">{product}</code>
+                            <code class="text-primary small" title="Số hotline hệ thống">{hotline}</code>
+                            <code class="text-primary small" title="Email hỗ trợ hệ thống">{email}</code>
+                            <code class="text-primary small" title="Danh sách các danh mục sản phẩm">{categories}</code>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="keyword-rules-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30%">Từ khóa / Mẫu (Regex)</th>
+                                    <th>Câu trả lời</th>
+                                    <th style="width: 80px" class="text-center">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="keyword-rules-body">
+                                <!-- Rules will be injected here by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <input type="hidden" name="keyword_rules" id="keyword_rules_input">
+                </div>
+            </div>
+
+            <div class="card mt-4">
                 <div class="card-header">
                     <h5>Thông tin hỗ trợ & AI Keys</h5>
                 </div>
@@ -214,6 +250,80 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+});
+
+// Logic cho Quản lý từ khóa
+document.addEventListener('DOMContentLoaded', function() {
+    const rulesBody = document.getElementById('keyword-rules-body');
+    const addBtn = document.getElementById('add-keyword-rule');
+    const rulesInput = document.getElementById('keyword_rules_input');
+    
+    // Load existing rules
+    let rules = [];
+    try {
+        const rawValue = `{!! $settings['keyword_rules'] ?? '[]' !!}`;
+        rules = JSON.parse(rawValue);
+        if (!Array.isArray(rules)) rules = [];
+    } catch (e) {
+        console.error('Failed to parse keyword rules:', e);
+        rules = [];
+    }
+
+    function renderRules() {
+        rulesBody.innerHTML = '';
+        if (rules.length === 0) {
+            rulesBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Chưa có quy tắc nào. Hãy nhấn "Thêm quy tắc" để bắt đầu.</td></tr>';
+        }
+
+        rules.forEach((rule, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <input type="text" class="form-control rule-keyword" value="${rule.keyword || ''}" placeholder="Vd: khuyến mãi, giá,..." data-index="${index}">
+                </td>
+                <td>
+                    <textarea class="form-control rule-response" rows="2" placeholder="Nhập câu trả lời..." data-index="${index}">${rule.response || ''}</textarea>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-rule" data-index="${index}">
+                        <i class="ti ti-trash"></i>
+                    </button>
+                </td>
+            `;
+            rulesBody.appendChild(tr);
+        });
+        updateHiddenInput();
+    }
+
+    function updateHiddenInput() {
+        rulesInput.value = JSON.stringify(rules);
+    }
+
+    addBtn.addEventListener('click', function() {
+        rules.push({ keyword: '', response: '' });
+        renderRules();
+    });
+
+    rulesBody.addEventListener('click', function(e) {
+        if (e.target.closest('.btn-remove-rule')) {
+            const index = e.target.closest('.btn-remove-rule').dataset.index;
+            rules.splice(index, 1);
+            renderRules();
+        }
+    });
+
+    rulesBody.addEventListener('input', function(e) {
+        const input = e.target;
+        const index = input.dataset.index;
+        if (input.classList.contains('rule-keyword')) {
+            rules[index].keyword = input.value;
+        } else if (input.classList.contains('rule-response')) {
+            rules[index].response = input.value;
+        }
+        updateHiddenInput();
+    });
+
+    renderRules();
 });
 </script>
 @endsection

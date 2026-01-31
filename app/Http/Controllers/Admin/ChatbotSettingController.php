@@ -28,6 +28,7 @@ class ChatbotSettingController extends Controller
             'system_instruction' => 'required|string',
             'gemini_api_key' => 'nullable|string',
             'openai_api_key' => 'nullable|string',
+            'keyword_rules' => 'nullable|string',
         ]);
 
         $data = $request->except('_token');
