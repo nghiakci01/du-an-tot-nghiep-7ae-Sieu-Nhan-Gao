@@ -45,7 +45,9 @@ class ChatManagementController extends Controller
             ->where('sender_type', 'user')
             ->update(['is_read' => true]);
 
-        return view('admin.chat.show', compact('messages', 'sessionId'));
+        $user = $messages->where('user_id', '!=', null)->where('sender_type', 'user')->first()?->user;
+
+        return view('admin.chat.show', compact('messages', 'sessionId', 'user'));
     }
 
     public function reply(Request $request, $sessionId)

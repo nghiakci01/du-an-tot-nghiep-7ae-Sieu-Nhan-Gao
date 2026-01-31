@@ -115,8 +115,13 @@
                 </ul>
             </div>
             <div class="col-md-12">
-                <div class="page-header-title">
-                    <h2 class="mb-0">Hội thoại với {{ substr($sessionId, 0, 8) }}</h2>
+                <div class="page-header-title d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Hội thoại với {{ $user ? $user->name : substr($sessionId, 0, 8) }}</h2>
+                    @if($user)
+                        <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-info btn-sm rounded-pill shadow-sm px-4">
+                            <i class="ti ti-user-circle me-1"></i> Xem Profile
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>

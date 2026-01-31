@@ -129,6 +129,11 @@
                             
                             <!-- Actions -->
                             <div class="d-flex align-items-center gap-3 pe-4">
+                                @if($chat->user)
+                                    <a href="{{ route('admin.users.show', $chat->user->id) }}" class="btn btn-link text-info p-0" title="Xem hồ sồ khách hàng">
+                                        <i class="ti ti-user-circle fs-4"></i>
+                                    </a>
+                                @endif
                                 <form action="{{ route('admin.chat.destroy', $chat->session_id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn chuyển hội thoại này vào thùng rác?')">
                                     @csrf
                                     @method('DELETE')
