@@ -106,8 +106,9 @@ class ChatService
         }
 
         try {
-            $context = $this->getAiContext($message);
-            $fullPrompt = $context . "\n\nUser Question: " . $message;
+            $contextData = $this->getAiContext($message);
+            $fullPrompt = $contextData['instruction'] . "\n\nUser Question: " . $message;
+            $products = $contextData['products'];
             
             // Updated to use 'gemini-flash-latest' and 'v1beta' based on successful diagnostics
             $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={$apiKey}";
@@ -133,6 +134,10 @@ class ChatService
             if ($response->successful()) {
                 $data = $response->json();
                 $responseText = $data['candidates'][0]['content']['parts'][0]['text'] ?? "Tôi không nhận được phản hồi từ AI. 😅";
+                
+                if ($products->isNotEmpty()) {
+                    return $this->productResponse($responseText, $products);
+                }
                 return $this->textResponse($responseText);
             }
 
@@ -154,7 +159,8 @@ class ChatService
         }
 
         try {
-            $context = $this->getAiContext($message);
+            $contextData = $this->getAiContext($message);
+            $products = $contextData['products'];
             
             $response = \Illuminate\Support\Facades\Http::withOptions([
                 'curl' => [
@@ -167,7 +173,7 @@ class ChatService
                 'Content-Type' => 'application/json',
             ])->post("https://api.openai.com/v1/responses", [
                 'model' => 'gpt-3.5-turbo',
-                'instructions' => $context,
+                'instructions' => $contextData['instruction'],
                 'input' => $message,
                 'temperature' => 0.7,
                 'max_output_tokens' => 800,
@@ -177,6 +183,10 @@ class ChatService
                 $data = $response->json();
                 // v1/responses structure: output[0].content[0].text
                 $responseText = $data['output'][0]['content'][0]['text'] ?? "Tôi không nhận được phản hồi từ OpenAI. 😅";
+                
+                if ($products->isNotEmpty()) {
+                    return $this->productResponse($responseText, $products);
+                }
                 return $this->textResponse($responseText);
             }
 
@@ -192,7 +202,7 @@ class ChatService
     /**
      * Get context for AI (Product list, Shop info, etc.)
      */
-    private function getAiContext(string $userMessage = ''): string
+    private function getAiContext(string $userMessage = ''): array
     {
         $categories = Category::pluck('name')->toArray();
         $hotline = $this->getSetting('hotline', '1900-xxxx');
@@ -202,8 +212,9 @@ class ChatService
         $productContext = "";
         $keywords = $this->extractKeywords($userMessage);
         
+        $foundProducts = collect([]);
         if (!empty($keywords)) {
-            $products = Product::where('is_active', true)
+            $foundProducts = Product::where('is_active', true)
                 ->where(function($q) use ($keywords) {
                     foreach ($keywords as $keyword) {
                         $q->orWhere('name', 'LIKE', "%{$keyword}%");
@@ -212,9 +223,9 @@ class ChatService
                 ->limit(5)
                 ->get();
 
-            if ($products->isNotEmpty()) {
+            if ($foundProducts->isNotEmpty()) {
                 $productContext = "DƯỚI ĐÂY LÀ DANH SÁCH SẢN PHẨM THỰC TẾ TRONG KHO (HÃY DÙNG ĐỂ TRẢ LỜI):\n";
-                foreach ($products as $p) {
+                foreach ($foundProducts as $p) {
                     $price = number_format($p->price);
                     $productContext .= "- {$p->name} (Giá: {$price} VND, Tình trạng: " . ($p->quantity > 0 ? 'Còn hàng' : 'Hết hàng') . ")\n";
                 }
@@ -241,7 +252,10 @@ class ChatService
         $instruction = str_replace('{email}', $email, $instruction);
         $instruction = str_replace('{categories}', implode(', ', $categories), $instruction);
         
-        return $instruction . "\n\n" . $productContext;
+        return [
+            'instruction' => $instruction . "\n\n" . $productContext,
+            'products' => $foundProducts
+        ];
     }
     
     /**
