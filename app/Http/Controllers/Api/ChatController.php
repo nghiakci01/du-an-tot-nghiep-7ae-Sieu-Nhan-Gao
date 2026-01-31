@@ -43,7 +43,10 @@ class ChatController extends Controller
             'session_id' => $sessionId,
             'user_id' => $userId,
             'message' => $result['message'],
-            'sender_type' => 'bot'
+            'sender_type' => 'bot',
+            'payload' => [
+                'products' => $result['products'] ?? []
+            ]
         ]);
 
         return response()->json([

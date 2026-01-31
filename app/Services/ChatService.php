@@ -98,7 +98,7 @@ class ChatService
         }
         
         // 9. Default response with suggestions (Fallback)
-        $fallback = $this->getSetting('fallback_message', 'Tôi chưa hiểu rõ yêu cầu của bạn. Vui lòng liên hệ hotline {hotline} để được hỗ trợ!');
+        $fallback = $this->getSetting('fallback_message', 'Hiện tại tôi chưa có thông tin về yêu cầu này. Vui lòng chờ nhân viên tư vấn sẽ hỗ trợ bạn ngay nhé! 😊');
         $hotline = $this->getSetting('hotline', '1900-xxxx');
         $fallback = str_replace('{hotline}', $hotline, $fallback);
         

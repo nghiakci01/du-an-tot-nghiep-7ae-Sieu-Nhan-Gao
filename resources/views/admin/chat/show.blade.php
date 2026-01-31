@@ -136,6 +136,23 @@
                     <div class="msg-wrapper {{ $msg->sender_type }} position-relative">
                         <div class="msg-bubble">
                             {{ $msg->message }}
+
+                            @if($msg->sender_type == 'bot' && !empty($msg->payload['products']))
+                                <div class="admin-recommended-products mt-3 border-top pt-3">
+                                    <p class="small text-muted mb-2"><i class="ti ti-shopping-cart"></i> Sản phẩm AI đã đề xuất:</p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @foreach($msg->payload['products'] as $product)
+                                            <div class="card mb-0 shadow-none border p-2" style="width: 150px;">
+                                                <img src="{{ $product['image'] }}" class="card-img-top rounded mb-2" style="height: 80px; object-fit: cover;">
+                                                <div class="card-body p-0">
+                                                    <h6 class="card-title mb-1" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $product['name'] }}</h6>
+                                                    <p class="text-primary fw-bold mb-0" style="font-size: 10px;">{{ $product['price_formatted'] }}</p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                         <div class="msg-info d-flex justify-content-between align-items-center w-100 mt-2">
                             <span class="flex-grow-1">
