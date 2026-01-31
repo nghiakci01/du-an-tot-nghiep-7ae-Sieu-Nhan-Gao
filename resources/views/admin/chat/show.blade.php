@@ -128,18 +128,32 @@
         <div class="chat-container-admin">
             <div class="chat-messages-admin" id="admin-chat-box">
                 @foreach($messages as $msg)
-                    <div class="msg-wrapper {{ $msg->sender_type }}">
+                    <div class="msg-wrapper {{ $msg->sender_type }} position-relative">
                         <div class="msg-bubble">
                             {{ $msg->message }}
                         </div>
-                        <div class="msg-info">
-                            @if($msg->sender_type == 'user')
-                                KHÁCH HÀNG • {{ $msg->created_at->format('H:i') }}
-                            @elseif($msg->sender_type == 'bot')
-                                AI ASSISTANT • {{ $msg->created_at->format('H:i') }}
-                            @else
-                                NHÂN VIÊN • {{ $msg->created_at->format('H:i') }}
-                            @endif
+                        <div class="msg-info d-flex justify-content-between align-items-center w-100 mt-2">
+                            <span class="flex-grow-1">
+                                @if($msg->sender_type == 'user')
+                                    KHÁCH HÀNG
+                                @elseif($msg->sender_type == 'bot')
+                                    AI ASSISTANT
+                                @else
+                                    NHÂN VIÊN
+                                @endif
+                                • {{ $msg->created_at->format('H:i') }}
+                            </span>
+                            
+                            <!-- Delete Message Action -->
+                            <div class="ms-2">
+                                <form action="{{ route('admin.chat.destroy_message', $msg->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tin nhắn này?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-link text-danger p-0 d-flex align-items-center" title="Xóa tin nhắn">
+                                        <i class="ti ti-x fs-6"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 @endforeach

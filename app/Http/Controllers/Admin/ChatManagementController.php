@@ -63,4 +63,56 @@ class ChatManagementController extends Controller
 
         return redirect()->back()->with('success', 'Đã gửi phản hồi!');
     }
+
+    public function destroy($sessionId)
+    {
+        ChatMessage::where('session_id', $sessionId)->delete();
+        return redirect()->route('admin.chat.index')->with('success', 'Đã chuyển hội thoại vào thùng rác!');
+    }
+
+    public function trash()
+    {
+        // Get sessions that ONLY have trashed messages (or at least no active ones)
+        $activeSessionIds = ChatMessage::pluck('session_id')->unique();
+
+        $conversations = ChatMessage::onlyTrashed()
+            ->whereNotIn('session_id', $activeSessionIds)
+            ->select('session_id', 'user_id', \DB::raw('MAX(deleted_at) as deleted_at'))
+            ->with(['user'])
+            ->groupBy('session_id', 'user_id')
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(15);
+
+        foreach ($conversations as $chat) {
+            $lastMsg = ChatMessage::onlyTrashed()
+                ->where('session_id', $chat->session_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            $chat->last_message = $lastMsg ? $lastMsg->message : '';
+        }
+
+        return view('admin.chat.trash', compact('conversations'));
+    }
+
+    public function restore($sessionId)
+    {
+        ChatMessage::onlyTrashed()->where('session_id', $sessionId)->restore();
+        return redirect()->route('admin.chat.trash')->with('success', 'Đã khôi phục hội thoại!');
+    }
+
+    public function permanentDelete($sessionId)
+    {
+        ChatMessage::onlyTrashed()->where('session_id', $sessionId)->forceDelete();
+        return redirect()->route('admin.chat.trash')->with('success', 'Đã xóa vĩnh viễn hội thoại!');
+    }
+
+    public function destroyMessage($id)
+    {
+        $message = ChatMessage::findOrFail($id);
+        $sessionId = $message->session_id;
+        $message->delete();
+
+        return redirect()->back()->with('success', 'Đã xóa tin nhắn!');
+    }
 }

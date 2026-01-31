@@ -420,7 +420,7 @@
     }
 </style>
 
-<div x-data="chatBot()" x-init="initChat()" class="chatbot-widget chat-container">
+<div x-data="chatBot({ mode: '{{ $chatbot_mode ?? 'rules' }}' })" x-init="initChat()" class="chatbot-widget chat-container">
     
     <!-- Chat Window -->
     <div x-show="isOpen" 
@@ -527,7 +527,7 @@
 
         <!-- Input Area -->
         <div class="chat-input-area">
-            <form @submit.prevent="sendMessage" class="chat-form">
+            <form @submit.prevent="sendMessage()" class="chat-form">
                 <input type="text" 
                        x-model="newMessage"
                        placeholder="Nhập tin nhắn..." 
@@ -569,13 +569,14 @@
 </div>
 
 <script>
-    function chatBot() {
+    function chatBot(config = {}) {
         return {
             isOpen: false,
             isFullscreen: false,
             messages: [],
             newMessage: '',
             isLoading: false,
+            mode: config.mode || 'rules',
 
             async initChat() {
                 console.log('Chatbot initialized (History Sync Enabled)');
@@ -649,8 +650,9 @@
             },
 
             async sendMessage(textInput = null) {
-                const text = textInput || this.newMessage.trim();
-                if (!text) return;
+                // If textInput is an Event (from @submit), ignore it and use newMessage
+                const text = (typeof textInput === 'string') ? textInput : this.newMessage.trim();
+                if (!text || typeof text !== 'string') return;
 
                 // Add User Message
                 this.messages.push({
@@ -697,8 +699,16 @@
 
                 } catch (error) {
                     console.error('Chat Error:', error);
+                    
+                    let errorText = "Xin lỗi, hiện tại tôi đang gặp sự cố kết nối. Vui lòng thử lại sau.";
+                    if (this.mode === 'rules') {
+                        errorText = "Hệ thống đang bận một chút, bạn vui lòng nhắn lại sau ít phút hoặc liên hệ hotline để được hỗ trợ nhanh nhất nhé! 😊";
+                    } else {
+                        errorText = "Hệ thống AI đang gặp sự cố kỹ thuật. Vui lòng thử lại sau một lát! 🤖";
+                    }
+
                     this.messages.push({
-                        text: "Xin lỗi, hiện tại tôi đang gặp sự cố kết nối. Vui lòng thử lại sau.",
+                        text: errorText,
                         isUser: false,
                         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                     });

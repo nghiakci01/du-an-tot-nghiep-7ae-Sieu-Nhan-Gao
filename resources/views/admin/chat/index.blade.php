@@ -86,44 +86,62 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card chat-list-card">
-            <div class="card-header bg-white py-3">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Danh sách hội thoại</h5>
+                <a href="{{ route('admin.chat.trash') }}" class="btn btn-outline-danger btn-sm">
+                    <i class="ti ti-trash me-1"></i> Thùng rác
+                </a>
             </div>
             <div class="card-body p-0">
                 @forelse($conversations as $chat)
-                    <a href="{{ route('admin.chat.show', $chat->session_id) }}" 
-                       class="chat-item {{ $chat->unread_count > 0 ? 'unread' : '' }}">
+                    <div class="chat-item-wrapper border-bottom position-relative">
                         <div class="d-flex align-items-center">
-                            <div class="user-avatar shadow-sm">
-                                {{ $chat->user ? strtoupper(substr($chat->user->name, 0, 1)) : 'K' }}
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="mb-1 font-weight-bold">
-                                            {{ $chat->user ? $chat->user->name : 'Khách vãng lai (' . substr($chat->session_id, 0, 8) . ')' }}
-                                        </h6>
-                                        <p class="last-message-snippet mb-0">
-                                            @if($chat->unread_count > 0)
-                                                <strong>{{ $chat->last_message }}</strong>
-                                            @else
-                                                {{ $chat->last_message }}
-                                            @endif
-                                        </p>
+                            <a href="{{ route('admin.chat.show', $chat->session_id) }}" 
+                               class="chat-item {{ $chat->unread_count > 0 ? 'unread' : '' }} flex-grow-1 border-0 mb-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar shadow-sm">
+                                        {{ $chat->user ? strtoupper(substr($chat->user->name, 0, 1)) : 'K' }}
                                     </div>
-                                    <div class="text-end">
-                                        <span class="chat-time d-block mb-1">{{ $chat->created_at ? $chat->created_at->diffForHumans() : '' }}</span>
-                                        @if($chat->unread_count > 0)
-                                            <span class="unread-badge ms-auto">{{ $chat->unread_count }}</span>
-                                        @endif
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1 font-weight-bold">
+                                                    {{ $chat->user ? $chat->user->name : 'Khách vãng lai (' . substr($chat->session_id, 0, 8) . ')' }}
+                                                </h6>
+                                                <p class="last-message-snippet mb-0">
+                                                    @if($chat->unread_count > 0)
+                                                        <strong>{{ $chat->last_message }}</strong>
+                                                    @else
+                                                        {{ $chat->last_message }}
+                                                    @endif
+                                                </p>
+                                            </div>
+                                            <div class="text-end me-3">
+                                                <span class="chat-time d-block mb-1">{{ $chat->created_at ? $chat->created_at->diffForHumans() : '' }}</span>
+                                                @if($chat->unread_count > 0)
+                                                    <span class="unread-badge ms-auto">{{ $chat->unread_count }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="ms-3">
-                                <i class="ti ti-chevron-right text-muted"></i>
+                            </a>
+                            
+                            <!-- Actions -->
+                            <div class="d-flex align-items-center gap-3 pe-4">
+                                <form action="{{ route('admin.chat.destroy', $chat->session_id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn chuyển hội thoại này vào thùng rác?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-link text-danger p-0" title="Xóa">
+                                        <i class="ti ti-trash fs-4"></i>
+                                    </button>
+                                </form>
+                                <a href="{{ route('admin.chat.show', $chat->session_id) }}" class="text-muted">
+                                    <i class="ti ti-chevron-right"></i>
+                                </a>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 @empty
                     <div class="p-5 text-center">
                         <div class="mb-3">

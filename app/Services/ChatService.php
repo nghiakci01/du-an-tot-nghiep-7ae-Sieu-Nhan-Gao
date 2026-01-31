@@ -23,20 +23,32 @@ class ChatService
 
     public function generateResponse(string $message): array
     {
-        $mode = $this->getSetting('chatbot_mode', 'rules');
+        try {
+            $mode = $this->getSetting('chatbot_mode', 'rules');
+            
+            // Treat empty value as 'rules'
+            if (empty($mode) || $mode === 'rules') {
+                return $this->generateRuleResponse($message);
+            }
 
-        if ($mode === 'rules') {
-            return $this->generateRuleResponse($message);
+            // Handle AI modes
+            $provider = $this->getSetting('ai_provider', 'gemini');
+
+            if ($provider === 'openai') {
+                return $this->generateOpenAIResponse($message);
+            }
+
+            return $this->generateGeminiResponse($message);
+        } catch (\Exception $e) {
+            Log::error("ChatService Exception: " . $e->getMessage());
+            $mode = $this->getSetting('chatbot_mode', 'rules');
+            
+            if (empty($mode) || $mode === 'rules') {
+                return $this->textResponse("Rất tiếc, hệ thống đang bận. Vui lòng thử lại sau một lát! 😊");
+            }
+            
+            return $this->textResponse("Hệ thống AI đang gặp sự cố kỹ thuật. Vui lòng thử lại sau! 🤖");
         }
-
-        // Handle legacy 'gemini' mode as 'ai'
-        $provider = $this->getSetting('ai_provider', 'gemini');
-
-        if ($provider === 'openai') {
-            return $this->generateOpenAIResponse($message);
-        }
-
-        return $this->generateGeminiResponse($message);
     }
 
     /**

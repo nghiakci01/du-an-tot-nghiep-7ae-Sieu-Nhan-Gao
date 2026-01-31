@@ -50,8 +50,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Chatbot Management (Admin & Staff)
     Route::prefix('chat')->name('chat.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\ChatManagementController::class, 'index'])->name('index');
+        Route::get('/trash', [\App\Http\Controllers\Admin\ChatManagementController::class, 'trash'])->name('trash');
         Route::get('/{sessionId}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'show'])->name('show');
         Route::post('/{sessionId}/reply', [\App\Http\Controllers\Admin\ChatManagementController::class, 'reply'])->name('reply');
+        Route::delete('/{sessionId}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'destroy'])->name('destroy');
+        Route::post('/{sessionId}/restore', [\App\Http\Controllers\Admin\ChatManagementController::class, 'restore'])->name('restore');
+        Route::delete('/{sessionId}/permanent', [\App\Http\Controllers\Admin\ChatManagementController::class, 'permanentDelete'])->name('permanent');
+        Route::delete('/message/{id}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'destroyMessage'])->name('destroy_message');
     });
 
     // Chatbot Settings (Admin only)
