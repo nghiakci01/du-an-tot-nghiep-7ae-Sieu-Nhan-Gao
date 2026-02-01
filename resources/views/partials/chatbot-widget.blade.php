@@ -591,7 +591,7 @@
                         isUser: false,
                         sender_type: 'bot',
                         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        quickActions: ['Hàng mới về 🆕', 'Khuyến mãi 🔥', 'Áo thun', 'Váy đầm', 'Liên hệ']
+                        quickActions: {!! json_encode($chatbot_suggested_questions ?? ['Hàng mới về 🆕', 'Khuyến mãi 🔥', 'Áo thun', 'Váy đầm', 'Liên hệ']) !!}
                     });
                 }
 

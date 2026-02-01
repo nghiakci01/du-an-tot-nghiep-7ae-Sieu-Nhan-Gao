@@ -224,6 +224,14 @@
                   <span class="pc-mtext">Cấu hình Chatbot</span>
                 </a>
               </li>
+              <li class="pc-item">
+                <a href="{{ route('admin.chatbot.questions.index') }}" class="pc-link">
+                  <span class="pc-micon">
+                    <i class="ti ti-help"></i>
+                  </span>
+                  <span class="pc-mtext">Câu hỏi gợi ý</span>
+                </a>
+              </li>
             @endif
             <li class="pc-item pc-caption">
               <label data-i18n="Widget">Widget</label>

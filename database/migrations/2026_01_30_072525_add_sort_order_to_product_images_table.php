@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('product_images', function (Blueprint $table) {
-            $table->integer('sort_order')->default(0)->after('image_path');
-        });
+        if (!Schema::hasColumn('product_images', 'sort_order')) {
+            Schema::table('product_images', function (Blueprint $table) {
+                $table->integer('sort_order')->default(0)->after('image_path');
+            });
+        }
     }
 
     /**

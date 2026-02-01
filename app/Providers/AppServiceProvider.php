@@ -44,6 +44,15 @@ class AppServiceProvider extends ServiceProvider
 
                 $view->with('chatbot_enabled', $chatbotEnabled == '1');
                 $view->with('chatbot_mode', $chatbotMode);
+
+                // Share suggested questions
+                $suggestedQuestions = \Illuminate\Support\Facades\Cache::remember('chatbot_suggested_questions', 3600, function () {
+                    return \App\Models\ChatbotSuggestedQuestion::where('is_active', true)
+                        ->orderBy('order')
+                        ->pluck('question')
+                        ->toArray();
+                });
+                $view->with('chatbot_suggested_questions', $suggestedQuestions);
             });
         } catch (\Exception $e) {
             // Log or ignore if DB connection fails during boot (e.g. composer install)

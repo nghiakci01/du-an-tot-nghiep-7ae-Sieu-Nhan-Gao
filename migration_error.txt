@@ -1,0 +1,7 @@
+Migration successful!
+
+   INFO  Running migrations.  
+
+  2026_01_30_072525_add_sort_order_to_product_images_table  15.40ms DONE
+  2026_02_01_042536_create_chatbot_suggested_questions_table  29.62ms DONE
+

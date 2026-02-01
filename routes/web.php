@@ -60,6 +60,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::delete('/message/{id}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'destroyMessage'])->name('destroy_message');
     });
 
+    // Chatbot Questions (Admin only)
+    Route::middleware(['admin.only'])->group(function () {
+        Route::prefix('chatbot')->name('chatbot.')->group(function () {
+            Route::resource('questions', \App\Http\Controllers\Admin\ChatbotSuggestedQuestionController::class);
+        });
+    });
+
     // Chatbot Settings (Admin only)
     Route::middleware(['admin.only'])->group(function () {
         Route::prefix('settings')->name('settings.')->group(function () {
