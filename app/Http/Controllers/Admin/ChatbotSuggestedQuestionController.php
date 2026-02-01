@@ -10,8 +10,7 @@ class ChatbotSuggestedQuestionController extends Controller
 {
     public function index()
     {
-        $questions = ChatbotSuggestedQuestion::orderBy('order')->orderBy('created_at', 'desc')->get();
-        return view('admin.chatbot.questions.index', compact('questions'));
+        return redirect()->route('admin.settings.chatbot', ['tab' => 'questions']);
     }
 
     public function create()
@@ -25,15 +24,15 @@ class ChatbotSuggestedQuestionController extends Controller
             'question' => 'required|string|max:255',
             'answer' => 'nullable|string',
             'order' => 'required|integer',
-            'is_active' => 'boolean',
         ]);
 
         $data = $request->all();
         $data['is_active'] = $request->has('is_active');
 
         ChatbotSuggestedQuestion::create($data);
+        \Illuminate\Support\Facades\Cache::forget('chatbot_suggested_questions');
 
-        return redirect()->route('admin.chatbot.questions.index')->with('success', 'Thêm câu hỏi gợi ý thành công!');
+        return redirect()->route('admin.settings.chatbot', ['tab' => 'questions'])->with('success', 'Thêm câu hỏi gợi ý thành công!');
     }
 
     public function edit(ChatbotSuggestedQuestion $question)
@@ -47,20 +46,21 @@ class ChatbotSuggestedQuestionController extends Controller
             'question' => 'required|string|max:255',
             'answer' => 'nullable|string',
             'order' => 'required|integer',
-            'is_active' => 'boolean',
         ]);
 
         $data = $request->all();
         $data['is_active'] = $request->has('is_active');
 
         $question->update($data);
+        \Illuminate\Support\Facades\Cache::forget('chatbot_suggested_questions');
 
-        return redirect()->route('admin.chatbot.questions.index')->with('success', 'Cập nhật câu hỏi gợi ý thành công!');
+        return redirect()->route('admin.settings.chatbot', ['tab' => 'questions'])->with('success', 'Cập nhật câu hỏi gợi ý thành công!');
     }
 
     public function destroy(ChatbotSuggestedQuestion $question)
     {
         $question->delete();
-        return redirect()->route('admin.chatbot.questions.index')->with('success', 'Xóa câu hỏi gợi ý thành công!');
+        \Illuminate\Support\Facades\Cache::forget('chatbot_suggested_questions');
+        return redirect()->route('admin.settings.chatbot', ['tab' => 'questions'])->with('success', 'Xóa câu hỏi gợi ý thành công!');
     }
 }

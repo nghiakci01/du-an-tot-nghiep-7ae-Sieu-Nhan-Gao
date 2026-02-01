@@ -12,7 +12,7 @@
                 </div>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="feather icon-home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.chatbot.questions.index') }}">Câu hỏi gợi ý</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.settings.chatbot', ['tab' => 'questions']) }}">Câu hỏi gợi ý</a></li>
                     <li class="breadcrumb-item"><a href="#!">Chỉnh sửa</a></li>
                 </ul>
             </div>
@@ -69,7 +69,7 @@
 
                     <div class="mt-4">
                         <button type="submit" class="btn btn-primary">Cập nhật</button>
-                        <a href="{{ route('admin.chatbot.questions.index') }}" class="btn btn-secondary">Quay lại</a>
+                        <a href="{{ route('admin.settings.chatbot', ['tab' => 'questions']) }}" class="btn btn-secondary">Quay lại</a>
                     </div>
                 </form>
             </div>
