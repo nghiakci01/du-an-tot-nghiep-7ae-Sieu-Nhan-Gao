@@ -266,6 +266,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @section('scripts')
 <script>
@@ -332,6 +333,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 resultDiv.innerHTML = 'Lỗi hệ thống khi gửi yêu cầu. Vui lòng thử lại sau!';
                 console.error('Error:', error);
             });
+        });
+    });
+
     // Xử lý chuyển tab tự động từ URL
     const urlParams = new URLSearchParams(window.location.search);
     const activeTab = urlParams.get('tab');
@@ -430,5 +434,4 @@ document.addEventListener('DOMContentLoaded', function() {
     renderRules();
 });
 </script>
-@endsection
 @endsection
