@@ -40,6 +40,15 @@
 
                     <div class="form-group mb-3">
                         <label class="form-label">Câu trả lời mẫu (Tùy chọn)</label>
+                        <div class="alert alert-info border-0 shadow-none py-2 px-3 mb-2" style="background: rgba(var(--bs-info-rgb), 0.1);">
+                            <small class="fw-bold d-block mb-1 text-info"><i class="ti ti-info-circle me-1"></i> Các thẻ động hỗ trợ:</small>
+                            <div class="d-flex flex-wrap gap-2">
+                                <code class="text-primary small" title="Hiện danh sách sản phẩm liên quan">{product}</code>
+                                <code class="text-primary small" title="Số hotline hệ thống">{hotline}</code>
+                                <code class="text-primary small" title="Email hỗ trợ hệ thống">{email}</code>
+                                <code class="text-primary small" title="Danh sách các danh mục sản phẩm">{categories}</code>
+                            </div>
+                        </div>
                         <textarea name="answer" class="form-control @error('answer') is-invalid @enderror" rows="4" placeholder="Nhập câu trả lời mẫu cho quy tắc (nếu có)">{{ old('answer') }}</textarea>
                         @error('answer')
                             <div class="invalid-feedback">{{ $message }}</div>

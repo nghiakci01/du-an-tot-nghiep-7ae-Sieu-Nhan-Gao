@@ -332,7 +332,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 resultDiv.innerHTML = 'Lỗi hệ thống khi gửi yêu cầu. Vui lòng thử lại sau!';
                 console.error('Error:', error);
             });
-        });
     // Xử lý chuyển tab tự động từ URL
     const urlParams = new URLSearchParams(window.location.search);
     const activeTab = urlParams.get('tab');
@@ -343,17 +342,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-// Logic cho Quản lý từ khóa
-document.addEventListener('DOMContentLoaded', function() {
+    // Logic cho Quản lý từ khóa
     const rulesBody = document.getElementById('keyword-rules-body');
     const addBtn = document.getElementById('add-keyword-rule');
     const rulesInput = document.getElementById('keyword_rules_input');
     
-    // Load existing rules
+    // Load existing rules - Safely pass from PHP to JS
     let rules = [];
     try {
-        const rawValue = `{!! $settings['keyword_rules'] ?? '[]' !!}`;
-        rules = JSON.parse(rawValue);
+        const rawJson = @json($settings['keyword_rules'] ?? '[]');
+        rules = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
         if (!Array.isArray(rules)) rules = [];
     } catch (e) {
         console.error('Failed to parse keyword rules:', e);
@@ -361,19 +359,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderRules() {
+        if (!rulesBody) return;
         rulesBody.innerHTML = '';
         if (rules.length === 0) {
-            rulesBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Chưa có quy tắc nào. Hãy nhấn "Thêm quy tắc" để bắt đầu.</td></tr>';
+            rulesBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">Chưa có quy tắc nào. Hãy nhấn "Thêm quy tắc" để bắt đầu.</td></tr>';
+            return;
         }
 
         rules.forEach((rule, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>
-                    <input type="text" class="form-control rule-keyword" value="${rule.keyword || ''}" placeholder="Vd: khuyến mãi, giá,..." data-index="${index}">
+                    <input type="text" class="form-control rule-keyword" value="${escapeHtml(rule.keyword || '')}" placeholder="Vd: khuyến mãi, giá,..." data-index="${index}">
                 </td>
                 <td>
-                    <textarea class="form-control rule-response" rows="2" placeholder="Nhập câu trả lời..." data-index="${index}">${rule.response || ''}</textarea>
+                    <textarea class="form-control rule-response" rows="2" placeholder="Nhập câu trả lời..." data-index="${index}">${escapeHtml(rule.response || '')}</textarea>
                 </td>
                 <td class="text-center">
                     <button type="button" class="btn btn-sm btn-outline-danger btn-remove-rule" data-index="${index}">
@@ -386,33 +386,46 @@ document.addEventListener('DOMContentLoaded', function() {
         updateHiddenInput();
     }
 
-    function updateHiddenInput() {
-        rulesInput.value = JSON.stringify(rules);
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
-    addBtn.addEventListener('click', function() {
-        rules.push({ keyword: '', response: '' });
-        renderRules();
-    });
+    function updateHiddenInput() {
+        if (rulesInput) {
+            rulesInput.value = JSON.stringify(rules);
+        }
+    }
 
-    rulesBody.addEventListener('click', function(e) {
-        if (e.target.closest('.btn-remove-rule')) {
-            const index = e.target.closest('.btn-remove-rule').dataset.index;
-            rules.splice(index, 1);
+    if (addBtn) {
+        addBtn.addEventListener('click', function() {
+            rules.push({ keyword: '', response: '' });
             renderRules();
-        }
-    });
+        });
+    }
 
-    rulesBody.addEventListener('input', function(e) {
-        const input = e.target;
-        const index = input.dataset.index;
-        if (input.classList.contains('rule-keyword')) {
-            rules[index].keyword = input.value;
-        } else if (input.classList.contains('rule-response')) {
-            rules[index].response = input.value;
-        }
-        updateHiddenInput();
-    });
+    if (rulesBody) {
+        rulesBody.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-remove-rule');
+            if (btn) {
+                const index = btn.dataset.index;
+                rules.splice(index, 1);
+                renderRules();
+            }
+        });
+
+        rulesBody.addEventListener('input', function(e) {
+            const input = e.target;
+            const index = input.dataset.index;
+            if (input.classList.contains('rule-keyword')) {
+                rules[index].keyword = input.value;
+            } else if (input.classList.contains('rule-response')) {
+                rules[index].response = input.value;
+            }
+            updateHiddenInput();
+        });
+    }
 
     renderRules();
 });
