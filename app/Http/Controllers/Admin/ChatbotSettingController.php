@@ -12,7 +12,8 @@ class ChatbotSettingController extends Controller
     public function index()
     {
         $settings = ChatbotSetting::all()->pluck('value', 'key');
-        return view('admin.settings.chatbot', compact('settings'));
+        $questions = \App\Models\ChatbotSuggestedQuestion::orderBy('order')->orderBy('created_at', 'desc')->get();
+        return view('admin.settings.chatbot', compact('settings', 'questions'));
     }
 
     public function update(Request $request)

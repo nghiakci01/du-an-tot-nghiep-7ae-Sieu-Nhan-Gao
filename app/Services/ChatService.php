@@ -56,9 +56,24 @@ class ChatService
      */
     private function generateRuleResponse(string $message): array
     {
-        $messageLower = mb_strtolower($message);
+        $messageLower = mb_strtolower(trim($message));
         
-        // 0. Check for custom keyword rules from settings (High Priority)
+        // 0. Check for Suggested Questions (Exact Match Preference)
+        $suggestedQuestion = \App\Models\ChatbotSuggestedQuestion::where('is_active', true)
+            ->where('question', $message) // Check exact case first
+            ->orWhere('question', $messageLower)
+            ->first();
+            
+        if ($suggestedQuestion && !empty($suggestedQuestion->answer)) {
+            $parsed = $this->parseResponseTags($suggestedQuestion->answer, $suggestedQuestion->question);
+            return [
+                'message' => $parsed['text'],
+                'products' => $parsed['products'],
+                'type' => 'text'
+            ];
+        }
+
+        // 0.5 Check for custom keyword rules from settings
         $customRulesJson = $this->getSetting('keyword_rules', '[]');
         $customRules = json_decode($customRulesJson, true);
         
@@ -71,37 +86,11 @@ class ChatService
                     }, explode(',', $rule['keyword']));
                     
                     if ($this->matchesPattern($messageLower, $keywords)) {
-                        $responseText = $rule['response'];
-                        $products = [];
-
-                        // Replace standard tags
-                        $responseText = str_replace('{hotline}', $this->getSetting('hotline', '1900-xxxx'), $responseText);
-                        $responseText = str_replace('{email}', $this->getSetting('email', 'support@example.com'), $responseText);
+                        $parsed = $this->parseResponseTags($rule['response'], $keywords[0] ?? '');
                         
-                        if (str_contains($responseText, '{categories}')) {
-                            $categories = \App\Models\Category::pluck('name')->toArray();
-                            $responseText = str_replace('{categories}', implode(', ', $categories), $responseText);
-                        }
-
-                        // Handle {product} tag
-                        if (str_contains($responseText, '{product}')) {
-                            // Use the first keyword to search for products
-                            $searchKeyword = $keywords[0];
-                            $productResponse = $this->intelligentProductSearch($searchKeyword);
-                            
-                            if ($productResponse && !empty($productResponse['products'])) {
-                                $products = $productResponse['products'];
-                                // Replace {product} with a generic term or actual product name if only one
-                                $replacement = count($products) === 1 ? $products[0]['name'] : "sản phẩm";
-                                $responseText = str_replace('{product}', $replacement, $responseText);
-                            } else {
-                                $responseText = str_replace('{product}', "sản phẩm", $responseText);
-                            }
-                        }
-
                         return [
-                            'message' => $responseText,
-                            'products' => $products,
+                            'message' => $parsed['text'],
+                            'products' => $parsed['products'],
                             'type' => 'text'
                         ];
                     }
@@ -574,6 +563,42 @@ class ChatService
         return array_values(array_unique($keywords));
     }
     
+    /**
+     * Centralized dynamic tag replacement
+     */
+    private function parseResponseTags(string $responseText, string $searchKeyword = ''): array
+    {
+        $products = [];
+        
+        // Replace standard tags
+        $responseText = str_replace('{hotline}', $this->getSetting('hotline', '1900-xxxx'), $responseText);
+        $responseText = str_replace('{email}', $this->getSetting('email', 'support@example.com'), $responseText);
+        
+        if (str_contains($responseText, '{categories}')) {
+            $categories = \App\Models\Category::pluck('name')->toArray();
+            $responseText = str_replace('{categories}', implode(', ', $categories), $responseText);
+        }
+
+        // Handle {product} tag
+        if (str_contains($responseText, '{product}')) {
+            $productResponse = $this->intelligentProductSearch($searchKeyword);
+            
+            if ($productResponse && !empty($productResponse['products'])) {
+                $products = $productResponse['products'];
+                // Replace {product} with a generic term or actual product name if only one
+                $replacement = count($products) === 1 ? $products[0]['name'] : "sản phẩm";
+                $responseText = str_replace('{product}', $replacement, $responseText);
+            } else {
+                $responseText = str_replace('{product}', "sản phẩm", $responseText);
+            }
+        }
+        
+        return [
+            'text' => $responseText,
+            'products' => $products
+        ];
+    }
+
     /**
      * Default response
      */

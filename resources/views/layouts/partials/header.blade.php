@@ -20,17 +20,19 @@
             <div class="top_right">
                 <ul>
                     @guest
-                    <li class="top_links"><a href="{{ route('login') }}">Đăng nhập / Đăng ký <i class="ion-android-person"></i></a></li>
+                        <li class="top_links"><a href="{{ route('login') }}">Đăng nhập</a></li>
+                        <li class="top_links"><a href="{{ route('register') }}">Đăng ký</a></li>
                     @else
-                    <li class="top_links"><a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
-                        <ul class="dropdown_links">
-                            @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
-                                <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? 'Dashboard' : 'Staff' }}</a></li>
-                            @endif
-                            <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a></li>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-                        </ul>
-                    </li> 
+                        <li class="top_links"><a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
+                            <ul class="dropdown_links">
+                                <li><a href="{{ route('account.index') }}">Tài khoản của tôi</a></li>
+                                @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
+                                    <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? 'Quản trị' : 'Nhân viên' }}</a></li>
+                                @endif
+                                <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a></li>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+                            </ul>
+                        </li> 
                     @endguest
                 </ul>
             </div> 
@@ -115,27 +117,34 @@
                                                 <li><a href="#">BRL</a></li>
                                             </ul>
                                         </li>
-                                       <li class="top_links"><a href="#"><i class="ion-android-person"></i> My Account <i class="ion-chevron-down"></i></a>
-                                            <ul class="dropdown_links">
-                                                <li><a href="#">My Wish List </a></li>
-                                                <li><a href="{{ route('account.index') }}">My Account </a></li>
-                                                @auth
+                                        @guest
+                                            <li class="top_links"><a href="{{ route('login') }}">Đăng nhập</a></li>
+                                            <li class="top_links"><a href="{{ route('register') }}">Đăng ký</a></li>
+                                        @else
+                                            <li class="top_links"><a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
+                                                <ul class="dropdown_links">
+                                                    <li><a href="{{ route('account.index') }}">Tài khoản của tôi</a></li>
                                                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
-                                                        <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? 'Dashboard' : 'Staff' }}</a></li>
+                                                        <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? 'Quản trị' : 'Nhân viên' }}</a></li>
                                                     @endif
-                                                    <li><a href="#">Compare Products</a></li>
-                                                    <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sign Out</a></li>
+                                                    <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a></li>
                                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-                                                @else
-                                                    <li><a href="{{ route('login') }}">Sign In</a></li>
-                                                    <li><a href="#">Compare Products</a></li>
-                                                @endauth
-                                            </ul>
-                                        </li> 
+                                                </ul>
+                                            </li> 
+                                        @endguest
                                         
                                     </ul>
                                 </div>   
 
+                                @guest
+                                    <div class="middel_links">
+                                        <ul>
+                                            <li><a href="{{ route('login') }}">Đăng nhập</a></li>
+                                            <li>/</li>
+                                            <li><a href="{{ route('register') }}">Đăng ký</a></li>
+                                        </ul>
+                                    </div>
+                                @endguest
                                 <div class="cart_link">
                                     <a href="{{ route('cart.index') }}"><i class="fa fa-shopping-basket"></i>{{ count((array) session('cart')) }} item(s)</a>
                                     <!--mini cart-->
