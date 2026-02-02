@@ -581,10 +581,10 @@
             async initChat() {
                 console.log('Chatbot initialized (History Sync Enabled)');
                 
-                // Fetch existing history
+                // Fetch initial history
                 await this.pollMessages();
                 
-                // If no messages, show greeting (or if last message is very old)
+                // If no messages, show greeting
                 if (this.messages.length === 0) {
                     this.messages.push({
                         text: "Xin chào! 👋 Chào mừng bạn đến với Reid Fashion. Tôi giúp được gì cho bạn?",
@@ -597,10 +597,10 @@
 
                 // Start polling for new messages (staff replies)
                 setInterval(() => {
-                    if (this.isOpen) {
+                    if (this.isOpen && !this.isLoading) {
                         this.pollMessages();
                     }
-                }, 5000); // Poll every 5 seconds
+                }, 3000); // Poll every 3 seconds for better responsiveness
             },
 
             async pollMessages() {
@@ -609,23 +609,18 @@
                     if (response.ok) {
                         const data = await response.json();
                         if (data.status === 'success') {
-                            // Check if server has more messages than local
-                            if (data.messages.length > this.messages.length) {
-                                // Update messages while preserving local product state if possible
-                                // For simplicity, we'll sync the list
-                                const oldLength = this.messages.length;
-                                this.messages = data.messages.map((m, idx) => {
-                                    // Preserve products if they exist locally
-                                    const localMsg = this.messages[idx];
-                                    return {
-                                        ...m,
-                                        products: localMsg ? localMsg.products : []
-                                    };
-                                });
-                                
-                                if (this.messages.length > oldLength) {
-                                    this.scrollToBottom();
-                                }
+                            // Extract existing message IDs to find only new ones
+                            const existingIds = this.messages.filter(m => m.id).map(m => m.id);
+                            const newMessages = data.messages.filter(m => !existingIds.includes(m.id));
+                            
+                            if (newMessages.length > 0) {
+                                // Add only truly new messages
+                                this.messages.push(...newMessages);
+                                this.scrollToBottom();
+                            } else if (this.messages.length === 0 && data.messages.length > 0) {
+                                // Initial load
+                                this.messages = data.messages;
+                                this.scrollToBottom();
                             }
                         }
                     }
@@ -638,8 +633,9 @@
                 this.isOpen = !this.isOpen;
                 if (this.isOpen) {
                     this.scrollToBottom();
+                    // Sync on open
+                    this.pollMessages();
                 } else {
-                    // Reset fullscreen when closed
                     this.isFullscreen = false;
                 }
             },
@@ -650,23 +646,23 @@
             },
 
             async sendMessage(textInput = null) {
-                // If textInput is an Event (from @submit), ignore it and use newMessage
                 const text = (typeof textInput === 'string') ? textInput : this.newMessage.trim();
                 if (!text || typeof text !== 'string') return;
 
-                // Add User Message
-                this.messages.push({
+                // Add User Message locally with a temp flag
+                const tempUserMsg = {
                     text: text,
                     isUser: true,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                });
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    isTemp: true
+                };
+                this.messages.push(tempUserMsg);
                 
                 this.newMessage = '';
                 this.isLoading = true;
                 this.scrollToBottom();
 
                 try {
-                    // Call API
                     const response = await fetch('/api/chat/send', {
                         method: 'POST',
                         headers: {
@@ -677,39 +673,22 @@
                         body: JSON.stringify({ message: text })
                     });
 
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        console.error('API Error:', response.status, errorData);
-                        throw new Error(`Server error: ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error('Network response was not ok');
 
                     const data = await response.json();
+                    
+                    // Remove the temporary message before syncing
+                    this.messages = this.messages.filter(m => !m.isTemp);
 
-                    if (data.reply) {
-                        this.messages.push({
-                            text: data.reply,
-                            isUser: false,
-                            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                            products: data.products || [],
-                            type: data.type || 'text'
-                        });
-                    } else if (data.is_muted) {
-                        // Bot is muted, do nothing, just stop loading
-                        console.log('Bot is muted for this session.');
-                    } else {
-                        throw new Error('No reply');
-                    }
+                    // Re-sync messages from server to get official IDs and the bot reply
+                    await this.pollMessages();
 
                 } catch (error) {
                     console.error('Chat Error:', error);
+                    // Remove temp on error too
+                    this.messages = this.messages.filter(m => !m.isTemp);
                     
-                    let errorText = "Xin lỗi, hiện tại tôi đang gặp sự cố kết nối. Vui lòng thử lại sau.";
-                    if (this.mode === 'rules') {
-                        errorText = "Hệ thống đang bận một chút, bạn vui lòng nhắn lại sau ít phút hoặc liên hệ hotline để được hỗ trợ nhanh nhất nhé! 😊";
-                    } else {
-                        errorText = "Hệ thống AI đang gặp sự cố kỹ thuật. Vui lòng thử lại sau một lát! 🤖";
-                    }
-
+                    const errorText = "Xin lỗi, hiện tại tôi đang gặp sự cố kết nối. Vui lòng thử lại sau.";
                     this.messages.push({
                         text: errorText,
                         isUser: false,
@@ -718,7 +697,6 @@
                 } finally {
                     this.isLoading = false;
                     this.scrollToBottom();
-                    // Force re-focus input on desktop? optional
                 }
             },
 
