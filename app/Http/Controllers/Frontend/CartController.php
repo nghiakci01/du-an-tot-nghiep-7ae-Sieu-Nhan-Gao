@@ -66,11 +66,32 @@ class CartController extends Controller
             if ($variant && $variant->stock_quantity >= $request->quantity) {
                  $cart[$request->id]["quantity"] = $request->quantity;
                  session()->put('cart', $cart);
-                 session()->flash('success', 'Giỏ hàng đã được cập nhật');
+                 
+                 // Calculate new totals
+                 $itemTotal = $cart[$request->id]['price'] * $request->quantity;
+                 $cartTotal = 0;
+                 $cartCount = 0;
+                 foreach($cart as $item) {
+                    $cartTotal += $item['price'] * $item['quantity'];
+                    $cartCount += $item['quantity'];
+                 }
+
+                 return response()->json([
+                     'success' => true,
+                     'message' => 'Giỏ hàng đã được cập nhật',
+                     'item_total' => number_format($itemTotal) . ' đ',
+                     'cart_total' => number_format($cartTotal) . ' đ',
+                     'cart_count' => $cartCount
+                 ]);
             } else {
-                 session()->flash('error', 'Số lượng không hợp lệ hoặc vượt quá tồn kho');
+                 return response()->json([
+                     'success' => false,
+                     'message' => 'Số lượng không hợp lệ hoặc vượt quá tồn kho'
+                 ], 400);
             }
         }
+        
+        return response()->json(['success' => false, 'message' => 'Yêu cầu không hợp lệ'], 400);
     }
 
     public function remove(Request $request)
@@ -80,14 +101,38 @@ class CartController extends Controller
             if(isset($cart[$request->id])) {
                 unset($cart[$request->id]);
                 session()->put('cart', $cart);
+                
+                // Calculate new totals
+                 $cartTotal = 0;
+                 $cartCount = 0;
+                 foreach($cart as $item) {
+                    $cartTotal += $item['price'] * $item['quantity'];
+                    $cartCount += $item['quantity'];
+                 }
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Sản phẩm đã được xóa khỏi giỏ hàng',
+                    'cart_total' => number_format($cartTotal) . ' đ',
+                    'cart_count' => $cartCount
+                ]);
             }
-            session()->flash('success', 'Sản phẩm đã được xóa khỏi giỏ hàng');
         }
+        
+        return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại trong giỏ'], 404);
     }
 
-    public function clearCart()
+    public function clearCart(Request $request)
     {
         session()->forget('cart');
+        
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Giỏ hàng đã được xóa'
+            ]);
+        }
+        
         return redirect()->route('cart.index')->with('success', 'Giỏ hàng đã được xóa');
     }
 

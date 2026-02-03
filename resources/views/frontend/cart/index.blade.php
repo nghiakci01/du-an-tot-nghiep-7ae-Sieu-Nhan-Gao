@@ -164,20 +164,46 @@
             e.preventDefault();
             var ele = $(this);
             var row = ele.parents("tr");
+            var id = row.attr("data-id");
+            var quantity = ele.val();
             
             $.ajax({
                 url: '{{ route('cart.update') }}',
                 method: "PATCH",
                 data: {
                     _token: '{{ csrf_token() }}', 
-                    id: row.attr("data-id"), 
-                    quantity: ele.val()
+                    id: id, 
+                    quantity: quantity
                 },
                 success: function (response) {
-                    window.location.reload();
+                    if(response.success) {
+                        // Update item total
+                        row.find('.product_total').text(response.item_total);
+                        
+                        // Update cart totals
+                        $('.cart_amount').each(function() {
+                             // Assuming all cart_amount classes are totals/subtotals that should match
+                             // Ideally add specific IDs for subtotal and grand total if they differ logic, 
+                             // but here they are same value.
+                             if($(this).find('span').text() !== 'Free') {
+                                 $(this).text(response.cart_total);
+                             }
+                        });
+                        
+                        // Update header cart count
+                        $('#cart-count').text(response.cart_count);
+                        
+                        // Optional: Show a small toast or visual feedback instead of alert
+                        // alert(response.message); 
+                    } else {
+                        alert(response.message || 'Có lỗi xảy ra.');
+                        window.location.reload(); // Fallback
+                    }
                 },
                 error: function(xhr) {
-                    alert('An error occurred. Please try again.');
+                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Số lượng vượt quá tồn kho hoặc có lỗi xảy ra.';
+                    alert(errorMsg);
+                    window.location.reload(); // Reset to valid state
                 }
             });
         });
@@ -187,20 +213,41 @@
             e.preventDefault();
             var ele = $(this);
             var row = ele.parents("tr");
+            var id = row.attr("data-id");
             
-            if(confirm("Are you sure you want to remove this product?")) {
+            if(confirm("Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?")) {
                 $.ajax({
                     url: '{{ route('cart.remove') }}',
-                    method: "DELETE",
+                    method: "POST",
                     data: {
                         _token: '{{ csrf_token() }}', 
-                        id: row.attr("data-id")
+                        _method: 'DELETE',
+                        id: id
                     },
                     success: function (response) {
-                        window.location.reload();
+                        if(response.success) {
+                            row.fadeOut(300, function() { $(this).remove(); });
+                            
+                            // Update cart totals
+                            $('.cart_amount').each(function() {
+                                 if($(this).find('span').text() !== 'Free') {
+                                     $(this).text(response.cart_total);
+                                 }
+                            });
+                            
+                             // Update header cart count
+                            $('#cart-count').text(response.cart_count);
+                            
+                            // Check if cart is empty
+                            if(response.cart_count == 0) {
+                                setTimeout(function() { window.location.reload(); }, 500);
+                            }
+                        } else {
+                            alert(response.message || 'Có lỗi xảy ra.');
+                        }
                     },
                     error: function(xhr) {
-                        alert('An error occurred. Please try again.');
+                        alert('Có lỗi xảy ra. Vui lòng thử lại.');
                     }
                 });
             }
@@ -210,7 +257,7 @@
         $("#clear-cart").click(function(e) {
             e.preventDefault();
             
-            if(confirm("Are you sure you want to clear your cart?")) {
+            if(confirm("Bạn có chắc muốn xóa sạch giỏ hàng?")) {
                 $.ajax({
                     url: '{{ route('cart.clear') }}',
                     method: "POST",
@@ -221,7 +268,7 @@
                         window.location.reload();
                     },
                     error: function(xhr) {
-                        alert('An error occurred. Please try again.');
+                        alert('Có lỗi xảy ra. Vui lòng thử lại.');
                     }
                 });
             }

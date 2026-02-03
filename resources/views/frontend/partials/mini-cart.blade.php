@@ -102,16 +102,21 @@ $(document).ready(function() {
         e.preventDefault();
         var itemId = $(this).data('id');
         
-        if(confirm('Xóa sản phẩm này khỏi giỏ hàng?')) {
-            $.ajax({
-                url: '{{ route('cart.remove') }}',
-                method: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    id: itemId
-                },
+            if(confirm('Xóa sản phẩm này khỏi giỏ hàng?')) {
+                $.ajax({
+                    url: '{{ route('cart.remove') }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        _method: 'DELETE',
+                        id: itemId
+                    },
                 success: function(response) {
-                    location.reload();
+                    if(response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message || 'Có lỗi xảy ra.');
+                    }
                 },
                 error: function(xhr) {
                     alert('Có lỗi xảy ra. Vui lòng thử lại.');

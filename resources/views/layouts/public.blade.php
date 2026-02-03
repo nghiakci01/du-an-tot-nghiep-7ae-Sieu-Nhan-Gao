@@ -44,6 +44,9 @@
 <!-- Main JS -->
 <script src="{{ asset('frontend-assets/js/main.js') }}"></script>
 
+@yield('scripts')
+@stack('scripts')
+
 
 
 
