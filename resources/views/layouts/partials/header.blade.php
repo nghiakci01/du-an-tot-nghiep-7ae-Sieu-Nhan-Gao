@@ -69,9 +69,7 @@
                                 </ul>
 
                             </div>
-                            <div class="cart_link">
-                                <a href="{{ route('cart.index') }}"><i class="fa fa-shopping-basket"></i>{{ count((array) session('cart')) }} item(s)</a>
-                            </div>
+                            @include('frontend.partials.mini-cart')
                         </div>
                         <div id="menu" class="text-left ">
                             <ul class="offcanvas_main_menu">
@@ -161,55 +159,7 @@
                                     </ul>
                                 </div>   
 
-                                <div class="cart_link">
-                                    <a href="{{ route('cart.index') }}"><i class="fa fa-shopping-basket"></i>{{ count((array) session('cart')) }} item(s)</a>
-                                    <!--mini cart-->
-                                     <div class="mini_cart">
-                                        @if(session('cart'))
-                                            @php $total = 0; @endphp
-                                            @foreach(session('cart') as $id => $details)
-                                                @php $total += $details['price'] * $details['quantity']; @endphp
-                                                <div class="cart_item top">
-                                                   <div class="cart_img">
-                                                       <a href="#"><img src="{{ $details['image'] ?? asset('frontend-assets/img/s-product/product.jpg') }}" alt=""></a>
-                                                   </div>
-                                                    <div class="cart_info">
-                                                        <a href="#">{{ $details['name'] }}</a>
-                                                        <span>{{ $details['quantity'] }}x ${{ number_format($details['price']) }}</span>
-                                                    </div>
-                                                    <div class="cart_remove">
-                                                        <a href="#"><i class="ion-android-close"></i></a>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                            <div class="cart__table">
-                                                <table>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="text-left">Subtotal :</td>
-                                                            <td class="text-right">${{ number_format($total) }}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-left">Total :</td>
-                                                            <td class="text-right">${{ number_format($total) }}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div class="cart_button view_cart">
-                                                <a href="{{ route('cart.index') }}">View Cart</a>
-                                            </div>
-                                            <div class="cart_button checkout">
-                                                <a href="{{ route('checkout.index') }}">Checkout</a>
-                                            </div>
-                                        @else
-                                            <div class="cart_item">
-                                                <p>Cart is empty.</p>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <!--mini cart end-->
-                                </div>
+                                @include('frontend.partials.mini-cart')
                             </div>
                         </div>  
                     </div>
