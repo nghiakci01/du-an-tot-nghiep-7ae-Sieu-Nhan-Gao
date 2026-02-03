@@ -22,7 +22,7 @@ class HomeController extends Controller
         $featuredProducts = Product::where('is_active', true)
                                    ->where('is_featured', true)
                                    ->with('category')
-                                   ->take(8)
+                                   ->take(10)
                                    ->get();
         
         // Sản phẩm mới nhất cho section dưới banner

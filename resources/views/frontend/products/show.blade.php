@@ -112,7 +112,7 @@
                                 </div>
                                 
                                 <div class="product_variant color mb-20">
-                                    <h3>Màu sắc</h3>
+                                    <h3>Color</h3>
                                     <div class="d-flex gap-2 flex-wrap">
                                         @foreach($uniqueColors as $color)
                                             <button type="button" class="btn btn-outline-secondary btn-sm color-btn p-1" data-color="{{ $color }}" title="{{ $color }}" style="min-width: 35px; height: 35px; border-radius: 0; padding: 2px;">
@@ -150,14 +150,14 @@
                                                         addToCartBtn.textContent = 'Add to Cart';
                                                     } else {
                                                         variantInput.value = '';
-                                                        msg.textContent = 'Sản phẩm này tạm hết hàng';
+                                                        msg.textContent = 'This product is out of stock';
                                                         msg.style.display = 'block';
                                                         addToCartBtn.disabled = true;
-                                                        addToCartBtn.textContent = 'Hết hàng';
+                                                        addToCartBtn.textContent = 'Out of Stock';
                                                     }
                                                 } else {
                                                     variantInput.value = '';
-                                                    msg.textContent = 'Phiên bản này không tồn tại';
+                                                    msg.textContent = 'This variant does not exist';
                                                     msg.style.display = 'block';
                                                     addToCartBtn.disabled = true;
                                                 }
