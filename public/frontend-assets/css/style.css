@@ -14777,14 +14777,6 @@ textarea:-ms-input-placeholder {
   color: #ffffff;
 }
 
-/* Custom 5-column grid for product section */
-@media (min-width: 992px) {
-  .product_column5 .col-lg-3 {
-    -webkit-box-flex: 0;
-    -ms-flex: 0 0 20%;
-    flex: 0 0 20%;
-    max-width: 20%;
-  }
-}
+/* Custom grid for Trending Products removed to use theme slider */
 
 /*# sourceMappingURL=style.css.map */

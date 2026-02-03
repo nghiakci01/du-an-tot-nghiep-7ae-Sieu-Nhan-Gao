@@ -1,6 +1,62 @@
 @extends('layouts.public')
 
 @section('content')
+<style>
+    /* Nuclear fix: Direct embedded CSS for the 10-product grid */
+    .custom_product_grid_10 {
+        display: -webkit-box !important;
+        display: -ms-flexbox !important;
+        display: flex !important;
+        -ms-flex-wrap: wrap !important;
+        flex-wrap: wrap !important;
+        margin-left: -15px !important;
+        margin-right: -15px !important;
+    }
+
+    .custom_product_grid_10 .product_item_5 {
+        position: relative !important;
+        width: 100% !important;
+        padding-right: 15px !important;
+        padding-left: 15px !important;
+        -webkit-box-flex: 0 !important;
+        -ms-flex: 0 0 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 30px;
+    }
+
+    @media (min-width: 576px) {
+        .custom_product_grid_10 .product_item_5 {
+            -ms-flex: 0 0 50% !important;
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .custom_product_grid_10 .product_item_5 {
+            -ms-flex: 0 0 33.333333% !important;
+            flex: 0 0 33.333333% !important;
+            max-width: 33.333333% !important;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .custom_product_grid_10 .product_item_5 {
+            -ms-flex: 0 0 25% !important;
+            flex: 0 0 25% !important;
+            max-width: 25% !important;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .custom_product_grid_10 .product_item_5 {
+            -ms-flex: 0 0 20% !important;
+            flex: 0 0 20% !important;
+            max-width: 20% !important;
+        }
+    }
+</style>
     <!--slider area start-->
     <div class="slider_section slider_section_six">
         <div class="container-fluid">
@@ -98,9 +154,9 @@
             </div>    
             <div class="product_area"> 
                 <div class="product_container">
-                    <div class="row product_column5">
+                    <div class="custom_product_grid_10">
                         @foreach($featuredProducts as $product)
-                        <div class="col-lg-3">
+                        <div class="product_item_5">
                             <div class="single_product">
                                 <div class="product_thumb">
                                     <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
@@ -177,7 +233,7 @@
                 <div class="product_container">
                     <div class="row product_slick_column5">
                         @foreach($newProducts as $product)
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-12">
                             <div class="single_product">
                                 <div class="product_thumb">
                                     <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
