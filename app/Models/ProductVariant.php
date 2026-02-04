@@ -22,18 +22,26 @@ class ProductVariant extends Model
         'sku',
     ];
 
+    protected $casts = [
+        'stock_quantity' => 'integer',
+        'price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
+    ];
+
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function size(): BelongsTo
+    public function sizeRelationship(): BelongsTo
     {
-        return $this->belongsTo(Size::class);
+        return $this->belongsTo(Size::class, 'size_id');
     }
 
-    public function color(): BelongsTo
+    public function colorRelationship(): BelongsTo
     {
-        return $this->belongsTo(Color::class);
+        return $this->belongsTo(Color::class, 'color_id');
     }
+
 }
