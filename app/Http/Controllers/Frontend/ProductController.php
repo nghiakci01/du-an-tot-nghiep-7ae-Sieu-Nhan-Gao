@@ -66,8 +66,9 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)
                           ->where('is_active', true)
-                          ->with(['category', 'variants', 'images', 'reviews.user'])
+                          ->with(['category', 'variants.sizeRelationship', 'variants.colorRelationship', 'images', 'reviews.user'])
                           ->firstOrFail();
+
 
         // Get related products (same category, excluding current)
         $relatedProducts = Product::where('category_id', $product->category_id)

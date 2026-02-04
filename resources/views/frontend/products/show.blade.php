@@ -141,9 +141,10 @@
 
                             @if($product->variants->count() > 0)
                                 @php
-                                    $uniqueSizes = $product->variants->pluck('sizeRelationship')->unique('id');
-                                    $uniqueColors = $product->variants->pluck('colorRelationship')->unique('id');
+                                    $uniqueSizes = $product->variants->pluck('sizeRelationship')->filter()->unique('id');
+                                    $uniqueColors = $product->variants->pluck('colorRelationship')->filter()->unique('id');
                                 @endphp
+
 
 
                                 <div class="product_variant size">
