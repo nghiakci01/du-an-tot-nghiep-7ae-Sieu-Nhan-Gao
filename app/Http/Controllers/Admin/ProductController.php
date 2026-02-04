@@ -17,14 +17,16 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')->withCount('variants')->paginate(10);
+        $products = Product::with(['category', 'variants'])->withCount('variants')->paginate(10);
         return view('admin.products.index', compact('products'));
     }
 
     public function create()
     {
         $categories = Category::all();
-        return view('admin.products.create', compact('categories'));
+        $sizes = \App\Models\Size::active()->orderBy('display_order')->get();
+        $colors = \App\Models\Color::active()->orderBy('display_order')->get();
+        return view('admin.products.create', compact('categories', 'sizes', 'colors'));
     }
 
     public function store(StoreProductRequest $request)
@@ -33,6 +35,9 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $data = $request->except('variants');
+            if (empty($data['price'])) {
+                $data['price'] = 0;
+            }
             $data['slug'] = Str::slug($data['name']) . '-' . uniqid(); // Ensure unique slug
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
             $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
@@ -46,16 +51,23 @@ class ProductController extends Controller
 
             if ($request->has('variants')) {
                 foreach ($request->variants as $variantData) {
-                    // Auto generate SKU if empty: PROD-ID-SIZE-COLOR (simplified)
+                    // Lookup Size name and Color name for backward compatibility and SKU generation
+                    $sizeName = \App\Models\Size::find($variantData['size_id'])?->name ?? 'Unknown';
+                    $colorName = \App\Models\Color::find($variantData['color_id'])?->name ?? 'Unknown';
+
+                    // Auto generate SKU if empty
                     $sku = $variantData['sku'];
                     if (empty($sku)) {
-                        $sku = strtoupper(Str::slug($product->name . '-' . $variantData['size'] . '-' . $variantData['color']));
-                        // Basic check to ensure uniqueness or append random string if needed, skipping for now
+                        $sku = strtoupper(Str::slug($product->name . '-' . $sizeName . '-' . $colorName . '-' . uniqid()));
                     }
 
                     $product->variants()->create([
-                        'size' => $variantData['size'],
-                        'color' => $variantData['color'],
+                        'size_id' => $variantData['size_id'],
+                        'color_id' => $variantData['color_id'],
+                        'size' => $sizeName,   // Backward compatibility
+                        'color' => $colorName, // Backward compatibility
+                        'price' => $variantData['price'] ?? null,
+                        'sale_price' => $variantData['sale_price'] ?? null,
                         'stock_quantity' => $variantData['stock_quantity'],
                         'sku' => $sku,
                     ]);
@@ -86,7 +98,9 @@ class ProductController extends Controller
     {
         $product->load('variants');
         $categories = Category::all();
-        return view('admin.products.edit', compact('product', 'categories'));
+        $sizes = \App\Models\Size::active()->orderBy('display_order')->get();
+        $colors = \App\Models\Color::active()->orderBy('display_order')->get();
+        return view('admin.products.edit', compact('product', 'categories', 'sizes', 'colors'));
     }
 
     public function update(UpdateProductRequest $request, Product $product)
@@ -95,6 +109,9 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $data = $request->except('variants');
+            if (empty($data['price'])) {
+                $data['price'] = 0;
+            }
             $data['slug'] = Str::slug($data['name']) . '-' . $product->id;
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
             $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
@@ -117,30 +134,35 @@ class ProductController extends Controller
             $product->variants()->whereNotIn('id', $submittedIds)->delete();
 
             foreach ($submittedVariants as $variantData) {
+                // Lookup Size name and Color name
+                $sizeName = \App\Models\Size::find($variantData['size_id'])?->name ?? 'Unknown';
+                $colorName = \App\Models\Color::find($variantData['color_id'])?->name ?? 'Unknown';
+
                 $sku = $variantData['sku'];
                 if (empty($sku)) {
-                    $sku = strtoupper(Str::slug($product->name . '-' . $variantData['size'] . '-' . $variantData['color']));
+                    $sku = strtoupper(Str::slug($product->name . '-' . $sizeName . '-' . $colorName . '-' . uniqid()));
                 }
+
+                $variantAttributes = [
+                    'size_id' => $variantData['size_id'],
+                    'color_id' => $variantData['color_id'],
+                    'size' => $sizeName,
+                    'color' => $colorName,
+                    'price' => $variantData['price'] ?? null,
+                    'sale_price' => $variantData['sale_price'] ?? null,
+                    'stock_quantity' => $variantData['stock_quantity'],
+                    'sku' => $sku,
+                ];
 
                 if (isset($variantData['id']) && $variantData['id']) {
                     // Update existing
                     $variant = ProductVariant::find($variantData['id']);
                     if ($variant) {
-                        $variant->update([
-                            'size' => $variantData['size'],
-                            'color' => $variantData['color'],
-                            'stock_quantity' => $variantData['stock_quantity'],
-                            'sku' => $sku,
-                        ]);
+                        $variant->update($variantAttributes);
                     }
                 } else {
                     // Create new
-                    $product->variants()->create([
-                        'size' => $variantData['size'],
-                        'color' => $variantData['color'],
-                        'stock_quantity' => $variantData['stock_quantity'],
-                        'sku' => $sku,
-                    ]);
+                    $product->variants()->create($variantAttributes);
                 }
             }
 

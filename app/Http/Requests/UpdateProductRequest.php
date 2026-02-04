@@ -16,7 +16,8 @@ class UpdateProductRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'price' => 'required|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0|lt:price',
             'description' => 'nullable|string|max:500',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240|dimensions:min_width=400,min_height=400',
             'gallery_images' => 'nullable|array|max:6',
@@ -26,8 +27,10 @@ class UpdateProductRequest extends FormRequest
             // Variants validation
             'variants' => 'required|array|min:1',
             'variants.*.id' => 'nullable|exists:product_variants,id',
-            'variants.*.size' => 'required|string|max:50',
-            'variants.*.color' => 'required|string|max:50',
+            'variants.*.size_id' => 'required|exists:sizes,id',
+            'variants.*.color_id' => 'required|exists:colors,id',
+            'variants.*.price' => 'nullable|numeric|min:0',
+            'variants.*.sale_price' => 'nullable|numeric|min:0|lt:variants.*.price',
             'variants.*.stock_quantity' => 'required|integer|min:0',
             'variants.*.sku' => 'nullable|string|max:100',
         ];

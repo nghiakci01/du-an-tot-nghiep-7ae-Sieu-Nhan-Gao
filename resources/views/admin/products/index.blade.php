@@ -64,7 +64,21 @@
                                     <small>{{ $product->slug }}</small>
                                 </td>
                                 <td>{{ $product->category->name ?? 'N/A' }}</td>
-                                <td>{{ number_format($product->price) }} đ</td>
+                                <td>
+                                    @if($product->variants->isNotEmpty())
+                                        @php
+                                            $minPrice = $product->variants->min('price');
+                                            $maxPrice = $product->variants->max('price');
+                                        @endphp
+                                        @if($minPrice == $maxPrice)
+                                            {{ number_format($minPrice) }} đ
+                                        @else
+                                            {{ number_format($minPrice) }} - {{ number_format($maxPrice) }} đ
+                                        @endif
+                                    @else
+                                        {{ number_format($product->price) }} đ
+                                    @endif
+                                </td>
                                 <td><span class="badge bg-info">{{ $product->variants_count }} variants</span></td>
                                 <td>
                                     @if($product->is_active)
