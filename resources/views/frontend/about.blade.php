@@ -27,7 +27,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-6 col-md-12">
                     <div class="about_thumb">
-                        <img src="{{ asset('frontend-assets/img/bg/about1.jpg') }}" alt="Về chúng tôi">
+                        <img src="{{ asset('frontend-assets/img/about/about1.jpg') }}" alt="Về chúng tôi">
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-12">
@@ -52,7 +52,7 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="single_chose">
                         <div class="chose_icone">
-                            <img src="{{ asset('frontend-assets/img/about/About_icon1.png') }}" alt="">
+                            <img src="{{ asset('frontend-assets/img/about/shipping1.png') }}" alt="">
                         </div>
                         <div class="chose_content">
                             <h3>Chất lượng cao</h3>
@@ -63,7 +63,7 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="single_chose">
                         <div class="chose_icone">
-                            <img src="{{ asset('frontend-assets/img/about/About_icon2.png') }}" alt="">
+                            <img src="{{ asset('frontend-assets/img/about/shipping2.png') }}" alt="">
                         </div>
                         <div class="chose_content">
                             <h3>Vận chuyển nhanh</h3>
@@ -74,7 +74,7 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="single_chose">
                         <div class="chose_icone">
-                            <img src="{{ asset('frontend-assets/img/about/About_icon3.png') }}" alt="">
+                            <img src="{{ asset('frontend-assets/img/about/shipping3.png') }}" alt="">
                         </div>
                         <div class="chose_content">
                             <h3>Hỗ trợ 24/7</h3>
