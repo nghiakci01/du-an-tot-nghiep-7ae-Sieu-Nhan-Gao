@@ -136,7 +136,7 @@
                                 @foreach(old('variants') as $index => $variant)
                                     <tr class="variant-row" data-index="{{ $index }}">
                                         <td>
-                                            <select class="form-select form-select-sm @error('variants.'.$index.'.size_id') is-invalid @enderror" name="variants[{{ $index }}][size_id]" required>
+                                            <select class="form-select form-select-sm size-select @error('variants.'.$index.'.size_id') is-invalid @enderror" name="variants[{{ $index }}][size_id]" required>
                                                 <option value="">-- Chọn Size --</option>
                                                 @foreach($sizes as $size)
                                                     <option value="{{ $size->id }}" {{ old("variants.{$index}.size_id") == $size->id ? 'selected' : '' }}>{{ $size->name }}</option>
@@ -144,8 +144,9 @@
                                             </select>
                                             @error('variants.'.$index.'.size_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </td>
+
                                         <td>
-                                            <select class="form-select form-select-sm @error('variants.'.$index.'.color_id') is-invalid @enderror" name="variants[{{ $index }}][color_id]" required>
+                                            <select class="form-select form-select-sm color-select @error('variants.'.$index.'.color_id') is-invalid @enderror" name="variants[{{ $index }}][color_id]" required>
                                                 <option value="">-- Chọn Màu --</option>
                                                 @foreach($colors as $color)
                                                     <option value="{{ $color->id }}" {{ old("variants.{$index}.color_id") == $color->id ? 'selected' : '' }}>
@@ -155,6 +156,7 @@
                                             </select>
                                             @error('variants.'.$index.'.color_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </td>
+
                                         <td>
                                             <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.price') is-invalid @enderror" name="variants[{{ $index }}][price]" value="{{ $variant['price'] ?? '' }}" min="0" step="0.01" placeholder="Giá">
                                             @error('variants.'.$index.'.price') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -179,7 +181,7 @@
                             @else
                                 <tr class="variant-row" data-index="0">
                                     <td>
-                                        <select class="form-select form-select-sm @error('variants.0.size_id') is-invalid @enderror" name="variants[0][size_id]" required>
+                                        <select class="form-select form-select-sm size-select @error('variants.0.size_id') is-invalid @enderror" name="variants[0][size_id]" required>
                                             <option value="">-- Chọn Size --</option>
                                             @foreach($sizes as $size)
                                                 <option value="{{ $size->id }}">{{ $size->name }}</option>
@@ -188,7 +190,7 @@
                                         @error('variants.0.size_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
-                                        <select class="form-select form-select-sm @error('variants.0.color_id') is-invalid @enderror" name="variants[0][color_id]" required>
+                                        <select class="form-select form-select-sm color-select @error('variants.0.color_id') is-invalid @enderror" name="variants[0][color_id]" required>
                                             <option value="">-- Chọn Màu --</option>
                                             @foreach($colors as $color)
                                                 <option value="{{ $color->id }}">{{ $color->name }}</option>
@@ -196,6 +198,7 @@
                                         </select>
                                         @error('variants.0.color_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
+
                                     <td>
                                         <input type="number" class="form-control form-control-sm @error('variants.0.price') is-invalid @enderror" name="variants[0][price]" min="0" step="0.01" placeholder="Giá">
                                         @error('variants.0.price') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -243,7 +246,7 @@
             const row = `
                 <tr class="variant-row" data-index="${variantIndex}">
                     <td>
-                        <select class="form-select form-select-sm" name="variants[${variantIndex}][size_id]" required>
+                        <select class="form-select form-select-sm size-select" name="variants[${variantIndex}][size_id]" required>
                             <option value="">-- Chọn Size --</option>
                             @foreach($sizes as $size)
                                 <option value="{{ $size->id }}">{{ $size->name }}</option>
@@ -251,7 +254,7 @@
                         </select>
                     </td>
                     <td>
-                        <select class="form-select form-select-sm" name="variants[${variantIndex}][color_id]" required>
+                        <select class="form-select form-select-sm color-select" name="variants[${variantIndex}][color_id]" required>
                             <option value="">-- Chọn Màu --</option>
                             @foreach($colors as $color)
                                 <option value="{{ $color->id }}">{{ $color->name }}</option>
@@ -289,6 +292,34 @@
                 }
             }
         });
+
+        // Prevention of duplicate variants
+        tableBody.addEventListener('change', function(e) {
+            if (e.target.classList.contains('size-select') || e.target.classList.contains('color-select')) {
+                const row = e.target.closest('tr');
+                const sizeId = row.querySelector('.size-select').value;
+                const colorId = row.querySelector('.color-select').value;
+
+                if (sizeId && colorId) {
+                    let duplicate = false;
+                    document.querySelectorAll('.variant-row').forEach(otherRow => {
+                        if (otherRow === row) return;
+                        const otherSizeId = otherRow.querySelector('.size-select').value;
+                        const otherColorId = otherRow.querySelector('.color-select').value;
+
+                        if (sizeId === otherSizeId && colorId === otherColorId) {
+                            duplicate = true;
+                        }
+                    });
+
+                    if (duplicate) {
+                        alert('Biến thể với Size và Màu sắc này đã được chọn.');
+                        e.target.value = '';
+                    }
+                }
+            }
+        });
+
 
         // Character counter for description
         const descTextarea = document.getElementById('description');

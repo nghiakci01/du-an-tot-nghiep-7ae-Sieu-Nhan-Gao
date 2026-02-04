@@ -23,13 +23,14 @@ class ColorController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:colors,name',
-            'hex_code' => 'required|regex:/^#[0-9A-Fa-f]{6}$/',
+            'hex_code' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
             'display_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);
 
         $validated['is_active'] = $request->has('is_active');
         $validated['display_order'] = $validated['display_order'] ?? 0;
+        $validated['hex_code'] = $validated['hex_code'] ?? '#000000';
 
         Color::create($validated);
 
@@ -46,13 +47,14 @@ class ColorController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:colors,name,' . $color->id,
-            'hex_code' => 'required|regex:/^#[0-9A-Fa-f]{6}$/',
+            'hex_code' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
             'display_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);
 
         $validated['is_active'] = $request->has('is_active');
         $validated['display_order'] = $validated['display_order'] ?? 0;
+        $validated['hex_code'] = $validated['hex_code'] ?? '#000000';
 
         $color->update($validated);
 

@@ -141,17 +141,20 @@
 
                             @if($product->variants->count() > 0)
                                 @php
-                                    $uniqueSizes = $product->variants->pluck('size')->unique();
-                                    $uniqueColors = $product->variants->pluck('color')->unique();
+                                    $uniqueSizes = $product->variants->pluck('sizeRelationship')->filter()->unique('id');
+                                    $uniqueColors = $product->variants->pluck('colorRelationship')->filter()->unique('id');
                                 @endphp
+
+
 
                                 <div class="product_variant size">
                                     <h3>Size</h3>
                                     <select class="niceselect_option" id="select_size">
                                         <option selected value="">Choose Size</option>
                                         @foreach($uniqueSizes as $size)
-                                            <option value="{{ $size }}">{{ $size }}</option>
+                                            <option value="{{ $size->id }}">{{ $size->name }}</option>
                                         @endforeach
+
                                     </select>
                                 </div>
                                 
@@ -160,8 +163,9 @@
                                     <select class="niceselect_option" id="select_color">
                                         <option selected value="">Choose Color</option>
                                         @foreach($uniqueColors as $color)
-                                            <option value="{{ $color }}">{{ $color }}</option>
+                                            <option value="{{ $color->id }}">{{ $color->name }}</option>
                                         @endforeach
+
                                     </select>
                                 </div>
 
@@ -194,7 +198,8 @@
                                             selectedColor = colorSelect.value;
 
                                             if (selectedSize && selectedColor) {
-                                                const matchedVariant = variants.find(v => v.size == selectedSize && v.color == selectedColor);
+                                                const matchedVariant = variants.find(v => v.size_id == selectedSize && v.color_id == selectedColor);
+
                                                 
                                                 if (matchedVariant) {
                                                     // Dynamic Price Update

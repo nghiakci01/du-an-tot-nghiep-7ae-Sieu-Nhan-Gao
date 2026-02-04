@@ -25,13 +25,44 @@ class StoreProductRequest extends FormRequest
             'is_active' => 'boolean',
             
             // Variants validation
-            'variants' => 'required|array|min:1',
+            'variants' => [
+                'required',
+                'array',
+                'min:1',
+                function ($attribute, $value, $fail) {
+                    $combinations = [];
+                    foreach ($value as $index => $variant) {
+                        $sizeId = $variant['size_id'] ?? null;
+                        $colorId = $variant['color_id'] ?? null;
+                        if ($sizeId && $colorId) {
+                            $key = "{$sizeId}-{$colorId}";
+                            if (in_array($key, $combinations)) {
+                                $fail("Sản phẩm không được có các biến thể trùng lặp về Size và Màu sắc.");
+                                return;
+                            }
+                            $combinations[] = $key;
+                        }
+                    }
+                }
+            ],
             'variants.*.size_id' => 'required|exists:sizes,id',
             'variants.*.color_id' => 'required|exists:colors,id',
             'variants.*.price' => 'nullable|numeric|min:0',
-            'variants.*.sale_price' => 'nullable|numeric|min:0|lt:variants.*.price',
+            'variants.*.sale_price' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                function ($attribute, $value, $fail) {
+                    $index = explode('.', $attribute)[1];
+                    $price = request()->input("variants.{$index}.price");
+                    if ($price && $value >= $price) {
+                        $fail("Giá khuyến mãi phải nhỏ hơn giá gốc.");
+                    }
+                }
+            ],
             'variants.*.stock_quantity' => 'required|integer|min:0',
             'variants.*.sku' => 'nullable|string|max:100|distinct', // We will generate if empty, but check distinct in array
         ];
     }
 }
+

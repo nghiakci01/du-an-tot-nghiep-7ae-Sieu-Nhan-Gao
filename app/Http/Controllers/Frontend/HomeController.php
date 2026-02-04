@@ -33,4 +33,14 @@ class HomeController extends Controller
                               ->get();
         return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts'));
     }
+
+    public function about()
+    {
+        return view('frontend.about');
+    }
+
+    public function news()
+    {
+        return view('frontend.news');
+    }
 }

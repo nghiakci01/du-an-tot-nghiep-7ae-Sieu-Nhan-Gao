@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Models\ContactMessage;
 
 class ContactController extends Controller
 {
@@ -21,6 +22,8 @@ class ContactController extends Controller
             'subject' => 'required|string|max:255',
             'message' => 'required|string',
         ]);
+
+        ContactMessage::create($validated);
 
         // TODO: Implement email sending logic
         // For now, just return success message

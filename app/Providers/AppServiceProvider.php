@@ -35,27 +35,37 @@ class AppServiceProvider extends ServiceProvider
                 }
 
                 // Share chatbot settings
-                $chatbotEnabled = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_enabled', 3600, function () {
-                    return \App\Models\ChatbotSetting::where('key', 'chatbot_enabled')->first()?->value ?? '0';
-                });
-                $chatbotMode = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_mode', 3600, function () {
-                    return \App\Models\ChatbotSetting::where('key', 'chatbot_mode')->first()?->value ?? 'rules';
-                });
+                if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_settings')) {
+                    $chatbotEnabled = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_enabled', 3600, function () {
+                        return \App\Models\ChatbotSetting::where('key', 'chatbot_enabled')->first()?->value ?? '0';
+                    });
+                    $chatbotMode = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_mode', 3600, function () {
+                        return \App\Models\ChatbotSetting::where('key', 'chatbot_mode')->first()?->value ?? 'rules';
+                    });
 
-                $view->with('chatbot_enabled', $chatbotEnabled == '1');
-                $view->with('chatbot_mode', $chatbotMode);
+                    $view->with('chatbot_enabled', $chatbotEnabled == '1');
+                    $view->with('chatbot_mode', $chatbotMode);
+                } else {
+                    $view->with('chatbot_enabled', false);
+                    $view->with('chatbot_mode', 'rules');
+                }
 
                 // Share suggested questions
-                $suggestedQuestions = \Illuminate\Support\Facades\Cache::remember('chatbot_suggested_questions', 3600, function () {
-                    return \App\Models\ChatbotSuggestedQuestion::where('is_active', true)
-                        ->orderBy('order')
-                        ->pluck('question')
-                        ->toArray();
-                });
-                $view->with('chatbot_suggested_questions', $suggestedQuestions);
+                if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_suggested_questions')) {
+                    $suggestedQuestions = \Illuminate\Support\Facades\Cache::remember('chatbot_suggested_questions', 3600, function () {
+                        return \App\Models\ChatbotSuggestedQuestion::where('is_active', true)
+                            ->orderBy('order')
+                            ->pluck('question')
+                            ->toArray();
+                    });
+                    $view->with('chatbot_suggested_questions', $suggestedQuestions);
+                } else {
+                    $view->with('chatbot_suggested_questions', []);
+                }
             });
         } catch (\Exception $e) {
             // Log or ignore if DB connection fails during boot (e.g. composer install)
         }
     }
 }
+

@@ -22,21 +22,6 @@
                             @enderror
                         </div>
 
-                        <div class="form-group">
-                            <label for="hex_code">Hex Color Code <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="color" id="color_picker" class="form-control" style="max-width: 80px; padding: 2px;" value="{{ old('hex_code', $color->hex_code) }}">
-                                <input type="text" name="hex_code" id="hex_code" class="form-control @error('hex_code') is-invalid @enderror" value="{{ old('hex_code', $color->hex_code) }}" pattern="^#[0-9A-Fa-f]{6}$" required>
-                                @error('hex_code')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Color Preview</label>
-                            <div id="color_preview" style="width: 100px; height: 100px; border: 1px solid #ddd; border-radius: 4px; background-color: {{ old('hex_code', $color->hex_code) }};"></div>
-                        </div>
 
                         <div class="form-group">
                             <label for="display_order">Display Order</label>
@@ -67,24 +52,4 @@
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const colorPicker = document.getElementById('color_picker');
-    const hexInput = document.getElementById('hex_code');
-    const preview = document.getElementById('color_preview');
-
-    colorPicker.addEventListener('input', function() {
-        hexInput.value = this.value.toUpperCase();
-        preview.style.backgroundColor = this.value;
-    });
-
-    hexInput.addEventListener('input', function() {
-        const hex = this.value;
-        if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
-            colorPicker.value = hex;
-            preview.style.backgroundColor = hex;
-        }
-    });
-});
-</script>
 @endsection

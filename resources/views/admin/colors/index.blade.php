@@ -31,9 +31,7 @@
                         <thead>
                             <tr>
                                 <th width="8%">ID</th>
-                                <th width="10%">Preview</th>
-                                <th width="30%">Name</th>
-                                <th width="15%">Hex Code</th>
+                                <th width="50%">Name</th>
                                 <th width="12%">Display Order</th>
                                 <th width="10%">Status</th>
                                 <th width="15%">Actions</th>
@@ -43,11 +41,7 @@
                             @forelse($colors as $color)
                             <tr>
                                 <td>{{ $color->id }}</td>
-                                <td>
-                                    <div style="width: 40px; height: 40px; background-color: {{ $color->hex_code }}; border: 1px solid #ddd; border-radius: 4px;"></div>
-                                </td>
                                 <td>{{ $color->name }}</td>
-                                <td><code>{{ $color->hex_code }}</code></td>
                                 <td>{{ $color->display_order }}</td>
                                 <td>
                                     <span class="badge badge-{{ $color->is_active ? 'success' : 'secondary' }}">

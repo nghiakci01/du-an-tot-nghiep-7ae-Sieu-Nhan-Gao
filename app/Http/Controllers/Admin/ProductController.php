@@ -51,11 +51,12 @@ class ProductController extends Controller
 
             if ($request->has('variants')) {
                 foreach ($request->variants as $variantData) {
-                    // Lookup Size name and Color name for backward compatibility and SKU generation
-                    $sizeName = \App\Models\Size::find($variantData['size_id'])?->name ?? 'Unknown';
-                    $colorName = \App\Models\Color::find($variantData['color_id'])?->name ?? 'Unknown';
+                    $size = \App\Models\Size::find($variantData['size_id']);
+                    $color = \App\Models\Color::find($variantData['color_id']);
+                    
+                    $sizeName = $size?->name ?? 'Unknown';
+                    $colorName = $color?->name ?? 'Unknown';
 
-                    // Auto generate SKU if empty
                     $sku = $variantData['sku'];
                     if (empty($sku)) {
                         $sku = strtoupper(Str::slug($product->name . '-' . $sizeName . '-' . $colorName . '-' . uniqid()));
@@ -64,8 +65,8 @@ class ProductController extends Controller
                     $product->variants()->create([
                         'size_id' => $variantData['size_id'],
                         'color_id' => $variantData['color_id'],
-                        'size' => $sizeName,   // Backward compatibility
-                        'color' => $colorName, // Backward compatibility
+                        'size' => $sizeName,
+                        'color' => $colorName,
                         'price' => $variantData['price'] ?? null,
                         'sale_price' => $variantData['sale_price'] ?? null,
                         'stock_quantity' => $variantData['stock_quantity'],
@@ -73,6 +74,7 @@ class ProductController extends Controller
                     ]);
                 }
             }
+
 
             // Handle gallery images
             if ($request->hasFile('gallery_images')) {
@@ -134,9 +136,11 @@ class ProductController extends Controller
             $product->variants()->whereNotIn('id', $submittedIds)->delete();
 
             foreach ($submittedVariants as $variantData) {
-                // Lookup Size name and Color name
-                $sizeName = \App\Models\Size::find($variantData['size_id'])?->name ?? 'Unknown';
-                $colorName = \App\Models\Color::find($variantData['color_id'])?->name ?? 'Unknown';
+                $size = \App\Models\Size::find($variantData['size_id']);
+                $color = \App\Models\Color::find($variantData['color_id']);
+                
+                $sizeName = $size?->name ?? 'Unknown';
+                $colorName = $color?->name ?? 'Unknown';
 
                 $sku = $variantData['sku'];
                 if (empty($sku)) {
@@ -155,16 +159,15 @@ class ProductController extends Controller
                 ];
 
                 if (isset($variantData['id']) && $variantData['id']) {
-                    // Update existing
                     $variant = ProductVariant::find($variantData['id']);
                     if ($variant) {
                         $variant->update($variantAttributes);
                     }
                 } else {
-                    // Create new
                     $product->variants()->create($variantAttributes);
                 }
             }
+
 
             // Handle gallery images
             if ($request->hasFile('gallery_images')) {
