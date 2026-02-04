@@ -192,7 +192,7 @@
                                     <a href="{{ route('shop') }}">Shop</a>
                                 </li>
                                 <li class="menu-item-has-children">
-                                    <a href="#">Blog</a>
+                                    <a href="{{ route('about') }}">About Us</a>
                                 </li>
                                 <li class="menu-item-has-children {{ request()->is('contact') ? 'active' : '' }}">
                                     <a href="{{ route('contact.index') }}">Contact</a>
@@ -301,7 +301,7 @@
                                     </ul>
                                 </li>
                                 <li><a href="#">News</a></li>
-                                <li><a href="#">About Us</a></li>
+                                <li><a href="{{ route('about') }}">About Us</a></li>
                                 <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
                             </ul>   
                         </nav> 

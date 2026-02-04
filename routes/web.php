@@ -8,6 +8,7 @@ Route::get('/shop', [App\Http\Controllers\Frontend\ProductController::class, 'in
 Route::get('/product/{slug}', [App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('product.detail');
 Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'send'])->name('contact.send');
+Route::get('/about', [App\Http\Controllers\Frontend\HomeController::class, 'about'])->name('about');
 
 Route::get('/cart', [App\Http\Controllers\Frontend\CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [App\Http\Controllers\Frontend\CartController::class, 'addToCart'])->name('cart.add');
@@ -42,6 +43,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
         Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
+        Route::resource('contact-messages', App\Http\Controllers\Admin\ContactMessageController::class)->only(['index', 'show', 'destroy']);
         Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
         
         // Product Attributes

@@ -230,6 +230,14 @@
                 <span class="pc-mtext">Hỗ trợ khách hàng</span>
               </a>
             </li>
+            <li class="pc-item">
+              <a href="{{ route('admin.contact-messages.index') }}" class="pc-link">
+                <span class="pc-micon">
+                  <i class="ti ti-mail"></i>
+                </span>
+                <span class="pc-mtext">Tin nhắn liên hệ</span>
+              </a>
+            </li>
             @if(auth()->user()->isAdmin())
             <li class="pc-item">
               <a href="{{ route('admin.users.index') }}" class="pc-link">
