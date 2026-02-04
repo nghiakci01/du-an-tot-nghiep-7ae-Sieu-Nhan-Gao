@@ -30,9 +30,9 @@
                 <div class="col-lg-5 col-md-5">
                    <div class="product-details-tab">
 
-                        <div id="img-1" class="zoomWrapper single-zoom">
-                            <a href="#">
-                                <img id="zoom1" src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" alt="{{ $product->name }}">
+                        <div class="single-zoom-no-hover"> <!-- Changed class from single-zoom, removed id="img-1" -->
+                            <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#productImageModal">
+                                <img id="current-product-img" src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" alt="{{ $product->name }}">
                             </a>
                         </div>
 
@@ -40,14 +40,14 @@
                             <ul class="s-tab-zoom owl-carousel single-product-active" id="gallery_01">
                                 <!-- Main Image in Thumbnail -->
                                 <li>
-                                    <a href="#" class="elevatezoom-gallery active" data-update="" data-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}">
+                                    <a href="javascript:void(0)" class="elevatezoom-gallery active" data-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}">
                                         <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" alt="{{ $product->name }}"/>
                                     </a>
                                 </li>
                                 <!-- Gallery Images -->
                                 @foreach($product->images as $image)
                                 <li>
-                                    <a href="#" class="elevatezoom-gallery" data-update="" data-image="{{ asset('storage/' . $image->image_path) }}" data-zoom-image="{{ asset('storage/' . $image->image_path) }}">
+                                    <a href="javascript:void(0)" class="elevatezoom-gallery" data-image="{{ asset('storage/' . $image->image_path) }}">
                                         <img src="{{ asset('storage/' . $image->image_path) }}" alt="zo-th-{{ $loop->iteration }}"/>
                                     </a>
                                 </li>
@@ -56,6 +56,51 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Product Image Modal -->
+                <div class="modal fade" id="productImageModal" tabindex="-1" aria-labelledby="productImageModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content" style="background: transparent; border: none;">
+                            <div class="modal-body p-0 text-center position-relative">
+                                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" style="z-index: 1051; background-color: white; opacity: 0.8;"></button>
+                                <img id="modal-product-img" src="" class="img-fluid" style="max-height: 90vh; border-radius: 8px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Handle thumbnail click to switch main image
+                        const thumbnails = document.querySelectorAll('.elevatezoom-gallery');
+                        const mainImg = document.getElementById('current-product-img');
+                        const modalImg = document.getElementById('modal-product-img');
+
+                        thumbnails.forEach(thumb => {
+                            thumb.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                
+                                // Update active class
+                                thumbnails.forEach(t => t.classList.remove('active'));
+                                this.classList.add('active');
+
+                                // Get image source
+                                const newSrc = this.getAttribute('data-image');
+                                
+                                // Update main image
+                                mainImg.src = newSrc;
+                            });
+                        });
+
+                        // Update modal image when modal opens
+                        const imageModal = document.getElementById('productImageModal');
+                        if (imageModal) {
+                            imageModal.addEventListener('show.bs.modal', function () {
+                                modalImg.src = mainImg.src;
+                            });
+                        }
+                    });
+                </script>
                 <div class="col-lg-7 col-md-7">
                     <div class="product_d_right">
                        <form action="{{ route('cart.add') }}" method="POST">
@@ -74,75 +119,102 @@
                                 </ul>
                             </div>
                             <div class="product_price">
-                                <span class="current_price">{{ number_format($product->price) }} đ</span>
+                                @if($product->variants->isNotEmpty())
+                                    <span class="current_price">
+                                        @if($product->variants->min('price') == $product->variants->max('price'))
+                                            {{ number_format($product->variants->min('price')) }} đ
+                                        @else
+                                            {{ number_format($product->variants->min('price')) }} - {{ number_format($product->variants->max('price')) }} đ
+                                        @endif
+                                    </span>
+                                @elseif($product->sale_price)
+                                    <span class="current_price">{{ number_format($product->sale_price) }} đ</span>
+                                    <span class="old_price" style="text-decoration: line-through; color: #999; margin-left: 10px;">{{ number_format($product->price) }} đ</span>
+                                @else
+                                    <span class="current_price">{{ number_format($product->price) }} đ</span>
+                                @endif
+                            </div>
+
+                            <div class="product_desc">
+                                <p>{{ $product->short_description }}</p>
                             </div>
 
                             @if($product->variants->count() > 0)
                                 @php
                                     $uniqueSizes = $product->variants->pluck('size')->unique();
                                     $uniqueColors = $product->variants->pluck('color')->unique();
-                                    
-                                    // Custom color mapping for common colors (could be moved to a helper or config)
-                                    $colorMap = [
-                                        'Trắng' => '#ffffff',
-                                        'White' => '#ffffff',
-                                        'Đen' => '#000000',
-                                        'Black' => '#000000',
-                                        'Đỏ' => '#ff0000',
-                                        'Red' => '#ff0000',
-                                        'Xanh' => '#0000ff',
-                                        'Blue' => '#0000ff',
-                                        'Xanh lá' => '#008000',
-                                        'Green' => '#008000',
-                                        'Vàng' => '#ffff00',
-                                        'Yellow' => '#ffff00',
-                                        'Hồng' => '#ffc0cb',
-                                        'Pink' => '#ffc0cb',
-                                    ];
                                 @endphp
-                                
-                                <div class="product_variant size mb-20">
+
+                                <div class="product_variant size">
                                     <h3>Size</h3>
-                                    <div class="d-flex gap-2 flex-wrap">
+                                    <select class="niceselect_option" id="select_size">
+                                        <option selected value="">Choose Size</option>
                                         @foreach($uniqueSizes as $size)
-                                            <button type="button" class="btn btn-outline-secondary btn-sm size-btn" data-size="{{ $size }}" style="min-width: 40px; border-radius: 0;">{{ $size }}</button>
+                                            <option value="{{ $size }}">{{ $size }}</option>
                                         @endforeach
-                                    </div>
-                                    <span id="selected-size-label" class="text-primary ms-2" style="font-weight: normal; font-size: 0.9em;"></span>
+                                    </select>
                                 </div>
                                 
-                                <div class="product_variant color mb-20">
+                                <div class="product_variant color">
                                     <h3>Color</h3>
-                                    <div class="d-flex gap-2 flex-wrap">
+                                    <select class="niceselect_option" id="select_color">
+                                        <option selected value="">Choose Color</option>
                                         @foreach($uniqueColors as $color)
-                                            <button type="button" class="btn btn-outline-secondary btn-sm color-btn p-1" data-color="{{ $color }}" title="{{ $color }}" style="min-width: 35px; height: 35px; border-radius: 0; padding: 2px;">
-                                                <span style="display: block; width: 100%; height: 100%; background-color: {{ $colorMap[$color] ?? '#ccc' }}; border: 1px solid rgba(0,0,0,0.1);"></span>
-                                            </button>
+                                            <option value="{{ $color }}">{{ $color }}</option>
                                         @endforeach
-                                    </div>
-                                    <span id="selected-color-label" class="text-primary ms-2" style="font-weight: normal; font-size: 0.9em;"></span>
+                                    </select>
                                 </div>
-                                
+
                                 <input type="hidden" id="variant_select" name="variant_id" required>
                                 <div id="variant-message" class="text-danger mt-2 mb-3" style="display:none; font-weight: bold;"></div>
-                                
+
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function() {
                                         const variants = @json($product->variants);
-                                        const sizeBtns = document.querySelectorAll('.size-btn');
-                                        const colorBtns = document.querySelectorAll('.color-btn');
+                                        const sizeSelect = document.getElementById('select_size');
+                                        const colorSelect = document.getElementById('select_color');
                                         const variantInput = document.getElementById('variant_select');
                                         const msg = document.getElementById('variant-message');
                                         const addToCartBtn = document.querySelector('button[type="submit"]');
+                                        const priceContainer = document.querySelector('.product_price');
+                                        
+                                        // Store original price HTML to revert if needed
+                                        const originalPriceHtml = priceContainer.innerHTML;
                                         
                                         let selectedSize = null;
                                         let selectedColor = null;
+
+                                        // Helper to format currency
+                                        const formatCurrency = (amount) => {
+                                            return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
+                                        };
                                         
                                         function checkSelection() {
+                                            selectedSize = sizeSelect.value;
+                                            selectedColor = colorSelect.value;
+
                                             if (selectedSize && selectedColor) {
                                                 const matchedVariant = variants.find(v => v.size == selectedSize && v.color == selectedColor);
                                                 
                                                 if (matchedVariant) {
+                                                    // Dynamic Price Update
+                                                    // Priority: Variant Sale Price -> Variant Regular Price -> Original Product Logic
+                                                    let html = '';
+                                                    let finalPrice = matchedVariant.price; 
+                                                    // If variant has specific price override (not null)
+                                                    if (matchedVariant.price !== null) {
+                                                        if (matchedVariant.sale_price !== null) {
+                                                            html = `<span class="current_price">${formatCurrency(matchedVariant.sale_price)}</span>
+                                                                    <span class="old_price" style="text-decoration: line-through; color: #999; margin-left: 10px;">${formatCurrency(matchedVariant.price)}</span>`;
+                                                        } else {
+                                                            html = `<span class="current_price">${formatCurrency(matchedVariant.price)}</span>`;
+                                                        }
+                                                        priceContainer.innerHTML = html;
+                                                    } else {
+                                                        // Fallback to original if variant prices are null (inherit from parent)
+                                                        priceContainer.innerHTML = originalPriceHtml;
+                                                    }
+
                                                     if (matchedVariant.stock_quantity > 0) {
                                                         variantInput.value = matchedVariant.id;
                                                         msg.style.display = 'none';
@@ -160,48 +232,30 @@
                                                     msg.textContent = 'This variant does not exist';
                                                     msg.style.display = 'block';
                                                     addToCartBtn.disabled = true;
+                                                    // Revert price
+                                                    priceContainer.innerHTML = originalPriceHtml;
                                                 }
                                             } else {
-                                                // Disable button if not fully selected
                                                 addToCartBtn.disabled = true;
+                                                // Revert price if selection matches nothing
+                                                // priceContainer.innerHTML = originalPriceHtml; 
+                                                // (Optional: keep last valid price or revert immediately. Let's revert.)
+                                                // But typically users might change just one dropdown. Keep simple: 
+                                                // Only revert if we want "no selection" state. 
                                             }
                                         }
                                         
                                         // Init button state
                                         addToCartBtn.disabled = true;
                                         
-                                        sizeBtns.forEach(btn => {
-                                            btn.addEventListener('click', function() {
-                                                sizeBtns.forEach(b => b.classList.remove('active', 'btn-primary'));
-                                                this.classList.add('active', 'btn-primary');
-                                                this.classList.remove('btn-outline-secondary');
-                                                // Reset others
-                                                sizeBtns.forEach(b => {
-                                                    if (b !== this) b.classList.add('btn-outline-secondary');
-                                                });
-                                                
-                                                selectedSize = this.dataset.size;
-                                                // Check for label existence before setting
-                                                const sizeLabel = document.getElementById('selected-size-label');
-                                                if(sizeLabel) sizeLabel.textContent = selectedSize;
-                                                
-                                                checkSelection();
-                                            });
-                                        });
-                                        
-                                        colorBtns.forEach(btn => {
-                                            btn.addEventListener('click', function() {
-                                                colorBtns.forEach(b => b.style.border = '1px solid #ddd');
-                                                this.style.border = '2px solid #000';
-                                                
-                                                selectedColor = this.dataset.color;
-                                                // Check for label existence before setting
-                                                const colorLabel = document.getElementById('selected-color-label');
-                                                if(colorLabel) colorLabel.textContent = selectedColor;
-                                                
-                                                checkSelection();
-                                            });
-                                        });
+                                        // Use jQuery change event because niceselect plugin hides the original select and uses its own UI
+                                        if (typeof $ !== 'undefined') {
+                                            $(sizeSelect).on('change', checkSelection);
+                                            $(colorSelect).on('change', checkSelection);
+                                        } else {
+                                            sizeSelect.addEventListener('change', checkSelection);
+                                            colorSelect.addEventListener('change', checkSelection);
+                                        }
                                     });
                                 </script>
                             @endif
@@ -214,6 +268,7 @@
                             <div class=" product_d_action">
                                <ul>
                                    <li><a href="#" title="Add to wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i> Add to Wish List</a></li>
+                                   <li><a href="#" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i> Compare this Product</a></li>
                                </ul>
                             </div>
                             

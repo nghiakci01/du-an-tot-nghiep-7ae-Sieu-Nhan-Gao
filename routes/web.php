@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 Route::get('/', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('welcome');
 Route::get('/shop', [App\Http\Controllers\Frontend\ProductController::class, 'index'])->name('shop');
 Route::get('/product/{slug}', [App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('product.detail');
+Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'index'])->name('contact.index');
+Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'send'])->name('contact.send');
 
 Route::get('/cart', [App\Http\Controllers\Frontend\CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [App\Http\Controllers\Frontend\CartController::class, 'addToCart'])->name('cart.add');
@@ -41,6 +43,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
         Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
         Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
+        
+        // Product Attributes
+        Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
+        Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
     });
     
     // Admin & Staff Routes (Stock only)

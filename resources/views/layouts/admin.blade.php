@@ -190,6 +190,29 @@
                 <span class="pc-mtext">Sản phẩm</span>
               </a>
             </li>
+            <li class="pc-item pc-hasmenu">
+              <a href="#!" class="pc-link">
+                <span class="pc-micon">
+                  <i class="ti ti-palette"></i>
+                </span>
+                <span class="pc-mtext">Thuộc tính</span>
+                <span class="pc-arrow">
+                  <i data-feather="chevron-right"></i>
+                </span>
+              </a>
+              <ul class="pc-submenu">
+                <li class="pc-item">
+                  <a href="{{ route('admin.sizes.index') }}" class="pc-link">
+                    <span class="pc-mtext">Kích thước</span>
+                  </a>
+                </li>
+                <li class="pc-item">
+                  <a href="{{ route('admin.colors.index') }}" class="pc-link">
+                    <span class="pc-mtext">Màu sắc</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
             @endif
             <li class="pc-item">
               <a href="{{ route('admin.stock.index') }}" class="pc-link">

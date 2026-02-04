@@ -48,10 +48,10 @@
                         </div> 
                         <div class="search_bar">
                             <form action="{{ route('shop') }}" method="GET">
-                                <select class="select_option" name="category_id" >
+                                <select class="select_option" name="category" >
                                     <option selected value="">All Categories</option>
                                     @foreach($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        <option value="{{ $category->slug }}">{{ $category->name }}</option>
                                     @endforeach
                                 </select>
                                 <input placeholder="Search products..." type="text" name="search">
@@ -82,8 +82,8 @@
                                 <li class="menu-item-has-children">
                                     <a href="#">Blog</a>
                                 </li>
-                                <li class="menu-item-has-children">
-                                    <a href="#">Contact</a>
+                                <li class="menu-item-has-children {{ request()->is('contact') ? 'active' : '' }}">
+                                    <a href="{{ route('contact.index') }}">Contact</a>
                                 </li>
                                 <li class="menu-item-has-children">
                                     <a href="#">Liên hệ</a> 
@@ -173,8 +173,8 @@
                                     <ul class="mega_menu">
                                         <li><a href="#">Product Categories</a>
                                             <ul>
-                                                @foreach($categories->take(5) as $category)
-                                                    <li><a href="{{ route('shop', ['category_id' => $category->id]) }}">{{ $category->name }}</a></li>
+                                                @foreach($categories as $category)
+                                                    <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
                                                 @endforeach
                                             </ul>
                                         </li>
@@ -190,7 +190,7 @@
                                 </li>
                                 <li><a href="#">News</a></li>
                                 <li><a href="#">About Us</a></li>
-                                <li><a href="#">Contact Us</a></li>
+                                <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
                             </ul>   
                         </nav> 
                     </div>
@@ -213,8 +213,8 @@
                                             <ul class="mega_menu">
                                                 <li><a href="#">Product Categories</a>
                                                     <ul>
-                                                        @foreach($categories->take(5) as $category)
-                                                            <li><a href="{{ route('shop', ['category_id' => $category->id]) }}">{{ $category->name }}</a></li>
+                                                        @foreach($categories as $category)
+                                                            <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
                                                         @endforeach
                                                     </ul>
                                                 </li>
@@ -229,7 +229,7 @@
                                         </li>
                                         <li><a href="#">News</a></li>
                                         <li><a href="#">About Us</a></li>
-                                        <li><a href="#">Contact Us</a></li>
+                                        <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
                                     </ul>   
                                 </nav> 
                             </div>

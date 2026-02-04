@@ -18,6 +18,7 @@ class Product extends Model
         'short_description',
         'description',
         'price',
+        'sale_price',
         'is_active',
         'is_featured',
         'image',
@@ -27,6 +28,7 @@ class Product extends Model
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
         'price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
     ];
 
     public function category(): BelongsTo

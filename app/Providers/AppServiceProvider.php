@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
             View::composer('*', function ($view) {
                 // Check if categories is already set to avoid double query or overriding
                 if (!isset($view->getData()['categories'])) {
-                     $categories = Category::whereNull('parent_id')->take(6)->get();
+                     $categories = Category::whereNull('parent_id')->get();
                      $view->with('categories', $categories);
                 }
 
