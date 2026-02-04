@@ -300,7 +300,7 @@
                                         <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
                                     </ul>
                                 </li>
-                                <li><a href="#">News</a></li>
+                                <li><a href="{{ route('news') }}">News</a></li>
                                 <li><a href="{{ route('about') }}">About Us</a></li>
                                 <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
                             </ul>   

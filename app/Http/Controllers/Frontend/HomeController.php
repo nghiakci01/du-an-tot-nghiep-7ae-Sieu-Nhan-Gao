@@ -38,4 +38,9 @@ class HomeController extends Controller
     {
         return view('frontend.about');
     }
+
+    public function news()
+    {
+        return view('frontend.news');
+    }
 }

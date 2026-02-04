@@ -9,6 +9,7 @@ Route::get('/product/{slug}', [App\Http\Controllers\Frontend\ProductController::
 Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'send'])->name('contact.send');
 Route::get('/about', [App\Http\Controllers\Frontend\HomeController::class, 'about'])->name('about');
+Route::get('/news', [App\Http\Controllers\Frontend\HomeController::class, 'news'])->name('news');
 
 Route::get('/cart', [App\Http\Controllers\Frontend\CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [App\Http\Controllers\Frontend\CartController::class, 'addToCart'])->name('cart.add');
