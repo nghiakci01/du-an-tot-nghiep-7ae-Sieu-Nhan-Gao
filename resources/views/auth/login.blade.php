@@ -51,6 +51,18 @@
                             </label>
                             <button type="submit">Login</button>
                         </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12 text-center">
+                                <p>Or login with</p>
+                                <a href="{{ route('social.login', 'google') }}" class="btn btn-danger btn-block" style="background-color: #db4437; border-color: #db4437; color: white; width: 100%; margin-bottom: 10px;">
+                                    <i class="fa fa-google"></i> Login with Google
+                                </a>
+                                <a href="{{ route('social.login', 'facebook') }}" class="btn btn-primary btn-block" style="background-color: #3b5998; border-color: #3b5998; color: white; width: 100%;">
+                                    <i class="fa fa-facebook"></i> Login with Facebook
+                                </a>
+                            </div>
+                        </div>
                         <div class="text-center mt-3">
                             <p>Don't have an account?</p>
                             <a href="{{ route('register') }}" class="btn btn-secondary">Create an Account</a>
