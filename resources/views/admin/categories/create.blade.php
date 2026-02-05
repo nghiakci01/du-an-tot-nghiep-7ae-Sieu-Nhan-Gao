@@ -31,7 +31,10 @@
                     @csrf
                     <div class="mb-3">
                         <label for="name" class="form-label">Tên Danh mục</label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" maxlength="50" required>
+                        <small class="text-muted">
+                            <span id="charCount">0</span>/50 ký tự
+                        </small>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -67,4 +70,35 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nameInput = document.getElementById('name');
+    const charCount = document.getElementById('charCount');
+    
+    // Update counter on input
+    nameInput.addEventListener('input', function() {
+        const length = this.value.length;
+        charCount.textContent = length;
+        
+        // Color feedback
+        if (length >= 50) {
+            charCount.classList.add('text-danger');
+            charCount.classList.remove('text-warning');
+        } else if (length >= 40) {
+            charCount.classList.add('text-warning');
+            charCount.classList.remove('text-danger');
+        } else {
+            charCount.classList.remove('text-danger', 'text-warning');
+        }
+    });
+    
+    // Initialize counter with existing value
+    if (nameInput.value) {
+        nameInput.dispatchEvent(new Event('input'));
+    }
+});
+</script>
 @endsection

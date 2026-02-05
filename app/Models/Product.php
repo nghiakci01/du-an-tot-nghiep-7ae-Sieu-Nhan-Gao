@@ -18,13 +18,17 @@ class Product extends Model
         'short_description',
         'description',
         'price',
+        'sale_price',
         'is_active',
+        'is_featured',
         'image',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
         'price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
     ];
 
     public function category(): BelongsTo
@@ -39,7 +43,7 @@ class Product extends Model
 
     public function images(): HasMany
     {
-        return $this->hasMany(ProductImage::class);
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
     public function reviews(): HasMany

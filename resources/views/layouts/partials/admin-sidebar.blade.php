@@ -96,7 +96,7 @@
                                                     <polyline points="9 18 15 12 9 6"></polyline>
                                                 </svg></span>
                                             <span class="pc-badge">2</span></a>
-                                        {{-- <ul class="pc-submenu" style="display: block;">
+                                        <ul class="pc-submenu" style="display: block;">
                                             <li class="pc-item active">
                                                 <a class="pc-link" href="{{ route('admin.products.index') }}"
                                                     data-i18n="Default">Products</a>
@@ -113,11 +113,27 @@
                                                 <a class="pc-link" href="{{ route('admin.users.index') }}"
                                                     data-i18n="Analytics">Users</a>
                                             </li>
-                                            <li class="pc-item">
-                                                <a class="pc-link" href="{{ route('admin.reviews.index') }}"
-                                                    data-i18n="Analytics">Reviews</a>
+                                            <li class="pc-item pc-hasmenu">
+                                                <a class="pc-link" href="#!"><span data-i18n="Attributes">Attributes</span>
+                                                    <span class="pc-arrow"><svg xmlns="http://www.w3.org/2000/svg"
+                                                            width="24" height="24" viewBox="0 0 24 24"
+                                                            fill="none" stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            class="feather feather-chevron-right">
+                                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                                        </svg></span></a>
+                                                <ul class="pc-submenu" style="display: none;">
+                                                    <li class="pc-item">
+                                                        <a class="pc-link" href="{{ route('admin.sizes.index') }}"
+                                                            data-i18n="Sizes">Sizes</a>
+                                                    </li>
+                                                    <li class="pc-item">
+                                                        <a class="pc-link" href="{{ route('admin.colors.index') }}"
+                                                            data-i18n="Colors">Colors</a>
+                                                    </li>
+                                                </ul>
                                             </li>
-                                        </ul> --}}
+                                        </ul>
                                     </li>
                                     <li class="pc-item pc-hasmenu">
                                         <a href="#!" class="pc-link"><span class="pc-micon"><svg

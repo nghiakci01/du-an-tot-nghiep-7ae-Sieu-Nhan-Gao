@@ -10,9 +10,6 @@ use App\Models\ProductVariant;
 
 class ProductSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         // Lấy category theo slug
@@ -84,5 +81,7 @@ class ProductSeeder extends Seeder
                 );
             }
         }
+        
+        echo "\n✅ Đã thêm thành công " . count($products) . " sản phẩm với " . (count($products) * 4) . " biến thể!\n";
     }
 }

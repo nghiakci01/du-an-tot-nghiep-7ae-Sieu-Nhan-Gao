@@ -30,8 +30,37 @@ class AppServiceProvider extends ServiceProvider
             View::composer('*', function ($view) {
                 // Check if categories is already set to avoid double query or overriding
                 if (!isset($view->getData()['categories'])) {
-                     $categories = Category::whereNull('parent_id')->take(6)->get();
+                     $categories = Category::whereNull('parent_id')->get();
                      $view->with('categories', $categories);
+                }
+
+                // Share chatbot settings
+                if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_settings')) {
+                    $chatbotEnabled = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_enabled', 3600, function () {
+                        return \App\Models\ChatbotSetting::where('key', 'chatbot_enabled')->first()?->value ?? '0';
+                    });
+                    $chatbotMode = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_mode', 3600, function () {
+                        return \App\Models\ChatbotSetting::where('key', 'chatbot_mode')->first()?->value ?? 'rules';
+                    });
+
+                    $view->with('chatbot_enabled', $chatbotEnabled == '1');
+                    $view->with('chatbot_mode', $chatbotMode);
+                } else {
+                    $view->with('chatbot_enabled', false);
+                    $view->with('chatbot_mode', 'rules');
+                }
+
+                // Share suggested questions
+                if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_suggested_questions')) {
+                    $suggestedQuestions = \Illuminate\Support\Facades\Cache::remember('chatbot_suggested_questions', 3600, function () {
+                        return \App\Models\ChatbotSuggestedQuestion::where('is_active', true)
+                            ->orderBy('order')
+                            ->pluck('question')
+                            ->toArray();
+                    });
+                    $view->with('chatbot_suggested_questions', $suggestedQuestions);
+                } else {
+                    $view->with('chatbot_suggested_questions', []);
                 }
             });
         } catch (\Exception $e) {
@@ -39,3 +68,4 @@ class AppServiceProvider extends ServiceProvider
         }
     }
 }
+

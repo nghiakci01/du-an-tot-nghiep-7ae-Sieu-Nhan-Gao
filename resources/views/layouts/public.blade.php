@@ -9,6 +9,7 @@
     <title>Reid - Fashion eCommerce HTML Template</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend-assets/img/favicon.ico') }}">
     
@@ -46,7 +47,9 @@
 
 
 
-@include('partials.chatbot-widget')
+@if($chatbot_enabled)
+    @include('frontend.partials.chatbot-widget')
+@endif
 
 </body>
 

@@ -190,6 +190,29 @@
                 <span class="pc-mtext">Sản phẩm</span>
               </a>
             </li>
+            <li class="pc-item pc-hasmenu">
+              <a href="#!" class="pc-link">
+                <span class="pc-micon">
+                  <i class="ti ti-palette"></i>
+                </span>
+                <span class="pc-mtext">Thuộc tính</span>
+                <span class="pc-arrow">
+                  <i data-feather="chevron-right"></i>
+                </span>
+              </a>
+              <ul class="pc-submenu">
+                <li class="pc-item">
+                  <a href="{{ route('admin.sizes.index') }}" class="pc-link">
+                    <span class="pc-mtext">Kích thước</span>
+                  </a>
+                </li>
+                <li class="pc-item">
+                  <a href="{{ route('admin.colors.index') }}" class="pc-link">
+                    <span class="pc-mtext">Màu sắc</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
             @endif
             <li class="pc-item">
               <a href="{{ route('admin.stock.index') }}" class="pc-link">
@@ -197,6 +220,22 @@
                   <i class="ti ti-archive"></i>
                 </span>
                 <span class="pc-mtext">Quản lý Kho</span>
+              </a>
+            </li>
+            <li class="pc-item">
+              <a href="{{ route('admin.chat.index') }}" class="pc-link">
+                <span class="pc-micon">
+                  <i class="ti ti-messages"></i>
+                </span>
+                <span class="pc-mtext">Hỗ trợ khách hàng</span>
+              </a>
+            </li>
+            <li class="pc-item">
+              <a href="{{ route('admin.contact-messages.index') }}" class="pc-link">
+                <span class="pc-micon">
+                  <i class="ti ti-mail"></i>
+                </span>
+                <span class="pc-mtext">Tin nhắn liên hệ</span>
               </a>
             </li>
             @if(auth()->user()->isAdmin())
@@ -208,6 +247,14 @@
                 <span class="pc-mtext">Người dùng</span>
               </a>
             </li>
+            <li class="pc-item">
+                <a href="{{ route('admin.settings.chatbot') }}" class="pc-link">
+                  <span class="pc-micon">
+                    <i class="ti ti-settings"></i>
+                  </span>
+                  <span class="pc-mtext">Cấu hình Chatbot</span>
+                </a>
+              </li>
             @endif
             <li class="pc-item pc-caption">
               <label data-i18n="Widget">Widget</label>

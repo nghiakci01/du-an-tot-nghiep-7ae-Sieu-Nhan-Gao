@@ -1,10 +1,10 @@
 @extends('layouts.public')
 
-@section('title', 'Thanh toán | FashionStore')
+@section('title', 'Checkout | FashionStore')
 
 @section('content')
 <div class="container py-5">
-    <h2 class="fw-bold mb-4">Thanh toán</h2>
+    <h2 class="fw-bold mb-4">Checkout</h2>
 
     @if(session('error'))
         <div class="alert alert-danger">
@@ -19,23 +19,23 @@
             <div class="col-lg-7">
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-white">
-                        <h5 class="card-title mb-0 fw-bold">Thông tin giao hàng</h5>
+                        <h5 class="card-title mb-0 fw-bold">Shipping Information</h5>
                     </div>
                     <div class="card-body">
                          <div class="mb-3">
-                            <label for="name" class="form-label">Họ và Tên</label>
+                            <label for="name" class="form-label">Full Name</label>
                             <input type="text" class="form-control" id="name" name="name" value="{{ Auth::check() ? Auth::user()->name : old('name') }}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="phone" class="form-label">Số điện thoại</label>
+                            <label for="phone" class="form-label">Phone Number</label>
                             <input type="text" class="form-control" id="phone" name="phone" value="{{ Auth::check() ? Auth::user()->phone : old('phone') }}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="address" class="form-label">Địa chỉ nhận hàng</label>
+                            <label for="address" class="form-label">Shipping Address</label>
                             <textarea class="form-control" id="address" name="address" rows="3" required>{{ Auth::check() ? Auth::user()->address : old('address') }}</textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="note" class="form-label">Ghi chú (Tùy chọn)</label>
+                            <label for="note" class="form-label">Order Notes (Optional)</label>
                             <textarea class="form-control" id="note" name="note" rows="2">{{ old('note') }}</textarea>
                         </div>
                     </div>
@@ -46,7 +46,7 @@
             <div class="col-lg-5">
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-white">
-                        <h5 class="card-title mb-0 fw-bold">Đơn hàng của bạn</h5>
+                        <h5 class="card-title mb-0 fw-bold">Your Order</h5>
                     </div>
                     <div class="card-body">
                         <ul class="list-group list-group-flush mb-3">
@@ -54,32 +54,32 @@
                             <li class="list-group-item d-flex justify-content-between lh-sm">
                                 <div>
                                     <h6 class="my-0">{{ $details['name'] }}</h6>
-                                    <small class="text-muted">SL: {{ $details['quantity'] }} ({{ $details['size'] }}/{{ $details['color'] }})</small>
+                                    <small class="text-muted">Qty: {{ $details['quantity'] }} ({{ $details['size'] }}/{{ $details['color'] }})</small>
                                 </div>
                                 <span class="text-muted">{{ number_format($details['price'] * $details['quantity']) }} đ</span>
                             </li>
                             @endforeach
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Tổng cộng (USD)</span>
+                                <span>Total</span>
                                 <strong>{{ number_format($total) }} đ</strong>
                             </li>
                         </ul>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Phương thức thanh toán</label>
+                            <label class="form-label fw-bold">Payment Method</label>
                             <div class="form-check">
                                 <input id="credit" name="payment_method" type="radio" class="form-check-input" value="COD" checked required>
-                                <label class="form-check-label" for="credit">Thanh toán khi nhận hàng (COD)</label>
+                                <label class="form-check-label" for="credit">Cash on Delivery (COD)</label>
                             </div>
                             <div class="form-check">
                                 <input id="debit" name="payment_method" type="radio" class="form-check-input" value="BANK_TRANSFER" required>
-                                <label class="form-check-label" for="debit">Chuyển khoản Ngân hàng</label>
+                                <label class="form-check-label" for="debit">Bank Transfer</label>
                             </div>
                         </div>
 
                         <hr class="my-4">
 
-                        <button class="w-100 btn btn-primary btn-lg" type="submit">Đặt hàng</button>
+                        <button class="w-100 btn btn-primary btn-lg" type="submit">Place Order</button>
                     </div>
                 </div>
             </div>

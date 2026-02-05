@@ -52,13 +52,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="price" class="form-label">Giá (VNĐ)</label>
-                        <input type="number" class="form-control @error('price') is-invalid @enderror" id="price" name="price" value="{{ old('price', $product->price) }}" required min="0">
-                        @error('price')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+
                     <div class="col-md-6 mb-3">
                         <label for="image" class="form-label">Hình ảnh</label>
                          @if($product->image)
@@ -66,23 +60,66 @@
                                 <img src="{{ asset('storage/' . $product->image) }}" alt="Current Image" width="100">
                             </div>
                         @endif
-                        <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image">
-                        <small class="text-muted">Để trống nếu không thay đổi.</small>
+                        <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp">
+                        <small class="text-muted d-block">Để trống nếu không thay đổi.</small>
+                        <small class="text-muted">Tối thiểu 400x400px, tối đa 10MB</small>
                         @error('image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="description" class="form-label">Mô tả</label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3">{{ old('description', $product->description) }}</textarea>
-                         @error('description')
+                        <label for="gallery_images" class="form-label">Ảnh Gallery (Tối đa 6 ảnh)</label>
+                        
+                        @if($product->images->count() > 0)
+                            <div class="mb-3">
+                                <label class="d-block">Ảnh hiện tại:</label>
+                                <div class="d-flex gap-2 flex-wrap" id="existing-gallery">
+                                    @foreach($product->images as $img)
+                                        <div class="position-relative" data-image-id="{{ $img->id }}">
+                                            <img src="{{ asset('storage/' . $img->image_path) }}" width="100" class="border rounded">
+                                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 delete-gallery-img" 
+                                                    data-id="{{ $img->id }}" style="padding: 0 5px; font-size: 12px;">×</button>
+                                            <small class="d-block text-center">{{ $loop->iteration }}</small>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                        
+                        <input type="file" class="form-control @error('gallery_images.*') is-invalid @enderror" 
+                               id="gallery_images" name="gallery_images[]" multiple 
+                               accept="image/jpeg,image/png,image/jpg,image/gif,image/webp">
+                        <small class="text-muted d-block">Thêm ảnh mới (sẽ được thêm vào gallery hiện có)</small>
+                        <small class="text-muted">Tối thiểu 400x400px, tối đa 10MB/ảnh</small>
+                        @error('gallery_images.*')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        <div id="gallery-preview" class="mt-3 d-flex gap-2 flex-wrap"></div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="description" class="form-label">Mô tả <small class="text-muted">(Tối đa 500 ký tự)</small></label>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="500">{{ old('description', $product->description) }}</textarea>
+                        <div class="d-flex justify-content-between mt-1">
+                            <div>
+                                @error('description')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <small class="text-muted">
+                                <span id="char-count">0</span> / 500 ký tự
+                            </small>
+                        </div>
                     </div>
                     <div class="col-md-12 mb-3">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', $product->is_active) ? 'checked' : '' }}>
                             <label class="form-check-label" for="is_active">Kích hoạt</label>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_featured">Sản phẩm nổi bật</label>
                         </div>
                     </div>
                 </div>
@@ -112,6 +149,8 @@
                             <tr>
                                 <th>Size</th>
                                 <th>Màu sắc</th>
+                                <th>Giá (VNĐ)</th>
+                                <th>Giá KM (VNĐ)</th>
                                 <th>Số lượng tồn kho</th>
                                 <th>SKU (Mã kho)</th>
                                 <th>Hành động</th>
@@ -130,16 +169,46 @@
                                     @endif
 
                                     <td>
-                                        <input type="text" class="form-control form-control-sm" name="variants[{{ $index }}][size]" value="{{ $variant['size'] }}" placeholder="VD: S, M, XL" required>
+                                        <select class="form-select form-select-sm size-select @error('variants.'.$index.'.size_id') is-invalid @enderror" name="variants[{{ $index }}][size_id]" required>
+                                            <option value="">-- Chọn Size --</option>
+                                            @foreach($sizes as $size)
+                                                <option value="{{ $size->id }}" 
+                                                    {{ (old("variants.{$index}.size_id") ?? $variant['size_id'] ?? '') == $size->id ? 'selected' : '' }}>
+                                                    {{ $size->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('variants.'.$index.'.size_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </td>
+
+                                    <td>
+                                        <select class="form-select form-select-sm color-select @error('variants.'.$index.'.color_id') is-invalid @enderror" name="variants[{{ $index }}][color_id]" required>
+                                            <option value="">-- Chọn Màu --</option>
+                                            @foreach($colors as $color)
+                                                <option value="{{ $color->id }}"
+                                                    {{ (old("variants.{$index}.color_id") ?? $variant['color_id'] ?? '') == $color->id ? 'selected' : '' }}>
+                                                    {{ $color->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('variants.'.$index.'.color_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </td>
+
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.price') is-invalid @enderror" name="variants[{{ $index }}][price]" value="{{ $variant['price'] ?? '' }}" min="0" step="0.01" placeholder="Giá">
+                                        @error('variants.'.$index.'.price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm" name="variants[{{ $index }}][color]" value="{{ $variant['color'] }}" placeholder="VD: Đỏ, Xanh" required>
+                                        <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.sale_price') is-invalid @enderror" name="variants[{{ $index }}][sale_price]" value="{{ $variant['sale_price'] ?? '' }}" min="0" step="0.01" placeholder="Giá KM">
+                                        @error('variants.'.$index.'.sale_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm" name="variants[{{ $index }}][stock_quantity]" value="{{ $variant['stock_quantity'] }}" min="0" required>
+                                        <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.stock_quantity') is-invalid @enderror" name="variants[{{ $index }}][stock_quantity]" value="{{ $variant['stock_quantity'] }}" min="0" required>
+                                        @error('variants.'.$index.'.stock_quantity') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm" name="variants[{{ $index }}][sku]" value="{{ $variant['sku'] }}" placeholder="Để trống tự tạo">
+                                        <input type="text" class="form-control form-control-sm @error('variants.'.$index.'.sku') is-invalid @enderror" name="variants[{{ $index }}][sku]" value="{{ $variant['sku'] }}" placeholder="Để trống tự tạo">
+                                        @error('variants.'.$index.'.sku') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-danger btn-sm remove-variant-btn"><i class="feather icon-trash-2"></i></button>
@@ -150,16 +219,39 @@
                             @if(count($variants) == 0)
                                  <tr class="variant-row" data-index="0">
                                     <td>
-                                        <input type="text" class="form-control form-control-sm" name="variants[0][size]" placeholder="VD: S, M, XL" required>
+                                        <select class="form-select form-select-sm size-select @error('variants.0.size_id') is-invalid @enderror" name="variants[0][size_id]" required>
+                                            <option value="">-- Chọn Size --</option>
+                                            @foreach($sizes as $size)
+                                                <option value="{{ $size->id }}">{{ $size->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('variants.0.size_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm" name="variants[0][color]" placeholder="VD: Đỏ, Xanh" required>
+                                        <select class="form-select form-select-sm color-select @error('variants.0.color_id') is-invalid @enderror" name="variants[0][color_id]" required>
+                                            <option value="">-- Chọn Màu --</option>
+                                            @foreach($colors as $color)
+                                                <option value="{{ $color->id }}">{{ $color->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('variants.0.color_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </td>
+
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm @error('variants.0.price') is-invalid @enderror" name="variants[0][price]" min="0" step="0.01" placeholder="Giá">
+                                        @error('variants.0.price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm" name="variants[0][stock_quantity]" value="0" min="0" required>
+                                        <input type="number" class="form-control form-control-sm @error('variants.0.sale_price') is-invalid @enderror" name="variants[0][sale_price]" min="0" step="0.01" placeholder="Giá KM">
+                                        @error('variants.0.sale_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm" name="variants[0][sku]" placeholder="Để trống tự tạo">
+                                        <input type="number" class="form-control form-control-sm @error('variants.0.stock_quantity') is-invalid @enderror" name="variants[0][stock_quantity]" value="0" min="0" required>
+                                        @error('variants.0.stock_quantity') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm @error('variants.0.sku') is-invalid @enderror" name="variants[0][sku]" placeholder="Để trống tự tạo">
+                                        @error('variants.0.sku') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-danger btn-sm remove-variant-btn"><i class="feather icon-trash-2"></i></button>
@@ -200,10 +292,26 @@
             const row = `
                 <tr class="variant-row" data-index="${variantIndex}">
                     <td>
-                        <input type="text" class="form-control form-control-sm" name="variants[${variantIndex}][size]" placeholder="VD: S, M, XL" required>
+                        <select class="form-select form-select-sm size-select" name="variants[${variantIndex}][size_id]" required>
+                            <option value="">-- Chọn Size --</option>
+                            @foreach($sizes as $size)
+                                <option value="{{ $size->id }}">{{ $size->name }}</option>
+                            @endforeach
+                        </select>
                     </td>
                     <td>
-                        <input type="text" class="form-control form-control-sm" name="variants[${variantIndex}][color]" placeholder="VD: Đỏ, Xanh" required>
+                        <select class="form-select form-select-sm color-select" name="variants[${variantIndex}][color_id]" required>
+                            <option value="">-- Chọn Màu --</option>
+                            @foreach($colors as $color)
+                                <option value="{{ $color->id }}">{{ $color->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][price]" min="0" step="0.01" placeholder="Giá">
+                    </td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][sale_price]" min="0" step="0.01" placeholder="Giá KM">
                     </td>
                     <td>
                         <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][stock_quantity]" value="0" min="0" required>
@@ -228,6 +336,113 @@
                     alert('Phải có ít nhất một biến thể.');
                 }
             }
+        });
+
+        // Prevention of duplicate variants
+        tableBody.addEventListener('change', function(e) {
+            if (e.target.classList.contains('size-select') || e.target.classList.contains('color-select')) {
+                const row = e.target.closest('tr');
+                const sizeId = row.querySelector('.size-select').value;
+                const colorId = row.querySelector('.color-select').value;
+
+                if (sizeId && colorId) {
+                    let duplicate = false;
+                    document.querySelectorAll('.variant-row').forEach(otherRow => {
+                        if (otherRow === row) return;
+                        const otherSizeId = otherRow.querySelector('.size-select').value;
+                        const otherColorId = otherRow.querySelector('.color-select').value;
+
+                        if (sizeId === otherSizeId && colorId === otherColorId) {
+                            duplicate = true;
+                        }
+                    });
+
+                    if (duplicate) {
+                        alert('Biến thể với Size và Màu sắc này đã được chọn.');
+                        e.target.value = '';
+                    }
+                }
+            }
+        });
+
+
+        // Character counter for description
+        const descTextarea = document.getElementById('description');
+        const charCount = document.getElementById('char-count');
+        
+        if (descTextarea && charCount) {
+            // Update on load
+            charCount.textContent = descTextarea.value.length;
+            
+            // Update on input
+            descTextarea.addEventListener('input', function() {
+                charCount.textContent = this.value.length;
+            });
+        }
+
+        // Gallery images preview
+        const galleryInput = document.getElementById('gallery_images');
+        const galleryPreview = document.getElementById('gallery-preview');
+        
+        if (galleryInput && galleryPreview) {
+            galleryInput.addEventListener('change', function(e) {
+                galleryPreview.innerHTML = '';
+                const files = Array.from(e.target.files);
+                const existingCount = document.querySelectorAll('#existing-gallery > div').length;
+                
+                if (existingCount + files.length > 6) {
+                    alert(`Tối đa 6 ảnh gallery. Hiện có ${existingCount} ảnh, chỉ có thể thêm ${6 - existingCount} ảnh nữa`);
+                    this.value = '';
+                    return;
+                }
+                
+                files.forEach((file, index) => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const div = document.createElement('div');
+                            div.className = 'position-relative';
+                            div.innerHTML = `
+                                <img src="${e.target.result}" width="100" class="border rounded">
+                                <small class="d-block text-center">Mới ${index + 1}</small>
+                            `;
+                            galleryPreview.appendChild(div);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+        }
+
+        // Delete gallery image
+        document.querySelectorAll('.delete-gallery-img').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (confirm('Xóa ảnh này khỏi gallery?')) {
+                    const imageId = this.dataset.id;
+                    const imageDiv = this.closest('[data-image-id]');
+                    
+                    // Send AJAX request to delete
+                    fetch(`/admin/products/gallery/${imageId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            imageDiv.remove();
+                        } else {
+                            alert('Lỗi khi xóa ảnh');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Lỗi khi xóa ảnh');
+                    });
+                }
+            });
         });
     });
 </script>
