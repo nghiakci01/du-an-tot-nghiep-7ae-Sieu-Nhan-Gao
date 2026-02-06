@@ -54,6 +54,11 @@ class CartController extends Controller
         }
 
         session()->put('cart', $cart);
+        
+        if ($request->input('action') === 'buy_now') {
+            return redirect()->route('checkout.index');
+        }
+
         return redirect()->route('cart.index')->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
     }
 
