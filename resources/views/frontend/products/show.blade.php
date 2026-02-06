@@ -268,7 +268,8 @@
                             <div class="product_variant quantity">
                                 <label>quantity</label>
                                 <input min="1" max="100" value="1" type="number" name="quantity">
-                                <button class="button" type="submit">add to cart</button>  
+                                <button class="button" type="submit" name="action" value="add_to_cart">add to cart</button>
+                                <button class="button" type="submit" name="action" value="buy_now" style="background: #ef233c; border-color: #ef233c; margin-left: 10px;">Mua ngay</button>  
                             </div>
                             <div class=" product_d_action">
                                <ul>
