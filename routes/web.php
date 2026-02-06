@@ -18,7 +18,7 @@ Route::delete('/cart/remove', [App\Http\Controllers\Frontend\CartController::cla
 Route::post('/cart/clear', [App\Http\Controllers\Frontend\CartController::class, 'clearCart'])->name('cart.clear');
 Route::get('/cart/count', [App\Http\Controllers\Frontend\CartController::class, 'getCartCount'])->name('cart.count');
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
 Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
@@ -38,10 +38,8 @@ Route::get('/api/chat/messages', [App\Http\Controllers\Api\ChatController::class
 
 // Admin & Staff Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
-    
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
     // Admin Only Routes
     Route::middleware(['admin.only'])->group(function () {
         Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
@@ -50,12 +48,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
         Route::resource('contact-messages', App\Http\Controllers\Admin\ContactMessageController::class)->only(['index', 'show', 'destroy']);
         Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
-        
+
         // Product Attributes
         Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
         Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
     });
-    
+
     // Admin & Staff Routes (Stock only)
     Route::get('stock', [App\Http\Controllers\Admin\StockController::class, 'index'])->name('stock.index');
     Route::post('stock/update', [App\Http\Controllers\Admin\StockController::class, 'update'])->name('stock.update');
@@ -93,13 +91,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 // Test Route for Gemini Chatbot
 Route::get('/test-gemini', function () {
     $chatService = app(\App\Services\ChatService::class);
-    
+
     $tests = [
         'Xin chào, bạn có thể giúp gì cho tôi?' => 'Simple Greeting',
         'Có sản phẩm laptop không?' => 'Product Query (RAG)',
         'Cho tôi xem sản phẩm iPhone' => 'Specific Product Search',
     ];
-    
+
     $results = [];
     foreach ($tests as $question => $testName) {
         $response = $chatService->generateResponse($question);
@@ -109,7 +107,7 @@ Route::get('/test-gemini', function () {
             'response' => $response
         ];
     }
-    
+
     return view('test-gemini', compact('results'));
 });
 
