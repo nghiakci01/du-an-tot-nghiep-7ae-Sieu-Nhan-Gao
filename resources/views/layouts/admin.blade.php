@@ -102,7 +102,7 @@
                   ><a href="{{ route('admin.settings.index') }}"
                     ><i class="ti ti-settings"></i>
                     <span data-i18n="Settings">Settings</span> </a
-                  ><a href="#!"
+                  ><a href="{{ route('admin.lock') }}"
                     ><i class="ti ti-lock"></i>
                     <span data-i18n="Lock Screen">Lock Screen</span> </a
                   ><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
@@ -1788,6 +1788,9 @@
     data-cf-beacon='{"version":"2024.11.0","token":"db59679aec724f808b8e535e8076f80c","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
     crossorigin="anonymous"></script> --}}
   @yield('scripts')
+  <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+      @csrf
+  </form>
 </body>
 <!-- [Body] end -->
 <!-- Mirrored from ableproadmin.com/dashboard/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 09 Jan 2026 02:18:51 GMT -->

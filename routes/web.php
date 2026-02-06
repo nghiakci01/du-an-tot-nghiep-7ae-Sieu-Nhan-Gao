@@ -41,58 +41,70 @@ Route::get('/api/chat/messages', [App\Http\Controllers\Api\ChatController::class
 
 // Admin & Staff Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
-    Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
 
-    // System Settings
-    Route::get('/system-settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
-    Route::post('/system-settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+    // Lock Screen Routes (No admin.lock)
+    Route::get('/lock', [\App\Http\Controllers\Admin\LockScreenController::class, 'lock'])->name('lock');
+    Route::get('/unlock', function () {
+        return view('admin.auth.lock-screen');
+    })->name('unlock');
+    Route::post('/unlock', [\App\Http\Controllers\Admin\LockScreenController::class, 'unlock'])->name('unlock.submit');
 
-    // Admin Only Routes
-    Route::middleware(['admin.only'])->group(function () {
-        Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
-        Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
-        Route::resource('users', App\Http\Controllers\Admin\UserController::class);
-        Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
-        Route::resource('contact-messages', App\Http\Controllers\Admin\ContactMessageController::class)->only(['index', 'show', 'destroy']);
-        Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
+    // Protected Routes
+    Route::middleware(['admin.lock'])->group(function () {
 
-        // Product Attributes
-        Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
-        Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
-    });
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
+        Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
 
-    // Admin & Staff Routes (Stock only)
-    Route::get('stock', [App\Http\Controllers\Admin\StockController::class, 'index'])->name('stock.index');
-    Route::post('stock/update', [App\Http\Controllers\Admin\StockController::class, 'update'])->name('stock.update');
+        // System Settings
+        Route::get('/system-settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+        Route::post('/system-settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 
-    // Chatbot Management (Admin & Staff)
-    Route::prefix('chat')->name('chat.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\ChatManagementController::class, 'index'])->name('index');
-        Route::get('/trash', [\App\Http\Controllers\Admin\ChatManagementController::class, 'trash'])->name('trash');
-        Route::get('/{sessionId}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'show'])->name('show');
-        Route::post('/{sessionId}/reply', [\App\Http\Controllers\Admin\ChatManagementController::class, 'reply'])->name('reply');
-        Route::delete('/{sessionId}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'destroy'])->name('destroy');
-        Route::post('/{sessionId}/restore', [\App\Http\Controllers\Admin\ChatManagementController::class, 'restore'])->name('restore');
-        Route::delete('/{sessionId}/permanent', [\App\Http\Controllers\Admin\ChatManagementController::class, 'permanentDelete'])->name('permanent');
-        Route::post('/{sessionId}/toggle-bot', [\App\Http\Controllers\Admin\ChatManagementController::class, 'toggleBot'])->name('toggle_bot');
-        Route::delete('/message/{id}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'destroyMessage'])->name('destroy_message');
-    });
+        // Admin Only Routes
+        Route::middleware(['admin.only'])->group(function () {
+            Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+            Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
+            Route::resource('users', App\Http\Controllers\Admin\UserController::class);
+            Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
+            Route::resource('contact-messages', App\Http\Controllers\Admin\ContactMessageController::class)->only(['index', 'show', 'destroy']);
+            Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
 
-    // Chatbot Questions (Admin only)
-    Route::middleware(['admin.only'])->group(function () {
-        Route::prefix('chatbot')->name('chatbot.')->group(function () {
-            Route::resource('questions', \App\Http\Controllers\Admin\ChatbotSuggestedQuestionController::class);
+            // Product Attributes
+            Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
+            Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
         });
-    });
 
-    // Chatbot Settings (Admin only)
-    Route::middleware(['admin.only'])->group(function () {
-        Route::prefix('settings')->name('settings.')->group(function () {
-            Route::get('/chatbot', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'index'])->name('chatbot');
-            Route::post('/chatbot', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'update'])->name('chatbot.update');
-            Route::post('/chatbot/test', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'testConnection'])->name('chatbot.test');
+        // Admin & Staff Routes (Stock only)
+        Route::get('stock', [App\Http\Controllers\Admin\StockController::class, 'index'])->name('stock.index');
+        Route::post('stock/update', [App\Http\Controllers\Admin\StockController::class, 'update'])->name('stock.update');
+
+        // Chatbot Management (Admin & Staff)
+        Route::prefix('chat')->name('chat.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\ChatManagementController::class, 'index'])->name('index');
+            Route::get('/trash', [\App\Http\Controllers\Admin\ChatManagementController::class, 'trash'])->name('trash');
+            Route::get('/{sessionId}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'show'])->name('show');
+            Route::post('/{sessionId}/reply', [\App\Http\Controllers\Admin\ChatManagementController::class, 'reply'])->name('reply');
+            Route::delete('/{sessionId}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'destroy'])->name('destroy');
+            Route::post('/{sessionId}/restore', [\App\Http\Controllers\Admin\ChatManagementController::class, 'restore'])->name('restore');
+            Route::delete('/{sessionId}/permanent', [\App\Http\Controllers\Admin\ChatManagementController::class, 'permanentDelete'])->name('permanent');
+            Route::post('/{sessionId}/toggle-bot', [\App\Http\Controllers\Admin\ChatManagementController::class, 'toggleBot'])->name('toggle_bot');
+            Route::delete('/message/{id}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'destroyMessage'])->name('destroy_message');
+        });
+
+        // Chatbot Questions (Admin only)
+        Route::middleware(['admin.only'])->group(function () {
+            Route::prefix('chatbot')->name('chatbot.')->group(function () {
+                Route::resource('questions', \App\Http\Controllers\Admin\ChatbotSuggestedQuestionController::class);
+            });
+        });
+
+        // Chatbot Settings (Admin only)
+        Route::middleware(['admin.only'])->group(function () {
+            Route::prefix('settings')->name('settings.')->group(function () {
+                Route::get('/chatbot', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'index'])->name('chatbot');
+                Route::post('/chatbot', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'update'])->name('chatbot.update');
+                Route::post('/chatbot/test', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'testConnection'])->name('chatbot.test');
+            });
         });
     });
 });
