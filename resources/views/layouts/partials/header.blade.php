@@ -1,116 +1,4 @@
-    <!--Offcanvas menu area start-->
-    <style>
-        /* Show categories menu on hover for all pages */
-        .categories_menu:hover .categories_menu_toggle {
-            display: block !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-
-        /* Fix Shop mega menu hover */
-        .main_menu nav ul li:hover .mega_menu {
-            opacity: 1 !important;
-            visibility: visible !important;
-            top: 100% !important;
-        }
-        
-        /* Ensure horizontal menu is visible if used */
-        .horizontal_menu_six {
-            display: flex !important;
-            justify-content: center !important;
-            padding: 5px 0 !important;
-            z-index: 1000 !important;
-            position: relative !important;
-            top: auto !important;
-            left: auto !important;
-            width: 100% !important;
-            border-top: 1px solid #f0f0f0;
-            border-bottom: 1px solid #f0f0f0;
-            margin-top: 5px;
-        }
-
-        .horizontal_menu_six .main_menu nav > ul > li {
-            margin: 0 20px;
-        }
-
-        .horizontal_menu_six .main_menu nav > ul > li > a {
-            font-size: 13px !important;
-            font-weight: 600 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 1.2px !important;
-            color: #1a1a1a !important;
-            padding: 12px 0 !important;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .horizontal_menu_six .main_menu nav > ul > li > a::after {
-            content: '';
-            position: absolute;
-            bottom: 5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #ff6a28;
-            transition: width 0.3s ease;
-        }
-
-        .horizontal_menu_six .main_menu nav > ul > li:hover > a {
-            color: #ff6a28 !important;
-        }
-
-        .horizontal_menu_six .main_menu nav > ul > li:hover > a::after {
-            width: 100%;
-        }
-
-        .horizontal_menu_six .main_menu nav > ul > li.active > a {
-            color: #ff6a28 !important;
-        }
-
-        .horizontal_menu_six .main_menu nav > ul > li.active > a::after {
-            width: 100%;
-        }
-
-        /* Mega menu improvements */
-        .horizontal_menu_six .mega_menu {
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
-            border: 1px solid #f0f0f0 !important;
-            padding: 25px !important;
-            border-radius: 4px;
-        }
-
-        .horizontal_menu_six .mega_menu li a {
-            font-size: 14px !important;
-            transition: padding-left 0.3s ease;
-        }
-
-        .horizontal_menu_six .mega_menu li a:hover {
-            padding-left: 5px;
-            color: #ff6a28 !important;
-        }
-
-        /* Make product actions persistent on home page */
-        .is-home .product_action {
-            bottom: 30% !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-
-        .is-home .quick_button {
-            bottom: 10% !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-
-        /* Compact Header */
-        .header_middel {
-            padding: 15px 0 !important;
-        }
-        .middel_inner {
-            border-bottom: 0 !important;
-            padding-bottom: 0 !important;
-        }
-    </style>
+   
     <div class="off_canvars_overlay">
                 
     </div>
@@ -135,7 +23,16 @@
                                     <li class="top_links"><a href="{{ route('login') }}">Login</a></li>
                                     <li class="top_links"><a href="{{ route('register') }}">Register</a></li>
                                @else
-                                    <li class="top_links"><a href="#">{{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
+                                    <li class="top_links">
+                                        <a href="#" style="display: flex; align-items: center; gap: 5px;">
+                                            @if(Auth::user()->avatar)
+                                                <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                                            @else
+                                                <i class="ion-android-person"></i>
+                                            @endif
+                                            {{ Auth::user()->name }} 
+                                            <i class="ion-chevron-down"></i>
+                                        </a>
                                         <ul class="dropdown_links">
                                             <li><a href="{{ route('account.index') }}">My Account</a></li>
                                             @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
@@ -256,7 +153,15 @@
                                                     <li><a href="{{ route('register') }}">Register</a></li>
                                                 </ul>
                                             @else
-                                                <a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
+                                                <a href="#" style="display: flex; align-items: center; gap: 5px;">
+                                                    @if(Auth::user()->avatar)
+                                                        <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                                                    @else
+                                                        <i class="ion-android-person"></i>
+                                                    @endif
+                                                    {{ Auth::user()->name }} 
+                                                    <i class="ion-chevron-down"></i>
+                                                </a>
                                                 <ul class="dropdown_links">
                                                     <li><a href="{{ route('account.index') }}">My Account</a></li>
                                                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
@@ -276,40 +181,81 @@
                         </div>  
                     </div>
                 </div>
-                <div class="horizontal_menu horizontal_menu_six">
-                    <div class="main_menu"> 
-                        <nav>  
-                            <ul>
-                                <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">Home</a></li>
-                                <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">Shop<i class="fa fa-angle-down"></i></a>
-                                    <ul class="mega_menu">
-                                        <li><a href="#">Product Categories</a>
-                                            <ul>
-                                                @foreach($categories as $category)
-                                                    <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
-                                                @endforeach
+            <div class="horizontal_menu horizontal_menu_six">
+                <div class="main_menu"> 
+                    <nav>  
+                        <ul>
+                            <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">Home</a></li>
+                            <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">Shop<i class="fa fa-angle-down"></i></a>
+                                <ul class="mega_menu">
+                                    <li><a href="#">Product Categories</a>
+                                        <ul>
+                                            @foreach($categories as $category)
+                                                <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                    <li><a href="#">Other pages</a>
+                                        <ul>
+                                            <li><a href="{{ route('cart.index') }}">Cart</a></li>
+                                            <li><a href="{{ route('checkout.index') }}">Checkout</a></li>
+                                            <li><a href="{{ route('account.index') }}">Account</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
+                                </ul>
+                            </li>
+                            <li><a href="{{ route('news') }}">News</a></li>
+                            <li><a href="{{ route('about') }}">About Us</a></li>
+                            <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
+                        </ul>   
+                    </nav> 
+                </div>
+            </div>
+        </div>
+    </div>
+        <!--header middel end-->
+
+        <!--header bottom satrt-->
+        <div class="header_bottom sticky-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <div class="main_menu_inner">
+                            <div class="main_menu"> 
+                                <nav>  
+                                    <ul>
+                                        <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">Home</a></li>
+                                        <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">Shop<i class="fa fa-angle-down"></i></a>
+                                            <ul class="mega_menu">
+                                                <li><a href="#">Product Categories</a>
+                                                    <ul>
+                                                        @foreach($categories as $category)
+                                                            <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                                        @endforeach
+                                                    </ul>
+                                                </li>
+                                                <li><a href="#">Other pages</a>
+                                                    <ul>
+                                                        <li><a href="{{ route('cart.index') }}">Cart</a></li>
+                                                        <li><a href="{{ route('checkout.index') }}">Checkout</a></li>
+                                                        <li><a href="{{ route('account.index') }}">Account</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
                                             </ul>
                                         </li>
-                                        <li><a href="#">Other pages</a>
-                                            <ul>
-                                                <li><a href="{{ route('cart.index') }}">Cart</a></li>
-                                                <li><a href="{{ route('checkout.index') }}">Checkout</a></li>
-                                                <li><a href="{{ route('account.index') }}">Account</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="{{ route('news') }}">News</a></li>
-                                <li><a href="{{ route('about') }}">About Us</a></li>
-                                <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
-                            </ul>   
-                        </nav> 
+                                        <li><a href="{{ route('news') }}">News</a></li>
+                                        <li><a href="{{ route('about') }}">About Us</a></li>
+                                        <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
+                                    </ul>   
+                                </nav> 
+                            </div>
+                        </div> 
                     </div>
                 </div>
             </div>
         </div>
-        <!--header middel end-->
-
+        <!--header bottom end-->
     </header>
     <!--header area end-->

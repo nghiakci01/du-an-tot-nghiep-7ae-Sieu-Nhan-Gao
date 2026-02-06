@@ -147,7 +147,7 @@
             <div class="row">   
                 <div class="col-12">
                    <div class="section_title">
-                       <h2>Trending Products</h2>
+                       <h2>Sản Phẩm Nổi Bật</h2>
                        <p>Modern, minimalist design, bringing a delicate and trendy impression.</p>
                    </div>
                 </div> 
@@ -234,7 +234,7 @@
             <div class="row">   
                 <div class="col-12">
                    <div class="section_title">
-                       <h2>New Arrivals</h2>
+                       <h2>Sản Phẩm Mới</h2>
                        <p>New products with modern, minimalist design and full of charm.</p>
                    </div>
                 </div> 

@@ -28,6 +28,7 @@ class User extends Authenticatable
         'phone',
         'address',
         'role',
+        'avatar',
     ];
 
     /**
@@ -66,5 +67,10 @@ class User extends Authenticatable
     public function isStaff(): bool
     {
         return $this->role === self::ROLE_STAFF;
+    }
+
+    public function socialAccounts()
+    {
+        return $this->hasMany(SocialAccount::class);
     }
 }

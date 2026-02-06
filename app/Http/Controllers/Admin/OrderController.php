@@ -55,16 +55,29 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
+        // Standardize to UPPERCASE to match Frontend View logic
         $request->validate([
-            'status' => 'required|in:pending,confirmed,shipped,completed,cancelled',
+            'status' => 'required|in:PENDING,CONFIRMED,SHIPPED,COMPLETED,CANCELLED,pending,confirmed,shipped,completed,cancelled',
         ]);
 
+        $oldStatus = strtoupper($order->status); // Ensure we compare normalized upper
+        $newStatus = strtoupper($request->input('status')); // Force Save as Upper
+
+        // Nếu đơn hàng bị hủy và trước đó chưa hủy -> Hoàn lại kho
+        if ($newStatus == 'CANCELLED' && $oldStatus != 'CANCELLED') {
+            foreach ($order->items as $item) {
+                if ($item->variant) {
+                    $item->variant->increment('stock_quantity', $item->quantity);
+                }
+            }
+        }
+
         $order->update([
-            'status' => $request->status,
+            'status' => $newStatus,
         ]);
 
         return redirect()->route('admin.orders.index')
-            ->with('success', 'Trạng thái đơn hàng đã được cập nhật thành công.');
+            ->with('success', 'Trạng thái đơn hàng đã được cập nhật thành công.' . ($newStatus == 'CANCELLED' ? ' (Đã hoàn kho)' : ''));
     }
 
     /**
