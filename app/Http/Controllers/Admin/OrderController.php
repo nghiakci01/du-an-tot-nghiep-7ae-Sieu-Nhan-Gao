@@ -59,12 +59,24 @@ class OrderController extends Controller
             'status' => 'required|in:pending,confirmed,shipped,completed,cancelled',
         ]);
 
+        $oldStatus = $order->status;
+        $newStatus = $request->input('status');
+
+        // Nếu đơn hàng bị hủy và trước đó chưa hủy -> Hoàn lại kho
+        if ($newStatus == 'cancelled' && $oldStatus != 'cancelled') {
+            foreach ($order->items as $item) {
+                if ($item->variant) {
+                    $item->variant->increment('stock_quantity', $item->quantity);
+                }
+            }
+        }
+
         $order->update([
-            'status' => $request->status,
+            'status' => $newStatus,
         ]);
 
         return redirect()->route('admin.orders.index')
-            ->with('success', 'Trạng thái đơn hàng đã được cập nhật thành công.');
+            ->with('success', 'Trạng thái đơn hàng đã được cập nhật thành công.' . ($newStatus == 'cancelled' ? ' (Đã hoàn kho)' : ''));
     }
 
     /**
