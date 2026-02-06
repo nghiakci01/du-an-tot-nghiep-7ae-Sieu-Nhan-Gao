@@ -66,22 +66,17 @@
                                 <td>{{ $product->category->name ?? 'N/A' }}</td>
                                 <td>
                                     @if($product->variants->isNotEmpty())
-                                        <div style="font-size: 0.85em;">
-                                            @php
-                                                $sizes = $product->variants->pluck('size')->unique()->filter()->implode(', ');
-                                                $colors = $product->variants->pluck('color')->unique()->filter()->implode(', ');
-                                                $minPrice = $product->variants->min('price');
-                                                $maxPrice = $product->variants->max('price');
-                                            @endphp
-                                            <div><strong>Sizes:</strong> {{ $sizes ?: 'N/A' }}</div>
-                                            <div><strong>Colors:</strong> {{ $colors ?: 'N/A' }}</div>
-                                            <div class="text-success mt-1">
-                                                {{ number_format($minPrice) }} - {{ number_format($maxPrice) }} đ
-                                            </div>
-                                        </div>
+                                        @php
+                                            $minPrice = $product->variants->min('price');
+                                            $maxPrice = $product->variants->max('price');
+                                        @endphp
+                                        @if($minPrice == $maxPrice)
+                                            {{ number_format($minPrice) }} đ
+                                        @else
+                                            {{ number_format($minPrice) }} - {{ number_format($maxPrice) }} đ
+                                        @endif
                                     @else
                                         {{ number_format($product->price) }} đ
-                                        <div class="text-muted small">No Variants</div>
                                     @endif
                                 </td>
                                 <td><span class="badge bg-info">{{ $product->variants_count }} variants</span></td>

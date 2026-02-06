@@ -139,131 +139,189 @@
                                 <p>{{ $product->short_description }}</p>
                             </div>
 
-                            @if($product->variants->count() > 0)
-                                @php
-                                    $uniqueSizes = $product->variants->pluck('sizeRelationship')->filter()->unique('id');
-                                    $uniqueColors = $product->variants->pluck('colorRelationship')->filter()->unique('id');
-                                @endphp
+                                @if($product->variants->count() > 0)
+                                    @php
+                                        $uniqueSizes = $product->variants->pluck('sizeRelationship')->filter()->unique('id');
+                                        $uniqueColors = $product->variants->pluck('colorRelationship')->filter()->unique('id');
+                                    @endphp
 
-
-
-                                <div class="product_variant size">
-                                    <h3>Size</h3>
-                                    <select class="niceselect_option" id="select_size">
-                                        <option selected value="">Choose Size</option>
-                                        @foreach($uniqueSizes as $size)
-                                            <option value="{{ $size->id }}">{{ $size->name }}</option>
-                                        @endforeach
-
-                                    </select>
-                                </div>
-                                
-                                <div class="product_variant color">
-                                    <h3>Color</h3>
-                                    <select class="niceselect_option" id="select_color">
-                                        <option selected value="">Choose Color</option>
-                                        @foreach($uniqueColors as $color)
-                                            <option value="{{ $color->id }}">{{ $color->name }}</option>
-                                        @endforeach
-
-                                    </select>
-                                </div>
-
-                                <input type="hidden" id="variant_select" name="variant_id" required>
-                                <div id="variant-message" class="text-danger mt-2 mb-3" style="display:none; font-weight: bold;"></div>
-
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        const variants = @json($product->variants);
-                                        const sizeSelect = document.getElementById('select_size');
-                                        const colorSelect = document.getElementById('select_color');
-                                        const variantInput = document.getElementById('variant_select');
-                                        const msg = document.getElementById('variant-message');
-                                        const addToCartBtn = document.querySelector('button[type="submit"]');
-                                        const priceContainer = document.querySelector('.product_price');
+                                    <style>
+                                        .product_variant h3 {
+                                            margin-bottom: 12px;
+                                            font-size: 15px;
+                                            font-weight: 600;
+                                            text-transform: uppercase;
+                                            letter-spacing: 0.5px;
+                                            color: #222;
+                                        }
+                                        .variant-group {
+                                            display: flex;
+                                            flex-wrap: wrap;
+                                            gap: 12px;
+                                            margin-bottom: 25px;
+                                        }
+                                        .variant-option {
+                                            display: inline-flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            padding: 10px 24px;
+                                            border: 1px solid #e1e1e1;
+                                            background: #fff;
+                                            cursor: pointer;
+                                            min-width: 45px;
+                                            font-weight: 500;
+                                            font-size: 14px;
+                                            color: #555;
+                                            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                                            user-select: none;
+                                            position: relative;
+                                            overflow: hidden;
+                                        }
                                         
-                                        // Store original price HTML to revert if needed
-                                        const originalPriceHtml = priceContainer.innerHTML;
+                                        /* Sharp & Sophisticated Look */
+                                        .variant-option:hover {
+                                            border-color: #333;
+                                            color: #000;
+                                        }
                                         
-                                        let selectedSize = null;
-                                        let selectedColor = null;
-
-                                        // Helper to format currency
-                                        const formatCurrency = (amount) => {
-                                            return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
-                                        };
+                                        .variant-option.active {
+                                            border-color: #222;
+                                            background: #222;
+                                            color: #fff;
+                                            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                                        }
                                         
-                                        function checkSelection() {
-                                            selectedSize = sizeSelect.value;
-                                            selectedColor = colorSelect.value;
+                                        /* Specific styling for Size */
+                                        .product_variant.size .variant-option {
+                                            min-width: 50px;
+                                        }
 
-                                            if (selectedSize && selectedColor) {
-                                                const matchedVariant = variants.find(v => v.size_id == selectedSize && v.color_id == selectedColor);
+                                        .variant-option.disabled {
+                                            opacity: 0.4;
+                                            cursor: not-allowed;
+                                            background: #f8f9fa;
+                                            border-color: #eee;
+                                            color: #aaa;
+                                            box-shadow: none !important;
+                                            border-style: dashed;
+                                        }
+                                    </style>
 
-                                                
-                                                if (matchedVariant) {
-                                                    // Dynamic Price Update
-                                                    // Priority: Variant Sale Price -> Variant Regular Price -> Original Product Logic
-                                                    let html = '';
-                                                    let finalPrice = matchedVariant.price; 
-                                                    // If variant has specific price override (not null)
-                                                    if (matchedVariant.price !== null) {
-                                                        if (matchedVariant.sale_price !== null) {
-                                                            html = `<span class="current_price">${formatCurrency(matchedVariant.sale_price)}</span>
-                                                                    <span class="old_price" style="text-decoration: line-through; color: #999; margin-left: 10px;">${formatCurrency(matchedVariant.price)}</span>`;
+                                    <div class="product_variant size">
+                                        <h3>Size</h3>
+                                        <div class="variant-group" id="group_size">
+                                            @foreach($uniqueSizes as $size)
+                                                <div class="variant-option" data-value="{{ $size->id }}" data-type="size">{{ $size->name }}</div>
+                                            @endforeach
+                                        </div>
+                                        <input type="hidden" id="select_size" value="">
+                                    </div>
+                                    
+                                    <div class="product_variant color">
+                                        <h3>Màu sắc</h3>
+                                        <div class="variant-group" id="group_color">
+                                            @foreach($uniqueColors as $color)
+                                                <div class="variant-option" data-value="{{ $color->id }}" data-type="color">{{ $color->name }}</div>
+                                            @endforeach
+                                        </div>
+                                        <input type="hidden" id="select_color" value="">
+                                    </div>
+
+                                    <input type="hidden" id="variant_select" name="variant_id" required>
+                                    <div id="variant-message" class="text-danger mt-2 mb-3" style="font-weight: bold; display: none;"></div>
+
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            const variants = @json($product->variants);
+                                            const sizeInput = document.getElementById('select_size');
+                                            const colorInput = document.getElementById('select_color');
+                                            const variantInput = document.getElementById('variant_select');
+                                            const msg = document.getElementById('variant-message');
+                                            const addToCartBtn = document.querySelector('button[type="submit"]');
+                                            const priceContainer = document.querySelector('.product_price');
+                                            
+                                            const originalPriceHtml = priceContainer.innerHTML;
+                                            
+                                            // Handle button clicks
+                                            document.querySelectorAll('.variant-option').forEach(opt => {
+                                                opt.addEventListener('click', function() {
+                                                    if (this.classList.contains('disabled')) return;
+                                                    
+                                                    const type = this.getAttribute('data-type');
+                                                    const value = this.getAttribute('data-value');
+                                                    const group = type === 'size' ? 'group_size' : 'group_color';
+                                                    const input = type === 'size' ? sizeInput : colorInput;
+                                                    
+                                                    // Remove active from siblings
+                                                    document.querySelectorAll(`#${group} .variant-option`).forEach(el => el.classList.remove('active'));
+                                                    
+                                                    // Set active to clicked
+                                                    this.classList.add('active');
+                                                    input.value = value;
+                                                    
+                                                    checkSelection();
+                                                });
+                                            });
+
+                                            // Helper to format currency
+                                            const formatCurrency = (amount) => {
+                                                return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
+                                            };
+                                            
+                                            function checkSelection() {
+                                                const selectedSize = sizeInput.value;
+                                                const selectedColor = colorInput.value;
+
+                                                if (selectedSize && selectedColor) {
+                                                    const matchedVariant = variants.find(v => v.size_id == selectedSize && v.color_id == selectedColor);
+
+                                                    if (matchedVariant) {
+                                                        // Update Price
+                                                        let html = '';
+                                                        if (matchedVariant.price !== null) {
+                                                            if (matchedVariant.sale_price !== null && matchedVariant.sale_price < matchedVariant.price) {
+                                                                html = `<span class="current_price">${formatCurrency(matchedVariant.sale_price)}</span>
+                                                                        <span class="old_price" style="text-decoration: line-through; color: #999; margin-left: 10px;">${formatCurrency(matchedVariant.price)}</span>`;
+                                                            } else {
+                                                                html = `<span class="current_price">${formatCurrency(matchedVariant.price)}</span>`;
+                                                            }
+                                                            priceContainer.innerHTML = html;
                                                         } else {
-                                                            html = `<span class="current_price">${formatCurrency(matchedVariant.price)}</span>`;
+                                                            priceContainer.innerHTML = originalPriceHtml;
                                                         }
-                                                        priceContainer.innerHTML = html;
-                                                    } else {
-                                                        // Fallback to original if variant prices are null (inherit from parent)
-                                                        priceContainer.innerHTML = originalPriceHtml;
-                                                    }
 
-                                                    if (matchedVariant.stock_quantity > 0) {
-                                                        variantInput.value = matchedVariant.id;
-                                                        msg.style.display = 'none';
-                                                        addToCartBtn.disabled = false;
-                                                        addToCartBtn.textContent = 'Add to Cart';
+                                                        if (matchedVariant.stock_quantity > 0) {
+                                                            variantInput.value = matchedVariant.id;
+                                                            msg.style.display = 'none';
+                                                            addToCartBtn.disabled = false;
+                                                            addToCartBtn.textContent = 'Thêm vào giỏ hàng';
+                                                            // Enable Buy Now button if handled similarly, or ensure it uses same form
+                                                        } else {
+                                                            variantInput.value = '';
+                                                            msg.textContent = 'Sản phẩm tạm hết hàng mẫu này';
+                                                            msg.style.display = 'block';
+                                                            addToCartBtn.disabled = true;
+                                                            addToCartBtn.textContent = 'Hết hàng';
+                                                        }
                                                     } else {
                                                         variantInput.value = '';
-                                                        msg.textContent = 'This product is out of stock';
+                                                        msg.textContent = 'Phiên bản này không tồn tại';
                                                         msg.style.display = 'block';
                                                         addToCartBtn.disabled = true;
-                                                        addToCartBtn.textContent = 'Out of Stock';
+                                                        addToCartBtn.textContent = 'Không khả dụng';
+                                                        priceContainer.innerHTML = originalPriceHtml;
                                                     }
                                                 } else {
-                                                    variantInput.value = '';
-                                                    msg.textContent = 'This variant does not exist';
-                                                    msg.style.display = 'block';
+                                                    // Incomplete selection
                                                     addToCartBtn.disabled = true;
-                                                    // Revert price
-                                                    priceContainer.innerHTML = originalPriceHtml;
                                                 }
-                                            } else {
-                                                addToCartBtn.disabled = true;
-                                                // Revert price if selection matches nothing
-                                                // priceContainer.innerHTML = originalPriceHtml; 
-                                                // (Optional: keep last valid price or revert immediately. Let's revert.)
-                                                // But typically users might change just one dropdown. Keep simple: 
-                                                // Only revert if we want "no selection" state. 
                                             }
-                                        }
-                                        
-                                        // Init button state
-                                        addToCartBtn.disabled = true;
-                                        
-                                        // Use jQuery change event because niceselect plugin hides the original select and uses its own UI
-                                        if (typeof $ !== 'undefined') {
-                                            $(sizeSelect).on('change', checkSelection);
-                                            $(colorSelect).on('change', checkSelection);
-                                        } else {
-                                            sizeSelect.addEventListener('change', checkSelection);
-                                            colorSelect.addEventListener('change', checkSelection);
-                                        }
-                                    });
-                                </script>
-                            @endif
+                                            
+                                            // Init
+                                            addToCartBtn.disabled = true;
+                                        });
+                                    </script>
+                                @endif
 
                             <div class="product_variant quantity">
                                 <label>quantity</label>
