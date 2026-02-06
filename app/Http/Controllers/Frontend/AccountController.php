@@ -24,6 +24,7 @@ class AccountController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:15',
+            'address' => 'nullable|string|max:255',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'current_password' => 'nullable|required_with:new_password',
             'new_password' => 'nullable|min:8|confirmed',
@@ -31,6 +32,7 @@ class AccountController extends Controller
 
         $user->name = $request->name;
         $user->phone = $request->phone;
+        $user->address = $request->address;
 
         if ($request->hasFile('avatar')) {
             // Delete old avatar if exists
