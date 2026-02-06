@@ -30,6 +30,9 @@ Route::get('auth/{provider}/callback', [App\Http\Controllers\Auth\SocialLoginCon
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])->name('account.index');
+    Route::post('/my-account/update', [App\Http\Controllers\Frontend\AccountController::class, 'updateDetails'])->name('account.update');
+    Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'viewOrder'])->name('account.orders.show');
+    Route::post('/my-account/orders/{id}/cancel', [App\Http\Controllers\Frontend\AccountController::class, 'cancelOrder'])->name('account.orders.cancel');
 });
 
 // Public Chatbot Route (Moved from API to Web to access Session)
