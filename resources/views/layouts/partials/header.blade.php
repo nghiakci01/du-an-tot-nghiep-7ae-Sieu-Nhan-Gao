@@ -102,47 +102,48 @@
             <div class="container-fluid">
                 <div class="middel_inner">
                     <div class="row align-items-center">
-                       <div class="col-lg-2 col-md-3">
-                            <div class="logo">
-                                <a href="{{ route('welcome') }}"><img src="{{ asset('frontend-assets/img/logo/logo.png') }}" alt=""></a>
-                            </div>
-                        </div>
-                        
-                        <!-- Main Menu Column -->
-                        <div class="col-lg-5 col-md-9 d-none d-lg-block">
-                            <div class="main_menu"> 
-                                <nav>  
-                                    <ul>
-                                        <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">Home</a></li>
-                                        <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">Shop<i class="fa fa-angle-down"></i></a>
-                                            <ul class="mega_menu">
-                                                <li><a href="#">Product Categories</a>
-                                                    <ul>
-                                                        @foreach($categories as $category)
-                                                            <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
-                                                        @endforeach
-                                                    </ul>
-                                                </li>
-                                                <li><a href="#">Other pages</a>
-                                                    <ul>
-                                                        <li><a href="{{ route('cart.index') }}">Cart</a></li>
-                                                        <li><a href="{{ route('checkout.index') }}">Checkout</a></li>
-                                                        <li><a href="{{ route('account.index') }}">Account</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="{{ route('news') }}">News</a></li>
-                                        <li><a href="{{ route('about') }}">About Us</a></li>
-                                        <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
-                                    </ul>   
-                                </nav> 
+                        <!-- Logo + Menu Column -->
+                        <div class="col-lg-5 col-md-3">
+                            <div class="header_left d-flex align-items-center">
+                                <div class="logo">
+                                    <a href="{{ route('welcome') }}"><img src="{{ asset('frontend-assets/img/logo/logo.png') }}" alt=""></a>
+                                </div>
+                                
+                                <!-- Main Menu (Desktop) -->
+                                <div class="main_menu d-none d-lg-block">
+                                    <nav>
+                                        <ul>
+                                            <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">Home</a></li>
+                                            <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">Shop<i class="fa fa-angle-down"></i></a>
+                                                <ul class="mega_menu">
+                                                    <li><a href="#">Product Categories</a>
+                                                        <ul>
+                                                            @foreach($categories as $category)
+                                                                <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </li>
+                                                    <li><a href="#">Other pages</a>
+                                                        <ul>
+                                                            <li><a href="{{ route('cart.index') }}">Cart</a></li>
+                                                            <li><a href="{{ route('checkout.index') }}">Checkout</a></li>
+                                                            <li><a href="{{ route('account.index') }}">Account</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a href="{{ route('news') }}">News</a></li>
+                                            <li><a href="{{ route('about') }}">About</a></li>
+                                            <li><a href="{{ route('contact.index') }}">Contact</a></li>
+                                        </ul>
+                                    </nav>
+                                </div>
                             </div>
                         </div>
                         
                         <!-- Search/Account/Cart Column -->
-                        <div class="col-lg-5 col-md-9">
+                        <div class="col-lg-7 col-md-9">
                             <div class="middel_right_info">
                                 <div class="search_bar">
                                     <form action="{{ route('shop') }}" method="GET">                          
@@ -170,14 +171,7 @@
                                                     <li><a href="{{ route('register') }}">Register</a></li>
                                                 </ul>
                                             @else
-                                                <a href="#" style="display: flex; align-items: center; gap: 5px;">
-                                                    @if(Auth::user()->avatar)
-                                                        <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-                                                    @else
-                                                        <i class="ion-android-person"></i>
-                                                    @endif
-                                                    {{ Auth::user()->name }} <i class="ion-chevron-down"></i>
-                                                </a>
+                                                <a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
                                                 <ul class="dropdown_links">
                                                     <li><a href="{{ route('account.index') }}">My Account</a></li>
                                                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
@@ -195,6 +189,39 @@
                         </div>  
                     </div>
                 </div>
+                
+                <!-- Horizontal Menu -->
+                <div class="horizontal_menu horizontal_menu_six">
+                    <div class="main_menu"> 
+                        <nav>  
+                            <ul>
+                                <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">Home</a></li>
+                                <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">Shop<i class="fa fa-angle-down"></i></a>
+                                    <ul class="mega_menu">
+                                        <li><a href="#">Product Categories</a>
+                                            <ul>
+                                                @foreach($categories as $category)
+                                                    <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                                @endforeach
+                                            </ul>
+                                        </li>
+                                        <li><a href="#">Other pages</a>
+                                            <ul>
+                                                <li><a href="{{ route('cart.index') }}">Cart</a></li>
+                                                <li><a href="{{ route('checkout.index') }}">Checkout</a></li>
+                                                <li><a href="{{ route('account.index') }}">Account</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="{{ route('news') }}">News</a></li>
+                                <li><a href="{{ route('about') }}">About Us</a></li>
+                                <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
+                            </ul>   
+                        </nav> 
+                    </div>
+                </div>
             </div>
         </div>
         <!--header middel end-->
@@ -205,10 +232,10 @@
     <!--sticky header start-->
     <div class="sticky-header header_six">
         <div class="container-fluid">
-            <div class="sticky_inner">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="main_menu text-center"> 
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="main_menu_inner">
+                        <div class="main_menu"> 
                             <nav>  
                                 <ul>
                                     <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">Home</a></li>

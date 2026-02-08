@@ -1,43 +1,77 @@
-/* Custom Header Layout Styles - Menu Next to Logo */
+/* ===== Original Theme Header Styles ===== */
 
-/* Adjust menu spacing to fit next to logo */
-.header_middel .main_menu nav>ul>li {
-    margin: 0 8px;
+/* Header Middle - Logo + Menu Inline */
+.header_middel .middel_inner {
+    padding: 20px 0;
 }
 
-.header_middel .main_menu nav>ul>li>a {
-    padding: 10px 6px;
+/* Logo + Menu inline container */
+.header_middel .header_left {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+}
+
+.header_middel .header_left .logo {
+    flex-shrink: 0;
+}
+
+.header_middel .header_left .main_menu {
+    flex-grow: 1;
+}
+
+/* Menu items compact spacing */
+.header_middel .header_left .main_menu nav>ul {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.header_middel .header_left .main_menu nav>ul>li {
+    margin: 0;
+}
+
+.header_middel .header_left .main_menu nav>ul>li>a {
+    padding: 10px 8px;
+    font-size: 15px;
+    font-weight: 400;
+    color: #2c2c2c;
+    text-transform: capitalize;
+}
+
+.header_middel .header_left .main_menu nav>ul>li>a:hover {
+    color: #ff6a00;
+}
+
+/* Horizontal Menu Styles */
+.horizontal_menu_six {
+    background: #f7f7f7;
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.horizontal_menu_six .main_menu nav>ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.horizontal_menu_six .main_menu nav>ul>li {
+    margin: 0 20px;
+}
+
+.horizontal_menu_six .main_menu nav>ul>li>a {
+    padding: 15px 0;
+    display: block;
     font-size: 14px;
+    font-weight: 500;
+    text-transform: capitalize;
 }
 
-/* Ensure mega menu doesn't overflow */
-.header_middel .mega_menu {
-    left: 0;
-    min-width: 600px;
-}
-
-/* Adjust search bar width */
-.header_middel .search_bar {
-    max-width: 300px;
-    margin-bottom: 10px;
-}
-
-/* Mobile responsive - menu already hidden with d-none d-lg-block */
+/* Hide horizontal menu on mobile */
 @media only screen and (max-width: 991px) {
-    .header_middel .search_bar {
-        max-width: 100%;
-    }
-}
-
-/* Tablet adjustments - tighter spacing */
-@media only screen and (min-width: 992px) and (max-width: 1199px) {
-    .header_middel .main_menu nav>ul>li {
-        margin: 0 4px;
-    }
-
-    .header_middel .main_menu nav>ul>li>a {
-        padding: 10px 4px;
-        font-size: 13px;
+    .horizontal_menu_six {
+        display: none;
     }
 }
 
@@ -58,30 +92,24 @@
     top: 0;
 }
 
-/* Sticky header padding */
-.sticky-header .sticky_inner {
+/* Sticky header menu - full width centered */
+.sticky-header .main_menu_inner {
     padding: 15px 0;
 }
 
-/* Center the menu */
-.sticky-header .main_menu {
+.sticky-header .main_menu nav>ul {
     display: flex;
     justify-content: center;
-}
-
-/* Sticky header menu adjustments */
-.sticky-header .main_menu nav>ul {
-    display: inline-flex;
-    justify-content: center;
+    align-items: center;
 }
 
 .sticky-header .main_menu nav>ul>li {
-    margin: 0 15px;
+    margin: 0 20px;
 }
 
 .sticky-header .main_menu nav>ul>li>a {
-    padding: 10px 8px;
-    font-size: 15px;
+    padding: 10px 0;
+    font-size: 14px;
     font-weight: 500;
 }
 
