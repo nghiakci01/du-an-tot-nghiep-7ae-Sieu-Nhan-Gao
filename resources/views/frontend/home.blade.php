@@ -191,7 +191,7 @@
                                 <div class="product_content">
                                     <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
                                     <span class="current_price">
-                                        @if($product->variants->count() > 0)
+                                        @if($product->variants->count() > 0 && $product->variants->min('price') > 0)
                                             @if($product->variants->min('price') == $product->variants->max('price'))
                                                 {{ number_format($product->variants->min('price')) }} đ
                                             @else
@@ -281,7 +281,7 @@
                                 <div class="product_content">
                                     <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
                                     <span class="current_price">
-                                        @if($product->variants->count() > 0)
+                                        @if($product->variants->count() > 0 && $product->variants->min('price') > 0)
                                             @if($product->variants->min('price') == $product->variants->max('price'))
                                                 {{ number_format($product->variants->min('price')) }} đ
                                             @else

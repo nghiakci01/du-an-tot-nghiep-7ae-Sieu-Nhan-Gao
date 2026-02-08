@@ -139,7 +139,7 @@
                                 <p>{{ $product->short_description }}</p>
                             </div>
 
-                                @if($product->variants->count() > 0)
+                                @if($product->variants->count() > 0 && $product->variants->min('price') > 0)
                                     @php
                                         $uniqueSizes = $product->variants->pluck('sizeRelationship')->filter()->unique('id');
                                         $uniqueColors = $product->variants->pluck('colorRelationship')->filter()->unique('id');
