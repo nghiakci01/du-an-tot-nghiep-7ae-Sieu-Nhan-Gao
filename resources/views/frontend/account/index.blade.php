@@ -40,13 +40,16 @@
                         <!-- Nav tabs -->
                         <div class="dashboard_tab_button">
                             <ul role="tablist" class="nav flex-column dashboard-list">
-                                <li><a href="#dashboard" data-bs-toggle="tab" class="nav-link active">Dashboard</a></li>
-                                <li> <a href="#orders" data-bs-toggle="tab" class="nav-link">Orders</a></li>
-                                <li><a href="#address" data-bs-toggle="tab" class="nav-link">Account details</a></li>
+                                <li><a href="#dashboard" data-bs-toggle="tab"
+                                        class="nav-link active">{{ __('messages.dashboard') }}</a></li>
+                                <li> <a href="#orders" data-bs-toggle="tab" class="nav-link">{{ __('messages.orders') }}</a>
+                                </li>
+                                <li><a href="#address" data-bs-toggle="tab"
+                                        class="nav-link">{{ __('messages.account_details') }}</a></li>
                                 <li>
                                     <a href="{{ route('logout') }}" class="nav-link"
                                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        logout
+                                        {{ __('messages.logout') }}
                                     </a>
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
@@ -59,27 +62,28 @@
                         <!-- Tab panes -->
                         <div class="tab-content dashboard_content">
                             <div class="tab-pane fade show active" id="dashboard">
-                                <h3>Dashboard </h3>
-                                <p>Hello, <strong>{{ $user->name }}</strong> (not <strong>{{ $user->name }}</strong>? <a
+                                <h3>{{ __('messages.dashboard') }} </h3>
+                                <p>{{ __('messages.hello') }}, <strong>{{ $user->name }}</strong>
+                                    ({{ __('messages.not_user') }} <strong>{{ $user->name }}</strong>? <a
                                         href="{{ route('logout') }}"
-                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Log
-                                        out</a>)</p>
-                                <p>From your account dashboard. you can easily check &amp; view your <a href="#orders"
-                                        data-bs-toggle="tab">recent orders</a>, manage your <a href="#address"
-                                        data-bs-toggle="tab">shipping and billing addresses</a> and <a href="#address"
-                                        data-bs-toggle="tab">Edit your password and account details.</a></p>
+                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('messages.logout') }}</a>)
+                                </p>
+                                <p>{{ __('messages.dashboard_desc') }} <a href="#orders"
+                                        data-bs-toggle="tab">{{ __('messages.recent_orders') }}</a>,
+                                    {{ __('messages.manage_shipping') }} {{ __('messages.and') }} <a href="#address"
+                                        data-bs-toggle="tab">{{ __('messages.edit_password') }}</a></p>
                             </div>
                             <div class="tab-pane fade" id="orders">
-                                <h3>Orders</h3>
+                                <h3>{{ __('messages.orders') }}</h3>
                                 <div class="table-responsive">
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th>Order</th>
-                                                <th>Date</th>
-                                                <th>Status</th>
-                                                <th>Total</th>
-                                                <th>Actions</th>
+                                                <th>{{ __('messages.order_id') }}</th>
+                                                <th>{{ __('messages.date') }}</th>
+                                                <th>{{ __('messages.status') }}</th>
+                                                <th>{{ __('messages.total') }}</th>
+                                                <th>{{ __('messages.actions') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -96,20 +100,21 @@
                                                     <td>{{ number_format($order->total_price) }} VND</td>
                                                     <td>
                                                         <a href="{{ route('account.orders.show', $order->id) }}"
-                                                            class="view btn btn-sm btn-primary">View</a>
+                                                            class="view btn btn-sm btn-primary">{{ __('messages.view') }}</a>
                                                         @if($order->status == 'PENDING')
                                                             <form action="{{ route('account.orders.cancel', $order->id) }}"
                                                                 method="POST" class="d-inline"
-                                                                onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?');">
+                                                                onsubmit="return confirm('{{ __('messages.confirm_cancel') }}');">
                                                                 @csrf
-                                                                <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+                                                                <button type="submit"
+                                                                    class="btn btn-sm btn-danger">{{ __('messages.cancel') }}</button>
                                                             </form>
                                                         @endif
                                                     </td>
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="5">Bạn chưa có đơn hàng nào.</td>
+                                                    <td colspan="5">{{ __('messages.no_orders') }}</td>
                                                 </tr>
                                             @endforelse
                                         </tbody>
@@ -118,7 +123,7 @@
                             </div>
 
                             <div class="tab-pane fade" id="address">
-                                <h3>Account details </h3>
+                                <h3>{{ __('messages.account_details') }} </h3>
                                 <div class="login">
                                     <div class="login_form_container">
                                         <div class="account_login_form">
@@ -128,43 +133,44 @@
 
                                                 <div class="mb-4 text-center">
                                                     @if($user->avatar)
-                                                        <img id="avatar-preview" src="{{ Storage::url($user->avatar) }}" alt="Avatar"
-                                                            class="rounded-circle img-thumbnail"
+                                                        <img id="avatar-preview" src="{{ Storage::url($user->avatar) }}"
+                                                            alt="Avatar" class="rounded-circle img-thumbnail"
                                                             style="width: 120px; height: 120px; object-fit: cover;">
                                                     @else
-                                                        <img id="avatar-preview" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random"
+                                                        <img id="avatar-preview"
+                                                            src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random"
                                                             alt="Avatar" class="rounded-circle img-thumbnail"
                                                             style="width: 120px; height: 120px; object-fit: cover;">
                                                     @endif
                                                     <div class="mt-2">
-                                                        <label for="avatar" class="btn btn-sm btn-outline-primary">Choose
-                                                            Image</label>
+                                                        <label for="avatar"
+                                                            class="btn btn-sm btn-outline-primary">{{ __('messages.choose_image') }}</label>
                                                         <input type="file" name="avatar" id="avatar" class="d-none"
                                                             accept="image/*"
                                                             onchange="document.getElementById('avatar-preview').src = window.URL.createObjectURL(this.files[0])">
                                                     </div>
                                                 </div>
 
-                                                <label>Name</label>
+                                                <label>{{ __('messages.full_name') }}</label>
                                                 <input type="text" name="name" value="{{ old('name', $user->name) }}">
 
-                                                <label>Phone</label>
+                                                <label>{{ __('messages.phone_number') }}</label>
                                                 <input type="text" name="phone" value="{{ old('phone', $user->phone) }}">
 
-                                                <label>Email</label>
+                                                <label>{{ __('messages.email') }}</label>
                                                 <input type="text" name="email" value="{{ $user->email }}" readonly
                                                     disabled>
 
-                                                <h5 class="mt-4">Change Password</h5>
-                                                <small class="text-muted">(Leave blank to keep current)</small>
+                                                <h5 class="mt-4">{{ __('messages.change_password') }}</h5>
+                                                <small class="text-muted">{{ __('messages.leave_blank') }}</small>
 
-                                                <label>Current Password</label>
+                                                <label>{{ __('messages.current_password') }}</label>
                                                 <input type="password" name="current_password">
 
-                                                <label>New Password</label>
+                                                <label>{{ __('messages.new_password') }}</label>
                                                 <input type="password" name="new_password">
 
-                                                <label>Confirm New Password</label>
+                                                <label>{{ __('messages.confirm_new_password') }}</label>
                                                 <input type="password" name="new_password_confirmation">
 
                                                 <br>
