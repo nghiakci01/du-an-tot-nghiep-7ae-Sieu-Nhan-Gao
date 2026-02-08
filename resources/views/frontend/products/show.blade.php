@@ -14,7 +14,7 @@
                             <li>/</li>
                             <li><a href="{{ route('shop') }}">shop</a></li>
                             <li>/</li>
-                            <li>{{ $product->name }}</li>
+                            <li>product details</li>
                         </ul>
                     </div>
                 </div>
@@ -29,25 +29,21 @@
             <div class="row">
                 <div class="col-lg-5 col-md-5">
                    <div class="product-details-tab">
-
-                        <div class="single-zoom-no-hover"> <!-- Changed class from single-zoom, removed id="img-1" -->
-                            <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#productImageModal">
-                                <img id="current-product-img" src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" alt="{{ $product->name }}">
+                        <div id="img-1" class="zoomWrapper single-zoom">
+                            <a href="#">
+                                <img id="zoom1" src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" alt="{{ $product->name }}">
                             </a>
                         </div>
-
                         <div class="single-zoom-thumb">
                             <ul class="s-tab-zoom owl-carousel single-product-active" id="gallery_01">
-                                <!-- Main Image in Thumbnail -->
                                 <li>
-                                    <a href="javascript:void(0)" class="elevatezoom-gallery active" data-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}">
+                                    <a href="#" class="elevatezoom-gallery active" data-update="" data-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}">
                                         <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" alt="{{ $product->name }}"/>
                                     </a>
                                 </li>
-                                <!-- Gallery Images -->
                                 @foreach($product->images as $image)
                                 <li>
-                                    <a href="javascript:void(0)" class="elevatezoom-gallery" data-image="{{ asset('storage/' . $image->image_path) }}">
+                                    <a href="#" class="elevatezoom-gallery" data-update="" data-image="{{ asset('storage/' . $image->image_path) }}" data-zoom-image="{{ asset('storage/' . $image->image_path) }}">
                                         <img src="{{ asset('storage/' . $image->image_path) }}" alt="zo-th-{{ $loop->iteration }}"/>
                                     </a>
                                 </li>
@@ -56,51 +52,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Product Image Modal -->
-                <div class="modal fade" id="productImageModal" tabindex="-1" aria-labelledby="productImageModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-lg">
-                        <div class="modal-content" style="background: transparent; border: none;">
-                            <div class="modal-body p-0 text-center position-relative">
-                                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" style="z-index: 1051; background-color: white; opacity: 0.8;"></button>
-                                <img id="modal-product-img" src="" class="img-fluid" style="max-height: 90vh; border-radius: 8px;">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        // Handle thumbnail click to switch main image
-                        const thumbnails = document.querySelectorAll('.elevatezoom-gallery');
-                        const mainImg = document.getElementById('current-product-img');
-                        const modalImg = document.getElementById('modal-product-img');
-
-                        thumbnails.forEach(thumb => {
-                            thumb.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                
-                                // Update active class
-                                thumbnails.forEach(t => t.classList.remove('active'));
-                                this.classList.add('active');
-
-                                // Get image source
-                                const newSrc = this.getAttribute('data-image');
-                                
-                                // Update main image
-                                mainImg.src = newSrc;
-                            });
-                        });
-
-                        // Update modal image when modal opens
-                        const imageModal = document.getElementById('productImageModal');
-                        if (imageModal) {
-                            imageModal.addEventListener('show.bs.modal', function () {
-                                modalImg.src = mainImg.src;
-                            });
-                        }
-                    });
-                </script>
                 <div class="col-lg-7 col-md-7">
                     <div class="product_d_right">
                        <form action="{{ route('cart.add') }}" method="POST">
@@ -108,249 +59,164 @@
                            <input type="hidden" name="product_id" value="{{ $product->id }}">
                            
                             <h1>{{ $product->name }}</h1>
-                            <div class=" product_ratting">
+                            <div class="product_ratting">
                                 <ul>
-                                    <!-- Dynamic Stars -->
                                     @php $rating = $product->reviews->avg('rating') ?? 0; @endphp
                                     @for($i = 1; $i <= 5; $i++)
                                         <li><a href="#"><i class="fa {{ $i <= $rating ? 'fa-star' : 'fa-star-o' }}"></i></a></li>
                                     @endfor
-                                    <li class="review"><a href="#reviews"> {{ $product->reviews->count() }} reviews </a></li>
+                                    <li class="review"><a href="#reviews"> ({{ $product->reviews->count() }} reviews) </a></li>
                                 </ul>
                             </div>
                             <div class="product_price">
-                                @if($product->variants->isNotEmpty() && $product->variants->min('price') > 0)
-                                    <span class="current_price">
-                                        @if($product->variants->min('price') == $product->variants->max('price'))
-                                            {{ number_format($product->variants->min('price')) }} đ
-                                        @else
-                                            {{ number_format($product->variants->min('price')) }} - {{ number_format($product->variants->max('price')) }} đ
-                                        @endif
-                                    </span>
-                                @elseif($product->sale_price && $product->sale_price > 0)
-                                    <span class="current_price">{{ number_format($product->sale_price) }} đ</span>
-                                    <span class="old_price" style="text-decoration: line-through; color: #999; margin-left: 10px;">{{ number_format($product->price) }} đ</span>
-                                @else
-                                    <span class="current_price">{{ number_format($product->price) }} đ</span>
-                                @endif
+                                @include('frontend.partials.product-price', ['product' => $product])
                             </div>
-
                             <div class="product_desc">
                                 <p>{{ $product->short_description }}</p>
                             </div>
 
-                                @if($product->variants->count() > 0 && $product->variants->min('price') > 0)
-                                    @php
-                                        $uniqueSizes = $product->variants->pluck('sizeRelationship')->filter()->unique('id');
-                                        $uniqueColors = $product->variants->pluck('colorRelationship')->filter()->unique('id');
-                                    @endphp
+                            @if($product->variants->count() > 0 && $product->variants->min('price') > 0)
+                                @php
+                                    $uniqueSizes = $product->variants->pluck('sizeRelationship')->filter()->unique('id');
+                                    $uniqueColors = $product->variants->pluck('colorRelationship')->filter()->unique('id');
+                                @endphp
 
-                                    <style>
-                                        .product_variant h3 {
-                                            margin-bottom: 12px;
-                                            font-size: 15px;
-                                            font-weight: 600;
-                                            text-transform: uppercase;
-                                            letter-spacing: 0.5px;
-                                            color: #222;
-                                        }
-                                        .variant-group {
-                                            display: flex;
-                                            flex-wrap: wrap;
-                                            gap: 12px;
-                                            margin-bottom: 25px;
-                                        }
-                                        .variant-option {
-                                            display: inline-flex;
-                                            align-items: center;
-                                            justify-content: center;
-                                            padding: 10px 24px;
-                                            border: 1px solid #e1e1e1;
-                                            background: #fff;
-                                            cursor: pointer;
-                                            min-width: 45px;
-                                            font-weight: 500;
-                                            font-size: 14px;
-                                            color: #555;
-                                            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-                                            user-select: none;
-                                            position: relative;
-                                            overflow: hidden;
-                                        }
+                                <div class="product_variant size">
+                                    <h3>Size</h3>
+                                    <select class="niceselect_option" id="select_size_nice" name="size_id">
+                                        <option selected value="">Chọn size</option>
+                                        @foreach($uniqueSizes as $size)
+                                            <option value="{{ $size->id }}">{{ $size->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="hidden" id="select_size" value="">
+                                </div>
+                                
+                                <div class="product_variant color">
+                                    <h3>Màu sắc</h3>
+                                    <select class="niceselect_option" id="select_color_nice" name="color_id">
+                                        <option selected value="">Chọn màu</option>
+                                        @foreach($uniqueColors as $color)
+                                            <option value="{{ $color->id }}">{{ $color->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="hidden" id="select_color" value="">
+                                </div>
+
+                                <input type="hidden" id="variant_select" name="variant_id" required>
+                                <div id="variant-message" class="text-danger mt-2 mb-3" style="font-weight: bold; display: none;"></div>
+
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        const variants = @json($product->variants);
+                                        const niceSize = document.getElementById('select_size_nice');
+                                        const niceColor = document.getElementById('select_color_nice');
+                                        const sizeInput = document.getElementById('select_size');
+                                        const colorInput = document.getElementById('select_color');
+                                        const variantInput = document.getElementById('variant_select');
+                                        const msg = document.getElementById('variant-message');
+                                        const addToCartBtn = document.querySelector('.button[value="add_to_cart"]');
+                                        const buyNowBtn = document.querySelector('.button[value="buy_now"]');
+                                        const priceContainer = document.querySelector('.product_price');
                                         
-                                        /* Sharp & Sophisticated Look */
-                                        .variant-option:hover {
-                                            border-color: #333;
-                                            color: #000;
-                                        }
+                                        const originalPriceHtml = priceContainer.innerHTML;
                                         
-                                        .variant-option.active {
-                                            border-color: #222;
-                                            background: #222;
-                                            color: #fff;
-                                            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                                        }
+                                        // Handle Nice Select changes
+                                        $(niceSize).on('change', function() {
+                                            sizeInput.value = this.value;
+                                            checkSelection();
+                                        });
+                                        $(niceColor).on('change', function() {
+                                            colorInput.value = this.value;
+                                            checkSelection();
+                                        });
+
+                                        const formatCurrency = (amount) => {
+                                            return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
+                                        };
                                         
-                                        /* Specific styling for Size */
-                                        .product_variant.size .variant-option {
-                                            min-width: 50px;
-                                        }
-
-                                        .variant-option.disabled {
-                                            opacity: 0.4;
-                                            cursor: not-allowed;
-                                            background: #f8f9fa;
-                                            border-color: #eee;
-                                            color: #aaa;
-                                            box-shadow: none !important;
-                                            border-style: dashed;
-                                        }
-                                    </style>
-
-                                    <div class="product_variant size">
-                                        <h3>Size</h3>
-                                        <div class="variant-group" id="group_size">
-                                            @foreach($uniqueSizes as $size)
-                                                <div class="variant-option" data-value="{{ $size->id }}" data-type="size">{{ $size->name }}</div>
-                                            @endforeach
-                                        </div>
-                                        <input type="hidden" id="select_size" value="">
-                                    </div>
-                                    
-                                    <div class="product_variant color">
-                                        <h3>Màu sắc</h3>
-                                        <div class="variant-group" id="group_color">
-                                            @foreach($uniqueColors as $color)
-                                                <div class="variant-option" data-value="{{ $color->id }}" data-type="color">{{ $color->name }}</div>
-                                            @endforeach
-                                        </div>
-                                        <input type="hidden" id="select_color" value="">
-                                    </div>
-
-                                    <input type="hidden" id="variant_select" name="variant_id" required>
-                                    <div id="variant-message" class="text-danger mt-2 mb-3" style="font-weight: bold; display: none;"></div>
-
-                                    <script>
-                                        document.addEventListener('DOMContentLoaded', function() {
-                                            const variants = @json($product->variants);
-                                            const sizeInput = document.getElementById('select_size');
-                                            const colorInput = document.getElementById('select_color');
-                                            const variantInput = document.getElementById('variant_select');
-                                            const msg = document.getElementById('variant-message');
-                                            const addToCartBtn = document.querySelector('button[type="submit"]');
-                                            const priceContainer = document.querySelector('.product_price');
+                                        function checkSelection() {
+                                            const selectedSize = sizeInput.value;
+                                            const selectedColor = colorInput.value;
                                             
-                                            const originalPriceHtml = priceContainer.innerHTML;
-                                            
-                                            // Handle button clicks
-                                            document.querySelectorAll('.variant-option').forEach(opt => {
-                                                opt.addEventListener('click', function() {
-                                                    if (this.classList.contains('disabled')) return;
-                                                    
-                                                    const type = this.getAttribute('data-type');
-                                                    const value = this.getAttribute('data-value');
-                                                    const group = type === 'size' ? 'group_size' : 'group_color';
-                                                    const input = type === 'size' ? sizeInput : colorInput;
-                                                    
-                                                    // Remove active from siblings
-                                                    document.querySelectorAll(`#${group} .variant-option`).forEach(el => el.classList.remove('active'));
-                                                    
-                                                    // Set active to clicked
-                                                    this.classList.add('active');
-                                                    input.value = value;
-                                                    
-                                                    checkSelection();
-                                                });
-                                            });
+                                            let filteredVariants = variants;
+                                            if (selectedSize) {
+                                                filteredVariants = filteredVariants.filter(v => v.size_id == selectedSize);
+                                            }
+                                            if (selectedColor) {
+                                                filteredVariants = filteredVariants.filter(v => v.color_id == selectedColor);
+                                            }
 
-                                            // Helper to format currency
-                                            const formatCurrency = (amount) => {
-                                                return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
-                                            };
-                                            
-                                            function checkSelection() {
-                                                const selectedSize = sizeInput.value;
-                                                const selectedColor = colorInput.value;
+                                            if (filteredVariants.length > 0) {
+                                                let html = '';
                                                 
-                                                // Filter variants based on available selection
-                                                let filteredVariants = variants;
-                                                if (selectedSize) {
-                                                    filteredVariants = filteredVariants.filter(v => v.size_id == selectedSize);
-                                                }
-                                                if (selectedColor) {
-                                                    filteredVariants = filteredVariants.filter(v => v.color_id == selectedColor);
-                                                }
-
-                                                if (filteredVariants.length > 0) {
-                                                    // Calculate min/max price of matching variants
-                                                    const prices = filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0);
+                                                if (selectedSize && selectedColor) {
+                                                    const matchedVariant = filteredVariants[0];
                                                     
-                                                    if (prices.length > 0) {
-                                                        const minPrice = Math.min(...prices);
-                                                        const maxPrice = Math.max(...prices);
-                                                        
-                                                        let html = '';
-                                                        if (minPrice === maxPrice) {
-                                                            html = `<span class="current_price">${formatCurrency(minPrice)}</span>`;
-                                                        } else {
-                                                            html = `<span class="current_price">${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}</span>`;
-                                                        }
-                                                        priceContainer.innerHTML = html;
+                                                    if (matchedVariant.sale_price && matchedVariant.sale_price > 0 && matchedVariant.sale_price < matchedVariant.price) {
+                                                        html = `<span class="current_price">
+                                                                    <span class="old_price" style="text-decoration: line-through; color: #999; margin-right: 10px;">${formatCurrency(matchedVariant.price)}</span>
+                                                                    ${formatCurrency(matchedVariant.sale_price)}
+                                                                </span>`;
                                                     } else {
-                                                        priceContainer.innerHTML = originalPriceHtml;
+                                                        html = `<span class="current_price">${formatCurrency(matchedVariant.price)}</span>`;
                                                     }
 
-                                                    // If exactly one variant matches both selections
-                                                    if (selectedSize && selectedColor) {
-                                                        const matchedVariant = filteredVariants[0];
-                                                        if (matchedVariant && matchedVariant.stock_quantity > 0) {
-                                                            variantInput.value = matchedVariant.id;
-                                                            msg.style.display = 'none';
-                                                            addToCartBtn.disabled = false;
-                                                            addToCartBtn.textContent = 'Thêm vào giỏ hàng';
-                                                        } else if (matchedVariant) {
-                                                            variantInput.value = '';
-                                                            msg.textContent = 'Sản phẩm tạm hết hàng mẫu này';
-                                                            msg.style.display = 'block';
-                                                            addToCartBtn.disabled = true;
-                                                            addToCartBtn.textContent = 'Hết hàng';
-                                                        } else {
-                                                            variantInput.value = '';
-                                                            msg.textContent = 'Phiên bản này không tồn tại';
-                                                            msg.style.display = 'block';
-                                                            addToCartBtn.disabled = true;
-                                                            addToCartBtn.textContent = 'Không khả dụng';
-                                                        }
+                                                    if (matchedVariant.stock_quantity > 0) {
+                                                        variantInput.value = matchedVariant.id;
+                                                        msg.style.display = 'none';
+                                                        addToCartBtn.disabled = false;
+                                                        buyNowBtn.disabled = false;
+                                                        addToCartBtn.textContent = 'Thêm vào giỏ hàng';
                                                     } else {
                                                         variantInput.value = '';
+                                                        msg.textContent = 'Sản phẩm tạm hết hàng mẫu này';
+                                                        msg.style.display = 'block';
                                                         addToCartBtn.disabled = true;
-                                                        addToCartBtn.textContent = 'Chọn đầy đủ tùy chọn';
-                                                        msg.style.display = 'none';
+                                                        buyNowBtn.disabled = true;
+                                                        addToCartBtn.textContent = 'Hết hàng';
                                                     }
                                                 } else {
-                                                    // No variants match the combination
+                                                    const minPrice = Math.min(...filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0));
+                                                    const maxPrice = Math.max(...filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0));
+                                                    
+                                                    if (minPrice === maxPrice) {
+                                                        html = `<span class="current_price">${formatCurrency(minPrice)}</span>`;
+                                                    } else {
+                                                        html = `<span class="current_price">${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}</span>`;
+                                                    }
+                                                    
                                                     variantInput.value = '';
-                                                    msg.textContent = 'Kết hợp này không có sẵn';
-                                                    msg.style.display = 'block';
                                                     addToCartBtn.disabled = true;
-                                                    addToCartBtn.textContent = 'Không khả dụng';
-                                                    priceContainer.innerHTML = originalPriceHtml;
+                                                    buyNowBtn.disabled = true;
+                                                    addToCartBtn.textContent = 'Thêm vào giỏ hàng';
+                                                    msg.style.display = 'none';
                                                 }
+                                                
+                                                priceContainer.innerHTML = html;
+                                            } else {
+                                                variantInput.value = '';
+                                                msg.textContent = 'Kết hợp này không có sẵn';
+                                                msg.style.display = 'block';
+                                                addToCartBtn.disabled = true;
+                                                buyNowBtn.disabled = true;
+                                                priceContainer.innerHTML = originalPriceHtml;
                                             }
-                                            
-                                            // Init
-                                            addToCartBtn.disabled = true;
-                                        });
-                                    </script>
-                                @endif
+                                        }
+                                        
+                                        addToCartBtn.disabled = true;
+                                        buyNowBtn.disabled = true;
+                                    });
+                                </script>
+                            @endif
 
                             <div class="product_variant quantity">
                                 <label>quantity</label>
                                 <input min="1" max="100" value="1" type="number" name="quantity">
                                 <button class="button" type="submit" name="action" value="add_to_cart">add to cart</button>
-                                <button class="button" type="submit" name="action" value="buy_now" style="background: #ef233c; border-color: #ef233c; margin-left: 10px;">Mua ngay</button>  
+                                <button class="button" type="submit" name="action" value="buy_now" style="background: #ef233c; border-color: #ef233c; margin-left: 10px;">Buy now</button>  
                             </div>
-                            <div class=" product_d_action">
+                            <div class="product_d_action">
                                <ul>
                                    <li><a href="#" title="Add to wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i> Add to Wish List</a></li>
                                    <li><a href="#" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i> Compare this Product</a></li>
@@ -400,8 +266,8 @@
                                 <div class="product_info_content">
                                     <p>Customer reviews for {{ $product->name }}</p>
                                 </div>
+                                @foreach($product->reviews as $review)
                                 <div class="product_info_inner">
-                                    @foreach($product->reviews as $review)
                                     <div class="product_ratting mb-10">
                                         <ul>
                                             @for($i = 1; $i <= 5; $i++)
@@ -414,9 +280,9 @@
                                     <div class="product_demo">
                                         <p>{{ $review->comment }}</p>
                                     </div>
-                                    <hr>
-                                    @endforeach
                                 </div> 
+                                <hr>
+                                @endforeach
                                 <div class="product_review_form">
                                     <form action="#">
                                         <h2>Add a review </h2>
@@ -456,25 +322,24 @@
                         <div class="col-lg-3">
                             <div class="single_product">
                                 <div class="product_thumb">
-                                    <a class="primary_img" href="{{ route('product.detail', $related->slug) }}"><img src="{{ $related->image ? asset('storage/' . $related->image) : asset('frontend-assets/img/product/product21.jpg') }}" alt=""></a>
+                                    <a class="primary_img" href="{{ route('product.detail', $related->slug) }}">
+                                        <img src="{{ $related->image ? asset('storage/' . $related->image) : asset('frontend-assets/img/product/product21.jpg') }}" alt="{{ $related->name }}">
+                                    </a>
                                     <div class="product_action">
                                         <div class="hover_action">
-                                           <a  href="#"><i class="fa fa-plus"></i></a>
+                                           <a href="{{ route('product.detail', $related->slug) }}"><i class="fa fa-plus"></i></a>
                                             <div class="action_button">
                                                 <ul>
-                                                    <li><a title="add to cart" href="cart.html"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="wishlist.html" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                                    <li><a title="add to cart" href="{{ route('product.detail', $related->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
+                                                    <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
                                                 </ul>
                                             </div>
                                        </div>
                                     </div>
-                                    <div class="product_sale">
-                                        <!-- <span>-7%</span> -->
-                                    </div>
                                 </div>
                                 <div class="product_content">
                                     <h3><a href="{{ route('product.detail', $related->slug) }}">{{ $related->name }}</a></h3>
-                                    <span class="current_price">{{ number_format($related->price) }} đ</span>
+                                    @include('frontend.partials.product-price', ['product' => $related])
                                 </div>
                             </div>
                         </div>
