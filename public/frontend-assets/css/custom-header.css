@@ -109,8 +109,14 @@
 
 .sticky-header .main_menu nav>ul>li>a {
     padding: 10px 0;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 400;
+    color: #2c2c2c;
+    text-transform: capitalize;
+}
+
+.sticky-header .main_menu nav>ul>li>a:hover {
+    color: #ff6a00;
 }
 
 /* Hide sticky header on mobile */
