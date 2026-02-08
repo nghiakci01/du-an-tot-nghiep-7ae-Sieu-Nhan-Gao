@@ -33,6 +33,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/my-account/update', [App\Http\Controllers\Frontend\AccountController::class, 'updateDetails'])->name('account.update');
     Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'viewOrder'])->name('account.orders.show');
     Route::post('/my-account/orders/{id}/cancel', [App\Http\Controllers\Frontend\AccountController::class, 'cancelOrder'])->name('account.orders.cancel');
+
+    // Wishlist Routes
+    Route::get('/wishlist', [App\Http\Controllers\Frontend\WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/add', [App\Http\Controllers\Frontend\WishlistController::class, 'store'])->name('wishlist.add');
+    Route::delete('/wishlist/{id}', [App\Http\Controllers\Frontend\WishlistController::class, 'destroy'])->name('wishlist.destroy');
 });
 
 // Public Chatbot Route (Moved from API to Web to access Session)

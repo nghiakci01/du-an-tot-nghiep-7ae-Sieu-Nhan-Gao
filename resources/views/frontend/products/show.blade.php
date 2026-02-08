@@ -5,7 +5,7 @@
 @section('content')
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area product_bread">
-        <div class="container">   
+        <div class="container">
             <div class="row">
                 <div class="col-12">
                     <div class="breadcrumb_content">
@@ -19,34 +19,43 @@
                     </div>
                 </div>
             </div>
-        </div>         
+        </div>
     </div>
     <!--breadcrumbs area end-->
-    
+
     <!--product details start-->
     <div class="product_details">
         <div class="container">
             <div class="row">
                 <div class="col-lg-5 col-md-5">
-                   <div class="product-details-tab">
+                    <div class="product-details-tab">
                         <div id="img-1" class="zoomWrapper single-zoom">
                             <a href="#">
-                                <img id="zoom1" src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" alt="{{ $product->name }}">
+                                <img id="zoom1"
+                                    src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}"
+                                    data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}"
+                                    alt="{{ $product->name }}">
                             </a>
                         </div>
                         <div class="single-zoom-thumb">
                             <ul class="s-tab-zoom owl-carousel single-product-active" id="gallery_01">
                                 <li>
-                                    <a href="#" class="elevatezoom-gallery active" data-update="" data-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}">
-                                        <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" alt="{{ $product->name }}"/>
+                                    <a href="#" class="elevatezoom-gallery active" data-update=""
+                                        data-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}"
+                                        data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}">
+                                        <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}"
+                                            alt="{{ $product->name }}" />
                                     </a>
                                 </li>
                                 @foreach($product->images as $image)
-                                <li>
-                                    <a href="#" class="elevatezoom-gallery" data-update="" data-image="{{ asset('storage/' . $image->image_path) }}" data-zoom-image="{{ asset('storage/' . $image->image_path) }}">
-                                        <img src="{{ asset('storage/' . $image->image_path) }}" alt="zo-th-{{ $loop->iteration }}"/>
-                                    </a>
-                                </li>
+                                    <li>
+                                        <a href="#" class="elevatezoom-gallery" data-update=""
+                                            data-image="{{ asset('storage/' . $image->image_path) }}"
+                                            data-zoom-image="{{ asset('storage/' . $image->image_path) }}">
+                                            <img src="{{ asset('storage/' . $image->image_path) }}"
+                                                alt="zo-th-{{ $loop->iteration }}" />
+                                        </a>
+                                    </li>
                                 @endforeach
                             </ul>
                         </div>
@@ -54,18 +63,20 @@
                 </div>
                 <div class="col-lg-7 col-md-7">
                     <div class="product_d_right">
-                       <form action="{{ route('cart.add') }}" method="POST">
-                           @csrf
-                           <input type="hidden" name="product_id" value="{{ $product->id }}">
-                           
+                        <form action="{{ route('cart.add') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+
                             <h1>{{ $product->name }}</h1>
                             <div class="product_ratting">
                                 <ul>
                                     @php $rating = $product->reviews->avg('rating') ?? 0; @endphp
                                     @for($i = 1; $i <= 5; $i++)
-                                        <li><a href="#"><i class="fa {{ $i <= $rating ? 'fa-star' : 'fa-star-o' }}"></i></a></li>
+                                        <li><a href="#"><i class="fa {{ $i <= $rating ? 'fa-star' : 'fa-star-o' }}"></i></a>
+                                        </li>
                                     @endfor
-                                    <li class="review"><a href="#reviews"> ({{ $product->reviews->count() }} reviews) </a></li>
+                                    <li class="review"><a href="#reviews"> ({{ $product->reviews->count() }} reviews) </a>
+                                    </li>
                                 </ul>
                             </div>
                             <div class="product_price">
@@ -91,7 +102,7 @@
                                     </select>
                                     <input type="hidden" id="select_size" value="">
                                 </div>
-                                
+
                                 <div class="product_variant color">
                                     <h3>Màu sắc</h3>
                                     <select class="niceselect_option" id="select_color_nice" name="color_id">
@@ -104,10 +115,11 @@
                                 </div>
 
                                 <input type="hidden" id="variant_select" name="variant_id" required>
-                                <div id="variant-message" class="text-danger mt-2 mb-3" style="font-weight: bold; display: none;"></div>
+                                <div id="variant-message" class="text-danger mt-2 mb-3"
+                                    style="font-weight: bold; display: none;"></div>
 
                                 <script>
-                                    document.addEventListener('DOMContentLoaded', function() {
+                                    document.addEventListener('DOMContentLoaded', function () {
                                         const variants = @json($product->variants);
                                         const niceSize = document.getElementById('select_size_nice');
                                         const niceColor = document.getElementById('select_color_nice');
@@ -118,15 +130,15 @@
                                         const addToCartBtn = document.querySelector('.button[value="add_to_cart"]');
                                         const buyNowBtn = document.querySelector('.button[value="buy_now"]');
                                         const priceContainer = document.querySelector('.product_price');
-                                        
+
                                         const originalPriceHtml = priceContainer.innerHTML;
-                                        
+
                                         // Handle Nice Select changes
-                                        $(niceSize).on('change', function() {
+                                        $(niceSize).on('change', function () {
                                             sizeInput.value = this.value;
                                             checkSelection();
                                         });
-                                        $(niceColor).on('change', function() {
+                                        $(niceColor).on('change', function () {
                                             colorInput.value = this.value;
                                             checkSelection();
                                         });
@@ -134,11 +146,11 @@
                                         const formatCurrency = (amount) => {
                                             return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
                                         };
-                                        
+
                                         function checkSelection() {
                                             const selectedSize = sizeInput.value;
                                             const selectedColor = colorInput.value;
-                                            
+
                                             let filteredVariants = variants;
                                             if (selectedSize) {
                                                 filteredVariants = filteredVariants.filter(v => v.size_id == selectedSize);
@@ -149,15 +161,15 @@
 
                                             if (filteredVariants.length > 0) {
                                                 let html = '';
-                                                
+
                                                 if (selectedSize && selectedColor) {
                                                     const matchedVariant = filteredVariants[0];
-                                                    
+
                                                     if (matchedVariant.sale_price && matchedVariant.sale_price > 0 && matchedVariant.sale_price < matchedVariant.price) {
                                                         html = `<span class="current_price">
-                                                                    <span class="old_price" style="text-decoration: line-through; color: #999; margin-right: 10px;">${formatCurrency(matchedVariant.price)}</span>
-                                                                    ${formatCurrency(matchedVariant.sale_price)}
-                                                                </span>`;
+                                                                            <span class="old_price" style="text-decoration: line-through; color: #999; margin-right: 10px;">${formatCurrency(matchedVariant.price)}</span>
+                                                                            ${formatCurrency(matchedVariant.sale_price)}
+                                                                        </span>`;
                                                     } else {
                                                         html = `<span class="current_price">${formatCurrency(matchedVariant.price)}</span>`;
                                                     }
@@ -179,20 +191,20 @@
                                                 } else {
                                                     const minPrice = Math.min(...filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0));
                                                     const maxPrice = Math.max(...filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0));
-                                                    
+
                                                     if (minPrice === maxPrice) {
                                                         html = `<span class="current_price">${formatCurrency(minPrice)}</span>`;
                                                     } else {
                                                         html = `<span class="current_price">${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}</span>`;
                                                     }
-                                                    
+
                                                     variantInput.value = '';
                                                     addToCartBtn.disabled = true;
                                                     buyNowBtn.disabled = true;
                                                     addToCartBtn.textContent = 'Thêm vào giỏ hàng';
                                                     msg.style.display = 'none';
                                                 }
-                                                
+
                                                 priceContainer.innerHTML = html;
                                             } else {
                                                 variantInput.value = '';
@@ -203,7 +215,7 @@
                                                 priceContainer.innerHTML = originalPriceHtml;
                                             }
                                         }
-                                        
+
                                         addToCartBtn.disabled = true;
                                         buyNowBtn.disabled = true;
                                     });
@@ -214,74 +226,85 @@
                                 <label>quantity</label>
                                 <input min="1" max="100" value="1" type="number" name="quantity">
                                 <button class="button" type="submit" name="action" value="add_to_cart">add to cart</button>
-                                <button class="button" type="submit" name="action" value="buy_now" style="background: #ef233c; border-color: #ef233c; margin-left: 10px;">Buy now</button>  
+                                <button class="button" type="submit" name="action" value="buy_now"
+                                    style="background: #ef233c; border-color: #ef233c; margin-left: 10px;">Buy now</button>
                             </div>
                             <div class="product_d_action">
-                               <ul>
-                                   <li><a href="#" title="Add to wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i> Add to Wish List</a></li>
-                                   <li><a href="#" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i> Compare this Product</a></li>
-                               </ul>
+                                <ul>
+                                    <li>
+                                        <a href="#" class="add-to-wishlist" data-id="{{ $product->id }}"
+                                            title="Add to wishlist">
+                                            <i class="fa fa-heart-o" aria-hidden="true"></i> Add to Wish List
+                                        </a>
+                                    </li>
+                                    <li><a href="#" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i>
+                                            Compare this Product</a></li>
+                                </ul>
                             </div>
-                            
+
                         </form>
                         <div class="priduct_social">
                             <h3>Share on:</h3>
                             <ul>
                                 <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>        
-                            </ul>      
+                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                            </ul>
                         </div>
 
                     </div>
                 </div>
             </div>
-        </div>    
+        </div>
     </div>
     <!--product details end-->
-    
+
     <!--product info start-->
     <div class="product_d_info">
-        <div class="container">   
+        <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <div class="product_d_inner">   
-                        <div class="product_info_button">    
+                    <div class="product_d_inner">
+                        <div class="product_info_button">
                             <ul class="nav" role="tablist">
-                                <li >
-                                    <a class="active" data-bs-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">More info</a>
+                                <li>
+                                    <a class="active" data-bs-toggle="tab" href="#info" role="tab" aria-controls="info"
+                                        aria-selected="false">More info</a>
                                 </li>
                                 <li>
-                                   <a data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews ({{ $product->reviews->count() }})</a>
+                                    <a data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews"
+                                        aria-selected="false">Reviews ({{ $product->reviews->count() }})</a>
                                 </li>
                             </ul>
                         </div>
                         <div class="tab-content">
-                            <div class="tab-pane fade show active" id="info" role="tabpanel" >
+                            <div class="tab-pane fade show active" id="info" role="tabpanel">
                                 <div class="product_info_content" style="max-height: 400px; overflow-y: auto;">
                                     <p>{!! nl2br(e($product->description)) !!}</p>
-                                </div>    
+                                </div>
                             </div>
 
-                            <div class="tab-pane fade" id="reviews" role="tabpanel" >
+                            <div class="tab-pane fade" id="reviews" role="tabpanel">
                                 <div class="product_info_content">
                                     <p>Customer reviews for {{ $product->name }}</p>
                                 </div>
                                 @foreach($product->reviews as $review)
-                                <div class="product_info_inner">
-                                    <div class="product_ratting mb-10">
-                                        <ul>
-                                            @for($i = 1; $i <= 5; $i++)
-                                                <li><a href="#"><i class="fa {{ $i <= $review->rating ? 'fa-star' : 'fa-star-o' }}"></i></a></li>
-                                            @endfor
-                                        </ul>
-                                        <strong>{{ $review->user->name ?? 'Guest' }}</strong> 
-                                        <p>{{ $review->created_at->format('d/m/Y') }}</p>
+                                    <div class="product_info_inner">
+                                        <div class="product_ratting mb-10">
+                                            <ul>
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <li><a href="#"><i
+                                                                class="fa {{ $i <= $review->rating ? 'fa-star' : 'fa-star-o' }}"></i></a>
+                                                    </li>
+                                                @endfor
+                                            </ul>
+                                            <strong>{{ $review->user->name ?? 'Guest' }}</strong>
+                                            <p>{{ $review->created_at->format('d/m/Y') }}</p>
+                                        </div>
+                                        <div class="product_demo">
+                                            <p>{{ $review->comment }}</p>
+                                        </div>
                                     </div>
-                                    <div class="product_demo">
-                                        <p>{{ $review->comment }}</p>
-                                    </div>
-                                </div> 
-                                <hr>
+                                    <hr>
                                 @endforeach
                                 <div class="product_review_form">
                                     <form action="#">
@@ -290,59 +313,67 @@
                                         <div class="row">
                                             <div class="col-12">
                                                 <label for="review_comment">Your review </label>
-                                                <textarea name="comment" id="review_comment" ></textarea>
-                                            </div> 
+                                                <textarea name="comment" id="review_comment"></textarea>
+                                            </div>
                                         </div>
                                         <button type="submit">Submit</button>
-                                     </form>   
-                                </div>     
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>     
+                    </div>
                 </div>
             </div>
-        </div>    
-    </div>  
+        </div>
+    </div>
     <!--product info end-->
-    
+
     <!--product section area start-->
     <section class="product_section related_product">
         <div class="container">
-            <div class="row">   
+            <div class="row">
                 <div class="col-12">
-                   <div class="section_title">
-                       <h2>Related Products</h2>
-                   </div>
-                </div> 
-            </div>    
-            <div class="product_area"> 
-                 <div class="row">
+                    <div class="section_title">
+                        <h2>Related Products</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="product_area">
+                <div class="row">
                     <div class="product_carousel product_three_column4 owl-carousel">
                         @foreach($relatedProducts as $related)
-                        <div class="col-lg-3">
-                            <div class="single_product">
-                                <div class="product_thumb">
-                                    <a class="primary_img" href="{{ route('product.detail', $related->slug) }}">
-                                        <img src="{{ $related->image ? asset('storage/' . $related->image) : asset('frontend-assets/img/product/product21.jpg') }}" alt="{{ $related->name }}">
-                                    </a>
-                                    <div class="product_action">
-                                        <div class="hover_action">
-                                           <a href="{{ route('product.detail', $related->slug) }}"><i class="fa fa-plus"></i></a>
-                                            <div class="action_button">
-                                                <ul>
-                                                    <li><a title="add to cart" href="{{ route('product.detail', $related->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                </ul>
+                            <div class="col-lg-3">
+                                <div class="single_product">
+                                    <div class="product_thumb">
+                                        <a class="primary_img" href="{{ route('product.detail', $related->slug) }}">
+                                            <img src="{{ $related->image ? asset('storage/' . $related->image) : asset('frontend-assets/img/product/product21.jpg') }}"
+                                                alt="{{ $related->name }}">
+                                        </a>
+                                        <div class="product_action">
+                                            <div class="hover_action">
+                                                <a href="{{ route('product.detail', $related->slug) }}"><i
+                                                        class="fa fa-plus"></i></a>
+                                                <div class="action_button">
+                                                    <ul>
+                                                        <li><a title="add to cart"
+                                                                href="{{ route('product.detail', $related->slug) }}"><i
+                                                                    class="fa fa-shopping-basket" aria-hidden="true"></i></a>
+                                                        </li>
+                                                        <li><a href="#" class="add-to-wishlist" data-id="{{ $related->id }}"
+                                                                title="Add to Wishlist"><i class="fa fa-heart-o"
+                                                                    aria-hidden="true"></i></a></li>
+                                                    </ul>
+                                                </div>
                                             </div>
-                                       </div>
+                                        </div>
+                                    </div>
+                                    <div class="product_content">
+                                        <h3><a href="{{ route('product.detail', $related->slug) }}">{{ $related->name }}</a>
+                                        </h3>
+                                        @include('frontend.partials.product-price', ['product' => $related])
                                     </div>
                                 </div>
-                                <div class="product_content">
-                                    <h3><a href="{{ route('product.detail', $related->slug) }}">{{ $related->name }}</a></h3>
-                                    @include('frontend.partials.product-price', ['product' => $related])
-                                </div>
                             </div>
-                        </div>
                         @endforeach
                     </div>
                 </div>
@@ -350,4 +381,41 @@
         </div>
     </section>
     <!--product section area end-->
+
+    @section('scripts')
+        <script>
+            $(document).ready(function () {
+                $('.add-to-wishlist').click(function (e) {
+                    e.preventDefault();
+                    var productId = $(this).data('id');
+                    var icon = $(this).find('i');
+
+                    $.ajax({
+                        url: '{{ route("wishlist.add") }}',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            product_id: productId
+                        },
+                        success: function (response) {
+                            if (response.status === 'success' || response.status === 'info') {
+                                // Change icon to filled heart
+                                icon.removeClass('fa-heart-o').addClass('fa-heart').css('color', 'red');
+                                alert(response.message);
+                            } else {
+                                alert(response.message);
+                            }
+                        },
+                        error: function (xhr) {
+                            if (xhr.status === 401) {
+                                window.location.href = "{{ route('login') }}";
+                            } else {
+                                alert('Có lỗi xảy ra, vui lòng thử lại!');
+                            }
+                        }
+                    });
+                });
+            });
+        </script>
+    @endsection
 @endsection

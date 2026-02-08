@@ -17,21 +17,29 @@ class HomeController extends Controller
     public function index()
     {
         $categories = Category::whereNull('parent_id')->take(6)->get();
-        
+
         // Sản phẩm nổi bật cho section "New Arrivals"
         $featuredProducts = Product::where('is_active', true)
-                                   ->where('is_featured', true)
-                                   ->with(['category', 'variants'])
-                                   ->take(10)
-                                   ->get();
-        
+            ->where('is_featured', true)
+            ->with(['category', 'variants'])
+            ->take(10)
+            ->get();
+
         // Sản phẩm mới nhất cho section dưới banner
         $newProducts = Product::where('is_active', true)
-                              ->with(['category', 'variants'])
-                              ->latest()
-                              ->take(12)
-                              ->get();
-        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts'));
+            ->with(['category', 'variants'])
+            ->latest()
+            ->take(12)
+            ->get();
+
+        // Sản phẩm được yêu thích nhất (Top Wishlisted)
+        $topWishlisted = Product::where('is_active', true)
+            ->withCount('wishlistedBy')
+            ->orderByDesc('wishlisted_by_count')
+            ->take(10)
+            ->get();
+
+        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted'));
     }
 
     public function about()
