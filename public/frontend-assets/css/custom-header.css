@@ -40,3 +40,65 @@
         font-size: 13px;
     }
 }
+
+/* ===== Sticky Header Styles ===== */
+.sticky-header {
+    position: fixed;
+    top: -100px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 999;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: top 0.3s ease-in-out;
+}
+
+.sticky-header.sticky {
+    top: 0;
+}
+
+/* Sticky header padding */
+.sticky-header .sticky_inner {
+    padding: 15px 0;
+}
+
+/* Center the menu */
+.sticky-header .main_menu {
+    display: flex;
+    justify-content: center;
+}
+
+/* Sticky header menu adjustments */
+.sticky-header .main_menu nav>ul {
+    display: inline-flex;
+    justify-content: center;
+}
+
+.sticky-header .main_menu nav>ul>li {
+    margin: 0 15px;
+}
+
+.sticky-header .main_menu nav>ul>li>a {
+    padding: 10px 8px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* Hide sticky header on mobile */
+@media only screen and (max-width: 991px) {
+    .sticky-header {
+        display: none;
+    }
+}
+
+/* Tablet adjustments */
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+    .sticky-header .main_menu nav>ul>li {
+        margin: 0 10px;
+    }
+
+    .sticky-header .main_menu nav>ul>li>a {
+        font-size: 14px;
+    }
+}

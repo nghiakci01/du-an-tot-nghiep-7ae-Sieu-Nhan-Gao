@@ -201,5 +201,47 @@
 
     </header>
     <!--header area end-->
+
+    <!--sticky header start-->
+    <div class="sticky-header header_six">
+        <div class="container-fluid">
+            <div class="sticky_inner">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="main_menu text-center"> 
+                            <nav>  
+                                <ul>
+                                    <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">Home</a></li>
+                                    <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">Shop<i class="fa fa-angle-down"></i></a>
+                                        <ul class="mega_menu">
+                                            <li><a href="#">Product Categories</a>
+                                                <ul>
+                                                    @foreach($categories as $category)
+                                                        <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                                    @endforeach
+                                                </ul>
+                                            </li>
+                                            <li><a href="#">Other pages</a>
+                                                <ul>
+                                                    <li><a href="{{ route('cart.index') }}">Cart</a></li>
+                                                    <li><a href="{{ route('checkout.index') }}">Checkout</a></li>
+                                                    <li><a href="{{ route('account.index') }}">Account</a></li>
+                                                </ul>
+                                            </li>
+                                            <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="{{ route('news') }}">News</a></li>
+                                    <li><a href="{{ route('about') }}">About Us</a></li>
+                                    <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
+                                </ul>   
+                            </nav> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--sticky header end-->
     </header>
     <!--header area end-->
