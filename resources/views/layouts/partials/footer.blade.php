@@ -1,4 +1,4 @@
-<footer class="footer_widgets product_page">
+<footer class="footer_widgets">
     <div class="footer_top">
         <div class="container">
             <div class="row">
@@ -19,31 +19,38 @@
                 </div>
                 <div class="col-lg-2 col-md-6 col-sm-6 col-6">
                     <div class="widgets_container">
-                        <h3>Extras</h3>
+                        <h3>Product categories</h3>
                         <div class="footer_menu">
                             <ul>
-                                <li><a href="#">Brands</a></li>
-                                <li><a href="#">Gift Certificates</a></li>
-                                <li><a href="#">Affiliate</a></li>
-                                <li><a href="#">Specials</a></li>
-                                <li><a href="#">Site Map</a></li>
-                                <li><a href="#">My Account</a></li>
+                                @foreach($categories->take(6) as $category)
+                                    <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                @endforeach
                             </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="widgets_container contact_us">
-                        <h3>Contact Us</h3>
-                        <div class="footer_contact">
-                            <p>Address:Your address goes here.</p>
-                            <p>Phone: <a href="tel:01234567890">01234567890</a> </p>
-                            <p>Email: demo@example.com</p>
+                <div class="col-lg-2 col-md-6 col-sm-6 col-6">
+                    <div class="widgets_container">
+                        <h3>Manufacturer</h3>
+                        <div class="footer_menu">
                             <ul>
-                                <li><a href="#" title="Twitter"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="#" title="google-plus"><i class="fa fa-google-plus"></i></a></li>
-                                <li><a href="#" title="facebook"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#" title="youtube"><i class="fa fa-youtube"></i></a></li>
+                                <li><a href="#">Apple</a></li>
+                                <li><a href="#">Samsung</a></li>
+                                <li><a href="#">Sony</a></li>
+                                <li><a href="#">Marshall</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 col-6">
+                    <div class="widgets_container">
+                        <h3>Popular Tags</h3>
+                        <div class="footer_menu">
+                            <ul>
+                                <li><a href="#">Headphone</a></li>
+                                <li><a href="#">Bluetooth</a></li>
+                                <li><a href="#">Portable</a></li>
+                                <li><a href="#">Retina</a></li>
                             </ul>
                         </div>
                     </div>
@@ -58,12 +65,11 @@
                                     <input id="mc-email" type="email" autocomplete="off" placeholder="Enter you email address here..." />
                                     <button id="mc-submit">Subscribe !</button>
                                 </form>
-                                <!-- mailchimp-alerts Start -->
                                 <div class="mailchimp-alerts text-centre">
-                                    <div class="mailchimp-submitting"></div><!-- mailchimp-submitting end -->
-                                    <div class="mailchimp-success"></div><!-- mailchimp-success end -->
-                                    <div class="mailchimp-error"></div><!-- mailchimp-error end -->
-                                </div><!-- mailchimp-alerts end -->
+                                    <div class="mailchimp-submitting"></div>
+                                    <div class="mailchimp-success"></div>
+                                    <div class="mailchimp-error"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
