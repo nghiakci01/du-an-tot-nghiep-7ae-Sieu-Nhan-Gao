@@ -119,7 +119,7 @@
                                 </ul>
                             </div>
                             <div class="product_price">
-                                @if($product->variants->isNotEmpty())
+                                @if($product->variants->isNotEmpty() && $product->variants->min('price') > 0)
                                     <span class="current_price">
                                         @if($product->variants->min('price') == $product->variants->max('price'))
                                             {{ number_format($product->variants->min('price')) }} đ
@@ -127,7 +127,7 @@
                                             {{ number_format($product->variants->min('price')) }} - {{ number_format($product->variants->max('price')) }} đ
                                         @endif
                                     </span>
-                                @elseif($product->sale_price)
+                                @elseif($product->sale_price && $product->sale_price > 0)
                                     <span class="current_price">{{ number_format($product->sale_price) }} đ</span>
                                     <span class="old_price" style="text-decoration: line-through; color: #999; margin-left: 10px;">{{ number_format($product->price) }} đ</span>
                                 @else
