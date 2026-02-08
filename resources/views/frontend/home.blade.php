@@ -56,6 +56,44 @@
             max-width: 20% !important;
         }
     }
+
+    /* Fix image ratio and layout breaking on hover */
+    .single_product .product_thumb {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        overflow: hidden;
+        background: #f5f5f5; /* Placeholder color for loading */
+    }
+
+    .single_product .product_thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    /* Ensure secondary image also fills correctly */
+    .single_product .product_thumb a.secondary_img {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Fix alignment for titles and prices */
+    .product_content {
+        padding-top: 10px;
+        text-align: left;
+    }
+
+    .product_content h3 {
+        margin-bottom: 5px;
+        font-size: 14px;
+        line-height: 1.2;
+        height: 2.4em; /* Max 2 lines height for alignment */
+        overflow: hidden;
+    }
 </style>
     <!--slider area start-->
     <div class="slider_section slider_section_six">
