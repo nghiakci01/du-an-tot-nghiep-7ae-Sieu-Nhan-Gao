@@ -84,7 +84,7 @@
                                 <div class="product_variant size">
                                     <h3>Size</h3>
                                     <select class="niceselect_option" id="select_size_nice" name="size_id">
-                                        <option selected value="">Chọn size</option>
+                                        <option selected value="">Size</option>
                                         @foreach($uniqueSizes as $size)
                                             <option value="{{ $size->id }}">{{ $size->name }}</option>
                                         @endforeach
@@ -95,7 +95,7 @@
                                 <div class="product_variant color">
                                     <h3>Màu sắc</h3>
                                     <select class="niceselect_option" id="select_color_nice" name="color_id">
-                                        <option selected value="">Chọn màu</option>
+                                        <option selected value="">Color</option>
                                         @foreach($uniqueColors as $color)
                                             <option value="{{ $color->id }}">{{ $color->name }}</option>
                                         @endforeach

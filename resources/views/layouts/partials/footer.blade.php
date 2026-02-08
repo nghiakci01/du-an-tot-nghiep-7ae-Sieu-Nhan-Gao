@@ -1,6 +1,6 @@
-<footer class="footer_widgets footer_six">
+<footer class="footer_widgets product_page">
     <div class="footer_top">
-        <div class="container-fluid">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-2 col-md-6 col-sm-6 col-6">
                     <div class="widgets_container">
@@ -45,7 +45,6 @@
                                 <li><a href="#" title="facebook"><i class="fa fa-facebook"></i></a></li>
                                 <li><a href="#" title="youtube"><i class="fa fa-youtube"></i></a></li>
                             </ul>
-                          
                         </div>
                     </div>
                 </div>
@@ -55,8 +54,8 @@
                         <div class="newleter-content">
                             <p>Exceptional quality. Ethical factories. Sign up to enjoy free U.S. shipping and returns on your first order.</p>
                              <div class="subscribe_form">
-                                <form id="mc-form" class="mc-form footer-newsletter" novalidate="true">
-                                    <input id="mc-email" type="email" autocomplete="off" placeholder="Enter you email address here..." name="EMAIL">
+                                <form id="mc-form" class="mc-form footer-newsletter">
+                                    <input id="mc-email" type="email" autocomplete="off" placeholder="Enter you email address here..." />
                                     <button id="mc-submit">Subscribe !</button>
                                 </form>
                                 <!-- mailchimp-alerts Start -->
