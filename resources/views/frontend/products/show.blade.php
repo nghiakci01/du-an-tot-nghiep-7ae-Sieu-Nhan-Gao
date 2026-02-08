@@ -271,49 +271,70 @@
                                             function checkSelection() {
                                                 const selectedSize = sizeInput.value;
                                                 const selectedColor = colorInput.value;
+                                                
+                                                // Filter variants based on available selection
+                                                let filteredVariants = variants;
+                                                if (selectedSize) {
+                                                    filteredVariants = filteredVariants.filter(v => v.size_id == selectedSize);
+                                                }
+                                                if (selectedColor) {
+                                                    filteredVariants = filteredVariants.filter(v => v.color_id == selectedColor);
+                                                }
 
-                                                if (selectedSize && selectedColor) {
-                                                    const matchedVariant = variants.find(v => v.size_id == selectedSize && v.color_id == selectedColor);
-
-                                                    if (matchedVariant) {
-                                                        // Update Price
+                                                if (filteredVariants.length > 0) {
+                                                    // Calculate min/max price of matching variants
+                                                    const prices = filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0);
+                                                    
+                                                    if (prices.length > 0) {
+                                                        const minPrice = Math.min(...prices);
+                                                        const maxPrice = Math.max(...prices);
+                                                        
                                                         let html = '';
-                                                        if (matchedVariant.price !== null) {
-                                                            if (matchedVariant.sale_price !== null && matchedVariant.sale_price < matchedVariant.price) {
-                                                                html = `<span class="current_price">${formatCurrency(matchedVariant.sale_price)}</span>
-                                                                        <span class="old_price" style="text-decoration: line-through; color: #999; margin-left: 10px;">${formatCurrency(matchedVariant.price)}</span>`;
-                                                            } else {
-                                                                html = `<span class="current_price">${formatCurrency(matchedVariant.price)}</span>`;
-                                                            }
-                                                            priceContainer.innerHTML = html;
+                                                        if (minPrice === maxPrice) {
+                                                            html = `<span class="current_price">${formatCurrency(minPrice)}</span>`;
                                                         } else {
-                                                            priceContainer.innerHTML = originalPriceHtml;
+                                                            html = `<span class="current_price">${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}</span>`;
                                                         }
+                                                        priceContainer.innerHTML = html;
+                                                    } else {
+                                                        priceContainer.innerHTML = originalPriceHtml;
+                                                    }
 
-                                                        if (matchedVariant.stock_quantity > 0) {
+                                                    // If exactly one variant matches both selections
+                                                    if (selectedSize && selectedColor) {
+                                                        const matchedVariant = filteredVariants[0];
+                                                        if (matchedVariant && matchedVariant.stock_quantity > 0) {
                                                             variantInput.value = matchedVariant.id;
                                                             msg.style.display = 'none';
                                                             addToCartBtn.disabled = false;
                                                             addToCartBtn.textContent = 'Thêm vào giỏ hàng';
-                                                            // Enable Buy Now button if handled similarly, or ensure it uses same form
-                                                        } else {
+                                                        } else if (matchedVariant) {
                                                             variantInput.value = '';
                                                             msg.textContent = 'Sản phẩm tạm hết hàng mẫu này';
                                                             msg.style.display = 'block';
                                                             addToCartBtn.disabled = true;
                                                             addToCartBtn.textContent = 'Hết hàng';
+                                                        } else {
+                                                            variantInput.value = '';
+                                                            msg.textContent = 'Phiên bản này không tồn tại';
+                                                            msg.style.display = 'block';
+                                                            addToCartBtn.disabled = true;
+                                                            addToCartBtn.textContent = 'Không khả dụng';
                                                         }
                                                     } else {
                                                         variantInput.value = '';
-                                                        msg.textContent = 'Phiên bản này không tồn tại';
-                                                        msg.style.display = 'block';
                                                         addToCartBtn.disabled = true;
-                                                        addToCartBtn.textContent = 'Không khả dụng';
-                                                        priceContainer.innerHTML = originalPriceHtml;
+                                                        addToCartBtn.textContent = 'Chọn đầy đủ tùy chọn';
+                                                        msg.style.display = 'none';
                                                     }
                                                 } else {
-                                                    // Incomplete selection
+                                                    // No variants match the combination
+                                                    variantInput.value = '';
+                                                    msg.textContent = 'Kết hợp này không có sẵn';
+                                                    msg.style.display = 'block';
                                                     addToCartBtn.disabled = true;
+                                                    addToCartBtn.textContent = 'Không khả dụng';
+                                                    priceContainer.innerHTML = originalPriceHtml;
                                                 }
                                             }
                                             
