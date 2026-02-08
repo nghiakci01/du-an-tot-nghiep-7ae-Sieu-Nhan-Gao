@@ -96,29 +96,45 @@
 
 @push('scripts')
 <script>
-$(document).ready(function() {
-    // Mini cart remove item
-    $('.mini-cart-remove').click(function(e) {
-        e.preventDefault();
-        var itemId = $(this).data('id');
-        
-        if(confirm('Xóa sản phẩm này khỏi giỏ hàng?')) {
-            $.ajax({
-                url: '{{ route('cart.remove') }}',
-                method: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    id: itemId
-                },
-                success: function(response) {
-                    location.reload();
-                },
-                error: function(xhr) {
-                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
-                }
-            });
-        }
+if (typeof miniCartInitialized === 'undefined') {
+    var miniCartInitialized = true;
+    $(document).ready(function() {
+        // Mini cart remove item - using delegated listener for durability
+        $(document).on('click', '.mini-cart-remove', function(e) {
+            e.preventDefault();
+            var itemId = $(this).data('id');
+            
+            console.log('Mini-cart removing item:', itemId);
+            
+            if(confirm('Xóa sản phẩm này khỏi giỏ hàng?')) {
+                $.ajax({
+                    url: '{{ route('cart.remove') }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        _method: 'DELETE',
+                        id: itemId
+                    },
+                    success: function(response) {
+                        console.log('Mini-cart remove success:', response);
+                        location.reload();
+                    },
+                    error: function(xhr) {
+                        console.error('Mini-cart remove failed:', xhr.responseText);
+                        let errorMsg = 'Lỗi hệ thống';
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.message) errorMsg = response.message;
+                        } catch(e) {}
+
+                        if(confirm("Lỗi khi xóa bằng AJAX (" + errorMsg + "). Thử dùng phương pháp xóa dự phòng?")) {
+                            window.location.href = '{{ route('cart.remove') }}?id=' + itemId;
+                        }
+                    }
+                });
+            }
+        });
     });
-});
+}
 </script>
 @endpush

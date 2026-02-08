@@ -54,6 +54,9 @@
     @include('frontend.partials.chatbot-widget')
 @endif
 
+@stack('scripts')
+@yield('scripts')
+
 </body>
 
 

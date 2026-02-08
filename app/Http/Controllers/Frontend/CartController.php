@@ -86,34 +86,79 @@ class CartController extends Controller
     public function updateCart(Request $request)
     {
         if($request->id && $request->quantity){
-            $cart = session()->get('cart');
+            $cart = session()->get('cart', []);
             $variant = ProductVariant::find($request->id);
 
             if ($variant && $variant->stock_quantity >= $request->quantity) {
-                 $cart[$request->id]["quantity"] = $request->quantity;
-                 session()->put('cart', $cart);
-                 session()->flash('success', 'Giỏ hàng đã được cập nhật');
-            } else {
-                 session()->flash('error', 'Số lượng không hợp lệ hoặc vượt quá tồn kho');
+                 if (isset($cart[$request->id])) {
+                     $cart[$request->id]["quantity"] = $request->quantity;
+                     session()->put('cart', $cart);
+                     session()->flash('success', 'Giỏ hàng đã được cập nhật');
+                     return response()->json(['success' => true]);
+                 }
             }
+            
+            session()->flash('error', 'Số lượng không hợp lệ hoặc vượt quá tồn kho');
+            return response()->json(['success' => false], 400);
         }
+        return response()->json(['success' => false], 400);
     }
 
     public function remove(Request $request)
     {
-        if($request->id) {
-            $cart = session()->get('cart');
-            if(isset($cart[$request->id])) {
-                unset($cart[$request->id]);
-                session()->put('cart', $cart);
+        $id = $request->id ?: $request->get('id');
+        $cart = session()->get('cart', []);
+        
+        \Log::info('Cart Remove Request', [
+            'method' => $request->method(),
+            'id' => $id,
+            'cart_keys' => array_keys($cart)
+        ]);
+
+        if ($id !== null) {
+            // Find the key in the cart - sometimes keys might be strings even if numeric
+            $foundKey = null;
+            if (isset($cart[$id])) {
+                $foundKey = $id;
+            } else {
+                foreach (array_keys($cart) as $key) {
+                    if ((string)$key === (string)$id) {
+                        $foundKey = $key;
+                        break;
+                    }
+                }
             }
-            session()->flash('success', 'Sản phẩm đã được xóa khỏi giỏ hàng');
+
+            if ($foundKey !== null) {
+                unset($cart[$foundKey]);
+                session()->put('cart', $cart);
+                session()->flash('success', 'Sản phẩm đã được xóa khỏi giỏ hàng');
+                
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json(['success' => true]);
+                }
+                return redirect()->route('cart.index');
+            }
         }
+        
+        $msg = 'Không tìm thấy sản phẩm trong giỏ hàng (ID: ' . $id . ')';
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => false, 
+                'message' => $msg,
+                'cart_keys' => array_keys($cart)
+            ], 400);
+        }
+        return redirect()->route('cart.index')->with('error', $msg);
     }
 
-    public function clearCart()
+    public function clearCart(Request $request)
     {
         session()->forget('cart');
+        if ($request->ajax()) {
+            session()->flash('success', 'Giỏ hàng đã được xóa');
+            return response()->json(['success' => true]);
+        }
         return redirect()->route('cart.index')->with('success', 'Giỏ hàng đã được xóa');
     }
 
