@@ -435,8 +435,11 @@
                     const imageId = this.dataset.id;
                     const imageDiv = this.closest('[data-image-id]');
                     
+                    let url = "{{ route('admin.products.gallery.delete', ':id') }}";
+                    url = url.replace(':id', imageId);
+                    
                     // Send AJAX request to delete
-                    fetch(`/admin/products/gallery/${imageId}`, {
+                    fetch(url, {
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
