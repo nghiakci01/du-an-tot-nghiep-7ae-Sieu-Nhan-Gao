@@ -87,6 +87,13 @@ class ProductController extends Controller
                 }
             }
 
+            // Update product base price from variants
+            if ($product->variants->isNotEmpty()) {
+                $product->price = $product->variants->where('price', '>', 0)->min('price') ?? 0;
+                $product->sale_price = $product->variants->where('sale_price', '>', 0)->min('sale_price');
+                $product->save();
+            }
+
             DB::commit();
             return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
 
@@ -183,6 +190,13 @@ class ProductController extends Controller
                         ]);
                     }
                 }
+            }
+
+            // Update product base price from variants
+            if ($product->variants->isNotEmpty()) {
+                $product->price = $product->variants->where('price', '>', 0)->min('price') ?? 0;
+                $product->sale_price = $product->variants->where('sale_price', '>', 0)->min('sale_price');
+                $product->save();
             }
 
             DB::commit();

@@ -145,17 +145,7 @@
                                     
                                     <div class="product_content grid_content">
                                         <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
-                                        <span class="current_price">
-                                            @if($product->variants->count() > 0 && $product->variants->min('price') > 0)
-                                                @if($product->variants->min('price') == $product->variants->max('price'))
-                                                    {{ number_format($product->variants->min('price')) }} đ
-                                                @else
-                                                    {{ number_format($product->variants->min('price')) }} - {{ number_format($product->variants->max('price')) }} đ
-                                                @endif
-                                            @else
-                                                {{ number_format($product->price) }} đ
-                                            @endif
-                                        </span>
+                                        @include('frontend.partials.product-price', ['product' => $product])
                                     </div>
                                     
                                     <div class="product_content list_content">
@@ -169,17 +159,7 @@
                                             </ul>
                                         </div>
                                         <div class="product_price">
-                                            <span class="current_price">
-                                                @if($product->variants->count() > 0 && $product->variants->min('price') > 0)
-                                                    @if($product->variants->min('price') == $product->variants->max('price'))
-                                                        {{ number_format($product->variants->min('price')) }} đ
-                                                    @else
-                                                        {{ number_format($product->variants->min('price')) }} - {{ number_format($product->variants->max('price')) }} đ
-                                                    @endif
-                                                @else
-                                                    {{ number_format($product->price) }} đ
-                                                @endif
-                                            </span>
+                                            @include('frontend.partials.product-price', ['product' => $product])
                                         </div>
                                         <div class="product_desc">
                                             <p>{{ $product->short_description }}</p>
