@@ -244,7 +244,7 @@
 
                         <div class="shop_toolbar t_bottom">
                             <div class="pagination">
-                                {{ $products->withQueryString()->links('pagination::bootstrap-4') }}
+                                {{ $products->withQueryString()->links('vendor.pagination.reid') }}
                             </div>
                         </div>
                         <!--shop toolbar end-->
