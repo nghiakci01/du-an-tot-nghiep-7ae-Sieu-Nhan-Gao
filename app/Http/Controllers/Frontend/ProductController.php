@@ -13,6 +13,16 @@ class ProductController extends Controller
     {
         $query = Product::where('is_active', true)->with(['category', 'variants']);
 
+        // Search by keyword
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%")
+                  ->orWhere('short_description', 'LIKE', "%{$search}%");
+            });
+        }
+
         // Filter by Category
         if ($request->has('category')) {
             $slug = $request->category;
