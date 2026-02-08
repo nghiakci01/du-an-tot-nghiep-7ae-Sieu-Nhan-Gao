@@ -94,6 +94,48 @@
         height: 2.4em; /* Max 2 lines height for alignment */
         overflow: hidden;
     }
+
+    /* Custom Slider Arrows to match user image */
+    .product_section .prev_arrow, 
+    .product_section .next_arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        background: transparent;
+        border: none;
+        font-size: 50px; /* Large arrow */
+        color: #cccccc; /* Light grey */
+        cursor: pointer;
+        transition: color 0.3s;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .product_section .prev_arrow {
+        left: -40px;
+    }
+
+    .product_section .next_arrow {
+        right: -40px;
+    }
+
+    .product_section .prev_arrow:hover, 
+    .product_section .next_arrow:hover {
+        color: #333;
+    }
+
+    /* Adjust container to give space for arrows */
+    .product_container {
+        position: relative;
+        padding: 0 50px;
+    }
+
+    @media (max-width: 1200px) {
+        .product_section .prev_arrow { left: -10px; }
+        .product_section .next_arrow { right: -10px; }
+        .product_container { padding: 0 20px; }
+    }
 </style>
     <!--slider area start-->
     <div class="slider_section slider_section_six">
@@ -192,47 +234,15 @@
             </div>    
             <div class="product_area"> 
                 <div class="product_container">
-                    <div class="custom_product_grid_10">
+                    <div class="product_column5">
                         @foreach($featuredProducts as $product)
-                        <div class="product_item_5">
-                            <div class="single_product">
-                                <div class="product_thumb">
-                                    <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                        <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}" alt="{{ $product->name }}">
-                                    </a>
-                                    <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                        <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : ($product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg')) }}" alt="{{ $product->name }}">
-                                    </a>
-                                    <div class="product_action">
-                                        <div class="hover_action">
-                                           <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
-                                            <div class="action_button">
-                                                <ul>
-                                                    <li><a title="add to cart" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i></a></li>
-                                                </ul>
-                                            </div>
-                                       </div>
-                                    </div>
-                                    <div class="quick_button">
-                                        <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick view</a>
-                                    </div>
-                                    @if($product->price < $product->original_price)
-                                    <div class="double_base">
-                                        <div class="product_sale">
-                                            <span>Sale</span>
-                                        </div>
-                                    </div>
-                                    @endif
-                                </div>
-                                <div class="product_content">
-                                    <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
-                                    @include('frontend.partials.product-price', ['product' => $product])
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach                    </div>
+                            @include('frontend.partials.product-grid-item', [
+                                'product' => $product,
+                                'columnClass' => 'col-lg-3',
+                                'contentClass' => 'grid_content'
+                            ])
+                        @endforeach
+                    </div>
                 </div> 
             </div>
                
