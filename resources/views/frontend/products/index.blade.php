@@ -92,12 +92,40 @@
                                     </li>
                                     @foreach($categories as $category)
                                         <li>
-                                            <a href="{{ route('shop', ['category' => $category->slug]) }}">
+                                            <a href="{{ route('shop', ['category' => $category->slug]) }}" class="{{ request('category') == $category->slug ? 'active' : '' }}">
                                                 {{ $category->name }} <span>{{ $category->products_count }}</span>
                                             </a> 
                                         </li>
                                     @endforeach
                                 </ul>
+                            </div>
+                            <div class="widget_list widget_categories">
+                                <h2>Manufacturer</h2>
+                                <ul>
+                                    <li><a href="#">Apple <span>6</span></a> </li>
+                                    <li><a href="#">Samsung <span>10</span></a> </li>
+                                    <li><a href="#">Sony <span>4</span></a> </li>
+                                    <li><a href="#">Marshall <span>4</span></a> </li>
+                                </ul>
+                            </div>
+                            <div class="widget_list widget_categories">
+                                <h2>Select By Color</h2>
+                                <ul>
+                                    <li><a href="#">Black <span>6</span></a> </li>
+                                    <li><a href="#">Blue <span>10</span></a> </li>
+                                    <li><a href="#">White <span>8</span></a> </li>
+                                </ul>
+                            </div>
+                            <div class="widget_list tag-cloud">
+                                <h2>Popular Tags</h2>
+                                <div class="tag_widget">
+                                    <ul>
+                                        <li><a href="#">Headphone</a></li>
+                                        <li><a href="#">Bluetooth</a></li>
+                                        <li><a href="#">Portable</a></li>
+                                        <li><a href="#">Retina</a></li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                         <!--sidebar widget end-->
@@ -112,6 +140,7 @@
                             <div class="shop_toolbar_btn">
                                 <button data-role="grid_3" type="button" class="active btn-grid-3" data-bs-toggle="tooltip" title="3"></button>
                                 <button data-role="grid_4" type="button" class="btn-grid-4" data-bs-toggle="tooltip" title="4"></button>
+                                <button data-role="grid_5" type="button" class="btn-grid-5" data-bs-toggle="tooltip" title="5"></button>
                                 <button data-role="grid_list" type="button" class="btn-list" data-bs-toggle="tooltip" title="List"></button>
                             </div>
                             <div class="niceselect_option">
@@ -204,7 +233,6 @@
                                             <p>{{ $product->short_description }}</p>
                                         </div>
                                     </div>
-                                    
                                 </div>
                             </div>
                             @empty
