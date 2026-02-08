@@ -234,11 +234,11 @@
             </div>    
             <div class="product_area"> 
                 <div class="product_container">
-                    <div class="product_column5">
+                    <div class="product_column5 row">
                         @foreach($featuredProducts as $product)
                             @include('frontend.partials.product-grid-item', [
                                 'product' => $product,
-                                'columnClass' => 'col-lg-3',
+                                'columnClass' => null,
                                 'contentClass' => 'grid_content'
                             ])
                         @endforeach

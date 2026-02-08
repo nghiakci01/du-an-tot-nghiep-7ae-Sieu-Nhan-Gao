@@ -1,4 +1,6 @@
-<div class="{{ $columnClass ?? 'col-lg-3 col-md-4 col-sm-6 col-12' }}">
+@if(isset($columnClass) && $columnClass)
+<div class="{{ $columnClass }}">
+@endif
     <div class="single_product">
         <div class="product_thumb">
             <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
@@ -49,4 +51,6 @@
             @include('frontend.partials.product-price', ['product' => $product])
         </div>
     </div>
+@if(isset($columnClass) && $columnClass)
 </div>
+@endif
