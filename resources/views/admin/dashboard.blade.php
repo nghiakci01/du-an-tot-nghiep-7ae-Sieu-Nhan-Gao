@@ -134,6 +134,78 @@
       </div>
     </div>
 
+    <!-- Charts Row -->
+    <div class="row">
+      <!-- Revenue Chart -->
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header">
+            <h5>Doanh Thu 30 Ngày Gần Nhất</h5>
+          </div>
+          <div class="card-body">
+            <div id="revenue-chart"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Status Chart -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h5>Trạng Thái Đơn Hàng</h5>
+          </div>
+          <div class="card-body">
+            <div id="order-status-chart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Top Selling Products -->
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5>Top 5 Sản Phẩm Bán Chạy</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Sản Phẩm</th>
+                    <th>Giá</th>
+                    <th>Đã Bán</th>
+                    <th>Doanh Thu (Ước tính)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @forelse($topProducts as $product)
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <img src="{{ asset('storage/' . $product->image) }}" alt="" class="img-fluid wid-40 rounded me-2"
+                            style="height: 40px; object-fit: cover;">
+                          <h6 class="mb-0">{{ $product->name }}</h6>
+                        </div>
+                      </td>
+                      <td>{{ number_format($product->price) }} VND</td>
+                      <td>{{ $product->total_sold }}</td>
+                      <td>{{ number_format($product->price * $product->total_sold) }} VND</td>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="4" class="text-center">Chưa có dữ liệu bán hàng</td>
+                    </tr>
+                  @endforelse
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Recent Orders Table -->
     <div class="col-lg-12">
       <div class="card">
@@ -191,4 +263,79 @@
       </div>
     </div>
   </div>
+@endsection
+
+@section('scripts')
+  <!-- ApexChart -->
+  <script src="{{ asset('admin-assets/js/plugins/apexcharts.min.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Revenue Chart
+      var revenueOptions = {
+        series: [{
+          name: 'Doanh Thu',
+          data: @json($revenueValues)
+        }],
+        chart: {
+          type: 'area', // or line, bar
+          height: 350,
+          toolbar: {
+            show: false
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'smooth'
+        },
+        xaxis: {
+          categories: @json($revenueLabels),
+        },
+        yaxis: {
+          labels: {
+            formatter: function (value) {
+              return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+            }
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: function (value) {
+              return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+            }
+          }
+        },
+        colors: ['#4680ff']
+      };
+
+      var revenueChart = new ApexCharts(document.querySelector("#revenue-chart"), revenueOptions);
+      revenueChart.render();
+
+      // Order Status Chart
+      var statusOptions = {
+        series: @json($statusValues),
+        chart: {
+          type: 'donut', // or pie
+          height: 350,
+        },
+        labels: @json($statusLabels),
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }],
+        colors: ['#ffc107', '#4680ff', '#2ca87f', '#dc3545', '#6c757d'] // Customize colors as needed
+      };
+
+      var statusChart = new ApexCharts(document.querySelector("#order-status-chart"), statusOptions);
+      statusChart.render();
+    });
+  </script>
 @endsection
