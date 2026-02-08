@@ -10,9 +10,9 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">trang chủ</a></li>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
-                            <li>tin tức</li>
+                            <li>{{ __('messages.news') }}</li>
                         </ul>
                     </div>
                 </div>

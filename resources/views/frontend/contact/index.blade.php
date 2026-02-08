@@ -10,9 +10,9 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">home</a></li>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
-                            <li>contact us</li>
+                            <li>{{ __('messages.contact') }}</li>
                         </ul>
                     </div>
                 </div>
