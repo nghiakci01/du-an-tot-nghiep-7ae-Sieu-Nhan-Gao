@@ -163,82 +163,16 @@
                         
                         <div class="row shop_wrapper">
                             @forelse($products as $product)
-                            <div class="col-lg-4 col-md-4 col-12 ">
-                                <div class="single_product">
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product15.jpg') }}" alt="{{ $product->name }}">
-                                        </a>
-                                        <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : ($product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product16.jpg')) }}" alt="{{ $product->name }}">
-                                        </a>
-                                        <div class="product_action">
-                                            <div class="hover_action">
-                                               <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
-                                                <div class="action_button">
-                                                    <ul>
-                                                        <li>
-                                                            <a href="#" title="add to cart" onclick="event.preventDefault(); document.getElementById('add-to-cart-{{ $product->id }}').submit();">
-                                                                <i class="fa fa-shopping-basket" aria-hidden="true"></i>
-                                                            </a>
-                                                            <form id="add-to-cart-{{ $product->id }}" action="{{ route('cart.add') }}" method="POST" style="display: none;">
-                                                                @csrf
-                                                                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                                                <input type="hidden" name="quantity" value="1">
-                                                            </form>
-                                                        </li>
-                                                        <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                        <li><a href="#" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i></a></li>
-                                                    </ul>
-                                                </div>
-                                           </div>
-                                        </div>
-                                        <div class="quick_button">
-                                            <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick view</a>
-                                        </div>
-
-                                        <div class="double_base">
-                                            @if($product->price < $product->original_price)
-                                            <div class="product_sale">
-                                                <span>Sale</span>
-                                            </div>
-                                            @endif
-                                            @if($product->created_at->diffInDays(now()) < 7)
-                                            <div class="label_product">
-                                                <span>new</span>
-                                            </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="product_content grid_content">
-                                        <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
-                                        @include('frontend.partials.product-price', ['product' => $product])
-                                    </div>
-                                    
-                                    <div class="product_content list_content">
-                                        <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
-                                        <div class="product_ratting">
-                                            <ul>
-                                                @php $rating = $product->reviews->avg('rating') ?? 0; @endphp
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    <li><a href="#"><i class="fa {{ $i <= $rating ? 'fa-star' : 'fa-star-o' }}"></i></a></li>
-                                                @endfor
-                                            </ul>
-                                        </div>
-                                        <div class="product_price">
-                                            @include('frontend.partials.product-price', ['product' => $product])
-                                        </div>
-                                        <div class="product_desc">
-                                            <p>{{ $product->short_description }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                @include('frontend.partials.product-grid-item', [
+                                    'product' => $product,
+                                    'columnClass' => 'col-lg-4 col-md-4 col-12',
+                                    'contentClass' => 'grid_content',
+                                    'showListContent' => true
+                                ])
                             @empty
-                            <div class="col-12 text-center">
-                                <p>No products found.</p>
-                            </div>
+                                <div class="col-12 text-center">
+                                    <p>No products found.</p>
+                                </div>
                             @endforelse
                         </div>
 

@@ -22,6 +22,9 @@
                                     @csrf
                                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                                     <input type="hidden" name="quantity" value="1">
+                                    @if($product->variants->count() === 1)
+                                        <input type="hidden" name="variant_id" value="{{ $product->variants->first()->id }}">
+                                    @endif
                                 </form>
                             </li>
                             <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
@@ -50,6 +53,26 @@
             <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
             @include('frontend.partials.product-price', ['product' => $product])
         </div>
+        
+        @if(isset($showListContent) && $showListContent)
+        <div class="product_content list_content">
+            <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
+            <div class="product_ratting">
+                <ul>
+                    @php $rating = $product->reviews->avg('rating') ?? 0; @endphp
+                    @for($i = 1; $i <= 5; $i++)
+                        <li><a href="#"><i class="fa {{ $i <= $rating ? 'fa-star' : 'fa-star-o' }}"></i></a></li>
+                    @endfor
+                </ul>
+            </div>
+            <div class="product_price">
+                @include('frontend.partials.product-price', ['product' => $product])
+            </div>
+            <div class="product_desc">
+                <p>{{ $product->short_description }}</p>
+            </div>
+        </div>
+        @endif
     </div>
 @if(isset($columnClass) && $columnClass)
 </div>
