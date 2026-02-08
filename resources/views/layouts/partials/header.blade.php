@@ -102,12 +102,47 @@
             <div class="container-fluid">
                 <div class="middel_inner">
                     <div class="row align-items-center">
-                       <div class="col-lg-2 col-md-2">
+                       <div class="col-lg-2 col-md-3">
                             <div class="logo">
                                 <a href="{{ route('welcome') }}"><img src="{{ asset('frontend-assets/img/logo/logo.png') }}" alt=""></a>
                             </div>
                         </div>
-                        <div class="col-lg-10 col-md-10">
+                        
+                        <!-- Main Menu Column -->
+                        <div class="col-lg-5 col-md-9 d-none d-lg-block">
+                            <div class="main_menu"> 
+                                <nav>  
+                                    <ul>
+                                        <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">Home</a></li>
+                                        <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">Shop<i class="fa fa-angle-down"></i></a>
+                                            <ul class="mega_menu">
+                                                <li><a href="#">Product Categories</a>
+                                                    <ul>
+                                                        @foreach($categories as $category)
+                                                            <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                                        @endforeach
+                                                    </ul>
+                                                </li>
+                                                <li><a href="#">Other pages</a>
+                                                    <ul>
+                                                        <li><a href="{{ route('cart.index') }}">Cart</a></li>
+                                                        <li><a href="{{ route('checkout.index') }}">Checkout</a></li>
+                                                        <li><a href="{{ route('account.index') }}">Account</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="{{ route('news') }}">News</a></li>
+                                        <li><a href="{{ route('about') }}">About Us</a></li>
+                                        <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
+                                    </ul>   
+                                </nav> 
+                            </div>
+                        </div>
+                        
+                        <!-- Search/Account/Cart Column -->
+                        <div class="col-lg-5 col-md-9">
                             <div class="middel_right_info">
                                 <div class="search_bar">
                                     <form action="{{ route('shop') }}" method="GET">                          
@@ -160,8 +195,8 @@
                         </div>  
                     </div>
                 </div>
+            </div>
         </div>
-    </div>
         <!--header middel end-->
 
     </header>

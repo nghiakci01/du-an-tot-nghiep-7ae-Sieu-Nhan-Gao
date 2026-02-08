@@ -1,0 +1,42 @@
+/* Custom Header Layout Styles - Menu Next to Logo */
+
+/* Adjust menu spacing to fit next to logo */
+.header_middel .main_menu nav>ul>li {
+    margin: 0 8px;
+}
+
+.header_middel .main_menu nav>ul>li>a {
+    padding: 10px 6px;
+    font-size: 14px;
+}
+
+/* Ensure mega menu doesn't overflow */
+.header_middel .mega_menu {
+    left: 0;
+    min-width: 600px;
+}
+
+/* Adjust search bar width */
+.header_middel .search_bar {
+    max-width: 300px;
+    margin-bottom: 10px;
+}
+
+/* Mobile responsive - menu already hidden with d-none d-lg-block */
+@media only screen and (max-width: 991px) {
+    .header_middel .search_bar {
+        max-width: 100%;
+    }
+}
+
+/* Tablet adjustments - tighter spacing */
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+    .header_middel .main_menu nav>ul>li {
+        margin: 0 4px;
+    }
+
+    .header_middel .main_menu nav>ul>li>a {
+        padding: 10px 4px;
+        font-size: 13px;
+    }
+}
