@@ -23,20 +23,62 @@ class DashboardController extends Controller
         // 3. Đơn hàng mới (Pending)
         $newOrders = Order::where('status', 'PENDING')->count();
 
-        // 4. Tổng số khách hàng (User có role là user hoặc user thường)
-        // Giả sử toàn bộ trong bảng users là khách hàng trừ admin, hoặc đếm tất cả nếu chưa phân role kỹ
-        $totalCustomers = User::count();
+        // 4. Tổng số khách hàng
+        $totalCustomers = User::where('role', 'user')->count();
 
         // 5. Tổng số sản phẩm đang bán
         $totalProducts = Product::where('is_active', true)->count();
 
         // 6. Sản phẩm sắp hết hàng (Stock < 10)
-        // Cần join với variants để tính tổng stock
-        // Hoặc đơn giản là đếm variants sắp hết hàng
         $lowStockProducts = \App\Models\ProductVariant::where('stock_quantity', '<', 10)->count();
 
         // 7. Lấy 5 đơn hàng mới nhất
         $recentOrders = Order::with('user')->latest()->take(5)->get();
+
+        // --- NEW: Data for Charts ---
+
+        // 8. Doanh thu 30 ngày gần nhất
+        $revenueData = Order::where('status', 'COMPLETED')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('SUM(total_price) as total')
+            )
+            ->groupBy('date')
+            ->orderBy('date', 'asc') // Order by date ascending for the chart
+            ->get();
+
+        // Prepare data for ApexCharts (Labels and Series)
+        $revenueLabels = $revenueData->pluck('date')->map(function ($date) {
+            return \Carbon\Carbon::parse($date)->format('d/m');
+        })->toArray();
+        $revenueValues = $revenueData->pluck('total')->toArray();
+
+        // 9. Trạng thái đơn hàng (Pie/Donut Chart)
+        $orderStatusData = Order::select('status', DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
+
+        // Ensure all statuses are present for consistent coloring if needed, or just send keys/values
+        $statusLabels = array_keys($orderStatusData);
+        $statusValues = array_values($orderStatusData);
+
+        // 10. Top 5 Sản phẩm bán chạy
+        $topProducts = DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'products.id', '=', 'order_items.product_id')
+            ->where('orders.status', 'COMPLETED')
+            ->select(
+                'products.name',
+                'products.price', // Or aggregate sum(order_items.price) if price changes
+                'products.image',
+                DB::raw('SUM(order_items.quantity) as total_sold')
+            )
+            ->groupBy('products.id', 'products.name', 'products.price', 'products.image')
+            ->orderByDesc('total_sold')
+            ->limit(5)
+            ->get();
 
         return view('admin.dashboard', compact(
             'totalRevenue',
@@ -45,7 +87,12 @@ class DashboardController extends Controller
             'totalCustomers',
             'totalProducts',
             'lowStockProducts',
-            'recentOrders'
+            'recentOrders',
+            'revenueLabels',
+            'revenueValues',
+            'statusLabels',
+            'statusValues',
+            'topProducts'
         ));
     }
 }

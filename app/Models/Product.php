@@ -51,6 +51,11 @@ class Product extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function wishlistedBy()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
     /**
      * Accessor for original_price (maps to price field)
      * Used for view compatibility

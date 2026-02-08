@@ -69,7 +69,7 @@
                        <!--sidebar widget start-->
                         <div class="sidebar_widget">
                             <div class="widget_list widget_filter">
-                                <h2>Filter by price</h2>
+                                <h2>{{ __('messages.filter_by_price') }}</h2>
                                 <form action="{{ route('shop') }}" method="GET"> 
                                     @if(request('sort'))
                                         <input type="hidden" name="sort" value="{{ request('sort') }}">
@@ -78,16 +78,16 @@
                                     <input type="hidden" name="max_price" id="max_price" value="{{ request('max_price', 5000000) }}">
 
                                     <div id="slider-range"></div>   
-                                    <button type="submit">Filter</button>
+                                    <button type="submit">{{ __('messages.filter') }}</button>
                                     <input type="text" name="text" id="amount" readonly style="border:0; color:#f6931d; font-weight:bold; width: 100%; margin-top: 10px;" />   
                                 </form> 
                             </div>
                             <div class="widget_list widget_categories">
-                                <h2>Product categories</h2>
+                                <h2>{{ __('messages.product_categories') }}</h2>
                                 <ul>
                                     <li>
                                         <a href="{{ route('shop') }}" class="{{ !request('category') ? 'active' : '' }}">
-                                            All Products <span>{{ $totalActiveProducts }}</span>
+                                            {{ __('messages.all_products') }} <span>{{ $totalActiveProducts }}</span>
                                         </a>
                                     </li>
                                     @foreach($categories as $category)
@@ -106,7 +106,7 @@
                         <!--shop wrapper start-->
                         <!--shop toolbar start-->
                         <div class="shop_title">
-                            <h1>shop</h1>
+                            <h1>{{ __('messages.shop') }}</h1>
                         </div>
                         <div class="shop_toolbar_wrapper">
                             <div class="shop_toolbar_btn">
@@ -117,17 +117,17 @@
                             <div class="niceselect_option">
                                 <form class="select_option" action="{{ route('shop') }}" method="GET">
                                     <select name="sort" id="short" onchange="this.form.submit()">
-                                        <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Sort by latest</option>
-                                        <option value="popularity" {{ request('sort') == 'popularity' ? 'selected' : '' }}>Sort by popularity</option>
-                                        <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Sort by average rating</option>
-                                        <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Sort by price: low to high</option>
-                                        <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Sort by price: high to low</option>
-                                        <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Product Name: A-Z</option>
+                                        <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>{{ __('messages.sort_by_latest') }}</option>
+                                        <option value="popularity" {{ request('sort') == 'popularity' ? 'selected' : '' }}>{{ __('messages.sort_by_popularity') }}</option>
+                                        <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>{{ __('messages.sort_by_rating') }}</option>
+                                        <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>{{ __('messages.sort_by_price_asc') }}</option>
+                                        <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>{{ __('messages.sort_by_price_desc') }}</option>
+                                        <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>{{ __('messages.product_name_az') }}</option>
                                     </select>
                                 </form>
                             </div>
                             <div class="page_amount">
-                                <p>Showing {{ $products->firstItem() ?? 0 }}–{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p>
+                                <p>{{ __('messages.showing_results', ['first' => $products->firstItem() ?? 0, 'last' => $products->lastItem() ?? 0, 'total' => $products->total()]) }}</p>
                             </div>
                         </div>
                         <!--shop toolbar end-->
@@ -149,7 +149,7 @@
                                                 <div class="action_button">
                                                     <ul>
                                                         <li>
-                                                            <a href="#" title="add to cart" onclick="event.preventDefault(); document.getElementById('add-to-cart-{{ $product->id }}').submit();">
+                                                            <a href="#" title="{{ __('messages.add_to_cart') }}" onclick="event.preventDefault(); document.getElementById('add-to-cart-{{ $product->id }}').submit();">
                                                                 <i class="fa fa-shopping-basket" aria-hidden="true"></i>
                                                             </a>
                                                             <form id="add-to-cart-{{ $product->id }}" action="{{ route('cart.add') }}" method="POST" style="display: none;">
@@ -158,25 +158,25 @@
                                                                 <input type="hidden" name="quantity" value="1">
                                                             </form>
                                                         </li>
-                                                        <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                                        <li><a href="#" title="{{ __('messages.add_to_wishlist') }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
                                                         <li><a href="#" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i></a></li>
                                                     </ul>
                                                 </div>
                                            </div>
                                         </div>
                                         <div class="quick_button">
-                                            <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick view</a>
+                                            <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ {{ __('messages.quick_view') }}</a>
                                         </div>
 
                                         <div class="double_base">
                                             @if($product->price < $product->original_price)
                                             <div class="product_sale">
-                                                <span>Sale</span>
+                                                <span>{{ __('messages.sale') }}</span>
                                             </div>
                                             @endif
                                             @if($product->created_at->diffInDays(now()) < 7)
                                             <div class="label_product">
-                                                <span>new</span>
+                                                <span>{{ __('messages.new') }}</span>
                                             </div>
                                             @endif
                                         </div>
@@ -209,7 +209,7 @@
                             </div>
                             @empty
                             <div class="col-12 text-center">
-                                <p>No products found.</p>
+                                <p>{{ __('messages.no_products_found') }}</p>
                             </div>
                             @endforelse
                         </div>

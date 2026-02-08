@@ -97,19 +97,15 @@
             </div>
             <div class="collapse pc-user-links" id="pc_sidebar_userlink">
               <div class="pt-3">
-                  <a href="{{ route('admin.profile.index') }}"
-                    ><i class="ti ti-user"></i>
-                    <span data-i18n="My Account">My Account</span> </a
-                  ><a href="{{ route('admin.settings.index') }}"
-                    ><i class="ti ti-settings"></i>
-                    <span data-i18n="Settings">Settings</span> </a
-                  ><a href="{{ route('admin.lock') }}"
-                    ><i class="ti ti-lock"></i>
-                    <span data-i18n="Lock Screen">Lock Screen</span> </a
-                  ><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                    ><i class="ti ti-power"></i>
-                    <span data-i18n="Logout">Logout</span></a
-                  >
+                <a href="{{ route('admin.profile.index') }}"><i class="ti ti-user"></i>
+                  <span data-i18n="My Account">My Account</span> </a><a href="{{ route('admin.settings.index') }}"><i
+                    class="ti ti-settings"></i>
+                  <span data-i18n="Settings">Settings</span> </a><a href="{{ route('admin.lock') }}"><i
+                    class="ti ti-lock"></i>
+                  <span data-i18n="Lock Screen">Lock Screen</span> </a><a href="{{ route('logout') }}"
+                  onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
+                    class="ti ti-power"></i>
+                  <span data-i18n="Logout">Logout</span></a>
               </div>
             </div>
           </div>
@@ -167,6 +163,14 @@
                   <i class="ti ti-box"></i>
                 </span>
                 <span class="pc-mtext">Sản phẩm</span>
+              </a>
+            </li>
+            <li class="pc-item">
+              <a href="{{ route('admin.banners.index') }}" class="pc-link">
+                <span class="pc-micon">
+                  <i class="ti ti-photo"></i>
+                </span>
+                <span class="pc-mtext">Quản lý Banner</span>
               </a>
             </li>
             <li class="pc-item pc-hasmenu">
@@ -1790,7 +1794,7 @@
     crossorigin="anonymous"></script> --}}
   @yield('scripts')
   <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-      @csrf
+    @csrf
   </form>
 </body>
 <!-- [Body] end -->

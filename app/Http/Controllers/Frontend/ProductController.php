@@ -16,8 +16,17 @@ class ProductController extends Controller
         // Filter by Category
         if ($request->has('category')) {
             $slug = $request->category;
-            $query->whereHas('category', function($q) use ($slug) {
+            $query->whereHas('category', function ($q) use ($slug) {
                 $q->where('slug', $slug);
+            });
+        }
+
+        // Filter by Search Keyword
+        if ($request->has('search')) {
+            $keyword = $request->search;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'like', '%' . $keyword . '%')
+                    ->orWhere('description', 'like', '%' . $keyword . '%');
             });
         }
 
@@ -25,9 +34,9 @@ class ProductController extends Controller
         if ($request->has('min_price') && $request->has('max_price')) {
             $min = $request->min_price;
             $max = $request->max_price;
-            
+
             // Check if product has ANY variant within the price range
-            $query->whereHas('variants', function($q) use ($min, $max) {
+            $query->whereHas('variants', function ($q) use ($min, $max) {
                 $q->whereBetween('price', [$min, $max]);
             });
         }
@@ -41,6 +50,12 @@ class ProductController extends Controller
                 case 'price_desc':
                     $query->orderBy('price', 'desc');
                     break;
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('name', 'desc');
+                    break;
                 case 'latest':
                 default:
                     $query->latest();
@@ -51,7 +66,7 @@ class ProductController extends Controller
         }
 
         $products = $query->paginate(12);
-        
+
         // Convert pagination query params
         $products->appends($request->all());
 
@@ -65,17 +80,17 @@ class ProductController extends Controller
     public function show($slug)
     {
         $product = Product::where('slug', $slug)
-                          ->where('is_active', true)
-                          ->with(['category', 'variants.sizeRelationship', 'variants.colorRelationship', 'images', 'reviews.user'])
-                          ->firstOrFail();
+            ->where('is_active', true)
+            ->with(['category', 'variants.sizeRelationship', 'variants.colorRelationship', 'images', 'reviews.user'])
+            ->firstOrFail();
 
 
         // Get related products (same category, excluding current)
         $relatedProducts = Product::where('category_id', $product->category_id)
-                                  ->where('id', '!=', $product->id)
-                                  ->where('is_active', true)
-                                  ->take(4)
-                                  ->get();
+            ->where('id', '!=', $product->id)
+            ->where('is_active', true)
+            ->take(4)
+            ->get();
 
         return view('frontend.products.show', compact('product', 'relatedProducts'));
     }
