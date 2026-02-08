@@ -95,6 +95,55 @@
         overflow: hidden;
     }
 
+    /* Fix banner height to match slider (Home 6) */
+    @media (min-width: 992px) {
+        .banner_slider_section {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Base height for > 1600px */
+        .banner_slider_section > .row {
+            height: 747px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: space-between;
+        }
+
+        /* Responsive heights matching style.css slider heights */
+        @media (min-width: 1200px) and (max-width: 1600px) {
+            .banner_slider_section > .row { height: 511px; }
+        }
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .banner_slider_section > .row { height: 511px; }
+        }
+        
+        .banner_slider_section .col-12 {
+            height: calc(50% - 15px);
+        }
+        
+        .banner_slider_section .col-12 .banner_top {
+            height: 100% !important;
+            margin-bottom: 0 !important;
+        }
+
+        .banner_slider_section .col-lg-6 {
+            height: calc(50% - 15px);
+        }
+        
+        .banner_slider_section .banner_area {
+            height: 100%;
+        }
+
+        .banner_slider_section .banner_thumb,
+        .banner_slider_section .banner_thumb a,
+        .banner_slider_section .banner_thumb a img {
+            height: 100% !important;
+            width: 100% !important;
+            object-fit: cover !important;
+        }
+    }
+
 </style>
     <!--slider area start-->
     <div class="slider_section slider_section_six">
