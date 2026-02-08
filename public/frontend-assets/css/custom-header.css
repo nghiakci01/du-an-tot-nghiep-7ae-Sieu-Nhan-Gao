@@ -1,0 +1,138 @@
+/* ===== Original Theme Header Styles ===== */
+
+/* Header Middle - Logo + Menu Inline */
+.header_middel .middel_inner {
+    padding: 20px 0;
+}
+
+/* Logo + Menu inline container */
+.header_middel .header_left {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+}
+
+.header_middel .header_left .logo {
+    flex-shrink: 0;
+}
+
+.header_middel .header_left .main_menu {
+    flex-grow: 1;
+}
+
+/* Menu items compact spacing */
+.header_middel .header_left .main_menu nav>ul {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.header_middel .header_left .main_menu nav>ul>li {
+    margin: 0;
+}
+
+.header_middel .header_left .main_menu nav>ul>li>a {
+    padding: 10px 8px;
+    font-size: 15px;
+    font-weight: 400;
+    color: #2c2c2c;
+    text-transform: capitalize;
+}
+
+.header_middel .header_left .main_menu nav>ul>li>a:hover {
+    color: #ff6a00;
+}
+
+/* Horizontal Menu Styles */
+.horizontal_menu_six {
+    background: #f7f7f7;
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.horizontal_menu_six .main_menu nav>ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.horizontal_menu_six .main_menu nav>ul>li {
+    margin: 0 20px;
+}
+
+.horizontal_menu_six .main_menu nav>ul>li>a {
+    padding: 15px 0;
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+/* Hide horizontal menu on mobile */
+@media only screen and (max-width: 991px) {
+    .horizontal_menu_six {
+        display: none;
+    }
+}
+
+/* ===== Sticky Header Styles ===== */
+.sticky-header {
+    position: fixed;
+    top: -100px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 999;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: top 0.3s ease-in-out;
+}
+
+.sticky-header.sticky {
+    top: 0;
+}
+
+/* Sticky header menu - full width centered */
+.sticky-header .main_menu_inner {
+    padding: 15px 0;
+}
+
+.sticky-header .main_menu nav>ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sticky-header .main_menu nav>ul>li {
+    margin: 0 20px;
+}
+
+.sticky-header .main_menu nav>ul>li>a {
+    padding: 10px 0;
+    font-size: 15px;
+    font-weight: 400;
+    color: #2c2c2c;
+    text-transform: capitalize;
+}
+
+.sticky-header .main_menu nav>ul>li>a:hover {
+    color: #ff6a00;
+}
+
+/* Hide sticky header on mobile */
+@media only screen and (max-width: 991px) {
+    .sticky-header {
+        display: none;
+    }
+}
+
+/* Tablet adjustments */
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+    .sticky-header .main_menu nav>ul>li {
+        margin: 0 10px;
+    }
+
+    .sticky-header .main_menu nav>ul>li>a {
+        font-size: 14px;
+    }
+}

@@ -22,6 +22,9 @@
     
     <!-- Main Style CSS -->
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/style.css') }}">
+    
+    <!-- Custom Header CSS -->
+    <link rel="stylesheet" href="{{ asset('frontend-assets/css/custom-header.css') }}">
 
 </head>
 

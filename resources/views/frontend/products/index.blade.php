@@ -3,6 +3,45 @@
 @section('title', 'Shop | FashionStore')
 
 @section('content')
+<style>
+    /* Fix image ratio and layout breaking on hover for Shop page */
+    .single_product .product_thumb {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        overflow: hidden;
+        background: #f5f5f5;
+    }
+
+    .single_product .product_thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    /* Ensure secondary image also fills correctly */
+    .single_product .product_thumb a.secondary_img {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Fix alignment for titles and prices in grid view */
+    .product_content.grid_content {
+        padding-top: 10px;
+        text-align: left;
+    }
+
+    .product_content.grid_content h3 {
+        margin-bottom: 5px;
+        font-size: 14px;
+        line-height: 1.2;
+        height: 2.4em; /* Max 2 lines height for alignment */
+        overflow: hidden;
+    }
+</style>
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area">
         <div class="container">   
@@ -145,17 +184,7 @@
                                     
                                     <div class="product_content grid_content">
                                         <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
-                                        <span class="current_price">
-                                            @if($product->variants->count() > 0)
-                                                @if($product->variants->min('price') == $product->variants->max('price'))
-                                                    {{ number_format($product->variants->min('price')) }} đ
-                                                @else
-                                                    {{ number_format($product->variants->min('price')) }} - {{ number_format($product->variants->max('price')) }} đ
-                                                @endif
-                                            @else
-                                                {{ number_format($product->price) }} đ
-                                            @endif
-                                        </span>
+                                        @include('frontend.partials.product-price', ['product' => $product])
                                     </div>
                                     
                                     <div class="product_content list_content">
@@ -169,17 +198,7 @@
                                             </ul>
                                         </div>
                                         <div class="product_price">
-                                            <span class="current_price">
-                                                @if($product->variants->count() > 0)
-                                                    @if($product->variants->min('price') == $product->variants->max('price'))
-                                                        {{ number_format($product->variants->min('price')) }} đ
-                                                    @else
-                                                        {{ number_format($product->variants->min('price')) }} - {{ number_format($product->variants->max('price')) }} đ
-                                                    @endif
-                                                @else
-                                                    {{ number_format($product->price) }} đ
-                                                @endif
-                                            </span>
+                                            @include('frontend.partials.product-price', ['product' => $product])
                                         </div>
                                         <div class="product_desc">
                                             <p>{{ $product->short_description }}</p>

@@ -50,4 +50,13 @@ class Product extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    /**
+     * Accessor for original_price (maps to price field)
+     * Used for view compatibility
+     */
+    public function getOriginalPriceAttribute()
+    {
+        return $this->price;
+    }
 }

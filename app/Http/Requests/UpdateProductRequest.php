@@ -19,9 +19,62 @@ class UpdateProductRequest extends FormRequest
             'price' => 'nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0|lt:price',
             'description' => 'nullable|string|max:500',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240|dimensions:min_width=400,min_height=400',
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048',
+                function ($attribute, $value, $fail) {
+                    if ($value instanceof \Illuminate\Http\UploadedFile && $value->isValid()) {
+                        $path = $value->getRealPath();
+                        if (empty($path)) return;
+
+                        $dimensions = @getimagesize($path);
+                        if (!$dimensions) {
+                            $fail("Không thể đọc định dạng hình ảnh chính.");
+                            return;
+                        }
+
+                        [$width, $height] = $dimensions;
+                        if ($width < 500 || $height < 600) {
+                            $fail("Hình ảnh chính phải có kích thước tối thiểu 500x600px.");
+                        }
+
+                        $ratio = round($width / $height, 2);
+                        if ($ratio != 0.8 && $ratio != 1.0) {
+                            $fail("Hình ảnh chính phải có tỷ lệ 4:5 hoặc 1:1.");
+                        }
+                    }
+                }
+            ],
             'gallery_images' => 'nullable|array|max:6',
-            'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240|dimensions:min_width=400,min_height=400',
+            'gallery_images.*' => [
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048',
+                function ($attribute, $value, $fail) {
+                    if ($value instanceof \Illuminate\Http\UploadedFile && $value->isValid()) {
+                        $path = $value->getRealPath();
+                        if (empty($path)) return;
+
+                        $dimensions = @getimagesize($path);
+                        if (!$dimensions) {
+                            $fail("Không thể đọc định dạng hình ảnh gallery.");
+                            return;
+                        }
+
+                        [$width, $height] = $dimensions;
+                        if ($width < 500 || $height < 600) {
+                            $fail("Hình ảnh gallery phải có kích thước tối thiểu 500x600px.");
+                        }
+
+                        $ratio = round($width / $height, 2);
+                        if ($ratio != 0.8 && $ratio != 1.0) {
+                            $fail("Hình ảnh gallery phải có tỷ lệ 4:5 hoặc 1:1.");
+                        }
+                    }
+                }
+            ],
             'is_active' => 'boolean',
 
             // Variants validation

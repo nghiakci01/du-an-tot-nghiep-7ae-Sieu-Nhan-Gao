@@ -72,6 +72,20 @@
                         <div id="gallery-preview" class="mt-3 d-flex gap-2 flex-wrap"></div>
                     </div>
                     <div class="col-md-12 mb-3">
+                        <label for="short_description" class="form-label">Mô tả ngắn <small class="text-muted">(Tối đa 1000 ký tự)</small></label>
+                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="short_description" name="short_description" rows="4" maxlength="1000">{{ old('short_description') }}</textarea>
+                        <div class="d-flex justify-content-between mt-1">
+                            <div>
+                                @error('short_description')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <small class="text-muted">
+                                <span id="short-char-count">0</span> / 1000 ký tự
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
                         <label for="description" class="form-label">Mô tả <small class="text-muted">(Tối đa 500 ký tự)</small></label>
                         <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="500">{{ old('description') }}</textarea>
                         <div class="d-flex justify-content-between mt-1">

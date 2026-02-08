@@ -40,12 +40,19 @@ class CartController extends Controller
         if(isset($cart[$variant->id])) {
             $cart[$variant->id]['quantity'] += $request->quantity;
         } else {
+            // Determine price: Use variant's sale_price if it exists and is less than price, else use variant price
+            // Fallback to product price if variant price is null
+            $itemPrice = $variant->price ?? $product->price;
+            if ($variant->sale_price && $variant->sale_price < ($variant->price ?? PHP_INT_MAX)) {
+                $itemPrice = $variant->sale_price;
+            }
+
             $cart[$variant->id] = [
                 "product_id" => $product->id,
                 "variant_id" => $variant->id,
                 "name" => $product->name,
                 "quantity" => $request->quantity,
-                "price" => $product->price,
+                "price" => $itemPrice,
                 "image" => $product->image,
                 "size" => $variant->size,
                 "color" => $variant->color,
