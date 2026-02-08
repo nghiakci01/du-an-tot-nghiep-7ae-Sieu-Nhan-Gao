@@ -139,6 +139,9 @@ Route::get('/test-gemini', function () {
 });
 
 // Quick Test Route
-Route::get('/quick-test', function () {
-    return view('quick-test');
-});
+Route::get('lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'vi'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('lang.switch');
