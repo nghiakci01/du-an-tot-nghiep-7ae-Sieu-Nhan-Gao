@@ -33,6 +33,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/my-account/update', [App\Http\Controllers\Frontend\AccountController::class, 'updateDetails'])->name('account.update');
     Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'viewOrder'])->name('account.orders.show');
     Route::post('/my-account/orders/{id}/cancel', [App\Http\Controllers\Frontend\AccountController::class, 'cancelOrder'])->name('account.orders.cancel');
+
+    // Wishlist Routes
+    Route::get('/wishlist', [App\Http\Controllers\Frontend\WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/add', [App\Http\Controllers\Frontend\WishlistController::class, 'store'])->name('wishlist.add');
+    Route::delete('/wishlist/{id}', [App\Http\Controllers\Frontend\WishlistController::class, 'destroy'])->name('wishlist.destroy');
 });
 
 // Public Chatbot Route (Moved from API to Web to access Session)
@@ -72,6 +77,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             // Product Attributes
             Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
             Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
+            Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
         });
 
         // Admin & Staff Routes (Stock only)
@@ -133,6 +139,9 @@ Route::get('/test-gemini', function () {
 });
 
 // Quick Test Route
-Route::get('/quick-test', function () {
-    return view('quick-test');
-});
+Route::get('lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'vi'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('lang.switch');

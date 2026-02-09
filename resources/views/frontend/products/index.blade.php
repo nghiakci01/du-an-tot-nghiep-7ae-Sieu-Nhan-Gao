@@ -69,7 +69,7 @@
                        <!--sidebar widget start-->
                         <div class="sidebar_widget">
                             <div class="widget_list widget_filter">
-                                <h2>Filter by price</h2>
+                                <h2>{{ __('messages.filter_by_price') }}</h2>
                                 <form action="{{ route('shop') }}" method="GET"> 
                                     @if(request('sort'))
                                         <input type="hidden" name="sort" value="{{ request('sort') }}">
@@ -78,16 +78,16 @@
                                     <input type="hidden" name="max_price" id="max_price" value="{{ request('max_price', 5000000) }}">
 
                                     <div id="slider-range"></div>   
-                                    <button type="submit">Filter</button>
+                                    <button type="submit">{{ __('messages.filter') }}</button>
                                     <input type="text" name="text" id="amount" readonly style="border:0; color:#f6931d; font-weight:bold; width: 100%; margin-top: 10px;" />   
                                 </form> 
                             </div>
                             <div class="widget_list widget_categories">
-                                <h2>Product categories</h2>
+                                <h2>{{ __('messages.product_categories') }}</h2>
                                 <ul>
                                     <li>
                                         <a href="{{ route('shop') }}" class="{{ !request('category') ? 'active' : '' }}">
-                                            All Products <span>{{ $totalActiveProducts }}</span>
+                                            {{ __('messages.all_products') }} <span>{{ $totalActiveProducts }}</span>
                                         </a>
                                     </li>
                                     @foreach($categories as $category)
@@ -134,7 +134,7 @@
                         <!--shop wrapper start-->
                         <!--shop toolbar start-->
                         <div class="shop_title">
-                            <h1>shop</h1>
+                            <h1>{{ __('messages.shop') }}</h1>
                         </div>
                         <div class="shop_toolbar_wrapper">
                             <div class="shop_toolbar_btn">
@@ -146,17 +146,17 @@
                             <div class="niceselect_option">
                                 <form class="select_option" action="{{ route('shop') }}" method="GET">
                                     <select name="sort" id="short" onchange="this.form.submit()">
-                                        <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Sort by latest</option>
-                                        <option value="popularity" {{ request('sort') == 'popularity' ? 'selected' : '' }}>Sort by popularity</option>
-                                        <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Sort by average rating</option>
-                                        <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Sort by price: low to high</option>
-                                        <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Sort by price: high to low</option>
-                                        <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Product Name: A-Z</option>
+                                        <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>{{ __('messages.sort_by_latest') }}</option>
+                                        <option value="popularity" {{ request('sort') == 'popularity' ? 'selected' : '' }}>{{ __('messages.sort_by_popularity') }}</option>
+                                        <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>{{ __('messages.sort_by_rating') }}</option>
+                                        <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>{{ __('messages.sort_by_price_asc') }}</option>
+                                        <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>{{ __('messages.sort_by_price_desc') }}</option>
+                                        <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>{{ __('messages.product_name_az') }}</option>
                                     </select>
                                 </form>
                             </div>
                             <div class="page_amount">
-                                <p>Showing {{ $products->firstItem() ?? 0 }}–{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p>
+                                <p>{{ __('messages.showing_results', ['first' => $products->firstItem() ?? 0, 'last' => $products->lastItem() ?? 0, 'total' => $products->total()]) }}</p>
                             </div>
                         </div>
                         <!--shop toolbar end-->
