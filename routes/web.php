@@ -11,10 +11,14 @@ Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class,
 Route::get('/about', [App\Http\Controllers\Frontend\HomeController::class, 'about'])->name('about');
 Route::get('/news', [App\Http\Controllers\Frontend\HomeController::class, 'news'])->name('news');
 
+// Search Routes
+Route::get('/search', [App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('search.index');
+Route::get('/search/suggestions', [App\Http\Controllers\Frontend\SearchController::class, 'suggestions'])->name('search.suggestions');
+
 Route::get('/cart', [App\Http\Controllers\Frontend\CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [App\Http\Controllers\Frontend\CartController::class, 'addToCart'])->name('cart.add');
 Route::patch('/cart/update', [App\Http\Controllers\Frontend\CartController::class, 'updateCart'])->name('cart.update');
-Route::delete('/cart/remove', [App\Http\Controllers\Frontend\CartController::class, 'remove'])->name('cart.remove');
+Route::match(['get', 'post', 'delete'], '/cart/remove', [App\Http\Controllers\Frontend\CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/clear', [App\Http\Controllers\Frontend\CartController::class, 'clearCart'])->name('cart.clear');
 Route::get('/cart/count', [App\Http\Controllers\Frontend\CartController::class, 'getCartCount'])->name('cart.count');
 

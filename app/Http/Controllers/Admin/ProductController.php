@@ -34,17 +34,37 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->except('variants');
+            $data = $request->except(['variants', 'image']);
             if (empty($data['price'])) {
                 $data['price'] = 0;
             }
             $data['slug'] = Str::slug($data['name']) . '-' . uniqid(); // Ensure unique slug
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
             $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
+            $data['image'] = null; // Default to null
 
+            // Handle main product image
             if ($request->hasFile('image')) {
-                $path = $request->file('image')->store('products', 'public');
-                $data['image'] = $path;
+                $file = $request->file('image');
+                $path = $file->getRealPath() ?: $file->getPathname();
+                if ($file->isValid() && !empty($path)) {
+                    try {
+                        $filename = $file->hashName();
+                        $stream = fopen($path, 'r');
+                        $storedPath = Storage::disk('public')->put('products/' . $filename, $stream);
+                        if (is_resource($stream)) {
+                            fclose($stream);
+                        }
+                        
+                        if ($storedPath) {
+                            $data['image'] = 'products/' . $filename;
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Image upload failed: ' . $e->getMessage());
+                    }
+                } else {
+                    \Log::warning('Main image upload attempted but file is invalid or path is empty: ' . $file->getClientOriginalName());
+                }
             }
 
             $product = Product::create($data);
@@ -79,11 +99,28 @@ class ProductController extends Controller
             // Handle gallery images
             if ($request->hasFile('gallery_images')) {
                 foreach ($request->file('gallery_images') as $index => $image) {
-                    $path = $image->store('products/gallery', 'public');
-                    $product->images()->create([
-                        'image_path' => $path,
-                        'sort_order' => $index
-                    ]);
+                    $path = $image->getRealPath() ?: $image->getPathname();
+                    if ($image->isValid() && !empty($path)) {
+                        try {
+                            $filename = $image->hashName();
+                            $stream = fopen($path, 'r');
+                            $storedPath = Storage::disk('public')->put('products/gallery/' . $filename, $stream);
+                            if (is_resource($stream)) {
+                                fclose($stream);
+                            }
+
+                            if ($storedPath) {
+                                $product->images()->create([
+                                    'image_path' => 'products/gallery/' . $filename,
+                                    'sort_order' => $index
+                                ]);
+                            }
+                        } catch (\Exception $e) {
+                            \Log::error('Gallery image upload failed: ' . $e->getMessage());
+                        }
+                    } else {
+                        \Log::warning('Gallery image upload attempted but file is invalid or path is empty: ' . $image->getClientOriginalName());
+                    }
                 }
             }
 
@@ -117,7 +154,7 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->except('variants');
+            $data = $request->except(['variants', 'image']);
             if (empty($data['price'])) {
                 $data['price'] = 0;
             }
@@ -125,12 +162,33 @@ class ProductController extends Controller
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
             $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
+            // Handle main product image
             if ($request->hasFile('image')) {
-                if ($product->image) {
-                    Storage::disk('public')->delete($product->image);
+                $file = $request->file('image');
+                $path = $file->getRealPath() ?: $file->getPathname();
+                if ($file->isValid() && !empty($path)) {
+                    try {
+                        // Delete old image
+                        if ($product->image) {
+                            Storage::disk('public')->delete($product->image);
+                        }
+                        
+                        $filename = $file->hashName();
+                        $stream = fopen($path, 'r');
+                        $storedPath = Storage::disk('public')->put('products/' . $filename, $stream);
+                        if (is_resource($stream)) {
+                            fclose($stream);
+                        }
+
+                        if ($storedPath) {
+                            $data['image'] = 'products/' . $filename;
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Image update failed: ' . $e->getMessage());
+                    }
+                } else {
+                    \Log::warning('Main image update attempted but file is invalid or path is empty: ' . $file->getClientOriginalName());
                 }
-                $path = $request->file('image')->store('products', 'public');
-                $data['image'] = $path;
             }
 
             $product->update($data);
@@ -183,11 +241,28 @@ class ProductController extends Controller
                 
                 if ($currentCount + $newCount <= 6) {
                     foreach ($request->file('gallery_images') as $index => $image) {
-                        $path = $image->store('products/gallery', 'public');
-                        $product->images()->create([
-                            'image_path' => $path,
-                            'sort_order' => $currentCount + $index
-                        ]);
+                        $path = $image->getRealPath() ?: $image->getPathname();
+                        if ($image->isValid() && !empty($path)) {
+                            try {
+                                $filename = $image->hashName();
+                                $stream = fopen($path, 'r');
+                                $storedPath = Storage::disk('public')->put('products/gallery/' . $filename, $stream);
+                                if (is_resource($stream)) {
+                                    fclose($stream);
+                                }
+
+                                if ($storedPath) {
+                                    $product->images()->create([
+                                        'image_path' => 'products/gallery/' . $filename,
+                                        'sort_order' => $currentCount + $index
+                                    ]);
+                                }
+                            } catch (\Exception $e) {
+                                \Log::error('Gallery image update failed: ' . $e->getMessage());
+                            }
+                        } else {
+                             \Log::warning('Gallery image update attempted but file is invalid or path is empty: ' . $image->getClientOriginalName());
+                        }
                     }
                 }
             }

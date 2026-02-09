@@ -26,7 +26,7 @@ class UpdateProductRequest extends FormRequest
                 'max:2048',
                 function ($attribute, $value, $fail) {
                     if ($value instanceof \Illuminate\Http\UploadedFile && $value->isValid()) {
-                        $path = $value->getRealPath();
+                        $path = $value->getRealPath() ?: $value->getPathname();
                         if (empty($path)) return;
 
                         $dimensions = @getimagesize($path);
@@ -54,7 +54,7 @@ class UpdateProductRequest extends FormRequest
                 'max:2048',
                 function ($attribute, $value, $fail) {
                     if ($value instanceof \Illuminate\Http\UploadedFile && $value->isValid()) {
-                        $path = $value->getRealPath();
+                        $path = $value->getRealPath() ?: $value->getPathname();
                         if (empty($path)) return;
 
                         $dimensions = @getimagesize($path);

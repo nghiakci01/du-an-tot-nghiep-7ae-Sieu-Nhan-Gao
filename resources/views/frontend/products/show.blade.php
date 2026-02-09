@@ -93,7 +93,7 @@
                                 @endphp
 
                                 <div class="product_variant size">
-                                    <h3>Size</h3>
+                                    <h3>Kích thước</h3>
                                     <select class="niceselect_option" id="select_size_nice" name="size_id">
                                         <option selected value="">Size</option>
                                         @foreach($uniqueSizes as $size)
@@ -150,6 +150,13 @@
                                         function checkSelection() {
                                             const selectedSize = sizeInput.value;
                                             const selectedColor = colorInput.value;
+                                            
+                                            // Reset variant input if either is missing
+                                            if (!selectedSize || !selectedColor) {
+                                                variantInput.value = '';
+                                                addToCartBtn.disabled = true;
+                                                buyNowBtn.disabled = true;
+                                            }
 
                                             let filteredVariants = variants;
                                             if (selectedSize) {
@@ -167,11 +174,11 @@
 
                                                     if (matchedVariant.sale_price && matchedVariant.sale_price > 0 && matchedVariant.sale_price < matchedVariant.price) {
                                                         html = `<span class="current_price">
-                                                                            <span class="old_price" style="text-decoration: line-through; color: #999; margin-right: 10px;">${formatCurrency(matchedVariant.price)}</span>
-                                                                            ${formatCurrency(matchedVariant.sale_price)}
-                                                                        </span>`;
+                                                                    <span class="old_price" style="text-decoration: line-through; color: #999; margin-right: 15px;">${formatCurrency(matchedVariant.price)}</span>
+                                                                    <span style="color: #ef233c; font-weight: bold;">${formatCurrency(matchedVariant.sale_price)}</span>
+                                                                </span>`;
                                                     } else {
-                                                        html = `<span class="current_price">${formatCurrency(matchedVariant.price)}</span>`;
+                                                        html = `<span class="current_price" style="font-weight: bold;">${formatCurrency(matchedVariant.price)}</span>`;
                                                     }
 
                                                     if (matchedVariant.stock_quantity > 0) {
@@ -179,29 +186,32 @@
                                                         msg.style.display = 'none';
                                                         addToCartBtn.disabled = false;
                                                         buyNowBtn.disabled = false;
-                                                        addToCartBtn.textContent = 'Thêm vào giỏ hàng';
+                                                        addToCartBtn.textContent = 'THÊM VÀO GIỎ HÀNG';
                                                     } else {
                                                         variantInput.value = '';
                                                         msg.textContent = 'Sản phẩm tạm hết hàng mẫu này';
                                                         msg.style.display = 'block';
                                                         addToCartBtn.disabled = true;
                                                         buyNowBtn.disabled = true;
-                                                        addToCartBtn.textContent = 'Hết hàng';
+                                                        addToCartBtn.textContent = 'HẾT HÀNG';
                                                     }
                                                 } else {
-                                                    const minPrice = Math.min(...filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0));
-                                                    const maxPrice = Math.max(...filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0));
-
+                                                    // Only one or none selected
+                                                    const activePrices = filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0);
+                                                    const minPrice = Math.min(...activePrices);
+                                                    const maxPrice = Math.max(...activePrices);
+                                                    
                                                     if (minPrice === maxPrice) {
                                                         html = `<span class="current_price">${formatCurrency(minPrice)}</span>`;
                                                     } else {
                                                         html = `<span class="current_price">${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}</span>`;
                                                     }
-
+                                                    
+                                                    // Don't enable buttons if not both selected
                                                     variantInput.value = '';
                                                     addToCartBtn.disabled = true;
                                                     buyNowBtn.disabled = true;
-                                                    addToCartBtn.textContent = 'Thêm vào giỏ hàng';
+                                                    addToCartBtn.textContent = 'THÊM VÀO GIỎ HÀNG';
                                                     msg.style.display = 'none';
                                                 }
 
@@ -225,10 +235,25 @@
                             <div class="product_variant quantity">
                                 <label>quantity</label>
                                 <input min="1" max="100" value="1" type="number" name="quantity">
-                                <button class="button" type="submit" name="action" value="add_to_cart">add to cart</button>
-                                <button class="button" type="submit" name="action" value="buy_now"
-                                    style="background: #ef233c; border-color: #ef233c; margin-left: 10px;">Buy now</button>
+                                <button class="button" type="submit" name="action" value="add_to_cart">ADD TO CART</button>
+                                <button class="button buy_now" type="submit" name="action" value="buy_now">BUY NOW</button>  
                             </div>
+                            <style>
+                                .product_variant.quantity .button.buy_now {
+                                    background: #ef233c; 
+                                    border-color: #ef233c; 
+                                    margin-left: 10px;
+                                }
+                                .product_variant.quantity .button.buy_now:hover {
+                                    background: #333;
+                                    border-color: #333;
+                                }
+                                .product_variant.quantity .button:disabled {
+                                    background: #ccc;
+                                    border-color: #ccc;
+                                    cursor: not-allowed;
+                                }
+                            </style>
                             <div class="product_d_action">
                                 <ul>
                                     <li>

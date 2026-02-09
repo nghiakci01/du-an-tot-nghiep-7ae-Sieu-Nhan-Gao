@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>@yield('title', 'FashionStore - ' . __('messages.home'))</title>
+    <title>@yield('title', 'Elite - ' . __('messages.home'))</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -26,6 +26,9 @@
 
     <!-- Custom Header CSS -->
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/custom-header.css') }}">
+
+    <!-- Search Autocomplete CSS -->
+    <link rel="stylesheet" href="{{ asset('frontend-assets/css/search-autocomplete.css') }}">
 
 </head>
 
@@ -48,12 +51,18 @@
     <!-- Main JS -->
     <script src="{{ asset('frontend-assets/js/main.js') }}"></script>
 
+    <!-- Search Autocomplete JS -->
+    <script src="{{ asset('frontend-assets/js/search-autocomplete.js') }}"></script>
+
 
 
 
     @if($chatbot_enabled)
         @include('frontend.partials.chatbot-widget')
     @endif
+
+@stack('scripts')
+@yield('scripts')
 
 </body>
 

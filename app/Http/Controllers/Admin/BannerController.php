@@ -37,10 +37,21 @@ class BannerController extends Controller
             'sort_order' => 'integer',
         ]);
 
-        $data = $request->all();
+        $data = $request->except('image');
+        $data['image'] = null;
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('banners', 'public');
+            $file = $request->file('image');
+            $path = $file->getRealPath() ?: $file->getPathname();
+            if ($file->isValid() && !empty($path)) {
+                $filename = $file->hashName();
+                $stream = fopen($path, 'r');
+                Storage::disk('public')->put('banners/' . $filename, $stream);
+                if (is_resource($stream)) {
+                    fclose($stream);
+                }
+                $data['image'] = 'banners/' . $filename;
+            }
         }
 
         $data['is_active'] = $request->has('is_active');
@@ -69,14 +80,25 @@ class BannerController extends Controller
             'sort_order' => 'integer',
         ]);
 
-        $data = $request->all();
+        $data = $request->except('image');
 
         if ($request->hasFile('image')) {
-            // Delete old image
-            if ($banner->image) {
-                Storage::disk('public')->delete($banner->image);
+            $file = $request->file('image');
+            $path = $file->getRealPath() ?: $file->getPathname();
+            if ($file->isValid() && !empty($path)) {
+                // Delete old image
+                if ($banner->image) {
+                    Storage::disk('public')->delete($banner->image);
+                }
+                
+                $filename = $file->hashName();
+                $stream = fopen($path, 'r');
+                Storage::disk('public')->put('banners/' . $filename, $stream);
+                if (is_resource($stream)) {
+                    fclose($stream);
+                }
+                $data['image'] = 'banners/' . $filename;
             }
-            $data['image'] = $request->file('image')->store('banners', 'public');
         }
 
         $data['is_active'] = $request->has('is_active');

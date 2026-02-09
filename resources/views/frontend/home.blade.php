@@ -88,15 +88,14 @@
             text-align: left;
         }
 
-        .product_content h3 {
-            margin-bottom: 5px;
-            font-size: 14px;
-            line-height: 1.2;
-            height: 2.4em;
-            /* Max 2 lines height for alignment */
-            overflow: hidden;
-        }
-    </style>
+    .product_content h3 {
+        margin-bottom: 5px;
+        font-size: 14px;
+        line-height: 1.2;
+        height: 2.4em; /* Max 2 lines height for alignment */
+        overflow: hidden;
+    }
+</style>
     <!--slider area start-->
     <div class="slider_section slider_section_six">
         <div class="container-fluid">
@@ -200,327 +199,52 @@
             </div>
             <div class="product_area">
                 <div class="product_container">
-                    <div class="custom_product_grid_10">
+                    <div class="row product_column5">
                         @foreach($featuredProducts as $product)
-                            <div class="product_item_5">
-                                <div class="single_product">
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}"
-                                                alt="{{ $product->name }}">
-                                        </a>
-                                        <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : ($product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg')) }}"
-                                                alt="{{ $product->name }}">
-                                        </a>
-                                        <div class="product_action">
-                                            <div class="hover_action">
-                                                <a href="{{ route('product.detail', $product->slug) }}"><i
-                                                        class="fa fa-plus"></i></a>
-                                                <div class="action_button">
-                                                    <ul>
-                                                        <li><a title="{{ __('messages.add_to_cart') }}"
-                                                                href="{{ route('product.detail', $product->slug) }}"><i
-                                                                    class="fa fa-shopping-basket" aria-hidden="true"></i></a>
-                                                        </li>
-                                                        <li><a href="#" title="{{ __('messages.add_to_wishlist') }}"><i
-                                                                    class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                        <li><a href="#" title="Add to Compare"><i class="fa fa-sliders"
-                                                                    aria-hidden="true"></i></a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="quick_button">
-                                            <a href="{{ route('product.detail', $product->slug) }}"
-                                                title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
-                                        </div>
-                                        @if($product->price < $product->original_price)
-                                            <div class="double_base">
-                                                <div class="product_sale">
-                                                    <span>{{ __('messages.sale') }}</span>
-                                                </div>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="product_content">
-                                        <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a>
-                                        </h3>
-                                        @include('frontend.partials.product-price', ['product' => $product])
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-    <!--product section area end-->
-
-    <!--banner area start-->
-    <div class="banner_slider_section section_fullwidth">
-        <div class="container-fluid">
-            <div class="row ">
-                <div class="col-12">
-                    <div class="banner_area">
-                        <div class="banner_thumb">
-                            <a href="{{ route('shop') }}"><img src="{{ asset('frontend-assets') }}/img/bg/banner21.jpg"
-                                    alt="#"></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--banner area end-->
-
-    <!--product section area start-->
-    <section class="product_section womens_product product_section_six bottom">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section_title">
-                        <h2>{{ __('messages.new_products') }}</h2>
-                        <p>{{ __('messages.new_desc') }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="product_area">
-                <div class="product_container">
-                    <div class="row product_slick_column5">
-                        @foreach($newProducts as $product)
-                            <div class="col-lg-3 col-md-4 col-sm-6 col-12">
-                                <div class="single_product">
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}"
-                                                alt="{{ $product->name }}">
-                                        </a>
-                                        <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : ($product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg')) }}"
-                                                alt="{{ $product->name }}">
-                                        </a>
-                                        <div class="product_action">
-                                            <div class="hover_action">
-                                                <a href="{{ route('product.detail', $product->slug) }}"><i
-                                                        class="fa fa-plus"></i></a>
-                                                <div class="action_button">
-                                                    <ul>
-                                                        <li><a title="{{ __('messages.add_to_cart') }}"
-                                                                href="{{ route('product.detail', $product->slug) }}"><i
-                                                                    class="fa fa-shopping-basket" aria-hidden="true"></i></a>
-                                                        </li>
-                                                        <li><a href="#" title="{{ __('messages.add_to_wishlist') }}"><i
-                                                                    class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                        <li><a href="#" title="Add to Compare"><i class="fa fa-sliders"
-                                                                    aria-hidden="true"></i></a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="quick_button">
-                                            <a href="{{ route('product.detail', $product->slug) }}"
-                                                title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
-                                        </div>
-                                        <div class="double_base">
-                                            @if($product->price < $product->original_price)
-                                                <div class="product_sale">
-                                                    <span>{{ __('messages.sale') }}</span>
-                                                </div>
-                                            @endif
-                                            <div class="label_product">
-                                                <span>{{ __('messages.new') }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="product_content">
-                                        <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a>
-                                        </h3>
-                                        @include('frontend.partials.product-price', ['product' => $product])
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!--product section area end-->
-
-    <!--product section area end-->
-
-    <!--product section area start (Top Wishlisted)-->
-    <section class="product_section womens_product product_section_six bottom">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section_title">
-                        <h2>{{ __('messages.top_wishlisted') }}</h2>
-                        <p>{{ __('messages.top_wishlisted_desc') }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="product_area">
-                <div class="product_container">
-                    <div class="row product_slick_column5">
-                        @foreach($topWishlisted as $product)
-                            <div class="col-lg-3 col-md-4 col-sm-6 col-12">
-                                <div class="single_product">
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}"
-                                                alt="{{ $product->name }}">
-                                        </a>
-                                        <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : ($product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg')) }}"
-                                                alt="{{ $product->name }}">
-                                        </a>
-                                        <div class="product_action">
-                                            <div class="hover_action">
-                                                <a href="{{ route('product.detail', $product->slug) }}"><i
-                                                        class="fa fa-plus"></i></a>
-                                                <div class="action_button">
-                                                    <ul>
-                                                        <li><a title="{{ __('messages.add_to_cart') }}"
-                                                                href="{{ route('product.detail', $product->slug) }}"><i
-                                                                    class="fa fa-shopping-basket" aria-hidden="true"></i></a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="add-to-wishlist" data-id="{{ $product->id }}"
-                                                                title="{{ __('messages.add_to_wishlist') }}">
-                                                                <i class="fa fa-heart-o" aria-hidden="true"></i>
-                                                            </a>
-                                                        </li>
-                                                        <li><a href="#" title="Add to Compare"><i class="fa fa-sliders"
-                                                                    aria-hidden="true"></i></a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="quick_button">
-                                            <a href="{{ route('product.detail', $product->slug) }}"
-                                                title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
-                                        </div>
-                                        <div class="double_base">
-                                            @if($product->price < $product->original_price)
-                                                <div class="product_sale">
-                                                    <span>{{ __('messages.sale') }}</span>
-                                                </div>
-                                            @endif
-                                            <div class="label_product">
-                                                <span>Top</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="product_content">
-                                        <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a>
-                                        </h3>
-                                        @include('frontend.partials.product-price', ['product' => $product])
-                                        <div style="font-size: 12px; color: #ff6a28; margin-top: 5px;">
-                                            <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} lượt yêu thích
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!--product section area end (Top Wishlisted)-->
-
-    <!--Instagram area start-->
-    <section class="instagram_area instagram_six">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section_title">
-                        <h2>{{ __('messages.follow_instagram') }}</h2>
-                        <p>{{ __('messages.instagram_desc') }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="instagram_home_block">
-                <div class="row">
-                    <div class="instagram_wrapper instagram_column5 owl-carousel">
-                        <!-- ... (Existing instagram images) ... -->
                         <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram.png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram.png"><i
-                                            class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- ... -->
-                    </div>
-                    <div class="col-12">
-                        <div class="text_follow">
-                            <a href="#">{{ __('messages.follow_us_hashtag') }}</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <div class="product_area">
-        <div class="product_container">
-            <div class="custom_product_grid_10">
-                @foreach($featuredProducts as $product)
-                    <div class="product_item_5">
-                        <div class="single_product">
-                            <div class="product_thumb">
-                                <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                    <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}"
-                                        alt="{{ $product->name }}">
-                                </a>
-                                <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                    <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : ($product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg')) }}"
-                                        alt="{{ $product->name }}">
-                                </a>
-                                <div class="product_action">
-                                    <div class="hover_action">
-                                        <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
-                                        <div class="action_button">
-                                            <ul>
-                                                <li><a title="add to cart"
-                                                        href="{{ route('product.detail', $product->slug) }}"><i
-                                                            class="fa fa-shopping-basket" aria-hidden="true"></i></a>
-                                                </li>
-                                                <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o"
-                                                            aria-hidden="true"></i></a></li>
-                                                <li><a href="#" title="Add to Compare"><i class="fa fa-sliders"
-                                                            aria-hidden="true"></i></a></li>
-                                            </ul>
-                                        </div>
+                            <div class="single_product">
+                                <div class="product_thumb">
+                                    <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
+                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
+                                    </a>
+                                    <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
+                                        @php
+                                            $secondaryImage = $product->images->count() > 0 
+                                                ? $product->images->first()?->image_url 
+                                                : $product->image_url;
+                                        @endphp
+                                        <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
+                                    </a>
+                                    <div class="product_action">
+                                        <div class="hover_action">
+                                           <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
+                                            <div class="action_button">
+                                                <ul>
+                                                    <li><a title="add to cart" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
+                                                    <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                                </ul>
+                                            </div>
+                                       </div>
                                     </div>
-                                </div>
-                                <div class="quick_button">
-                                    <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick
-                                        view</a>
-                                </div>
-                                @if($product->price < $product->original_price)
+                                    <div class="quick_button">
+                                        <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick view</a>
+                                    </div>
+                                    @if($product->price < $product->original_price)
                                     <div class="double_base">
                                         <div class="product_sale">
                                             <span>Sale</span>
                                         </div>
                                     </div>
-                                @endif
-                            </div>
-                            <div class="product_content">
-                                <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a>
-                                </h3>
-                                @include('frontend.partials.product-price', ['product' => $product])
+                                    @endif
+                                </div>
+                                <div class="product_content">
+                                    <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
+                                    @include('frontend.partials.product-price', ['product' => $product])
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
+                        @endforeach                    </div>
+                </div> 
             </div>
         </div>
     </div>
@@ -560,57 +284,50 @@
                 <div class="product_container">
                     <div class="row product_slick_column5">
                         @foreach($newProducts as $product)
-                            <div class="col-lg-3 col-md-4 col-sm-6 col-12">
-                                <div class="single_product">
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}"
-                                                alt="{{ $product->name }}">
-                                        </a>
-                                        <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : ($product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg')) }}"
-                                                alt="{{ $product->name }}">
-                                        </a>
-                                        <div class="product_action">
-                                            <div class="hover_action">
-                                                <a href="{{ route('product.detail', $product->slug) }}"><i
-                                                        class="fa fa-plus"></i></a>
-                                                <div class="action_button">
-                                                    <ul>
-                                                        <li><a title="add to cart"
-                                                                href="{{ route('product.detail', $product->slug) }}"><i
-                                                                    class="fa fa-shopping-basket" aria-hidden="true"></i></a>
-                                                        </li>
-                                                        <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o"
-                                                                    aria-hidden="true"></i></a></li>
-                                                        <li><a href="#" title="Add to Compare"><i class="fa fa-sliders"
-                                                                    aria-hidden="true"></i></a></li>
-                                                    </ul>
-                                                </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+                            <div class="single_product">
+                                <div class="product_thumb">
+                                    <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
+                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
+                                    </a>
+                                    <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
+                                        @php
+                                            $secondaryImage = $product->images->count() > 0 
+                                                ? $product->images->first()?->image_url 
+                                                : $product->image_url;
+                                        @endphp
+                                        <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
+                                    </a>
+                                    <div class="product_action">
+                                        <div class="hover_action">
+                                           <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
+                                            <div class="action_button">
+                                                <ul>
+                                                    <li><a title="add to cart" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
+                                                    <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>                                                </ul>
                                             </div>
-                                        </div>
-                                        <div class="quick_button">
-                                            <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick
-                                                view</a>
-                                        </div>
-                                        <div class="double_base">
-                                            @if($product->price < $product->original_price)
-                                                <div class="product_sale">
-                                                    <span>Sale</span>
-                                                </div>
-                                            @endif
-                                            <div class="label_product">
-                                                <span>new</span>
-                                            </div>
-                                        </div>
+                                       </div>
                                     </div>
-                                    <div class="product_content">
-                                        <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a>
-                                        </h3>
-                                        @include('frontend.partials.product-price', ['product' => $product])
+                                    <div class="quick_button">
+                                        <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick view</a>
+                                    </div>
+                                    <div class="double_base">
+                                        @if($product->price < $product->original_price)
+                                        <div class="product_sale">
+                                            <span>Sale</span>
+                                        </div>
+                                        @endif
+                                        <div class="label_product">
+                                            <span>new</span>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="product_content">
+                                    <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
+                                    @include('frontend.partials.product-price', ['product' => $product])
+                                </div>
                             </div>
+                        </div>
                         @endforeach
                     </div>
                 </div>
@@ -640,12 +357,15 @@
                                 <div class="single_product">
                                     <div class="product_thumb">
                                         <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}"
-                                                alt="{{ $product->name }}">
+                                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                         </a>
                                         <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : ($product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg')) }}"
-                                                alt="{{ $product->name }}">
+                                            @php
+                                                $secondaryImage = $product->images->count() > 0 
+                                                    ? $product->images->first()?->image_url 
+                                                    : $product->image_url;
+                                            @endphp
+                                            <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
                                         </a>
                                         <div class="product_action">
                                             <div class="hover_action">
@@ -663,8 +383,6 @@
                                                                 <i class="fa fa-heart-o" aria-hidden="true"></i>
                                                             </a>
                                                         </li>
-                                                        <li><a href="#" title="Add to Compare"><i class="fa fa-sliders"
-                                                                    aria-hidden="true"></i></a></li>
                                                     </ul>
                                                 </div>
                                             </div>

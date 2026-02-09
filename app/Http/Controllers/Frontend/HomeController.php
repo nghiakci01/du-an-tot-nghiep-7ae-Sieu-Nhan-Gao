@@ -28,11 +28,11 @@ class HomeController extends Controller
 
         // Sản phẩm nổi bật cho section "New Arrivals"
         $featuredProducts = Product::where('is_active', true)
-            ->where('is_featured', true)
-            ->with(['category', 'variants'])
-            ->take(10)
-            ->get();
-
+                                   ->where('is_featured', true)
+                                   ->with(['category', 'variants', 'images'])
+                                   ->take(30)
+                                   ->get();
+        
         // Sản phẩm mới nhất cho section dưới banner
         $newProducts = Product::where('is_active', true)
             ->with(['category', 'variants'])

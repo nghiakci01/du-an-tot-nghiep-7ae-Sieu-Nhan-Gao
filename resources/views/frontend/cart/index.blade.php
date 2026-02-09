@@ -162,76 +162,98 @@
 @endsection
 
 @section('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            // Update cart quantity
-            $(".update-cart").change(function (e) {
-                e.preventDefault();
-                var ele = $(this);
-                var row = ele.parents("tr");
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Set up CSRF token for all AJAX requests
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
 
-                $.ajax({
-                    url: '{{ route('cart.update') }}',
-                    method: "PATCH",
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        id: row.attr("data-id"),
-                        quantity: ele.val()
-                    },
-                    success: function (response) {
-                        window.location.reload();
-                    },
-                    error: function (xhr) {
-                        alert('An error occurred. Please try again.');
-                    }
-                });
-            });
+        // Update cart quantity
+        $(".update-cart").on('change', function (e) {
+            e.preventDefault();
+            var ele = $(this);
+            var row = ele.parents("tr");
+            var id = row.attr("data-id");
+            var qty = ele.val();
+            
+            console.log('Updating item:', id, 'Qty:', qty);
 
-            // Remove item from cart
-            $(".remove-from-cart").click(function (e) {
-                e.preventDefault();
-                var ele = $(this);
-                var row = ele.parents("tr");
-
-                if (confirm("Are you sure you want to remove this product?")) {
-                    $.ajax({
-                        url: '{{ route('cart.remove') }}',
-                        method: "DELETE",
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            id: row.attr("data-id")
-                        },
-                        success: function (response) {
-                            window.location.reload();
-                        },
-                        error: function (xhr) {
-                            alert('An error occurred. Please try again.');
-                        }
-                    });
-                }
-            });
-
-            // Clear entire cart
-            $("#clear-cart").click(function (e) {
-                e.preventDefault();
-
-                if (confirm("Are you sure you want to clear your cart?")) {
-                    $.ajax({
-                        url: '{{ route('cart.clear') }}',
-                        method: "POST",
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function (response) {
-                            window.location.reload();
-                        },
-                        error: function (xhr) {
-                            alert('An error occurred. Please try again.');
-                        }
-                    });
+            $.ajax({
+                url: '{{ route('cart.update') }}',
+                method: "POST",
+                data: {
+                    _method: 'PATCH',
+                    id: id, 
+                    quantity: qty
+                },
+                success: function (response) {
+                    window.location.reload();
+                },
+                error: function(xhr) {
+                    console.error('Update failed:', xhr.responseText);
+                    alert('Không thể cập nhật giỏ hàng. Vui lòng thử lại.');
                 }
             });
         });
-    </script>
+
+        // Remove item from cart
+        $(".remove-from-cart").on('click', function (e) {
+            e.preventDefault();
+            var ele = $(this);
+            var row = ele.parents("tr");
+            var id = row.attr("data-id");
+            
+            console.log('Removing item:', id);
+
+            if(confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+                $.ajax({
+                    url: '{{ route('cart.remove') }}',
+                    method: "POST",
+                    data: {
+                        _method: 'DELETE',
+                        id: id
+                    },
+                    success: function (response) {
+                        console.log('Remove success:', response);
+                        window.location.reload();
+                    },
+                    error: function(xhr) {
+                        console.error('Remove failed:', xhr.responseText);
+                        let errorMsg = 'Lỗi hệ thống';
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.message) errorMsg = response.message;
+                        } catch(e) {}
+
+                        if(confirm("Lỗi khi xóa bằng AJAX (" + errorMsg + "). Thử dùng phương pháp xóa dự phòng?")) {
+                            window.location.href = '{{ route('cart.remove') }}?id=' + id;
+                        }
+                    }
+                });
+            }
+        });
+
+        // Clear entire cart
+        $("#clear-cart").on('click', function(e) {
+            e.preventDefault();
+            
+            if(confirm("Bạn có chắc chắn muốn xóa toàn bộ giỏ hàng?")) {
+                $.ajax({
+                    url: '{{ route('cart.clear') }}',
+                    method: "POST",
+                    success: function (response) {
+                        window.location.reload();
+                    },
+                    error: function(xhr) {
+                        console.error('Clear cart failed:', xhr.responseText);
+                        alert('Không thể xóa giỏ hàng. Vui lòng thử lại.');
+                    }
+                });
+            }
+        });
+    });
+</script>
 @endsection

@@ -1,6 +1,6 @@
-<footer class="footer_widgets product_page">
+<footer class="footer_widgets footer_six">
     <div class="footer_top">
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-2 col-md-6 col-sm-6 col-6">
                     <div class="widgets_container">
@@ -59,12 +59,11 @@
                                         placeholder="{{ __('messages.enter_email') }}" />
                                     <button id="mc-submit">{{ __('messages.subscribe') }}</button>
                                 </form>
-                                <!-- mailchimp-alerts Start -->
                                 <div class="mailchimp-alerts text-centre">
-                                    <div class="mailchimp-submitting"></div><!-- mailchimp-submitting end -->
-                                    <div class="mailchimp-success"></div><!-- mailchimp-success end -->
-                                    <div class="mailchimp-error"></div><!-- mailchimp-error end -->
-                                </div><!-- mailchimp-alerts end -->
+                                    <div class="mailchimp-submitting"></div>
+                                    <div class="mailchimp-success"></div>
+                                    <div class="mailchimp-error"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
