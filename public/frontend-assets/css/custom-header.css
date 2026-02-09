@@ -9,7 +9,8 @@
 .header_middel .header_left {
     display: flex;
     align-items: center;
-    gap: 80px;
+    gap: 20px;
+    /* Reduced to provide more space for menu items */
 }
 
 .header_middel .header_left .logo {
@@ -22,9 +23,12 @@
 
 /* Menu items compact spacing */
 .header_middel .header_left .main_menu nav>ul {
-    display: flex;
-    justify-content: space-between;
+    display: flex !important;
+    justify-content: flex-start;
+    flex-wrap: nowrap !important;
     width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .header_middel .header_left .main_menu nav>ul>li {
@@ -33,10 +37,13 @@
 
 .header_middel .header_left .main_menu nav>ul>li>a {
     padding: 10px 8px;
-    font-size: 15px;
-    font-weight: 400;
+    /* Balanced padding */
+    font-size: 14px;
+    font-weight: 500;
     color: #2c2c2c;
     text-transform: capitalize;
+    white-space: nowrap !important;
+    /* Force items to stay on one line */
 }
 
 .header_middel .header_left .main_menu nav>ul>li>a:hover {
