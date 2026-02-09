@@ -222,7 +222,6 @@
                                                 <ul>
                                                     <li><a title="add to cart" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
                                                     <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i></a></li>
                                                 </ul>
                                             </div>
                                        </div>
@@ -305,9 +304,7 @@
                                             <div class="action_button">
                                                 <ul>
                                                     <li><a title="add to cart" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i></a></li>
-                                                </ul>
+                                                    <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>                                                </ul>
                                             </div>
                                        </div>
                                     </div>
@@ -386,8 +383,6 @@
                                                                 <i class="fa fa-heart-o" aria-hidden="true"></i>
                                                             </a>
                                                         </li>
-                                                        <li><a href="#" title="Add to Compare"><i class="fa fa-sliders"
-                                                                    aria-hidden="true"></i></a></li>
                                                     </ul>
                                                 </div>
                                             </div>
