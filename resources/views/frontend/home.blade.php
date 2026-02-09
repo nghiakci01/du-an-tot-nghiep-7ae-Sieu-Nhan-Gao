@@ -209,8 +209,8 @@
                                     </a>
                                     <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
                                         @php
-                                            $secondaryImage = $product->images->count() > 1 
-                                                ? $product->images->skip(1)->first()?->image_url 
+                                            $secondaryImage = $product->images->count() > 0 
+                                                ? $product->images->first()?->image_url 
                                                 : $product->image_url;
                                         @endphp
                                         <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
@@ -293,8 +293,8 @@
                                     </a>
                                     <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
                                         @php
-                                            $secondaryImage = $product->images->count() > 1 
-                                                ? $product->images->skip(1)->first()?->image_url 
+                                            $secondaryImage = $product->images->count() > 0 
+                                                ? $product->images->first()?->image_url 
                                                 : $product->image_url;
                                         @endphp
                                         <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
