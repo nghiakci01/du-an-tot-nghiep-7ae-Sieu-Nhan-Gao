@@ -120,7 +120,7 @@
                                 </div>
                                 
                                 <!-- Main Menu (Desktop) -->
-                                <div class="main_menu d-none d-lg-block" style="margin-left: 40px;">
+                                <div class="main_menu d-none d-lg-block" style="margin-left: 70px;">
                                     <nav>
                                         <ul style="display: flex !important; flex-wrap: nowrap !important; white-space: nowrap;">
                                             <li class="{{ request()->is('/') ? 'active' : '' }}"><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
