@@ -7,7 +7,14 @@
                 <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
             </a>
             <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                <img src="{{ $product->images->first()?->image_url ?? $product->image_url }}" alt="{{ $product->name }}">
+                @php
+                    // If product has multiple gallery images, use the second one for hover
+                    // Otherwise, use the main image
+                    $secondaryImage = $product->images->count() > 1 
+                        ? $product->images->skip(1)->first()?->image_url 
+                        : $product->image_url;
+                @endphp
+                <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
             </a>
             <div class="product_action">
                 <div class="hover_action">

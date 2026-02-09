@@ -150,7 +150,6 @@
                                         function checkSelection() {
                                             const selectedSize = sizeInput.value;
                                             const selectedColor = colorInput.value;
-<<<<<<< HEAD
                                             
                                             // Reset variant input if either is missing
                                             if (!selectedSize || !selectedColor) {
@@ -158,8 +157,6 @@
                                                 addToCartBtn.disabled = true;
                                                 buyNowBtn.disabled = true;
                                             }
-=======
->>>>>>> 8405ad433ff61de144486d273bb15067fc6ab3c1
 
                                             let filteredVariants = variants;
                                             if (selectedSize) {
@@ -177,15 +174,9 @@
 
                                                     if (matchedVariant.sale_price && matchedVariant.sale_price > 0 && matchedVariant.sale_price < matchedVariant.price) {
                                                         html = `<span class="current_price">
-<<<<<<< HEAD
                                                                     <span class="old_price" style="text-decoration: line-through; color: #999; margin-right: 15px;">${formatCurrency(matchedVariant.price)}</span>
                                                                     <span style="color: #ef233c; font-weight: bold;">${formatCurrency(matchedVariant.sale_price)}</span>
                                                                 </span>`;
-=======
-                                                                            <span class="old_price" style="text-decoration: line-through; color: #999; margin-right: 10px;">${formatCurrency(matchedVariant.price)}</span>
-                                                                            ${formatCurrency(matchedVariant.sale_price)}
-                                                                        </span>`;
->>>>>>> 8405ad433ff61de144486d273bb15067fc6ab3c1
                                                     } else {
                                                         html = `<span class="current_price" style="font-weight: bold;">${formatCurrency(matchedVariant.price)}</span>`;
                                                     }
@@ -205,28 +196,18 @@
                                                         addToCartBtn.textContent = 'HẾT HÀNG';
                                                     }
                                                 } else {
-<<<<<<< HEAD
                                                     // Only one or none selected
                                                     const activePrices = filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0);
                                                     const minPrice = Math.min(...activePrices);
                                                     const maxPrice = Math.max(...activePrices);
                                                     
-=======
-                                                    const minPrice = Math.min(...filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0));
-                                                    const maxPrice = Math.max(...filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0));
-
->>>>>>> 8405ad433ff61de144486d273bb15067fc6ab3c1
                                                     if (minPrice === maxPrice) {
                                                         html = `<span class="current_price">${formatCurrency(minPrice)}</span>`;
                                                     } else {
                                                         html = `<span class="current_price">${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}</span>`;
                                                     }
-<<<<<<< HEAD
                                                     
                                                     // Don't enable buttons if not both selected
-=======
-
->>>>>>> 8405ad433ff61de144486d273bb15067fc6ab3c1
                                                     variantInput.value = '';
                                                     addToCartBtn.disabled = true;
                                                     buyNowBtn.disabled = true;
@@ -254,14 +235,8 @@
                             <div class="product_variant quantity">
                                 <label>quantity</label>
                                 <input min="1" max="100" value="1" type="number" name="quantity">
-<<<<<<< HEAD
                                 <button class="button" type="submit" name="action" value="add_to_cart">ADD TO CART</button>
                                 <button class="button buy_now" type="submit" name="action" value="buy_now">BUY NOW</button>  
-=======
-                                <button class="button" type="submit" name="action" value="add_to_cart">add to cart</button>
-                                <button class="button" type="submit" name="action" value="buy_now"
-                                    style="background: #ef233c; border-color: #ef233c; margin-left: 10px;">Buy now</button>
->>>>>>> 8405ad433ff61de144486d273bb15067fc6ab3c1
                             </div>
                             <style>
                                 .product_variant.quantity .button.buy_now {

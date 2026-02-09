@@ -199,7 +199,7 @@
             </div>
             <div class="product_area">
                 <div class="product_container">
-                    <div class="row product_slick_column5">
+                    <div class="row product_column5">
                         @foreach($featuredProducts as $product)
                         <div class="col-lg-3">
                             <div class="single_product">
@@ -208,7 +208,12 @@
                                         <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                     </a>
                                     <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                        <img src="{{ $product->images->first()?->image_url ?? $product->image_url }}" alt="{{ $product->name }}">
+                                        @php
+                                            $secondaryImage = $product->images->count() > 1 
+                                                ? $product->images->skip(1)->first()?->image_url 
+                                                : $product->image_url;
+                                        @endphp
+                                        <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
                                     </a>
                                     <div class="product_action">
                                         <div class="hover_action">
@@ -287,7 +292,12 @@
                                         <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                     </a>
                                     <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                        <img src="{{ $product->images->first()?->image_url ?? $product->image_url }}" alt="{{ $product->name }}">
+                                        @php
+                                            $secondaryImage = $product->images->count() > 1 
+                                                ? $product->images->skip(1)->first()?->image_url 
+                                                : $product->image_url;
+                                        @endphp
+                                        <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
                                     </a>
                                     <div class="product_action">
                                         <div class="hover_action">
@@ -350,12 +360,15 @@
                                 <div class="single_product">
                                     <div class="product_thumb">
                                         <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}"
-                                                alt="{{ $product->name }}">
+                                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                         </a>
                                         <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : ($product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg')) }}"
-                                                alt="{{ $product->name }}">
+                                            @php
+                                                $secondaryImage = $product->images->count() > 0 
+                                                    ? $product->images->first()?->image_url 
+                                                    : $product->image_url;
+                                            @endphp
+                                            <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
                                         </a>
                                         <div class="product_action">
                                             <div class="hover_action">
