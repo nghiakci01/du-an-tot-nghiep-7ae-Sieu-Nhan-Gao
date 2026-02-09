@@ -4,10 +4,10 @@
     <div class="single_product">
         <div class="product_thumb">
             <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}" alt="{{ $product->name }}">
+                <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
             </a>
             <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : ($product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg')) }}" alt="{{ $product->name }}">
+                <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : $product->image_url }}" alt="{{ $product->name }}">
             </a>
             <div class="product_action">
                 <div class="hover_action">

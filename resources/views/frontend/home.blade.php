@@ -199,9 +199,9 @@
             </div>
             <div class="product_area">
                 <div class="product_container">
-                    <div class="row product_column5">
+                    <div class="row product_slick_column5">
                         @foreach($featuredProducts as $product)
-                        <div class="product_item_5">
+                        <div class="col-lg-3">
                             <div class="single_product">
                                 <div class="product_thumb">
                                     <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">

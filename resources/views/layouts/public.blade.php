@@ -27,6 +27,9 @@
     <!-- Custom Header CSS -->
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/custom-header.css') }}">
 
+    <!-- Search Autocomplete CSS -->
+    <link rel="stylesheet" href="{{ asset('frontend-assets/css/search-autocomplete.css') }}">
+
 </head>
 
 <body>
@@ -47,6 +50,9 @@
 
     <!-- Main JS -->
     <script src="{{ asset('frontend-assets/js/main.js') }}"></script>
+
+    <!-- Search Autocomplete JS -->
+    <script src="{{ asset('frontend-assets/js/search-autocomplete.js') }}"></script>
 
 
 

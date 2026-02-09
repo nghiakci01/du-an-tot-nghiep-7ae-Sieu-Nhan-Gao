@@ -64,4 +64,16 @@ class Product extends Model
     {
         return $this->price;
     }
+
+    /**
+     * Accessor for image_url with fallback
+     * Returns placeholder if image file doesn't exist
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->image && \Storage::disk('public')->exists($this->image)) {
+            return asset('storage/' . $this->image);
+        }
+        return asset('frontend-assets/img/product/product21.jpg');
+    }
 }
