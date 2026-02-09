@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Shop | FashionStore')
+@section('title', 'Shop | Elite')
 
 @section('content')
 <style>
