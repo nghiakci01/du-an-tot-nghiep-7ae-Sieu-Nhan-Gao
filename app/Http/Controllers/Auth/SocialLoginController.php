@@ -51,7 +51,7 @@ class SocialLoginController extends Controller
             if (Auth::check()) {
                 Log::info("Login Verified for Existing User", ['user_id' => Auth::id()]);
                 session()->regenerate();
-                return redirect()->intended('/');
+                return redirect()->intended('/home');
             }
             Log::error("Auth Check Failed After Login for Existing User");
             return redirect()->route('login')->with('error', 'Authentication failed after login.');
@@ -105,7 +105,7 @@ class SocialLoginController extends Controller
             
             if (Auth::check()) {
                 session()->regenerate();
-                return redirect()->intended('/');
+                return redirect()->intended('/home');
             }
             return redirect()->route('login')->with('error', 'Authentication failed after registration.');
 
