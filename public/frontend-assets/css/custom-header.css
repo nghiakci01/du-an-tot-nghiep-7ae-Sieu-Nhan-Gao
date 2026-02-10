@@ -1,26 +1,8 @@
 /* ===== Original Theme Header Styles ===== */
 
 /* Header Middle - Logo + Menu Inline */
-/* Force zero padding on all header container levels */
-.header_six.header_area,
-.header_six.header_area .header_middel,
-.header_six.header_area .header_middel .container-fluid,
-.header_six.header_area .middel_inner {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-/* Remove margins/padding from the elements themselves */
-.header_six .logo,
-.header_six .logo a,
-.header_six .logo img,
-.header_six .header_left,
-.header_six .middel_right_info,
-.header_six .search_bar {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
+.header_middel .middel_inner {
+    /* Let theme handle padding naturally */
 }
 
 /* Logo + Menu inline container */
