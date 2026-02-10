@@ -61,9 +61,27 @@
         @include('frontend.partials.chatbot-widget')
     @endif
 
-@stack('scripts')
-@yield('scripts')
+    @stack('scripts')
+    @yield('scripts')
 
+    <!-- Facebook Redirect Fragment Cleanup -->
+    <script type="text/javascript">
+        if (window.location.hash && window.location.hash == '#_=_') {
+            if (window.history && history.pushState) {
+                window.history.pushState("", document.title, window.location.pathname + window.location.search);
+            } else {
+                // Prevent scrolling by storing the page's current scroll offset
+                var scroll = {
+                    top: document.body.scrollTop,
+                    left: document.body.scrollLeft
+                };
+                window.location.hash = '';
+                // Restore the scroll offset, as setting # will cause the page to scroll to the top
+                document.body.scrollTop = scroll.top;
+                document.body.scrollLeft = scroll.left;
+            }
+        }
+    </script>
 </body>
 
 

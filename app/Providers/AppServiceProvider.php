@@ -22,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Support\Facades\URL::forceScheme('https');
+
         try {
             // Share categories globally for header menu
             // Using View::composer to avoid query on console commands if DB not ready, 
