@@ -1,8 +1,13 @@
 /* ===== Original Theme Header Styles ===== */
 
 /* Header Middle - Logo + Menu Inline */
-.header_six .middel_inner {
-    padding: 0 !important;
+/* Force zero padding on all header container levels */
+.header_six.header_area,
+.header_six.header_area .header_middel,
+.header_six.header_area .header_middel .container-fluid,
+.header_six.header_area .middel_inner {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 /* Logo + Menu inline container */
