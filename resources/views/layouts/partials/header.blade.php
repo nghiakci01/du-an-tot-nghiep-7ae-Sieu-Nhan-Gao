@@ -114,13 +114,13 @@
                     <div class="row align-items-center">
                         <!-- Logo + Menu Column -->
                         <div class="col-lg-5 col-md-3">
-                            <div class="header_left d-flex align-items-center" style="gap: 30px; justify-content: space-between; width: 100%;">
+                            <div class="header_left d-flex align-items-center">
                                 <div class="logo">
-                                    <a href="{{ route('welcome') }}"><img src="{{ asset('frontend-assets/img/logo/logo.png') }}" alt=""></a>
+                                    <a href="{{ route('welcome') }}"><img src="{{ asset('frontend-assets/img/logo/logo-elite-new.png') }}" alt=""></a>
                                 </div>
                                 
                                 <!-- Main Menu (Desktop) -->
-                                <div class="main_menu d-none d-lg-block" style="margin-left: 70px;">
+                                <div class="main_menu d-none d-lg-block">
                                     <nav>
                                         <ul style="display: flex !important; flex-wrap: nowrap !important; white-space: nowrap;">
                                             <li class="{{ request()->is('/') ? 'active' : '' }}"><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>

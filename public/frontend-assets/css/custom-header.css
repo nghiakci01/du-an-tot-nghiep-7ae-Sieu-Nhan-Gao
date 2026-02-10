@@ -2,7 +2,7 @@
 
 /* Header Middle - Logo + Menu Inline */
 .header_middel .middel_inner {
-    padding: 20px 0;
+    padding: 10px 0;
 }
 
 /* Logo + Menu inline container */
@@ -15,6 +15,12 @@
 
 .header_middel .header_left .logo {
     flex-shrink: 0;
+}
+
+.header_middel .header_left .logo img {
+    max-height: 110px;
+    width: auto;
+    display: block;
 }
 
 .header_middel .header_left .main_menu {

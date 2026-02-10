@@ -74,7 +74,7 @@
       <div class="m-header">
         <a href="{{ route('admin.dashboard') }}"
           class="b-brand text-primary"><!-- ========   Change your logo from here   ============ -->
-          <img src="{{ asset('admin-assets') }}/images/logo-dark.svg" class="img-fluid logo-lg" alt="logo" />
+          <img src="{{ asset('admin-assets/images/logo-elite-new.png') }}" class="img-fluid logo-lg" alt="logo" style="max-height: 80px; width: auto;" />
           <span class="badge bg-light-success rounded-pill ms-2 theme-version">v9.6.2</span></a>
       </div>
       <div class="navbar-content">
