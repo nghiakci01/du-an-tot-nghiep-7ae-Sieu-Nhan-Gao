@@ -1,8 +1,8 @@
 /* ===== Original Theme Header Styles ===== */
 
 /* Header Middle - Logo + Menu Inline */
-.header_middel .middel_inner {
-    padding: 2px 0;
+.header_six .middel_inner {
+    padding: 0 !important;
 }
 
 /* Logo + Menu inline container */
@@ -18,7 +18,8 @@
 }
 
 .header_middel .header_left .logo img {
-    max-height: 50px;
+    max-height: 90px;
+    /* Restored size */
     width: auto;
     display: block;
 }
@@ -42,8 +43,8 @@
 }
 
 .header_middel .header_left .main_menu nav>ul>li>a {
-    padding: 2px 8px;
-    /* Balanced padding */
+    padding: 15px 10px;
+    /* Restored padding */
     font-size: 14px;
     font-weight: 500;
     color: #2c2c2c;
