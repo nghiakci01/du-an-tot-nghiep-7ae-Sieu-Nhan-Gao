@@ -1,8 +1,38 @@
-/* ===== Original Theme Header Styles ===== */
-
 /* Header Middle - Logo + Menu Inline */
-.header_middel .middel_inner {
-    padding: 10px 0;
+.header_six.header_area,
+.header_six .header_middel,
+.header_six .middel_inner,
+.header_six .container-fluid {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    min-height: 0 !important;
+}
+
+.middel_right_info {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.middel_right_info .search_bar {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Hide mini cart on mobile/phone */
+@media (max-width: 991px) {
+
+    .header_six .cart_area,
+    .header_six .mini_cart,
+    .header_six .cart_link {
+        display: none !important;
+    }
 }
 
 /* Logo + Menu inline container */
@@ -15,10 +45,12 @@
 
 .header_middel .header_left .logo {
     flex-shrink: 0;
+    margin: 0 !important;
 }
 
 .header_middel .header_left .logo img {
-    max-height: 110px;
+    max-height: 90px;
+    /* Restored size */
     width: auto;
     display: block;
 }
@@ -42,8 +74,8 @@
 }
 
 .header_middel .header_left .main_menu nav>ul>li>a {
-    padding: 10px 8px;
-    /* Balanced padding */
+    padding: 8px 10px;
+    /* Reduced padding to shorten header */
     font-size: 14px;
     font-weight: 500;
     color: #2c2c2c;
@@ -74,7 +106,7 @@
 }
 
 .horizontal_menu_six .main_menu nav>ul>li>a {
-    padding: 15px 0;
+    padding: 5px 0;
     display: block;
     font-size: 14px;
     font-weight: 500;
@@ -107,7 +139,7 @@
 
 /* Sticky header menu - full width centered */
 .sticky-header .main_menu_inner {
-    padding: 15px 0;
+    padding: 5px 0;
 }
 
 .sticky-header .main_menu nav>ul {
