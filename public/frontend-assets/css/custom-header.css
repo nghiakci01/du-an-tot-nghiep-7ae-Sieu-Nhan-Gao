@@ -10,6 +10,19 @@
     padding-bottom: 0 !important;
 }
 
+/* Remove margins/padding from the elements themselves */
+.header_six .logo,
+.header_six .logo a,
+.header_six .logo img,
+.header_six .header_left,
+.header_six .middel_right_info,
+.header_six .search_bar {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
 /* Logo + Menu inline container */
 .header_middel .header_left {
     display: flex;
