@@ -2,7 +2,7 @@
 
 /* Header Middle - Logo + Menu Inline */
 .header_middel .middel_inner {
-    padding: 5px 0;
+    padding: 2px 0;
 }
 
 /* Logo + Menu inline container */
@@ -18,7 +18,7 @@
 }
 
 .header_middel .header_left .logo img {
-    max-height: 70px;
+    max-height: 50px;
     width: auto;
     display: block;
 }
@@ -42,7 +42,7 @@
 }
 
 .header_middel .header_left .main_menu nav>ul>li>a {
-    padding: 5px 8px;
+    padding: 2px 8px;
     /* Balanced padding */
     font-size: 14px;
     font-weight: 500;
@@ -74,7 +74,7 @@
 }
 
 .horizontal_menu_six .main_menu nav>ul>li>a {
-    padding: 10px 0;
+    padding: 5px 0;
     display: block;
     font-size: 14px;
     font-weight: 500;
@@ -107,7 +107,7 @@
 
 /* Sticky header menu - full width centered */
 .sticky-header .main_menu_inner {
-    padding: 8px 0;
+    padding: 5px 0;
 }
 
 .sticky-header .main_menu nav>ul {
