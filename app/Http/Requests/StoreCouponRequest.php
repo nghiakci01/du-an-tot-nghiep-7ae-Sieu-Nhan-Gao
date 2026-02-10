@@ -48,9 +48,9 @@ class StoreCouponRequest extends FormRequest
 
         // Additional validation based on type
         if ($this->type === 'percentage') {
-            $rules['value'][] = 'max:100';
+            $rules['value'] .= '|max:100';
         } elseif ($this->type === 'fixed') {
-            $rules['value'][] = 'min:1000';
+            $rules['value'] .= '|min:1000';
         }
 
         return $rules;
