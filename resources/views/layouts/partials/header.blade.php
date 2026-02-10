@@ -114,17 +114,17 @@
                     <div class="row align-items-center">
                         <!-- Logo + Menu Column -->
                         <div class="col-lg-5 col-md-3">
-                            <div class="header_left d-flex align-items-center">
+                            <div class="header_left d-flex align-items-center" style="gap: 30px; justify-content: space-between; width: 100%;">
                                 <div class="logo">
                                     <a href="{{ route('welcome') }}"><img src="{{ asset('frontend-assets/img/logo/logo.png') }}" alt=""></a>
                                 </div>
                                 
                                 <!-- Main Menu (Desktop) -->
-                                <div class="main_menu d-none d-lg-block">
+                                <div class="main_menu d-none d-lg-block" style="margin-left: 70px;">
                                     <nav>
-                                        <ul>
-                                            <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
-                                            <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">{{ __('messages.shop') }}<i class="fa fa-angle-down"></i></a>
+                                        <ul style="display: flex !important; flex-wrap: nowrap !important; white-space: nowrap;">
+                                            <li class="{{ request()->is('/') ? 'active' : '' }}"><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
+                                            <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('shop') }}">{{ __('messages.shop') }}<i class="fa fa-angle-down"></i></a>
                                                 <ul class="mega_menu">
                                                     <li><a href="#">{{ __('messages.product_categories') }}</a>
                                                         <ul>
@@ -143,9 +143,9 @@
                                                     <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
                                                 </ul>
                                             </li>
-                                            <li><a href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
-                                            <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
-                                            <li><a href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
+                                            <li><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
+                                            <li><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
+                                            <li><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
                                         </ul>
                                     </nav>
                                 </div>
