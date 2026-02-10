@@ -1,12 +1,28 @@
-/* ===== Original Theme Header Styles ===== */
-
 /* Header Middle - Logo + Menu Inline */
-/* Header Middle - Logo + Menu Inline */
+.header_six.header_area,
 .header_six .header_middel,
-.header_six .middel_inner {
-    padding-top: 5px !important;
-    padding-bottom: 5px !important;
-    border-bottom: 0;
+.header_six .middel_inner,
+.header_six .container-fluid {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    min-height: 0 !important;
+}
+
+.middel_right_info {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.middel_right_info .search_bar {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 /* Logo + Menu inline container */
