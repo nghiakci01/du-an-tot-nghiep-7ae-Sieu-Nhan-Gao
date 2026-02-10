@@ -85,11 +85,20 @@ class Coupon extends Model
      */
     public function isExpired(): bool
     {
-        if ($this->start_date && Carbon::parse($this->start_date)->isFuture()) {
+        // Only check end_date for expiration
+        if ($this->end_date && now()->isAfter($this->end_date->endOfDay())) {
             return true;
         }
 
-        if ($this->end_date && Carbon::parse($this->end_date)->isPast()) {
+        return false;
+    }
+
+    /**
+     * Check if coupon has not started yet
+     */
+    public function isNotYetStarted(): bool
+    {
+        if ($this->start_date && now()->isBefore($this->start_date->copy()->startOfDay())) {
             return true;
         }
 
@@ -101,34 +110,39 @@ class Coupon extends Model
      */
     public function hasReachedUsageLimit(): bool
     {
-        if ($this->usage_limit === null) {
-            return false;
+        if ($this->usage_limit && $this->used_count >= $this->usage_limit) {
+            return true;
         }
 
-        return $this->used_count >= $this->usage_limit;
+        return false;
     }
 
     /**
-     * Calculate discount amount for given order amount
+     * Calculate discount amount for given order total
      */
-    public function calculateDiscount(float $orderAmount): float
+    public function calculateDiscount(float $orderTotal): float
     {
-        if ($orderAmount < ($this->min_order_amount ?? 0)) {
+        // Check if order meets minimum amount
+        if ($this->min_order_amount && $orderTotal < $this->min_order_amount) {
             return 0;
         }
 
+        $discount = 0;
+
         if ($this->type === 'percentage') {
-            $discount = $orderAmount * ($this->value / 100);
-            
-            if ($this->max_discount_amount) {
-                $discount = min($discount, $this->max_discount_amount);
+            $discount = ($orderTotal * $this->value) / 100;
+
+            // Apply max discount limit if set
+            if ($this->max_discount_amount && $discount > $this->max_discount_amount) {
+                $discount = $this->max_discount_amount;
             }
-            
-            return round($discount, 2);
+        } else {
+            // Fixed amount
+            $discount = $this->value;
         }
 
-        // Fixed amount
-        return min($this->value, $orderAmount);
+        // Discount cannot exceed order total
+        return min($discount, $orderTotal);
     }
 
     /**
@@ -140,12 +154,16 @@ class Coupon extends Model
             return '<span class="badge bg-warning">Không hoạt động</span>';
         }
 
-        if ($this->hasReachedUsageLimit()) {
-            return '<span class="badge bg-secondary">Hết lượt dùng</span>';
-        }
-
         if ($this->isExpired()) {
             return '<span class="badge bg-danger">Hết hạn</span>';
+        }
+
+        if ($this->isNotYetStarted()) {
+            return '<span class="badge bg-info">Chưa bắt đầu</span>';
+        }
+
+        if ($this->hasReachedUsageLimit()) {
+            return '<span class="badge bg-secondary">Hết lượt dùng</span>';
         }
 
         return '<span class="badge bg-success">Hoạt động</span>';
