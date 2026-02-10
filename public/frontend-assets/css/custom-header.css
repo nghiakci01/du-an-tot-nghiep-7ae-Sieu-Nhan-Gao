@@ -25,6 +25,16 @@
     padding-bottom: 0 !important;
 }
 
+/* Hide mini cart on mobile/phone */
+@media (max-width: 991px) {
+
+    .header_six .cart_area,
+    .header_six .mini_cart,
+    .header_six .cart_link {
+        display: none !important;
+    }
+}
+
 /* Logo + Menu inline container */
 .header_middel .header_left {
     display: flex;
