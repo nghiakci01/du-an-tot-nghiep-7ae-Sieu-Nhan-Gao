@@ -66,8 +66,8 @@ return [
     'subscribe' => 'Đăng ký!',
     // About
     'about_us' => 'Về chúng tôi',
-    'about_welcome' => 'Chào mừng bạn đến với Siêu Nhân Gạo!',
-    'about_intro_1' => 'Siêu Nhân Gạo là điểm đến tin cậy cho những tín đồ thời trang yêu thích sự tối giản, hiện đại và chất lượng. Chúng tôi không chỉ cung cấp quần áo, mà còn mang đến phong cách sống và sự tự tin cho mỗi khách hàng.',
+    'about_welcome' => 'Chào mừng bạn đến với Elite!',
+    'about_intro_1' => 'Elite là điểm đến tin cậy cho những tín đồ thời trang yêu thích sự tối giản, hiện đại và chất lượng. Chúng tôi không chỉ cung cấp quần áo, mà còn mang đến phong cách sống và sự tự tin cho mỗi khách hàng.',
     'about_intro_2' => 'Với sứ mệnh mang lại những sản phẩm chất lượng cao nhất với giá thành hợp lý, đội ngũ của chúng tôi luôn nỗ lực không ngừng để tuyển chọn những mẫu thiết kế mới nhất, bắt kịp xu hướng thời trang thế giới.',
     'view_work' => 'Xem sản phẩm ngay',
     'high_quality' => 'Chất lượng cao',
@@ -94,7 +94,7 @@ return [
 
     // News
     'latest_news' => 'Tin tức mới nhất',
-    'latest_news_desc' => 'Cập nhật những xu hướng thời trang và thông báo mới nhất từ Siêu Nhân Gạo',
+    'latest_news_desc' => 'Cập nhật những xu hướng thời trang và thông báo mới nhất từ Elite',
     'read_more' => 'Đọc thêm',
     'newsletter_signup' => 'Đăng ký nhận tin',
     'newsletter_signup_desc' => 'Nhận ngay thông báo về các bộ sưu tập mới và ưu đãi đặc quyền.',
