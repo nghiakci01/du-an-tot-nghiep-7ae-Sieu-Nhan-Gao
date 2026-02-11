@@ -56,7 +56,7 @@
                                         </thead>
                                         <tbody>
                                             @foreach(session('cart') as $id => $details)
-                                                <tr data-id="{{ $id }}">
+                                                                                        <tr data-id="{{ $id }}">
                                                     <td class="product_remove">
                                                         <a href="javascript:void(0)" class="remove-from-cart">
                                                             <i class="fa fa-trash-o"></i>
@@ -122,7 +122,7 @@
                                     <div class="coupon_inner">
                                         <div class="cart_subtotal">
                                             <p>{{ __('messages.subtotal') }}</p>
-                                            <p class="cart_amount">{{ number_format($total) }} đ</p>
+                                            <p class="cart_amount" id="cart-subtotal">{{ number_format($total) }} đ</p>
                                         </div>
                                         <div class="cart_subtotal ">
                                             <p>{{ __('messages.shipping') }}</p>
@@ -131,7 +131,7 @@
 
                                         <div class="cart_subtotal">
                                             <p>{{ __('messages.grand_total') }}</p>
-                                            <p class="cart_amount">{{ number_format($total) }} đ</p>
+                                            <p class="cart_amount" id="cart-grand-total">{{ number_format($total) }} đ</p>
                                         </div>
                                         <div class="checkout_btn">
                                             <a href="{{ route('checkout.index') }}">{{ __('messages.proceed_to_checkout') }}</a>
@@ -172,14 +172,17 @@
         });
 
         // Update cart quantity
-        $(".update-cart").on('change', function (e) {
-            e.preventDefault();
+        $(".update-cart").on('change keyup', function (e) {
             var ele = $(this);
             var row = ele.parents("tr");
             var id = row.attr("data-id");
             var quantity = ele.val();
             
-            console.log('Updating item:', id, 'Qty:', quantity);
+            // Prevent duplicate triggers for same value
+            if (ele.data('prev-val') == quantity) return;
+            ele.data('prev-val', quantity);
+
+            if (quantity < 1) return;
 
             $.ajax({
                 url: '{{ route('cart.update') }}',
@@ -194,30 +197,23 @@
                         // Update item total
                         row.find('.product_total').text(response.item_total);
                         
-                        // Update cart totals
-                        $('.cart_amount').each(function() {
-                             // Assuming all cart_amount classes are totals/subtotals that should match
-                             // Ideally add specific IDs for subtotal and grand total if they differ logic, 
-                             // but here they are same value.
-                             if($(this).find('span').text() !== 'Free') {
-                                 $(this).text(response.cart_total);
-                             }
-                        });
+                        // Update cart totals using specific IDs
+                        $('#cart-subtotal').text(response.cart_total);
+                        $('#cart-grand-total').text(response.cart_total);
                         
                         // Update header cart count
                         $('#cart-count').text(response.cart_count);
                         
-                        // Optional: Show a small toast or visual feedback instead of alert
-                        // alert(response.message); 
+                        // Optional: trigger mini-cart update if needed
                     } else {
                         alert(response.message || 'Có lỗi xảy ra.');
-                        window.location.reload(); // Fallback
+                        window.location.reload();
                     }
                 },
                 error: function(xhr) {
                     var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Số lượng vượt quá tồn kho hoặc có lỗi xảy ra.';
                     alert(errorMsg);
-                    window.location.reload(); // Reset to valid state
+                    window.location.reload();
                 }
             });
         });

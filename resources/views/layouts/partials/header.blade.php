@@ -133,7 +133,7 @@
                                                             @endforeach
                                                         </ul>
                                                     </li>
-                                                    <li><a href="#">Other pages</a>
+                                                    <li><a href="#">{{ __('messages.other_pages') }}</a>
                                                         <ul>
                                                             <li><a href="{{ route('cart.index') }}">{{ __('messages.cart') }}</a></li>
                                                             <li><a href="{{ route('checkout.index') }}">{{ __('messages.checkout') }}</a></li>
@@ -185,19 +185,19 @@
                                         </li>
                                         <li class="top_links">
                                             @guest
-                                                <a href="#"><i class="ion-android-person"></i> Account <i class="ion-chevron-down"></i></a>
+                                                <a href="#"><i class="ion-android-person"></i> {{ __('messages.account') }} <i class="ion-chevron-down"></i></a>
                                                 <ul class="dropdown_links">
-                                                    <li><a href="{{ route('login') }}">Sign In</a></li>
-                                                    <li><a href="{{ route('register') }}">Register</a></li>
+                                                    <li><a href="{{ route('login') }}">{{ __('messages.login') }}</a></li>
+                                                    <li><a href="{{ route('register') }}">{{ __('messages.register') }}</a></li>
                                                 </ul>
                                             @else
                                                 <a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
                                                 <ul class="dropdown_links">
-                                                    <li><a href="{{ route('account.index') }}">My Account</a></li>
+                                                    <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
                                                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
-                                                        <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? 'Admin' : 'Staff' }}</a></li>
+                                                        <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? __('messages.admin') : __('messages.staff') }}</a></li>
                                                     @endif
-                                                    <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a></li>
+                                                    <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('messages.logout') }}</a></li>
                                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                                                 </ul>
                                             @endguest
@@ -215,29 +215,29 @@
                     <div class="main_menu"> 
                         <nav>  
                             <ul>
-                                <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">Home</a></li>
-                                <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">Shop<i class="fa fa-angle-down"></i></a>
+                                <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
+                                <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">{{ __('messages.shop') }}<i class="fa fa-angle-down"></i></a>
                                     <ul class="mega_menu">
-                                        <li><a href="#">Product Categories</a>
+                                        <li><a href="#">{{ __('messages.product_categories') }}</a>
                                             <ul>
                                                 @foreach($categories as $category)
                                                     <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
                                                 @endforeach
                                             </ul>
                                         </li>
-                                        <li><a href="#">Other pages</a>
+                                        <li><a href="#">{{ __('messages.other_pages') }}</a>
                                             <ul>
-                                                <li><a href="{{ route('cart.index') }}">Cart</a></li>
-                                                <li><a href="{{ route('checkout.index') }}">Checkout</a></li>
-                                                <li><a href="{{ route('account.index') }}">Account</a></li>
+                                                <li><a href="{{ route('cart.index') }}">{{ __('messages.cart') }}</a></li>
+                                                <li><a href="{{ route('checkout.index') }}">{{ __('messages.checkout') }}</a></li>
+                                                <li><a href="{{ route('account.index') }}">{{ __('messages.account') }}</a></li>
                                             </ul>
                                         </li>
                                         <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
                                     </ul>
                                 </li>
-                                <li><a href="{{ route('news') }}">News</a></li>
-                                <li><a href="{{ route('about') }}">About Us</a></li>
-                                <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
+                                <li><a href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
+                                <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
+                                <li><a href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
                             </ul>   
                         </nav> 
                     </div>
@@ -258,29 +258,29 @@
                         <div class="main_menu"> 
                             <nav>  
                                 <ul>
-                                    <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">Home</a></li>
-                                    <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">Shop<i class="fa fa-angle-down"></i></a>
+                                    <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
+                                    <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">{{ __('messages.shop') }}<i class="fa fa-angle-down"></i></a>
                                         <ul class="mega_menu">
-                                            <li><a href="#">Product Categories</a>
+                                            <li><a href="#">{{ __('messages.product_categories') }}</a>
                                                 <ul>
                                                     @foreach($categories as $category)
                                                         <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
                                                     @endforeach
                                                 </ul>
                                             </li>
-                                            <li><a href="#">Other pages</a>
+                                            <li><a href="#">{{ __('messages.other_pages') }}</a>
                                                 <ul>
-                                                    <li><a href="{{ route('cart.index') }}">Cart</a></li>
-                                                    <li><a href="{{ route('checkout.index') }}">Checkout</a></li>
-                                                    <li><a href="{{ route('account.index') }}">Account</a></li>
+                                                    <li><a href="{{ route('cart.index') }}">{{ __('messages.cart') }}</a></li>
+                                                    <li><a href="{{ route('checkout.index') }}">{{ __('messages.checkout') }}</a></li>
+                                                    <li><a href="{{ route('account.index') }}">{{ __('messages.account') }}</a></li>
                                                 </ul>
                                             </li>
                                             <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
                                         </ul>
                                     </li>
-                                    <li><a href="{{ route('news') }}">News</a></li>
-                                    <li><a href="{{ route('about') }}">About Us</a></li>
-                                    <li><a href="{{ route('contact.index') }}">Contact Us</a></li>
+                                    <li><a href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
+                                    <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
+                                    <li><a href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
                                 </ul>   
                             </nav> 
                         </div>
