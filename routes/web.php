@@ -34,15 +34,17 @@ Route::get('auth/{provider}/callback', [App\Http\Controllers\Auth\SocialLoginCon
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])->name('account.index');
-    Route::post('/my-account/update', [App\Http\Controllers\Frontend\AccountController::class, 'updateDetails'])->name('account.update');
-    Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'viewOrder'])->name('account.orders.show');
+    Route::post('/my-account/update', [App\Http\Controllers\Frontend\AccountController::class, 'update'])->name('account.update');
+    Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'showOrder'])->name('account.orders.show');
     Route::post('/my-account/orders/{id}/cancel', [App\Http\Controllers\Frontend\AccountController::class, 'cancelOrder'])->name('account.orders.cancel');
 
     // Wishlist Routes
     Route::get('/wishlist', [App\Http\Controllers\Frontend\WishlistController::class, 'index'])->name('wishlist.index');
-    Route::post('/wishlist/add', [App\Http\Controllers\Frontend\WishlistController::class, 'store'])->name('wishlist.add');
     Route::delete('/wishlist/{id}', [App\Http\Controllers\Frontend\WishlistController::class, 'destroy'])->name('wishlist.destroy');
 });
+
+// Wishlist Add (Handled with manual auth check for AJX)
+Route::post('/wishlist/add', [App\Http\Controllers\Frontend\WishlistController::class, 'store'])->name('wishlist.add');
 
 // Public Chatbot Route (Moved from API to Web to access Session)
 Route::post('/api/chat/send', [App\Http\Controllers\Api\ChatController::class, 'sendMessage'])->name('api.chat.send');
@@ -82,6 +84,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
             Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
             Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
+            
+            // Coupons
+            Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
         });
 
         // Admin & Staff Routes (Stock only)

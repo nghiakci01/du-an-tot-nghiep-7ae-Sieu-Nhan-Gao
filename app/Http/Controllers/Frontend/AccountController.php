@@ -13,74 +13,59 @@ class AccountController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $orders = $user->orders()->latest()->get();
+        $orders = $user->orders()->orderBy('created_at', 'desc')->get();
         return view('frontend.account.index', compact('user', 'orders'));
     }
 
-    public function updateDetails(Request $request)
+    public function showOrder($id)
+    {
+        $user = Auth::user();
+        $order = $user->orders()->with('items.product')->findOrFail($id);
+        return view('frontend.account.orders.show', compact('user', 'order'));
+    }
+
+    public function update(Request $request)
     {
         $user = Auth::user();
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:15',
-            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'current_password' => 'nullable|required_with:new_password',
+            'current_password' => 'required_with:new_password|nullable',
             'new_password' => 'nullable|min:8|confirmed',
         ]);
 
         $user->name = $request->name;
         $user->phone = $request->phone;
-        $user->address = $request->address;
 
         if ($request->hasFile('avatar')) {
-            // Delete old avatar if exists
             if ($user->avatar) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
             }
-            // Store new avatar in 'avatars' folder within public disk
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $path;
+            $user->avatar = $request->file('avatar')->store('avatars', 'public');
         }
 
         if ($request->filled('new_password')) {
             if (!Hash::check($request->current_password, $user->password)) {
-                return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng']);
+                return redirect()->back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.']);
             }
             $user->password = Hash::make($request->new_password);
         }
 
         $user->save();
 
-        return back()->with('success', 'Cập nhật thông tin thành công!');
-    }
-
-    public function viewOrder($id)
-    {
-        $order = Order::where('id', $id)->where('user_id', Auth::id())->with('items.product', 'items.variant')->firstOrFail();
-        return view('frontend.account.order_detail', compact('order'));
+        return redirect()->back()->with('success', 'Cập nhật thông tin thành công!');
     }
 
     public function cancelOrder($id)
     {
-        $order = Order::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $user = Auth::user();
+        $order = $user->orders()->where('status', 'PENDING')->findOrFail($id);
 
-        // Check for UPPERCASE status 'PENDING' to match DB convention
-        if ($order->status == 'PENDING') {
-            $order->status = 'CANCELLED'; // Save as UPPERCASE
-            $order->save();
+        $order->status = 'CANCELLED';
+        $order->save();
 
-            // Replicate stock restore logic here for User-initiated cancellation
-            foreach ($order->items as $item) {
-                if ($item->variant) {
-                    $item->variant->increment('stock_quantity', $item->quantity);
-                }
-            }
-
-            return back()->with('success', 'Đã hủy đơn hàng thành công.');
-        }
-
-        return back()->with('error', 'Không thể hủy đơn hàng này.');
+        return redirect()->back()->with('success', 'Đã hủy đơn hàng thành công!');
     }
 }
