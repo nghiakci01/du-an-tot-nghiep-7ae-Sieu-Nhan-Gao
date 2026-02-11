@@ -19,19 +19,14 @@
     </div>
     <!--breadcrumbs area end-->
 
-    <!-- my account start  -->
-    <section class="main_content_area">
-        <div class="container">
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-            @if($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+<!-- my account start  -->
+<section class="main_content_area">
+    <div class="container">
+        <div class="account_dashboard">
+            <div class="row">
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <!-- Nav tabs -->
+@include('frontend.account.partials.sidebar')
                 </div>
             @endif
             <div class="account_dashboard">
@@ -57,21 +52,35 @@
                                 </li>
                             </ul>
                         </div>
-                    </div>
-                    <div class="col-sm-12 col-md-9 col-lg-9">
-                        <!-- Tab panes -->
-                        <div class="tab-content dashboard_content">
-                            <div class="tab-pane fade show active" id="dashboard">
-                                <h3>{{ __('messages.dashboard') }} </h3>
-                                <p>{{ __('messages.hello') }}, <strong>{{ $user->name }}</strong>
-                                    ({{ __('messages.not_user') }} <strong>{{ $user->name }}</strong>? <a
-                                        href="{{ route('logout') }}"
-                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('messages.logout') }}</a>)
-                                </p>
-                                <p>{{ __('messages.dashboard_desc') }} <a href="#orders"
-                                        data-bs-toggle="tab">{{ __('messages.recent_orders') }}</a>,
-                                    {{ __('messages.manage_shipping') }} {{ __('messages.and') }} <a href="#address"
-                                        data-bs-toggle="tab">{{ __('messages.edit_password') }}</a></p>
+                        <div class="tab-pane fade" id="orders">
+                            <h3>Orders</h3>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Order</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Total</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($orders as $order)
+                                        <tr>
+                                            <td>#{{ $order->id }}</td>
+                                            <td>{{ $order->created_at->format('M d, Y') }}</td>
+                                            <td><span class="{{ $order->status === 'completed' ? 'success' : ($order->status === 'cancelled' ? 'danger' : 'warning') }}">{{ $order->status }}</span></td>
+                                            <td>{{ number_format($order->total_price) }}₫ </td>
+                                            <td><a href="{{ route('account.orders.show', $order->id) }}" class="view">view</a></td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="5">You have no orders.</td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
                             </div>
                             <div class="tab-pane fade" id="orders">
                                 <h3>{{ __('messages.orders') }}</h3>

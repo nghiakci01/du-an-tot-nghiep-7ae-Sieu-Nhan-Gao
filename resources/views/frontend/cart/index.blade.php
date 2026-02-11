@@ -177,7 +177,7 @@
             var ele = $(this);
             var row = ele.parents("tr");
             var id = row.attr("data-id");
-            var qty = ele.val();
+            var quantity = ele.val();
             
             console.log('Updating item:', id, 'Qty:', qty);
 
@@ -185,16 +185,39 @@
                 url: '{{ route('cart.update') }}',
                 method: "POST",
                 data: {
-                    _method: 'PATCH',
+                    _token: '{{ csrf_token() }}', 
                     id: id, 
-                    quantity: qty
+                    quantity: quantity
                 },
                 success: function (response) {
-                    window.location.reload();
+                    if(response.success) {
+                        // Update item total
+                        row.find('.product_total').text(response.item_total);
+                        
+                        // Update cart totals
+                        $('.cart_amount').each(function() {
+                             // Assuming all cart_amount classes are totals/subtotals that should match
+                             // Ideally add specific IDs for subtotal and grand total if they differ logic, 
+                             // but here they are same value.
+                             if($(this).find('span').text() !== 'Free') {
+                                 $(this).text(response.cart_total);
+                             }
+                        });
+                        
+                        // Update header cart count
+                        $('#cart-count').text(response.cart_count);
+                        
+                        // Optional: Show a small toast or visual feedback instead of alert
+                        // alert(response.message); 
+                    } else {
+                        alert(response.message || 'Có lỗi xảy ra.');
+                        window.location.reload(); // Fallback
+                    }
                 },
                 error: function(xhr) {
-                    console.error('Update failed:', xhr.responseText);
-                    alert('Không thể cập nhật giỏ hàng. Vui lòng thử lại.');
+                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Số lượng vượt quá tồn kho hoặc có lỗi xảy ra.';
+                    alert(errorMsg);
+                    window.location.reload(); // Reset to valid state
                 }
             });
         });
@@ -206,31 +229,39 @@
             var row = ele.parents("tr");
             var id = row.attr("data-id");
             
-            console.log('Removing item:', id);
-
-            if(confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+            if(confirm("Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?")) {
                 $.ajax({
                     url: '{{ route('cart.remove') }}',
                     method: "POST",
                     data: {
+                        _token: '{{ csrf_token() }}', 
                         _method: 'DELETE',
                         id: id
                     },
                     success: function (response) {
-                        console.log('Remove success:', response);
-                        window.location.reload();
+                        if(response.success) {
+                            row.fadeOut(300, function() { $(this).remove(); });
+                            
+                            // Update cart totals
+                            $('.cart_amount').each(function() {
+                                 if($(this).find('span').text() !== 'Free') {
+                                     $(this).text(response.cart_total);
+                                 }
+                            });
+                            
+                             // Update header cart count
+                            $('#cart-count').text(response.cart_count);
+                            
+                            // Check if cart is empty
+                            if(response.cart_count == 0) {
+                                setTimeout(function() { window.location.reload(); }, 500);
+                            }
+                        } else {
+                            alert(response.message || 'Có lỗi xảy ra.');
+                        }
                     },
                     error: function(xhr) {
-                        console.error('Remove failed:', xhr.responseText);
-                        let errorMsg = 'Lỗi hệ thống';
-                        try {
-                            const response = JSON.parse(xhr.responseText);
-                            if (response.message) errorMsg = response.message;
-                        } catch(e) {}
-
-                        if(confirm("Lỗi khi xóa bằng AJAX (" + errorMsg + "). Thử dùng phương pháp xóa dự phòng?")) {
-                            window.location.href = '{{ route('cart.remove') }}?id=' + id;
-                        }
+                        alert('Có lỗi xảy ra. Vui lòng thử lại.');
                     }
                 });
             }
@@ -240,7 +271,7 @@
         $("#clear-cart").on('click', function(e) {
             e.preventDefault();
             
-            if(confirm("Bạn có chắc chắn muốn xóa toàn bộ giỏ hàng?")) {
+            if(confirm("Bạn có chắc muốn xóa sạch giỏ hàng?")) {
                 $.ajax({
                     url: '{{ route('cart.clear') }}',
                     method: "POST",
@@ -248,8 +279,7 @@
                         window.location.reload();
                     },
                     error: function(xhr) {
-                        console.error('Clear cart failed:', xhr.responseText);
-                        alert('Không thể xóa giỏ hàng. Vui lòng thử lại.');
+                        alert('Có lỗi xảy ra. Vui lòng thử lại.');
                     }
                 });
             }
