@@ -19,68 +19,20 @@
     </div>
     <!--breadcrumbs area end-->
 
-<!-- my account start  -->
-<section class="main_content_area">
-    <div class="container">
-        <div class="account_dashboard">
-            <div class="row">
-                <div class="col-sm-12 col-md-3 col-lg-3">
-                    <!-- Nav tabs -->
-@include('frontend.account.partials.sidebar')
-                </div>
-            @endif
+    <!-- my account start  -->
+    <section class="main_content_area">
+        <div class="container">
             <div class="account_dashboard">
                 <div class="row">
                     <div class="col-sm-12 col-md-3 col-lg-3">
-                        <!-- Nav tabs -->
-                        <div class="dashboard_tab_button">
-                            <ul role="tablist" class="nav flex-column dashboard-list">
-                                <li><a href="#dashboard" data-bs-toggle="tab"
-                                        class="nav-link active">{{ __('messages.dashboard') }}</a></li>
-                                <li> <a href="#orders" data-bs-toggle="tab" class="nav-link">{{ __('messages.orders') }}</a>
-                                </li>
-                                <li><a href="#address" data-bs-toggle="tab"
-                                        class="nav-link">{{ __('messages.account_details') }}</a></li>
-                                <li>
-                                    <a href="{{ route('logout') }}" class="nav-link"
-                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        {{ __('messages.logout') }}
-                                    </a>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="tab-pane fade" id="orders">
-                            <h3>Orders</h3>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Order</th>
-                                            <th>Date</th>
-                                            <th>Status</th>
-                                            <th>Total</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($orders as $order)
-                                        <tr>
-                                            <td>#{{ $order->id }}</td>
-                                            <td>{{ $order->created_at->format('M d, Y') }}</td>
-                                            <td><span class="{{ $order->status === 'completed' ? 'success' : ($order->status === 'cancelled' ? 'danger' : 'warning') }}">{{ $order->status }}</span></td>
-                                            <td>{{ number_format($order->total_price) }}₫ </td>
-                                            <td><a href="{{ route('account.orders.show', $order->id) }}" class="view">view</a></td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="5">You have no orders.</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                        @include('frontend.account.partials.sidebar')
+                    </div>
+                    <div class="col-sm-12 col-md-9 col-lg-9">
+                        <!-- Tab panes -->
+                        <div class="tab-content dashboard_content">
+                            <div class="tab-pane fade show active" id="dashboard">
+                                <h3>{{ __('messages.dashboard') }} </h3>
+                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>, manage your <a href="#">shipping and billing addresses</a> and <a href="#">Edit your password and account details.</a></p>
                             </div>
                             <div class="tab-pane fade" id="orders">
                                 <h3>{{ __('messages.orders') }}</h3>
@@ -123,67 +75,108 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="5">{{ __('messages.no_orders') }}</td>
+                                                    <td colspan="5" class="text-center">{{ __('messages.no_orders') }}</td>
                                                 </tr>
                                             @endforelse
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-
+                            <div class="tab-pane fade" id="downloads">
+                                <h3>Downloads</h3>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Downloads</th>
+                                                <th>Expires</th>
+                                                <th>Download</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Shopro - Multipurpose eCommerce HTML Template</td>
+                                                <td>May 10, 2018</td>
+                                                <td>never</td>
+                                                <td><a href="#" class="view">Download File</a></td>
+                                            </tr>
+                                            <tr>
+                                                <td>HasTech - Multipurpose eCommerce HTML Template</td>
+                                                <td>Sep 11, 2018</td>
+                                                <td>never</td>
+                                                <td><a href="#" class="view">Download File</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                             <div class="tab-pane fade" id="address">
+                                <p>The following addresses will be used on the checkout page by default.</p>
+                                <h4 class="billing-address">Billing address</h4>
+                                <a href="#" class="view">Edit</a>
+                                <p><strong>Bobby Jackson</strong></p>
+                                <address>
+                                    House #15<br>
+                                    Road #1<br>
+                                    Block #C <br>
+                                    Banasree, Dhaka-1219
+                                </address>
+                                <p>Bangladesh</p>
+                            </div>
+                            <div class="tab-pane fade" id="account-details">
                                 <h3>{{ __('messages.account_details') }} </h3>
                                 <div class="login">
                                     <div class="login_form_container">
                                         <div class="account_login_form">
-                                            <form action="{{ route('account.update') }}" method="POST"
-                                                enctype="multipart/form-data">
+                                            <form action="{{ route('account.update') }}" method="POST" enctype="multipart/form-data">
                                                 @csrf
-
                                                 <div class="mb-4 text-center">
                                                     @if($user->avatar)
-                                                        <img id="avatar-preview" src="{{ Storage::url($user->avatar) }}"
-                                                            alt="Avatar" class="rounded-circle img-thumbnail"
-                                                            style="width: 120px; height: 120px; object-fit: cover;">
+                                                        <img id="avatar-preview" src="{{ Storage::url($user->avatar) }}" alt="Avatar" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
                                                     @else
-                                                        <img id="avatar-preview"
-                                                            src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random"
-                                                            alt="Avatar" class="rounded-circle img-thumbnail"
-                                                            style="width: 120px; height: 120px; object-fit: cover;">
+                                                        <img id="avatar-preview" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random" alt="Avatar" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
                                                     @endif
                                                     <div class="mt-2">
-                                                        <label for="avatar"
-                                                            class="btn btn-sm btn-outline-primary">{{ __('messages.choose_image') }}</label>
-                                                        <input type="file" name="avatar" id="avatar" class="d-none"
-                                                            accept="image/*"
-                                                            onchange="document.getElementById('avatar-preview').src = window.URL.createObjectURL(this.files[0])">
+                                                        <label for="avatar" class="btn btn-sm btn-outline-primary">{{ __('messages.choose_image') }}</label>
+                                                        <input type="file" name="avatar" id="avatar" class="d-none" accept="image/*" onchange="document.getElementById('avatar-preview').src = window.URL.createObjectURL(this.files[0])">
                                                     </div>
                                                 </div>
-
-                                                <label>{{ __('messages.full_name') }}</label>
-                                                <input type="text" name="name" value="{{ old('name', $user->name) }}">
-
-                                                <label>{{ __('messages.phone_number') }}</label>
-                                                <input type="text" name="phone" value="{{ old('phone', $user->phone) }}">
-
-                                                <label>{{ __('messages.email') }}</label>
-                                                <input type="text" name="email" value="{{ $user->email }}" readonly
-                                                    disabled>
+                                                
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <label>{{ __('messages.full_name') }}</label>
+                                                        <input type="text" name="name" value="{{ old('name', $user->name) }}">
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <label>{{ __('messages.phone_number') }}</label>
+                                                        <input type="text" name="phone" value="{{ old('phone', $user->phone) }}">
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <label>{{ __('messages.email') }}</label>
+                                                        <input type="text" name="email" value="{{ $user->email }}" readonly disabled>
+                                                    </div>
+                                                </div>
 
                                                 <h5 class="mt-4">{{ __('messages.change_password') }}</h5>
                                                 <small class="text-muted">{{ __('messages.leave_blank') }}</small>
 
-                                                <label>{{ __('messages.current_password') }}</label>
-                                                <input type="password" name="current_password">
+                                                <div class="row mt-3">
+                                                    <div class="col-12">
+                                                        <label>{{ __('messages.current_password') }}</label>
+                                                        <input type="password" name="current_password">
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <label>{{ __('messages.new_password') }}</label>
+                                                        <input type="password" name="new_password">
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <label>{{ __('messages.confirm_new_password') }}</label>
+                                                        <input type="password" name="new_password_confirmation">
+                                                    </div>
+                                                </div>
 
-                                                <label>{{ __('messages.new_password') }}</label>
-                                                <input type="password" name="new_password">
-
-                                                <label>{{ __('messages.confirm_new_password') }}</label>
-                                                <input type="password" name="new_password_confirmation">
-
-                                                <br>
-                                                <div class="save_button primary_btn default_button">
+                                                <div class="save_button primary_btn default_button mt-3">
                                                     <button type="submit">Save Changes</button>
                                                 </div>
                                             </form>
