@@ -179,11 +179,11 @@
             var id = row.attr("data-id");
             var quantity = ele.val();
             
-            console.log('Updating item:', id, 'Qty:', qty);
+            console.log('Updating item:', id, 'Qty:', quantity);
 
             $.ajax({
                 url: '{{ route('cart.update') }}',
-                method: "POST",
+                method: "PATCH",
                 data: {
                     _token: '{{ csrf_token() }}', 
                     id: id, 
