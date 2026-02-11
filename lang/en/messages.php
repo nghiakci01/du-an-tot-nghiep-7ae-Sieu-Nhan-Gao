@@ -66,8 +66,8 @@ return [
     'subscribe' => 'Subscribe!',
     // About
     'about_us' => 'About Us',
-    'about_welcome' => 'Welcome to Siêu Nhân Gạo!',
-    'about_intro_1' => 'Siêu Nhân Gạo is a trusted destination for fashion lovers who love minimalism, modernity and quality. We not only provide clothes, but also bring lifestyle and confidence to every customer.',
+    'about_welcome' => 'Welcome to Elite!',
+    'about_intro_1' => 'Elite is a trusted destination for fashion lovers who love minimalism, modernity and quality. We not only provide clothes, but also bring lifestyle and confidence to every customer.',
     'about_intro_2' => 'With the mission of bringing the highest quality products at reasonable prices, our team always strives to select the latest designs, catching up with world fashion trends.',
     'view_work' => 'View products now',
     'high_quality' => 'High Quality',
@@ -94,7 +94,7 @@ return [
 
     // News
     'latest_news' => 'Latest News',
-    'latest_news_desc' => 'Update the latest fashion trends and announcements from Siêu Nhân Gạo',
+    'latest_news_desc' => 'Update the latest fashion trends and announcements from Elite',
     'read_more' => 'Read More',
     'newsletter_signup' => 'Sign up for newsletter',
     'newsletter_signup_desc' => 'Get immediate notifications about new collections and exclusive offers.',
