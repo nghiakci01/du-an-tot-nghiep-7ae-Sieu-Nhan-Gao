@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', __('messages.about_us') . ' | Reid Fashion')
+@section('title', __('messages.about_us') . ' | Siêu Nhân Gạo')
 
 @section('content')
     <!--breadcrumbs area start-->
