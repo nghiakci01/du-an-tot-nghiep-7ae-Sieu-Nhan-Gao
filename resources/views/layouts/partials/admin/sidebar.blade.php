@@ -102,6 +102,14 @@
                               <span class="pc-mtext">Quản lý Banner</span>
                           </a>
                       </li>
+                      <li class="pc-item">
+                          <a href="{{ route('admin.coupons.index') }}" class="pc-link">
+                              <span class="pc-micon">
+                                  <i class="ti ti-ticket"></i>
+                              </span>
+                              <span class="pc-mtext">Mã Giảm Giá</span>
+                          </a>
+                      </li>
                       <li class="pc-item pc-hasmenu">
                           <a href="#!" class="pc-link">
                               <span class="pc-micon">

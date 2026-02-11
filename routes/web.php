@@ -84,6 +84,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
             Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
             Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
+            
+            // Coupons
+            Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
         });
 
         // Admin & Staff Routes (Stock only)
