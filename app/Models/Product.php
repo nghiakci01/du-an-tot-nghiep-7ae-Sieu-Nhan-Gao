@@ -18,6 +18,7 @@ class Product extends Model
         'short_description',
         'description',
         'price',
+        'sale_price',
         'is_active',
         'is_featured',
         'image',
@@ -27,6 +28,7 @@ class Product extends Model
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
         'price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
     ];
 
     public function category(): BelongsTo
@@ -47,5 +49,31 @@ class Product extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function wishlistedBy()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    /**
+     * Accessor for original_price (maps to price field)
+     * Used for view compatibility
+     */
+    public function getOriginalPriceAttribute()
+    {
+        return $this->price;
+    }
+
+    /**
+     * Accessor for image_url with fallback
+     * Returns placeholder if image file doesn't exist
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->image && \Storage::disk('public')->exists($this->image)) {
+            return asset('storage/' . $this->image);
+        }
+        return asset('frontend-assets/img/product/product21.jpg');
     }
 }

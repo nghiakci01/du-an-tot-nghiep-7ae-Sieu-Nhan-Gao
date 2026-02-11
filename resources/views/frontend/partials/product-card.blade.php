@@ -33,7 +33,7 @@
         </div>
         <div class="product_content">
             <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
-            <span class="current_price">{{ number_format($product->price, 0, ',', '.') }}đ</span>
+            @include('frontend.partials.product-price', ['product' => $product])
         </div>
     </div>
 </div>

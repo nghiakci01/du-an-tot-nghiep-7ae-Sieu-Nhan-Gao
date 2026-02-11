@@ -23,13 +23,27 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'variant_id' => 'required|exists:product_variants,id',
+            'variant_id' => 'nullable|exists:product_variants,id',
             'quantity' => 'required|integer|min:1'
         ]);
 
         $product = Product::findOrFail($request->product_id);
-        $variant = ProductVariant::findOrFail($request->variant_id);
+        $variantId = $request->variant_id;
 
+        // Auto-select variant if missing
+        if (!$variantId) {
+            $variants = $product->variants;
+            if ($variants->count() === 1) {
+                $variantId = $variants->first()->id;
+            } elseif ($variants->count() > 1) {
+                return redirect()->route('product.detail', $product->slug)
+                    ->with('info', 'Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.');
+            } else {
+                return redirect()->back()->with('error', 'Sản phẩm này hiện chưa có biến thể sẵn sàng.');
+            }
+        }
+
+        $variant = ProductVariant::findOrFail($variantId);
         $cart = session()->get('cart', []);
 
         // Check availability
@@ -40,12 +54,19 @@ class CartController extends Controller
         if(isset($cart[$variant->id])) {
             $cart[$variant->id]['quantity'] += $request->quantity;
         } else {
+            // Determine price: Use variant's sale_price if it exists and is less than price, else use variant price
+            // Fallback to product price if variant price is null
+            $itemPrice = $variant->price ?? $product->price;
+            if ($variant->sale_price && $variant->sale_price < ($variant->price ?? PHP_INT_MAX)) {
+                $itemPrice = $variant->sale_price;
+            }
+
             $cart[$variant->id] = [
                 "product_id" => $product->id,
                 "variant_id" => $variant->id,
                 "name" => $product->name,
                 "quantity" => $request->quantity,
-                "price" => $product->price,
+                "price" => $itemPrice,
                 "image" => $product->image,
                 "size" => $variant->size,
                 "color" => $variant->color,
@@ -54,13 +75,18 @@ class CartController extends Controller
         }
 
         session()->put('cart', $cart);
+        
+        if ($request->input('action') === 'buy_now') {
+            return redirect()->route('checkout.index');
+        }
+
         return redirect()->route('cart.index')->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
     }
 
     public function updateCart(Request $request)
     {
         if($request->id && $request->quantity){
-            $cart = session()->get('cart');
+            $cart = session()->get('cart', []);
             $variant = ProductVariant::find($request->id);
 
             if ($variant && $variant->stock_quantity >= $request->quantity) {
@@ -89,6 +115,9 @@ class CartController extends Controller
                      'message' => 'Số lượng không hợp lệ hoặc vượt quá tồn kho'
                  ], 400);
             }
+            
+            session()->flash('error', 'Số lượng không hợp lệ hoặc vượt quá tồn kho');
+            return response()->json(['success' => false], 400);
         }
         
         return response()->json(['success' => false, 'message' => 'Yêu cầu không hợp lệ'], 400);
@@ -96,10 +125,31 @@ class CartController extends Controller
 
     public function remove(Request $request)
     {
-        if($request->id) {
-            $cart = session()->get('cart');
-            if(isset($cart[$request->id])) {
-                unset($cart[$request->id]);
+        $id = $request->id ?: $request->get('id');
+        $cart = session()->get('cart', []);
+        
+        \Log::info('Cart Remove Request', [
+            'method' => $request->method(),
+            'id' => $id,
+            'cart_keys' => array_keys($cart)
+        ]);
+
+        if ($id !== null) {
+            // Find the key in the cart - sometimes keys might be strings even if numeric
+            $foundKey = null;
+            if (isset($cart[$id])) {
+                $foundKey = $id;
+            } else {
+                foreach (array_keys($cart) as $key) {
+                    if ((string)$key === (string)$id) {
+                        $foundKey = $key;
+                        break;
+                    }
+                }
+            }
+
+            if ($foundKey !== null) {
+                unset($cart[$foundKey]);
                 session()->put('cart', $cart);
                 
                 // Calculate new totals

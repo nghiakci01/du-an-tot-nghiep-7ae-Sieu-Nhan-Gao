@@ -662,17 +662,30 @@
     /*----------------------------
     	slider-range here
     ------------------------------ */
+    var minPrice = 0;
+    var maxPrice = 5000000;
+    
+    // Check if values exist in URL params to persist state
+    var urlParams = new URLSearchParams(window.location.search);
+    var currentMin = urlParams.has('min_price') ? parseInt(urlParams.get('min_price')) : minPrice;
+    var currentMax = urlParams.has('max_price') ? parseInt(urlParams.get('max_price')) : maxPrice;
+
     $( "#slider-range" ).slider({
         range: true,
-        min: 50,
-        max: 500,
-        values: [ 0, 500 ],
+        min: minPrice,
+        max: maxPrice,
+        step: 50000,
+        values: [ currentMin, currentMax ],
         slide: function( event, ui ) {
-        $( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
+            $( "#amount" ).val( new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(ui.values[ 0 ]) + " - " + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(ui.values[ 1 ]) );
+            
+            // Update hidden inputs if they exist
+            if($('#min_price').length) $('#min_price').val(ui.values[0]);
+            if($('#max_price').length) $('#max_price').val(ui.values[1]);
        }
     });
-    $( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) +
-       " - $" + $( "#slider-range" ).slider( "values", 1 ) );
+    $( "#amount" ).val( new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format($( "#slider-range" ).slider( "values", 0 )) +
+       " - " + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format($( "#slider-range" ).slider( "values", 1 )) );
     
 
     /*niceSelect*/

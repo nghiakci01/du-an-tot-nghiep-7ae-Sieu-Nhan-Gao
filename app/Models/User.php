@@ -11,7 +11,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
-    
+
     const ROLE_ADMIN = 'admin';
     const ROLE_STAFF = 'staff';
     const ROLE_USER = 'user';
@@ -28,6 +28,7 @@ class User extends Authenticatable
         'phone',
         'address',
         'role',
+        'avatar',
     ];
 
     /**
@@ -66,5 +67,15 @@ class User extends Authenticatable
     public function isStaff(): bool
     {
         return $this->role === self::ROLE_STAFF;
+    }
+
+    public function socialAccounts()
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class);
     }
 }
