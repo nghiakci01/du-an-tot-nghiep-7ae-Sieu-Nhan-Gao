@@ -26,24 +26,7 @@
             <div class="row">
                 <div class="col-sm-12 col-md-3 col-lg-3">
                     <!-- Nav tabs -->
-                    <div class="dashboard_tab_button">
-                        <ul role="tablist" class="nav flex-column dashboard-list">
-                            <li><a href="#dashboard" data-bs-toggle="tab" class="nav-link active">Dashboard</a></li>
-                            <li> <a href="#orders" data-bs-toggle="tab" class="nav-link">Orders</a></li>
-                            <li><a href="#downloads" data-bs-toggle="tab" class="nav-link">Downloads</a></li>
-                            <li><a href="#address" data-bs-toggle="tab" class="nav-link">Addresses</a></li>
-                            <li><a href="#account-details" data-bs-toggle="tab" class="nav-link">Account details</a></li>
-                            <li>
-                                <a href="{{ route('logout') }}" class="nav-link"
-                                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    logout
-                                </a>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
+@include('frontend.account.partials.sidebar')
                 </div>
                 <div class="col-sm-12 col-md-9 col-lg-9">
                     <!-- Tab panes -->
@@ -67,14 +50,19 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- Placeholder for orders -->
+                                        @forelse($orders as $order)
                                         <tr>
-                                            <td>1</td>
-                                            <td>May 10, 2022</td>
-                                            <td><span class="success">Completed</span></td>
-                                            <td>$25.00 for 1 item </td>
-                                            <td><a href="#" class="view">view</a></td>
+                                            <td>#{{ $order->id }}</td>
+                                            <td>{{ $order->created_at->format('M d, Y') }}</td>
+                                            <td><span class="{{ $order->status === 'completed' ? 'success' : ($order->status === 'cancelled' ? 'danger' : 'warning') }}">{{ $order->status }}</span></td>
+                                            <td>{{ number_format($order->total_price) }}₫ </td>
+                                            <td><a href="{{ route('account.orders.show', $order->id) }}" class="view">view</a></td>
                                         </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="5">You have no orders.</td>
+                                        </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>

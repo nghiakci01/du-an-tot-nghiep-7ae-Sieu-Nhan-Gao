@@ -11,6 +11,14 @@ class AccountController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return view('frontend.account.index', compact('user'));
+        $orders = $user->orders()->orderBy('created_at', 'desc')->get();
+        return view('frontend.account.index', compact('user', 'orders'));
+    }
+
+    public function showOrder($id)
+    {
+        $user = Auth::user();
+        $order = $user->orders()->with('items.product')->findOrFail($id);
+        return view('frontend.account.orders.show', compact('user', 'order'));
     }
 }
