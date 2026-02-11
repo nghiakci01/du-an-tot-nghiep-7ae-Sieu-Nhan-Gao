@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Shopping Cart | FashionStore')
+@section('title', __('messages.shopping_cart') . ' | FashionStore')
 
 @section('content')
     <!--breadcrumbs area start-->
@@ -10,9 +10,9 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">Home</a></li>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
-                            <li>Shopping Cart</li>
+                            <li>{{ __('messages.shopping_cart') }}</li>
                         </ul>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                                                         <a
                                                             href="{{ route('product.detail', $details['slug']) }}">{{ $details['name'] }}</a>
                                                         <br>
-                                                        <small class="text-muted">Size: {{ $details['size'] }} | Color:
+                                                        <small class="text-muted">{{ __('messages.size') }}: {{ $details['size'] }} | {{ __('messages.color') }}:
                                                             {{ $details['color'] }}</small>
                                                     </td>
                                                     <td class="product-price">{{ number_format($details['price']) }} đ</td>
@@ -111,7 +111,7 @@
                                         <input placeholder="{{ __('messages.coupon_code') }}" type="text" disabled>
                                         <button type="button" disabled>{{ __('messages.apply') }}</button>
                                         <small class="text-muted d-block mt-2">
-                                            <i class="fa fa-info-circle"></i> Feature coming soon
+                                            <i class="fa fa-info-circle"></i> Tính năng đang phát triển
                                         </small>
                                     </div>
                                 </div>
