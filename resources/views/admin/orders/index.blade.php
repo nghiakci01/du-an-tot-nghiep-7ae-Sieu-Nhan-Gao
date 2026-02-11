@@ -51,8 +51,13 @@
                             <tr>
                                 <td>#{{ $order->id }}</td>
                                 <td>
-                                    <strong>{{ $order->user->name }}</strong><br>
-                                    <small>{{ $order->user->email }}</small>
+                                    @if($order->user)
+                                        <strong>{{ $order->user->name }}</strong><br>
+                                        <small>{{ $order->user->email }}</small>
+                                    @else
+                                        <strong>Khách vãng lai</strong><br>
+                                        <small>Không có tài khoản</small>
+                                    @endif
                                 </td>
                                 <td>{{ number_format($order->total_price, 0, ',', '.') }}đ</td>
                                 <td>{{ $order->payment_method }}</td>

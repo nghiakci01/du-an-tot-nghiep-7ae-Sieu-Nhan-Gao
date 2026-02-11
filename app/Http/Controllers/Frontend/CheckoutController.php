@@ -53,7 +53,7 @@ class CheckoutController extends Controller
 
             $order = Order::create([
                 'user_id' => Auth::id(), // Nullable if guest
-                'status' => 'PENDING',
+                'status' => 'pending',
                 'total_price' => $total,
                 'payment_method' => $request->payment_method,
                 'shipping_address' => $request->address . ' - ' . $request->phone . ' - ' . $request->name, // Simple concatenation or store separately if schema supported
