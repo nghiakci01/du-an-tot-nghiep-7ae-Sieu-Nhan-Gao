@@ -108,7 +108,7 @@ class CartController extends Controller
                      'item_total' => number_format($itemTotal) . ' đ',
                      'cart_total' => number_format($cartTotal) . ' đ',
                      'cart_count' => $cartCount
-                 ]);
+                 ], 200);
             } else {
                  return response()->json([
                      'success' => false,

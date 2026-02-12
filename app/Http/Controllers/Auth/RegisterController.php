@@ -49,10 +49,21 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'name' => ['required', 'string', 'min:2', 'max:50', 'regex:/^[a-zA-ZÀ-ỹ\s]+$/u'],
+            'phone' => ['required', 'string', 'regex:/^0[0-9]{9}$/'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/'],
+            'password' => [
+                'required', 
+                'string', 
+                'min:8', 
+                'confirmed', 
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+            ],
+        ], [
+            'name.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng.',
+            'phone.regex' => 'Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0.',
+            'email.regex' => 'Định dạng email không hợp lệ.',
+            'password.regex' => 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt.',
         ]);
     }
 

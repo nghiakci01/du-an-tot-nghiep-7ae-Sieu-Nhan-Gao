@@ -12,7 +12,7 @@
 <div class="cart_link">
     <a href="{{ route('cart.index') }}">
         <i class="fa fa-shopping-basket"></i>
-        <span id="cart-count">{{ $cartCount }}</span> sản phẩm
+        <span id="cart-count">{{ $cartCount }}</span> {{ __('messages.product') }}
     </a>
     
     <!--mini cart-->
@@ -66,11 +66,11 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td class="text-left">Tạm tính:</td>
+                            <td class="text-left">{{ __('messages.subtotal') }}:</td>
                             <td class="text-right">{{ number_format($cartTotal) }} đ</td>
                         </tr>
                         <tr>
-                            <td class="text-left">Tổng:</td>
+                            <td class="text-left">{{ __('messages.total') }}:</td>
                             <td class="text-right">{{ number_format($cartTotal) }} đ</td>
                         </tr>
                     </tbody>
@@ -78,15 +78,15 @@
             </div>
             
             <div class="cart_button view_cart">
-                <a href="{{ route('cart.index') }}">Xem giỏ hàng</a>
+                <a href="{{ route('cart.index') }}">{{ __('messages.view_cart') }}</a>
             </div>
             <div class="cart_button checkout">
-                <a href="{{ route('checkout.index') }}">Thanh toán</a>
+                <a href="{{ route('checkout.index') }}">{{ __('messages.checkout') }}</a>
             </div>
         @else
             <div class="cart_item">
                 <div class="cart_info text-center">
-                    <p class="text-muted">Giỏ hàng trống</p>
+                    <p class="text-muted">{{ __('messages.cart_empty') }}</p>
                 </div>
             </div>
         @endif
@@ -102,7 +102,7 @@ $(document).ready(function() {
         e.preventDefault();
         var itemId = $(this).data('id');
         
-            if(confirm('Xóa sản phẩm này khỏi giỏ hàng?')) {
+            if(confirm('{{ __('messages.confirm_remove_item') }}')) {
                 $.ajax({
                     url: '{{ route('cart.remove') }}',
                     method: 'POST',
@@ -115,11 +115,11 @@ $(document).ready(function() {
                     if(response.success) {
                         location.reload();
                     } else {
-                        alert(response.message || 'Có lỗi xảy ra.');
+                        alert(response.message || '{{ __('messages.error_occurred') }}');
                     }
                 },
                 error: function(xhr) {
-                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                    alert('{{ __('messages.error_occurred') }}');
                 }
             });
         }
