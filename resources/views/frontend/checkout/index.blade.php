@@ -258,6 +258,49 @@
     color: #28a745;
     font-weight: 600;
 }
+
+/* Validation Styles */
+.form_group input.is-invalid,
+.form_group select.is-invalid,
+.form_group textarea.is-invalid,
+input.is-invalid,
+select.is-invalid,
+textarea.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    padding-right: calc(1.5em + 0.75rem);
+}
+
+.form_group input.is-valid,
+.form_group select.is-valid,
+.form_group textarea.is-valid,
+input.is-valid,
+select.is-valid,
+textarea.is-valid {
+    border-color: #28a745;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    padding-right: calc(1.5em + 0.75rem);
+}
+
+.invalid-feedback {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc3545;
+}
+
+.valid-feedback {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #28a745;
+}
 </style>
 @endsection
 
@@ -370,20 +413,32 @@
                             <div class="row">
                                 <div class="col-lg-6 mb-20">
                                     <label>{{ __('messages.full_name') }} <span>*</span></label>
-                                    <input type="text" name="name" value="{{ Auth::check() ? Auth::user()->name : old('name') }}" required>    
+                                    <input type="text" name="name" value="{{ Auth::check() ? Auth::user()->name : old('name') }}" required class="@error('name') is-invalid @enderror">
+                                    @error('name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-12 mb-20">
                                     <label>{{ __('messages.phone_number') }} <span>*</span></label>
-                                    <input type="text" name="phone" value="{{ Auth::check() ? Auth::user()->phone : old('phone') }}" required>     
+                                    <input type="tel" name="phone" value="{{ Auth::check() ? Auth::user()->phone : old('phone') }}" required pattern="[0-9]{10,11}" class="@error('phone') is-invalid @enderror">
+                                    @error('phone')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-12 mb-20">
                                     <label>{{ __('messages.email') }} <span>*</span></label>
-                                    <input type="email" name="email" value="{{ Auth::check() ? Auth::user()->email : old('email') }}" required>     
+                                    <input type="email" name="email" value="{{ Auth::check() ? Auth::user()->email : old('email') }}" required class="@error('email') is-invalid @enderror">
+                                    @error('email')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="col-12 mb-20">
                                     <label>{{ __('messages.shipping_address') }} <span>*</span></label>
-                                    <input placeholder="{{ __('messages.street_address') }}" type="text" name="address" value="{{ Auth::check() ? Auth::user()->address : old('address') }}" required>     
+                                    <input placeholder="{{ __('messages.street_address') }}" type="text" name="address" value="{{ Auth::check() ? Auth::user()->address : old('address') }}" required minlength="10" class="@error('address') is-invalid @enderror">
+                                    @error('address')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="col-12">
@@ -563,6 +618,135 @@ $(document).ready(function() {
         </div>`;
         $('#couponMessage').html(html);
     }
+
+    // ============ FORM VALIDATION ============
+    
+    // Validation functions
+    function validateName(value) {
+        if (!value || value.trim().length < 2) {
+            return 'Vui lòng nhập họ tên (ít nhất 2 ký tự)';
+        }
+        return '';
+    }
+
+    function validatePhone(value) {
+        if (!value) {
+            return 'Vui lòng nhập số điện thoại';
+        }
+        const phoneRegex = /^[0-9]{10,11}$/;
+        if (!phoneRegex.test(value)) {
+            return 'Số điện thoại phải có 10-11 chữ số';
+        }
+        return '';
+    }
+
+    function validateEmail(value) {
+        if (!value) {
+            return 'Vui lòng nhập email';
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            return 'Email không hợp lệ';
+        }
+        return '';
+    }
+
+    function validateAddress(value) {
+        if (!value || value.trim().length < 10) {
+            return 'Vui lòng nhập địa chỉ (ít nhất 10 ký tự)';
+        }
+        return '';
+    }
+
+    // Show validation feedback
+    function showValidation(input, errorMessage) {
+        const $input = $(input);
+        const $feedback = $input.next('.invalid-feedback');
+        
+        if (errorMessage) {
+            $input.removeClass('is-valid').addClass('is-invalid');
+            if ($feedback.length) {
+                $feedback.text(errorMessage);
+            } else {
+                $input.after(`<div class="invalid-feedback">${errorMessage}</div>`);
+            }
+        } else {
+            $input.removeClass('is-invalid').addClass('is-valid');
+            $feedback.remove();
+        }
+    }
+
+    // Real-time validation on blur
+    $('input[name="name"]').on('blur', function() {
+        const error = validateName($(this).val());
+        showValidation(this, error);
+    });
+
+    $('input[name="phone"]').on('blur', function() {
+        const error = validatePhone($(this).val());
+        showValidation(this, error);
+    });
+
+    $('input[name="email"]').on('blur', function() {
+        const error = validateEmail($(this).val());
+        showValidation(this, error);
+    });
+
+    $('input[name="address"]').on('blur', function() {
+        const error = validateAddress($(this).val());
+        showValidation(this, error);
+    });
+
+    // Form submission validation
+    $('form').on('submit', function(e) {
+        let hasError = false;
+
+        // Validate all fields
+        const nameError = validateName($('input[name="name"]').val());
+        const phoneError = validatePhone($('input[name="phone"]').val());
+        const emailError = validateEmail($('input[name="email"]').val());
+        const addressError = validateAddress($('input[name="address"]').val());
+
+        showValidation('input[name="name"]', nameError);
+        showValidation('input[name="phone"]', phoneError);
+        showValidation('input[name="email"]', emailError);
+        showValidation('input[name="address"]', addressError);
+
+        if (nameError || phoneError || emailError || addressError) {
+            hasError = true;
+        }
+
+        // Check payment method
+        if (!$('input[name="payment_method"]:checked').length) {
+            alert('Vui lòng chọn phương thức thanh toán');
+            hasError = true;
+        }
+
+        if (hasError) {
+            e.preventDefault();
+            // Scroll to first error
+            const firstError = $('.is-invalid').first();
+            if (firstError.length) {
+                $('html, body').animate({
+                    scrollTop: firstError.offset().top - 100
+                }, 500);
+            }
+            return false;
+        }
+
+        // Show loading state
+        const $submitBtn = $(this).find('button[type="submit"]');
+        $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...');
+    });
+
+    // Remove validation on input
+    $('input[name="name"], input[name="phone"], input[name="email"], input[name="address"]').on('input', function() {
+        if ($(this).hasClass('is-invalid')) {
+            $(this).removeClass('is-invalid');
+            $(this).next('.invalid-feedback').remove();
+        }
+    });
 });
+
 </script>
 @endsection
