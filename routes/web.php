@@ -25,6 +25,8 @@ Route::get('/cart/count', [App\Http\Controllers\Frontend\CartController::class, 
 Route::get('/home', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
 Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
+Route::post('/checkout/remove-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeCoupon'])->name('checkout.removeCoupon');
 Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
 Auth::routes();
 
@@ -34,15 +36,17 @@ Route::get('auth/{provider}/callback', [App\Http\Controllers\Auth\SocialLoginCon
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])->name('account.index');
-    Route::post('/my-account/update', [App\Http\Controllers\Frontend\AccountController::class, 'updateDetails'])->name('account.update');
-    Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'viewOrder'])->name('account.orders.show');
+    Route::post('/my-account/update', [App\Http\Controllers\Frontend\AccountController::class, 'update'])->name('account.update');
+    Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'showOrder'])->name('account.orders.show');
     Route::post('/my-account/orders/{id}/cancel', [App\Http\Controllers\Frontend\AccountController::class, 'cancelOrder'])->name('account.orders.cancel');
 
     // Wishlist Routes
     Route::get('/wishlist', [App\Http\Controllers\Frontend\WishlistController::class, 'index'])->name('wishlist.index');
-    Route::post('/wishlist/add', [App\Http\Controllers\Frontend\WishlistController::class, 'store'])->name('wishlist.add');
     Route::delete('/wishlist/{id}', [App\Http\Controllers\Frontend\WishlistController::class, 'destroy'])->name('wishlist.destroy');
 });
+
+// Wishlist Add (Handled with manual auth check for AJX)
+Route::post('/wishlist/add', [App\Http\Controllers\Frontend\WishlistController::class, 'store'])->name('wishlist.add');
 
 // Public Chatbot Route (Moved from API to Web to access Session)
 Route::post('/api/chat/send', [App\Http\Controllers\Api\ChatController::class, 'sendMessage'])->name('api.chat.send');

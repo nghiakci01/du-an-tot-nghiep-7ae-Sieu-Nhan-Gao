@@ -90,18 +90,37 @@ class CartController extends Controller
             $variant = ProductVariant::find($request->id);
 
             if ($variant && $variant->stock_quantity >= $request->quantity) {
-                 if (isset($cart[$request->id])) {
-                     $cart[$request->id]["quantity"] = $request->quantity;
-                     session()->put('cart', $cart);
-                     session()->flash('success', 'Giỏ hàng đã được cập nhật');
-                     return response()->json(['success' => true]);
+                 $cart[$request->id]["quantity"] = $request->quantity;
+                 session()->put('cart', $cart);
+                 
+                 // Calculate new totals
+                 $itemTotal = $cart[$request->id]['price'] * $request->quantity;
+                 $cartTotal = 0;
+                 $cartCount = 0;
+                 foreach($cart as $item) {
+                    $cartTotal += $item['price'] * $item['quantity'];
+                    $cartCount += $item['quantity'];
                  }
+
+                 return response()->json([
+                     'success' => true,
+                     'message' => 'Giỏ hàng đã được cập nhật',
+                     'item_total' => number_format($itemTotal) . ' đ',
+                     'cart_total' => number_format($cartTotal) . ' đ',
+                     'cart_count' => $cartCount
+                 ]);
+            } else {
+                 return response()->json([
+                     'success' => false,
+                     'message' => 'Số lượng không hợp lệ hoặc vượt quá tồn kho'
+                 ], 400);
             }
             
             session()->flash('error', 'Số lượng không hợp lệ hoặc vượt quá tồn kho');
             return response()->json(['success' => false], 400);
         }
-        return response()->json(['success' => false], 400);
+        
+        return response()->json(['success' => false, 'message' => 'Yêu cầu không hợp lệ'], 400);
     }
 
     public function remove(Request $request)
@@ -132,33 +151,38 @@ class CartController extends Controller
             if ($foundKey !== null) {
                 unset($cart[$foundKey]);
                 session()->put('cart', $cart);
-                session()->flash('success', 'Sản phẩm đã được xóa khỏi giỏ hàng');
                 
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json(['success' => true]);
-                }
-                return redirect()->route('cart.index');
+                // Calculate new totals
+                 $cartTotal = 0;
+                 $cartCount = 0;
+                 foreach($cart as $item) {
+                    $cartTotal += $item['price'] * $item['quantity'];
+                    $cartCount += $item['quantity'];
+                 }
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Sản phẩm đã được xóa khỏi giỏ hàng',
+                    'cart_total' => number_format($cartTotal) . ' đ',
+                    'cart_count' => $cartCount
+                ]);
             }
         }
         
-        $msg = 'Không tìm thấy sản phẩm trong giỏ hàng (ID: ' . $id . ')';
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'success' => false, 
-                'message' => $msg,
-                'cart_keys' => array_keys($cart)
-            ], 400);
-        }
-        return redirect()->route('cart.index')->with('error', $msg);
+        return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại trong giỏ'], 404);
     }
 
     public function clearCart(Request $request)
     {
         session()->forget('cart');
+        
         if ($request->ajax()) {
-            session()->flash('success', 'Giỏ hàng đã được xóa');
-            return response()->json(['success' => true]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Giỏ hàng đã được xóa'
+            ]);
         }
+        
         return redirect()->route('cart.index')->with('success', 'Giỏ hàng đã được xóa');
     }
 

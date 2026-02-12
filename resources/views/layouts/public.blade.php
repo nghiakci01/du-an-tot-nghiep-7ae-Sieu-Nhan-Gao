@@ -54,6 +54,9 @@
     <!-- Search Autocomplete JS -->
     <script src="{{ asset('frontend-assets/js/search-autocomplete.js') }}"></script>
 
+@yield('scripts')
+@stack('scripts')
+
 
 
 

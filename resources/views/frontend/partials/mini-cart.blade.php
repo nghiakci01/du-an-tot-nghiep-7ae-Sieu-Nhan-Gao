@@ -96,16 +96,12 @@
 
 @push('scripts')
 <script>
-if (typeof miniCartInitialized === 'undefined') {
-    var miniCartInitialized = true;
-    $(document).ready(function() {
-        // Mini cart remove item - using delegated listener for durability
-        $(document).on('click', '.mini-cart-remove', function(e) {
-            e.preventDefault();
-            var itemId = $(this).data('id');
-            
-            console.log('Mini-cart removing item:', itemId);
-            
+$(document).ready(function() {
+    // Mini cart remove item
+    $('.mini-cart-remove').click(function(e) {
+        e.preventDefault();
+        var itemId = $(this).data('id');
+        
             if(confirm('Xóa sản phẩm này khỏi giỏ hàng?')) {
                 $.ajax({
                     url: '{{ route('cart.remove') }}',
@@ -115,25 +111,18 @@ if (typeof miniCartInitialized === 'undefined') {
                         _method: 'DELETE',
                         id: itemId
                     },
-                    success: function(response) {
-                        console.log('Mini-cart remove success:', response);
+                success: function(response) {
+                    if(response.success) {
                         location.reload();
-                    },
-                    error: function(xhr) {
-                        console.error('Mini-cart remove failed:', xhr.responseText);
-                        let errorMsg = 'Lỗi hệ thống';
-                        try {
-                            const response = JSON.parse(xhr.responseText);
-                            if (response.message) errorMsg = response.message;
-                        } catch(e) {}
-
-                        if(confirm("Lỗi khi xóa bằng AJAX (" + errorMsg + "). Thử dùng phương pháp xóa dự phòng?")) {
-                            window.location.href = '{{ route('cart.remove') }}?id=' + itemId;
-                        }
+                    } else {
+                        alert(response.message || 'Có lỗi xảy ra.');
                     }
-                });
-            }
-        });
+                },
+                error: function(xhr) {
+                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                }
+            });
+        }
     });
 }
 </script>

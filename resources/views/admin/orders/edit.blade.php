@@ -32,7 +32,7 @@
                     @method('PUT')
                     
                     <div class="alert alert-info py-2 mb-4">
-                        Đơn hàng của <strong>{{ $order->user->name }}</strong><br>
+                        Đơn hàng của <strong>{{ $order->user ? $order->user->name : 'Khách vãng lai' }}</strong><br>
                         Tổng tiền: <strong>{{ number_format($order->total_price, 0, ',', '.') }}đ</strong>
                     </div>
 

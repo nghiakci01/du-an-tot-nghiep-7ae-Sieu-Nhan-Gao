@@ -69,9 +69,9 @@
                 <h5>Thông tin khách hàng</h5>
             </div>
             <div class="card-body">
-                <p><strong>Tên:</strong> {{ $order->user->name }}</p>
-                <p><strong>Email:</strong> {{ $order->user->email }}</p>
-                <p><strong>SĐT:</strong> {{ $order->user->phone ?? 'N/A' }}</p>
+                <p><strong>Tên:</strong> {{ $order->user ? $order->user->name : 'Khách vãng lai' }}</p>
+                <p><strong>Email:</strong> {{ $order->user ? $order->user->email : 'N/A' }}</p>
+                <p><strong>SĐT:</strong> {{ $order->user ? ($order->user->phone ?? 'N/A') : 'N/A' }}</p>
                 <hr>
                 <p><strong>Địa chỉ nhận hàng:</strong><br>{{ $order->shipping_address }}</p>
                 <p><strong>Ghi chú:</strong> {{ $order->note ?? 'Không có' }}</p>
