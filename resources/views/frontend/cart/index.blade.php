@@ -197,23 +197,30 @@
                         // Update item total
                         row.find('.product_total').text(response.item_total);
                         
-                        // Update cart totals using specific IDs
-                        $('#cart-subtotal').text(response.cart_total);
-                        $('#cart-grand-total').text(response.cart_total);
+                        // Update cart totals
+                        $('.cart_amount').each(function() {
+                             // Assuming all cart_amount classes are totals/subtotals that should match
+                             // Ideally add specific IDs for subtotal and grand total if they differ logic, 
+                             // but here they are same value.
+                             if($(this).find('span').text() !== 'Free') {
+                                 $(this).text(response.cart_total);
+                             }
+                        });
                         
                         // Update header cart count
                         $('#cart-count').text(response.cart_count);
                         
-                        // Optional: trigger mini-cart update if needed
+                        // Optional: Show a small toast or visual feedback instead of alert
+                        // alert(response.message); 
                     } else {
                         alert(response.message || 'Có lỗi xảy ra.');
-                        window.location.reload();
+                        window.location.reload(); // Fallback
                     }
                 },
                 error: function(xhr) {
                     var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Số lượng vượt quá tồn kho hoặc có lỗi xảy ra.';
                     alert(errorMsg);
-                    window.location.reload();
+                    window.location.reload(); // Reset to valid state
                 }
             });
         });

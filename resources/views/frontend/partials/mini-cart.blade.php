@@ -102,7 +102,7 @@ $(document).ready(function() {
         e.preventDefault();
         var itemId = $(this).data('id');
         
-            if(confirm('{{ __('messages.confirm_remove_item') }}')) {
+            if(confirm('Xóa sản phẩm này khỏi giỏ hàng?')) {
                 $.ajax({
                     url: '{{ route('cart.remove') }}',
                     method: 'POST',
@@ -115,11 +115,11 @@ $(document).ready(function() {
                     if(response.success) {
                         location.reload();
                     } else {
-                        alert(response.message || '{{ __('messages.error_occurred') }}');
+                        alert(response.message || 'Có lỗi xảy ra.');
                     }
                 },
                 error: function(xhr) {
-                    alert('{{ __('messages.error_occurred') }}');
+                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
                 }
             });
         }
