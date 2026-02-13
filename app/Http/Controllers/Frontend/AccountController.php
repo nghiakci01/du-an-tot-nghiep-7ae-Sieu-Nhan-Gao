@@ -20,7 +20,7 @@ class AccountController extends Controller
     public function showOrder($id)
     {
         $user = Auth::user();
-        $order = $user->orders()->with('items.product')->findOrFail($id);
+        $order = $user->orders()->with(['items.product', 'items.variant.sizeRelationship', 'items.variant.colorRelationship'])->findOrFail($id);
         return view('frontend.account.orders.show', compact('user', 'order'));
     }
 
