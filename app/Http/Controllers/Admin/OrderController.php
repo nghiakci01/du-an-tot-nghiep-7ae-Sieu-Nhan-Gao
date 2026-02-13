@@ -53,41 +53,22 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Order $order)
+    public function update(Request $request, Order $order, \App\Services\OrderService $orderService)
     {
-        // Standardize to UPPERCASE to match Frontend View logic
         $request->validate([
-            'status' => 'required|in:PENDING,CONFIRMED,SHIPPED,COMPLETED,CANCELLED,pending,confirmed,shipped,completed,cancelled',
+            'status' => 'required|string',
         ]);
 
-        $oldStatus = $order->status; // Model accessor might be used, but raw DB value is safest if enum is consistent. 
-        // Actually $order->status returns string from DB. 
-        // Let's ensure we use defined constants or lowercase/uppercase consistently.
-        // The DB enum is lowercase: 'pending', 'confirmed'...
-        // The Controller seemed to force UPPERCASE in previous code, but DB is lowercase.
-        // Let's fix the controller to use lowercase to match DB and Model constants.
-        
-        $newStatus = strtolower($request->input('status'));
+        $newStatus = $request->input('status');
 
-        if (!$order->canTransitionTo($newStatus)) {
-            return back()->with('error', 'Không thể chuyển trạng thái từ ' . $order->status_text . ' sang ' . $this->getStatusText($newStatus));
+        try {
+            $orderService->updateOrderStatus($order, $newStatus, auth()->user());
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
 
-        // Nếu đơn hàng bị hủy và trước đó chưa hủy -> Hoàn lại kho
-        if ($newStatus == Order::STATUS_CANCELLED && $oldStatus != Order::STATUS_CANCELLED) {
-            foreach ($order->items as $item) {
-                if ($item->variant) {
-                    $item->variant->increment('stock_quantity', $item->quantity);
-                }
-            }
-        }
-
-        $order->update([
-            'status' => $newStatus,
-        ]);
-
-        return redirect()->route('admin.orders.index')
-            ->with('success', 'Trạng thái đơn hàng đã được cập nhật thành công.' . ($newStatus == 'CANCELLED' ? ' (Đã hoàn kho)' : ''));
+        return redirect()->route('admin.orders.show', $order)
+            ->with('success', 'Trạng thái đơn hàng đã được cập nhật thành công.');
     }
 
     /**

@@ -82,25 +82,65 @@
                 <h5>Trạng thái & Thanh toán</h5>
             </div>
             <div class="card-body">
-                <p><strong>Phương thức:</strong> {{ $order->payment_method }}</p>
-                <p><strong>Trạng thái:</strong> 
-                    <span class="badge {{ $order->status_badge }}">{{ $order->status_text }}</span>
-                </p>
+                <div class="mb-3">
+                    <p><strong>Phương thức:</strong> {{ $order->payment_method }}</p>
+                    <p><strong>Trạng thái:</strong> 
+                        <span class="badge {{ $order->status_badge }}">{{ $order->status_text }}</span>
+                    </p>
+                </div>
+
+                @if($order->canTransitionTo($order->status)) 
+                {{-- Only show form if there are transitions available (excluding self) --}}
+                @php
+                    $allowed = $order->getAllowedTransitions();
+                @endphp
+                
+                @if(count($allowed) > 0)
                 <form action="{{ route('admin.orders.update', $order) }}" method="POST" class="mt-3">
                     @csrf
                     @method('PUT')
                     <div class="mb-3">
                         <label class="form-label">Cập nhật trạng thái</label>
                         <select name="status" class="form-select select-sm">
-                            <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Chờ xác nhận</option>
-                            <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
-                            <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Đang giao hàng</option>
-                            <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
-                            <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
+                            <option value="">-- Chọn trạng thái --</option>
+                            @foreach($allowed as $status)
+                                <option value="{{ $status }}">
+                                    @switch($status)
+                                        @case(\App\Models\Order::STATUS_CONFIRMED) Đã xác nhận @break
+                                        @case(\App\Models\Order::STATUS_SHIPPED) Đang giao hàng @break
+                                        @case(\App\Models\Order::STATUS_COMPLETED) Hoàn thành @break
+                                        @case(\App\Models\Order::STATUS_CANCELLED) Hủy đơn @break
+                                        @case(\App\Models\Order::STATUS_FAILED) Thất bại @break
+                                        @case(\App\Models\Order::STATUS_RETURNED) Trả hàng @break
+                                        @default {{ $status }}
+                                    @endswitch
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary btn-sm w-100">Lưu thay đổi</button>
                 </form>
+                @endif
+                @endif
+
+                <hr>
+                <h6>Lịch sử đơn hàng</h6>
+                <ul class="list-unstyled">
+                    @forelse($order->histories as $history)
+                        <li class="mb-2">
+                            <small class="text-muted">{{ $history->created_at->format('H:i d/m/Y') }}</small>
+                            <br>
+                            <strong>{{ $history->user ? $history->user->name : 'Hệ thống' }}</strong>: 
+                            Chuyển từ <span class="badge bg-secondary">{{ $history->previous_status ?? 'N/A' }}</span> 
+                            sang <span class="badge bg-primary">{{ $history->new_status }}</span>
+                            @if($history->note)
+                                <br><em>{{ $history->note }}</em>
+                            @endif
+                        </li>
+                    @empty
+                        <li>Chưa có lịch sử.</li>
+                    @endforelse
+                </ul>
             </div>
         </div>
     </div>
