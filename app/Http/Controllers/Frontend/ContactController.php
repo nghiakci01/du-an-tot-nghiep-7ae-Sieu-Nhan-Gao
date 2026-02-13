@@ -29,6 +29,6 @@ class ContactController extends Controller
         // For now, just return success message
         
         return redirect()->route('contact.index')
-            ->with('success', 'Thank you for contacting us! We will get back to you soon.');
+            ->with('success', __('messages.contact_success'));
     }
 }
