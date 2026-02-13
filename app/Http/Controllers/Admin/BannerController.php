@@ -16,7 +16,7 @@ class BannerController extends Controller
      */
     public function index()
     {
-        $banners = Banner::orderBy('position')->latest()->get();
+        $banners = Banner::orderBy('position')->orderBy('sort_order')->latest()->get();
         return view('admin.banners.index', compact('banners'));
     }
 
@@ -34,23 +34,12 @@ class BannerController extends Controller
     public function store(StoreBannerRequest $request)
     {
         $data = $request->validated();
-        $data['image'] = null;
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $path = $file->getRealPath() ?: $file->getPathname();
-            if ($file->isValid() && !empty($path)) {
-                $filename = $file->hashName();
-                $stream = fopen($path, 'r');
-                Storage::disk('public')->put('banners/' . $filename, $stream);
-                if (is_resource($stream)) {
-                    fclose($stream);
-                }
-                $data['image'] = 'banners/' . $filename;
-            }
+            $data['image'] = $request->file('image')->store('banners', 'public');
         }
 
-        $data['is_active'] = $request->has('is_active');
+        $data['is_active'] = $request->boolean('is_active', true);
 
         Banner::create($data);
 
@@ -73,25 +62,14 @@ class BannerController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $path = $file->getRealPath() ?: $file->getPathname();
-            if ($file->isValid() && !empty($path)) {
-                // Delete old image
-                if ($banner->image) {
-                    Storage::disk('public')->delete($banner->image);
-                }
-                
-                $filename = $file->hashName();
-                $stream = fopen($path, 'r');
-                Storage::disk('public')->put('banners/' . $filename, $stream);
-                if (is_resource($stream)) {
-                    fclose($stream);
-                }
-                $data['image'] = 'banners/' . $filename;
+            // Delete old image
+            if ($banner->image) {
+                Storage::disk('public')->delete($banner->image);
             }
+            $data['image'] = $request->file('image')->store('banners', 'public');
         }
 
-        $data['is_active'] = $request->has('is_active');
+        $data['is_active'] = $request->boolean('is_active');
 
         $banner->update($data);
 
