@@ -23,7 +23,6 @@
                                         <th>Hình ảnh</th>
                                         <th>Tiêu đề</th>
                                         <th>Vị trí</th>
-                                        <th>Thứ tự</th>
                                         <th>Trạng thái</th>
                                         <th>Hành động</th>
                                     </tr>
@@ -38,7 +37,6 @@
                                             </td>
                                             <td>{{ $banner->title ?? 'N/A' }}</td>
                                             <td>{{ $banner->position }}</td>
-                                            <td>{{ $banner->sort_order }}</td>
                                             <td>
                                                 @if($banner->is_active)
                                                     <span class="badge bg-success">Hiển thị</span>

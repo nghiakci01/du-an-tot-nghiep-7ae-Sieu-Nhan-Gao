@@ -11,7 +11,6 @@ class Banner extends Model
         'image',
         'link',
         'position',
-        'sort_order',
         'is_active',
     ];
 

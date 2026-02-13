@@ -42,10 +42,6 @@
                                 </select>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="sort_order" class="form-label">Thứ tự hiển thị</label>
-                                <input type="number" class="form-control" id="sort_order" name="sort_order" value="0">
-                            </div>
 
                             <div class="mb-3 form-check">
                                 <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked>

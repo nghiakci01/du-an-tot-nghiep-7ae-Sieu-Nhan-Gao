@@ -14,7 +14,7 @@ class BannerController extends Controller
      */
     public function index()
     {
-        $banners = Banner::orderBy('position')->orderBy('sort_order')->get();
+        $banners = Banner::orderBy('position')->latest()->get();
         return view('admin.banners.index', compact('banners'));
     }
 
@@ -34,7 +34,6 @@ class BannerController extends Controller
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'position' => 'required|string',
-            'sort_order' => 'integer',
         ]);
 
         $data = $request->except('image');
@@ -77,7 +76,6 @@ class BannerController extends Controller
         $request->validate([
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'position' => 'required|string',
-            'sort_order' => 'integer',
         ]);
 
         $data = $request->except('image');
