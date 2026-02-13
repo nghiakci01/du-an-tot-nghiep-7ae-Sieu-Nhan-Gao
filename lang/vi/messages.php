@@ -224,4 +224,18 @@ return [
     'print_receipt' => 'In hóa đơn',
     'copied_to_clipboard' => 'Đã sao chép!',
     'copy_failed' => 'Sao chép thất bại. Vui lòng sao chép thủ công.',
+
+    // Account Redesign
+    'total_orders' => 'Tổng đơn hàng',
+    'total_spent' => 'Tổng chi tiêu',
+    'default_shipping_address' => 'Địa chỉ giao hàng mặc định',
+    'edit_address' => 'Chỉnh sửa địa chỉ',
+    'update_address' => 'Cập nhật địa chỉ',
+    'update_account' => 'Cập nhật tài khoản',
+    'profile_image' => 'Ảnh đại diện',
+    'upload_image' => 'Tải ảnh lên',
+    'personal_info' => 'Thông tin cá nhân',
+    'change_password_desc' => 'Để trống nếu không muốn đổi mật khẩu',
+    'welcome_back' => 'Chào mừng trở lại',
+    'no_address_set' => 'Chưa thiết lập địa chỉ mặc định.',
 ];

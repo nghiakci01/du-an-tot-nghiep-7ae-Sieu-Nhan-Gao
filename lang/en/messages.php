@@ -224,4 +224,18 @@ return [
     'print_receipt' => 'Print Receipt',
     'copied_to_clipboard' => 'Copied to clipboard!',
     'copy_failed' => 'Failed to copy. Please copy manually.',
+    
+    // Account Redesign
+    'total_orders' => 'Total Orders',
+    'total_spent' => 'Total Spent',
+    'default_shipping_address' => 'Default Shipping Address',
+    'edit_address' => 'Edit Address',
+    'update_address' => 'Update Address',
+    'update_account' => 'Update Account',
+    'profile_image' => 'Profile Image',
+    'upload_image' => 'Upload Image',
+    'personal_info' => 'Personal Information',
+    'change_password_desc' => 'Leave blank to keep current password',
+    'welcome_back' => 'Welcome back',
+    'no_address_set' => 'No default address set.',
 ];

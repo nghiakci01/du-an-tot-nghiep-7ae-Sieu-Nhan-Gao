@@ -31,6 +31,7 @@ class AccountController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'current_password' => 'required_with:new_password|nullable',
             'new_password' => 'nullable|min:8|confirmed',
@@ -38,6 +39,7 @@ class AccountController extends Controller
 
         $user->name = $request->name;
         $user->phone = $request->phone;
+        $user->address = $request->address;
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar) {
