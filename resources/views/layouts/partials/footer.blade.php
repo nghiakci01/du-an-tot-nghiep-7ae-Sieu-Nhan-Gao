@@ -37,8 +37,8 @@
                         <h3>{{ __('messages.contact_us') }}</h3>
                         <div class="footer_contact">
                             <p>{{ __('messages.address') }}: Số 7 Ngõ 91 Lai Xá - Hoài Đức - Thành Phố Hà Nội - Việt Nam</p>
-                            <p>{{ __('messages.phone') }}: <a href="tel:01234567890">01234567890</a> </p>
-                            <p>{{ __('messages.email') }}: demo@example.com</p>
+                            <p>{{ __('messages.phone') }}: <a href="tel:01234567890">0354869999</a> </p>
+                            <p>{{ __('messages.email') }}: Elite@gmail.com</p>
                             <ul>
                                 <li><a href="#" title="Twitter"><i class="fa fa-twitter"></i></a></li>
                                 <li><a href="#" title="google-plus"><i class="fa fa-google-plus"></i></a></li>
