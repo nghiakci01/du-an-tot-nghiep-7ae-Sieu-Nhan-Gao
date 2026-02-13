@@ -25,6 +25,74 @@
       </div>
     </div>
 
+    <!-- Filter Section -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <form action="{{ route('admin.dashboard') }}" method="GET" id="filterForm">
+            <div class="row align-items-end">
+              <!-- Quick Filters -->
+              <div class="col-md-12 mb-3">
+                <label class="form-label fw-bold">Bộ lọc nhanh:</label>
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-sm {{ $filterType == 'today' ? 'btn-primary' : 'btn-outline-primary' }}" onclick="setFilter('today')">
+                    <i class="ti ti-calendar-event"></i> Hôm nay
+                  </button>
+                  <button type="button" class="btn btn-sm {{ $filterType == 'this_week' ? 'btn-primary' : 'btn-outline-primary' }}" onclick="setFilter('this_week')">
+                    <i class="ti ti-calendar-week"></i> Tuần này
+                  </button>
+                  <button type="button" class="btn btn-sm {{ $filterType == 'this_month' ? 'btn-primary' : 'btn-outline-primary' }}" onclick="setFilter('this_month')">
+                    <i class="ti ti-calendar-month"></i> Tháng này
+                  </button>
+                  <button type="button" class="btn btn-sm {{ $filterType == 'this_year' ? 'btn-primary' : 'btn-outline-primary' }}" onclick="setFilter('this_year')">
+                    <i class="ti ti-calendar"></i> Năm nay
+                  </button>
+                  <button type="button" class="btn btn-sm {{ $filterType == 'last_30_days' ? 'btn-primary' : 'btn-outline-primary' }}" onclick="setFilter('last_30_days')">
+                    <i class="ti ti-calendar-stats"></i> 30 ngày
+                  </button>
+                </div>
+              </div>
+
+              <!-- Custom Date Range -->
+              <div class="col-md-4">
+                <label class="form-label">Từ ngày:</label>
+                <input type="date" class="form-control" name="start_date" id="start_date" value="{{ $startDate }}" onchange="setFilter('custom')">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Đến ngày:</label>
+                <input type="date" class="form-control" name="end_date" id="end_date" value="{{ $endDate }}" onchange="setFilter('custom')">
+              </div>
+
+              <!-- Month Selector -->
+              <div class="col-md-3">
+                <label class="form-label">Chọn tháng:</label>
+                <input type="month" class="form-control" name="month" id="month" value="{{ $month }}" onchange="setFilter('month')">
+              </div>
+
+              <!-- Hidden filter type input -->
+              <input type="hidden" name="filter_type" id="filter_type" value="{{ $filterType }}">
+
+              <!-- Reset Button -->
+              <div class="col-md-1">
+                <button type="button" class="btn btn-secondary w-100" onclick="resetFilter()">
+                  <i class="ti ti-refresh"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Current Filter Display -->
+            <div class="row mt-3">
+              <div class="col-12">
+                <div class="alert alert-info mb-0">
+                  <i class="ti ti-filter"></i> <strong>Đang hiển thị:</strong> {{ $filterText }}
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- Stats Cards -->
     <div class="col-md-6 col-xxl-3">
       <div class="card">
@@ -269,6 +337,38 @@
   <!-- ApexChart -->
   <script src="{{ asset('admin-assets/js/plugins/apexcharts.min.js') }}"></script>
   <script>
+    // Filter Functions
+    function setFilter(type) {
+      document.getElementById('filter_type').value = type;
+      
+      // Clear other inputs based on filter type
+      if (type !== 'custom') {
+        document.getElementById('start_date').value = '';
+        document.getElementById('end_date').value = '';
+      }
+      if (type !== 'month') {
+        document.getElementById('month').value = '';
+      }
+      
+      // Submit form
+      document.getElementById('filterForm').submit();
+    }
+
+    function resetFilter() {
+      window.location.href = '{{ route("admin.dashboard") }}';
+    }
+
+    // Date validation
+    document.getElementById('end_date')?.addEventListener('change', function() {
+      const startDate = document.getElementById('start_date').value;
+      const endDate = this.value;
+      
+      if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+        alert('Ngày kết thúc phải sau ngày bắt đầu!');
+        this.value = '';
+      }
+    });
+
     document.addEventListener('DOMContentLoaded', function () {
       // Revenue Chart
       var revenueOptions = {
