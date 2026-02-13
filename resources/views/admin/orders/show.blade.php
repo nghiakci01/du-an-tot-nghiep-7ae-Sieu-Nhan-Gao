@@ -31,6 +31,7 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
+                                <th width="80">Hình ảnh</th>
                                 <th>Sản phẩm</th>
                                 <th>Đơn giá</th>
                                 <th>Số lượng</th>
@@ -41,9 +42,19 @@
                             @foreach($order->items as $item)
                             <tr>
                                 <td>
+                                    @if($item->product->image)
+                                        <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="img-fluid rounded" style="max-width: 60px;">
+                                    @else
+                                        <img src="{{ asset('frontend-assets/img/product/product-1.jpg') }}" alt="Default" class="img-fluid rounded" style="max-width: 60px;">
+                                    @endif
+                                </td>
+                                <td>
                                     <strong>{{ $item->product->name }}</strong>
                                     @if($item->variant)
-                                        <br><small class="text-muted">Phân loại: {{ $item->variant->name }}</small>
+                                        <div class="small text-muted mt-1">
+                                            <div>Size: <strong>{{ $item->variant->sizeRelationship->name ?? $item->variant->size ?? 'N/A' }}</strong></div>
+                                            <div>Màu: <strong>{{ $item->variant->colorRelationship->name ?? $item->variant->color ?? 'N/A' }}</strong></div>
+                                        </div>
                                     @endif
                                 </td>
                                 <td>{{ number_format($item->price, 0, ',', '.') }}đ</td>
@@ -54,7 +65,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="3" class="text-end">Tổng cộng:</th>
+                                <th colspan="4" class="text-end">Tổng cộng:</th>
                                 <th class="text-danger">{{ number_format($order->total_price, 0, ',', '.') }}đ</th>
                             </tr>
                         </tfoot>
