@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\StoreBannerRequest;
+use App\Http\Requests\Admin\UpdateBannerRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use Illuminate\Http\Request;
@@ -14,7 +16,7 @@ class BannerController extends Controller
      */
     public function index()
     {
-        $banners = Banner::orderBy('position')->orderBy('sort_order')->get();
+        $banners = Banner::orderBy('position')->orderBy('sort_order')->latest()->get();
         return view('admin.banners.index', compact('banners'));
     }
 
@@ -29,32 +31,15 @@ class BannerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreBannerRequest $request)
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'position' => 'required|string',
-            'sort_order' => 'integer',
-        ]);
-
-        $data = $request->except('image');
-        $data['image'] = null;
+        $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $path = $file->getRealPath() ?: $file->getPathname();
-            if ($file->isValid() && !empty($path)) {
-                $filename = $file->hashName();
-                $stream = fopen($path, 'r');
-                Storage::disk('public')->put('banners/' . $filename, $stream);
-                if (is_resource($stream)) {
-                    fclose($stream);
-                }
-                $data['image'] = 'banners/' . $filename;
-            }
+            $data['image'] = $request->file('image')->store('banners', 'public');
         }
 
-        $data['is_active'] = $request->has('is_active');
+        $data['is_active'] = $request->boolean('is_active', true);
 
         Banner::create($data);
 
@@ -72,36 +57,19 @@ class BannerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Banner $banner)
+    public function update(UpdateBannerRequest $request, Banner $banner)
     {
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'position' => 'required|string',
-            'sort_order' => 'integer',
-        ]);
-
-        $data = $request->except('image');
+        $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $path = $file->getRealPath() ?: $file->getPathname();
-            if ($file->isValid() && !empty($path)) {
-                // Delete old image
-                if ($banner->image) {
-                    Storage::disk('public')->delete($banner->image);
-                }
-                
-                $filename = $file->hashName();
-                $stream = fopen($path, 'r');
-                Storage::disk('public')->put('banners/' . $filename, $stream);
-                if (is_resource($stream)) {
-                    fclose($stream);
-                }
-                $data['image'] = 'banners/' . $filename;
+            // Delete old image
+            if ($banner->image) {
+                Storage::disk('public')->delete($banner->image);
             }
+            $data['image'] = $request->file('image')->store('banners', 'public');
         }
 
-        $data['is_active'] = $request->has('is_active');
+        $data['is_active'] = $request->boolean('is_active');
 
         $banner->update($data);
 
