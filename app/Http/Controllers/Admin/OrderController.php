@@ -60,11 +60,21 @@ class OrderController extends Controller
             'status' => 'required|in:PENDING,CONFIRMED,SHIPPED,COMPLETED,CANCELLED,pending,confirmed,shipped,completed,cancelled',
         ]);
 
-        $oldStatus = strtoupper($order->status); // Ensure we compare normalized upper
-        $newStatus = strtoupper($request->input('status')); // Force Save as Upper
+        $oldStatus = $order->status; // Model accessor might be used, but raw DB value is safest if enum is consistent. 
+        // Actually $order->status returns string from DB. 
+        // Let's ensure we use defined constants or lowercase/uppercase consistently.
+        // The DB enum is lowercase: 'pending', 'confirmed'...
+        // The Controller seemed to force UPPERCASE in previous code, but DB is lowercase.
+        // Let's fix the controller to use lowercase to match DB and Model constants.
+        
+        $newStatus = strtolower($request->input('status'));
+
+        if (!$order->canTransitionTo($newStatus)) {
+            return back()->with('error', 'Không thể chuyển trạng thái từ ' . $order->status_text . ' sang ' . $this->getStatusText($newStatus));
+        }
 
         // Nếu đơn hàng bị hủy và trước đó chưa hủy -> Hoàn lại kho
-        if ($newStatus == 'CANCELLED' && $oldStatus != 'CANCELLED') {
+        if ($newStatus == Order::STATUS_CANCELLED && $oldStatus != Order::STATUS_CANCELLED) {
             foreach ($order->items as $item) {
                 if ($item->variant) {
                     $item->variant->increment('stock_quantity', $item->quantity);
@@ -93,5 +103,17 @@ class OrderController extends Controller
 
         return redirect()->route('admin.orders.index')
             ->with('success', 'Đơn hàng đã được xóa thành công.');
+    }
+
+    private function getStatusText($status)
+    {
+        return match ($status) {
+            Order::STATUS_PENDING => 'Chờ xác nhận',
+            Order::STATUS_CONFIRMED => 'Đã xác nhận',
+            Order::STATUS_SHIPPED => 'Đang giao hàng',
+            Order::STATUS_COMPLETED => 'Hoàn thành',
+            Order::STATUS_CANCELLED => 'Đã hủy',
+            default => 'Không xác định',
+        };
     }
 }
