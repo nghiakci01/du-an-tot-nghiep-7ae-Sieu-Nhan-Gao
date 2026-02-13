@@ -15,40 +15,47 @@
                             enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
-                            <div class="mb-3">
                                 <label for="title" class="form-label">Tiêu đề (Tùy chọn)</label>
-                                <input type="text" class="form-control" id="title" name="title"
+                                <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title"
                                     value="{{ old('title', $banner->title) }}">
+                                @error('title')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-3">
                                 <label for="image" class="form-label">Hình ảnh (Chỉ chọn nếu muốn thay đổi)</label>
-                                <input type="file" class="form-control" id="image" name="image">
+                                <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image">
                                 <div class="mt-2">
                                     <img src="{{ asset('storage/' . $banner->image) }}" alt="Current Image"
                                         style="height: 100px;">
                                 </div>
                                 @error('image')
-                                    <div class="text-danger">{{ $message }}</div>
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <div class="mb-3">
                                 <label for="link" class="form-label">Liên kết (Tùy chọn)</label>
-                                <input type="text" class="form-control" id="link" name="link"
+                                <input type="text" class="form-control @error('link') is-invalid @enderror" id="link" name="link"
                                     value="{{ old('link', $banner->link) }}">
+                                @error('link')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-3">
                                 <label for="position" class="form-label">Vị trí hiển thị <span
                                         class="text-danger">*</span></label>
-                                <select class="form-select" id="position" name="position" required>
-                                    <option value="slider" {{ $banner->position == 'slider' ? 'selected' : '' }}>Slider Chính
+                                <select class="form-select @error('position') is-invalid @enderror" id="position" name="position">
+                                    <option value="slider" {{ old('position', $banner->position) == 'slider' ? 'selected' : '' }}>Slider Chính
                                         (Trang chủ)</option>
-                                    <option value="banner_top" {{ $banner->position == 'banner_top' ? 'selected' : '' }}>
+                                    <option value="banner_top" {{ old('position', $banner->position) == 'banner_top' ? 'selected' : '' }}>
                                         Banner Top (Bên phải Slider)</option>
-                                    <option value="banner_bottom" {{ $banner->position == 'banner_bottom' ? 'selected' : '' }}>Banner Bottom (Cuối trang)</option>
+                                    <option value="banner_bottom" {{ old('position', $banner->position) == 'banner_bottom' ? 'selected' : '' }}>Banner Bottom (Cuối trang)</option>
                                 </select>
+                                @error('position')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
 

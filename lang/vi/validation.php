@@ -132,5 +132,7 @@ return [
         'variants.*.sale_price' => 'Giá khuyến mãi biến thể',
         'variants.*.stock_quantity' => 'Số lượng tồn kho',
         'variants.*.sku' => 'Mã SKU',
+        'link' => 'Liên kết',
+        'position' => 'Vị trí hiển thị',
     ],
 ];
