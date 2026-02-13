@@ -34,4 +34,19 @@ class StoreBannerRequest extends FormRequest
             'is_active' => 'Trạng thái hiển thị',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute không được để trống.',
+            'image' => ':attribute phải là định dạng hình ảnh.',
+            'mimes' => ':attribute phải có định dạng: :values.',
+            'max' => ':attribute không được vượt quá :max ký tự.',
+            'image.max' => ':attribute không được vượt quá :max KB.',
+            'integer' => ':attribute phải dưới dạng số nguyên.',
+            'min' => ':attribute phải lớn hơn hoặc bằng :min.',
+            'in' => ':attribute không hợp lệ.',
+            'string' => ':attribute phải là chuỗi ký tự.',
+        ];
+    }
 }
