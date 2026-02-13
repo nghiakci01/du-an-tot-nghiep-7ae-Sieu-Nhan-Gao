@@ -30,8 +30,7 @@
                         <h3>{{ __('messages.contact_us') }}</h3>
                         <p>{{ __('messages.contact_intro') }}</p>
                         <ul>
-                            <li><i class="fa fa-fax"></i> {{ __('messages.address_label') }}: 123 Đường ABC, Quận XYZ, TP.
-                                Hồ Chí Minh, Việt Nam</li>
+                            <li><i class="fa fa-fax"></i> {{ __('messages.address_label') }}: Số 7 Ngõ 91 Lai Xá - Hoài Đức - Thành Phố Hà Nội - Việt Nam</li>
                             <li><i class="fa fa-phone"></i> <a href="tel:0123456789">0123 456 789</a></li>
                             <li><i class="fa fa-envelope-o"></i> <a
                                     href="mailto:contact@fashionstore.vn">contact@fashionstore.vn</a></li>
