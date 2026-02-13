@@ -41,11 +41,6 @@
                     <div class="contact_message form">
                         <h3>{{ __('messages.send_message') }}</h3>
 
-                        @if(session('success'))
-                            <div class="alert alert-success">
-                                <i class="fa fa-check-circle"></i> {{ session('success') }}
-                            </div>
-                        @endif
 
                         @if($errors->any())
                             <div class="alert alert-danger">
@@ -105,4 +100,18 @@
         </div>
     </div>
     <!--contact map end-->
+@endsection
+
+@section('scripts')
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                title: 'Thành công!',
+                text: "{{ session('success') }}",
+                icon: 'success',
+                confirmButtonText: 'Đóng',
+                confirmButtonColor: '#fe4536'
+            });
+        </script>
+    @endif
 @endsection

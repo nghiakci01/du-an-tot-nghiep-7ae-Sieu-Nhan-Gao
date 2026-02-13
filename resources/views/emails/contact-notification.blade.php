@@ -1,3 +1,4 @@
+<x-mail::message>
 # Thông báo tin nhắn liên hệ mới
 
 Xin chào,
@@ -18,3 +19,4 @@ Xem chi tiết trong trang quản trị
 
 Trân trọng,<br>
 {{ config('app.name') }}
+</x-mail::message>
