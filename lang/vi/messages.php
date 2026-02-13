@@ -18,6 +18,7 @@ return [
     'staff' => 'Nhân viên',
     'language' => 'Ngôn ngữ',
     'product_categories' => 'Danh mục sản phẩm',
+    'other_pages' => 'Trang khác',
     'all_products' => 'Tất cả sản phẩm',
     'filter_by_price' => 'Lọc theo giá',
     'filter' => 'Lọc',
@@ -66,8 +67,8 @@ return [
     'subscribe' => 'Đăng ký!',
     // About
     'about_us' => 'Về chúng tôi',
-    'about_welcome' => 'Chào mừng bạn đến với Reid Fashion!',
-    'about_intro_1' => 'Reid Fashion là điểm đến tin cậy cho những tín đồ thời trang yêu thích sự tối giản, hiện đại và chất lượng. Chúng tôi không chỉ cung cấp quần áo, mà còn mang đến phong cách sống và sự tự tin cho mỗi khách hàng.',
+    'about_welcome' => 'Chào mừng bạn đến với Elite!',
+    'about_intro_1' => 'Elite là điểm đến tin cậy cho những tín đồ thời trang yêu thích sự tối giản, hiện đại và chất lượng. Chúng tôi không chỉ cung cấp quần áo, mà còn mang đến phong cách sống và sự tự tin cho mỗi khách hàng.',
     'about_intro_2' => 'Với sứ mệnh mang lại những sản phẩm chất lượng cao nhất với giá thành hợp lý, đội ngũ của chúng tôi luôn nỗ lực không ngừng để tuyển chọn những mẫu thiết kế mới nhất, bắt kịp xu hướng thời trang thế giới.',
     'view_work' => 'Xem sản phẩm ngay',
     'high_quality' => 'Chất lượng cao',
@@ -94,7 +95,7 @@ return [
 
     // News
     'latest_news' => 'Tin tức mới nhất',
-    'latest_news_desc' => 'Cập nhật những xu hướng thời trang và thông báo mới nhất từ Reid Fashion',
+    'latest_news_desc' => 'Cập nhật những xu hướng thời trang và thông báo mới nhất từ Elite',
     'read_more' => 'Đọc thêm',
     'newsletter_signup' => 'Đăng ký nhận tin',
     'newsletter_signup_desc' => 'Nhận ngay thông báo về các bộ sưu tập mới và ưu đãi đặc quyền.',
@@ -115,6 +116,9 @@ return [
     'free' => 'Miễn phí',
     'grand_total' => 'Tổng thanh toán',
     'proceed_to_checkout' => 'Tiến hành thanh toán',
+    'view_cart' => 'Xem giỏ hàng',
+    'confirm_remove_item' => 'Xóa sản phẩm này khỏi giỏ hàng?',
+    'error_occurred' => 'Có lỗi xảy ra. Vui lòng thử lại.',
     'coupon_code' => 'Mã giảm giá',
     'enter_coupon_desc' => 'Nhập mã giảm giá của bạn nếu có.',
     'apply' => 'Áp dụng',

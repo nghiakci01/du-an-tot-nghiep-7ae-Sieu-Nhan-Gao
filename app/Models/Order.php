@@ -57,4 +57,26 @@ class Order extends Model
             default => 'bg-secondary',
         };
     }
+
+    public function getAllowedTransitions()
+    {
+        return match ($this->status) {
+            self::STATUS_PENDING => [self::STATUS_CONFIRMED, self::STATUS_CANCELLED],
+            self::STATUS_CONFIRMED => [self::STATUS_SHIPPED, self::STATUS_CANCELLED],
+            self::STATUS_SHIPPED => [self::STATUS_COMPLETED, self::STATUS_CANCELLED],
+            self::STATUS_COMPLETED => [],
+            self::STATUS_CANCELLED => [],
+            default => [],
+        };
+    }
+
+    public function canTransitionTo($newStatus)
+    {
+        // Allow strictly expected next steps OR staying same (idempotent)
+        if ($this->status === $newStatus) {
+            return true;
+        }
+        
+        return in_array($newStatus, $this->getAllowedTransitions());
+    }
 }

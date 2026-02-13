@@ -441,7 +441,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="m5.2 6.8 1.4-1.4"/><path d="m17.4 5.4 1.4 1.4"/><path d="M5 13a7 7 0 1 0 14 0"/><path d="M8 12h8"/><path d="M12 12v4"/></svg>
                 </div>
                 <div class="chat-title">
-                    <h3>Trợ lý ảo Reid</h3>
+                    <h3>Trợ lý ảo Elite</h3>
                     <p><span class="status-dot"></span> Sẵn sàng hỗ trợ</p>
                 </div>
             </div>
@@ -587,7 +587,7 @@
                 // If no messages, show greeting
                 if (this.messages.length === 0) {
                     this.messages.push({
-                        text: "Xin chào! 👋 Chào mừng bạn đến với Reid Fashion. Tôi giúp được gì cho bạn?",
+                        text: "Xin chào! 👋 Chào mừng bạn đến với Elite. Tôi giúp được gì cho bạn?",
                         isUser: false,
                         sender_type: 'bot',
                         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
