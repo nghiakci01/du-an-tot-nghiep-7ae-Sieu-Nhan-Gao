@@ -30,6 +30,8 @@
     <!-- Search Autocomplete CSS -->
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/search-autocomplete.css') }}">
 
+    @yield('styles')
+    @stack('styles')
 </head>
 
 <body>

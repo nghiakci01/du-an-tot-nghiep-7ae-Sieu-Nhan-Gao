@@ -3,6 +3,7 @@
 @section('title', __('messages.order_success') . ' | FashionStore')
 
 @section('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
 /* Success Page Styles */
 .success-container {
@@ -306,7 +307,7 @@
     <div class="order-summary-card">
         <h5><i class="bi bi-bag-check"></i> {{ __('messages.order_details') }}</h5>
         
-        @foreach($order->orderItems as $item)
+        @foreach($order->items as $item)
         <div class="product-item">
             <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="product-image">
             <div class="product-details">
@@ -417,7 +418,7 @@
     <!-- Action Buttons -->
     <div class="action-buttons">
         @if(Auth::check())
-        <a href="{{ route('account.orders') }}" class="btn btn-primary">
+        <a href="{{ route('account.index') }}" class="btn btn-primary">
             <i class="bi bi-box-seam"></i> {{ __('messages.view_orders') }}
         </a>
         @endif

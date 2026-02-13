@@ -123,7 +123,7 @@ class CheckoutController extends Controller
     public function success($id)
     {
         // Load order with all relationships
-        $order = Order::with(['orderItems.product', 'orderItems.variant', 'user'])
+        $order = Order::with(['items.product', 'items.variant', 'user'])
             ->findOrFail($id);
         
         // Security check: Only allow viewing if Auth user matches
