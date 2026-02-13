@@ -92,6 +92,7 @@ return [
     'address_label' => 'Địa chỉ',
     'phone_label' => 'Điện thoại',
     'email_label' => 'Email',
+    'contact_success' => 'Cảm ơn bạn đã liên hệ với chúng tôi! Chúng tôi sẽ phản hồi sớm nhất có thể.',
 
     // News
     'latest_news' => 'Tin tức mới nhất',

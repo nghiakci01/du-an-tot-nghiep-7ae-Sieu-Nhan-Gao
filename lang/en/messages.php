@@ -92,6 +92,7 @@ return [
     'address_label' => 'Address',
     'phone_label' => 'Phone',
     'email_label' => 'Email',
+    'contact_success' => 'Thank you for contacting us! We will get back to you soon.',
 
     // News
     'latest_news' => 'Latest News',

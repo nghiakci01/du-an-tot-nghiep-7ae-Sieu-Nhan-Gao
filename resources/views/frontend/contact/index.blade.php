@@ -30,11 +30,10 @@
                         <h3>{{ __('messages.contact_us') }}</h3>
                         <p>{{ __('messages.contact_intro') }}</p>
                         <ul>
-                            <li><i class="fa fa-fax"></i> {{ __('messages.address_label') }}: 123 Đường ABC, Quận XYZ, TP.
-                                Hồ Chí Minh, Việt Nam</li>
-                            <li><i class="fa fa-phone"></i> <a href="tel:0123456789">0123 456 789</a></li>
+                            <li><i class="fa fa-fax"></i> {{ __('messages.address_label') }}: Số 7 Ngõ 91 Lai Xá - Hoài Đức - Thành Phố Hà Nội - Việt Nam</li>
+                            <li><i class="fa fa-phone"></i> <a href="tel:0123456789">03575372804</a></li>
                             <li><i class="fa fa-envelope-o"></i> <a
-                                    href="mailto:contact@fashionstore.vn">contact@fashionstore.vn</a></li>
+                                    href="mailto:contact@fashionstore.vn">Elite@gmail.com</a></li>
                         </ul>
                     </div>
                 </div>
@@ -42,11 +41,6 @@
                     <div class="contact_message form">
                         <h3>{{ __('messages.send_message') }}</h3>
 
-                        @if(session('success'))
-                            <div class="alert alert-success">
-                                <i class="fa fa-check-circle"></i> {{ session('success') }}
-                            </div>
-                        @endif
 
                         @if($errors->any())
                             <div class="alert alert-danger">
@@ -106,4 +100,18 @@
         </div>
     </div>
     <!--contact map end-->
+@endsection
+
+@section('scripts')
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                title: 'Thành công!',
+                text: "{{ session('success') }}",
+                icon: 'success',
+                confirmButtonText: 'Đóng',
+                confirmButtonColor: '#fe4536'
+            });
+        </script>
+    @endif
 @endsection

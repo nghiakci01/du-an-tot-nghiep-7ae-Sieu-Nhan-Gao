@@ -30,6 +30,9 @@
     <!-- Search Autocomplete CSS -->
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/search-autocomplete.css') }}">
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body>
