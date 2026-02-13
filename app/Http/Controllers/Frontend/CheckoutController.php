@@ -122,14 +122,27 @@ class CheckoutController extends Controller
 
     public function success($id)
     {
-        $order = Order::findOrFail($id);
+        // Load order with all relationships
+        $order = Order::with(['orderItems.product', 'orderItems.variant', 'user'])
+            ->findOrFail($id);
         
-        // Security check: Only allow viewing if Auth user matches Or if just created (session check could be added here for strictness)
+        // Security check: Only allow viewing if Auth user matches
         if (Auth::check() && $order->user_id !== Auth::id()) {
              return redirect()->route('welcome');
         }
 
-        return view('frontend.checkout.success', compact('order'));
+        // Calculate estimated delivery date
+        $estimatedDays = $order->payment_method === 'COD' ? 3 : 5; // COD: 3-5 days, Bank: 5-7 days after payment
+        $estimatedDeliveryMin = now()->addDays($estimatedDays);
+        $estimatedDeliveryMax = now()->addDays($estimatedDays + 2);
+
+        // Get coupon info if applied
+        $coupon = null;
+        if ($order->coupon_code) {
+            $coupon = Coupon::where('code', $order->coupon_code)->first();
+        }
+
+        return view('frontend.checkout.success', compact('order', 'estimatedDeliveryMin', 'estimatedDeliveryMax', 'coupon'));
     }
 
     /**
