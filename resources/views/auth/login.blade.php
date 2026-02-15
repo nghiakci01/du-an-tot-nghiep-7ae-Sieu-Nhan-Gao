@@ -262,35 +262,39 @@
                     <form action="{{ route('register') }}" method="POST" class="auth-form {{ request('tab') == 'register' ? 'active' : '' }}" id="register-form">
                         @csrf
                         <div class="input-group">
-                            <input type="text" name="name" class="auth-input" placeholder="Họ tên" value="{{ old('name') }}" required>
+                            <input type="text" name="name" class="auth-input" placeholder="Họ tên" value="{{ old('name') }}" 
+                                required minlength="2" maxlength="50" pattern="^[a-zA-ZÀ-ỹ\s]+$" title="Họ tên chỉ được chứa chữ cái và khoảng trắng">
                             @error('name')
                                 <span class="error-message">{{ $message }}</span>
                             @enderror
                         </div>
                         
                         <div class="input-group">
-                            <input type="tel" name="phone" class="auth-input" placeholder="Điện thoại" value="{{ old('phone') }}">
+                            <input type="tel" name="phone" class="auth-input" placeholder="Điện thoại" value="{{ old('phone') }}"
+                                required pattern="^0[0-9]{9}$" title="Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0">
                             @error('phone')
                                 <span class="error-message">{{ $message }}</span>
                             @enderror
                         </div>
                         
                         <div class="input-group">
-                            <input type="email" name="email" class="auth-input" placeholder="Email" value="{{ old('email') }}" required>
+                            <input type="email" name="email" class="auth-input" placeholder="Email" value="{{ old('email') }}" 
+                                required pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" title="Vui lòng nhập định dạng email hợp lệ">
                             @error('email')
                                 <span class="error-message">{{ $message }}</span>
                             @enderror
                         </div>
                         
                         <div class="input-group">
-                            <input type="password" name="password" class="auth-input" placeholder="Mật khẩu của bạn" required>
+                            <input type="password" name="password" class="auth-input" placeholder="Mật khẩu của bạn" 
+                                required minlength="8" title="Mật khẩu phải có ít nhất 8 ký tự">
                             @error('password')
                                 <span class="error-message">{{ $message }}</span>
                             @enderror
                         </div>
                         
                         <div class="input-group">
-                            <input type="password" name="password_confirmation" class="auth-input" placeholder="Xác nhận mật khẩu" required>
+                            <input type="password" name="password_confirmation" class="auth-input" placeholder="Xác nhận mật khẩu" required minlength="8">
                         </div>
                         
                         <button type="submit" class="auth-btn auth-btn-register">Đăng ký</button>

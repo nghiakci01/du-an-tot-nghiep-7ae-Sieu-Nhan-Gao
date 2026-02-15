@@ -95,6 +95,49 @@
         height: 2.4em; /* Max 2 lines height for alignment */
         overflow: hidden;
     }
+
+    /* Banner & Slider Custom Refining */
+    @media (min-width: 992px) {
+        /* Desktop: Ensure slider and side banners have matching heights */
+        .home_six_slider .single_slider {
+            height: 600px !important; /* Fixed base height for slider */
+            background-size: cover !important;
+            background-position: center !important;
+        }
+
+        .banner_slider_section .banner_area.banner_top .banner_thumb img {
+            height: 340px !important; /* Top big banner */
+            object-fit: cover !important;
+            width: 100%;
+        }
+
+        .banner_slider_section .banner_area:not(.banner_top) .banner_thumb img {
+            height: 240px !important; /* Two small banners below */
+            object-fit: cover !important;
+            width: 100%;
+        }
+    }
+
+    /* General aspect ratios for consistency */
+    .banner_thumb img {
+        width: 100%;
+        object-fit: cover !important;
+    }
+
+    /* Smooth slider content overlay */
+    .slider_content {
+        background: rgba(255, 255, 255, 0.7);
+        padding: 30px;
+        display: inline-block;
+        border-radius: 4px;
+    }
+
+    /* Bottom banner refinement */
+    .section_fullwidth .banner_thumb img {
+        aspect-ratio: 21 / 6;
+        width: 100%;
+        object-fit: cover !important;
+    }
 </style>
     <!--slider area start-->
     <div class="slider_section slider_section_six">
@@ -102,81 +145,58 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="slider_area home_six_slider owl-carousel">
-                        <div class="single_slider" data-bgimg="{{ asset('frontend-assets') }}/img/slider/slider10.jpg">
-                            <div class="slider_content_inner">
+                        @foreach($sliders as $slider)
+                        <div class="single_slider" data-bgimg="{{ asset('storage/' . $slider->image) }}">
+                            <div class="slider_content_inner text-center">
                                 <div class="slider_content">
-                                    <h2>top trending</h2>
-                                    <h1>handbag</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique
-                                        perspiciatis, tempore unde </p>
-                                    <a href="shop.html">Discover Now</a>
+                                    <h2>{{ $slider->title }}</h2>
+                                    <h1>{{ $slider->subtitle }}</h1>
+                                    <p>{!! nl2br(e($slider->content)) !!}</p>
+                                    @if($slider->link)
+                                        <a href="{{ $slider->link }}">Khám phá ngay</a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
-                        <div class="single_slider" data-bgimg="{{ asset('frontend-assets') }}/img/slider/slider11.jpg">
-                            <div class="slider_content_inner">
-                                <div class="slider_content">
-                                    <h2>Featured Products</h2>
-                                    <h1>zip hoodie</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique
-                                        perspiciatis, tempore unde </p>
-                                    <a href="shop.html">Discover Now</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="single_slider" data-bgimg="{{ asset('frontend-assets') }}/img/slider/slider12.jpg">
-                            <div class="slider_content_inner">
-                                <div class="slider_content">
-                                    <h2>top trending</h2>
-                                    <h1>clothing</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique
-                                        perspiciatis, tempore unde </p>
-                                    <a href="shop.html">Discover Now</a>
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <!--banner area start-->
                     <div class="banner_slider_section">
-                        <div class="row ">
-                            <div class="col-12">
-                                <div class="banner_area banner_top">
-                                    <div class="banner_thumb">
-                                        <a href="shop.html"><img src="{{ asset('frontend-assets') }}/img/bg/banner18.jpg"
-                                                alt="#"></a>
-                                        <div class="banner_content">
-                                            <h1>Men’s <br> Summer Sneaker</h1>
-                                            <h3>Big Sale Off This Week</h3>
+                        <div class="row">
+                            @if($bannerTop->count() > 0)
+                                @php $firstBanner = $bannerTop->first(); @endphp
+                                <div class="col-12">
+                                    <div class="banner_area banner_top">
+                                        <div class="banner_thumb">
+                                            <a href="{{ $firstBanner->link ?? '#' }}">
+                                                <img src="{{ asset('storage/' . $firstBanner->image) }}" alt="{{ $firstBanner->title }}">
+                                            </a>
+                                            <div class="banner_content text-center">
+                                                <h1>{!! nl2br(e($firstBanner->title)) !!}</h1>
+                                                <h3>{{ $firstBanner->subtitle }}</h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="banner_area">
-                                    <div class="banner_thumb">
-                                        <a href="shop.html"><img src="{{ asset('frontend-assets') }}/img/bg/banner19.jpg"
-                                                alt="#"></a>
-                                        <div class="banner_content">
-                                            <h1>Clothing.No18</h1>
-                                            <h3>Sale Off 20% All Store</h3>
+                                
+                                @foreach($bannerTop->skip(1) as $banner)
+                                    <div class="col-lg-6 col-md-6 col-sm-6">
+                                        <div class="banner_area">
+                                            <div class="banner_thumb">
+                                                <a href="{{ $banner->link ?? '#' }}">
+                                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}">
+                                                </a>
+                                                <div class="banner_content text-center">
+                                                    <h1>{!! nl2br(e($banner->title)) !!}</h1>
+                                                    <h3>{{ $banner->subtitle }}</h3>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="banner_area">
-                                    <div class="banner_thumb">
-                                        <a href="shop.html"><img src="{{ asset('frontend-assets') }}/img/bg/banner20.jpg"
-                                                alt="#"></a>
-                                        <div class="banner_content">
-                                            <h1>Bag.No1</h1>
-                                            <h3>Big Sale No Limited</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                @endforeach
+                            @endif
                         </div>
                     </div>
                     <!--banner area end-->
@@ -254,19 +274,23 @@
     <!--product section area end-->
 
     <!--banner area start-->
+    @if($bannerBottom)
     <div class="banner_slider_section section_fullwidth">
         <div class="container-fluid">
-            <div class="row ">
+            <div class="row">
                 <div class="col-12">
                     <div class="banner_area">
                         <div class="banner_thumb">
-                            <a href="shop.html"><img src="{{ asset('frontend-assets') }}/img/bg/banner21.jpg" alt="#"></a>
+                            <a href="{{ $bannerBottom->link ?? '#' }}">
+                                <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title }}">
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @endif
     <!--banner area end-->
 
     <!--product section area start-->

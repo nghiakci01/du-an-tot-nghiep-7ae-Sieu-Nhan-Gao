@@ -18,6 +18,7 @@ class UpdateProductRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'price' => 'nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0|lt:price',
+            'short_description' => 'nullable|string|max:1000',
             'description' => 'nullable|string|max:500',
             'image' => [
                 'nullable',
@@ -36,13 +37,8 @@ class UpdateProductRequest extends FormRequest
                         }
 
                         [$width, $height] = $dimensions;
-                        if ($width < 500 || $height < 600) {
-                            $fail("Hình ảnh chính phải có kích thước tối thiểu 500x600px.");
-                        }
-
-                        $ratio = round($width / $height, 2);
-                        if ($ratio != 0.8 && $ratio != 1.0) {
-                            $fail("Hình ảnh chính phải có tỷ lệ 4:5 hoặc 1:1.");
+                        if ($width < 400 || $height < 400) {
+                            $fail("Hình ảnh chính phải có kích thước tối thiểu 400x400px.");
                         }
                     }
                 }
@@ -64,13 +60,8 @@ class UpdateProductRequest extends FormRequest
                         }
 
                         [$width, $height] = $dimensions;
-                        if ($width < 500 || $height < 600) {
-                            $fail("Hình ảnh gallery phải có kích thước tối thiểu 500x600px.");
-                        }
-
-                        $ratio = round($width / $height, 2);
-                        if ($ratio != 0.8 && $ratio != 1.0) {
-                            $fail("Hình ảnh gallery phải có tỷ lệ 4:5 hoặc 1:1.");
+                        if ($width < 400 || $height < 400) {
+                            $fail("Hình ảnh gallery phải có kích thước tối thiểu 400x400px.");
                         }
                     }
                 }
@@ -90,7 +81,7 @@ class UpdateProductRequest extends FormRequest
                         if ($sizeId && $colorId) {
                             $key = "{$sizeId}-{$colorId}";
                             if (in_array($key, $combinations)) {
-                                $fail("Sản phẩm không được có các biến thể trùng lặp về Size và Màu sắc.");
+                                $fail("Sản phẩm không được có các biến thể trùng lặp về Kích thước và Màu sắc.");
                                 return;
                             }
                             $combinations[] = $key;
@@ -116,6 +107,35 @@ class UpdateProductRequest extends FormRequest
             ],
             'variants.*.stock_quantity' => 'required|integer|min:0',
             'variants.*.sku' => 'nullable|string|max:100',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => 'Tên sản phẩm',
+            'category_id' => 'Danh mục',
+            'price' => 'Giá',
+            'sale_price' => 'Giá khuyến mãi',
+            'short_description' => 'Mô tả ngắn',
+            'description' => 'Mô tả',
+            'image' => 'Hình ảnh chính',
+            'gallery_images' => 'Ảnh bộ sưu tập',
+            'variants' => 'Biến thể',
+            'variants.*.size_id' => 'Kích thước',
+            'variants.*.color_id' => 'Màu sắc',
+            'variants.*.price' => 'Giá biến thể',
+            'variants.*.sale_price' => 'Giá khuyến mãi biến thể',
+            'variants.*.stock_quantity' => 'Số lượng tồn kho',
+            'variants.*.sku' => 'Mã SKU',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'sale_price.lt' => 'Giá khuyến mãi phải nhỏ hơn giá gốc.',
+            'gallery_images.max' => 'Bạn chỉ có thể tải lên tối đa :max ảnh bộ sưu tập.',
         ];
     }
 }

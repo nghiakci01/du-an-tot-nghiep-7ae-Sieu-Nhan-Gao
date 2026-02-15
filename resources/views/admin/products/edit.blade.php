@@ -380,18 +380,26 @@
         });
 
 
-        // Character counter for description
+        // Character counters for descriptions
+        const shortDescTextarea = document.getElementById('short_description');
+        const shortCharCount = document.getElementById('short-char-count');
         const descTextarea = document.getElementById('description');
         const charCount = document.getElementById('char-count');
         
+        function updateCount(textarea, counter) {
+            if (textarea && counter) {
+                counter.textContent = textarea.value.length;
+            }
+        }
+
+        if (shortDescTextarea && shortCharCount) {
+            updateCount(shortDescTextarea, shortCharCount);
+            shortDescTextarea.addEventListener('input', () => updateCount(shortDescTextarea, shortCharCount));
+        }
+        
         if (descTextarea && charCount) {
-            // Update on load
-            charCount.textContent = descTextarea.value.length;
-            
-            // Update on input
-            descTextarea.addEventListener('input', function() {
-                charCount.textContent = this.value.length;
-            });
+            updateCount(descTextarea, charCount);
+            descTextarea.addEventListener('input', () => updateCount(descTextarea, charCount));
         }
 
         // Gallery images preview

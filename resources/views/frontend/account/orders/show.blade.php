@@ -77,6 +77,38 @@
                                 {{ $order->shipping_address ?? $user->address ?? 'N/A' }}
                             </p>
                         </div>
+
+                        <div class="mt-4">
+                            <h4>Order History</h4>
+                            <div class="timeline">
+                                <ul class="list-unstyled">
+                                    @forelse($order->histories as $history)
+                                        <li class="mb-3">
+                                            <p class="mb-1 text-muted"><small>{{ $history->created_at->format('H:i d/m/Y') }}</small></p>
+                                            <p class="mb-1">
+                                                <strong>{{ $history->user ? $history->user->name : 'System' }}</strong>: 
+                                                Changed status from <span class="badge bg-secondary">{{ $history->previous_status }}</span> 
+                                                to <span class="badge bg-primary">{{ $history->new_status }}</span>
+                                            </p>
+                                            @if($history->note)
+                                                <p class="mb-0 text-muted"><em>{{ $history->note }}</em></p>
+                                            @endif
+                                        </li>
+                                    @empty
+                                        <li>No history available.</li>
+                                    @endforelse
+                                </ul>
+                            </div>
+                        </div>
+
+                        @if($order->status === \App\Models\Order::STATUS_PENDING)
+                            <div class="mt-4">
+                                <form action="{{ route('account.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                    @csrf
+                                    <button type="submit" class="btn btn-danger">Cancel Order</button>
+                                </form>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

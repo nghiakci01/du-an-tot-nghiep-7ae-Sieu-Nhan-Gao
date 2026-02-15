@@ -20,7 +20,7 @@ class AccountController extends Controller
     public function showOrder($id)
     {
         $user = Auth::user();
-        $order = $user->orders()->with('items.product')->findOrFail($id);
+        $order = $user->orders()->with(['items.product', 'histories'])->findOrFail($id);
         return view('frontend.account.orders.show', compact('user', 'order'));
     }
 
@@ -58,13 +58,20 @@ class AccountController extends Controller
         return redirect()->back()->with('success', 'Cập nhật thông tin thành công!');
     }
 
-    public function cancelOrder($id)
+    public function cancelOrder($id, \App\Services\OrderService $orderService)
     {
         $user = Auth::user();
-        $order = $user->orders()->where('status', 'PENDING')->findOrFail($id);
+        $order = $user->orders()->findOrFail($id);
 
-        $order->status = 'CANCELLED';
-        $order->save();
+        if ($order->status !== Order::STATUS_PENDING) {
+             return redirect()->back()->with('error', 'Chỉ có thể hủy đơn hàng khi trạng thái là Chờ xác nhận.');
+        }
+
+        try {
+            $orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, $user, 'Khách hàng tự hủy đơn');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
 
         return redirect()->back()->with('success', 'Đã hủy đơn hàng thành công!');
     }

@@ -53,31 +53,22 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Order $order)
+    public function update(Request $request, Order $order, \App\Services\OrderService $orderService)
     {
-        // Standardize to UPPERCASE to match Frontend View logic
         $request->validate([
-            'status' => 'required|in:PENDING,CONFIRMED,SHIPPED,COMPLETED,CANCELLED,pending,confirmed,shipped,completed,cancelled',
+            'status' => 'required|string',
         ]);
 
-        $oldStatus = strtoupper($order->status); // Ensure we compare normalized upper
-        $newStatus = strtoupper($request->input('status')); // Force Save as Upper
+        $newStatus = $request->input('status');
 
-        // Nếu đơn hàng bị hủy và trước đó chưa hủy -> Hoàn lại kho
-        if ($newStatus == 'CANCELLED' && $oldStatus != 'CANCELLED') {
-            foreach ($order->items as $item) {
-                if ($item->variant) {
-                    $item->variant->increment('stock_quantity', $item->quantity);
-                }
-            }
+        try {
+            $orderService->updateOrderStatus($order, $newStatus, auth()->user());
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
 
-        $order->update([
-            'status' => $newStatus,
-        ]);
-
-        return redirect()->route('admin.orders.index')
-            ->with('success', 'Trạng thái đơn hàng đã được cập nhật thành công.' . ($newStatus == 'CANCELLED' ? ' (Đã hoàn kho)' : ''));
+        return redirect()->route('admin.orders.show', $order)
+            ->with('success', 'Trạng thái đơn hàng đã được cập nhật thành công.');
     }
 
     /**
@@ -93,5 +84,17 @@ class OrderController extends Controller
 
         return redirect()->route('admin.orders.index')
             ->with('success', 'Đơn hàng đã được xóa thành công.');
+    }
+
+    private function getStatusText($status)
+    {
+        return match ($status) {
+            Order::STATUS_PENDING => 'Chờ xác nhận',
+            Order::STATUS_CONFIRMED => 'Đã xác nhận',
+            Order::STATUS_SHIPPED => 'Đang giao hàng',
+            Order::STATUS_COMPLETED => 'Hoàn thành',
+            Order::STATUS_CANCELLED => 'Đã hủy',
+            default => 'Không xác định',
+        };
     }
 }

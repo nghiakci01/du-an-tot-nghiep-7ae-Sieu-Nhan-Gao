@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Tin tức | Reid Fashion')
+@section('title', 'Tin tức | Elite')
 
 @section('content')
     <!--breadcrumbs area start-->
@@ -64,7 +64,7 @@
                                 <div class="articles_date">
                                     <p>01 Tháng 2, 2026 | <a href="#">Tips & Tricks</a> </p>
                                 </div>
-                                <p class="post_desc">Phong cách Minimalism chưa bao giờ lỗi mốt. Hãy cùng Reid Fashion tìm
+                                <p class="post_desc">Phong cách Minimalism chưa bao giờ lỗi mốt. Hãy cùng Elite tìm
                                     hiểu cách phối đồ chuẩn "soái ca"...</p>
                                 <footer class="btn_more">
                                     <a href="#"> {{ __('messages.read_more') }}</a>
@@ -84,7 +84,7 @@
                                 <div class="articles_date">
                                     <p>25 Tháng 1, 2026 | <a href="#">Thông báo</a> </p>
                                 </div>
-                                <p class="post_desc">Reid Fashion vui mừng thông báo khai trương chi nhánh thứ 5 tại TP. Hồ
+                                <p class="post_desc">Elite vui mừng thông báo khai trương chi nhánh thứ 5 tại TP. Hồ
                                     Chí Minh với nhiều ưu đãi hấp dẫn...</p>
                                 <footer class="btn_more">
                                     <a href="#"> {{ __('messages.read_more') }}</a>

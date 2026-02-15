@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 use App\Models\ContactMessage;
+use App\Mail\ContactNotification;
 
 class ContactController extends Controller
 {
@@ -23,12 +25,20 @@ class ContactController extends Controller
             'message' => 'required|string',
         ]);
 
-        ContactMessage::create($validated);
+        $contactMessage = ContactMessage::create($validated);
 
-        // TODO: Implement email sending logic
-        // For now, just return success message
+        // Send email notification to Admin and Staff
+        try {
+            $recipients = User::whereIn('role', [User::ROLE_ADMIN, User::ROLE_STAFF])->pluck('email');
+            
+            if ($recipients->isNotEmpty()) {
+                Mail::to($recipients)->send(new ContactNotification($contactMessage));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to send contact notification: ' . $e->getMessage());
+        }
         
         return redirect()->route('contact.index')
-            ->with('success', 'Thank you for contacting us! We will get back to you soon.');
+            ->with('success', __('messages.contact_success'));
     }
 }
