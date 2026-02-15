@@ -271,7 +271,7 @@
                         
                         <div class="input-group">
                             <input type="tel" name="phone" class="auth-input" placeholder="Điện thoại" value="{{ old('phone') }}"
-                                required pattern="^0[0-9]{9}$" title="Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0">
+                                required pattern="^0[0-9]{9}$" maxlength="10" title="Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0">
                             @error('phone')
                                 <span class="error-message">{{ $message }}</span>
                             @enderror
