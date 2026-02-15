@@ -59,6 +59,7 @@
 
 @yield('scripts')
 @stack('scripts')
+@stack('styles')
 
 
 
