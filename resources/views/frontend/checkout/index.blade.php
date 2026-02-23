@@ -505,7 +505,7 @@ textarea.is-valid {
                                         @endif
                                         <tr>
                                             <th>{{ __('messages.shipping') }}</th>
-                                            <td><strong>{{ __('messages.free') }}</strong></td>
+                                            <td><strong>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí' }}</strong></td>
                                         </tr>
                                         <tr class="order_total">
                                             <th>{{ __('messages.order_total') }}</th>
