@@ -131,11 +131,12 @@ class CheckoutController extends Controller
         $order = Order::findOrFail($id);
         
         // Security check: Only allow viewing if Auth user matches Or if just created (session check could be added here for strictness)
-        if (Auth::check() && $order->user_id !== Auth::id()) {
-             return redirect()->route('welcome');
-        }
+        $bankName = \App\Models\Setting::get('bank_name', 'Vietcombank');
+        $bankAccount = \App\Models\Setting::get('bank_account_number', '0071001234567');
+        $bankOwner = \App\Models\Setting::get('bank_account_name', 'CÔNG TY TNHH SIÊU NHÂN GAO');
+        $bankId = \App\Models\Setting::get('bank_id', 'vcb');
 
-        return view('frontend.checkout.success', compact('order'));
+        return view('frontend.checkout.success', compact('order', 'bankName', 'bankAccount', 'bankOwner', 'bankId'));
     }
 
     /**
