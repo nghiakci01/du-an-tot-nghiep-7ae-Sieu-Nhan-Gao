@@ -20,13 +20,25 @@ class ProductVariant extends Model
         'sale_price',
         'stock_quantity',
         'sku',
+        'alert_threshold',
     ];
 
     protected $casts = [
         'stock_quantity' => 'integer',
+        'alert_threshold' => 'integer',
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
     ];
+
+    public function voucherDetails()
+    {
+        return $this->hasMany(InventoryVoucherDetail::class, 'product_variant_id');
+    }
+
+    public function warehouseStocks()
+    {
+        return $this->hasMany(WarehouseStock::class, 'product_variant_id');
+    }
 
 
     public function product(): BelongsTo
