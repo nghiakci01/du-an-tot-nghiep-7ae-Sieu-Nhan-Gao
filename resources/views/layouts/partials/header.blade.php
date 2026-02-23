@@ -27,13 +27,14 @@
                                 <li><a href="{{ route('register') }}">{{ __('messages.register') }}</a></li>
                             </ul>
                         @else
-                            <a href="#" style="display: flex; align-items: center; gap: 5px;">
-                                @if(Auth::user()->avatar)
-                                    <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                            <a href="#" style="display: flex; align-items: center; gap: 8px;">
+                                @if(Auth::user()->avatar_url)
+                                    <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" style="width: 25px; height: 25px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
                                 @else
                                     <i class="ion-android-person"></i>
                                 @endif
-                                {{ Auth::user()->name }} <i class="ion-chevron-down"></i>
+                                <span style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Auth::user()->name }}</span>
+                                <i class="ion-chevron-down"></i>
                             </a>
                             <ul class="dropdown_links">
                                 <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
@@ -172,7 +173,15 @@
                                                     <li><a href="{{ route('register') }}">{{ __('messages.register') }}</a></li>
                                                 </ul>
                                             @else
-                                                <a href="#"><i class="ion-android-person"></i> {{ Auth::user()->name }} <i class="ion-chevron-down"></i></a>
+                                                <a href="#" style="display: flex; align-items: center; gap: 8px;">
+                                                    @if(Auth::user()->avatar_url)
+                                                        <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" style="width: 25px; height: 25px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
+                                                    @else
+                                                        <i class="ion-android-person"></i>
+                                                    @endif
+                                                    <span style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ Auth::user()->name }}</span>
+                                                    <i class="ion-chevron-down"></i>
+                                                </a>
                                                 <ul class="dropdown_links">
                                                     <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
                                                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
