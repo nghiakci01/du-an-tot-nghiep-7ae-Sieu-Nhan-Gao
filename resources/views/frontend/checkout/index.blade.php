@@ -434,7 +434,12 @@ textarea.is-valid {
                                 </div>
 
                                 <div class="col-12 mb-20">
-                                    <label>Tỉnh / Thành phố <span>*</span></label>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="mb-0">Tỉnh / Thành phố <span>*</span></label>
+                                        <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-primary" title="Sử dụng vị trí hiện tại của bạn">
+                                            <i class="fa fa-map-marker"></i> Định vị vị trí
+                                        </button>
+                                    </div>
                                     <select name="province" id="province" required class="form-control @error('province') is-invalid @enderror">
                                         <option value="">{{ __('Chọn tỉnh thành') }}</option>
                                         @foreach($provinces as $province)
@@ -774,6 +779,113 @@ $(document).ready(function() {
             $(this).removeClass('is-invalid');
             $(this).next('.invalid-feedback').remove();
         }
+    });
+
+    // ============ GEOLOCATION ============
+    $('#btn-locate-me').click(function() {
+        if (!navigator.geolocation) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Trình duyệt của bạn không hỗ trợ định vị.'
+            });
+            return;
+        }
+
+        const $btn = $(this);
+        const originalHtml = $btn.html();
+        $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang định vị...');
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                // Call Nominatim API for reverse geocoding
+                $.ajax({
+                    url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&accept-language=vi`,
+                    method: 'GET',
+                    success: function(data) {
+                        if (data && data.address) {
+                            const address = data.address;
+                            
+                            // Map Nominatim fields to our fields
+                            // Nominatim often returns 'city', 'town', 'village', or 'state' for provinces in VN
+                            let provinceName = address.city || address.province || address.state || address.town;
+                            
+                            // Clean up province name (Nominatim sometimes adds "Thành phố " or "Tỉnh ")
+                            if (provinceName) {
+                                provinceName = provinceName.replace('Thành phố ', '').replace('Tỉnh ', '').trim();
+                                
+                                // Special case for HCMC
+                                if (provinceName.toLowerCase().includes('hồ chí minh')) {
+                                    provinceName = 'TP Hồ Chí Minh';
+                                }
+                                
+                                // Try to match with our 63 provinces list
+                                let matchedProvince = '';
+                                $('#province option').each(function() {
+                                    const optionText = $(this).val();
+                                    if (provinceName.toLowerCase() === optionText.toLowerCase() || 
+                                        optionText.toLowerCase().includes(provinceName.toLowerCase())) {
+                                        matchedProvince = optionText;
+                                        return false;
+                                    }
+                                });
+
+                                if (matchedProvince) {
+                                    $('#province').val(matchedProvince).trigger('change');
+                                }
+                            }
+
+                            // Build street address
+                            const road = address.road || '';
+                            const suburb = address.suburb || address.neighbourhood || '';
+                            const quarter = address.quarter || '';
+                            const district = address.district || address.city_district || '';
+                            
+                            let streetAddress = [road, suburb, quarter, district].filter(Boolean).join(', ');
+                            if (streetAddress) {
+                                $('input[name="address"]').val(streetAddress);
+                                showValidation($('input[name="address"]')[0], '');
+                            }
+                            
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công',
+                                text: 'Đã cập nhật địa chỉ từ vị trí của bạn.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: 'Không thể lấy thông tin địa chỉ từ tọa độ.'
+                        });
+                    },
+                    complete: function() {
+                        $btn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            },
+            function(error) {
+                let message = 'Không thể lấy vị trí của bạn.';
+                if (error.code === 1) message = 'Bạn đã từ chối quyền truy cập vị trí.';
+                else if (error.code === 2) message = 'Không thể xác định vị trí.';
+                else if (error.code === 3) message = 'Hết thời gian yêu cầu vị trí.';
+                
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Thông báo',
+                    text: message
+                });
+                $btn.prop('disabled', false).html(originalHtml);
+            },
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        );
     });
 });
 
