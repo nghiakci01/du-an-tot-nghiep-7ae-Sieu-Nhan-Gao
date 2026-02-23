@@ -1,0 +1,145 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\InventoryVoucher;
+use App\Models\InventoryVoucherDetail;
+use App\Models\Warehouse;
+use App\Models\Supplier;
+use App\Models\ProductVariant;
+use App\Models\WarehouseStock;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+class InventoryVoucherController extends Controller
+{
+    public function index()
+    {
+        $vouchers = InventoryVoucher::with(['warehouse', 'supplier', 'user'])->latest()->paginate(10);
+        return view('admin.vouchers.index', compact('vouchers'));
+    }
+
+    public function create()
+    {
+        $warehouses = Warehouse::active()->get();
+        $suppliers = Supplier::active()->get();
+        return view('admin.vouchers.create', compact('warehouses', 'suppliers'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|in:INBOUND,OUTBOUND',
+            'warehouse_id' => 'required|exists:warehouses,id',
+            'voucher_date' => 'required|date',
+            'items' => 'required|array|min:1',
+            'items.*.product_variant_id' => 'required|exists:product_variants,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $voucher = InventoryVoucher::create([
+                'voucher_code' => 'IV' . date('YmdHis') . strtoupper(Str::random(4)),
+                'type' => $request->type,
+                'warehouse_id' => $request->warehouse_id,
+                'supplier_id' => $request->supplier_id,
+                'user_id' => auth()->id(),
+                'voucher_date' => $request->voucher_date,
+                'status' => 'PENDING',
+                'note' => $request->note,
+            ]);
+
+            $total = 0;
+            foreach ($request->items as $item) {
+                $unitPrice = $item['unit_price'] ?? 0;
+                $voucher->details()->create([
+                    'product_variant_id' => $item['product_variant_id'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $unitPrice,
+                ]);
+                $total += ($item['quantity'] * $unitPrice);
+            }
+
+            $voucher->update(['total_amount' => $total]);
+
+            DB::commit();
+            return redirect()->route('admin.vouchers.index')->with('success', 'Phiếu kho đã được tạo.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
+    public function show(InventoryVoucher $voucher)
+    {
+        $voucher->load('details.variant.product');
+        return view('admin.vouchers.show', compact('voucher'));
+    }
+
+    public function complete(InventoryVoucher $voucher)
+    {
+        if ($voucher->status !== 'PENDING') {
+            return back()->with('error', 'Chỉ có thể hoàn tất phiếu ở trạng thái chờ.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($voucher->details as $detail) {
+                $stock = WarehouseStock::firstOrNew([
+                    'warehouse_id' => $voucher->warehouse_id,
+                    'product_variant_id' => $detail->product_variant_id,
+                ]);
+
+                if ($voucher->type === 'INBOUND') {
+                    $stock->quantity += $detail->quantity;
+                } else {
+                    if ($stock->quantity < $detail->quantity) {
+                        throw new \Exception("Sản phẩm {$detail->variant->sku} không đủ tồn kho trong kho này.");
+                    }
+                    $stock->quantity -= $detail->quantity;
+                }
+                $stock->save();
+
+                // Sync global stock in product_variants
+                $globalStock = WarehouseStock::where('product_variant_id', $detail->product_variant_id)->sum('quantity');
+                $detail->variant->update(['stock_quantity' => $globalStock]);
+            }
+
+            $voucher->update(['status' => 'COMPLETED']);
+
+            DB::commit();
+            return back()->with('success', 'Đã xác nhận hoàn tất phiếu kho và cập nhật tồn kho.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function variantsSearch(Request $request)
+    {
+        $q = $request->q;
+        $variants = ProductVariant::with('product')
+            ->where('sku', 'like', "%$q%")
+            ->orWhereHas('product', function ($query) use ($q) {
+                $query->where('name', 'like', "%$q%");
+            })
+            ->limit(10)
+            ->get();
+
+        return response()->json($variants);
+    }
+
+    public function destroy(InventoryVoucher $voucher)
+    {
+        if ($voucher->status === 'COMPLETED') {
+            return back()->with('error', 'Không thể xóa phiếu đã hoàn tất.');
+        }
+        $voucher->delete();
+        return redirect()->route('admin.vouchers.index')->with('success', 'Đã xóa phiếu kho.');
+    }
+}

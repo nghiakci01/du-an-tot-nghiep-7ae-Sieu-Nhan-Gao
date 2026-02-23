@@ -85,8 +85,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
             Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
             Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
-            
-            // Coupons
+
+            // Inventory Management
+            Route::resource('suppliers', App\Http\Controllers\Admin\SupplierController::class);
+            Route::resource('warehouses', App\Http\Controllers\Admin\WarehouseController::class);
+            Route::resource('vouchers', App\Http\Controllers\Admin\InventoryVoucherController::class);
+            Route::post('vouchers/{voucher}/complete', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'complete'])->name('vouchers.complete');
+            Route::get('api/variants/search', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'variantsSearch'])->name('api.variants.search');
+            Route::get('stock', function () {
+                return "Stock Report Page (Coming Soon)";
+            })->name('stock.index');
+
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
         });
 
