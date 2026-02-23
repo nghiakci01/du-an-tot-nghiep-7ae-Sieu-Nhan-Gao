@@ -31,14 +31,32 @@ class ContactMessageController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Reply to the contact message.
      */
-    public function destroy(string $id)
+    public function reply(Request $request, string $id)
     {
         $message = \App\Models\ContactMessage::findOrFail($id);
-        $message->delete();
         
-        return redirect()->route('admin.contact-messages.index')
-            ->with('success', 'Message deleted successfully.');
+        $request->validate([
+            'reply_message' => 'required|string',
+        ]);
+
+        try {
+            // Send email
+            \Illuminate\Support\Facades\Mail::to($message->email)->send(new \App\Mail\ContactReply($message, $request->reply_message));
+
+            // Update message status
+            $message->update([
+                'reply_message' => $request->reply_message,
+                'replied_at' => now(),
+                'status' => 'replied',
+            ]);
+
+            return redirect()->route('admin.contact-messages.show', $message)
+                ->with('success', 'Email phản hồi đã được gửi thành công.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Có lỗi xảy ra khi gửi email: ' . $e->getMessage());
+        }
     }
 }
