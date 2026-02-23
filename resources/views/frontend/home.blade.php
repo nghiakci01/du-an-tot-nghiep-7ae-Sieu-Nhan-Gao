@@ -153,7 +153,7 @@
                                     <h1>{{ $slider->subtitle }}</h1>
                                     <p>{!! nl2br(e($slider->content)) !!}</p>
                                     @if($slider->link)
-                                        <a href="{{ $slider->link }}">Khám phá ngay</a>
+                                        <a href="{{ $slider->link }}">{{ __('messages.explore_now') }}</a>
                                     @endif
                                 </div>
                             </div>
@@ -240,19 +240,19 @@
                                            <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
                                             <div class="action_button">
                                                 <ul>
-                                                    <li><a title="add to cart" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                                    <li><a title="{{ __('messages.add_to_cart') }}" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
+                                                    <li><a href="#" title="{{ __('messages.add_to_wishlist') }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
                                                 </ul>
                                             </div>
                                        </div>
                                     </div>
                                     <div class="quick_button">
-                                        <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick view</a>
+                                        <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                     </div>
                                     @if($product->price < $product->original_price)
                                     <div class="double_base">
                                         <div class="product_sale">
-                                            <span>Sale</span>
+                                            <span>{{ __('messages.sale') }}</span>
                                         </div>
                                     </div>
                                     @endif
@@ -299,8 +299,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Sản Phẩm Mới</h2>
-                        <p>New products with modern, minimalist design and full of charm.</p>
+                        <h2>{{ __('messages.new_products') }}</h2>
+                        <p>{{ __('messages.new_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -333,16 +333,16 @@
                                        </div>
                                     </div>
                                     <div class="quick_button">
-                                        <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick view</a>
+                                        <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                     </div>
                                     <div class="double_base">
                                         @if($product->price < $product->original_price)
                                         <div class="product_sale">
-                                            <span>Sale</span>
+                                            <span>{{ __('messages.sale') }}</span>
                                         </div>
                                         @endif
                                         <div class="label_product">
-                                            <span>new</span>
+                                            <span>{{ __('messages.new') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -418,7 +418,7 @@
                                         <div class="double_base">
                                             @if($product->price < $product->original_price)
                                                 <div class="product_sale">
-                                                    <span>Sale</span>
+                                                    <span>{{ __('messages.sale') }}</span>
                                                 </div>
                                             @endif
                                             <div class="label_product">
@@ -450,8 +450,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Follow us On Instagram</h2>
-                        <p>Contemporary, minimal and modern designs embody the Lavish Alice handwriting</p>
+                        <h2>{{ __('messages.follow_instagram') }}</h2>
+                        <p>{{ __('messages.instagram_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -521,7 +521,7 @@
                     </div>
                     <div class="col-12">
                         <div class="text_follow">
-                            <a href="#">#Follow us on Instagram</a>
+                            <a href="#">{{ __('messages.follow_us_hashtag') }}</a>
                         </div>
                     </div>
                 </div>
@@ -654,7 +654,7 @@
                                         <div class="modal_add_to_cart">
                                             <form action="#">
                                                 <input min="0" max="100" step="2" value="1" type="number">
-                                                <button type="submit">add to cart</button>
+                                                <button type="submit">{{ __('messages.add_to_cart') }}</button>
                                             </form>
                                         </div>
                                     </div>

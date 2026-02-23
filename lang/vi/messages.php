@@ -70,6 +70,7 @@ return [
     'about_welcome' => 'Chào mừng bạn đến với Elite!',
     'about_intro_1' => 'Elite là điểm đến tin cậy cho những tín đồ thời trang yêu thích sự tối giản, hiện đại và chất lượng. Chúng tôi không chỉ cung cấp quần áo, mà còn mang đến phong cách sống và sự tự tin cho mỗi khách hàng.',
     'about_intro_2' => 'Với sứ mệnh mang lại những sản phẩm chất lượng cao nhất với giá thành hợp lý, đội ngũ của chúng tôi luôn nỗ lực không ngừng để tuyển chọn những mẫu thiết kế mới nhất, bắt kịp xu hướng thời trang thế giới.',
+    'explore_now' => 'Khám phá ngay',
     'view_work' => 'Xem sản phẩm ngay',
     'high_quality' => 'Chất lượng cao',
     'high_quality_desc' => 'Mỗi sản phẩm đều được kiểm tra kỹ lưỡng về chất liệu và đường may trước khi đến tay bạn.',
