@@ -59,4 +59,16 @@ class ContactMessageController extends Controller
                 ->with('error', 'Có lỗi xảy ra khi gửi email: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $message = \App\Models\ContactMessage::findOrFail($id);
+        $message->delete();
+        
+        return redirect()->route('admin.contact-messages.index')
+            ->with('success', 'Xóa tin nhắn thành công.');
+    }
 }
