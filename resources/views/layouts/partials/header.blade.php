@@ -45,7 +45,7 @@
                             </ul>
                         @endguest
                     </li> 
-                    <li class="language">
+                    <!-- <li class="language">
                          <a href="#">
                             @if(App::getLocale() == 'vi')
                                 <img src="{{ asset('frontend-assets/img/logo/language.png') }}" alt=""> Tiếng Việt
@@ -63,7 +63,7 @@
                         <ul class="dropdown_currency">
                             <li><a href="#">USD</a></li>
                         </ul>
-                    </li>
+                    </li> -->
                 </ul>
             </div> 
             <div class="search_bar">
@@ -113,7 +113,7 @@
                 <div class="middel_inner">
                     <div class="row align-items-center">
                         <!-- Logo + Menu Column -->
-                        <div class="col-lg-5 col-md-3">
+                        <div class="col-lg-6 col-md-3">
                             <div class="header_left d-flex align-items-center">
                                 <div class="logo">
                                     <a href="{{ route('welcome') }}"><img src="{{ asset('frontend-assets/img/logo/logo-elite-new.png') }}" alt=""></a>
@@ -122,9 +122,9 @@
                                 <!-- Main Menu (Desktop) -->
                                 <div class="main_menu d-none d-lg-block">
                                     <nav>
-                                        <ul style="display: flex !important; flex-wrap: nowrap !important; white-space: nowrap;">
-                                            <li class="{{ request()->is('/') ? 'active' : '' }}"><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
-                                            <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('shop') }}">{{ __('messages.shop') }}<i class="fa fa-angle-down"></i></a>
+                                        <ul>
+                                            <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
+                                            <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">{{ __('messages.shop') }} <i class="fa fa-angle-down"></i></a>
                                                 <ul class="mega_menu">
                                                     <li><a href="#">{{ __('messages.product_categories') }}</a>
                                                         <ul>
@@ -143,9 +143,9 @@
                                                     <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
                                                 </ul>
                                             </li>
-                                            <li><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
-                                            <li><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
-                                            <li><a style="white-space: nowrap; padding: 15px 10px;" href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
+                                            <li><a href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
+                                            <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
+                                            <li><a href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
                                         </ul>
                                     </nav>
                                 </div>
@@ -153,7 +153,7 @@
                         </div>
                         
                         <!-- Search/Account/Cart Column -->
-                        <div class="col-lg-7 col-md-9">
+                        <div class="col-lg-6 col-md-9">
                             <div class="middel_right_info">
                                 <div class="search_bar" style="position: relative;">
                                     <form action="{{ route('search.index') }}" method="GET">                          
@@ -164,25 +164,7 @@
                                 </div>
                                 <div class="top_right text-right">
                                     <ul>
-                                        <li class="language">
-                                            <a href="#">
-                                                @if(App::getLocale() == 'vi')
-                                                    <img src="{{ asset('frontend-assets/img/logo/language.png') }}" alt=""> Tiếng Việt
-                                                @else
-                                                    <img src="{{ asset('frontend-assets/img/logo/en-gb.png') }}" alt=""> English
-                                                @endif
-                                                <i class="ion-chevron-down"></i>
-                                            </a>
-                                            <ul class="dropdown_language">
-                                                <li><a href="{{ route('lang.switch', 'vi') }}">Tiếng Việt</a></li>
-                                                <li><a href="{{ route('lang.switch', 'en') }}">English</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="currency"><a href="#">VND <i class="ion-chevron-down"></i></a>
-                                            <ul class="dropdown_currency">
-                                                <li><a href="#">USD</a></li>
-                                            </ul>
-                                        </li>
+
                                         <li class="top_links">
                                             @guest
                                                 <a href="#"><i class="ion-android-person"></i> {{ __('messages.account') }} <i class="ion-chevron-down"></i></a>
