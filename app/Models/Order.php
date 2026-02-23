@@ -15,6 +15,7 @@ class Order extends Model
         'total_price',
         'coupon_code',
         'discount_amount',
+        'shipping_fee',
         'final_total',
         'payment_method',
         'shipping_address',

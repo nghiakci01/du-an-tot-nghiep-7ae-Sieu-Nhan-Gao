@@ -69,10 +69,15 @@ class CheckoutController extends Controller
         try {
             DB::beginTransaction();
 
-            // Get coupon data from session
+            // Get coupon and shipping data
             $couponCode = session()->get('coupon_code');
             $discount = session()->get('discount_amount', 0);
-            $finalTotal = $total - $discount;
+            
+            // Calculate shipping fee (Free if >= 500,000)
+            $shippingSetting = \App\Models\Setting::get('shipping_fee', 30000);
+            $shippingFee = ($total >= 500000) ? 0 : $shippingSetting;
+            
+            $finalTotal = $total - $discount + $shippingFee;
 
             $order = Order::create([
                 'user_id' => Auth::id(), // Nullable if guest
@@ -80,6 +85,7 @@ class CheckoutController extends Controller
                 'total_price' => $total,
                 'coupon_code' => $couponCode,
                 'discount_amount' => $discount,
+                'shipping_fee' => $shippingFee,
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
                 'shipping_address' => $request->address . ', ' . $request->province . ' - ' . $request->phone . ' - ' . $request->name,
