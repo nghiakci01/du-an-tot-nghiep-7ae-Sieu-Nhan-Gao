@@ -36,9 +36,12 @@ class CheckoutController extends Controller
         }
         
         $finalTotal = $total - $discount;
+        $shippingFee = \App\Models\Setting::getShippingFee($finalTotal);
+        $finalTotal += $shippingFee;
+
         $provinces = config('vietnam_provinces');
 
-        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'finalTotal', 'provinces'));
+        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces'));
     }
 
     public function store(Request $request)
@@ -73,9 +76,8 @@ class CheckoutController extends Controller
             $couponCode = session()->get('coupon_code');
             $discount = session()->get('discount_amount', 0);
             
-            // Calculate shipping fee (Free if >= 500,000)
-            $shippingSetting = \App\Models\Setting::get('shipping_fee', 30000);
-            $shippingFee = ($total >= 500000) ? 0 : $shippingSetting;
+            // Calculate shipping fee
+            $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
             
             $finalTotal = $total - $discount + $shippingFee;
 
