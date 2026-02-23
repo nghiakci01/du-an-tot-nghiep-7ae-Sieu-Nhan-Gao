@@ -434,8 +434,23 @@ textarea.is-valid {
                                 </div>
 
                                 <div class="col-12 mb-20">
+                                    <label>Tỉnh / Thành phố <span>*</span></label>
+                                    <select name="province" id="province" required class="form-control @error('province') is-invalid @enderror">
+                                        <option value="">{{ __('Chọn tỉnh thành') }}</option>
+                                        @foreach($provinces as $province)
+                                            <option value="{{ $province }}" {{ (Auth::check() && str_contains(Auth::user()->address, $province)) || old('province') == $province ? 'selected' : '' }}>
+                                                {{ $province }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('province')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-12 mb-20">
                                     <label>{{ __('messages.shipping_address') }} <span>*</span></label>
-                                    <input placeholder="{{ __('messages.street_address') }}" type="text" name="address" value="{{ Auth::check() ? Auth::user()->address : old('address') }}" required minlength="10" class="@error('address') is-invalid @enderror">
+                                    <input placeholder="{{ __('messages.street_address') }}" type="text" name="address" value="{{ Auth::check() ? Auth::user()->address : old('address') }}" required minlength="5" class="@error('address') is-invalid @enderror">
                                     @error('address')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -652,8 +667,15 @@ $(document).ready(function() {
     }
 
     function validateAddress(value) {
-        if (!value || value.trim().length < 10) {
-            return 'Vui lòng nhập địa chỉ (ít nhất 10 ký tự)';
+        if (!value || value.trim().length < 5) {
+            return 'Vui lòng nhập địa chỉ cụ thể (số nhà, tên đường)';
+        }
+        return '';
+    }
+
+    function validateProvince(value) {
+        if (!value) {
+            return 'Vui lòng chọn tỉnh thành';
         }
         return '';
     }
@@ -697,6 +719,11 @@ $(document).ready(function() {
         showValidation(this, error);
     });
 
+    $('select[name="province"]').on('change', function() {
+        const error = validateProvince($(this).val());
+        showValidation(this, error);
+    });
+
     // Form submission validation
     $('form').on('submit', function(e) {
         let hasError = false;
@@ -705,14 +732,16 @@ $(document).ready(function() {
         const nameError = validateName($('input[name="name"]').val());
         const phoneError = validatePhone($('input[name="phone"]').val());
         const emailError = validateEmail($('input[name="email"]').val());
+        const provinceError = validateProvince($('select[name="province"]').val());
         const addressError = validateAddress($('input[name="address"]').val());
 
         showValidation('input[name="name"]', nameError);
         showValidation('input[name="phone"]', phoneError);
         showValidation('input[name="email"]', emailError);
+        showValidation('select[name="province"]', provinceError);
         showValidation('input[name="address"]', addressError);
 
-        if (nameError || phoneError || emailError || addressError) {
+        if (nameError || phoneError || emailError || provinceError || addressError) {
             hasError = true;
         }
 
@@ -740,7 +769,7 @@ $(document).ready(function() {
     });
 
     // Remove validation on input
-    $('input[name="name"], input[name="phone"], input[name="email"], input[name="address"]').on('input', function() {
+    $('input[name="name"], input[name="phone"], input[name="email"], input[name="address"], select[name="province"]').on('input change', function() {
         if ($(this).hasClass('is-invalid')) {
             $(this).removeClass('is-invalid');
             $(this).next('.invalid-feedback').remove();

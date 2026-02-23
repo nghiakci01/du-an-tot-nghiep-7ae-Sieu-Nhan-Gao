@@ -36,18 +36,24 @@ class CheckoutController extends Controller
         }
         
         $finalTotal = $total - $discount;
+        $provinces = config('vietnam_provinces');
 
-        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'finalTotal'));
+        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'finalTotal', 'provinces'));
     }
 
     public function store(Request $request)
     {
+        $provinces = config('vietnam_provinces');
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
+            'province' => 'required|string|in:' . implode(',', $provinces),
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
             'payment_method' => 'required|in:COD,BANK_TRANSFER',
+        ], [
+            'province.required' => 'Vui lòng chọn tỉnh thành.',
+            'province.in' => 'Tỉnh thành không hợp lệ.',
         ]);
 
         $cart = session()->get('cart', []);
@@ -76,7 +82,7 @@ class CheckoutController extends Controller
                 'discount_amount' => $discount,
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
-                'shipping_address' => $request->address . ' - ' . $request->phone . ' - ' . $request->name,
+                'shipping_address' => $request->address . ', ' . $request->province . ' - ' . $request->phone . ' - ' . $request->name,
                 'note' => $request->note,
             ]);
 
