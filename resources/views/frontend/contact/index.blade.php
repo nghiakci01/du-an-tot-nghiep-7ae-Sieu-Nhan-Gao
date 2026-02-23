@@ -52,7 +52,7 @@
                             </div>
                         @endif
 
-                        <form id="contact-form" method="POST" action="{{ route('contact.send') }}">
+                        <form id="main-contact-form" method="POST" action="{{ route('contact.send') }}">
                             @csrf
                             <p>
                                 <label>{{ __('messages.name_required') }}</label>

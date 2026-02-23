@@ -30,11 +30,17 @@
             <div class="card-body">
                 <div class="row m-b-20">
                     <div class="col-md-3 font-weight-bold">Họ tên:</div>
-                    <div class="col-md-9">{{ $message->name }}</div>
+                    <div class="col-md-9">
+                        {{ $message->name }} 
+                        @if($message->user_id)
+                            <span class="badge bg-success ms-2">Khách hàng: {{ $message->user->name }}</span>
+                            <a href="{{ route('admin.users.show', $message->user_id) }}" class="btn btn-outline-info btn-xs ms-1">Xem hồ sơ</a>
+                        @endif
+                    </div>
                 </div>
                 <div class="row m-b-20">
                     <div class="col-md-3 font-weight-bold">Email:</div>
-                    <div class="col-md-9">{{ $message->email }} <a href="mailto:{{ $message->email }}" class="btn btn-outline-primary btn-xs ml-2">Gửi email phản hồi</a></div>
+                    <div class="col-md-9">{{ $message->email }}</div>
                 </div>
                 <div class="row m-b-20">
                     <div class="col-md-3 font-weight-bold">Tiêu đề:</div>
@@ -56,7 +62,6 @@
                         @endif
                     </div>
                 </div>
-                <hr>
                 <div class="row m-b-20">
                     <div class="col-md-12 font-weight-bold m-b-10">Nội dung tin nhắn:</div>
                     <div class="col-md-12">
@@ -65,6 +70,38 @@
                         </div>
                     </div>
                 </div>
+
+                @if($message->reply_message)
+                <hr>
+                <div class="row m-b-20">
+                    <div class="col-md-12 font-weight-bold m-b-10 text-success">
+                        <i class="ti ti-check"></i> Nội dung đã phản hồi ({{ $message->replied_at->format('d/m/Y H:i') }}):
+                    </div>
+                    <div class="col-md-12">
+                        <div class="p-3 bg-success-light border border-success rounded">
+                            {!! nl2br(e($message->reply_message)) !!}
+                        </div>
+                    </div>
+                </div>
+                @else
+                <hr>
+                <div class="row m-b-20">
+                    <div class="col-md-12 font-weight-bold m-b-10 text-primary">Phản hồi khách hàng:</div>
+                    <div class="col-md-12">
+                        <form action="{{ route('admin.contact-messages.reply', $message->id) }}" method="POST">
+                            @csrf
+                            <div class="mb-3">
+                                <textarea name="reply_message" class="form-control" rows="5" placeholder="Nhập nội dung phản hồi tại đây..." required></textarea>
+                            </div>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-send me-1"></i> Gửi Email Phản Hồi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                @endif
 
                 <div class="mt-4">
                     <form action="{{ route('admin.contact-messages.destroy', $message) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">

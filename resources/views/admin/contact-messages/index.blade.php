@@ -35,7 +35,7 @@
                         <thead>
                             <tr>
                                 <th>Ngày gửi</th>
-                                <th>Họ tên</th>
+                                <th>Khách hàng</th>
                                 <th>Email</th>
                                 <th>Tiêu đề</th>
                                 <th>Trạng thái</th>
@@ -46,7 +46,12 @@
                             @foreach($messages as $message)
                             <tr class="{{ $message->status == 'unread' ? 'font-weight-bold' : '' }}">
                                 <td>{{ $message->created_at->format('d/m/Y H:i') }}</td>
-                                <td>{{ $message->name }}</td>
+                                <td>
+                                    {{ $message->name }}
+                                    @if($message->user_id)
+                                        <br><small class="text-success"><i class="ti ti-user-check"></i> Đã đăng nhập</small>
+                                    @endif
+                                </td>
                                 <td>{{ $message->email }}</td>
                                 <td>{{ $message->subject }}</td>
                                 <td>
