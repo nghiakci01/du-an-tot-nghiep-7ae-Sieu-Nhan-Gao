@@ -1,3 +1,6 @@
+@php
+    $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? ['Hàng mới về 🆕', 'Khuyến mãi 🔥', 'Áo thun', 'Váy đầm', 'Liên hệ']);
+@endphp
 
 <!-- Alpine.js -->
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
@@ -420,7 +423,7 @@
     }
 </style>
 
-<div x-data="chatBot({ mode: '{{ $chatbot_mode ?? 'rules' }}' })" x-init="initChat()" class="chatbot-widget chat-container">
+<div x-data="chatBot({ mode: '{{ $chatbot_mode ?? 'rules' }}', suggestedQuestions: {!! $chatbot_suggested_questions_json !!} })" x-init="initChat()" class="chatbot-widget chat-container">
     
     <!-- Chat Window -->
     <div x-show="isOpen" 
@@ -538,12 +541,12 @@
                         class="chat-send-btn"
                         :disabled="!newMessage.trim() || isLoading">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.961l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                     </svg>
                 </button>
             </form>
             <div class="chat-footer">
-                <span>Powered by BizChatAI</span>
+                <span>Powered by Elite Admin</span>
             </div>
         </div>
     </div>
@@ -559,10 +562,12 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" style="color: white;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
         </svg>
-        <!-- Pulse effect -->
-        <span class="ping-animation">
+        <!-- Pulse/New Message effect -->
+        <span class="ping-animation" x-show="hasNewMessage">
+            <span class="ping-dot" style="background-color: #ef4444; width: 12px; height: 12px; top: -2px; right: -2px;"></span>
+        </span>
+        <span class="ping-animation" x-show="!hasNewMessage">
             <span class="ping-dot"></span>
-            <span class="ping-static"></span>
         </span>
     </button>
 
@@ -577,9 +582,11 @@
             newMessage: '',
             isLoading: false,
             mode: config.mode || 'rules',
+            hasNewMessage: false,
+            suggestedQuestions: config.suggestedQuestions || [],
 
             async initChat() {
-                console.log('Chatbot initialized (History Sync Enabled)');
+                console.log('Chatbot initialized (Enhanced Strategy)');
                 
                 // Fetch initial history
                 await this.pollMessages();
@@ -587,20 +594,18 @@
                 // If no messages, show greeting
                 if (this.messages.length === 0) {
                     this.messages.push({
-                        text: "Xin chào! 👋 Chào mừng bạn đến với Elite. Tôi giúp được gì cho bạn?",
+                        text: "Xin chào! 👋 Chào mừng bạn đến với Elite. Tôi có thể giúp gì cho bạn?",
                         isUser: false,
                         sender_type: 'bot',
                         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        quickActions: {!! json_encode($chatbot_suggested_questions ?? ['Hàng mới về 🆕', 'Khuyến mãi 🔥', 'Áo thun', 'Váy đầm', 'Liên hệ']) !!}
+                        quickActions: this.suggestedQuestions
                     });
                 }
 
-                // Start polling for new messages (staff replies)
+                // Polling for updates (staff replies or new bot messages if async)
                 setInterval(() => {
-                    if (this.isOpen && !this.isLoading) {
-                        this.pollMessages();
-                    }
-                }, 3000); // Poll every 3 seconds for better responsiveness
+                    this.pollMessages();
+                }, 4000);
             },
 
             async pollMessages() {
@@ -609,31 +614,37 @@
                     if (response.ok) {
                         const data = await response.json();
                         if (data.status === 'success') {
-                            // Extract existing message IDs to find only new ones
-                            const existingIds = this.messages.filter(m => m.id).map(m => m.id);
-                            const newMessages = data.messages.filter(m => !existingIds.includes(m.id));
+                            const currentCount = this.messages.filter(m => !m.isTemp).length;
+                            const newCount = data.messages.length;
                             
-                            if (newMessages.length > 0) {
-                                // Add only truly new messages
-                                this.messages.push(...newMessages);
-                                this.scrollToBottom();
-                            } else if (this.messages.length === 0 && data.messages.length > 0) {
-                                // Initial load
-                                this.messages = data.messages;
-                                this.scrollToBottom();
+                            if (newCount > currentCount) {
+                                // Find new messages
+                                const existingIds = this.messages.filter(m => m.id).map(m => m.id);
+                                const newOnes = data.messages.filter(m => !existingIds.includes(m.id));
+                                
+                                if (newOnes.length > 0) {
+                                    this.messages = data.messages;
+                                    
+                                    // If chat is closed, notify user
+                                    if (!this.isOpen) {
+                                        this.hasNewMessage = true;
+                                    }
+                                    
+                                    this.scrollToBottom();
+                                }
                             }
                         }
                     }
                 } catch (e) {
-                    console.warn('Polling failed', e);
+                    console.warn('Polling failure', e);
                 }
             },
 
             toggle() {
                 this.isOpen = !this.isOpen;
                 if (this.isOpen) {
+                    this.hasNewMessage = false;
                     this.scrollToBottom();
-                    // Sync on open
                     this.pollMessages();
                 } else {
                     this.isFullscreen = false;
@@ -647,16 +658,17 @@
 
             async sendMessage(textInput = null) {
                 const text = (typeof textInput === 'string') ? textInput : this.newMessage.trim();
-                if (!text || typeof text !== 'string') return;
+                if (!text) return;
 
-                // Add User Message locally with a temp flag
-                const tempUserMsg = {
+                // Optimistic UI: Add local temp message
+                const tempId = Date.now();
+                this.messages.push({
                     text: text,
                     isUser: true,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    isTemp: true
-                };
-                this.messages.push(tempUserMsg);
+                    isTemp: true,
+                    tempId: tempId,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                });
                 
                 this.newMessage = '';
                 this.isLoading = true;
@@ -673,25 +685,22 @@
                         body: JSON.stringify({ message: text })
                     });
 
-                    if (!response.ok) throw new Error('Network response was not ok');
-
-                    const data = await response.json();
-                    
-                    // Remove the temporary message before syncing
-                    this.messages = this.messages.filter(m => !m.isTemp);
-
-                    // Re-sync messages from server to get official IDs and the bot reply
-                    await this.pollMessages();
-
+                    if (response.ok) {
+                        // Success, poll for official sync
+                        await this.pollMessages();
+                        // Remove optimistic temp if official exists
+                        this.messages = this.messages.filter(m => !(m.isTemp && m.tempId === tempId));
+                    } else {
+                        throw new Error('Send failed');
+                    }
                 } catch (error) {
                     console.error('Chat Error:', error);
-                    // Remove temp on error too
-                    this.messages = this.messages.filter(m => !m.isTemp);
-                    
-                    const errorText = "Xin lỗi, hiện tại tôi đang gặp sự cố kết nối. Vui lòng thử lại sau.";
+                    // Mark as failed or remove
+                    this.messages = this.messages.filter(m => m.tempId !== tempId);
                     this.messages.push({
-                        text: errorText,
+                        text: "Hệ thống đang bận, vui lòng thử lại sau giây lát! 🔄",
                         isUser: false,
+                        sender_type: 'bot',
                         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                     });
                 } finally {
@@ -711,4 +720,3 @@
         }
     }
 </script>
-
