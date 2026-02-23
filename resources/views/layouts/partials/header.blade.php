@@ -12,7 +12,7 @@
             </div>
             <div class="welcome_text">
                 <ul>
-                    <li><span>{{ __('messages.contact') }}:</span> 0123 456 789</li>
+                    <li><span>{{ __('messages.contact') }}:</span> {{ $settings['site_phone'] ?? '0354869999' }}</li>
                     <li><span>{{ __('messages.offer') }}:</span> {{ __('messages.free_shipping') }}</li>
                 </ul>
             </div>
@@ -92,13 +92,12 @@
                 @include('frontend.partials.mini-cart')
             </div>
             <div class="offcanvas_footer">
-                <span><a href="#"><i class="fa fa-envelope-o"></i> contact@yourdomain.com</a></span>
+                <span><a href="mailto:{{ $settings['site_email'] ?? 'Elite@gmail.com' }}"><i class="fa fa-envelope-o"></i> {{ $settings['site_email'] ?? 'Elite@gmail.com' }}</a></span>
                 <ul>
-                    <li class="facebook"><a href="#"><i class="fa fa-facebook"></i></a></li>
+                    <li class="facebook"><a href="{{ $settings['social_facebook'] ?? '#' }}"><i class="fa fa-facebook"></i></a></li>
+                    <li class="instagram"><a href="{{ $settings['social_instagram'] ?? '#' }}"><i class="fa fa-instagram"></i></a></li>
                     <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
-                    <li class="pinterest"><a href="#"><i class="fa fa-pinterest-p"></i></a></li>
-                    <li class="google-plus"><a href="#"><i class="fa fa-google-plus"></i></a></li>
-                    <li class="linkedin"><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                    <li class="youtube"><a href="#"><i class="fa fa-youtube"></i></a></li>
                 </ul>
             </div>
         </div>
