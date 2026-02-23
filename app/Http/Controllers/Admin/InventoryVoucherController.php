@@ -131,7 +131,20 @@ class InventoryVoucherController extends Controller
             ->limit(10)
             ->get();
 
-        return response()->json($variants);
+        $results = $variants->map(function ($variant) {
+            return [
+                'id' => $variant->id,
+                'sku' => $variant->sku,
+                'size' => $variant->size,
+                'color' => $variant->color,
+                'price' => $variant->price ?? ($variant->product->price ?? 0),
+                'product' => [
+                    'name' => $variant->product->name
+                ]
+            ];
+        });
+
+        return response()->json($results);
     }
 
     public function destroy(InventoryVoucher $voucher)
