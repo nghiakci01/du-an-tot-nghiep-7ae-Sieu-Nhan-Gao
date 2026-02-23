@@ -10,11 +10,11 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">home</a></li>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
-                            <li><a href="{{ route('shop') }}">shop</a></li>
+                            <li><a href="{{ route('shop') }}">{{ __('messages.shop') }}</a></li>
                             <li>/</li>
-                            <li>product details</li>
+                            <li>{{ __('messages.product_details') }}</li>
                         </ul>
                     </div>
                 </div>
@@ -70,12 +70,14 @@
                             <h1>{{ $product->name }}</h1>
                             <div class="product_ratting">
                                 <ul>
-                                    @php $rating = $product->reviews->avg('rating') ?? 0; @endphp
+                                    @php $ratingAvg = $product->reviews->avg('rating') ?? 0; @endphp
                                     @for($i = 1; $i <= 5; $i++)
-                                        <li><a href="#"><i class="fa {{ $i <= $rating ? 'fa-star' : 'fa-star-o' }}"></i></a>
-                                        </li>
+                                        <li><a href="javascript:void(0)"><i class="fa {{ $i <= $ratingAvg ? 'fa-star' : 'fa-star-o' }}"></i></a></li>
                                     @endfor
-                                    <li class="review"><a href="#reviews"> ({{ $product->reviews->count() }} reviews) </a>
+                                    <li class="review">
+                                        <a href="#reviews" id="view-reviews-link">
+                                            ({{ $product->reviews->count() }} {{ __('messages.reviews') }})
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -233,10 +235,10 @@
                             @endif
 
                             <div class="product_variant quantity">
-                                <label>quantity</label>
+                                <label>{{ __('messages.quantity') }}</label>
                                 <input min="1" max="100" value="1" type="number" name="quantity">
-                                <button class="button" type="submit" name="action" value="add_to_cart">ADD TO CART</button>
-                                <button class="button buy_now" type="submit" name="action" value="buy_now">BUY NOW</button>  
+                                <button class="button" type="submit" name="action" value="add_to_cart">{{ __('messages.add_to_cart') }}</button>
+                                <button class="button buy_now" type="submit" name="action" value="buy_now">{{ __('messages.buy_now') }}</button>  
                             </div>
                             <style>
                                 .product_variant.quantity .button.buy_now {
@@ -252,6 +254,30 @@
                                     background: #ccc;
                                     border-color: #ccc;
                                     cursor: not-allowed;
+                                }
+                                .star-rating {
+                                    display: inline-flex;
+                                    flex-direction: row-reverse;
+                                    justify-content: flex-end;
+                                    gap: 5px;
+                                }
+                                .star-rating input {
+                                    display: none;
+                                }
+                                .star-rating label {
+                                    font-size: 24px;
+                                    color: #ccc;
+                                    cursor: pointer;
+                                    transition: color 0.2s;
+                                    margin: 0;
+                                }
+                                .star-rating label:hover i,
+                                .star-rating label:hover ~ label i,
+                                .star-rating input:checked ~ label i {
+                                    color: #f39c12 !important;
+                                }
+                                .star-rating label i {
+                                    pointer-events: none;
                                 }
                             </style>
                             <div class="product_d_action">
@@ -291,11 +317,11 @@
                             <ul class="nav" role="tablist">
                                 <li>
                                     <a class="active" data-bs-toggle="tab" href="#info" role="tab" aria-controls="info"
-                                        aria-selected="false">More info</a>
+                                        aria-selected="false">{{ __('messages.more_info') }}</a>
                                 </li>
                                 <li>
                                     <a data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews"
-                                        aria-selected="false">Reviews ({{ $product->reviews->count() }})</a>
+                                        aria-selected="false">{{ __('messages.reviews') }} ({{ $product->reviews->count() }})</a>
                                 </li>
                             </ul>
                         </div>
@@ -308,14 +334,14 @@
 
                             <div class="tab-pane fade" id="reviews" role="tabpanel">
                                 <div class="product_info_content">
-                                    <p>Customer reviews for {{ $product->name }}</p>
+                                    <p>{{ __('messages.customer_reviews_for') }} {{ $product->name }}</p>
                                 </div>
                                 @foreach($product->reviews as $review)
                                     <div class="product_info_inner">
                                         <div class="product_ratting mb-10">
                                             <ul>
                                                 @for($i = 1; $i <= 5; $i++)
-                                                    <li><a href="#"><i
+                                                    <li><a href="javascript:void(0)"><i
                                                                 class="fa {{ $i <= $review->rating ? 'fa-star' : 'fa-star-o' }}"></i></a>
                                                     </li>
                                                 @endfor
@@ -330,17 +356,51 @@
                                     <hr>
                                 @endforeach
                                 <div class="product_review_form">
-                                    <form action="#">
-                                        <h2>Add a review </h2>
-                                        <p>Your email address will not be published. Required fields are marked </p>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <label for="review_comment">Your review </label>
-                                                <textarea name="comment" id="review_comment"></textarea>
+                                    @if(session('success'))
+                                        <div class="alert alert-success">{{ session('success') }}</div>
+                                    @endif
+                                    @if(session('error'))
+                                        <div class="alert alert-danger">{{ session('error') }}</div>
+                                    @endif
+
+                                    @auth
+                                        @php
+                                            $userReview = $product->reviews->where('user_id', auth()->id())->first();
+                                        @endphp
+
+                                        @if(!$userReview)
+                                            <form action="{{ route('product.review.store', $product->id) }}" method="POST">
+                                                @csrf
+                                                <h2>{{ __('messages.add_a_review') }}</h2>
+                                                <p>{{ __('messages.review_notice') }}</p>
+                                                
+                                                <div class="product_ratting mb-20">
+                                                    <h3>{{ __('messages.your_rating') }}</h3>
+                                                    <div class="star-rating">
+                                                        <input type="radio" id="star5" name="rating" value="5" required /><label for="star5" title="5 stars"><i class="fa fa-star"></i></label>
+                                                        <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"><i class="fa fa-star"></i></label>
+                                                        <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"><i class="fa fa-star"></i></label>
+                                                        <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"><i class="fa fa-star"></i></label>
+                                                        <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"><i class="fa fa-star"></i></label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <label for="review_comment">{{ __('messages.your_review') }}</label>
+                                                        <textarea name="comment" id="review_comment" required></textarea>
+                                                    </div>
+                                                </div>
+                                                <button type="submit">{{ __('messages.submit') }}</button>
+                                            </form>
+                                        @else
+                                            <div class="alert alert-info">
+                                                {{ __('messages.already_reviewed') }}
                                             </div>
-                                        </div>
-                                        <button type="submit">Submit</button>
-                                    </form>
+                                        @endif
+                                    @else
+                                        <p>Vui lòng <a href="{{ route('login') }}" style="color: #ef233c; font-weight: bold;">đăng nhập</a> để gửi đánh giá của bạn.</p>
+                                    @endauth
                                 </div>
                             </div>
                         </div>
@@ -408,6 +468,21 @@
     @section('scripts')
         <script>
             $(document).ready(function () {
+                // Star Rating Debug
+                $('.star-rating input').on('change', function() {
+                    console.log('Rating selected: ' + $(this).val());
+                });
+
+                // Handle Review link click
+                $('#view-reviews-link').on('click', function(e) {
+                    e.preventDefault();
+                    var tab = new bootstrap.Tab($('a[href="#reviews"]')[0]);
+                    tab.show();
+                    $('html, body').animate({
+                        scrollTop: $(".product_d_info").offset().top - 100
+                    }, 500);
+                });
+
                 $('.add-to-wishlist').click(function (e) {
                     e.preventDefault();
                     var productId = $(this).data('id');
