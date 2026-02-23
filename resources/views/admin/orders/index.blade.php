@@ -66,7 +66,7 @@
                                         {{ $order->status_text }}
                                     </span>
                                 </td>
-                                <td>{{ $order->created_at->format('H:i d/m/Y') }}</td>
+                                <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                 <td>
                                     <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-info btn-sm">Xem</a>
                                     <a href="{{ route('admin.orders.edit', $order) }}" class="btn btn-warning btn-sm">Sửa</a>
