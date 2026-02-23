@@ -92,7 +92,11 @@
                                     </li>
                                     @foreach($categories as $category)
                                         <li>
-                                            <a href="{{ route('shop', ['category' => $category->slug]) }}" class="{{ request('category') == $category->slug ? 'active' : '' }}">
+                                            @php
+                                                $params = request()->all();
+                                                $params['category'] = $category->slug;
+                                            @endphp
+                                            <a href="{{ route('shop', $params) }}" class="{{ request('category') == $category->slug ? 'active' : '' }}">
                                                 {{ $category->name }} <span>{{ $category->products_count }}</span>
                                             </a> 
                                         </li>
@@ -100,30 +104,48 @@
                                 </ul>
                             </div>
                             <div class="widget_list widget_categories">
-                                <h2>Manufacturer</h2>
+                                <h2>{{ __('messages.manufacturer') }}</h2>
                                 <ul>
-                                    <li><a href="#">Apple <span>6</span></a> </li>
-                                    <li><a href="#">Samsung <span>10</span></a> </li>
-                                    <li><a href="#">Sony <span>4</span></a> </li>
-                                    <li><a href="#">Marshall <span>4</span></a> </li>
+                                    @foreach($brands as $brand)
+                                        <li>
+                                            @php
+                                                $params = request()->all();
+                                                $params['brand'] = $brand->slug;
+                                            @endphp
+                                            <a href="{{ route('shop', $params) }}" class="{{ request('brand') == $brand->slug ? 'active' : '' }}">
+                                                {{ $brand->name }} <span>{{ $brand->products_count }}</span>
+                                            </a> 
+                                        </li>
+                                    @endforeach
                                 </ul>
                             </div>
                             <div class="widget_list widget_categories">
-                                <h2>Select By Color</h2>
+                                <h2>{{ __('messages.select_by_color') }}</h2>
                                 <ul>
-                                    <li><a href="#">Black <span>6</span></a> </li>
-                                    <li><a href="#">Blue <span>10</span></a> </li>
-                                    <li><a href="#">White <span>8</span></a> </li>
+                                    @foreach($colors as $color)
+                                        <li>
+                                            @php
+                                                $params = request()->all();
+                                                $params['color'] = $color->slug;
+                                            @endphp
+                                            <a href="{{ route('shop', $params) }}" class="{{ request('color') == $color->slug ? 'active' : '' }}">
+                                                {{ $color->name }} <span>{{ $color->products_count }}</span>
+                                            </a> 
+                                        </li>
+                                    @endforeach
                                 </ul>
                             </div>
                             <div class="widget_list tag-cloud">
-                                <h2>Popular Tags</h2>
+                                <h2>{{ __('messages.popular_tags') }}</h2>
                                 <div class="tag_widget">
                                     <ul>
-                                        <li><a href="#">Headphone</a></li>
-                                        <li><a href="#">Bluetooth</a></li>
-                                        <li><a href="#">Portable</a></li>
-                                        <li><a href="#">Retina</a></li>
+                                        @foreach($tags as $tag)
+                                            @php
+                                                $params = request()->all();
+                                                $params['tag'] = $tag->slug;
+                                            @endphp
+                                            <li><a href="{{ route('shop', $params) }}" class="{{ request('tag') == $tag->slug ? 'active' : '' }}">{{ $tag->name }}</a></li>
+                                        @endforeach
                                     </ul>
                                 </div>
                             </div>
