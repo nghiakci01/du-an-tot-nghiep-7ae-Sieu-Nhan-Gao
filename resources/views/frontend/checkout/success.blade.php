@@ -16,12 +16,22 @@
         <p class="mb-0">Phương thức: {{ $order->payment_method }}</p>
         
         @if($order->payment_method == 'BANK_TRANSFER')
-            <div class="alert alert-info mt-3">
-                <strong>Thông tin chuyển khoản:</strong><br>
-                Ngân hàng: Vietcombank<br>
-                STK: 9999999999<br>
-                Chủ TK: NGUYEN VAN A<br>
-                Nội dung: THANHTOAN DH{{ $order->id }}
+            <div class="alert alert-info mt-3 text-start">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <strong>Thông tin chuyển khoản:</strong><br>
+                        Ngân hàng: {{ $bankName }}<br>
+                        Số tài khoản: <strong>{{ $bankAccount }}</strong><br>
+                        Chủ tài khoản: {{ $bankOwner }}<br>
+                        Số tiền: <strong>{{ number_format($order->total_price) }} đ</strong><br>
+                        Nội dung: <span class="text-danger fw-bold">THANHTOAN DH{{ $order->id }}</span>
+                    </div>
+                    <div class="col-md-5 text-center mt-3 mt-md-0">
+                        <img src="https://img.vietqr.io/image/{{ $bankId }}-{{ $bankAccount }}-compact.png?amount={{ $order->total_price }}&addInfo=THANHTOAN%20DH{{ $order->id }}&accountName={{ urlencode($bankOwner) }}" 
+                             alt="VietQR" class="img-fluid border rounded shadow-sm" style="max-width: 200px;">
+                        <p class="small text-muted mt-2 mb-0">Quét mã để thanh toán nhanh</p>
+                    </div>
+                </div>
             </div>
         @endif
     </div>
