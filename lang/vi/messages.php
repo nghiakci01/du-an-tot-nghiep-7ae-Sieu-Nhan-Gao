@@ -203,4 +203,7 @@ return [
     'your_review' => 'Nhận xét của bạn',
     'submit' => 'Gửi đi',
     'already_reviewed' => 'Bạn đã gửi đánh giá cho sản phẩm này.',
+    'manufacturer' => 'Thương hiệu',
+    'select_by_color' => 'Chọn theo màu sắc',
+    'popular_tags' => 'Thẻ phổ biến',
 ];

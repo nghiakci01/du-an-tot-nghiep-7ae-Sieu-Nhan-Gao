@@ -202,4 +202,7 @@ return [
     'your_review' => 'Your review',
     'submit' => 'Submit',
     'already_reviewed' => 'You have already submitted a review for this product.',
+    'manufacturer' => 'Manufacturer',
+    'select_by_color' => 'Select By Color',
+    'popular_tags' => 'Popular Tags',
 ];
