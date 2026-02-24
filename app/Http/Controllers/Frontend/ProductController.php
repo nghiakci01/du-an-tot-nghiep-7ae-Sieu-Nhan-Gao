@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Brand;
+use App\Models\Color;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -51,6 +54,30 @@ class ProductController extends Controller
             });
         }
 
+        // Filter by Brand
+        if ($request->has('brand')) {
+            $brandSlug = $request->brand;
+            $query->whereHas('brand', function ($q) use ($brandSlug) {
+                $q->where('slug', $brandSlug);
+            });
+        }
+
+        // Filter by Color
+        if ($request->has('color')) {
+            $colorSlug = $request->color;
+            $query->whereHas('variants.colorRelationship', function ($q) use ($colorSlug) {
+                $q->where('slug', $colorSlug);
+            });
+        }
+
+        // Filter by Tag
+        if ($request->has('tag')) {
+            $tagSlug = $request->tag;
+            $query->whereHas('tags', function ($q) use ($tagSlug) {
+                $q->where('slug', $tagSlug);
+            });
+        }
+
         // Sorting
         if ($request->has('sort')) {
             switch ($request->sort) {
@@ -80,11 +107,38 @@ class ProductController extends Controller
         // Convert pagination query params
         $products->appends($request->all());
 
-        // Get categories for sidebar
-        $categories = Category::withCount('products')->get();
+        // Get sidebar data
+        $categories = Category::withCount(['products' => function($q) {
+            $q->where('products.is_active', true);
+        }])->get();
+
+        $brands = Brand::where('is_active', true)->withCount(['products' => function($q) {
+            $q->where('products.is_active', true);
+        }])->get();
+
+        // Colors with product counts
+        $colors = Color::whereHas('productVariants.product', function($q) {
+            $q->where('products.is_active', true);
+        })->withCount(['productVariants as products_count' => function($q) {
+            $q->whereHas('product', function($pq) {
+                $pq->where('products.is_active', true);
+            });
+        }])->limit(10)->get();
+
+        $tags = Tag::withCount(['products' => function($q) {
+            $q->where('products.is_active', true);
+        }])->limit(15)->get();
+
         $totalActiveProducts = Product::where('is_active', true)->count();
 
-        return view('frontend.products.index', compact('products', 'categories', 'totalActiveProducts'));
+        return view('frontend.products.index', compact(
+            'products', 
+            'categories', 
+            'brands', 
+            'colors', 
+            'tags', 
+            'totalActiveProducts'
+        ));
     }
 
     public function show($slug)

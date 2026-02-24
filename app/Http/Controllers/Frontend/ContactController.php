@@ -25,7 +25,12 @@ class ContactController extends Controller
             'message' => 'required|string',
         ]);
 
-        $contactMessage = ContactMessage::create($validated);
+        $data = $validated;
+        if (auth()->check()) {
+            $data['user_id'] = auth()->id();
+        }
+
+        $contactMessage = ContactMessage::create($data);
 
         // Send email notification to Admin and Staff
         try {

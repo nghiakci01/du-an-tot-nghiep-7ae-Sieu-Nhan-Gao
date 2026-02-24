@@ -35,7 +35,6 @@
                                 </form>
                             </li>
                             <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                            <li><a href="#" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i></a></li>
                         </ul>
                     </div>
                </div>

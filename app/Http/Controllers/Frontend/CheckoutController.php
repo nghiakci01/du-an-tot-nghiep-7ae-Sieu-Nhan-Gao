@@ -36,18 +36,27 @@ class CheckoutController extends Controller
         }
         
         $finalTotal = $total - $discount;
+        $shippingFee = \App\Models\Setting::getShippingFee($finalTotal);
+        $finalTotal += $shippingFee;
 
-        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'finalTotal'));
+        $provinces = config('vietnam_provinces');
+
+        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces'));
     }
 
     public function store(Request $request)
     {
+        $provinces = config('vietnam_provinces');
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
+            'province' => 'required|string|in:' . implode(',', $provinces),
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
             'payment_method' => 'required|in:COD,BANK_TRANSFER',
+        ], [
+            'province.required' => 'Vui lòng chọn tỉnh thành.',
+            'province.in' => 'Tỉnh thành không hợp lệ.',
         ]);
 
         $cart = session()->get('cart', []);
@@ -63,10 +72,14 @@ class CheckoutController extends Controller
         try {
             DB::beginTransaction();
 
-            // Get coupon data from session
+            // Get coupon and shipping data
             $couponCode = session()->get('coupon_code');
             $discount = session()->get('discount_amount', 0);
-            $finalTotal = $total - $discount;
+            
+            // Calculate shipping fee
+            $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
+            
+            $finalTotal = $total - $discount + $shippingFee;
 
             $order = Order::create([
                 'user_id' => Auth::id(), // Nullable if guest
@@ -74,9 +87,10 @@ class CheckoutController extends Controller
                 'total_price' => $total,
                 'coupon_code' => $couponCode,
                 'discount_amount' => $discount,
+                'shipping_fee' => $shippingFee,
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
-                'shipping_address' => $request->address . ' - ' . $request->phone . ' - ' . $request->name,
+                'shipping_address' => $request->address . ', ' . $request->province . ' - ' . $request->phone . ' - ' . $request->name,
                 'note' => $request->note,
             ]);
 
@@ -125,11 +139,12 @@ class CheckoutController extends Controller
         $order = Order::findOrFail($id);
         
         // Security check: Only allow viewing if Auth user matches Or if just created (session check could be added here for strictness)
-        if (Auth::check() && $order->user_id !== Auth::id()) {
-             return redirect()->route('welcome');
-        }
+        $bankName = \App\Models\Setting::get('bank_name', 'Vietcombank');
+        $bankAccount = \App\Models\Setting::get('bank_account_number', '0071001234567');
+        $bankOwner = \App\Models\Setting::get('bank_account_name', 'CÔNG TY TNHH SIÊU NHÂN GAO');
+        $bankId = \App\Models\Setting::get('bank_id', 'vcb');
 
-        return view('frontend.checkout.success', compact('order'));
+        return view('frontend.checkout.success', compact('order', 'bankName', 'bankAccount', 'bankOwner', 'bankId'));
     }
 
     /**

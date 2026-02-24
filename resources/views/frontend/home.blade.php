@@ -145,7 +145,7 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="slider_area home_six_slider owl-carousel">
-                        @foreach($sliders as $slider)
+                        @forelse($sliders as $slider)
                         <div class="single_slider" data-bgimg="{{ asset('storage/' . $slider->image) }}">
                             <div class="slider_content_inner text-center">
                                 <div class="slider_content">
@@ -153,35 +153,57 @@
                                     <h1>{{ $slider->subtitle }}</h1>
                                     <p>{!! nl2br(e($slider->content)) !!}</p>
                                     @if($slider->link)
-                                        <a href="{{ $slider->link }}">Khám phá ngay</a>
+                                        <a href="{{ $slider->link }}">{{ __('messages.explore_now') }}</a>
                                     @endif
                                 </div>
                             </div>
                         </div>
-                        @endforeach
+                        @empty
+                        {{-- Fallback Slider 1 --}}
+                        <div class="single_slider" data-bgimg="{{ asset('frontend-assets/img/slider/slide1.jpg') }}">
+                            <div class="slider_content_inner text-center">
+                                <div class="slider_content">
+                                    <h2>Collection 2026</h2>
+                                    <h1>Elite Minimalism</h1>
+                                    <p>Khám phá phong cách tối giản đỉnh cao và sang trọng.</p>
+                                    <a href="{{ route('shop') }}">{{ __('messages.explore_now') }}</a>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- Fallback Slider 2 --}}
+                        <div class="single_slider" data-bgimg="{{ asset('frontend-assets/img/slider/slide2.jpg') }}">
+                            <div class="slider_content_inner text-center">
+                                <div class="slider_content">
+                                    <h2>New Arrivals</h2>
+                                    <h1>Modern Fashion</h1>
+                                    <p>Cập nhật những xu hướng thời trang mới nhất từ thế giới.</p>
+                                    <a href="{{ route('shop') }}">{{ __('messages.explore_now') }}</a>
+                                </div>
+                            </div>
+                        </div>
+                        @endforelse
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <!--banner area start-->
                     <div class="banner_slider_section">
                         <div class="row">
-                            @if($bannerTop->count() > 0)
-                                @php $firstBanner = $bannerTop->first(); @endphp
-                                <div class="col-12">
-                                    <div class="banner_area banner_top">
-                                        <div class="banner_thumb">
-                                            <a href="{{ $firstBanner->link ?? '#' }}">
-                                                <img src="{{ asset('storage/' . $firstBanner->image) }}" alt="{{ $firstBanner->title }}">
-                                            </a>
-                                            <div class="banner_content text-center">
-                                                <h1>{!! nl2br(e($firstBanner->title)) !!}</h1>
-                                                <h3>{{ $firstBanner->subtitle }}</h3>
+                            @forelse($bannerTop as $banner)
+                                @if($loop->first)
+                                    <div class="col-12">
+                                        <div class="banner_area banner_top">
+                                            <div class="banner_thumb">
+                                                <a href="{{ $banner->link ?? '#' }}">
+                                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}">
+                                                </a>
+                                                <div class="banner_content text-center">
+                                                    <h1>{!! nl2br(e($banner->title)) !!}</h1>
+                                                    <h3>{{ $banner->subtitle }}</h3>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                @foreach($bannerTop->skip(1) as $banner)
+                                @else
                                     <div class="col-lg-6 col-md-6 col-sm-6">
                                         <div class="banner_area">
                                             <div class="banner_thumb">
@@ -195,8 +217,47 @@
                                             </div>
                                         </div>
                                     </div>
-                                @endforeach
-                            @endif
+                                @endif
+                            @empty
+                                {{-- Fallback for Top Banners --}}
+                                <div class="col-12">
+                                    <div class="banner_area banner_top">
+                                        <div class="banner_thumb">
+                                            <a href="{{ route('shop') }}">
+                                                <img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt="Default Banner">
+                                            </a>
+                                            <div class="banner_content text-center">
+                                                <h1>New Collection</h1>
+                                                <h3>Up to 50% Off</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="banner_area">
+                                        <div class="banner_thumb">
+                                            <a href="{{ route('shop') }}">
+                                                <img src="{{ asset('frontend-assets/img/bg/banner2.jpg') }}" alt="Default Banner">
+                                            </a>
+                                            <div class="banner_content text-center">
+                                                <h1>Trending</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="banner_area">
+                                        <div class="banner_thumb">
+                                            <a href="{{ route('shop') }}">
+                                                <img src="{{ asset('frontend-assets/img/bg/banner3.jpg') }}" alt="Default Banner">
+                                            </a>
+                                            <div class="banner_content text-center">
+                                                <h1>Best Seller</h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                     <!--banner area end-->
@@ -240,19 +301,19 @@
                                            <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
                                             <div class="action_button">
                                                 <ul>
-                                                    <li><a title="add to cart" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                                    <li><a title="{{ __('messages.add_to_cart') }}" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
+                                                    <li><a href="#" title="{{ __('messages.add_to_wishlist') }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
                                                 </ul>
                                             </div>
                                        </div>
                                     </div>
                                     <div class="quick_button">
-                                        <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick view</a>
+                                        <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                     </div>
                                     @if($product->price < $product->original_price)
                                     <div class="double_base">
                                         <div class="product_sale">
-                                            <span>Sale</span>
+                                            <span>{{ __('messages.sale') }}</span>
                                         </div>
                                     </div>
                                     @endif
@@ -274,23 +335,27 @@
     <!--product section area end-->
 
     <!--banner area start-->
-    @if($bannerBottom)
     <div class="banner_slider_section section_fullwidth">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
                     <div class="banner_area">
                         <div class="banner_thumb">
-                            <a href="{{ $bannerBottom->link ?? '#' }}">
-                                <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title }}">
-                            </a>
+                            @if($bannerBottom)
+                                <a href="{{ $bannerBottom->link ?? '#' }}">
+                                    <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title }}">
+                                </a>
+                            @else
+                                <a href="{{ route('shop') }}">
+                                    <img src="{{ asset('frontend-assets/img/bg/banner4.jpg') }}" alt="Default Bottom Banner">
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    @endif
     <!--banner area end-->
 
     <!--product section area start-->
@@ -299,8 +364,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>New Arrivals</h2>
-                        <p>New products with modern, minimalist design and full of charm.</p>
+                        <h2>{{ __('messages.new_products') }}</h2>
+                        <p>{{ __('messages.new_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -333,16 +398,16 @@
                                        </div>
                                     </div>
                                     <div class="quick_button">
-                                        <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick view</a>
+                                        <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                     </div>
                                     <div class="double_base">
                                         @if($product->price < $product->original_price)
                                         <div class="product_sale">
-                                            <span>Sale</span>
+                                            <span>{{ __('messages.sale') }}</span>
                                         </div>
                                         @endif
                                         <div class="label_product">
-                                            <span>new</span>
+                                            <span>{{ __('messages.new') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -418,7 +483,7 @@
                                         <div class="double_base">
                                             @if($product->price < $product->original_price)
                                                 <div class="product_sale">
-                                                    <span>Sale</span>
+                                                    <span>{{ __('messages.sale') }}</span>
                                                 </div>
                                             @endif
                                             <div class="label_product">
@@ -450,8 +515,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Follow us On Instagram</h2>
-                        <p>Contemporary, minimal and modern designs embody the Lavish Alice handwriting</p>
+                        <h2>{{ __('messages.follow_instagram') }}</h2>
+                        <p>{{ __('messages.instagram_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -521,7 +586,7 @@
                     </div>
                     <div class="col-12">
                         <div class="text_follow">
-                            <a href="#">#Follow us on Instagram</a>
+                            <a href="#">{{ __('messages.follow_us_hashtag') }}</a>
                         </div>
                     </div>
                 </div>
@@ -654,7 +719,7 @@
                                         <div class="modal_add_to_cart">
                                             <form action="#">
                                                 <input min="0" max="100" step="2" value="1" type="number">
-                                                <button type="submit">add to cart</button>
+                                                <button type="submit">{{ __('messages.add_to_cart') }}</button>
                                             </form>
                                         </div>
                                     </div>

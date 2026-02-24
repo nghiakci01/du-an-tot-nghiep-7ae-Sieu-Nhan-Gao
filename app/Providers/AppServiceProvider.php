@@ -54,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
                     $view->with('chatbot_mode', 'rules');
                 }
 
-                // Share suggested questions
+                // Share chatbot suggested questions
                 if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_suggested_questions')) {
                     $suggestedQuestions = \Illuminate\Support\Facades\Cache::remember('chatbot_suggested_questions', 3600, function () {
                         return \App\Models\ChatbotSuggestedQuestion::where('is_active', true)
@@ -65,6 +65,16 @@ class AppServiceProvider extends ServiceProvider
                     $view->with('chatbot_suggested_questions', $suggestedQuestions);
                 } else {
                     $view->with('chatbot_suggested_questions', []);
+                }
+
+                // Share Global Settings
+                if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                    $settings = \Illuminate\Support\Facades\Cache::remember('global_settings', 3600, function () {
+                        return \App\Models\Setting::all()->pluck('value', 'key')->toArray();
+                    });
+                    $view->with('settings', $settings);
+                } else {
+                    $view->with('settings', []);
                 }
             });
         } catch (\Exception $e) {
