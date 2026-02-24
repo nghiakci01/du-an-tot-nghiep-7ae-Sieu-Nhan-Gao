@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('content')
-    <style>
+    <!-- <style>
         /* Nuclear fix: Direct embedded CSS for the 10-product grid */
         .custom_product_grid_10 {
             display: -webkit-box !important;
@@ -138,7 +138,7 @@
         width: 100%;
         object-fit: cover !important;
     }
-</style>
+</style> -->
     <!--slider area start-->
     <div class="slider_section slider_section_six">
         <div class="container-fluid">
@@ -303,25 +303,17 @@
 
     <!--banner area start-->
     <div class="banner_slider_section section_fullwidth">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
+       <div class="container-fluid">
+           <div class="row ">
+               <div class="col-12">
                     <div class="banner_area">
                         <div class="banner_thumb">
-                            @if($bannerBottom)
-                                <a href="{{ $bannerBottom->link ?? '#' }}">
-                                    <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title }}">
-                                </a>
-                            @else
-                                <a href="{{ route('shop') }}">
-                                    <img src="{{ asset('frontend-assets/img/bg/banner4.jpg') }}" alt="Default Bottom Banner">
-                                </a>
-                            @endif
+                            <a href="shop.html"><img src="assets/img/bg/banner21.jpg" alt="#"></a>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+       </div>  
     </div>
     <!--banner area end-->
 
