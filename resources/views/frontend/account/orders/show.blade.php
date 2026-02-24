@@ -171,6 +171,7 @@
                                                                     </label>
                                                                 @endfor
                                                             </div>
+                                                            <div class="likert-label-order" style="display:none; margin-top:6px; font-size:13px; font-weight:600; color:#ef233c; min-height:18px;"></div>
                                                         </div>
                                                         <div class="mb-3">
                                                             <label style="font-weight:600; margin-bottom:6px; display:block;">Nhận xét:</label>
@@ -211,6 +212,43 @@
 <!-- my account end   -->
 
 @section('scripts')
+<script>
+    // Likert scale labels
+    var likertLabels = {
+        1: 'Rất không hài lòng',
+        2: 'Không hài lòng',
+        3: 'Bình thường',
+        4: 'Hài lòng',
+        5: 'Rất hài lòng'
+    };
+
+    $(document).ready(function () {
+        // Star hover - show likert label
+        $('.star-rating-order label').on('mouseenter', function() {
+            var val = $(this).prev('input').val();
+            if (val) {
+                $(this).closest('.mb-3').find('.likert-label-order').text(likertLabels[val]).show();
+            }
+        });
+
+        // Mouse leave star area - show selected or hide
+        $('.star-rating-order').on('mouseleave', function() {
+            var selected = $(this).find('input:checked').val();
+            var label = $(this).closest('.mb-3').find('.likert-label-order');
+            if (selected) {
+                label.text(likertLabels[selected]).show();
+            } else {
+                label.hide();
+            }
+        });
+
+        // Star selected - keep label
+        $('.star-rating-order input').on('change', function() {
+            var val = $(this).val();
+            $(this).closest('.mb-3').find('.likert-label-order').text(likertLabels[val]).show();
+        });
+    });
+</script>
 <style>
     .star-rating-order {
         display: inline-flex;
