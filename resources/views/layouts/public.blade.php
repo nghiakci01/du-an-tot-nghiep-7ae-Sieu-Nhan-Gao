@@ -57,21 +57,13 @@
     <!-- Search Autocomplete JS -->
     <script src="{{ asset('frontend-assets/js/search-autocomplete.js') }}"></script>
 
-@yield('scripts')
-@stack('scripts')
-@stack('styles')
-
-
-
+    @stack('styles')
+    @stack('scripts')
+    @yield('scripts')
 
     @if($chatbot_enabled)
         @include('frontend.partials.chatbot-widget')
     @endif
-
-    @stack('scripts')
-    @yield('scripts')
-
-    <!-- Facebook Redirect Fragment Cleanup -->
     <script type="text/javascript">
         if (window.location.hash && window.location.hash == '#_=_') {
             if (window.history && history.pushState) {
