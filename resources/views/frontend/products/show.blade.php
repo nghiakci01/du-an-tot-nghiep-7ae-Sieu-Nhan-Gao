@@ -387,6 +387,7 @@
                                                         <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"><i class="fa fa-star"></i></label>
                                                         <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"><i class="fa fa-star"></i></label>
                                                     </div>
+                                                    <div id="likert-label" style="display:none; margin-top:6px; font-size:13px; font-weight:600; color:#ef233c; min-height:18px;"></div>
                                                 </div>
 
                                                 <div class="row">
@@ -473,10 +474,39 @@
 
     @section('scripts')
         <script>
+            // Likert scale labels
+            var likertLabels = {
+                1: 'Rất không hài lòng',
+                2: 'Không hài lòng',
+                3: 'Bình thường',
+                4: 'Hài lòng',
+                5: 'Rất hài lòng'
+            };
+
             $(document).ready(function () {
-                // Star Rating Debug
+                // Star hover - show likert label
+                $('.star-rating label').on('mouseenter', function() {
+                    var val = $(this).prev('input').val();
+                    if (val) {
+                        $('#likert-label').text(likertLabels[val]).show();
+                    }
+                });
+
+                // Mouse leave star area - show selected or hide
+                $('.star-rating').on('mouseleave', function() {
+                    var selected = $(this).find('input:checked').val();
+                    if (selected) {
+                        $('#likert-label').text(likertLabels[selected]).show();
+                    } else {
+                        $('#likert-label').hide();
+                    }
+                });
+
+                // Star selected - keep label
                 $('.star-rating input').on('change', function() {
-                    console.log('Rating selected: ' + $(this).val());
+                    var val = $(this).val();
+                    $('#likert-label').text(likertLabels[val]).show();
+                    console.log('Rating selected: ' + val);
                 });
 
                 // Handle Review link click
