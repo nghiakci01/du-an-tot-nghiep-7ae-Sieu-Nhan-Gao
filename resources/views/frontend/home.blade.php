@@ -299,7 +299,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Sản Phẩm Mới</h2>
+                        <h2>New Arrivals</h2>
                         <p>New products with modern, minimalist design and full of charm.</p>
                     </div>
                 </div>
