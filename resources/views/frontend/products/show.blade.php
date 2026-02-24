@@ -430,14 +430,14 @@
                         <div class="col-md-5 text-center mb-4 mb-md-0">
                             <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">Ảnh mẫu của bạn</p>
                             <div class="upload-area p-4 d-flex flex-column align-items-center justify-content-center" style="border: 2px dashed #ccc; border-radius: 8px; background: #fafafa; cursor: pointer; position: relative; min-height: 250px;" id="uploadBtn">
-                                <div id="uploadPlaceholder">
+                                <div id="uploadPlaceholder" style="pointer-events: none;">
                                     <i class="fa fa-cloud-upload fa-3x text-muted mb-3"></i>
                                     <p class="m-0" style="font-size: 14px; font-weight: 600;">Nhấn để tải ảnh lên</p>
                                     <p class="text-muted mt-1" style="font-size: 11px;">Hỗ trợ JPG, PNG (Tối đa 5MB)<br>Vui lòng chọn ảnh chụp thẳng dáng người</p>
                                 </div>
-                                <input type="file" id="userImageUpload" accept="image/*" style="opacity: 0; position: absolute; top:0; left:0; width: 100%; height: 100%; cursor: pointer; z-index: 5;">
+                                <input type="file" id="userImageUpload" accept="image/*" style="opacity: 0; position: absolute; top:0; left:0; width: 100%; height: 100%; cursor: pointer; z-index: 100;">
                                 <img id="userImagePreview" src="" style="max-width: 100%; max-height: 230px; border-radius: 6px; display: none; position: relative; z-index: 2;" alt="User Image">
-                                <button type="button" class="btn btn-sm btn-light position-absolute shadow-sm" id="btnChangeImage" style="display:none; bottom: 10px; right: 10px; z-index: 10; font-size: 11px; font-weight: bold;"><i class="fa fa-refresh"></i> Đổi ảnh</button>
+                                <button type="button" class="btn btn-sm btn-light position-absolute shadow-sm" id="btnChangeImage" style="display:none; bottom: 10px; right: 10px; z-index: 105; font-size: 11px; font-weight: bold;"><i class="fa fa-refresh"></i> Đổi ảnh</button>
                             </div>
                         </div>
                         <div class="col-md-2 text-center d-none d-md-block">
@@ -494,6 +494,9 @@
                 const aiSuccessResult = document.getElementById('aiSuccessResult');
                 const resultBaseImage = document.getElementById('resultBaseImage');
                 const btnDownloadResult = document.getElementById('btnDownloadResult');
+                
+                // Keep track of the product image path to calculate its overlay later
+                const productImageSrc = "{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}";
 
                 if (uploadBtn) {
                     // Trigger file input when clicking the upload area
@@ -563,9 +566,55 @@
                         }, 3000);
                     });
                     
-                    // Allow downloading the "result"
+                    // Allow downloading the real composite image using Canvas
                     btnDownloadResult.addEventListener('click', function() {
-                        alert('Chức năng tải ảnh đang được cập nhật!');
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Wait for images to be fully loaded before drawing
+                        const baseImgContent = new Image();
+                        baseImgContent.crossOrigin = "Anonymous";
+                        baseImgContent.src = resultBaseImage.src;
+                        
+                        baseImgContent.onload = function() {
+                            // Set canvas to uploaded image size
+                            canvas.width = baseImgContent.width;
+                            canvas.height = baseImgContent.height;
+                            
+                            // Draw base user image
+                            ctx.drawImage(baseImgContent, 0, 0);
+                            
+                            // Load Product Image
+                            const prodImg = new Image();
+                            prodImg.crossOrigin = "Anonymous";
+                            prodImg.src = productImageSrc;
+                            
+                            prodImg.onload = function() {
+                                // Apply multiply blend mode
+                                ctx.globalCompositeOperation = "multiply";
+                                
+                                // Calculate scaling to somewhat fit the center chest area roughly
+                                // This simulates the UI "max-height: 180px" logic but mapped to original resolution
+                                const scaleRatio = (baseImgContent.height * 0.75) / prodImg.height; // Product takes 75% height of origin image
+                                const newProdWidth = prodImg.width * scaleRatio;
+                                const newProdHeight = prodImg.height * scaleRatio;
+                                
+                                const posX = (canvas.width - newProdWidth) / 2;
+                                const posY = (canvas.height - newProdHeight) / 2;
+                                
+                                // Draw product image
+                                ctx.drawImage(prodImg, posX, posY, newProdWidth, newProdHeight);
+                                
+                                // Trigger download
+                                const dataURL = canvas.toDataURL("image/png");
+                                const link = document.createElement('a');
+                                link.download = 'AI_ThuDo_Reid.png';
+                                link.href = dataURL;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            }
+                        }
                     });
                 }
 
