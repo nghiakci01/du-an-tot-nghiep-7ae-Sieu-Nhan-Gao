@@ -33,14 +33,22 @@ class ProfileController extends Controller
         $user->phone = $request->phone;
         $user->address = $request->address;
 
-        if ($request->hasFile('avatar')) {
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             // Delete old avatar if exists
-            if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
+            if ($user->avatar && file_exists(storage_path('app/public/' . $user->avatar))) {
+                unlink(storage_path('app/public/' . $user->avatar));
             }
-            // Store new avatar in 'avatars' folder within public disk
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $path;
+
+            $file = $request->file('avatar');
+            $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $destinationPath = storage_path('app/public/avatars');
+
+            if (!is_dir($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            $file->move($destinationPath, $filename);
+            $user->avatar = 'avatars/' . $filename;
         }
 
         if ($request->filled('new_password')) {
