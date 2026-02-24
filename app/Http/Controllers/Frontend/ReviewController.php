@@ -16,15 +16,7 @@ class ReviewController extends Controller
             return back()->with('error', 'Vui lòng đăng nhập để gửi đánh giá.');
         }
 
-        // Chỉ cho phép review nếu đã mua và nhận hàng thành công
-        $hasPurchased = Order::where('user_id', Auth::id())
-            ->where('status', Order::STATUS_COMPLETED)
-            ->whereHas('items', fn($q) => $q->where('product_id', $productId))
-            ->exists();
-
-        if (!$hasPurchased) {
-            return back()->with('error', 'Bạn cần mua và nhận sản phẩm này trước khi có thể đánh giá.');
-        }
+        // Mọi user đăng nhập đều được review (bỏ kiểm tra hasPurchased theo yêu cầu)
 
         // Mỗi user chỉ được review 1 lần
         $existingReview = Review::where('product_id', $productId)
