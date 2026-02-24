@@ -308,7 +308,7 @@
                <div class="col-12">
                     <div class="banner_area">
                         <div class="banner_thumb">
-                            <a href="shop.html"><img src="assets/img/bg/banner21.jpg" alt="#"></a>
+                            <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner21.jpg') }}" alt="#"></a>
                         </div>
                     </div>
                 </div>
