@@ -368,8 +368,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Sản Phẩm Được Yêu Thích Nhất</h2>
-                        <p>Những sản phẩm được khách hàng quan tâm và yêu thích nhiều nhất.</p>
+                        <h2>Customer Favorites</h2>
+                        <p>Products that customers like and love the most.</p>
                     </div>
                 </div>
             </div>
