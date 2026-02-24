@@ -321,6 +321,17 @@
                                 <div class="product_content">
                                     <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
                                     @include('frontend.partials.product-price', ['product' => $product])
+                                    @php $ratingAvg = $product->reviews->avg('rating') ?? 0; $ratingCount = $product->reviews->count(); @endphp
+                                    <div class="product_ratting" style="margin-top:4px;">
+                                        <ul style="display:flex; align-items:center; gap:2px; list-style:none; padding:0; margin:0;">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <li><i class="fa {{ $i <= round($ratingAvg) ? 'fa-star' : 'fa-star-o' }}" style="color:#f39c12; font-size:11px;"></i></li>
+                                            @endfor
+                                            @if($ratingCount > 0)
+                                                <li style="font-size:10px; color:#999; margin-left:3px;">({{ $ratingCount }})</li>
+                                            @endif
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -414,6 +425,17 @@
                                 <div class="product_content">
                                     <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
                                     @include('frontend.partials.product-price', ['product' => $product])
+                                    @php $ratingAvg = $product->reviews->avg('rating') ?? 0; $ratingCount = $product->reviews->count(); @endphp
+                                    <div class="product_ratting" style="margin-top:4px;">
+                                        <ul style="display:flex; align-items:center; gap:2px; list-style:none; padding:0; margin:0;">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <li><i class="fa {{ $i <= round($ratingAvg) ? 'fa-star' : 'fa-star-o' }}" style="color:#f39c12; font-size:11px;"></i></li>
+                                            @endfor
+                                            @if($ratingCount > 0)
+                                                <li style="font-size:10px; color:#999; margin-left:3px;">({{ $ratingCount }})</li>
+                                            @endif
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -495,6 +517,17 @@
                                         <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a>
                                         </h3>
                                         @include('frontend.partials.product-price', ['product' => $product])
+                                        @php $ratingAvg = $product->reviews->avg('rating') ?? 0; $ratingCount = $product->reviews->count(); @endphp
+                                        <div class="product_ratting" style="margin-top:4px;">
+                                            <ul style="display:flex; align-items:center; gap:2px; list-style:none; padding:0; margin:0;">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <li><i class="fa {{ $i <= round($ratingAvg) ? 'fa-star' : 'fa-star-o' }}" style="color:#f39c12; font-size:11px;"></i></li>
+                                                @endfor
+                                                @if($ratingCount > 0)
+                                                    <li style="font-size:10px; color:#999; margin-left:3px;">({{ $ratingCount }})</li>
+                                                @endif
+                                            </ul>
+                                        </div>
                                         <div style="font-size: 12px; color: #ff6a28; margin-top: 5px;">
                                             <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} lượt yêu thích
                                         </div>
