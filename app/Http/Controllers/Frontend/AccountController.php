@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +22,15 @@ class AccountController extends Controller
     {
         $user = Auth::user();
         $order = $user->orders()->with(['items.product', 'histories'])->findOrFail($id);
-        return view('frontend.account.orders.show', compact('user', 'order'));
+
+        // Lấy danh sách product_id đã được user review trong đơn hàng này
+        $productIds = $order->items->pluck('product_id')->filter()->unique();
+        $userReviews = Review::where('user_id', $user->id)
+            ->whereIn('product_id', $productIds)
+            ->get()
+            ->keyBy('product_id');
+
+        return view('frontend.account.orders.show', compact('user', 'order', 'userReviews'));
     }
 
     public function update(Request $request)

@@ -205,4 +205,6 @@ return [
     'manufacturer' => 'Manufacturer',
     'select_by_color' => 'Select By Color',
     'popular_tags' => 'Popular Tags',
+    'review_purchase_required' => 'You need to purchase and receive this product before you can review it.',
+    'buy_to_review' => 'Buy now to review',
 ];

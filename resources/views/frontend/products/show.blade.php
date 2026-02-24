@@ -68,6 +68,9 @@
                             <input type="hidden" name="product_id" value="{{ $product->id }}">
 
                             <h1>{{ $product->name }}</h1>
+                            <div class="product_price">
+                                @include('frontend.partials.product-price', ['product' => $product])
+                            </div>
                             <div class="product_ratting">
                                 <ul>
                                     @php $ratingAvg = $product->reviews->avg('rating') ?? 0; @endphp
@@ -80,9 +83,6 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </div>
-                            <div class="product_price">
-                                @include('frontend.partials.product-price', ['product' => $product])
                             </div>
                             <div class="product_desc">
                                 <p>{{ $product->short_description }}</p>
@@ -368,12 +368,16 @@
                                             $userReview = $product->reviews->where('user_id', auth()->id())->first();
                                         @endphp
 
-                                        @if(!$userReview)
+                                        @if($userReview)
+                                            <div class="alert alert-info">
+                                                {{ __('messages.already_reviewed') }}
+                                            </div>
+                                        @elseif($hasPurchased)
                                             <form action="{{ route('product.review.store', $product->id) }}" method="POST">
                                                 @csrf
                                                 <h2>{{ __('messages.add_a_review') }}</h2>
                                                 <p>{{ __('messages.review_notice') }}</p>
-                                                
+
                                                 <div class="product_ratting mb-20">
                                                     <h3>{{ __('messages.your_rating') }}</h3>
                                                     <div class="star-rating">
@@ -394,8 +398,10 @@
                                                 <button type="submit">{{ __('messages.submit') }}</button>
                                             </form>
                                         @else
-                                            <div class="alert alert-info">
-                                                {{ __('messages.already_reviewed') }}
+                                            <div class="alert" style="background:#fff8e1; border-left:4px solid #f39c12; padding:15px; border-radius:4px;">
+                                                <i class="fa fa-info-circle" style="color:#f39c12;"></i>
+                                                {{ __('messages.review_purchase_required') }}
+                                                <a href="{{ route('shop') }}" class="btn btn-sm" style="background:#ef233c; color:#fff; margin-left:10px; padding:4px 12px; border-radius:3px;">{{ __('messages.buy_to_review') }}</a>
                                             </div>
                                         @endif
                                     @else
