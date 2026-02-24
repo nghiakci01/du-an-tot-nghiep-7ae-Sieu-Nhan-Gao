@@ -120,6 +120,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::resource('contact-messages', App\Http\Controllers\Admin\ContactMessageController::class)->only(['index', 'show', 'destroy']);
         Route::post('contact-messages/{id}/reply', [App\Http\Controllers\Admin\ContactMessageController::class, 'reply'])->name('contact-messages.reply');
 
+        // Review Management (Admin & Staff)
+        Route::resource('reviews', App\Http\Controllers\Admin\ReviewController::class)->only(['index', 'destroy']);
+
         // Chatbot Questions (Admin only)
         Route::middleware(['admin.only'])->group(function () {
             Route::prefix('chatbot')->name('chatbot.')->group(function () {

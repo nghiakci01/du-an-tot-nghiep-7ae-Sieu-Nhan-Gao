@@ -29,13 +29,13 @@ class HomeController extends Controller
         // Sản phẩm nổi bật cho section "New Arrivals"
         $featuredProducts = Product::where('is_active', true)
                                    ->where('is_featured', true)
-                                   ->with(['category', 'variants', 'images'])
+                                   ->with(['category', 'variants', 'images', 'reviews'])
                                    ->take(30)
                                    ->get();
         
         // Sản phẩm mới nhất cho section dưới banner
         $newProducts = Product::where('is_active', true)
-            ->with(['category', 'variants'])
+            ->with(['category', 'variants', 'reviews'])
             ->latest()
             ->take(12)
             ->get();
@@ -43,6 +43,7 @@ class HomeController extends Controller
         // Sản phẩm được yêu thích nhất (Top Wishlisted)
         $topWishlisted = Product::where('is_active', true)
             ->withCount('wishlistedBy')
+            ->with(['reviews'])
             ->orderByDesc('wishlisted_by_count')
             ->take(10)
             ->get();
