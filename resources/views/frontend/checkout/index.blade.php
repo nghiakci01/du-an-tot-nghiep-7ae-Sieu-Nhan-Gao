@@ -522,6 +522,19 @@ textarea.is-valid {
                                     </div>
                                 </div>
 
+                               <div class="panel-default">
+                                    <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY" data-bs-target="createp_account" required />
+                                    <label for="payment_vnpay" data-bs-toggle="collapse" data-bs-target="#method_vnpay" aria-controls="method_vnpay">
+                                        Thanh toán qua VNPAY
+                                    </label>
+
+                                    <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
+                                        <div class="card-body1">
+                                           <p>Thanh toán an toàn, tiện lợi qua cổng thanh toán VNPAY bằng mã QR, ứng dụng ngân hàng hoặc thẻ ATM/Visa/MasterCard.</p> 
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="order_button">
                                     <button type="submit">{{ __('messages.place_order') }}</button> 
                                 </div>    

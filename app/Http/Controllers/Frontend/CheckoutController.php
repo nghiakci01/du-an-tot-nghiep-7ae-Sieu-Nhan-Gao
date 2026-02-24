@@ -47,7 +47,7 @@ class CheckoutController extends Controller
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
         ]);
 
         $cart = session()->get('cart', []);
@@ -111,6 +111,10 @@ class CheckoutController extends Controller
             
             // Clear cart and coupon session
             Session::forget(['cart', 'coupon_code', 'discount_amount']);
+
+            if ($request->payment_method === 'VNPAY') {
+                return redirect()->route('vnpay.payment', ['order_id' => $order->id]);
+            }
 
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');
 
