@@ -1,22 +1,22 @@
 <x-mail::message>
-# Thông báo tin nhắn liên hệ mới
+# New contact message notification
 
-Xin chào,
+Hello,
 
-Hệ thống vừa nhận được một tin nhắn liên hệ mới từ khách hàng qua trang website.
+The system has just received a new contact message from a customer via the website.
 
-## Chi tiết tin nhắn:
-**Người gửi:** {{ $contactMessage->name }}  
+## Message details:
+**Sender:** {{ $contactMessage->name }}  
 **Email:** {{ $contactMessage->email }}  
-**Tiêu đề:** {{ $contactMessage->subject }}  
+**Subject:** {{ $contactMessage->subject }}  
 
-### Nội dung:
+### Content:
 {{ $contactMessage->message }}
 
 <x-mail::button :url="route('admin.contact-messages.show', $contactMessage->id)">
-Xem chi tiết trong trang quản trị
+View details in the admin panel
 </x-mail::button>
 
-Trân trọng,<br>
+Best regards,<br>
 {{ config('app.name') }}
 </x-mail::message>

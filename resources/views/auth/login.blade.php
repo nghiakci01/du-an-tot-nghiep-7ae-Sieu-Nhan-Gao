@@ -200,9 +200,9 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">Trang chủ</a></li>
+                            <li><a href="{{ route('welcome') }}">Home</a></li>
                             <li>/</li>
-                            <li>Tài khoản</li>
+                            <li>Account</li>
                         </ul>
                     </div>
                 </div>
@@ -222,11 +222,11 @@
                             <button type="button"
                                 class="auth-tab {{ !request()->has('tab') || request('tab') == 'login' ? 'active' : '' }}"
                                 data-tab="login">
-                                Đăng nhập
+                                Login
                             </button>
                             <button type="button" class="auth-tab {{ request('tab') == 'register' ? 'active' : '' }}"
                                 data-tab="register">
-                                Đăng ký
+                                Register
                             </button>
                         </div>
 
@@ -237,31 +237,31 @@
                             @csrf
                             <div class="input-group">
                                 <input type="email" name="email" class="auth-input"
-                                    placeholder="Nhập email hoặc Tên đăng nhập" value="{{ old('email') }}" required>
+                                    placeholder="Enter email or Username" value="{{ old('email') }}" required>
                                 @error('email')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="input-group">
-                                <input type="password" name="password" class="auth-input" placeholder="Mật khẩu" required>
+                                <input type="password" name="password" class="auth-input" placeholder="Password" required>
                                 @error('password')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <button type="submit" class="auth-btn auth-btn-login">Đăng nhập</button>
+                            <button type="submit" class="auth-btn auth-btn-login">Login</button>
 
-                            <a href="{{ route('password.request') }}" class="forgot-link">Quên mật khẩu?</a>
+                            <a href="{{ route('password.request') }}" class="forgot-link">Forgot password?</a>
 
-                            <div class="social-divider">Hoặc đăng nhập với</div>
+                            <div class="social-divider">Or login with</div>
 
                             <div class="social-buttons">
                                 <a href="{{ route('social.login', 'facebook') }}" class="social-btn social-btn-facebook">
-                                    <i class="fa fa-facebook"></i> Đăng nhập bằng Facebook
+                                    <i class="fa fa-facebook"></i> Login with Facebook
                                 </a>
                                 <a href="{{ route('social.login', 'google') }}" class="social-btn social-btn-google">
-                                    <i class="fa fa-google"></i> Đăng nhập bằng Google
+                                    <i class="fa fa-google"></i> Login with Google
                                 </a>
                             </div>
                         </form>
@@ -271,18 +271,18 @@
                             class="auth-form {{ request('tab') == 'register' ? 'active' : '' }}" id="register-form">
                             @csrf
                             <div class="input-group">
-                                <input type="text" name="name" class="auth-input" placeholder="Họ tên"
+                                <input type="text" name="name" class="auth-input" placeholder="Full Name"
                                     value="{{ old('name') }}" required minlength="2" maxlength="50"
-                                    pattern="^[a-zA-ZÀ-ỹ\s]+$" title="Họ tên chỉ được chứa chữ cái và khoảng trắng">
+                                    pattern="^[a-zA-ZÀ-ỹ\s]+$" title="Name can only contain letters and spaces">
                                 @error('name')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="input-group">
-                                <input type="tel" name="phone" class="auth-input" placeholder="Điện thoại"
+                                <input type="tel" name="phone" class="auth-input" placeholder="Phone"
                                     value="{{ old('phone') }}" required pattern="^0[0-9]{9}$" maxlength="10"
-                                    title="Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0">
+                                    title="Phone number must be 10 digits and start with 0">
                                 @error('phone')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
@@ -291,15 +291,15 @@
                             <div class="input-group">
                                 <input type="email" name="email" class="auth-input" placeholder="Email"
                                     value="{{ old('email') }}" required pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
-                                    title="Vui lòng nhập định dạng email hợp lệ">
+                                    title="Please enter a valid email format">
                                 @error('email')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="input-group">
-                                <input type="password" name="password" class="auth-input" placeholder="Mật khẩu của bạn"
-                                    required minlength="8" title="Mật khẩu phải có ít nhất 8 ký tự">
+                                <input type="password" name="password" class="auth-input" placeholder="Your password"
+                                    required minlength="8" title="Password must be at least 8 characters">
                                 @error('password')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
@@ -307,10 +307,10 @@
 
                             <div class="input-group">
                                 <input type="password" name="password_confirmation" class="auth-input"
-                                    placeholder="Xác nhận mật khẩu" required minlength="8">
+                                    placeholder="Confirm password" required minlength="8">
                             </div>
 
-                            <button type="submit" class="auth-btn auth-btn-register">Đăng ký</button>
+                            <button type="submit" class="auth-btn auth-btn-register">Register</button>
                         </form>
                     </div>
                 </div>
