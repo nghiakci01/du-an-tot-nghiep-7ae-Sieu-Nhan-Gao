@@ -16,7 +16,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::where('is_active', true)->with(['category', 'variants']);
+        $query = Product::where('is_active', true)->with(['category', 'variants', 'reviews']);
 
         // Search by keyword
         if ($request->has('search') && !empty($request->search)) {
