@@ -201,7 +201,7 @@
                 </div>
                 
                 <!-- Horizontal Menu -->
-                <div class="horizontal_menu horizontal_menu_six">
+                <!-- <div class="horizontal_menu horizontal_menu_six">
                     <div class="main_menu"> 
                         <nav>  
                             <ul>
@@ -233,7 +233,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <!--header middel end-->
 
     </header>
