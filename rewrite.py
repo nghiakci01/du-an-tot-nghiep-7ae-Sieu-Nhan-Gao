@@ -1,99 +1,85 @@
-@extends('layouts.public')
+import re
 
-@section('title', $product->name . ' | Reid')
+with open('resources/views/frontend/products/show.blade.php', 'r', encoding='utf-8') as f:
+    content = f.read()
 
-@section('content')
-    <!--breadcrumbs area start-->
-    <div class="breadcrumbs_area product_bread">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="breadcrumb_content">
-                        <ul>
-                            <li><a href="{{ route('welcome') }}">home</a></li>
-                            <li>/</li>
-                            <li><a href="{{ route('shop') }}">shop</a></li>
-                            <li>/</li>
-                            <li>product details</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--breadcrumbs area end-->
-
-    <!--product details start-->
+new_product_details = """    <!--product details start-->
     <style>
+        .editorial-layout { display: flex; flex-wrap: wrap; margin-top: 40px; margin-bottom: 60px; }
+        .editorial-images { flex: 0 0 100%; max-width: 100%; margin-bottom: 30px; }
+        .editorial-content { flex: 0 0 100%; max-width: 100%; }
         .editorial-sticky { position: relative; }
+        
         @media (min-width: 992px) {
-            .editorial-sticky { position: sticky; top: 120px; max-height: calc(100vh - 140px); overflow-y: auto; padding-right: 15px; scrollbar-width: none; }
+            .editorial-layout { align-items: flex-start; }
+            .editorial-images { flex: 0 0 60%; max-width: 60%; padding-right: 50px; margin-bottom: 0; }
+            .editorial-content { flex: 0 0 40%; max-width: 40%; }
+            .editorial-sticky { position: sticky; top: 120px; max-height: calc(100vh - 140px); overflow-y: auto; padding-right: 20px; scrollbar-width: none; }
             .editorial-sticky::-webkit-scrollbar { display: none; }
         }
 
-        .editorial-img-item { margin-bottom: 20px; width: 100%; overflow: hidden; background: #f5f5f5; border-radius: 4px; }
+        .editorial-img-item { margin-bottom: 20px; width: 100%; overflow: hidden; background: #f5f5f5; }
         .editorial-img-item img { width: 100%; height: auto; display: block; object-fit: cover; transition: transform 0.5s ease; }
         .editorial-img-item:hover img { transform: scale(1.03); }
 
-        .product_d_right h1 { font-size: 28px; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; line-height: 1.2; color: #111; }
+        .product_d_right h1 { font-size: 36px; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; line-height: 1.1; letter-spacing: -1px; color: #111; }
         .product_ratting { margin-bottom: 20px; }
         .product_ratting ul li { display: inline-block; }
         .product_ratting ul li.review a { color: #666; margin-left: 10px; text-decoration: underline; }
 
-        .product_price { font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #111; display: flex; align-items: baseline; gap: 15px; }
-        .product_price .old_price { font-size: 16px; color: #999; text-decoration: line-through; font-weight: 400; }
+        .product_price { font-size: 28px; font-weight: 700; margin-bottom: 25px; color: #111; display: flex; align-items: baseline; gap: 15px; }
+        .product_price .old_price { font-size: 18px; color: #999; text-decoration: line-through; font-weight: 400; }
 
         .product_desc { margin-bottom: 30px; font-size: 15px; line-height: 1.6; color: #555; border-bottom: 1px solid #eee; padding-bottom: 25px; }
 
         .variant-group { margin-bottom: 25px; }
-        .variant-title { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; color: #333; }
+        .variant-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; color: #111; }
         .variant-swatch-container { display: flex; flex-wrap: wrap; gap: 10px; }
-        .variant-swatch { display: inline-flex; align-items: center; justify-content: center; min-width: 45px; height: 40px; padding: 0 15px; border: 1px solid #ddd; background: #fff; color: #333; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; border-radius: 4px;}
-        .variant-swatch:hover, .variant-swatch.active { border-color: #111; background: #111; color: #fff; }
+        .variant-swatch { display: inline-flex; align-items: center; justify-content: center; min-width: 50px; height: 45px; padding: 0 15px; border: 1px solid #ddd; background: #fff; color: #333; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; }
+        .variant-swatch:hover, .variant-swatch.active { border-color: #111; }
+        .variant-swatch.active { background: #111; color: #fff; }
         
         .action-group { margin-bottom: 30px; }
-        .qty-wrapper { display: flex; align-items: center; border: 1px solid #ddd; width: 120px; height: 45px; margin-bottom: 20px; border-radius: 4px; overflow: hidden;}
-        .qty-btn { width: 40px; height: 100%; background: #f5f5f5; border: none; font-size: 18px; cursor: pointer; color: #111; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-        .qty-btn:hover { background: #e0e0e0; }
+        .qty-wrapper { display: flex; align-items: center; border: 1px solid #ddd; width: 120px; height: 50px; margin-bottom: 20px; }
+        .qty-btn { width: 40px; height: 100%; background: #fff; border: none; font-size: 20px; cursor: pointer; color: #111; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .qty-btn:hover { background: #f5f5f5; }
         .qty-input { width: 40px; height: 100%; border: none; text-align: center; font-size: 16px; font-weight: 600; color: #111; padding: 0; -moz-appearance: textfield; }
         .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-        .btn-massive { width: 100%; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; border: none; border-radius: 4px !important; margin-bottom: 10px; }
+        .btn-massive { width: 100%; height: 55px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); border: none; border-radius: 0 !important; margin-bottom: 10px; }
         .btn-add-cart { background: #111; color: #fff; border: 1px solid #111; }
         .btn-add-cart:hover:not(:disabled) { background: #fff; color: #111; }
         .btn-add-cart:disabled { background: #f0f0f0; color: #aaa; border-color: #eee; cursor: not-allowed; }
         .btn-buy-now { background: #ef233c; color: #fff; }
-        .btn-buy-now:hover:not(:disabled) { background: #d90429; box-shadow: 0 5px 15px rgba(239,35,60,0.2); transform: translateY(-1px); }
+        .btn-buy-now:hover:not(:disabled) { background: #d90429; box-shadow: 0 10px 20px rgba(239,35,60,0.2); transform: translateY(-2px); }
         .btn-buy-now:disabled { background: #f8a1ac; cursor: not-allowed; }
 
         .product_d_action ul { display: flex; gap: 20px; margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid #eee; }
-        .product_d_action ul li a { font-weight: 600; font-size: 13px; color: #555; text-transform: uppercase; transition: color 0.2s; display: flex; align-items: center; gap: 8px; }
-        .product_d_action ul li a:hover { color: #ef233c; }
+        .product_d_action ul li a { font-weight: 600; font-size: 13px; color: #555; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; display: flex; align-items: center; gap: 8px; }
+        .product_d_action ul li a:hover { color: #111; }
         
-        .priduct_social h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; color: #333; }
+        .priduct_social h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; color: #111; }
         .priduct_social ul { display: flex; gap: 15px; }
         .priduct_social ul li a { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid #ddd; color: #555; transition: all 0.3s; border-radius: 50%; }
-        .priduct_social ul li a:hover { background: #ef233c; border-color: #ef233c; color: #fff; }
+        .priduct_social ul li a:hover { background: #111; border-color: #111; color: #fff; }
 
-        .variant-msg { font-size: 14px; color: #ef233c; padding: 10px 15px; background: #fff0f2; border: 1px solid #ffccd3; margin-bottom: 20px; display: none; font-weight: 500; border-radius: 4px; }
+        .variant-msg { font-size: 14px; color: #ef233c; padding: 10px 15px; background: #fff0f2; border: 1px solid #ffccd3; margin-bottom: 20px; display: none; font-weight: 500; }
     </style>
-    <div class="product_details mt-50 mb-50">
+    <div class="product_details">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-6 col-md-12">
-                    <div class="editorial-images">
-                        <div class="editorial-img-item">
-                            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" alt="{{ $product->name }} Main Image">
-                        </div>
-                        @foreach($product->images as $image)
-                            <div class="editorial-img-item">
-                                <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $product->name }} Image {{ $loop->iteration }}">
-                            </div>
-                        @endforeach
+            <div class="editorial-layout">
+                <div class="editorial-images">
+                    <div class="editorial-img-item">
+                        <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}" alt="{{ $product->name }} Main Image">
                     </div>
+                    @foreach($product->images as $image)
+                        <div class="editorial-img-item">
+                            <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $product->name }} Image {{ $loop->iteration }}">
+                        </div>
+                    @endforeach
                 </div>
 
-                <div class="col-lg-6 col-md-12">
+                <div class="editorial-content">
                     <div class="editorial-sticky">
                         <div class="product_d_right">
                             <form action="{{ route('cart.add') }}" method="POST" id="add-to-cart-form">
@@ -292,9 +278,9 @@
             </div>
         </div>
     </div>
-    <!--product details end-->
+    <!--product details end-->"""
 
-    <!--product info start-->
+new_product_info = """    <!--product info start-->
     <style>
         .product_d_info { background: #fff; padding: 60px 0; border-top: 1px solid #eee; }
         .custom-tabs { border-bottom: 1px solid #ddd; margin-bottom: 40px; display: flex; justify-content: center; gap: 60px; }
@@ -374,96 +360,12 @@
             </div>
         </div>
     </div>
-    <!--product info end-->
+    <!--product info end-->"""
 
-    <!--product section area start-->
-    <section class="product_section related_product">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section_title">
-                        <h2>Related Products</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="product_area">
-                <div class="row">
-                    <div class="product_carousel product_three_column4 owl-carousel">
-                        @foreach($relatedProducts as $related)
-                            <div class="col-lg-3">
-                                <div class="single_product">
-                                    <div class="product_thumb">
-                                        <a class="primary_img" href="{{ route('product.detail', $related->slug) }}">
-                                            <img src="{{ $related->image ? asset('storage/' . $related->image) : asset('frontend-assets/img/product/product21.jpg') }}"
-                                                alt="{{ $related->name }}">
-                                        </a>
-                                        <div class="product_action">
-                                            <div class="hover_action">
-                                                <a href="{{ route('product.detail', $related->slug) }}"><i
-                                                        class="fa fa-plus"></i></a>
-                                                <div class="action_button">
-                                                    <ul>
-                                                        <li><a title="add to cart"
-                                                                href="{{ route('product.detail', $related->slug) }}"><i
-                                                                    class="fa fa-shopping-basket" aria-hidden="true"></i></a>
-                                                        </li>
-                                                        <li><a href="#" class="add-to-wishlist" data-id="{{ $related->id }}"
-                                                                title="Add to Wishlist"><i class="fa fa-heart-o"
-                                                                    aria-hidden="true"></i></a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="product_content">
-                                        <h3><a href="{{ route('product.detail', $related->slug) }}">{{ $related->name }}</a>
-                                        </h3>
-                                        @include('frontend.partials.product-price', ['product' => $related])
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!--product section area end-->
+content_updated = re.sub(r'<!--product details start-->.*?<!--product details end-->', new_product_details, content, flags=re.DOTALL)
+content_updated = re.sub(r'<!--product info start-->.*?<!--product info end-->', new_product_info, content_updated, flags=re.DOTALL)
 
-    @section('scripts')
-        <script>
-            $(document).ready(function () {
-                $('.add-to-wishlist').click(function (e) {
-                    e.preventDefault();
-                    var productId = $(this).data('id');
-                    var icon = $(this).find('i');
+with open('resources/views/frontend/products/show.blade.php', 'w', encoding='utf-8') as f:
+    f.write(content_updated)
 
-                    $.ajax({
-                        url: '{{ route("wishlist.add") }}',
-                        method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            product_id: productId
-                        },
-                        success: function (response) {
-                            if (response.status === 'success' || response.status === 'info') {
-                                // Change icon to filled heart
-                                icon.removeClass('fa-heart-o').addClass('fa-heart').css('color', 'red');
-                                alert(response.message);
-                            } else {
-                                alert(response.message);
-                            }
-                        },
-                        error: function (xhr) {
-                            if (xhr.status === 401) {
-                                window.location.href = "{{ route('login') }}";
-                            } else {
-                                alert('An error occurred, please try again!');
-                            }
-                        }
-                    });
-                });
-            });
-        </script>
-    @endsection
-@endsection
+print('Updated successfully')
