@@ -21,7 +21,7 @@
     .chat-container {
         position: fixed;
         bottom: 30px;
-        right: 30px;
+        right: 80px;
         z-index: 99999;
         display: flex;
         flex-direction: column;
