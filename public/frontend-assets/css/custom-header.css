@@ -35,33 +35,50 @@
     }
 }
 
-/* Logo Styles */
-.header_six .logo img {
-    max-height: 80px;
-    /* Reduced slightly for 3-column balance */
+/* Logo + Menu inline container */
+.header_middel .header_left {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.header_middel .header_left .logo {
+    flex-shrink: 0;
+    margin: 0 !important;
+}
+
+.header_middel .header_left .logo img {
+    max-height: 90px;
     width: auto;
     display: block;
 }
 
-/* Main Menu Column Styles */
-.header_six .main_menu nav>ul {
+.header_middel .header_left .main_menu {
+    flex-grow: 1;
+}
+
+/* Menu items - evenly spaced */
+.header_middel .header_left .main_menu nav>ul {
     display: flex !important;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     flex-wrap: nowrap !important;
-    gap: 15px;
-    /* Increased gap for better spacing in center column */
+    gap: 4px;
+    width: 100%;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.header_six .main_menu nav>ul>li>a {
+.header_middel .header_left .main_menu nav>ul>li {
+    margin: 0;
+    position: relative;
+}
+
+.header_middel .header_left .main_menu nav>ul>li>a {
     display: inline-block;
-    padding: 20px 0;
-    /* Vertical padding only, gap handles horizontal */
-    font-size: 15px;
-    /* Slightly larger for clarity */
+    padding: 12px 14px;
+    font-size: 14px;
     font-weight: 500;
     color: #333;
     text-transform: capitalize;
@@ -71,12 +88,12 @@
     position: relative;
 }
 
-.header_six .main_menu nav>ul>li>a::after {
+.header_middel .header_left .main_menu nav>ul>li>a::after {
     content: '';
     position: absolute;
-    bottom: 12px;
-    left: 0;
-    right: 0;
+    bottom: 6px;
+    left: 14px;
+    right: 14px;
     height: 2px;
     background-color: #ff6a00;
     transform: scaleX(0);
@@ -84,19 +101,19 @@
     transition: transform 0.3s ease;
 }
 
-.header_six .main_menu nav>ul>li:hover>a {
+.header_middel .header_left .main_menu nav>ul>li>a:hover {
     color: #ff6a00;
 }
 
-.header_six .main_menu nav>ul>li:hover>a::after {
+.header_middel .header_left .main_menu nav>ul>li>a:hover::after {
     transform: scaleX(1);
 }
 
-.header_six .main_menu nav>ul>li.active>a {
+.header_middel .header_left .main_menu nav>ul>li.active>a {
     color: #ff6a00;
 }
 
-.header_six .main_menu nav>ul>li.active>a::after {
+.header_middel .header_left .main_menu nav>ul>li.active>a::after {
     transform: scaleX(1);
 }
 

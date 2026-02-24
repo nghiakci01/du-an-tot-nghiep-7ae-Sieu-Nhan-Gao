@@ -99,7 +99,7 @@
     <!--news section end-->
 
     <!--newsletter area start-->
-    <div class="newsletter_area mt-60 mb-60">
+    <!-- <div class="newsletter_area mt-60 mb-60">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 col-md-12">
@@ -119,6 +119,6 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
     <!--newsletter area end-->
 @endsection
