@@ -128,7 +128,7 @@
                 <ul class="list-unstyled">
                     @forelse($order->histories as $history)
                         <li class="mb-2">
-                            <small class="text-muted">{{ $history->created_at->format('H:i d/m/Y') }}</small>
+                            <small class="text-muted">{{ $history->created_at->format('d/m/Y H:i') }}</small>
                             <br>
                             <strong>{{ $history->user ? $history->user->name : 'Hệ thống' }}</strong>: 
                             Chuyển từ <span class="badge bg-secondary">{{ $history->previous_status ?? 'N/A' }}</span> 

@@ -3,15 +3,20 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Brand;
+use App\Models\Color;
+use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::where('is_active', true)->with(['category', 'variants']);
+        $query = Product::where('is_active', true)->with(['category', 'variants', 'reviews']);
 
         // Search by keyword
         if ($request->has('search') && !empty($request->search)) {
@@ -51,6 +56,30 @@ class ProductController extends Controller
             });
         }
 
+        // Filter by Brand
+        if ($request->has('brand')) {
+            $brandSlug = $request->brand;
+            $query->whereHas('brand', function ($q) use ($brandSlug) {
+                $q->where('slug', $brandSlug);
+            });
+        }
+
+        // Filter by Color
+        if ($request->has('color')) {
+            $colorSlug = $request->color;
+            $query->whereHas('variants.colorRelationship', function ($q) use ($colorSlug) {
+                $q->where('slug', $colorSlug);
+            });
+        }
+
+        // Filter by Tag
+        if ($request->has('tag')) {
+            $tagSlug = $request->tag;
+            $query->whereHas('tags', function ($q) use ($tagSlug) {
+                $q->where('slug', $tagSlug);
+            });
+        }
+
         // Sorting
         if ($request->has('sort')) {
             switch ($request->sort) {
@@ -80,11 +109,38 @@ class ProductController extends Controller
         // Convert pagination query params
         $products->appends($request->all());
 
-        // Get categories for sidebar
-        $categories = Category::withCount('products')->get();
+        // Get sidebar data
+        $categories = Category::withCount(['products' => function($q) {
+            $q->where('products.is_active', true);
+        }])->get();
+
+        $brands = Brand::where('is_active', true)->withCount(['products' => function($q) {
+            $q->where('products.is_active', true);
+        }])->get();
+
+        // Colors with product counts
+        $colors = Color::whereHas('productVariants.product', function($q) {
+            $q->where('products.is_active', true);
+        })->withCount(['productVariants as products_count' => function($q) {
+            $q->whereHas('product', function($pq) {
+                $pq->where('products.is_active', true);
+            });
+        }])->limit(10)->get();
+
+        $tags = Tag::withCount(['products' => function($q) {
+            $q->where('products.is_active', true);
+        }])->limit(15)->get();
+
         $totalActiveProducts = Product::where('is_active', true)->count();
 
-        return view('frontend.products.index', compact('products', 'categories', 'totalActiveProducts'));
+        return view('frontend.products.index', compact(
+            'products', 
+            'categories', 
+            'brands', 
+            'colors', 
+            'tags', 
+            'totalActiveProducts'
+        ));
     }
 
     public function show($slug)
@@ -94,6 +150,14 @@ class ProductController extends Controller
             ->with(['category', 'variants.sizeRelationship', 'variants.colorRelationship', 'images', 'reviews.user'])
             ->firstOrFail();
 
+        // Kiểm tra user đã mua và nhận hàng thành công chưa
+        $hasPurchased = false;
+        if (Auth::check()) {
+            $hasPurchased = Order::where('user_id', Auth::id())
+                ->where('status', Order::STATUS_COMPLETED)
+                ->whereHas('items', fn($q) => $q->where('product_id', $product->id))
+                ->exists();
+        }
 
         // Get related products (same category, excluding current)
         $relatedProducts = Product::where('category_id', $product->category_id)
@@ -102,6 +166,6 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
-        return view('frontend.products.show', compact('product', 'relatedProducts'));
+        return view('frontend.products.show', compact('product', 'relatedProducts', 'hasPurchased'));
     }
 }

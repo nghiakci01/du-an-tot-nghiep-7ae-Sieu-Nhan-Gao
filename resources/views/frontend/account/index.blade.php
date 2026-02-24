@@ -32,7 +32,7 @@
                         <div class="tab-content dashboard_content">
                             <div class="tab-pane fade show active" id="dashboard">
                                 <h3>{{ __('messages.dashboard') }} </h3>
-                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>, manage your <a href="#">shipping and billing addresses</a> and <a href="#">Edit your password and account details.</a></p>
+                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a> and <a href="#">Edit your password and account details.</a></p>
                             </div>
                             <div class="tab-pane fade" id="orders">
                                 <h3>{{ __('messages.orders') }}</h3>
@@ -81,48 +81,6 @@
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
-                            <div class="tab-pane fade" id="downloads">
-                                <h3>Downloads</h3>
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Product</th>
-                                                <th>Downloads</th>
-                                                <th>Expires</th>
-                                                <th>Download</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Shopro - Multipurpose eCommerce HTML Template</td>
-                                                <td>May 10, 2018</td>
-                                                <td>never</td>
-                                                <td><a href="#" class="view">Download File</a></td>
-                                            </tr>
-                                            <tr>
-                                                <td>HasTech - Multipurpose eCommerce HTML Template</td>
-                                                <td>Sep 11, 2018</td>
-                                                <td>never</td>
-                                                <td><a href="#" class="view">Download File</a></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="address">
-                                <p>The following addresses will be used on the checkout page by default.</p>
-                                <h4 class="billing-address">Billing address</h4>
-                                <a href="#" class="view">Edit</a>
-                                <p><strong>Bobby Jackson</strong></p>
-                                <address>
-                                    House #15<br>
-                                    Road #1<br>
-                                    Block #C <br>
-                                    Banasree, Dhaka-1219
-                                </address>
-                                <p>Bangladesh</p>
                             </div>
                             <div class="tab-pane fade" id="account-details">
                                 <h3>{{ __('messages.account_details') }} </h3>

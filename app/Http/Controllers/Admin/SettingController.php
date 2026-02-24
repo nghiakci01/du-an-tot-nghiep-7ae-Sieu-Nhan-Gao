@@ -24,6 +24,9 @@ class SettingController extends Controller
                 ['value' => $value]
             );
         }
+        
+        // Clear settings cache
+        \Illuminate\Support\Facades\Cache::forget('global_settings');
 
         return back()->with('success', 'Cài đặt đã được cập nhật thành công!');
     }

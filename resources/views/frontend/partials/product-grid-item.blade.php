@@ -35,7 +35,6 @@
                                 </form>
                             </li>
                             <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                            <li><a href="#" title="Add to Compare"><i class="fa fa-sliders" aria-hidden="true"></i></a></li>
                         </ul>
                     </div>
                </div>
@@ -59,6 +58,17 @@
         <div class="product_content {{ $contentClass ?? '' }}">
             <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
             @include('frontend.partials.product-price', ['product' => $product])
+            @php $ratingAvg = $product->reviews->avg('rating') ?? 0; $ratingCount = $product->reviews->count(); @endphp
+            <div class="product_ratting" style="margin-top:5px;">
+                <ul style="display:flex; align-items:center; gap:2px; list-style:none; padding:0; margin:0;">
+                    @for($i = 1; $i <= 5; $i++)
+                        <li><i class="fa {{ $i <= round($ratingAvg) ? 'fa-star' : 'fa-star-o' }}" style="color:#f39c12; font-size:12px;"></i></li>
+                    @endfor
+                    @if($ratingCount > 0)
+                        <li style="font-size:11px; color:#999; margin-left:4px;">({{ $ratingCount }})</li>
+                    @endif
+                </ul>
+            </div>
         </div>
         
         @if(isset($showListContent) && $showListContent)

@@ -19,4 +19,17 @@ class Setting extends Model
         $setting = self::where('key', $key)->first();
         return $setting ? $setting->value : $default;
     }
+
+    /**
+     * Calculate shipping fee based on subtotal
+     */
+    public static function getShippingFee($subtotal)
+    {
+        // Free shipping for orders >= 500,000 đ
+        if ($subtotal >= 500000) {
+            return 0;
+        }
+
+        return (float) self::get('shipping_fee', 30000);
+    }
 }

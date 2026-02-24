@@ -93,22 +93,27 @@ class CartController extends Controller
                  $cart[$request->id]["quantity"] = $request->quantity;
                  session()->put('cart', $cart);
                  
-                 // Calculate new totals
-                 $itemTotal = $cart[$request->id]['price'] * $request->quantity;
-                 $cartTotal = 0;
-                 $cartCount = 0;
-                 foreach($cart as $item) {
-                    $cartTotal += $item['price'] * $item['quantity'];
-                    $cartCount += $item['quantity'];
-                 }
+                  // Calculate new totals
+                  $itemTotal = $cart[$request->id]['price'] * $request->quantity;
+                  $subtotal = 0;
+                  $cartCount = 0;
+                  foreach($cart as $item) {
+                     $subtotal += $item['price'] * $item['quantity'];
+                     $cartCount += $item['quantity'];
+                  }
 
-                 return response()->json([
-                     'success' => true,
-                     'message' => 'Cart updated successfully',
-                     'item_total' => number_format($itemTotal) . ' đ',
-                     'cart_total' => number_format($cartTotal) . ' đ',
-                     'cart_count' => $cartCount
-                 ]);
+                  $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
+                  $grandTotal = $subtotal + $shippingFee;
+
+                  return response()->json([
+                      'success' => true,
+                      'message' => 'Giỏ hàng đã được cập nhật',
+                      'item_total' => number_format($itemTotal) . ' đ',
+                      'cart_total' => number_format($subtotal) . ' đ',
+                      'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
+                      'grand_total' => number_format($grandTotal) . ' đ',
+                      'cart_count' => $cartCount
+                  ]);
             } else {
                  return response()->json([
                      'success' => false,
@@ -153,17 +158,22 @@ class CartController extends Controller
                 session()->put('cart', $cart);
                 
                 // Calculate new totals
-                 $cartTotal = 0;
+                 $subtotal = 0;
                  $cartCount = 0;
                  foreach($cart as $item) {
-                    $cartTotal += $item['price'] * $item['quantity'];
+                    $subtotal += $item['price'] * $item['quantity'];
                     $cartCount += $item['quantity'];
                  }
                 
+                $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
+                $grandTotal = $subtotal + $shippingFee;
+
                 return response()->json([
                     'success' => true,
-                    'message' => 'Product removed from cart',
-                    'cart_total' => number_format($cartTotal) . ' đ',
+                    'message' => 'Sản phẩm đã được xóa khỏi giỏ hàng',
+                    'cart_total' => number_format($subtotal) . ' đ',
+                    'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
+                    'grand_total' => number_format($grandTotal) . ' đ',
                     'cart_count' => $cartCount
                 ]);
             }

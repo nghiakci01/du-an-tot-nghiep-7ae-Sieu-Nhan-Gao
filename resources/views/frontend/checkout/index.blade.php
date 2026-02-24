@@ -434,8 +434,28 @@ textarea.is-valid {
                                 </div>
 
                                 <div class="col-12 mb-20">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="mb-0">Tỉnh / Thành phố <span>*</span></label>
+                                        <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-primary" title="Sử dụng vị trí hiện tại của bạn">
+                                            <i class="fa fa-map-marker"></i> Định vị vị trí
+                                        </button>
+                                    </div>
+                                    <select name="province" id="province" required class="form-control @error('province') is-invalid @enderror">
+                                        <option value="">{{ __('Chọn tỉnh thành') }}</option>
+                                        @foreach($provinces as $province)
+                                            <option value="{{ $province }}" {{ (Auth::check() && str_contains(Auth::user()->address, $province)) || old('province') == $province ? 'selected' : '' }}>
+                                                {{ $province }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('province')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-12 mb-20">
                                     <label>{{ __('messages.shipping_address') }} <span>*</span></label>
-                                    <input placeholder="{{ __('messages.street_address') }}" type="text" name="address" value="{{ Auth::check() ? Auth::user()->address : old('address') }}" required minlength="10" class="@error('address') is-invalid @enderror">
+                                    <input placeholder="{{ __('messages.street_address') }}" type="text" name="address" value="{{ Auth::check() ? Auth::user()->address : old('address') }}" required minlength="5" class="@error('address') is-invalid @enderror">
                                     @error('address')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -485,7 +505,7 @@ textarea.is-valid {
                                         @endif
                                         <tr>
                                             <th>{{ __('messages.shipping') }}</th>
-                                            <td><strong>{{ __('messages.free') }}</strong></td>
+                                            <td><strong>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí' }}</strong></td>
                                         </tr>
                                         <tr class="order_total">
                                             <th>{{ __('messages.order_total') }}</th>
@@ -665,8 +685,15 @@ $(document).ready(function() {
     }
 
     function validateAddress(value) {
-        if (!value || value.trim().length < 10) {
-            return 'Please enter your address (at least 10 characters)';
+        if (!value || value.trim().length < 5) {
+            return 'Vui lòng nhập địa chỉ cụ thể (số nhà, tên đường)';
+        }
+        return '';
+    }
+
+    function validateProvince(value) {
+        if (!value) {
+            return 'Vui lòng chọn tỉnh thành';
         }
         return '';
     }
@@ -710,6 +737,11 @@ $(document).ready(function() {
         showValidation(this, error);
     });
 
+    $('select[name="province"]').on('change', function() {
+        const error = validateProvince($(this).val());
+        showValidation(this, error);
+    });
+
     // Form submission validation
     $('form').on('submit', function(e) {
         let hasError = false;
@@ -718,14 +750,16 @@ $(document).ready(function() {
         const nameError = validateName($('input[name="name"]').val());
         const phoneError = validatePhone($('input[name="phone"]').val());
         const emailError = validateEmail($('input[name="email"]').val());
+        const provinceError = validateProvince($('select[name="province"]').val());
         const addressError = validateAddress($('input[name="address"]').val());
 
         showValidation('input[name="name"]', nameError);
         showValidation('input[name="phone"]', phoneError);
         showValidation('input[name="email"]', emailError);
+        showValidation('select[name="province"]', provinceError);
         showValidation('input[name="address"]', addressError);
 
-        if (nameError || phoneError || emailError || addressError) {
+        if (nameError || phoneError || emailError || provinceError || addressError) {
             hasError = true;
         }
 
@@ -753,11 +787,118 @@ $(document).ready(function() {
     });
 
     // Remove validation on input
-    $('input[name="name"], input[name="phone"], input[name="email"], input[name="address"]').on('input', function() {
+    $('input[name="name"], input[name="phone"], input[name="email"], input[name="address"], select[name="province"]').on('input change', function() {
         if ($(this).hasClass('is-invalid')) {
             $(this).removeClass('is-invalid');
             $(this).next('.invalid-feedback').remove();
         }
+    });
+
+    // ============ GEOLOCATION ============
+    $('#btn-locate-me').click(function() {
+        if (!navigator.geolocation) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Trình duyệt của bạn không hỗ trợ định vị.'
+            });
+            return;
+        }
+
+        const $btn = $(this);
+        const originalHtml = $btn.html();
+        $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang định vị...');
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                // Call Nominatim API for reverse geocoding
+                $.ajax({
+                    url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&accept-language=vi`,
+                    method: 'GET',
+                    success: function(data) {
+                        if (data && data.address) {
+                            const address = data.address;
+                            
+                            // Map Nominatim fields to our fields
+                            // Nominatim often returns 'city', 'town', 'village', or 'state' for provinces in VN
+                            let provinceName = address.city || address.province || address.state || address.town;
+                            
+                            // Clean up province name (Nominatim sometimes adds "Thành phố " or "Tỉnh ")
+                            if (provinceName) {
+                                provinceName = provinceName.replace('Thành phố ', '').replace('Tỉnh ', '').trim();
+                                
+                                // Special case for HCMC
+                                if (provinceName.toLowerCase().includes('hồ chí minh')) {
+                                    provinceName = 'TP Hồ Chí Minh';
+                                }
+                                
+                                // Try to match with our 63 provinces list
+                                let matchedProvince = '';
+                                $('#province option').each(function() {
+                                    const optionText = $(this).val();
+                                    if (provinceName.toLowerCase() === optionText.toLowerCase() || 
+                                        optionText.toLowerCase().includes(provinceName.toLowerCase())) {
+                                        matchedProvince = optionText;
+                                        return false;
+                                    }
+                                });
+
+                                if (matchedProvince) {
+                                    $('#province').val(matchedProvince).trigger('change');
+                                }
+                            }
+
+                            // Build street address
+                            const road = address.road || '';
+                            const suburb = address.suburb || address.neighbourhood || '';
+                            const quarter = address.quarter || '';
+                            const district = address.district || address.city_district || '';
+                            
+                            let streetAddress = [road, suburb, quarter, district].filter(Boolean).join(', ');
+                            if (streetAddress) {
+                                $('input[name="address"]').val(streetAddress);
+                                showValidation($('input[name="address"]')[0], '');
+                            }
+                            
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công',
+                                text: 'Đã cập nhật địa chỉ từ vị trí của bạn.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: 'Không thể lấy thông tin địa chỉ từ tọa độ.'
+                        });
+                    },
+                    complete: function() {
+                        $btn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            },
+            function(error) {
+                let message = 'Không thể lấy vị trí của bạn.';
+                if (error.code === 1) message = 'Bạn đã từ chối quyền truy cập vị trí.';
+                else if (error.code === 2) message = 'Không thể xác định vị trí.';
+                else if (error.code === 3) message = 'Hết thời gian yêu cầu vị trí.';
+                
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Thông báo',
+                    text: message
+                });
+                $btn.prop('disabled', false).html(originalHtml);
+            },
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        );
     });
 });
 

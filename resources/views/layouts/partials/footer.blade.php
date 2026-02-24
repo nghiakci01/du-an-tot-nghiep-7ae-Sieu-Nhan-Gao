@@ -36,13 +36,14 @@
                     <div class="widgets_container contact_us">
                         <h3>{{ __('messages.contact_us') }}</h3>
                         <div class="footer_contact">
-                            <p>{{ __('messages.address') }}: No. 7, Alley 91, Lai Xa - Hoai Duc - Hanoi City - Vietnam</p>
-                            <p>{{ __('messages.phone') }}: <a href="tel:01234567890">0354869999</a> </p>
-                            <p>{{ __('messages.email') }}: Elite@gmail.com</p>
+                            <p>{{ __('messages.address') }}: {{ $settings['site_address'] ?? 'Số 7 Ngõ 91 Lai Xá - Hoài Đức - Thành Phố Hà Nội - Việt Nam' }}</p>
+                            <p>{{ __('messages.phone') }}: <a href="tel:{{ str_replace(' ', '', $settings['site_phone'] ?? '0354869999') }}">{{ $settings['site_phone'] ?? '0354869999' }}</a> </p>
+                            <p>{{ __('messages.email') }}: {{ $settings['site_email'] ?? 'Elite@gmail.com' }}</p>
                             <ul>
                                 <li><a href="#" title="Twitter"><i class="fa fa-twitter"></i></a></li>
                                 <li><a href="#" title="google-plus"><i class="fa fa-google-plus"></i></a></li>
-                                <li><a href="#" title="facebook"><i class="fa fa-facebook"></i></a></li>
+                                <li><a href="{{ $settings['social_facebook'] ?? '#' }}" title="facebook"><i class="fa fa-facebook"></i></a></li>
+                                <li><a href="{{ $settings['social_instagram'] ?? '#' }}" title="Instagram"><i class="fa fa-instagram"></i></a></li>
                                 <li><a href="#" title="youtube"><i class="fa fa-youtube"></i></a></li>
                             </ul>
                         </div>

@@ -126,12 +126,17 @@
                                         </div>
                                         <div class="cart_subtotal ">
                                             <p>{{ __('messages.shipping') }}</p>
-                                            <p class="cart_amount"><span>{{ __('messages.free') }}</span></p>
+                                            @php
+                                                $shippingFee = \App\Models\Setting::getShippingFee($total);
+                                            @endphp
+                                            <p class="cart_amount" id="shipping-fee">
+                                                <span>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí' }}</span>
+                                            </p>
                                         </div>
 
                                         <div class="cart_subtotal">
                                             <p>{{ __('messages.grand_total') }}</p>
-                                            <p class="cart_amount" id="cart-grand-total">{{ number_format($total) }} VND</p>
+                                            <p class="cart_amount" id="cart-grand-total">{{ number_format($total + $shippingFee) }} đ</p>
                                         </div>
                                         <div class="checkout_btn">
                                             <a href="{{ route('checkout.index') }}">{{ __('messages.proceed_to_checkout') }}</a>
@@ -198,14 +203,9 @@
                         row.find('.product_total').text(response.item_total);
                         
                         // Update cart totals
-                        $('.cart_amount').each(function() {
-                             // Assuming all cart_amount classes are totals/subtotals that should match
-                             // Ideally add specific IDs for subtotal and grand total if they differ logic, 
-                             // but here they are same value.
-                             if($(this).find('span').text() !== 'Free') {
-                                 $(this).text(response.cart_total);
-                             }
-                        });
+                        $('#cart-subtotal').text(response.cart_total);
+                        $('#shipping-fee span').text(response.shipping_fee);
+                        $('#cart-grand-total').text(response.grand_total);
                         
                         // Update header cart count
                         $('#cart-count').text(response.cart_count);
@@ -246,11 +246,9 @@
                             row.fadeOut(300, function() { $(this).remove(); });
                             
                             // Update cart totals
-                            $('.cart_amount').each(function() {
-                                 if($(this).find('span').text() !== 'Free') {
-                                     $(this).text(response.cart_total);
-                                 }
-                            });
+                            $('#cart-subtotal').text(response.cart_total);
+                            $('#shipping-fee span').text(response.shipping_fee);
+                            $('#cart-grand-total').text(response.grand_total);
                             
                              // Update header cart count
                             $('#cart-count').text(response.cart_count);

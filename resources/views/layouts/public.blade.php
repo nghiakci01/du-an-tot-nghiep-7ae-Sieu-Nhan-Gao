@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 
 <!-- Mirrored from htmldemo.net/reid/reid/index-6.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 15 Jan 2026 03:35:37 GMT -->
@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>@yield('title', 'Elite - ' . __('messages.home'))</title>
+    <title>@yield('title', ($settings['site_title'] ?? 'Elite') . ' - ' . __('messages.home'))</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -57,21 +57,13 @@
     <!-- Search Autocomplete JS -->
     <script src="{{ asset('frontend-assets/js/search-autocomplete.js') }}"></script>
 
-@yield('scripts')
-@stack('scripts')
-@stack('styles')
-
-
-
+    @stack('styles')
+    @stack('scripts')
+    @yield('scripts')
 
     @if($chatbot_enabled)
         @include('frontend.partials.chatbot-widget')
     @endif
-
-    @stack('scripts')
-    @yield('scripts')
-
-    <!-- Facebook Redirect Fragment Cleanup -->
     <script type="text/javascript">
         if (window.location.hash && window.location.hash == '#_=_') {
             if (window.history && history.pushState) {

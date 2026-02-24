@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('content')
-    <style>
+    <!-- <style>
         /* Nuclear fix: Direct embedded CSS for the 10-product grid */
         .custom_product_grid_10 {
             display: -webkit-box !important;
@@ -138,65 +138,64 @@
         width: 100%;
         object-fit: cover !important;
     }
-</style>
+</style> -->
     <!--slider area start-->
     <div class="slider_section slider_section_six">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-8">
                     <div class="slider_area home_six_slider owl-carousel">
-                        @foreach($sliders as $slider)
-                        <div class="single_slider" data-bgimg="{{ asset('storage/' . $slider->image) }}">
-                            <div class="slider_content_inner text-center">
+                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}">
+                           <div class="slider_content_inner">
                                 <div class="slider_content">
-                                    <h2>{{ $slider->title }}</h2>
-                                    <h1>{{ $slider->subtitle }}</h1>
-                                    <p>{!! nl2br(e($slider->content)) !!}</p>
-                                    @if($slider->link)
+                                    <h2>{{ $slider->title ?? 'New Arrivals' }}</h2>
+                                    <h1>{{ $slider->subtitle ?? 'Trending' }}</h1>
+                                    <p>{!! nl2br(e($slider->content ?? 'Discover our latest collection.')) !!}</p>
+                                    @if(isset($slider->link))
                                         <a href="{{ $slider->link }}">Explore now</a>
                                     @endif
                                 </div>
                             </div>
                         </div>
-                        @endforeach
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <!--banner area start-->
                     <div class="banner_slider_section">
-                        <div class="row">
-                            @if($bannerTop->count() > 0)
-                                @php $firstBanner = $bannerTop->first(); @endphp
-                                <div class="col-12">
-                                    <div class="banner_area banner_top">
-                                        <div class="banner_thumb">
-                                            <a href="{{ $firstBanner->link ?? '#' }}">
-                                                <img src="{{ asset('storage/' . $firstBanner->image) }}" alt="{{ $firstBanner->title }}">
-                                            </a>
-                                            <div class="banner_content text-center">
-                                                <h1>{!! nl2br(e($firstBanner->title)) !!}</h1>
-                                                <h3>{{ $firstBanner->subtitle }}</h3>
-                                            </div>
+                        <div class="row ">
+                           <div class="col-12">
+                                <div class="banner_area banner_top">
+                                    <div class="banner_thumb">
+                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner18.jpg') }}" alt="#"></a>
+                                        <div class="banner_content">
+                                           <h1>Men’s <br> Summer Sneaker</h1>
+                                           <h3>Big Sale Off This Week</h3>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                @foreach($bannerTop->skip(1) as $banner)
-                                    <div class="col-lg-6 col-md-6 col-sm-6">
-                                        <div class="banner_area">
-                                            <div class="banner_thumb">
-                                                <a href="{{ $banner->link ?? '#' }}">
-                                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}">
-                                                </a>
-                                                <div class="banner_content text-center">
-                                                    <h1>{!! nl2br(e($banner->title)) !!}</h1>
-                                                    <h3>{{ $banner->subtitle }}</h3>
-                                                </div>
-                                            </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="banner_area">
+                                    <div class="banner_thumb">
+                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner19.jpg') }}" alt="#"></a>
+                                        <div class="banner_content">
+                                           <h1>Clothing.No18</h1>
+                                           <h3>Sale Off 20% All Store</h3>
                                         </div>
                                     </div>
-                                @endforeach
-                            @endif
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="banner_area">
+                                    <div class="banner_thumb">
+                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner20.jpg') }}" alt="#"></a>
+                                        <div class="banner_content">
+                                           <h1>Bag.No1</h1>
+                                           <h3>Big Sale No Limited</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!--banner area end-->
@@ -240,19 +239,19 @@
                                            <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
                                             <div class="action_button">
                                                 <ul>
-                                                    <li><a title="add to cart" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                                    <li><a title="{{ __('messages.add_to_cart') }}" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
+                                                    <li><a href="#" title="{{ __('messages.add_to_wishlist') }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
                                                 </ul>
                                             </div>
                                        </div>
                                     </div>
                                     <div class="quick_button">
-                                        <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick view</a>
+                                        <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                     </div>
                                     @if($product->price < $product->original_price)
                                     <div class="double_base">
                                         <div class="product_sale">
-                                            <span>Sale</span>
+                                            <span>{{ __('messages.sale') }}</span>
                                         </div>
                                     </div>
                                     @endif
@@ -260,6 +259,17 @@
                                 <div class="product_content">
                                     <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
                                     @include('frontend.partials.product-price', ['product' => $product])
+                                    @php $ratingAvg = $product->reviews->avg('rating') ?? 0; $ratingCount = $product->reviews->count(); @endphp
+                                    <div class="product_ratting" style="margin-top:4px;">
+                                        <ul style="display:flex; align-items:center; gap:2px; list-style:none; padding:0; margin:0;">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <li><i class="fa {{ $i <= round($ratingAvg) ? 'fa-star' : 'fa-star-o' }}" style="color:#f39c12; font-size:11px;"></i></li>
+                                            @endfor
+                                            @if($ratingCount > 0)
+                                                <li style="font-size:10px; color:#999; margin-left:3px;">({{ $ratingCount }})</li>
+                                            @endif
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -274,23 +284,19 @@
     <!--product section area end-->
 
     <!--banner area start-->
-    @if($bannerBottom)
     <div class="banner_slider_section section_fullwidth">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
+       <div class="container-fluid">
+           <div class="row ">
+               <div class="col-12">
                     <div class="banner_area">
                         <div class="banner_thumb">
-                            <a href="{{ $bannerBottom->link ?? '#' }}">
-                                <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title }}">
-                            </a>
+                            <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner21.jpg') }}" alt="#"></a>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+       </div>  
     </div>
-    @endif
     <!--banner area end-->
 
     <!--product section area start-->
@@ -299,8 +305,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>New Products</h2>
-                        <p>New products with modern, minimalist design and full of charm.</p>
+                        <h2>{{ __('messages.new_products') }}</h2>
+                        <p>{{ __('messages.new_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -333,22 +339,33 @@
                                        </div>
                                     </div>
                                     <div class="quick_button">
-                                        <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick view</a>
+                                        <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                     </div>
                                     <div class="double_base">
                                         @if($product->price < $product->original_price)
                                         <div class="product_sale">
-                                            <span>Sale</span>
+                                            <span>{{ __('messages.sale') }}</span>
                                         </div>
                                         @endif
                                         <div class="label_product">
-                                            <span>new</span>
+                                            <span>{{ __('messages.new') }}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="product_content">
                                     <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
                                     @include('frontend.partials.product-price', ['product' => $product])
+                                    @php $ratingAvg = $product->reviews->avg('rating') ?? 0; $ratingCount = $product->reviews->count(); @endphp
+                                    <div class="product_ratting" style="margin-top:4px;">
+                                        <ul style="display:flex; align-items:center; gap:2px; list-style:none; padding:0; margin:0;">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <li><i class="fa {{ $i <= round($ratingAvg) ? 'fa-star' : 'fa-star-o' }}" style="color:#f39c12; font-size:11px;"></i></li>
+                                            @endfor
+                                            @if($ratingCount > 0)
+                                                <li style="font-size:10px; color:#999; margin-left:3px;">({{ $ratingCount }})</li>
+                                            @endif
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -368,8 +385,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Top Wishlisted Products</h2>
-                        <p>The products most interested and loved by customers.</p>
+                        <h2>Customer Favorites</h2>
+                        <p>Products that customers like and love the most.</p>
                     </div>
                 </div>
             </div>
@@ -418,7 +435,7 @@
                                         <div class="double_base">
                                             @if($product->price < $product->original_price)
                                                 <div class="product_sale">
-                                                    <span>Sale</span>
+                                                    <span>{{ __('messages.sale') }}</span>
                                                 </div>
                                             @endif
                                             <div class="label_product">
@@ -430,6 +447,17 @@
                                         <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a>
                                         </h3>
                                         @include('frontend.partials.product-price', ['product' => $product])
+                                        @php $ratingAvg = $product->reviews->avg('rating') ?? 0; $ratingCount = $product->reviews->count(); @endphp
+                                        <div class="product_ratting" style="margin-top:4px;">
+                                            <ul style="display:flex; align-items:center; gap:2px; list-style:none; padding:0; margin:0;">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <li><i class="fa {{ $i <= round($ratingAvg) ? 'fa-star' : 'fa-star-o' }}" style="color:#f39c12; font-size:11px;"></i></li>
+                                                @endfor
+                                                @if($ratingCount > 0)
+                                                    <li style="font-size:10px; color:#999; margin-left:3px;">({{ $ratingCount }})</li>
+                                                @endif
+                                            </ul>
+                                        </div>
                                         <div style="font-size: 12px; color: #ff6a28; margin-top: 5px;">
                                             <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} likes
                                         </div>
@@ -450,8 +478,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Follow us On Instagram</h2>
-                        <p>Contemporary, minimal and modern designs embody the Lavish Alice handwriting</p>
+                        <h2>{{ __('messages.follow_instagram') }}</h2>
+                        <p>{{ __('messages.instagram_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -521,7 +549,7 @@
                     </div>
                     <div class="col-12">
                         <div class="text_follow">
-                            <a href="#">#Follow us on Instagram</a>
+                            <a href="#">{{ __('messages.follow_us_hashtag') }}</a>
                         </div>
                     </div>
                 </div>
@@ -654,7 +682,7 @@
                                         <div class="modal_add_to_cart">
                                             <form action="#">
                                                 <input min="0" max="100" step="2" value="1" type="number">
-                                                <button type="submit">add to cart</button>
+                                                <button type="submit">{{ __('messages.add_to_cart') }}</button>
                                             </form>
                                         </div>
                                     </div>

@@ -57,6 +57,10 @@
     flex-grow: 1;
 }
 
+.header_middel .header_left .main_menu nav {
+    position: relative;
+}
+
 /* Menu items - evenly spaced */
 .header_middel .header_left .main_menu nav>ul {
     display: flex !important;
@@ -75,6 +79,10 @@
     position: relative;
 }
 
+.header_middel .header_left .main_menu nav>ul>li.mega_items {
+    position: static !important;
+}
+
 .header_middel .header_left .main_menu nav>ul>li>a {
     display: inline-block;
     padding: 12px 14px;
@@ -86,6 +94,19 @@
     letter-spacing: 0.3px;
     transition: color 0.25s ease;
     position: relative;
+    z-index: 10;
+}
+
+/* Mega Menu Display Fix */
+.header_middel .header_left .main_menu nav>ul>li.mega_items:hover .mega_menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    top: 100% !important;
+}
+
+.header_middel .header_left .main_menu nav>ul>li.mega_items .mega_menu {
+    width: 600px !important;
+    left: 0 !important;
 }
 
 .header_middel .header_left .main_menu nav>ul>li>a::after {
@@ -142,6 +163,23 @@
     text-transform: capitalize;
 }
 
+/* Middle Horizontal Menu - Smaller Mega Menu */
+.horizontal_menu_six .main_menu nav {
+    position: relative;
+}
+
+.horizontal_menu_six .main_menu nav>ul>li.mega_items .mega_menu {
+    width: 500px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+
+.horizontal_menu_six .main_menu nav>ul>li.mega_items:hover .mega_menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    top: 100% !important;
+}
+
 /* Hide horizontal menu on mobile */
 @media only screen and (max-width: 991px) {
     .horizontal_menu_six {
@@ -191,6 +229,23 @@
 
 .sticky-header .main_menu nav>ul>li>a:hover {
     color: #ff6a00;
+}
+
+/* Sticky Header - Smaller Mega Menu */
+.sticky-header .main_menu nav {
+    position: relative;
+}
+
+.sticky-header .main_menu nav>ul>li.mega_items .mega_menu {
+    width: 500px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+
+.sticky-header .main_menu nav>ul>li.mega_items:hover .mega_menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    top: 100% !important;
 }
 
 /* Hide sticky header on mobile */
