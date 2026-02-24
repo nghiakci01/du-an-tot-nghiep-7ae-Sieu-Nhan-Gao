@@ -78,6 +78,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         // Admin Only Routes
         Route::middleware(['admin.only'])->group(function () {
             Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+            Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
             Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
             Route::resource('users', App\Http\Controllers\Admin\UserController::class);
             Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
