@@ -72,6 +72,15 @@ class OrderController extends Controller
     }
 
     /**
+     * Print the specified resource.
+     */
+    public function print(Order $order)
+    {
+        $order->load(['user', 'items.product', 'items.variant']);
+        return view('admin.orders.print', compact('order'));
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Order $order)
