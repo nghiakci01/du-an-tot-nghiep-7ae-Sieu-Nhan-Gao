@@ -112,48 +112,48 @@
             <div class="container-fluid">
                 <div class="middel_inner">
                     <div class="row align-items-center">
-                        <!-- Logo + Menu Column -->
-                        <div class="col-lg-6 col-md-3">
-                            <div class="header_left d-flex align-items-center">
-                                <div class="logo">
-                                    <a href="{{ route('welcome') }}"><img src="{{ asset('frontend-assets/img/logo/logo-elite-new.png') }}" alt=""></a>
-                                </div>
-                                
-                                <!-- Main Menu (Desktop) -->
-                                <div class="main_menu d-none d-lg-block">
-                                    <nav>
-                                        <ul>
-                                            <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
-                                            <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">{{ __('messages.shop') }} <i class="fa fa-angle-down"></i></a>
-                                                <ul class="mega_menu">
-                                                    <li><a href="#">{{ __('messages.product_categories') }}</a>
-                                                        <ul>
-                                                            @foreach($categories as $category)
-                                                                <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
-                                                            @endforeach
-                                                        </ul>
-                                                    </li>
-                                                    <li><a href="#">{{ __('messages.other_pages') }}</a>
-                                                        <ul>
-                                                            <li><a href="{{ route('cart.index') }}">{{ __('messages.cart') }}</a></li>
-                                                            <li><a href="{{ route('checkout.index') }}">{{ __('messages.checkout') }}</a></li>
-                                                            <li><a href="{{ route('account.index') }}">{{ __('messages.account') }}</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
-                                                </ul>
-                                            </li>
-                                            <li><a href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
-                                            <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
-                                            <li><a href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
-                                        </ul>
-                                    </nav>
-                                </div>
+                        <!-- Logo Column -->
+                        <div class="col-lg-3 col-md-3 col-3">
+                            <div class="logo">
+                                <a href="{{ route('welcome') }}"><img src="{{ asset('frontend-assets/img/logo/logo-elite-new.png') }}" alt=""></a>
+                            </div>
+                        </div>
+                        
+                        <!-- Menu Column (Desktop) -->
+                        <div class="col-lg-6 d-none d-lg-block">
+                            <div class="main_menu">
+                                <nav>
+                                    <ul class="justify-content-center">
+                                        <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
+                                        <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">{{ __('messages.shop') }} <i class="fa fa-angle-down"></i></a>
+                                            <ul class="mega_menu">
+                                                <li><a href="#">{{ __('messages.product_categories') }}</a>
+                                                    <ul>
+                                                        @foreach($categories as $category)
+                                                            <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                                        @endforeach
+                                                    </ul>
+                                                </li>
+                                                <li><a href="#">{{ __('messages.other_pages') }}</a>
+                                                    <ul>
+                                                        <li><a href="{{ route('cart.index') }}">{{ __('messages.cart') }}</a></li>
+                                                        <li><a href="{{ route('checkout.index') }}">{{ __('messages.checkout') }}</a></li>
+                                                        <li><a href="{{ route('account.index') }}">{{ __('messages.account') }}</a></li>
+                                                    </ul>
+                                                </li>
+                                                <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
+                                        <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
+                                        <li><a href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
+                                    </ul>
+                                </nav>
                             </div>
                         </div>
                         
                         <!-- Search/Account/Cart Column -->
-                        <div class="col-lg-6 col-md-9">
+                        <div class="col-lg-3 col-md-9 col-9">
                             <div class="middel_right_info">
                                 <div class="search_bar" style="position: relative;">
                                     <form action="{{ route('search.index') }}" method="GET">                          
@@ -164,7 +164,6 @@
                                 </div>
                                 <div class="top_right text-right">
                                     <ul>
-
                                         <li class="top_links">
                                             @guest
                                                 <a href="#"><i class="ion-android-person"></i> {{ __('messages.account') }} <i class="ion-chevron-down"></i></a>
@@ -196,7 +195,8 @@
                                 </div>   
                                 @include('frontend.partials.mini-cart')
                             </div>
-                        </div>  
+                        </div>
+  
                     </div>
                 </div>
                 
