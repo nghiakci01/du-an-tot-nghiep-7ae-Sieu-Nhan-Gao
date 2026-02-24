@@ -97,6 +97,12 @@ class VnpayController extends Controller
             if ($request->vnp_ResponseCode == '00') {
                 if ($order && $order->status == 'pending') {
                     $order->update(['status' => 'confirmed']); // Mark as paid/confirmed
+
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderConfirmationMail($order));
+                    } catch (\Exception $e) {
+                        \Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng VNPAY: ' . $e->getMessage());
+                    }
                 }
                 return redirect()->route('checkout.success', $orderId)->with('success', 'Thanh toán VNPAY thành công!');
             } else {

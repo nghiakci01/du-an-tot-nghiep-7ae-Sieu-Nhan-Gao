@@ -83,6 +83,11 @@ class CheckoutController extends Controller
 
             $order = Order::create([
                 'user_id' => Auth::id(), // Nullable if guest
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'province' => $request->province,
+                'address' => $request->address,
                 'status' => 'pending',
                 'total_price' => $total,
                 'coupon_code' => $couponCode,
@@ -128,6 +133,13 @@ class CheckoutController extends Controller
 
             if ($request->payment_method === 'VNPAY') {
                 return app(VnpayController::class)->createPayment($order);
+            }
+
+            // Send confirmation email for COD and BANK_TRANSFER
+            try {
+                \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
+            } catch (\Exception $e) {
+                \Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: ' . $e->getMessage());
             }
 
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');
