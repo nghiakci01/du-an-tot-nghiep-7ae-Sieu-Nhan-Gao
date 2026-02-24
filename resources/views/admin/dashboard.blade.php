@@ -239,9 +239,8 @@
                     </td>
                     <td>{{ number_format($order->total_price) }} VND</td>
                     <td>
-                      <span
-                        class="badge {{ $order->status == 'COMPLETED' ? 'bg-success' : ($order->status == 'CANCELLED' ? 'bg-danger' : 'bg-warning') }}">
-                        {{ $order->status }}
+                      <span class="badge {{ $order->status_badge }}">
+                        {{ $order->status_text }}
                       </span>
                     </td>
                     <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>

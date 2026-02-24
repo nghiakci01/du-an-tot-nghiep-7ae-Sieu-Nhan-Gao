@@ -15,13 +15,13 @@ class DashboardController extends Controller
     public function index()
     {
         // 1. Tổng doanh thu (Chỉ tính các đơn hàng đã hoàn thành)
-        $totalRevenue = Order::where('status', 'COMPLETED')->sum('total_price');
+        $totalRevenue = Order::where('status', Order::STATUS_COMPLETED)->sum('total_price');
 
         // 2. Tổng số đơn hàng
         $totalOrders = Order::count();
 
         // 3. Đơn hàng mới (Pending)
-        $newOrders = Order::where('status', 'PENDING')->count();
+        $newOrders = Order::where('status', Order::STATUS_PENDING)->count();
 
         // 4. Tổng số khách hàng
         $totalCustomers = User::where('role', 'user')->count();
@@ -38,7 +38,7 @@ class DashboardController extends Controller
         // --- NEW: Data for Charts ---
 
         // 8. Doanh thu 30 ngày gần nhất
-        $revenueData = Order::where('status', 'COMPLETED')
+        $revenueData = Order::where('status', Order::STATUS_COMPLETED)
             ->where('created_at', '>=', now()->subDays(30))
             ->select(
                 DB::raw('DATE(created_at) as date'),
@@ -61,14 +61,17 @@ class DashboardController extends Controller
             ->toArray();
 
         // Ensure all statuses are present for consistent coloring if needed, or just send keys/values
-        $statusLabels = array_keys($orderStatusData);
+        $statusLabels = array_map(function ($status) {
+            $order = new Order(['status' => $status]);
+            return $order->status_text;
+        }, array_keys($orderStatusData));
         $statusValues = array_values($orderStatusData);
 
         // 10. Top 5 Sản phẩm bán chạy
         $topProducts = DB::table('order_items')
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
             ->join('products', 'products.id', '=', 'order_items.product_id')
-            ->where('orders.status', 'COMPLETED')
+            ->where('orders.status', Order::STATUS_COMPLETED)
             ->select(
                 'products.name',
                 'products.price', // Or aggregate sum(order_items.price) if price changes
