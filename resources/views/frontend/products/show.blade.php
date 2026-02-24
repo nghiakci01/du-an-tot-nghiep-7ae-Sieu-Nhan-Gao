@@ -93,7 +93,7 @@
                                 @endphp
 
                                 <div class="product_variant size">
-                                    <h3>Kích thước</h3>
+                                    <h3>Size</h3>
                                     <select class="niceselect_option" id="select_size_nice" name="size_id">
                                         <option selected value="">Size</option>
                                         @foreach($uniqueSizes as $size)
@@ -104,7 +104,7 @@
                                 </div>
 
                                 <div class="product_variant color">
-                                    <h3>Màu sắc</h3>
+                                    <h3>Color</h3>
                                     <select class="niceselect_option" id="select_color_nice" name="color_id">
                                         <option selected value="">Color</option>
                                         @foreach($uniqueColors as $color)
@@ -144,7 +144,7 @@
                                         });
 
                                         const formatCurrency = (amount) => {
-                                            return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
+                                            return new Intl.NumberFormat('en-US').format(amount) + ' VND';
                                         };
 
                                         function checkSelection() {
@@ -186,14 +186,14 @@
                                                         msg.style.display = 'none';
                                                         addToCartBtn.disabled = false;
                                                         buyNowBtn.disabled = false;
-                                                        addToCartBtn.textContent = 'THÊM VÀO GIỎ HÀNG';
+                                                        addToCartBtn.textContent = 'ADD TO CART';
                                                     } else {
                                                         variantInput.value = '';
-                                                        msg.textContent = 'Sản phẩm tạm hết hàng mẫu này';
+                                                        msg.textContent = 'This variant is temporarily out of stock';
                                                         msg.style.display = 'block';
                                                         addToCartBtn.disabled = true;
                                                         buyNowBtn.disabled = true;
-                                                        addToCartBtn.textContent = 'HẾT HÀNG';
+                                                        addToCartBtn.textContent = 'OUT OF STOCK';
                                                     }
                                                 } else {
                                                     // Only one or none selected
@@ -211,14 +211,14 @@
                                                     variantInput.value = '';
                                                     addToCartBtn.disabled = true;
                                                     buyNowBtn.disabled = true;
-                                                    addToCartBtn.textContent = 'THÊM VÀO GIỎ HÀNG';
+                                                    addToCartBtn.textContent = 'ADD TO CART';
                                                     msg.style.display = 'none';
                                                 }
 
                                                 priceContainer.innerHTML = html;
                                             } else {
                                                 variantInput.value = '';
-                                                msg.textContent = 'Kết hợp này không có sẵn';
+                                                msg.textContent = 'This combination is not available';
                                                 msg.style.display = 'block';
                                                 addToCartBtn.disabled = true;
                                                 buyNowBtn.disabled = true;
@@ -435,7 +435,7 @@
                             if (xhr.status === 401) {
                                 window.location.href = "{{ route('login') }}";
                             } else {
-                                alert('Có lỗi xảy ra, vui lòng thử lại!');
+                                alert('An error occurred, please try again!');
                             }
                         }
                     });

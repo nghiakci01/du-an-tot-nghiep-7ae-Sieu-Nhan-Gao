@@ -30,7 +30,7 @@
                     </div>
                     <div class="cart_info" style="padding-left: 15px;">
                         <a href="{{ route('product.detail', $details['slug']) }}" style="font-size: 13px;">{{ Str::limit($details['name'], 25) }}</a>
-                        <span style="font-size: 12px;">{{ $details['quantity'] }}x {{ number_format($details['price']) }} đ</span>
+                        <span style="font-size: 12px;">{{ $details['quantity'] }}x {{ number_format($details['price']) }} VND</span>
                     </div>
                     <div class="cart_remove">
                         <a href="javascript:void(0)" class="mini-cart-remove" data-id="{{ $id }}">
@@ -67,11 +67,11 @@
                     <tbody>
                         <tr>
                             <td class="text-left">{{ __('messages.subtotal') }}:</td>
-                            <td class="text-right">{{ number_format($cartTotal) }} đ</td>
+                            <td class="text-right">{{ number_format($cartTotal) }} VND</td>
                         </tr>
                         <tr>
                             <td class="text-left">{{ __('messages.total') }}:</td>
-                            <td class="text-right">{{ number_format($cartTotal) }} đ</td>
+                            <td class="text-right">{{ number_format($cartTotal) }} VND</td>
                         </tr>
                     </tbody>
                 </table>
@@ -102,7 +102,7 @@ $(document).ready(function() {
         e.preventDefault();
         var itemId = $(this).data('id');
         
-            if(confirm('Xóa sản phẩm này khỏi giỏ hàng?')) {
+            if(confirm('Remove this product from cart?')) {
                 $.ajax({
                     url: '{{ route('cart.remove') }}',
                     method: 'POST',
@@ -115,11 +115,11 @@ $(document).ready(function() {
                     if(response.success) {
                         location.reload();
                     } else {
-                        alert(response.message || 'Có lỗi xảy ra.');
+                        alert(response.message || 'An error occurred.');
                     }
                 },
                 error: function(xhr) {
-                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                    alert('An error occurred. Please try again.');
                 }
             });
         }

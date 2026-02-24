@@ -76,13 +76,13 @@
                                                         <small class="text-muted">{{ __('messages.size') }}: {{ $details['size'] }} | {{ __('messages.color') }}:
                                                             {{ $details['color'] }}</small>
                                                     </td>
-                                                    <td class="product-price">{{ number_format($details['price']) }} đ</td>
+                                                    <td class="product-price">{{ number_format($details['price']) }} VND</td>
                                                     <td class="product_quantity">
                                                         <input min="1" max="100" value="{{ $details['quantity'] }}" type="number"
                                                             class="quantity update-cart">
                                                     </td>
                                                     <td class="product_total">
-                                                        {{ number_format($details['price'] * $details['quantity']) }} đ</td>
+                                                        {{ number_format($details['price'] * $details['quantity']) }} VND</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -111,7 +111,7 @@
                                         <input placeholder="{{ __('messages.coupon_code') }}" type="text" disabled>
                                         <button type="button" disabled>{{ __('messages.apply') }}</button>
                                         <small class="text-muted d-block mt-2">
-                                            <i class="fa fa-info-circle"></i> Tính năng đang phát triển
+                                            <i class="fa fa-info-circle"></i> Feature in development
                                         </small>
                                     </div>
                                 </div>
@@ -122,7 +122,7 @@
                                     <div class="coupon_inner">
                                         <div class="cart_subtotal">
                                             <p>{{ __('messages.subtotal') }}</p>
-                                            <p class="cart_amount" id="cart-subtotal">{{ number_format($total) }} đ</p>
+                                            <p class="cart_amount" id="cart-subtotal">{{ number_format($total) }} VND</p>
                                         </div>
                                         <div class="cart_subtotal ">
                                             <p>{{ __('messages.shipping') }}</p>
@@ -131,7 +131,7 @@
 
                                         <div class="cart_subtotal">
                                             <p>{{ __('messages.grand_total') }}</p>
-                                            <p class="cart_amount" id="cart-grand-total">{{ number_format($total) }} đ</p>
+                                            <p class="cart_amount" id="cart-grand-total">{{ number_format($total) }} VND</p>
                                         </div>
                                         <div class="checkout_btn">
                                             <a href="{{ route('checkout.index') }}">{{ __('messages.proceed_to_checkout') }}</a>
@@ -213,12 +213,12 @@
                         // Optional: Show a small toast or visual feedback instead of alert
                         // alert(response.message); 
                     } else {
-                        alert(response.message || 'Có lỗi xảy ra.');
+                        alert(response.message || 'An error occurred.');
                         window.location.reload(); // Fallback
                     }
                 },
                 error: function(xhr) {
-                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Số lượng vượt quá tồn kho hoặc có lỗi xảy ra.';
+                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Quantity exceeds stock or an error occurred.';
                     alert(errorMsg);
                     window.location.reload(); // Reset to valid state
                 }
@@ -232,7 +232,7 @@
             var row = ele.parents("tr");
             var id = row.attr("data-id");
             
-            if(confirm("Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+            if(confirm("Are you sure you want to remove this product from the cart?")) {
                 $.ajax({
                     url: '{{ route('cart.remove') }}',
                     method: "POST",
@@ -260,11 +260,11 @@
                                 setTimeout(function() { window.location.reload(); }, 500);
                             }
                         } else {
-                            alert(response.message || 'Có lỗi xảy ra.');
+                            alert(response.message || 'An error occurred.');
                         }
                     },
                     error: function(xhr) {
-                        alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                        alert('An error occurred. Please try again.');
                     }
                 });
             }
@@ -274,7 +274,7 @@
         $("#clear-cart").on('click', function(e) {
             e.preventDefault();
             
-            if(confirm("Bạn có chắc muốn xóa sạch giỏ hàng?")) {
+            if(confirm("Are you sure you want to clear the cart?")) {
                 $.ajax({
                     url: '{{ route('cart.clear') }}',
                     method: "POST",
@@ -282,7 +282,7 @@
                         window.location.reload();
                     },
                     error: function(xhr) {
-                        alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                        alert('An error occurred. Please try again.');
                     }
                 });
             }

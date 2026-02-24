@@ -385,7 +385,7 @@ textarea.is-valid {
                                     <div class="coupon-applied">
                                         <div>
                                             <i class="fa fa-check-circle"></i>
-                                            <span class="coupon-code">{{ $coupon->code }}</span> đã được áp dụng
+                                            <span class="coupon-code">{{ $coupon->code }}</span> has been applied
                                         </div>
                                         <button type="button" class="btn btn-sm btn-outline-danger" id="removeCouponBtn">
                                             <i class="fa fa-times"></i> {{ __('messages.remove') }}
@@ -468,19 +468,19 @@ textarea.is-valid {
                                                 <br>
                                                 <small class="text-muted">({{ $details['size'] }}/{{ $details['color'] }})</small>
                                             </td>
-                                            <td>{{ number_format($details['price'] * $details['quantity']) }} đ</td>
+                                            <td>{{ number_format($details['price'] * $details['quantity']) }} VND</td>
                                         </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <th>{{ __('messages.subtotal') }}</th>
-                                            <td>{{ number_format($total) }} đ</td>
+                                            <td>{{ number_format($total) }} VND</td>
                                         </tr>
                                         @if($discount > 0)
                                         <tr class="discount-row">
                                             <th>{{ __('messages.discount') }}</th>
-                                            <td>-{{ number_format($discount) }} đ</td>
+                                            <td>-{{ number_format($discount) }} VND</td>
                                         </tr>
                                         @endif
                                         <tr>
@@ -489,7 +489,7 @@ textarea.is-valid {
                                         </tr>
                                         <tr class="order_total">
                                             <th>{{ __('messages.order_total') }}</th>
-                                            <td><strong>{{ number_format($finalTotal) }} đ</strong></td>
+                                            <td><strong>{{ number_format($finalTotal) }} VND</strong></td>
                                         </tr>
                                     </tfoot>
                                 </table>     
@@ -525,12 +525,12 @@ textarea.is-valid {
                                <div class="panel-default">
                                     <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY" data-bs-target="createp_account" required />
                                     <label for="payment_vnpay" data-bs-toggle="collapse" data-bs-target="#method_vnpay" aria-controls="method_vnpay">
-                                        Thanh toán qua VNPAY
+                                        Pay with VNPAY
                                     </label>
 
                                     <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
                                         <div class="card-body1">
-                                           <p>Thanh toán an toàn, tiện lợi qua cổng thanh toán VNPAY bằng mã QR, ứng dụng ngân hàng hoặc thẻ ATM/Visa/MasterCard.</p> 
+                                           <p>Safe and convenient payment via VNPAY gateway using QR code, banking app, or ATM/Visa/MasterCard.</p> 
                                         </div>
                                     </div>
                                 </div>
@@ -637,36 +637,36 @@ $(document).ready(function() {
     // Validation functions
     function validateName(value) {
         if (!value || value.trim().length < 2) {
-            return 'Vui lòng nhập họ tên (ít nhất 2 ký tự)';
+            return 'Please enter your full name (at least 2 characters)';
         }
         return '';
     }
 
     function validatePhone(value) {
         if (!value) {
-            return 'Vui lòng nhập số điện thoại';
+            return 'Please enter your phone number';
         }
         const phoneRegex = /^[0-9]{10,11}$/;
         if (!phoneRegex.test(value)) {
-            return 'Số điện thoại phải có 10-11 chữ số';
+            return 'Phone number must have 10-11 digits';
         }
         return '';
     }
 
     function validateEmail(value) {
         if (!value) {
-            return 'Vui lòng nhập email';
+            return 'Please enter your email';
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(value)) {
-            return 'Email không hợp lệ';
+            return 'Invalid email';
         }
         return '';
     }
 
     function validateAddress(value) {
         if (!value || value.trim().length < 10) {
-            return 'Vui lòng nhập địa chỉ (ít nhất 10 ký tự)';
+            return 'Please enter your address (at least 10 characters)';
         }
         return '';
     }
@@ -731,7 +731,7 @@ $(document).ready(function() {
 
         // Check payment method
         if (!$('input[name="payment_method"]:checked').length) {
-            alert('Vui lòng chọn phương thức thanh toán');
+            alert('Please select a payment method');
             hasError = true;
         }
 
@@ -749,7 +749,7 @@ $(document).ready(function() {
 
         // Show loading state
         const $submitBtn = $(this).find('button[type="submit"]');
-        $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...');
+        $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Processing...');
     });
 
     // Remove validation on input

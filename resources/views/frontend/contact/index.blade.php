@@ -30,7 +30,7 @@
                         <h3>{{ __('messages.contact_us') }}</h3>
                         <p>{{ __('messages.contact_intro') }}</p>
                         <ul>
-                            <li><i class="fa fa-fax"></i> {{ __('messages.address_label') }}: Số 7 Ngõ 91 Lai Xá - Hoài Đức - Thành Phố Hà Nội - Việt Nam</li>
+                            <li><i class="fa fa-fax"></i> {{ __('messages.address_label') }}: No. 7, Alley 91, Lai Xa - Hoai Duc - Hanoi City - Vietnam</li>
                             <li><i class="fa fa-phone"></i> <a href="tel:0123456789">03575372804</a></li>
                             <li><i class="fa fa-envelope-o"></i> <a
                                     href="mailto:contact@fashionstore.vn">Elite@gmail.com</a></li>
@@ -106,10 +106,10 @@
     @if (session('success'))
         <script>
             Swal.fire({
-                title: 'Thành công!',
+                title: 'Success!',
                 text: "{{ session('success') }}",
                 icon: 'success',
-                confirmButtonText: 'Đóng',
+                confirmButtonText: 'Close',
                 confirmButtonColor: '#fe4536'
             });
         </script>

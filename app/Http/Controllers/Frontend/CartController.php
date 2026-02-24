@@ -37,9 +37,9 @@ class CartController extends Controller
                 $variantId = $variants->first()->id;
             } elseif ($variants->count() > 1) {
                 return redirect()->route('product.detail', $product->slug)
-                    ->with('info', 'Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.');
+                    ->with('info', 'Please select size and color before adding to cart.');
             } else {
-                return redirect()->back()->with('error', 'Sản phẩm này hiện chưa có biến thể sẵn sàng.');
+                return redirect()->back()->with('error', 'This product has no available variants.');
             }
         }
 
@@ -48,7 +48,7 @@ class CartController extends Controller
 
         // Check availability
         if ($variant->stock_quantity < $request->quantity) {
-             return redirect()->back()->with('error', 'Sản phẩm không đủ số lượng tồn kho.');
+             return redirect()->back()->with('error', 'Product does not have enough stock.');
         }
 
         if(isset($cart[$variant->id])) {
@@ -80,7 +80,7 @@ class CartController extends Controller
             return redirect()->route('checkout.index');
         }
 
-        return redirect()->route('cart.index')->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
+        return redirect()->route('cart.index')->with('success', 'Product added to cart!');
     }
 
     public function updateCart(Request $request)
@@ -104,7 +104,7 @@ class CartController extends Controller
 
                  return response()->json([
                      'success' => true,
-                     'message' => 'Giỏ hàng đã được cập nhật',
+                     'message' => 'Cart updated successfully',
                      'item_total' => number_format($itemTotal) . ' đ',
                      'cart_total' => number_format($cartTotal) . ' đ',
                      'cart_count' => $cartCount
@@ -112,15 +112,15 @@ class CartController extends Controller
             } else {
                  return response()->json([
                      'success' => false,
-                     'message' => 'Số lượng không hợp lệ hoặc vượt quá tồn kho'
+                     'message' => 'Invalid quantity or exceeds stock'
                  ], 400);
             }
             
-            session()->flash('error', 'Số lượng không hợp lệ hoặc vượt quá tồn kho');
+            session()->flash('error', 'Invalid quantity or exceeds stock');
             return response()->json(['success' => false], 400);
         }
         
-        return response()->json(['success' => false, 'message' => 'Yêu cầu không hợp lệ'], 400);
+        return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
     }
 
     public function remove(Request $request)
@@ -162,14 +162,14 @@ class CartController extends Controller
                 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Sản phẩm đã được xóa khỏi giỏ hàng',
+                    'message' => 'Product removed from cart',
                     'cart_total' => number_format($cartTotal) . ' đ',
                     'cart_count' => $cartCount
                 ]);
             }
         }
         
-        return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại trong giỏ'], 404);
+        return response()->json(['success' => false, 'message' => 'Product not found in cart'], 404);
     }
 
     public function clearCart(Request $request)
@@ -179,11 +179,11 @@ class CartController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Giỏ hàng đã được xóa'
+                'message' => 'Cart has been cleared'
             ]);
         }
         
-        return redirect()->route('cart.index')->with('success', 'Giỏ hàng đã được xóa');
+        return redirect()->route('cart.index')->with('success', 'Cart has been cleared');
     }
 
     public function getCartCount()

@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers\Frontend;
@@ -19,7 +20,7 @@ class PaymentController extends Controller
         $vnp_Returnurl = config('vnpay.vnp_Returnurl');
 
         $vnp_TxnRef = $order->id . '_' . time(); // Append time to avoid duplicate txnref
-        $vnp_OrderInfo = "Thanh toan don hang " . $order->id;
+        $vnp_OrderInfo = "Payment for order " . $order->id;
         $vnp_OrderType = 'billpayment';
         $vnp_Amount = $order->final_total * 100; // VNPAY expects amount in VND multiplied by 100
         $vnp_Locale = 'vn';
@@ -107,20 +108,20 @@ class PaymentController extends Controller
                     // Add order history log
                     $order->histories()->create([
                         'status' => Order::STATUS_CONFIRMED,
-                        'note' => 'Thanh toán thành công qua VNPAY. Mã GD: ' . $inputData['vnp_TransactionNo']
+                        'note' => 'Payment successful via VNPAY. Transaction No: ' . $inputData['vnp_TransactionNo']
                     ]);
                 }
-                return redirect()->route('checkout.success', $order->id)->with('success', 'Thanh toán thành công qua VNPAY!');
+                return redirect()->route('checkout.success', $order->id)->with('success', 'Payment successful via VNPAY!');
             } else {
                 // Failed or cancelled
                 if ($order && $order->payment_status !== 'paid') {
                     $order->payment_status = 'failed';
                     $order->save();
                 }
-                return redirect()->route('checkout.index')->with('error', 'Thanh toán VNPAY thất bại hoặc đã bị hủy.');
+                return redirect()->route('checkout.index')->with('error', 'VNPAY payment failed or was cancelled.');
             }
         } else {
-            return redirect()->route('checkout.index')->with('error', 'Chữ ký báo mật VNPAY không hợp lệ.');
+            return redirect()->route('checkout.index')->with('error', 'Invalid VNPAY secure hash.');
         }
     }
 }

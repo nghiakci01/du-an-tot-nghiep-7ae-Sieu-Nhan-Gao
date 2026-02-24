@@ -153,7 +153,7 @@
                                     <h1>{{ $slider->subtitle }}</h1>
                                     <p>{!! nl2br(e($slider->content)) !!}</p>
                                     @if($slider->link)
-                                        <a href="{{ $slider->link }}">Khám phá ngay</a>
+                                        <a href="{{ $slider->link }}">Explore now</a>
                                     @endif
                                 </div>
                             </div>
@@ -299,7 +299,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Sản Phẩm Mới</h2>
+                        <h2>New Products</h2>
                         <p>New products with modern, minimalist design and full of charm.</p>
                     </div>
                 </div>
@@ -368,8 +368,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Sản Phẩm Được Yêu Thích Nhất</h2>
-                        <p>Những sản phẩm được khách hàng quan tâm và yêu thích nhiều nhất.</p>
+                        <h2>Top Wishlisted Products</h2>
+                        <p>The products most interested and loved by customers.</p>
                     </div>
                 </div>
             </div>
@@ -431,7 +431,7 @@
                                         </h3>
                                         @include('frontend.partials.product-price', ['product' => $product])
                                         <div style="font-size: 12px; color: #ff6a28; margin-top: 5px;">
-                                            <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} lượt yêu thích
+                                            <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} likes
                                         </div>
                                     </div>
                                 </div>
@@ -707,7 +707,7 @@
                             if (xhr.status === 401) {
                                 window.location.href = "{{ route('login') }}";
                             } else {
-                                alert('Có lỗi xảy ra, vui lòng thử lại!');
+                                alert('An error occurred, please try again!');
                             }
                         }
                     });
