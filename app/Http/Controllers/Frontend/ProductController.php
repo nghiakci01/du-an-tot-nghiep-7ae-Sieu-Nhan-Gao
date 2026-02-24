@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Color;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -148,6 +150,14 @@ class ProductController extends Controller
             ->with(['category', 'variants.sizeRelationship', 'variants.colorRelationship', 'images', 'reviews.user'])
             ->firstOrFail();
 
+        // Kiểm tra user đã mua và nhận hàng thành công chưa
+        $hasPurchased = false;
+        if (Auth::check()) {
+            $hasPurchased = Order::where('user_id', Auth::id())
+                ->where('status', Order::STATUS_COMPLETED)
+                ->whereHas('items', fn($q) => $q->where('product_id', $product->id))
+                ->exists();
+        }
 
         // Get related products (same category, excluding current)
         $relatedProducts = Product::where('category_id', $product->category_id)
@@ -156,6 +166,6 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
-        return view('frontend.products.show', compact('product', 'relatedProducts'));
+        return view('frontend.products.show', compact('product', 'relatedProducts', 'hasPurchased'));
     }
 }

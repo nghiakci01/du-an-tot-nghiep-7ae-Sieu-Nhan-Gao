@@ -206,4 +206,6 @@ return [
     'manufacturer' => 'Thương hiệu',
     'select_by_color' => 'Chọn theo màu sắc',
     'popular_tags' => 'Thẻ phổ biến',
+    'review_purchase_required' => 'Bạn cần mua và nhận sản phẩm này trước khi có thể đánh giá.',
+    'buy_to_review' => 'Mua ngay để đánh giá',
 ];
