@@ -111,7 +111,7 @@
                                         <input placeholder="{{ __('messages.coupon_code') }}" type="text" disabled>
                                         <button type="button" disabled>{{ __('messages.apply') }}</button>
                                         <small class="text-muted d-block mt-2">
-                                            <i class="fa fa-info-circle"></i> Feature in development
+                                            <i class="fa fa-info-circle"></i> {{ __('messages.feature_in_development') }}
                                         </small>
                                     </div>
                                 </div>
@@ -130,7 +130,7 @@
                                                 $shippingFee = \App\Models\Setting::getShippingFee($total);
                                             @endphp
                                             <p class="cart_amount" id="shipping-fee">
-                                                <span>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí' }}</span>
+                                                <span>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : __('messages.free') }}</span>
                                             </p>
                                         </div>
 
@@ -213,12 +213,12 @@
                         // Optional: Show a small toast or visual feedback instead of alert
                         // alert(response.message); 
                     } else {
-                        alert(response.message || 'An error occurred.');
+                        alert("{{ __('messages.error_occurred') }}");
                         window.location.reload(); // Fallback
                     }
                 },
                 error: function(xhr) {
-                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Quantity exceeds stock or an error occurred.';
+                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : "{{ __('messages.cart_update_error') }}";
                     alert(errorMsg);
                     window.location.reload(); // Reset to valid state
                 }
@@ -232,7 +232,7 @@
             var row = ele.parents("tr");
             var id = row.attr("data-id");
             
-            if(confirm("Are you sure you want to remove this product from the cart?")) {
+            if(confirm("{{ __('messages.confirm_remove_cart_item') }}")) {
                 $.ajax({
                     url: '{{ route('cart.remove') }}',
                     method: "POST",
@@ -258,11 +258,11 @@
                                 setTimeout(function() { window.location.reload(); }, 500);
                             }
                         } else {
-                            alert(response.message || 'An error occurred.');
+                            alert(response.message || "{{ __('messages.error_occurred') }}");
                         }
                     },
                     error: function(xhr) {
-                        alert('An error occurred. Please try again.');
+                        alert("{{ __('messages.error_occurred') }}");
                     }
                 });
             }
@@ -272,7 +272,7 @@
         $("#clear-cart").on('click', function(e) {
             e.preventDefault();
             
-            if(confirm("Are you sure you want to clear the cart?")) {
+            if(confirm("{{ __('messages.confirm_clear_cart') }}")) {
                 $.ajax({
                     url: '{{ route('cart.clear') }}',
                     method: "POST",
@@ -280,7 +280,7 @@
                         window.location.reload();
                     },
                     error: function(xhr) {
-                        alert('An error occurred. Please try again.');
+                        alert("{{ __('messages.error_occurred') }}");
                     }
                 });
             }

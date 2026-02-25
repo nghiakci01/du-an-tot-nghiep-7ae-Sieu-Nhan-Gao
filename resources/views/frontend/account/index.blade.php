@@ -8,9 +8,9 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">home</a></li>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
-                            <li>my account</li>
+                            <li>{{ __('messages.my_account') }}</li>
                         </ul>
                     </div>
                 </div>
@@ -32,7 +32,7 @@
                         <div class="tab-content dashboard_content">
                             <div class="tab-pane fade show active" id="dashboard">
                                 <h3>{{ __('messages.dashboard') }} </h3>
-                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a> and <a href="#">Edit your password and account details.</a></p>
+                                <p>{!! __('messages.dashboard_desc') !!}</p>
                             </div>
                             <div class="tab-pane fade" id="orders">
                                 <h3>{{ __('messages.orders') }}</h3>
@@ -135,7 +135,7 @@
                                                 </div>
 
                                                 <div class="save_button primary_btn default_button mt-3">
-                                                    <button type="submit">Save Changes</button>
+                                                    <button type="submit">{{ __('messages.save_changes') }}</button>
                                                 </div>
                                             </form>
                                         </div>
