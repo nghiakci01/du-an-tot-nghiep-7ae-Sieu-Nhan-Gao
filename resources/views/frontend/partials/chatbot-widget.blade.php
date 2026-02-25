@@ -423,7 +423,7 @@
     }
 </style>
 
-<div x-data="chatBot({ mode: '{{ $chatbot_mode ?? 'rules' }}', suggestedQuestions: {{ json_encode($chatbot_suggested_questions ?? []) }} })" x-init="initChat()" class="chatbot-widget chat-container">
+<div x-data="chatBot({ mode: '{{ $chatbot_mode ?? 'rules' }}', suggestedQuestions: {!! $chatbot_suggested_questions_json !!} })" x-init="initChat()" class="chatbot-widget chat-container">
     
     <!-- Chat Window -->
     <div x-show="isOpen" 

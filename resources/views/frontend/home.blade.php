@@ -145,75 +145,119 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="slider_area home_six_slider owl-carousel">
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}">
-                           <div class="slider_content_inner">
+                        @forelse($sliders as $slider)
+                        <div class="single_slider" data-bgimg="{{ asset('storage/' . $slider->image) }}">
+                            <div class="slider_content_inner text-center">
                                 <div class="slider_content">
-                                   <h2>top trending</h2>
-                                    <h1>handbag</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="{{ route('shop') }}">Discover Now</a>
-                                </div>  
-                            </div>     
+                                    <h2>{{ $slider->title }}</h2>
+                                    <h1>{{ $slider->subtitle }}</h1>
+                                    <p>{!! nl2br(e($slider->content)) !!}</p>
+                                    @if($slider->link)
+                                        <a href="{{ $slider->link }}">{{ __('messages.explore_now') }}</a>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider11.jpg') }}">
-                           <div class="slider_content_inner">
+                        @empty
+                        {{-- Fallback Slider 1 --}}
+                        <div class="single_slider" data-bgimg="{{ asset('frontend-assets/img/slider/slide1.jpg') }}">
+                            <div class="slider_content_inner text-center">
                                 <div class="slider_content">
-                                    <h2>new arrivals</h2>
-                                    <h1>zip hoodie</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="{{ route('shop') }}">Discover Now</a>
-                                </div> 
-                            </div>   
+                                    <h2>Collection 2026</h2>
+                                    <h1>Elite Minimalism</h1>
+                                    <p>Khám phá phong cách tối giản đỉnh cao và sang trọng.</p>
+                                    <a href="{{ route('shop') }}">{{ __('messages.explore_now') }}</a>
+                                </div>
+                            </div>
                         </div>
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider12.jpg') }}">
-                           <div class="slider_content_inner">
+                        {{-- Fallback Slider 2 --}}
+                        <div class="single_slider" data-bgimg="{{ asset('frontend-assets/img/slider/slide2.jpg') }}">
+                            <div class="slider_content_inner text-center">
                                 <div class="slider_content">
-                                    <h2>top trending</h2>
-                                    <h1>clothing</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="{{ route('shop') }}">Discover Now</a>
-                                </div> 
-                            </div>         
+                                    <h2>New Arrivals</h2>
+                                    <h1>Modern Fashion</h1>
+                                    <p>Cập nhật những xu hướng thời trang mới nhất từ thế giới.</p>
+                                    <a href="{{ route('shop') }}">{{ __('messages.explore_now') }}</a>
+                                </div>
+                            </div>
                         </div>
+                        @endforelse
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <!--banner area start-->
                     <div class="banner_slider_section">
-                        <div class="row ">
-                           <div class="col-12">
-                                <div class="banner_area banner_top">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner18.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Men’s <br> Summer Sneaker</h1>
-                                           <h3>Big Sale Off This Week</h3>
+                        <div class="row">
+                            @forelse($bannerTop as $banner)
+                                @if($loop->first)
+                                    <div class="col-12">
+                                        <div class="banner_area banner_top">
+                                            <div class="banner_thumb">
+                                                <a href="{{ $banner->link ?? '#' }}">
+                                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}">
+                                                </a>
+                                                <div class="banner_content text-center">
+                                                    <h1>{!! nl2br(e($banner->title)) !!}</h1>
+                                                    <h3>{{ $banner->subtitle }}</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="col-lg-6 col-md-6 col-sm-6">
+                                        <div class="banner_area">
+                                            <div class="banner_thumb">
+                                                <a href="{{ $banner->link ?? '#' }}">
+                                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}">
+                                                </a>
+                                                <div class="banner_content text-center">
+                                                    <h1>{!! nl2br(e($banner->title)) !!}</h1>
+                                                    <h3>{{ $banner->subtitle }}</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            @empty
+                                {{-- Fallback for Top Banners --}}
+                                <div class="col-12">
+                                    <div class="banner_area banner_top">
+                                        <div class="banner_thumb">
+                                            <a href="{{ route('shop') }}">
+                                                <img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt="Default Banner">
+                                            </a>
+                                            <div class="banner_content text-center">
+                                                <h1>New Collection</h1>
+                                                <h3>Up to 50% Off</h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="banner_area">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner19.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Clothing.No18</h1>
-                                           <h3>Sale Off 20% All Store</h3>
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="banner_area">
+                                        <div class="banner_thumb">
+                                            <a href="{{ route('shop') }}">
+                                                <img src="{{ asset('frontend-assets/img/bg/banner2.jpg') }}" alt="Default Banner">
+                                            </a>
+                                            <div class="banner_content text-center">
+                                                <h1>Trending</h1>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="banner_area">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner20.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Bag.No1</h1>
-                                           <h3>Big Sale No Limited</h3>
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="banner_area">
+                                        <div class="banner_thumb">
+                                            <a href="{{ route('shop') }}">
+                                                <img src="{{ asset('frontend-assets/img/bg/banner3.jpg') }}" alt="Default Banner">
+                                            </a>
+                                            <div class="banner_content text-center">
+                                                <h1>Best Seller</h1>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endforelse
                         </div>
                     </div>
                     <!--banner area end-->
