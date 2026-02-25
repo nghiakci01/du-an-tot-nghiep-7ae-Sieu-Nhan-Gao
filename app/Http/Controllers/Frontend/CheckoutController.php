@@ -132,12 +132,6 @@ class CheckoutController extends Controller
             Session::forget(['cart', 'coupon_code', 'discount_amount']);
 
             if ($request->payment_method === 'VNPAY') {
-<<<<<<< HEAD
-                return redirect()->route('vnpay.payment', ['order_id' => $order->id]);
-            }
-
-            return redirect()->route('checkout.success', $order->id)->with('success', 'Order placed successfully!');
-=======
                 return app(VnpayController::class)->createPayment($order);
             }
 
@@ -149,7 +143,6 @@ class CheckoutController extends Controller
             }
 
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');
->>>>>>> 27f7096f0793bb92acaa6fc394aa0ea6a641a451
 
         } catch (\Exception $e) {
             DB::rollBack();

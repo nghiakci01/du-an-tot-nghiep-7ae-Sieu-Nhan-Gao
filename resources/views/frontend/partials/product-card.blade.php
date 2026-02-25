@@ -16,10 +16,8 @@
                 <div class="hover_action">
                     <a href="#"><i class="fa fa-plus"></i></a>
                     <div class="action_button">
-                        <ul>
                             <li><a title="Add to cart" href="#"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
                             <li><a href="#" title="Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
-                            <li><a href="#" title="Compare"><i class="fa fa-sliders" aria-hidden="true"></i></a></li>
                         </ul>
                     </div>
                 </div>

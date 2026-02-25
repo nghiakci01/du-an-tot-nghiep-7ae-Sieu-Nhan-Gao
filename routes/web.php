@@ -29,15 +29,10 @@ Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::clas
 Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
 Route::post('/checkout/remove-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeCoupon'])->name('checkout.removeCoupon');
 Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
-<<<<<<< HEAD
-
 // VNPAY Payment Routes
-Route::get('/vnpay/payment/{order_id}', [App\Http\Controllers\Frontend\PaymentController::class, 'createPayment'])->name('vnpay.payment');
-Route::get('/vnpay/return', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('vnpay.return');
-
-=======
+Route::get('/vnpay/payment/{order_id}', [App\Http\Controllers\Frontend\VnpayController::class, 'createPayment'])->name('vnpay.payment');
 Route::get('/vnpay/callback', [App\Http\Controllers\Frontend\VnpayController::class, 'callback'])->name('vnpay.callback');
->>>>>>> 27f7096f0793bb92acaa6fc394aa0ea6a641a451
+Route::get('/vnpay/return', [App\Http\Controllers\Frontend\VnpayController::class, 'vnpayReturn'])->name('vnpay.return');
 Auth::routes();
 
 // Social Login

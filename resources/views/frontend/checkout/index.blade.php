@@ -495,26 +495,14 @@
                                     </thead>
                                     <tbody>
                                         @foreach($cart as $details)
-<<<<<<< HEAD
                                         <tr>
                                             <td>{{ $details['name'] }} 
                                                 <strong>× {{ $details['quantity'] }}</strong>
                                                 <br>
                                                 <small class="text-muted">({{ $details['size'] }}/{{ $details['color'] }})</small>
                                             </td>
-                                            <td>{{ number_format($details['price'] * $details['quantity']) }} VND</td>
+                                            <td>{{ number_format($details['price'] * $details['quantity']) }} đ</td>
                                         </tr>
-=======
-                                            <tr>
-                                                <td>{{ $details['name'] }}
-                                                    <strong>× {{ $details['quantity'] }}</strong>
-                                                    <br>
-                                                    <small
-                                                        class="text-muted">({{ $details['size'] }}/{{ $details['color'] }})</small>
-                                                </td>
-                                                <td>{{ number_format($details['price'] * $details['quantity']) }} đ</td>
-                                            </tr>
->>>>>>> 27f7096f0793bb92acaa6fc394aa0ea6a641a451
                                         @endforeach
                                     </tbody>
                                     <tfoot>
@@ -523,17 +511,10 @@
                                             <td>{{ number_format($total) }} VND</td>
                                         </tr>
                                         @if($discount > 0)
-<<<<<<< HEAD
                                         <tr class="discount-row">
                                             <th>{{ __('messages.discount') }}</th>
-                                            <td>-{{ number_format($discount) }} VND</td>
+                                            <td>-{{ number_format($discount) }} đ</td>
                                         </tr>
-=======
-                                            <tr class="discount-row">
-                                                <th>{{ __('messages.discount') }}</th>
-                                                <td>-{{ number_format($discount) }} đ</td>
-                                            </tr>
->>>>>>> 27f7096f0793bb92acaa6fc394aa0ea6a641a451
                                         @endif
                                         <tr>
                                             <th>{{ __('messages.shipping') }}</th>
@@ -579,37 +560,22 @@
                                     </div>
                                 </div>
 
-<<<<<<< HEAD
-                               <div class="panel-default">
-                                    <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY" data-bs-target="createp_account" required />
-                                    <label for="payment_vnpay" data-bs-toggle="collapse" data-bs-target="#method_vnpay" aria-controls="method_vnpay">
-                                        Pay with VNPAY
-=======
                                 <div class="panel-default">
                                     <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY"
                                         data-bs-target="createp_account" required />
                                     <label for="payment_vnpay" data-bs-toggle="collapse" data-bs-target="#method_vnpay"
                                         aria-controls="method_vnpay">
                                         Thanh toán qua VNPAY
->>>>>>> 27f7096f0793bb92acaa6fc394aa0ea6a641a451
                                     </label>
 
                                     <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
                                         <div class="card-body1">
-<<<<<<< HEAD
-                                           <p>Safe and convenient payment via VNPAY gateway using QR code, banking app, or ATM/Visa/MasterCard.</p> 
-=======
-                                            <p>Bạn sẽ được chuyển hướng sang cổng thanh toán VNPAY an toàn để hoàn tất đơn
-                                                hàng.</p>
->>>>>>> 27f7096f0793bb92acaa6fc394aa0ea6a641a451
+                                            <p>Bạn sẽ được chuyển hướng sang cổng thanh toán VNPAY an toàn để hoàn tất đơn hàng.</p>
                                         </div>
                                     </div>
                                 </div>
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 27f7096f0793bb92acaa6fc394aa0ea6a641a451
                                 <div class="order_button">
                                     <button type="submit">{{ __('messages.place_order') }}</button>
                                 </div>
@@ -638,7 +604,37 @@
                 const btn = $(this);
                 btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> {{ __("messages.processing") }}...');
 
-<<<<<<< HEAD
+        $.ajax({
+            url: '{{ route("checkout.applyCoupon") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                coupon_code: couponCode
+            },
+            success: function (response) {
+                if (response.success) {
+                    showMessage(response.message, 'success');
+
+                    // Reload page to show applied coupon
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                }
+            },
+            error: function (xhr) {
+                const message = xhr.responseJSON?.message || '{{ __("messages.error_occurred") }}';
+                showMessage(message, 'danger');
+                btn.prop('disabled', false).html('{{ __("messages.apply_coupon") }}');
+            }
+        });
+    });
+
+    // Remove Coupon
+    $('#removeCouponBtn').click(function () {
+        if (!confirm('{{ __("messages.confirm_remove_coupon") }}')) {
+            return;
+        }
+
         const btn = $(this);
         btn.prop('disabled', true);
 
@@ -648,17 +644,36 @@
             data: {
                 _token: '{{ csrf_token() }}'
             },
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     location.reload();
                 }
             },
-            error: function() {
+            error: function () {
                 alert('{{ __("messages.error_occurred") }}');
                 btn.prop('disabled', false);
             }
         });
     });
+
+    // Enter key to apply coupon
+    $('#couponCode').keypress(function (e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $('#applyCouponBtn').click();
+        }
+    });
+
+    function showMessage(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const html = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>`;
+        $('#couponMessage').html(html);
+    }
+
+    // ============ FORM VALIDATION ============
 
     // Enter key to apply coupon
     $('#couponCode').keypress(function(e) {
@@ -840,8 +855,7 @@
                 const lon = position.coords.longitude;
 
                 // Call Nominatim API for reverse geocoding
-=======
->>>>>>> 27f7096f0793bb92acaa6fc394aa0ea6a641a451
+                // Call Nominatim API for reverse geocoding
                 $.ajax({
                     url: '{{ route("checkout.applyCoupon") }}',
                     method: 'POST',
