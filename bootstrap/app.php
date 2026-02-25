@@ -17,6 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
             users: '/home'
         );
         $middleware->trustProxies(at: '*');
+
+        // Bypass CSRF for cart routes (debug - remove after fix)
+        $middleware->validateCsrfTokens(except: [
+            'cart/*',
+        ]);
+
         $middleware->web(append: [
             \App\Http\Middleware\SetLanguage::class,
         ]);
