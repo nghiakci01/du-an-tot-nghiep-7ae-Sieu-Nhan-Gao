@@ -387,7 +387,7 @@
                                     <div class="coupon-applied">
                                         <div>
                                             <i class="fa fa-check-circle"></i>
-                                            <span class="coupon-code">{{ $coupon->code }}</span> đã được áp dụng
+                                            <span class="coupon-code">{{ $coupon->code }}</span> has been applied
                                         </div>
                                         <button type="button" class="btn btn-sm btn-outline-danger" id="removeCouponBtn">
                                             <i class="fa fa-times"></i> {{ __('messages.remove') }}
@@ -495,27 +495,26 @@
                                     </thead>
                                     <tbody>
                                         @foreach($cart as $details)
-                                            <tr>
-                                                <td>{{ $details['name'] }}
-                                                    <strong>× {{ $details['quantity'] }}</strong>
-                                                    <br>
-                                                    <small
-                                                        class="text-muted">({{ $details['size'] }}/{{ $details['color'] }})</small>
-                                                </td>
-                                                <td>{{ number_format($details['price'] * $details['quantity']) }} đ</td>
-                                            </tr>
+                                        <tr>
+                                            <td>{{ $details['name'] }} 
+                                                <strong>× {{ $details['quantity'] }}</strong>
+                                                <br>
+                                                <small class="text-muted">({{ $details['size'] }}/{{ $details['color'] }})</small>
+                                            </td>
+                                            <td>{{ number_format($details['price'] * $details['quantity']) }} đ</td>
+                                        </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <th>{{ __('messages.subtotal') }}</th>
-                                            <td>{{ number_format($total) }} đ</td>
+                                            <td>{{ number_format($total) }} VND</td>
                                         </tr>
                                         @if($discount > 0)
-                                            <tr class="discount-row">
-                                                <th>{{ __('messages.discount') }}</th>
-                                                <td>-{{ number_format($discount) }} đ</td>
-                                            </tr>
+                                        <tr class="discount-row">
+                                            <th>{{ __('messages.discount') }}</th>
+                                            <td>-{{ number_format($discount) }} đ</td>
+                                        </tr>
                                         @endif
                                         <tr>
                                             <th>{{ __('messages.shipping') }}</th>
@@ -524,7 +523,7 @@
                                         </tr>
                                         <tr class="order_total">
                                             <th>{{ __('messages.order_total') }}</th>
-                                            <td><strong>{{ number_format($finalTotal) }} đ</strong></td>
+                                            <td><strong>{{ number_format($finalTotal) }} VND</strong></td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -571,8 +570,7 @@
 
                                     <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
                                         <div class="card-body1">
-                                            <p>Bạn sẽ được chuyển hướng sang cổng thanh toán VNPAY an toàn để hoàn tất đơn
-                                                hàng.</p>
+                                            <p>Bạn sẽ được chuyển hướng sang cổng thanh toán VNPAY an toàn để hoàn tất đơn hàng.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -606,6 +604,258 @@
                 const btn = $(this);
                 btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> {{ __("messages.processing") }}...');
 
+        $.ajax({
+            url: '{{ route("checkout.applyCoupon") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                coupon_code: couponCode
+            },
+            success: function (response) {
+                if (response.success) {
+                    showMessage(response.message, 'success');
+
+                    // Reload page to show applied coupon
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                }
+            },
+            error: function (xhr) {
+                const message = xhr.responseJSON?.message || '{{ __("messages.error_occurred") }}';
+                showMessage(message, 'danger');
+                btn.prop('disabled', false).html('{{ __("messages.apply_coupon") }}');
+            }
+        });
+    });
+
+    // Remove Coupon
+    $('#removeCouponBtn').click(function () {
+        if (!confirm('{{ __("messages.confirm_remove_coupon") }}')) {
+            return;
+        }
+
+        const btn = $(this);
+        btn.prop('disabled', true);
+
+        $.ajax({
+            url: '{{ route("checkout.removeCoupon") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                }
+            },
+            error: function () {
+                alert('{{ __("messages.error_occurred") }}');
+                btn.prop('disabled', false);
+            }
+        });
+    });
+
+    // Enter key to apply coupon
+    $('#couponCode').keypress(function (e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $('#applyCouponBtn').click();
+        }
+    });
+
+    function showMessage(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const html = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>`;
+        $('#couponMessage').html(html);
+    }
+
+    // ============ FORM VALIDATION ============
+
+    // Enter key to apply coupon
+    $('#couponCode').keypress(function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $('#applyCouponBtn').click();
+        }
+    });
+
+    function showMessage(message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const html = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+        $('#couponMessage').html(html);
+    }
+
+    // ============ FORM VALIDATION ============
+    
+    // Validation functions
+    function validateName(value) {
+        if (!value || value.trim().length < 2) {
+            return 'Please enter your full name (at least 2 characters)';
+        }
+        return '';
+    }
+
+    function validatePhone(value) {
+        if (!value) {
+            return 'Please enter your phone number';
+        }
+        const phoneRegex = /^[0-9]{10,11}$/;
+        if (!phoneRegex.test(value)) {
+            return 'Phone number must have 10-11 digits';
+        }
+        return '';
+    }
+
+    function validateEmail(value) {
+        if (!value) {
+            return 'Please enter your email';
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            return 'Invalid email';
+        }
+        return '';
+    }
+
+    function validateAddress(value) {
+        if (!value || value.trim().length < 5) {
+            return 'Vui lòng nhập địa chỉ cụ thể (số nhà, tên đường)';
+        }
+        return '';
+    }
+
+    function validateProvince(value) {
+        if (!value) {
+            return 'Vui lòng chọn tỉnh thành';
+        }
+        return '';
+    }
+
+    // Show validation feedback
+    function showValidation(input, errorMessage) {
+        const $input = $(input);
+        const $feedback = $input.next('.invalid-feedback');
+        
+        if (errorMessage) {
+            $input.removeClass('is-valid').addClass('is-invalid');
+            if ($feedback.length) {
+                $feedback.text(errorMessage);
+            } else {
+                $input.after(`<div class="invalid-feedback">${errorMessage}</div>`);
+            }
+        } else {
+            $input.removeClass('is-invalid').addClass('is-valid');
+            $feedback.remove();
+        }
+    }
+
+    // Real-time validation on blur
+    $('input[name="name"]').on('blur', function() {
+        const error = validateName($(this).val());
+        showValidation(this, error);
+    });
+
+    $('input[name="phone"]').on('blur', function() {
+        const error = validatePhone($(this).val());
+        showValidation(this, error);
+    });
+
+    $('input[name="email"]').on('blur', function() {
+        const error = validateEmail($(this).val());
+        showValidation(this, error);
+    });
+
+    $('input[name="address"]').on('blur', function() {
+        const error = validateAddress($(this).val());
+        showValidation(this, error);
+    });
+
+    $('select[name="province"]').on('change', function() {
+        const error = validateProvince($(this).val());
+        showValidation(this, error);
+    });
+
+    // Form submission validation
+    $('form').on('submit', function(e) {
+        let hasError = false;
+
+        // Validate all fields
+        const nameError = validateName($('input[name="name"]').val());
+        const phoneError = validatePhone($('input[name="phone"]').val());
+        const emailError = validateEmail($('input[name="email"]').val());
+        const provinceError = validateProvince($('select[name="province"]').val());
+        const addressError = validateAddress($('input[name="address"]').val());
+
+        showValidation('input[name="name"]', nameError);
+        showValidation('input[name="phone"]', phoneError);
+        showValidation('input[name="email"]', emailError);
+        showValidation('select[name="province"]', provinceError);
+        showValidation('input[name="address"]', addressError);
+
+        if (nameError || phoneError || emailError || provinceError || addressError) {
+            hasError = true;
+        }
+
+        // Check payment method
+        if (!$('input[name="payment_method"]:checked').length) {
+            alert('Please select a payment method');
+            hasError = true;
+        }
+
+        if (hasError) {
+            e.preventDefault();
+            // Scroll to first error
+            const firstError = $('.is-invalid').first();
+            if (firstError.length) {
+                $('html, body').animate({
+                    scrollTop: firstError.offset().top - 100
+                }, 500);
+            }
+            return false;
+        }
+
+        // Show loading state
+        const $submitBtn = $(this).find('button[type="submit"]');
+        $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Processing...');
+    });
+
+    // Remove validation on input
+    $('input[name="name"], input[name="phone"], input[name="email"], input[name="address"], select[name="province"]').on('input change', function() {
+        if ($(this).hasClass('is-invalid')) {
+            $(this).removeClass('is-invalid');
+            $(this).next('.invalid-feedback').remove();
+        }
+    });
+
+    // ============ GEOLOCATION ============
+    $('#btn-locate-me').click(function() {
+        if (!navigator.geolocation) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Trình duyệt của bạn không hỗ trợ định vị.'
+            });
+            return;
+        }
+
+        const $btn = $(this);
+        const originalHtml = $btn.html();
+        $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang định vị...');
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                // Call Nominatim API for reverse geocoding
+                // Call Nominatim API for reverse geocoding
                 $.ajax({
                     url: '{{ route("checkout.applyCoupon") }}',
                     method: 'POST',

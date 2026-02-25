@@ -18,7 +18,7 @@ class CheckoutController extends Controller
     {
         $cart = session()->get('cart', []);
         if (count($cart) == 0) {
-            return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
+            return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
         $total = 0;
@@ -61,7 +61,7 @@ class CheckoutController extends Controller
 
         $cart = session()->get('cart', []);
         if (count($cart) == 0) {
-            return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
+            return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
         $total = 0;
@@ -111,7 +111,7 @@ class CheckoutController extends Controller
                 // Verify stock again
                 $variant = ProductVariant::find($details['variant_id']);
                 if (!$variant || $variant->stock_quantity < $details['quantity']) {
-                    throw new \Exception('Sản phẩm ' . $details['name'] . ' (' . $details['size'] . '/' . $details['color'] . ') không đủ hàng.');
+                    throw new \Exception('Product ' . $details['name'] . ' (' . $details['size'] . '/' . $details['color'] . ') is out of stock.');
                 }
 
                 // Deduct stock
@@ -146,7 +146,7 @@ class CheckoutController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Lỗi đặt hàng: ' . $e->getMessage())->withInput();
+            return redirect()->back()->with('error', 'Order error: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -176,7 +176,7 @@ class CheckoutController extends Controller
         if (count($cart) == 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Giỏ hàng của bạn đang trống.'
+                'message' => 'Your cart is empty.'
             ], 400);
         }
 
@@ -192,7 +192,7 @@ class CheckoutController extends Controller
         if (!$coupon) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mã giảm giá không tồn tại.'
+                'message' => 'Coupon code does not exist.'
             ], 404);
         }
 
@@ -200,35 +200,35 @@ class CheckoutController extends Controller
         if (!$coupon->is_active) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mã giảm giá không còn hoạt động.'
+                'message' => 'Coupon code is no longer active.'
             ], 400);
         }
 
         if ($coupon->isNotYetStarted()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mã giảm giá chưa bắt đầu.'
+                'message' => 'Coupon code is not yet valid.'
             ], 400);
         }
 
         if ($coupon->isExpired()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mã giảm giá đã hết hạn.'
+                'message' => 'Coupon code has expired.'
             ], 400);
         }
 
         if ($coupon->hasReachedUsageLimit()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mã giảm giá đã hết lượt sử dụng.'
+                'message' => 'Coupon usage limit has been reached.'
             ], 400);
         }
 
         if ($coupon->min_order_amount && $total < $coupon->min_order_amount) {
             return response()->json([
                 'success' => false,
-                'message' => 'Đơn hàng tối thiểu ' . number_format($coupon->min_order_amount) . ' đ để sử dụng mã này.'
+                'message' => 'Minimum order amount is ' . number_format($coupon->min_order_amount) . ' to use this coupon.'
             ], 400);
         }
 
@@ -242,7 +242,7 @@ class CheckoutController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Áp dụng mã giảm giá thành công!',
+            'message' => 'Coupon applied successfully!',
             'data' => [
                 'coupon_code' => $coupon->code,
                 'discount' => $discount,
@@ -262,7 +262,7 @@ class CheckoutController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Đã xóa mã giảm giá.'
+            'message' => 'Coupon removed.'
         ]);
     }
 }
