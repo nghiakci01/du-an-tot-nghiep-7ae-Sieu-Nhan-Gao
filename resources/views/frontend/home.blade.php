@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="slider_area home_six_slider owl-carousel">
-                        <div class="single_slider" data-bgimg="assets/img/slider/slider10.jpg">
+                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}">
                            <div class="slider_content_inner">
                                 <div class="slider_content">
                                    <h2>top trending</h2>
@@ -18,7 +18,7 @@
                                 </div>  
                             </div>     
                         </div>
-                        <div class="single_slider" data-bgimg="assets/img/slider/slider11.jpg">
+                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider11.jpg') }}">
                            <div class="slider_content_inner">
                                 <div class="slider_content">
                                     <h2>new arrivals</h2>
@@ -28,7 +28,7 @@
                                 </div> 
                             </div>   
                         </div>
-                        <div class="single_slider" data-bgimg="assets/img/slider/slider12.jpg">
+                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider12.jpg') }}">
                            <div class="slider_content_inner">
                                 <div class="slider_content">
                                     <h2>top trending</h2>
@@ -47,7 +47,7 @@
                            <div class="col-12">
                                 <div class="banner_area banner_top">
                                     <div class="banner_thumb">
-                                        <a href="shop.html"><img src="assets/img/bg/banner18.jpg" alt="#"></a>
+                                        <a href="shop.html"><img src="{{ asset('reid/assets/img/bg/banner18.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
                                            <h1>Men’s <br> Summer Sneaker</h1>
                                            <h3>Big Sale Off This Week</h3>
@@ -58,7 +58,7 @@
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="banner_area">
                                     <div class="banner_thumb">
-                                        <a href="shop.html"><img src="assets/img/bg/banner19.jpg" alt="#"></a>
+                                        <a href="shop.html"><img src="{{ asset('reid/assets/img/bg/banner19.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
                                            <h1>Clothing.No18</h1>
                                            <h3>Sale Off 20% All Store</h3>
@@ -69,7 +69,7 @@
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="banner_area">
                                     <div class="banner_thumb">
-                                        <a href="shop.html"><img src="assets/img/bg/banner20.jpg" alt="#"></a>
+                                        <a href="shop.html"><img src="{{ asset('reid/assets/img/bg/banner20.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
                                            <h1>Bag.No1</h1>
                                            <h3>Big Sale No Limited</h3>

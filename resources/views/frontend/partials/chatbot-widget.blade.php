@@ -1,5 +1,5 @@
 @php
-    $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? ['Hàng mới về 🆕', 'Khuyến mãi 🔥', 'Áo thun', 'Váy đầm', 'Liên hệ']);
+    $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? ['Hàng mới về 🆕', 'Khuyến mãi 🔥', 'Áo thun', 'Váy đầm', 'Liên hệ'], JSON_HEX_APOS | JSON_HEX_QUOT);
 @endphp
 
 <!-- Alpine.js -->
@@ -423,7 +423,7 @@
     }
 </style>
 
-<div x-data="chatBot({ mode: '{{ $chatbot_mode ?? 'rules' }}', suggestedQuestions: {!! $chatbot_suggested_questions_json !!} })" x-init="initChat()" class="chatbot-widget chat-container">
+<div x-data='chatBot({ mode: "{{ $chatbot_mode ?? "rules" }}", suggestedQuestions: {!! $chatbot_suggested_questions_json !!} })' x-init="initChat()" class="chatbot-widget chat-container">
     
     <!-- Chat Window -->
     <div x-show="isOpen" 
