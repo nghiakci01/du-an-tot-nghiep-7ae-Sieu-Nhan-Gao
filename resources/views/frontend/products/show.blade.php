@@ -251,18 +251,35 @@
                                 <button class="button buy_now" type="submit" name="action" value="buy_now">{{ __('messages.buy_now') }}</button>  
                             </div>
                             <style>
+                                .product_variant.quantity .button {
+                                    height: 50px;
+                                    line-height: 50px;
+                                    padding: 0 35px;
+                                    background: #111;
+                                    border: 1px solid #111;
+                                    color: #fff;
+                                    font-weight: 700;
+                                    text-transform: uppercase;
+                                    letter-spacing: 1px;
+                                    transition: all 0.3s ease;
+                                }
+                                .product_variant.quantity .button:hover {
+                                    background: #ef233c;
+                                    border-color: #ef233c;
+                                }
                                 .product_variant.quantity .button.buy_now {
                                     background: #ef233c; 
                                     border-color: #ef233c; 
                                     margin-left: 10px;
                                 }
                                 .product_variant.quantity .button.buy_now:hover {
-                                    background: #333;
-                                    border-color: #333;
+                                    background: #111;
+                                    border-color: #111;
                                 }
                                 .product_variant.quantity .button:disabled {
-                                    background: #ccc;
-                                    border-color: #ccc;
+                                    background: #ebebeb !important;
+                                    border-color: #ebebeb !important;
+                                    color: #999 !important;
                                     cursor: not-allowed;
                                 }
                                 .star-rating {
