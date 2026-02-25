@@ -70,11 +70,36 @@
                                                         </a>
                                                     </td>
                                                     <td class="product_name">
-                                                        <a
-                                                            href="{{ route('product.detail', $details['slug']) }}">{{ $details['name'] }}</a>
-                                                        <br>
-                                                        <small class="text-muted">{{ __('messages.size') }}: {{ $details['size'] }} | {{ __('messages.color') }}:
-                                                            {{ $details['color'] }}</small>
+                                                        <a href="{{ route('product.detail', $details['slug']) }}">{{ $details['name'] }}</a>
+                                                        <div class="cart-variant-selectors mt-2">
+                                                            @if(isset($details['available_sizes']) && count($details['available_sizes']) > 0)
+                                                                <div class="d-inline-block me-2">
+                                                                    <label class="small text-muted d-block">{{ __('messages.size') }}</label>
+                                                                    <select class="form-select form-select-sm variant-select size-select" data-type="size">
+                                                                        @foreach($details['available_sizes'] as $size)
+                                                                            <option value="{{ $size->id }}" {{ $details['size'] == $size->name ? 'selected' : '' }}>
+                                                                                {{ $size->name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            @endif
+
+                                                            @if(isset($details['available_colors']) && count($details['available_colors']) > 0)
+                                                                <div class="d-inline-block">
+                                                                    <label class="small text-muted d-block">{{ __('messages.color') }}</label>
+                                                                    <select class="form-select form-select-sm variant-select color-select" data-type="color">
+                                                                        @foreach($details['available_colors'] as $color)
+                                                                            <option value="{{ $color->id }}" {{ $details['color'] == $color->name ? 'selected' : '' }}>
+                                                                                {{ $color->name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                        <input type="hidden" class="product-id" value="{{ $details['product_id'] }}">
+                                                        <input type="hidden" class="current-variant-id" value="{{ $id }}">
                                                     </td>
                                                     <td class="product-price">{{ number_format($details['price']) }} VND</td>
                                                     <td class="product_quantity">
@@ -284,6 +309,46 @@
                     }
                 });
             }
+        });
+        // Change variant (Size/Color)
+        $(".variant-select").on('change', function() {
+            var ele = $(this);
+            var row = ele.parents("tr");
+            var productId = row.find(".product-id").val();
+            var oldVariantId = row.find(".current-variant-id").val();
+            var sizeId = row.find(".size-select").val();
+            var colorId = row.find(".color-select").val();
+
+            $.ajax({
+                url: '{{ route('cart.changeVariant') }}',
+                method: "POST",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    old_variant_id: oldVariantId,
+                    product_id: productId,
+                    size_id: sizeId,
+                    color_id: colorId
+                },
+                beforeSend: function() {
+                    // Show loading state if needed
+                    row.css('opacity', '0.5');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        }
+                    } else {
+                        alert(response.message || "{{ __('messages.error_occurred') }}");
+                        window.location.reload();
+                    }
+                },
+                error: function(xhr) {
+                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : "{{ __('messages.error_occurred') }}";
+                    alert(errorMsg);
+                    window.location.reload();
+                }
+            });
         });
     });
 </script>
