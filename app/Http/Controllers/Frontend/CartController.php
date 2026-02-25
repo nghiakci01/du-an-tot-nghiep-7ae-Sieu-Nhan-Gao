@@ -30,16 +30,24 @@ class CartController extends Controller
         $product = Product::findOrFail($request->product_id);
         $variantId = $request->variant_id;
 
-        // Auto-select variant if missing
+        // Validate: Nếu sản phẩm có variants thì bắt buộc phải chọn
         if (!$variantId) {
             $variants = $product->variants;
             if ($variants->count() === 1) {
+                // Tự động chọn nếu chỉ có 1 variant
                 $variantId = $variants->first()->id;
             } elseif ($variants->count() > 1) {
+                // Có nhiều variant → bắt buộc phải chọn
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.'
+                    ], 422);
+                }
                 return redirect()->route('product.detail', $product->slug)
-                    ->with('info', 'Please select size and color before adding to cart.');
+                    ->with('error', 'Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.');
             } else {
-                return redirect()->back()->with('error', 'This product has no available variants.');
+                return redirect()->back()->with('error', 'Sản phẩm này hiện không có biến thể nào.');
             }
         }
 
