@@ -71,13 +71,23 @@
                                                     </td>
                                                     <td class="product_name">
                                                         <a href="{{ route('product.detail', $details['slug']) }}">{{ $details['name'] }}</a>
-                                                        <div class="cart-variant-selectors mt-2">
+                                                        <div class="cart-variant-info mt-2">
+                                                            <span class="text-muted small">
+                                                                {{ __('messages.size') }}: <strong>{{ $details['size'] }}</strong> | 
+                                                                {{ __('messages.color') }}: <strong>{{ $details['color'] }}</strong>
+                                                            </span>
+                                                            <button type="button" class="btn btn-sm btn-link p-0 ms-2 edit-variant-btn" style="text-decoration: underline;">
+                                                                {{ __('messages.edit') ?? 'Đổi' }}
+                                                            </button>
+                                                        </div>
+
+                                                        <div class="cart-variant-selectors mt-2" style="display: none;">
                                                             @if(isset($details['available_sizes']) && count($details['available_sizes']) > 0)
                                                                 <div class="d-inline-block me-2">
                                                                     <label class="small text-muted d-block">{{ __('messages.size') }}</label>
                                                                     <select class="form-select form-select-sm variant-select size-select" data-type="size">
                                                                         @foreach($details['available_sizes'] as $size)
-                                                                            <option value="{{ $size->id }}" {{ $details['size'] == $size->name ? 'selected' : '' }}>
+                                                                            <option value="{{ $size->id }}" {{ (isset($details['size_id']) && $details['size_id'] == $size->id) ? 'selected' : '' }}>
                                                                                 {{ $size->name }}
                                                                             </option>
                                                                         @endforeach
@@ -90,13 +100,16 @@
                                                                     <label class="small text-muted d-block">{{ __('messages.color') }}</label>
                                                                     <select class="form-select form-select-sm variant-select color-select" data-type="color">
                                                                         @foreach($details['available_colors'] as $color)
-                                                                            <option value="{{ $color->id }}" {{ $details['color'] == $color->name ? 'selected' : '' }}>
+                                                                            <option value="{{ $color->id }}" {{ (isset($details['color_id']) && $details['color_id'] == $color->id) ? 'selected' : '' }}>
                                                                                 {{ $color->name }}
                                                                             </option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
                                                             @endif
+                                                            <div class="mt-1">
+                                                                <button type="button" class="btn btn-sm btn-secondary cancel-variant-btn">Hủy</button>
+                                                            </div>
                                                         </div>
                                                         <input type="hidden" class="product-id" value="{{ $details['product_id'] }}">
                                                         <input type="hidden" class="current-variant-id" value="{{ $id }}">
@@ -310,6 +323,19 @@
                 });
             }
         });
+        // Toggle variant selectors
+        $(".edit-variant-btn").on('click', function() {
+            var row = $(this).parents("td");
+            row.find(".cart-variant-info").hide();
+            row.find(".cart-variant-selectors").fadeIn();
+        });
+
+        $(".cancel-variant-btn").on('click', function() {
+            var row = $(this).parents("td");
+            row.find(".cart-variant-selectors").hide();
+            row.find(".cart-variant-info").fadeIn();
+        });
+
         // Change variant (Size/Color)
         $(".variant-select").on('change', function() {
             var ele = $(this);

@@ -26,6 +26,15 @@ class CartController extends Controller
                 
                 // Also get all valid variant combinations for this product to help client-side selection
                 $details['product_variants'] = $product->variants;
+                
+                // Set current IDs if not present (for migration of existing carts)
+                if (!isset($details['size_id']) || !isset($details['color_id'])) {
+                    $variant = ProductVariant::find($id);
+                    if ($variant) {
+                        $details['size_id'] = $variant->size_id;
+                        $details['color_id'] = $variant->color_id;
+                    }
+                }
             }
         }
         
@@ -91,8 +100,10 @@ class CartController extends Controller
                 "quantity" => $oldQuantity,
                 "price" => $itemPrice,
                 "image" => $product->image,
-                "size" => $newVariant->size,
-                "color" => $newVariant->color,
+                "size" => $newVariant->sizeRelationship ? $newVariant->sizeRelationship->name : $newVariant->size,
+                "color" => $newVariant->colorRelationship ? $newVariant->colorRelationship->name : $newVariant->color,
+                "size_id" => $newVariant->size_id,
+                "color_id" => $newVariant->color_id,
                 "slug" => $product->slug
             ];
         }
@@ -155,8 +166,10 @@ class CartController extends Controller
                 "quantity" => $request->quantity,
                 "price" => $itemPrice,
                 "image" => $product->image,
-                "size" => $variant->size,
-                "color" => $variant->color,
+                "size" => $variant->sizeRelationship ? $variant->sizeRelationship->name : $variant->size,
+                "color" => $variant->colorRelationship ? $variant->colorRelationship->name : $variant->color,
+                "size_id" => $variant->size_id,
+                "color_id" => $variant->color_id,
                 "slug" => $product->slug
             ];
         }
