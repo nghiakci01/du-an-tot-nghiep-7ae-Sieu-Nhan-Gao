@@ -2,7 +2,89 @@
 
 @section('content')
 
-
+        <!--slider area start-->
+    <div class="slider_section slider_section_six">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="slider_area home_six_slider owl-carousel">
+                        <div class="single_slider" data-bgimg="assets/img/slider/slider10.jpg">
+                           <div class="slider_content_inner">
+                                <div class="slider_content">
+                                   <h2>top trending</h2>
+                                    <h1>handbag</h1>
+                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
+                                    <a href="shop.html">Discover Now</a>
+                                </div>  
+                            </div>     
+                        </div>
+                        <div class="single_slider" data-bgimg="assets/img/slider/slider11.jpg">
+                           <div class="slider_content_inner">
+                                <div class="slider_content">
+                                    <h2>new arrivals</h2>
+                                    <h1>zip hoodie</h1>
+                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
+                                    <a href="shop.html">Discover Now</a>
+                                </div> 
+                            </div>   
+                        </div>
+                        <div class="single_slider" data-bgimg="assets/img/slider/slider12.jpg">
+                           <div class="slider_content_inner">
+                                <div class="slider_content">
+                                    <h2>top trending</h2>
+                                    <h1>clothing</h1>
+                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
+                                    <a href="shop.html">Discover Now</a>
+                                </div> 
+                            </div>         
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <!--banner area start-->
+                    <div class="banner_slider_section">
+                        <div class="row ">
+                           <div class="col-12">
+                                <div class="banner_area banner_top">
+                                    <div class="banner_thumb">
+                                        <a href="shop.html"><img src="assets/img/bg/banner18.jpg" alt="#"></a>
+                                        <div class="banner_content">
+                                           <h1>Men’s <br> Summer Sneaker</h1>
+                                           <h3>Big Sale Off This Week</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="banner_area">
+                                    <div class="banner_thumb">
+                                        <a href="shop.html"><img src="assets/img/bg/banner19.jpg" alt="#"></a>
+                                        <div class="banner_content">
+                                           <h1>Clothing.No18</h1>
+                                           <h3>Sale Off 20% All Store</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="banner_area">
+                                    <div class="banner_thumb">
+                                        <a href="shop.html"><img src="assets/img/bg/banner20.jpg" alt="#"></a>
+                                        <div class="banner_content">
+                                           <h1>Bag.No1</h1>
+                                           <h3>Big Sale No Limited</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--banner area end-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--slider area end-->
 
     <!--product section area start-->
     <section class="product_section womens_product product_section_six">
