@@ -321,7 +321,7 @@
                                             </div>
                                         </div>
                                         <div class="quick_button">
-                                            title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
+                                            <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                         </div>
                                         <div class="double_base">
                                             @if($product->price < $product->original_price)
