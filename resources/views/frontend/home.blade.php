@@ -1,6 +1,16 @@
 @extends('layouts.public')
 
 @section('content')
+<style>
+    /* Normalize product image heights */
+    .single_product .product_thumb a img {
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        width: 100%;
+        height: auto;
+        background-color: #f5f5f5; /* Fallback background */
+    }
+</style>
 
         <!--slider area start-->
     <div class="slider_section slider_section_six">
