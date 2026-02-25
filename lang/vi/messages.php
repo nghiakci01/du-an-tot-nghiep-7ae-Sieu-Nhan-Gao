@@ -208,6 +208,7 @@ return [
     'popular_tags' => 'Thẻ phổ biến',
     'review_purchase_required' => 'Bạn cần mua và nhận sản phẩm này trước khi có thể đánh giá.',
     'buy_to_review' => 'Mua ngay để đánh giá',
+    'buy_now' => 'Mua ngay',
     'share_on' => 'Chia sẻ qua:',
     'related_products' => 'Sản phẩm liên quan',
     'out_of_stock' => 'Hết hàng',

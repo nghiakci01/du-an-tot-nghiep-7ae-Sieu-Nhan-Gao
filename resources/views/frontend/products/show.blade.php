@@ -196,6 +196,7 @@
                                                         addToCartBtn.disabled = false;
                                                         buyNowBtn.disabled = false;
                                                         addToCartBtn.textContent = "{{ __('messages.add_to_cart') }}".toUpperCase();
+                                                        buyNowBtn.textContent = "{{ __('messages.buy_now') }}".toUpperCase();
                                                     } else {
                                                         variantInput.value = '';
                                                         msg.textContent = "{{ __('messages.variant_out_of_stock') }}";
@@ -203,6 +204,7 @@
                                                         addToCartBtn.disabled = true;
                                                         buyNowBtn.disabled = true;
                                                         addToCartBtn.textContent = "{{ __('messages.out_of_stock') }}".toUpperCase();
+                                                        buyNowBtn.textContent = "{{ __('messages.out_of_stock') }}".toUpperCase();
                                                     }
                                                 } else {
                                                     // Only one or none selected
@@ -221,6 +223,7 @@
                                                     addToCartBtn.disabled = true;
                                                     buyNowBtn.disabled = true;
                                                     addToCartBtn.textContent = "{{ __('messages.add_to_cart') }}".toUpperCase();
+                                                    buyNowBtn.textContent = "{{ __('messages.buy_now') }}".toUpperCase();
                                                     msg.style.display = 'none';
                                                 }
 
