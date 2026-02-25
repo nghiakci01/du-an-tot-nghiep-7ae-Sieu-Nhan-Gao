@@ -164,7 +164,6 @@
                                 </div>
                                 <div class="top_right text-right">
                                     <ul>
-
                                         <li class="top_links">
                                             @guest
                                                 <a href="#"><i class="ion-android-person"></i> {{ __('messages.account') }} <i class="ion-chevron-down"></i></a>
@@ -196,7 +195,8 @@
                                 </div>   
                                 @include('frontend.partials.mini-cart')
                             </div>
-                        </div>  
+                        </div>
+  
                     </div>
                 </div>
                 
