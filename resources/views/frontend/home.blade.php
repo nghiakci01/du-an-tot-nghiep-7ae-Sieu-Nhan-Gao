@@ -1,145 +1,8 @@
 @extends('layouts.public')
 
 @section('content')
-    <!-- <style>
-        /* Nuclear fix: Direct embedded CSS for the 10-product grid */
-        .custom_product_grid_10 {
-            display: -webkit-box !important;
-            display: -ms-flexbox !important;
-            display: flex !important;
-            -ms-flex-wrap: wrap !important;
-            flex-wrap: wrap !important;
-            margin-left: -15px !important;
-            margin-right: -15px !important;
-        }
 
-        .custom_product_grid_10 .product_item_5 {
-            position: relative !important;
-            width: 100% !important;
-            padding-right: 15px !important;
-            padding-left: 15px !important;
-            -webkit-box-flex: 0 !important;
-            -ms-flex: 0 0 100% !important;
-            flex: 0 0 100% !important;
-            max-width: 100% !important;
-            margin-bottom: 30px;
-        }
-
-        @media (min-width: 576px) {
-            .custom_product_grid_10 .product_item_5 {
-                -ms-flex: 0 0 50% !important;
-                flex: 0 0 50% !important;
-                max-width: 50% !important;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .custom_product_grid_10 .product_item_5 {
-                -ms-flex: 0 0 33.333333% !important;
-                flex: 0 0 33.333333% !important;
-                max-width: 33.333333% !important;
-            }
-        }
-
-        @media (min-width: 992px) {
-            .custom_product_grid_10 .product_item_5 {
-                -ms-flex: 0 0 25% !important;
-                flex: 0 0 25% !important;
-                max-width: 25% !important;
-            }
-        }
-
-        @media (min-width: 1200px) {
-            .custom_product_grid_10 .product_item_5 {
-                -ms-flex: 0 0 20% !important;
-                flex: 0 0 20% !important;
-                max-width: 20% !important;
-            }
-        }
-
-        /* Fix image ratio and layout breaking on hover */
-        .single_product .product_thumb {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 4 / 5;
-            overflow: hidden;
-            background: #f5f5f5;
-            /* Placeholder color for loading */
-        }
-
-        .single_product .product_thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        /* Ensure secondary image also fills correctly */
-        .single_product .product_thumb a.secondary_img {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Fix alignment for titles and prices */
-        .product_content {
-            padding-top: 10px;
-            text-align: left;
-        }
-
-    .product_content h3 {
-        margin-bottom: 5px;
-        font-size: 14px;
-        line-height: 1.2;
-        height: 2.4em; /* Max 2 lines height for alignment */
-        overflow: hidden;
-    }
-
-    /* Banner & Slider Custom Refining */
-    @media (min-width: 992px) {
-        /* Desktop: Ensure slider and side banners have matching heights */
-        .home_six_slider .single_slider {
-            height: 600px !important; /* Fixed base height for slider */
-            background-size: cover !important;
-            background-position: center !important;
-        }
-
-        .banner_slider_section .banner_area.banner_top .banner_thumb img {
-            height: 340px !important; /* Top big banner */
-            object-fit: cover !important;
-            width: 100%;
-        }
-
-        .banner_slider_section .banner_area:not(.banner_top) .banner_thumb img {
-            height: 240px !important; /* Two small banners below */
-            object-fit: cover !important;
-            width: 100%;
-        }
-    }
-
-    /* General aspect ratios for consistency */
-    .banner_thumb img {
-        width: 100%;
-        object-fit: cover !important;
-    }
-
-    /* Smooth slider content overlay */
-    .slider_content {
-        background: rgba(255, 255, 255, 0.7);
-        padding: 30px;
-        display: inline-block;
-        border-radius: 4px;
-    }
-
-    /* Bottom banner refinement */
-    .section_fullwidth .banner_thumb img {
-        aspect-ratio: 21 / 6;
-        width: 100%;
-        object-fit: cover !important;
-    }
-</style> -->
-    <!--slider area start-->
+        <!--slider area start-->
     <div class="slider_section slider_section_six">
         <div class="container-fluid">
             <div class="row">
@@ -148,14 +11,32 @@
                         <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}">
                            <div class="slider_content_inner">
                                 <div class="slider_content">
-                                    <h2>{{ $slider->title ?? 'New Arrivals' }}</h2>
-                                    <h1>{{ $slider->subtitle ?? 'Trending' }}</h1>
-                                    <p>{!! nl2br(e($slider->content ?? 'Discover our latest collection.')) !!}</p>
-                                    @if(isset($slider->link))
-                                        <a href="{{ $slider->link }}">Explore now</a>
-                                    @endif
-                                </div>
-                            </div>
+                                   <h2>top trending</h2>
+                                    <h1>handbag</h1>
+                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
+                                    <a href="shop.html">Discover Now</a>
+                                </div>  
+                            </div>     
+                        </div>
+                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider11.jpg') }}">
+                           <div class="slider_content_inner">
+                                <div class="slider_content">
+                                    <h2>new arrivals</h2>
+                                    <h1>zip hoodie</h1>
+                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
+                                    <a href="shop.html">Discover Now</a>
+                                </div> 
+                            </div>   
+                        </div>
+                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider12.jpg') }}">
+                           <div class="slider_content_inner">
+                                <div class="slider_content">
+                                    <h2>top trending</h2>
+                                    <h1>clothing</h1>
+                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
+                                    <a href="shop.html">Discover Now</a>
+                                </div> 
+                            </div>         
                         </div>
                     </div>
                 </div>
@@ -166,7 +47,7 @@
                            <div class="col-12">
                                 <div class="banner_area banner_top">
                                     <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner18.jpg') }}" alt="#"></a>
+                                        <a href="shop.html"><img src="{{ asset('reid/assets/img/bg/banner18.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
                                            <h1>Men’s <br> Summer Sneaker</h1>
                                            <h3>Big Sale Off This Week</h3>
@@ -177,7 +58,7 @@
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="banner_area">
                                     <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner19.jpg') }}" alt="#"></a>
+                                        <a href="shop.html"><img src="{{ asset('reid/assets/img/bg/banner19.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
                                            <h1>Clothing.No18</h1>
                                            <h3>Sale Off 20% All Store</h3>
@@ -188,7 +69,7 @@
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="banner_area">
                                     <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner20.jpg') }}" alt="#"></a>
+                                        <a href="shop.html"><img src="{{ asset('reid/assets/img/bg/banner20.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
                                            <h1>Bag.No1</h1>
                                            <h3>Big Sale No Limited</h3>
@@ -216,82 +97,11 @@
                     </div>
                 </div>
             </div>
-            <div class="product_area" style="margin-top: 10px;">
+            <div class="product_area">
                 <div class="product_container">
-                    <style>
-                        /* Modern Minimalist Horizontal Scroll */
-                        .modern-horizontal-scroll {
-                            display: flex;
-                            flex-wrap: nowrap;
-                            overflow-x: auto;
-                            gap: 24px;
-                            padding: 10px 5px 35px 5px;
-                            scroll-behavior: smooth;
-                            -webkit-overflow-scrolling: touch;
-                            scrollbar-width: none; /* Firefox */
-                        }
-                        .modern-horizontal-scroll::-webkit-scrollbar {
-                            display: none; /* Chrome/Safari */
-                        }
-                        .modern-product-item {
-                            flex: 0 0 260px;
-                            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-                            border-radius: 16px;
-                            background: #fff;
-                            border: 1px solid #f4f4f4;
-                        }
-                        .modern-product-item:hover {
-                            transform: translateY(-6px);
-                            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-                            border-color: transparent;
-                        }
-                        .modern-product-item .single_product {
-                            border: none !important;
-                            margin-bottom: 0;
-                        }
-                        .modern-product-item .product_thumb {
-                            border-radius: 16px 16px 0 0;
-                            overflow: hidden;
-                            aspect-ratio: 4 / 5;
-                        }
-                        .modern-product-item .product_content {
-                            padding: 18px 20px 22px;
-                            text-align: center;
-                        }
-                        .modern-product-item .product_content h3 {
-                            height: auto;
-                            margin-bottom: 8px;
-                        }
-                        .modern-product-item .product_content h3 a {
-                            font-weight: 500;
-                            color: #222;
-                            font-size: 15px;
-                            letter-spacing: 0.3px;
-                            display: -webkit-box;
-                            -webkit-line-clamp: 1;
-                            -webkit-box-orient: vertical;
-                            overflow: hidden;
-                        }
-                        .modern-product-item .product_ratting ul {
-                            justify-content: center !important;
-                        }
-                        .modern-product-item .price_box {
-                            display: flex;
-                            justify-content: center;
-                            gap: 8px;
-                            margin-top: 5px;
-                        }
-                        
-                        /* Custom Scrollbar for desktop optional styling */
-                        @media (min-width: 992px) {
-                            .modern-horizontal-scroll {
-                                padding-bottom: 25px;
-                            }
-                        }
-                    </style>
-                    <div class="modern-horizontal-scroll">
+                    <div class="row product_column5">
                         @foreach($featuredProducts as $product)
-                        <div class="modern-product-item">
+                        <div class="col-lg-3">
                             <div class="single_product">
                                 <div class="product_thumb">
                                     <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
@@ -530,7 +340,7 @@
                                             </ul>
                                         </div>
                                         <div style="font-size: 12px; color: #ff6a28; margin-top: 5px;">
-                                            <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} likes
+                                            <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} lượt yêu thích
                                         </div>
                                     </div>
                                 </div>
@@ -806,7 +616,7 @@
                             if (xhr.status === 401) {
                                 window.location.href = "{{ route('login') }}";
                             } else {
-                                alert('An error occurred, please try again!');
+                                alert('Có lỗi xảy ra, vui lòng thử lại!');
                             }
                         }
                     });

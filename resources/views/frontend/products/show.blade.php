@@ -343,7 +343,7 @@
                                 <div class="product_info_content">
                                     <p>{{ __('messages.customer_reviews_for') }} {{ $product->name }}</p>
                                 </div>
-                                @foreach($product->reviews as $review)
+                                @forelse($product->reviews as $review)
                                     <div class="product_info_inner">
                                         <div class="product_ratting mb-10">
                                             <ul>
@@ -361,7 +361,12 @@
                                         </div>
                                     </div>
                                     <hr>
-                                @endforeach
+                                @empty
+                                    <div class="alert alert-light text-center py-4" style="border: 1px dashed #ddd; border-radius: 8px;">
+                                        <i class="fa fa-commenting-o mb-2" style="font-size: 24px; color: #ccc; display: block;"></i>
+                                        <span class="text-muted">Sản phẩm chưa có đánh giá nào.</span>
+                                    </div>
+                                @endforelse
                                 <div class="product_review_form">
                                     @if(session('success'))
                                         <div class="alert alert-success">{{ session('success') }}</div>
