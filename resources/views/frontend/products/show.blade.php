@@ -63,7 +63,7 @@
                         <!-- AI Try On Button Indicator -->
                         <div class="ai-try-on-section mt-4 mb-3 text-center">
                             <button type="button" class="btn btn-outline-dark w-100 py-3" style="border: 1px dashed #333; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s;" data-bs-toggle="modal" data-bs-target="#aiTryOnModal" onmouseover="this.style.background='#333'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='#333';">
-                                <i class="fa fa-magic mr-2"></i> Thử đồ với AI (Phòng thử đồ ảo)
+                                <i class="fa fa-magic mr-2"></i> {{ __('messages.ai_try_on') }}
                             </button>
                         </div>
                     </div>
@@ -102,9 +102,9 @@
                                 @endphp
 
                                 <div class="product_variant size">
-                                    <h3>Size</h3>
+                                    <h3>{{ __('messages.size') }}</h3>
                                     <select class="niceselect_option" id="select_size_nice" name="size_id">
-                                        <option selected value="">Size</option>
+                                        <option selected value="">{{ __('messages.size') }}</option>
                                         @foreach($uniqueSizes as $size)
                                             <option value="{{ $size->id }}">{{ $size->name }}</option>
                                         @endforeach
@@ -113,9 +113,9 @@
                                 </div>
 
                                 <div class="product_variant color">
-                                    <h3>Color</h3>
+                                    <h3>{{ __('messages.color') }}</h3>
                                     <select class="niceselect_option" id="select_color_nice" name="color_id">
-                                        <option selected value="">Color</option>
+                                        <option selected value="">{{ __('messages.color') }}</option>
                                         @foreach($uniqueColors as $color)
                                             <option value="{{ $color->id }}">{{ $color->name }}</option>
                                         @endforeach
@@ -195,14 +195,16 @@
                                                         msg.style.display = 'none';
                                                         addToCartBtn.disabled = false;
                                                         buyNowBtn.disabled = false;
-                                                        addToCartBtn.textContent = 'ADD TO CART';
+                                                        addToCartBtn.textContent = "{{ __('messages.add_to_cart') }}".toUpperCase();
+                                                        buyNowBtn.textContent = "{{ __('messages.buy_now') }}".toUpperCase();
                                                     } else {
                                                         variantInput.value = '';
-                                                        msg.textContent = 'This variant is temporarily out of stock';
+                                                        msg.textContent = "{{ __('messages.variant_out_of_stock') }}";
                                                         msg.style.display = 'block';
                                                         addToCartBtn.disabled = true;
                                                         buyNowBtn.disabled = true;
-                                                        addToCartBtn.textContent = 'OUT OF STOCK';
+                                                        addToCartBtn.textContent = "{{ __('messages.out_of_stock') }}".toUpperCase();
+                                                        buyNowBtn.textContent = "{{ __('messages.out_of_stock') }}".toUpperCase();
                                                     }
                                                 } else {
                                                     // Only one or none selected
@@ -220,14 +222,15 @@
                                                     variantInput.value = '';
                                                     addToCartBtn.disabled = true;
                                                     buyNowBtn.disabled = true;
-                                                    addToCartBtn.textContent = 'ADD TO CART';
+                                                    addToCartBtn.textContent = "{{ __('messages.add_to_cart') }}".toUpperCase();
+                                                    buyNowBtn.textContent = "{{ __('messages.buy_now') }}".toUpperCase();
                                                     msg.style.display = 'none';
                                                 }
 
                                                 priceContainer.innerHTML = html;
                                             } else {
                                                 variantInput.value = '';
-                                                msg.textContent = 'This combination is not available';
+                                                msg.textContent = "{{ __('messages.combination_not_available') }}";
                                                 msg.style.display = 'block';
                                                 addToCartBtn.disabled = true;
                                                 buyNowBtn.disabled = true;
@@ -248,18 +251,35 @@
                                 <button class="button buy_now" type="submit" name="action" value="buy_now">{{ __('messages.buy_now') }}</button>  
                             </div>
                             <style>
+                                .product_variant.quantity .button {
+                                    height: 50px;
+                                    line-height: 50px;
+                                    padding: 0 35px;
+                                    background: #111;
+                                    border: 1px solid #111;
+                                    color: #fff;
+                                    font-weight: 700;
+                                    text-transform: uppercase;
+                                    letter-spacing: 1px;
+                                    transition: all 0.3s ease;
+                                }
+                                .product_variant.quantity .button:hover {
+                                    background: #ef233c;
+                                    border-color: #ef233c;
+                                }
                                 .product_variant.quantity .button.buy_now {
                                     background: #ef233c; 
                                     border-color: #ef233c; 
                                     margin-left: 10px;
                                 }
                                 .product_variant.quantity .button.buy_now:hover {
-                                    background: #333;
-                                    border-color: #333;
+                                    background: #111;
+                                    border-color: #111;
                                 }
                                 .product_variant.quantity .button:disabled {
-                                    background: #ccc;
-                                    border-color: #ccc;
+                                    background: #ebebeb !important;
+                                    border-color: #ebebeb !important;
+                                    color: #999 !important;
                                     cursor: not-allowed;
                                 }
                                 .star-rating {
@@ -291,8 +311,8 @@
                                 <ul>
                                     <li>
                                         <a href="#" class="add-to-wishlist" data-id="{{ $product->id }}"
-                                            title="Add to wishlist">
-                                            <i class="fa fa-heart-o" aria-hidden="true"></i> Add to Wish List
+                                            title="{{ __('messages.add_to_wishlist') }}">
+                                            <i class="fa fa-heart-o" aria-hidden="true"></i> {{ __('messages.add_to_wishlist') }}
                                         </a>
                                     </li>
                                 </ul>
@@ -300,7 +320,7 @@
 
                         </form>
                         <div class="priduct_social">
-                            <h3>Share on:</h3>
+                            <h3>{{ __('messages.share_on') }}</h3>
                             <ul>
                                 <li><a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" target="_blank" title="Share on Facebook"><i class="fa fa-facebook"></i></a></li>
                                 <li><a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($product->name) }}" target="_blank" title="Share on Twitter"><i class="fa fa-twitter"></i></a></li>
@@ -364,7 +384,7 @@
                                 @empty
                                     <div class="alert alert-light text-center py-4" style="border: 1px dashed #ddd; border-radius: 8px;">
                                         <i class="fa fa-commenting-o mb-2" style="font-size: 24px; color: #ccc; display: block;"></i>
-                                        <span class="text-muted">Sản phẩm chưa có đánh giá nào.</span>
+                                        <span class="text-muted">{{ __('messages.no_reviews_yet') }}</span>
                                     </div>
                                 @endforelse
                                 <div class="product_review_form">
@@ -418,7 +438,7 @@
                                             </div>
                                         @endif
                                     @else
-                                        <p>Vui lòng <a href="{{ route('login') }}" style="color: #ef233c; font-weight: bold;">đăng nhập</a> để gửi đánh giá của bạn.</p>
+                                        <p>{!! __('messages.login_to_review', ['login' => '<a href="'.route('login').'" style="color: #ef233c; font-weight: bold;">'.__('messages.login').'</a>']) !!}</p>
                                     @endauth
                                 </div>
                             </div>
@@ -436,7 +456,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Related Products</h2>
+                        <h2>{{ __('messages.related_products') }}</h2>
                     </div>
                 </div>
             </div>
@@ -489,41 +509,41 @@
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content border-0 shadow" style="border-radius: 12px; overflow: hidden;">
                 <div class="modal-header border-0 pb-0 pt-4 px-4 text-center d-block position-relative">
-                    <h5 class="modal-title" style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px;"><i class="fa fa-magic text-primary"></i> Trải nghiệm Thử Đồ AI</h5>
+                    <h5 class="modal-title" style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px;"><i class="fa fa-magic text-primary"></i> {{ __('messages.ai_try_on_modal_title') }}</h5>
                     <button type="button" class="close position-absolute" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close" style="top: 15px; right: 20px; font-size: 28px; background:transparent; border:none;">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <p class="text-muted mt-2" style="font-size: 14px;">Xem thử trang phục này trên người bạn sẽ trông như thế nào</p>
+                    <p class="text-muted mt-2" style="font-size: 14px;">{{ __('messages.ai_try_on_desc') }}</p>
                 </div>
                 <div class="modal-body p-4">
                     <div class="row align-items-center">
                         <div class="col-md-5 text-center mb-4 mb-md-0">
-                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">Ảnh mẫu của bạn</p>
+                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">{{ __('messages.user_photo_sample') }}</p>
                             <div class="upload-area p-4 d-flex flex-column align-items-center justify-content-center" style="border: 2px dashed #ccc; border-radius: 8px; background: #fafafa; cursor: pointer; position: relative; min-height: 250px;" id="uploadBtn">
                                 <div id="uploadPlaceholder" style="pointer-events: none;">
                                     <i class="fa fa-cloud-upload fa-3x text-muted mb-3"></i>
-                                    <p class="m-0" style="font-size: 14px; font-weight: 600;">Nhấn để tải ảnh lên</p>
-                                    <p class="text-muted mt-1" style="font-size: 11px;">Hỗ trợ JPG, PNG (Tối đa 5MB)<br>Vui lòng chọn ảnh chụp thẳng dáng người</p>
+                                    <p class="m-0" style="font-size: 14px; font-weight: 600;">{{ __('messages.upload_photo') }}</p>
+                                    <p class="text-muted mt-1" style="font-size: 11px;">{!! __('messages.upload_photo_support') !!}</p>
                                 </div>
                                 <input type="file" id="userImageUpload" accept="image/*" style="opacity: 0; position: absolute; top:0; left:0; width: 100%; height: 100%; cursor: pointer; z-index: 100;">
                                 <img id="userImagePreview" src="" style="max-width: 100%; max-height: 230px; border-radius: 6px; display: none; position: relative; z-index: 2;" alt="User Image">
-                                <button type="button" class="btn btn-sm btn-light position-absolute shadow-sm" id="btnChangeImage" style="display:none; bottom: 10px; right: 10px; z-index: 105; font-size: 11px; font-weight: bold;"><i class="fa fa-refresh"></i> Đổi ảnh</button>
+                                <button type="button" class="btn btn-sm btn-light position-absolute shadow-sm" id="btnChangeImage" style="display:none; bottom: 10px; right: 10px; z-index: 105; font-size: 11px; font-weight: bold;"><i class="fa fa-refresh"></i> {{ __('messages.change_photo') }}</button>
                             </div>
                         </div>
                         <div class="col-md-2 text-center d-none d-md-block">
                             <i class="fa fa-long-arrow-right fa-2x text-muted"></i>
                         </div>
                         <div class="col-md-5 text-center">
-                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">Kết quả AI</p>
+                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">{{ __('messages.ai_result') }}</p>
                             <div class="result-area p-4 d-flex align-items-center justify-content-center" style="border: 1px solid #eee; border-radius: 8px; background: #f8f9fa; min-height: 250px; position: relative; overflow: hidden;" id="aiResultArea">
                                 <div class="text-muted text-center" id="aiWaitingText">
                                     <i class="fa fa-user-circle-o fa-3x mb-3" style="color: #ddd;"></i><br>
-                                    <span style="font-size: 13px;">Vui lòng tải ảnh lên<br>để bắt đầu mô phỏng</span>
+                                    <span style="font-size: 13px;">{!! __('messages.please_upload_photo') !!}</span>
                                 </div>
                                 <div id="aiLoading" class="text-center" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%;">
                                     <i class="fa fa-spinner fa-spin fa-3x mb-3 text-dark"></i>
-                                    <p style="font-size: 13px; font-weight: 600; color: #111;" class="m-0">AI đang xử lý ghép đồ...</p>
-                                    <p style="font-size: 11px; color: #666;" class="m-0">Thường mất khoảng 3-5 giây</p>
+                                    <p style="font-size: 13px; font-weight: 600; color: #111;" class="m-0">{{ __('messages.ai_processing') }}</p>
+                                    <p style="font-size: 11px; color: #666;" class="m-0">{{ __('messages.ai_wait_time') }}</p>
                                 </div>
                                 <div id="aiSuccessResult" style="display: none; width: 100%; height: 100%;">
                                     <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
@@ -538,10 +558,10 @@
                 </div>
                 <div class="modal-footer border-0 pt-0 pb-4 justify-content-center">
                     <button type="button" class="btn btn-dark px-5 py-3" id="btnRunAI" style="border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-width: 250px; transition: all 0.3s;" disabled>
-                        <i class="fa fa-gears mr-2"></i> Bắt đầu Thử đồ
+                        <i class="fa fa-gears mr-2"></i> {{ __('messages.start_try_on') }}
                     </button>
                     <button type="button" class="btn btn-success px-5 py-3" id="btnDownloadResult" style="border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-width: 250px; display: none;">
-                        <i class="fa fa-download mr-2"></i> Tải ảnh về
+                        <i class="fa fa-download mr-2"></i> {{ __('messages.download_result') }}
                     </button>
                 </div>
             </div>
@@ -623,7 +643,7 @@
                         aiSuccessResult.style.display = 'none';
                         aiLoading.style.display = 'block';
                         btnRunAI.disabled = true;
-                        btnRunAI.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> Đang xử lý...';
+                        btnRunAI.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> {{ __('messages.processing') }}';
 
                         // Simulate API delay (3 seconds)
                         setTimeout(() => {
@@ -641,7 +661,7 @@
                             
                             // Reset Run AI button state for next time
                             btnRunAI.disabled = false;
-                            btnRunAI.innerHTML = '<i class="fa fa-gears mr-2"></i> Bắt đầu Thử đồ';
+                            btnRunAI.innerHTML = '<i class="fa fa-gears mr-2"></i> {{ __('messages.start_try_on') }}';
                         }, 3000);
                     });
                     

@@ -387,7 +387,7 @@
                                     <div class="coupon-applied">
                                         <div>
                                             <i class="fa fa-check-circle"></i>
-                                            <span class="coupon-code">{{ $coupon->code }}</span> has been applied
+                                            <span class="coupon-code">{{ $coupon->code }}</span> {{ __('messages.applied') }}
                                         </div>
                                         <button type="button" class="btn btn-sm btn-outline-danger" id="removeCouponBtn">
                                             <i class="fa fa-times"></i> {{ __('messages.remove') }}
@@ -443,15 +443,15 @@
 
                                 <div class="col-12 mb-20">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="mb-0">Tỉnh / Thành phố <span>*</span></label>
+                                        <label class="mb-0">{{ __('messages.province_city') }} <span>*</span></label>
                                         <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-primary"
                                             title="Sử dụng vị trí hiện tại của bạn">
-                                            <i class="fa fa-map-marker"></i> Định vị vị trí
+                                            <i class="fa fa-map-marker"></i> {{ __('messages.locate_me') }}
                                         </button>
                                     </div>
                                     <select name="province" id="province" required
                                         class="form-control @error('province') is-invalid @enderror">
-                                        <option value="">{{ __('Chọn tỉnh thành') }}</option>
+                                        <option value="">{{ __('messages.select_province') }}</option>
                                         @foreach($provinces as $province)
                                             <option value="{{ $province }}" {{ (Auth::check() && str_contains(Auth::user()->address, $province)) || old('province') == $province ? 'selected' : '' }}>
                                                 {{ $province }}
@@ -518,7 +518,7 @@
                                         @endif
                                         <tr>
                                             <th>{{ __('messages.shipping') }}</th>
-                                            <td><strong>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí' }}</strong>
+                                            <td><strong>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : __('messages.free') }}</strong>
                                             </td>
                                         </tr>
                                         <tr class="order_total">
@@ -565,12 +565,12 @@
                                         data-bs-target="createp_account" required />
                                     <label for="payment_vnpay" data-bs-toggle="collapse" data-bs-target="#method_vnpay"
                                         aria-controls="method_vnpay">
-                                        Thanh toán qua VNPAY
+                                        {{ __('messages.vnpay_payment') }}
                                     </label>
 
                                     <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
                                         <div class="card-body1">
-                                            <p>Bạn sẽ được chuyển hướng sang cổng thanh toán VNPAY an toàn để hoàn tất đơn hàng.</p>
+                                            <p>{{ __('messages.vnpay_description') }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -696,44 +696,43 @@
     
     // Validation functions
     function validateName(value) {
-        if (!value || value.trim().length < 2) {
-            return 'Please enter your full name (at least 2 characters)';
+            return "{{ __('messages.validate_name') }}";
         }
         return '';
     }
 
     function validatePhone(value) {
         if (!value) {
-            return 'Please enter your phone number';
+            return "{{ __('messages.validate_phone_required') }}";
         }
         const phoneRegex = /^[0-9]{10,11}$/;
         if (!phoneRegex.test(value)) {
-            return 'Phone number must have 10-11 digits';
+            return "{{ __('messages.validate_phone_digits') }}";
         }
         return '';
     }
 
     function validateEmail(value) {
         if (!value) {
-            return 'Please enter your email';
+            return "{{ __('messages.validate_email_required') }}";
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(value)) {
-            return 'Invalid email';
+            return "{{ __('messages.validate_email_invalid') }}";
         }
         return '';
     }
 
     function validateAddress(value) {
         if (!value || value.trim().length < 5) {
-            return 'Vui lòng nhập địa chỉ cụ thể (số nhà, tên đường)';
+            return "{{ __('messages.validate_address_required') }}";
         }
         return '';
     }
 
     function validateProvince(value) {
         if (!value) {
-            return 'Vui lòng chọn tỉnh thành';
+            return "{{ __('messages.validate_province_required') }}";
         }
         return '';
     }

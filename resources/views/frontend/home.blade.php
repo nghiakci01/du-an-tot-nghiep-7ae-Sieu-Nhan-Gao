@@ -277,8 +277,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Customer Favorites</h2>
-                        <p>Products that customers like and love the most.</p>
+                        <h2>{{ __('messages.top_wishlisted') }}</h2>
+                        <p>{{ __('messages.top_wishlisted_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -321,8 +321,7 @@
                                             </div>
                                         </div>
                                         <div class="quick_button">
-                                            <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick
-                                                view</a>
+                                            title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                         </div>
                                         <div class="double_base">
                                             @if($product->price < $product->original_price)
@@ -351,7 +350,7 @@
                                             </ul>
                                         </div>
                                         <div style="font-size: 12px; color: #ff6a28; margin-top: 5px;">
-                                            <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} lượt yêu thích
+                                            <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} {{ __('lượt yêu thích') }}
                                         </div>
                                     </div>
                                 </div>
