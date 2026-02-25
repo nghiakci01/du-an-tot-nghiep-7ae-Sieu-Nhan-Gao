@@ -19,8 +19,8 @@ class ProductSeeder extends Seeder
         // Nếu không tìm thấy category thì srr skip hoặc tạo mới (tùy logic, ở đây assume có rồi từ CategorySeeder)
         // Tuy nhiên tốt nhất là check null
         if (!$aoThunNam || !$vayDamNu) {
-             $this->command->error('Categories not found. Please run CategorySeeder first.');
-             return;
+            $this->command->error('Categories not found. Please run CategorySeeder first.');
+            return;
         }
 
         $products = [
@@ -29,6 +29,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Áo Thun Basic Trắng',
                 'slug' => 'ao-thun-basic-trang',
                 'description' => 'Áo thun cotton 100% thoáng mát.',
+                'short_description' => 'Áo thun cotton trắng thoáng mát dành cho nam ngầu.',
                 'price' => 150000,
                 'is_active' => true,
                 'variants' => [
@@ -37,11 +38,12 @@ class ProductSeeder extends Seeder
                     ['size' => 'L', 'color' => 'Trắng', 'stock_quantity' => 15, 'sku' => 'TS-W-L'],
                 ]
             ],
-             [
+            [
                 'category_id' => $aoThunNam->id,
                 'name' => 'Áo Thun Basic Đen',
                 'slug' => 'ao-thun-basic-den',
                 'description' => 'Áo thun đen phong cách.',
+                'short_description' => 'Áo thun đen năng động phong cách lịch sự.',
                 'price' => 150000,
                 'is_active' => true,
                 'variants' => [
@@ -54,6 +56,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Váy Hoa Nhí Vintage',
                 'slug' => 'vay-hoa-nhi-vintage',
                 'description' => 'Váy hoa nhẹ nhàng cho mùa hè.',
+                'short_description' => 'Váy hoa nhí vintage xinh xắn dành cho nữ.',
                 'price' => 350000,
                 'is_active' => true,
                 'variants' => [] // Add variants if needed
@@ -73,7 +76,7 @@ class ProductSeeder extends Seeder
             foreach ($variants as $variant) {
                 // Ensure unique SKU per variant
                 ProductVariant::firstOrCreate(
-                    ['sku' => $variant['sku'] . '-' . $product->id], 
+                    ['sku' => $variant['sku'] . '-' . $product->id],
                     array_merge($variant, [
                         'product_id' => $product->id,
                         'sku' => $variant['sku'] . '-' . $product->id // update SKU to include product ID as per original logic if needed, or just keep unique SKU
@@ -81,7 +84,7 @@ class ProductSeeder extends Seeder
                 );
             }
         }
-        
+
         echo "\n✅ Đã thêm thành công " . count($products) . " sản phẩm với " . (count($products) * 4) . " biến thể!\n";
     }
 }

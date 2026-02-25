@@ -55,7 +55,7 @@ class ProductController extends Controller
                         if (is_resource($stream)) {
                             fclose($stream);
                         }
-                        
+
                         if ($storedPath) {
                             $data['image'] = 'products/' . $filename;
                         }
@@ -73,11 +73,11 @@ class ProductController extends Controller
                 foreach ($request->variants as $variantData) {
                     $size = \App\Models\Size::find($variantData['size_id']);
                     $color = \App\Models\Color::find($variantData['color_id']);
-                    
+
                     $sizeName = $size?->name ?? 'Unknown';
                     $colorName = $color?->name ?? 'Unknown';
 
-                    $sku = $variantData['sku'];
+                    $sku = $variantData['sku'] ?? null;
                     if (empty($sku)) {
                         $sku = strtoupper(Str::slug($product->name . '-' . $sizeName . '-' . $colorName . '-' . uniqid()));
                     }
@@ -172,7 +172,7 @@ class ProductController extends Controller
                         if ($product->image) {
                             Storage::disk('public')->delete($product->image);
                         }
-                        
+
                         $filename = $file->hashName();
                         $stream = fopen($path, 'r');
                         $storedPath = Storage::disk('public')->put('products/' . $filename, $stream);
@@ -203,11 +203,11 @@ class ProductController extends Controller
             foreach ($submittedVariants as $variantData) {
                 $size = \App\Models\Size::find($variantData['size_id']);
                 $color = \App\Models\Color::find($variantData['color_id']);
-                
+
                 $sizeName = $size?->name ?? 'Unknown';
                 $colorName = $color?->name ?? 'Unknown';
 
-                $sku = $variantData['sku'];
+                $sku = $variantData['sku'] ?? null;
                 if (empty($sku)) {
                     $sku = strtoupper(Str::slug($product->name . '-' . $sizeName . '-' . $colorName . '-' . uniqid()));
                 }
@@ -238,7 +238,7 @@ class ProductController extends Controller
             if ($request->hasFile('gallery_images')) {
                 $currentCount = $product->images()->count();
                 $newCount = count($request->file('gallery_images'));
-                
+
                 if ($currentCount + $newCount <= 6) {
                     foreach ($request->file('gallery_images') as $index => $image) {
                         $path = $image->getRealPath() ?: $image->getPathname();
@@ -261,7 +261,7 @@ class ProductController extends Controller
                                 \Log::error('Gallery image update failed: ' . $e->getMessage());
                             }
                         } else {
-                             \Log::warning('Gallery image update attempted but file is invalid or path is empty: ' . $image->getClientOriginalName());
+                            \Log::warning('Gallery image update attempted but file is invalid or path is empty: ' . $image->getClientOriginalName());
                         }
                     }
                 }
@@ -307,15 +307,15 @@ class ProductController extends Controller
     {
         try {
             $image = \App\Models\ProductImage::findOrFail($imageId);
-            
+
             // Delete file from storage
             if (Storage::disk('public')->exists($image->image_path)) {
                 Storage::disk('public')->delete($image->image_path);
             }
-            
+
             // Delete database record
             $image->delete();
-            
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

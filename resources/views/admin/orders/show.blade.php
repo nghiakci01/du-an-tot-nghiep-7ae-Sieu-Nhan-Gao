@@ -16,6 +16,11 @@
                     <li class="breadcrumb-item"><a href="#!">Chi tiết</a></li>
                 </ul>
             </div>
+            <div class="col-md-12 text-end mt-3">
+                <a href="{{ route('admin.orders.print', $order->id) }}" target="_blank" class="btn btn-primary">
+                    <i class="feather icon-printer"></i> In Hóa Đơn
+                </a>
+            </div>
         </div>
     </div>
 </div>
