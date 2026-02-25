@@ -57,14 +57,14 @@ class AccountController extends Controller
 
         if ($request->filled('new_password')) {
             if (!Hash::check($request->current_password, $user->password)) {
-                return redirect()->back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.']);
+                return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
             }
             $user->password = Hash::make($request->new_password);
         }
 
         $user->save();
 
-        return redirect()->back()->with('success', 'Cập nhật thông tin thành công!');
+        return redirect()->back()->with('success', 'Information updated successfully!');
     }
 
     public function cancelOrder($id, \App\Services\OrderService $orderService)
@@ -73,15 +73,15 @@ class AccountController extends Controller
         $order = $user->orders()->findOrFail($id);
 
         if ($order->status !== Order::STATUS_PENDING) {
-             return redirect()->back()->with('error', 'Chỉ có thể hủy đơn hàng khi trạng thái là Chờ xác nhận.');
+             return redirect()->back()->with('error', 'Orders can only be cancelled when the status is Pending.');
         }
 
         try {
-            $orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, $user, 'Khách hàng tự hủy đơn');
+            $orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, $user, 'Customer cancelled order themselves');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', 'Đã hủy đơn hàng thành công!');
+        return redirect()->back()->with('success', 'Order cancelled successfully!');
     }
 }

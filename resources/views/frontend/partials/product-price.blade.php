@@ -24,10 +24,10 @@
 <span class="current_price">
     @if($displaySalePrice && $displaySalePrice > 0 && $displaySalePrice < $displayPrice)
         {{-- Sale price --}}
-        <span class="old_price" style="text-decoration: line-through; margin-right: 5px;">{{ number_format($displayPrice) }} đ</span>
-        {{ number_format($displaySalePrice) }} đ
+        <span class="old_price" style="text-decoration: line-through; margin-right: 5px;">{{ number_format($displayPrice) }} VND</span>
+        {{ number_format($displaySalePrice) }} VND
     @else
         {{-- Regular price --}}
-        {{ number_format($displayPrice) }} đ
+        {{ number_format($displayPrice) }} VND
     @endif
 </span>

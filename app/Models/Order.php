@@ -23,6 +23,8 @@ class Order extends Model
         'shipping_fee',
         'final_total',
         'payment_method',
+        'payment_status',
+        'transaction_id',
         'shipping_address',
         'note',
     ];

@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Tin tức | Elite')
+@section('title', 'News | Elite')
 
 @section('content')
     <!--breadcrumbs area start-->
@@ -40,12 +40,11 @@
                                 <a href="#"><img src="{{ asset('frontend-assets/img/blog/blog1.jpg') }}" alt=""></a>
                             </div>
                             <figcaption class="blog_content">
-                                <h4 class="post_title"><a href="#">Xu hướng thời trang Xuân - Hè 2026</a></h4>
+                                <h4 class="post_title"><a href="#">Spring - Summer 2026 Fashion Trends</a></h4>
                                 <div class="articles_date">
-                                    <p>04 Tháng 2, 2026 | <a href="#">Thời trang</a> </p>
+                                    <p>February 04, 2026 | <a href="#">Fashion</a> </p>
                                 </div>
-                                <p class="post_desc">Khám phá những bộ sưu tập mới nhất mang đậm phong cách trẻ trung, năng
-                                    động cho mùa lễ hội năm nay...</p>
+                                <p class="post_desc">Discover the latest collections with a youthful, dynamic style for this year's festive season...</p>
                                 <footer class="btn_more">
                                     <a href="#"> {{ __('messages.read_more') }}</a>
                                 </footer>
@@ -60,12 +59,11 @@
                                 <a href="#"><img src="{{ asset('frontend-assets/img/blog/blog2.jpg') }}" alt=""></a>
                             </div>
                             <figcaption class="blog_content">
-                                <h4 class="post_title"><a href="#">Bí quyết phối đồ tối giản cho nam giới</a></h4>
+                                <h4 class="post_title"><a href="#">Minimalist styling tips for men</a></h4>
                                 <div class="articles_date">
-                                    <p>01 Tháng 2, 2026 | <a href="#">Tips & Tricks</a> </p>
+                                    <p>February 01, 2026 | <a href="#">Tips & Tricks</a> </p>
                                 </div>
-                                <p class="post_desc">Phong cách Minimalism chưa bao giờ lỗi mốt. Hãy cùng Elite tìm
-                                    hiểu cách phối đồ chuẩn "soái ca"...</p>
+                                <p class="post_desc">Minimalist style never goes out of fashion. Let's learn standard fashion mixes with Elite...</p>
                                 <footer class="btn_more">
                                     <a href="#"> {{ __('messages.read_more') }}</a>
                                 </footer>
@@ -80,12 +78,11 @@
                                 <a href="#"><img src="{{ asset('frontend-assets/img/blog/blog3.jpg') }}" alt=""></a>
                             </div>
                             <figcaption class="blog_content">
-                                <h4 class="post_title"><a href="#">Thông báo: Khai trương chi nhánh mới</a></h4>
+                                <h4 class="post_title"><a href="#">Notice: Opening of new branch</a></h4>
                                 <div class="articles_date">
-                                    <p>25 Tháng 1, 2026 | <a href="#">Thông báo</a> </p>
+                                    <p>January 25, 2026 | <a href="#">Notice</a> </p>
                                 </div>
-                                <p class="post_desc">Elite vui mừng thông báo khai trương chi nhánh thứ 5 tại TP. Hồ
-                                    Chí Minh với nhiều ưu đãi hấp dẫn...</p>
+                                <p class="post_desc">Elite is pleased to announce the opening of its 5th branch in Ho Chi Minh City with many attractive deals...</p>
                                 <footer class="btn_more">
                                     <a href="#"> {{ __('messages.read_more') }}</a>
                                 </footer>
