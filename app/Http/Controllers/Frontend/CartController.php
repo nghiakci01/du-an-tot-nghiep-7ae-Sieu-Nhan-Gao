@@ -54,9 +54,26 @@ class CartController extends Controller
         $variant = ProductVariant::findOrFail($variantId);
         $cart = session()->get('cart', []);
 
-        // Check availability
-        if ($variant->stock_quantity < $request->quantity) {
-             return redirect()->back()->with('error', 'Product does not have enough stock.');
+        // Check tồn kho — tính cả số lượng đã có trong giỏ
+        $existingQty = isset($cart[$variant->id]) ? $cart[$variant->id]['quantity'] : 0;
+        $requestedQty = $request->quantity ?? 1;
+        $totalQty = $existingQty + $requestedQty;
+
+        if ($variant->stock_quantity <= 0) {
+            $msg = 'Sản phẩm này đã hết hàng.';
+            if ($request->expectsJson()) return response()->json(['success' => false, 'message' => $msg], 422);
+            return redirect()->back()->with('error', $msg);
+        }
+
+        if ($totalQty > $variant->stock_quantity) {
+            $available = $variant->stock_quantity - $existingQty;
+            if ($available <= 0) {
+                $msg = "Bạn đã có {$existingQty} sản phẩm này trong giỏ hàng. Không thể thêm, đã đạt giới hạn tồn kho ({$variant->stock_quantity}).";
+            } else {
+                $msg = "Chỉ còn {$variant->stock_quantity} sản phẩm trong kho. Bạn đã có {$existingQty} trong giỏ, chỉ có thể thêm tối đa {$available} sản phẩm.";
+            }
+            if ($request->expectsJson()) return response()->json(['success' => false, 'message' => $msg], 422);
+            return redirect()->back()->with('error', $msg);
         }
 
         if(isset($cart[$variant->id])) {

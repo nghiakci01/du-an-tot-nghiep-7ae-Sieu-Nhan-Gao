@@ -192,9 +192,53 @@
                                                             popup: 'animate__animated animate__fadeInDown'
                                                         },
                                                     });
+                                                        return false;
+                                                }
+
+                                                // Kiểm tra số lượng vượt tồn kho
+                                                const qtyInput = document.getElementById('quantity_input');
+                                                const requestedQty = parseInt(qtyInput ? qtyInput.value : 1);
+                                                const maxQty = parseInt(qtyInput ? qtyInput.max : 100);
+
+                                                if (maxQty && requestedQty > maxQty) {
+                                                    e.preventDefault();
+                                                    qtyInput.value = maxQty;
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: 'Vượt quá số lượng tồn kho!',
+                                                        html: `Sản phẩm này chỉ còn <strong>${maxQty}</strong> trong kho.<br>Số lượng đã được điều chỉnh về mức tối đa.`,
+                                                        confirmButtonColor: '#ef233c',
+                                                        confirmButtonText: 'Đồng ý',
+                                                        timer: 5000,
+                                                        timerProgressBar: true,
+                                                    });
                                                     return false;
                                                 }
                                             });
+
+                                            // Realtime check khi nhập số lượng
+                                            const qtyInputEl = document.getElementById('quantity_input');
+                                            if (qtyInputEl) {
+                                                qtyInputEl.addEventListener('input', function() {
+                                                    const max = parseInt(this.max);
+                                                    const val = parseInt(this.value);
+                                                    if (max && val > max) {
+                                                        Swal.fire({
+                                                            toast: true,
+                                                            position: 'top-end',
+                                                            icon: 'warning',
+                                                            title: `Chỉ còn ${max} sản phẩm trong kho!`,
+                                                            showConfirmButton: false,
+                                                            timer: 2500,
+                                                            timerProgressBar: true,
+                                                        });
+                                                        this.value = max;
+                                                    }
+                                                    if (val < 1 || isNaN(val)) {
+                                                        this.value = 1;
+                                                    }
+                                                });
+                                            }
                                         }
 
                                         const formatCurrency = (amount) => {
@@ -235,10 +279,26 @@
                                                     if (matchedVariant.stock_quantity > 0) {
                                                         variantInput.value = matchedVariant.id;
                                                         msg.style.display = 'none';
+                                                        // Cập nhật stock info và max quantity
+                                                        const qtyInput = document.getElementById('quantity_input');
+                                                        const stockInfo = document.getElementById('stock-info');
+                                                        if (qtyInput) {
+                                                            qtyInput.max = matchedVariant.stock_quantity;
+                                                            if (parseInt(qtyInput.value) > matchedVariant.stock_quantity) {
+                                                                qtyInput.value = matchedVariant.stock_quantity;
+                                                            }
+                                                        }
+                                                        if (stockInfo) {
+                                                            stockInfo.textContent = `(Còn ${matchedVariant.stock_quantity} sản phẩm)`;
+                                                            stockInfo.style.display = 'inline';
+                                                            stockInfo.style.color = matchedVariant.stock_quantity <= 5 ? '#ef233c' : '#666';
+                                                        }
                                                     } else {
                                                         variantInput.value = '';
                                                         msg.textContent = "{{ __('messages.variant_out_of_stock') }}";
                                                         msg.style.display = 'block';
+                                                        const stockInfo = document.getElementById('stock-info');
+                                                        if (stockInfo) stockInfo.style.display = 'none';
                                                     }
                                                 } else {
                                                     const activePrices = filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0);
@@ -270,9 +330,12 @@
 
                             <div class="product_variant quantity">
                                 <label>{{ __('messages.quantity') }}</label>
-                                <input min="1" max="100" value="1" type="number" name="quantity">
-                                <button class="button" type="submit" name="action" value="add_to_cart">{{ __('messages.add_to_cart') }}</button>
-                                <button class="button buy_now" type="submit" name="action" value="buy_now">{{ __('messages.buy_now') }}</button>  
+                                <input min="1" max="100" value="1" type="number" name="quantity" id="quantity_input">
+                                <span id="stock-info" style="display:none; font-size:13px; color:#666; margin-left:8px;"></span>
+                                <div style="margin-top:10px;">
+                                    <button class="button" type="submit" name="action" value="add_to_cart">{{ __('messages.add_to_cart') }}</button>
+                                    <button class="button buy_now" type="submit" name="action" value="buy_now">{{ __('messages.buy_now') }}</button>
+                                </div>
                             </div>
                             <style>
                                 .product_variant.quantity .button {
