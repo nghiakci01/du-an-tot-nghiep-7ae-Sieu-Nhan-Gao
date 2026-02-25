@@ -11,6 +11,11 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
+        'name',
+        'email',
+        'phone',
+        'province',
+        'address',
         'status',
         'total_price',
         'coupon_code',
@@ -93,7 +98,7 @@ class Order extends Model
         if ($this->status === $newStatus) {
             return true;
         }
-        
+
         return in_array($newStatus, $this->getAllowedTransitions());
     }
 }

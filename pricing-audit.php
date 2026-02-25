@@ -1,13 +1,15 @@
 <?php
 
-require __DIR__.'/vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-$app = require_once __DIR__.'/bootstrap/app.php';
+$app = require_once __DIR__ . '/bootstrap/app.php';
 $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
 use App\Models\Product;
 
 $products = Product::all();
+
+ob_start();
 
 echo "\n=== PRICING AUDIT ===\n\n";
 
@@ -22,7 +24,7 @@ foreach ($products as $product) {
     } else {
         $hasPrice++;
     }
-    
+
     if (!$product->sale_price || $product->sale_price == 0) {
         $missingSalePrice[] = $product->id;
     } else {
@@ -47,3 +49,9 @@ if (count($missingSalePrice) > 0 && count($missingSalePrice) <= 10) {
 }
 
 echo "\n";
+
+$output = ob_get_clean();
+echo $output; // Also print to console
+file_put_contents(__DIR__ . '/pricing-audit-report.txt', $output);
+echo "Report saved to pricing-audit-report.txt (UTF-8)\n";
+
