@@ -171,6 +171,7 @@ return [
     'variant' => 'Biến thể',
     'size' => 'Kích thước',
     'color' => 'Màu sắc',
+    'edit' => 'đổi size và màu',
     
     // Checkout - Reid Template
     'returning_customer' => 'Khách hàng cũ',

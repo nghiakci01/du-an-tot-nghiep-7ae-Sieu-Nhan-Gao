@@ -48,12 +48,14 @@ class CartController extends Controller
             'product_id' => 'required|exists:products,id',
             'size_id' => 'nullable',
             'color_id' => 'nullable',
+            'changed_type' => 'nullable|string' // 'size' or 'color'
         ]);
 
         $oldVariantId = $request->old_variant_id;
         $productId = $request->product_id;
         $sizeId = $request->size_id;
         $colorId = $request->color_id;
+        $changedType = $request->changed_type;
 
         $cart = session()->get('cart', []);
 
@@ -61,20 +63,30 @@ class CartController extends Controller
             return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại trong giỏ hàng'], 404);
         }
 
-        // Find the new variant based on product, size, and color
+        // Try to find the exact combination first
         $query = ProductVariant::where('product_id', $productId);
         if ($sizeId) $query->where('size_id', $sizeId);
         if ($colorId) $query->where('color_id', $colorId);
-        
         $newVariant = $query->first();
 
+        // If exact combination doesn't exist, try to find a variant matching the CHANGED attribute
+        if (!$newVariant && $changedType) {
+            $query = ProductVariant::where('product_id', $productId);
+            if ($changedType === 'size' && $sizeId) {
+                $query->where('size_id', $sizeId);
+            } elseif ($changedType === 'color' && $colorId) {
+                $query->where('color_id', $colorId);
+            }
+            $newVariant = $query->first(); // Get first available alternative
+        }
+
         if (!$newVariant) {
-            return response()->json(['success' => false, 'message' => 'Phiên bản sản phẩm này không tồn tại'], 404);
+            return response()->json(['success' => false, 'message' => 'Không tìm thấy phiên bản phù hợp'], 404);
         }
 
         // Check stock for the new variant
         if ($newVariant->stock_quantity < $cart[$oldVariantId]['quantity']) {
-            return response()->json(['success' => false, 'message' => 'Sản phẩm không đủ hàng'], 400);
+            return response()->json(['success' => false, 'message' => 'Sản phẩm không đủ hàng cho phiên bản này'], 400);
         }
 
         $oldQuantity = $cart[$oldVariantId]['quantity'];

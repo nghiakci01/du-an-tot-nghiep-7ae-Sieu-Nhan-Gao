@@ -170,6 +170,7 @@ return [
     'variant' => 'Variant',
     'size' => 'Size',
     'color' => 'Color',
+    'edit' => 'Change size & color',
     
     // Checkout - Reid Template
     'returning_customer' => 'Returning customer',

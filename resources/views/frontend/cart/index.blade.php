@@ -72,12 +72,13 @@
                                                     <td class="product_name">
                                                         <a href="{{ route('product.detail', $details['slug']) }}">{{ $details['name'] }}</a>
                                                         <div class="cart-variant-info mt-2">
-                                                            <span class="text-muted small">
+                                                            <div class="text-muted small mb-1">
                                                                 {{ __('messages.size') }}: <strong>{{ $details['size'] }}</strong> | 
                                                                 {{ __('messages.color') }}: <strong>{{ $details['color'] }}</strong>
-                                                            </span>
-                                                            <button type="button" class="btn btn-sm btn-link p-0 ms-2 edit-variant-btn" style="text-decoration: underline;">
-                                                                {{ __('messages.edit') ?? 'Đổi' }}
+                                                            </div>
+                                                            <button type="button" class="btn btn-sm edit-variant-btn p-0" 
+                                                                    style="font-size: 0.75rem; color: #ff6a28; text-decoration: none; border: none; background: transparent;">
+                                                                <i class="fa fa-pencil-square-o"></i> {{ __('messages.edit') }}
                                                             </button>
                                                         </div>
 
@@ -339,6 +340,7 @@
         // Change variant (Size/Color)
         $(".variant-select").on('change', function() {
             var ele = $(this);
+            var changedType = ele.data("type"); // Get 'size' or 'color'
             var row = ele.parents("tr");
             var productId = row.find(".product-id").val();
             var oldVariantId = row.find(".current-variant-id").val();
@@ -353,7 +355,8 @@
                     old_variant_id: oldVariantId,
                     product_id: productId,
                     size_id: sizeId,
-                    color_id: colorId
+                    color_id: colorId,
+                    changed_type: changedType
                 },
                 beforeSend: function() {
                     // Show loading state if needed
