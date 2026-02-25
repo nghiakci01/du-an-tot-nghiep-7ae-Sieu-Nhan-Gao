@@ -1,6 +1,16 @@
 @extends('layouts.public')
 
 @section('content')
+<style>
+    /* Normalize product image heights */
+    .single_product .product_thumb a img {
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        width: 100%;
+        height: auto;
+        background-color: #f5f5f5; /* Fallback background */
+    }
+</style>
 
         <!--slider area start-->
     <div class="slider_section slider_section_six">
@@ -97,82 +107,11 @@
                     </div>
                 </div>
             </div>
-            <div class="product_area" style="margin-top: 10px;">
+            <div class="product_area">
                 <div class="product_container">
-                    <style>
-                        /* Modern Minimalist Horizontal Scroll */
-                        .modern-horizontal-scroll {
-                            display: flex;
-                            flex-wrap: nowrap;
-                            overflow-x: auto;
-                            gap: 24px;
-                            padding: 10px 5px 35px 5px;
-                            scroll-behavior: smooth;
-                            -webkit-overflow-scrolling: touch;
-                            scrollbar-width: none; /* Firefox */
-                        }
-                        .modern-horizontal-scroll::-webkit-scrollbar {
-                            display: none; /* Chrome/Safari */
-                        }
-                        .modern-product-item {
-                            flex: 0 0 260px;
-                            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-                            border-radius: 16px;
-                            background: #fff;
-                            border: 1px solid #f4f4f4;
-                        }
-                        .modern-product-item:hover {
-                            transform: translateY(-6px);
-                            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-                            border-color: transparent;
-                        }
-                        .modern-product-item .single_product {
-                            border: none !important;
-                            margin-bottom: 0;
-                        }
-                        .modern-product-item .product_thumb {
-                            border-radius: 16px 16px 0 0;
-                            overflow: hidden;
-                            aspect-ratio: 4 / 5;
-                        }
-                        .modern-product-item .product_content {
-                            padding: 18px 20px 22px;
-                            text-align: center;
-                        }
-                        .modern-product-item .product_content h3 {
-                            height: auto;
-                            margin-bottom: 8px;
-                        }
-                        .modern-product-item .product_content h3 a {
-                            font-weight: 500;
-                            color: #222;
-                            font-size: 15px;
-                            letter-spacing: 0.3px;
-                            display: -webkit-box;
-                            -webkit-line-clamp: 1;
-                            -webkit-box-orient: vertical;
-                            overflow: hidden;
-                        }
-                        .modern-product-item .product_ratting ul {
-                            justify-content: center !important;
-                        }
-                        .modern-product-item .price_box {
-                            display: flex;
-                            justify-content: center;
-                            gap: 8px;
-                            margin-top: 5px;
-                        }
-                        
-                        /* Custom Scrollbar for desktop optional styling */
-                        @media (min-width: 992px) {
-                            .modern-horizontal-scroll {
-                                padding-bottom: 25px;
-                            }
-                        }
-                    </style>
-                    <div class="modern-horizontal-scroll">
+                    <div class="row product_column5">
                         @foreach($featuredProducts as $product)
-                        <div class="modern-product-item">
+                        <div class="col-lg-3">
                             <div class="single_product">
                                 <div class="product_thumb">
                                     <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
@@ -200,13 +139,13 @@
                                     <div class="quick_button">
                                         <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                     </div>
-                                    @if($product->price < $product->original_price)
                                     <div class="double_base">
+                                        @if($product->price < $product->original_price)
                                         <div class="product_sale">
                                             <span>{{ __('messages.sale') }}</span>
                                         </div>
+                                        @endif
                                     </div>
-                                    @endif
                                 </div>
                                 <div class="product_content">
                                     <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
