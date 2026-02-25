@@ -35,6 +35,15 @@ class CartController extends Controller
                         $details['color_id'] = $variant->color_id;
                     }
                 }
+
+                // Get other products in the same category
+                if ($product->category_id) {
+                    $details['category_products'] = Product::where('category_id', $product->category_id)
+                        ->where('is_active', true)
+                        ->get(['id', 'name']);
+                } else {
+                    $details['category_products'] = collect([]);
+                }
             }
         }
         
@@ -46,16 +55,19 @@ class CartController extends Controller
         $request->validate([
             'old_variant_id' => 'required',
             'product_id' => 'required|exists:products,id',
+            'new_product_id' => 'nullable|exists:products,id',
             'size_id' => 'nullable',
             'color_id' => 'nullable',
-            'changed_type' => 'nullable|string' // 'size' or 'color'
+            'changed_type' => 'nullable|string' // 'size', 'color', or 'product'
         ]);
 
         $oldVariantId = $request->old_variant_id;
-        $productId = $request->product_id;
+        $currentProductId = $request->product_id;
+        $newProductId = $request->new_product_id ?? $currentProductId;
         $sizeId = $request->size_id;
         $colorId = $request->color_id;
         $changedType = $request->changed_type;
+        $productId = $newProductId;
 
         $cart = session()->get('cart', []);
 
@@ -76,12 +88,19 @@ class CartController extends Controller
                 $query->where('size_id', $sizeId);
             } elseif ($changedType === 'color' && $colorId) {
                 $query->where('color_id', $colorId);
+            } elseif ($changedType === 'product') {
+                // If product changed, just pick the first available variant
             }
             $newVariant = $query->first(); // Get first available alternative
         }
 
         if (!$newVariant) {
-            return response()->json(['success' => false, 'message' => 'Không tìm thấy phiên bản phù hợp'], 404);
+            return response()->json(['success' => false, 'message' => 'Không tìm thấy phiên bản phù hợp cho sản phẩm này'], 404);
+        }
+
+        $product = Product::find($productId);
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Sản phẩm không hợp lệ'], 404);
         }
 
         // Check stock for the new variant
@@ -90,21 +109,19 @@ class CartController extends Controller
         }
 
         $oldQuantity = $cart[$oldVariantId]['quantity'];
-        $product = Product::find($productId);
-
-        // Remove old variant from cart session
-        unset($cart[$oldVariantId]);
-
-        // Determine price for new variant
+        
+        // Determine price
         $itemPrice = $newVariant->price ?? $product->price;
         if ($newVariant->sale_price && $newVariant->sale_price < ($newVariant->price ?? PHP_INT_MAX)) {
             $itemPrice = $newVariant->sale_price;
         }
 
-        // Add or merge new variant in cart
+        unset($cart[$oldVariantId]); // Remove old variant
+
         if (isset($cart[$newVariant->id])) {
-            $cart[$newVariant->id]['quantity'] += $oldQuantity;
+            $cart[$newVariant->id]['quantity'] += $oldQuantity; // Merge
         } else {
+            // Add new variant
             $cart[$newVariant->id] = [
                 "product_id" => $productId,
                 "variant_id" => $newVariant->id,
@@ -124,8 +141,8 @@ class CartController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Đã đổi phiên bản sản phẩm',
-            'redirect' => route('cart.index') // Refresh the page to update all UI elements easily
+            'message' => 'Đã cập nhật giỏ hàng',
+            'redirect' => route('cart.index', ['editing' => $newVariant->id])
         ]);
     }
 
