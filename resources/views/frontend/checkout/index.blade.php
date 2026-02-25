@@ -556,6 +556,23 @@
                                     <div id="method_bank" class="collapse" data-bs-parent="#accordion">
                                         <div class="card-body1">
                                             <p>{{ __('messages.bank_transfer_description') }}</p>
+                                            <div class="bank-details-qr mt-3 p-3 border rounded bg-light">
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-7">
+                                                        <ul class="list-unstyled mb-0">
+                                                            <li><strong>Ngân hàng:</strong> {{ \App\Models\Setting::get('bank_name', 'MB Bank') }}</li>
+                                                            <li><strong>Số tài khoản:</strong> <span class="text-primary fw-bold">{{ \App\Models\Setting::get('bank_account_number', '0359756805') }}</span></li>
+                                                            <li><strong>Chủ tài khoản:</strong> {{ \App\Models\Setting::get('bank_account_name', 'NGUYEN CONG BANG') }}</li>
+                                                            <li><strong>Nội dung:</strong> <span class="text-danger fw-bold">THANHTOAN DH[Mã đơn hàng]</span></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-md-5 text-center mt-3 mt-md-0">
+                                                        <img src="https://img.vietqr.io/image/{{ \App\Models\Setting::get('bank_id', 'MB') }}-{{ \App\Models\Setting::get('bank_account_number', '0359756805') }}-compact.png?amount={{ $finalTotal }}&addInfo=THANHTOAN%20DH&accountName={{ urlencode(\App\Models\Setting::get('bank_account_name', 'NGUYEN CONG BANG')) }}" 
+                                                             alt="Bank transfer QR" class="img-fluid rounded shadow-sm" style="max-width: 150px;">
+                                                        <p class="small text-muted mt-2 mb-0">Quét để thanh toán</p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
