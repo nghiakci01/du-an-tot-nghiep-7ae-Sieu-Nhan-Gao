@@ -20,6 +20,55 @@
     <!--breadcrumbs area end-->
 
     <!-- my account start  -->
+    <style>
+        /* Mobile Responsive Account Page */
+        @media (max-width: 767px) {
+            .dashboard-list {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .dashboard-list li {
+                display: inline-block;
+                width: auto;
+                margin-right: 15px;
+            }
+
+            .dashboard_content {
+                padding: 15px;
+                background: #f9f9f9;
+                border-radius: 5px;
+                margin-top: 15px;
+            }
+
+            .account_dashboard .table {
+                font-size: 13px;
+            }
+
+            .account_dashboard .table th,
+            .account_dashboard .table td {
+                padding: 10px 5px;
+                white-space: nowrap;
+            }
+
+            /* Style buttons inside table */
+            .account_dashboard .table .btn {
+                padding: 4px 8px;
+                font-size: 12px;
+                margin-bottom: 2px;
+            }
+
+            #avatar-preview {
+                width: 90px !important;
+                height: 90px !important;
+            }
+        }
+    </style>
     <section class="main_content_area">
         <div class="container">
             <div class="account_dashboard">
@@ -87,32 +136,44 @@
                                 <div class="login">
                                     <div class="login_form_container">
                                         <div class="account_login_form">
-                                            <form action="{{ route('account.update') }}" method="POST" enctype="multipart/form-data">
+                                            <form action="{{ route('account.update') }}" method="POST"
+                                                enctype="multipart/form-data">
                                                 @csrf
                                                 <div class="mb-4 text-center">
                                                     @if($user->avatar)
-                                                        <img id="avatar-preview" src="{{ Storage::url($user->avatar) }}" alt="Avatar" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
+                                                        <img id="avatar-preview" src="{{ Storage::url($user->avatar) }}"
+                                                            alt="Avatar" class="rounded-circle img-thumbnail"
+                                                            style="width: 120px; height: 120px; object-fit: cover;">
                                                     @else
-                                                        <img id="avatar-preview" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random" alt="Avatar" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
+                                                        <img id="avatar-preview"
+                                                            src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random"
+                                                            alt="Avatar" class="rounded-circle img-thumbnail"
+                                                            style="width: 120px; height: 120px; object-fit: cover;">
                                                     @endif
                                                     <div class="mt-2">
-                                                        <label for="avatar" class="btn btn-sm btn-outline-primary">{{ __('messages.choose_image') }}</label>
-                                                        <input type="file" name="avatar" id="avatar" class="d-none" accept="image/*" onchange="document.getElementById('avatar-preview').src = window.URL.createObjectURL(this.files[0])">
+                                                        <label for="avatar"
+                                                            class="btn btn-sm btn-outline-primary">{{ __('messages.choose_image') }}</label>
+                                                        <input type="file" name="avatar" id="avatar" class="d-none"
+                                                            accept="image/*"
+                                                            onchange="document.getElementById('avatar-preview').src = window.URL.createObjectURL(this.files[0])">
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="row">
                                                     <div class="col-12">
                                                         <label>{{ __('messages.full_name') }}</label>
-                                                        <input type="text" name="name" value="{{ old('name', $user->name) }}">
+                                                        <input type="text" name="name"
+                                                            value="{{ old('name', $user->name) }}">
                                                     </div>
                                                     <div class="col-12">
                                                         <label>{{ __('messages.phone_number') }}</label>
-                                                        <input type="text" name="phone" value="{{ old('phone', $user->phone) }}">
+                                                        <input type="text" name="phone"
+                                                            value="{{ old('phone', $user->phone) }}">
                                                     </div>
                                                     <div class="col-12">
                                                         <label>{{ __('messages.email') }}</label>
-                                                        <input type="text" name="email" value="{{ $user->email }}" readonly disabled>
+                                                        <input type="text" name="email" value="{{ $user->email }}" readonly
+                                                            disabled>
                                                     </div>
                                                 </div>
 
