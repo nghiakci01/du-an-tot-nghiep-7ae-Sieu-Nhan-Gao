@@ -28,6 +28,17 @@
                     <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm">Thêm mới</a>
                 </div>
                 <div class="card-body">
+                    <form action="{{ route('admin.users.index') }}" method="GET" class="mb-3 d-flex align-items-center">
+                        <label for="role" class="form-label mb-0 me-2 text-nowrap">Vai trò:</label>
+                        <select name="role" id="role" class="form-select form-select-sm w-auto me-2">
+                            <option value="">Tất cả</option>
+                            <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Quản trị viên</option>
+                            <option value="staff" {{ request('role') == 'staff' ? 'selected' : '' }}>Nhân viên</option>
+                            <option value="customer" {{ request('role') == 'customer' ? 'selected' : '' }}>Khách hàng</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
+                    </form>
+
                     @if(session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif

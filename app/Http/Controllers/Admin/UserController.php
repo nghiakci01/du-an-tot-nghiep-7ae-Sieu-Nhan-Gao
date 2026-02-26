@@ -13,7 +13,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::withCount('orders')->latest()->paginate(10);
+        $query = User::withCount('orders')->latest();
+
+        if (request()->has('role') && request()->role != '') {
+            $query->where('role', request('role'));
+        }
+
+        $users = $query->paginate(10)->appends(request()->all());
         return view('admin.users.index', compact('users'));
     }
 
