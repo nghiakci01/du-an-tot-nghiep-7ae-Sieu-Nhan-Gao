@@ -1,145 +1,18 @@
 @extends('layouts.public')
 
 @section('content')
-    <!-- <style>
-        /* Nuclear fix: Direct embedded CSS for the 10-product grid */
-        .custom_product_grid_10 {
-            display: -webkit-box !important;
-            display: -ms-flexbox !important;
-            display: flex !important;
-            -ms-flex-wrap: wrap !important;
-            flex-wrap: wrap !important;
-            margin-left: -15px !important;
-            margin-right: -15px !important;
-        }
-
-        .custom_product_grid_10 .product_item_5 {
-            position: relative !important;
-            width: 100% !important;
-            padding-right: 15px !important;
-            padding-left: 15px !important;
-            -webkit-box-flex: 0 !important;
-            -ms-flex: 0 0 100% !important;
-            flex: 0 0 100% !important;
-            max-width: 100% !important;
-            margin-bottom: 30px;
-        }
-
-        @media (min-width: 576px) {
-            .custom_product_grid_10 .product_item_5 {
-                -ms-flex: 0 0 50% !important;
-                flex: 0 0 50% !important;
-                max-width: 50% !important;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .custom_product_grid_10 .product_item_5 {
-                -ms-flex: 0 0 33.333333% !important;
-                flex: 0 0 33.333333% !important;
-                max-width: 33.333333% !important;
-            }
-        }
-
-        @media (min-width: 992px) {
-            .custom_product_grid_10 .product_item_5 {
-                -ms-flex: 0 0 25% !important;
-                flex: 0 0 25% !important;
-                max-width: 25% !important;
-            }
-        }
-
-        @media (min-width: 1200px) {
-            .custom_product_grid_10 .product_item_5 {
-                -ms-flex: 0 0 20% !important;
-                flex: 0 0 20% !important;
-                max-width: 20% !important;
-            }
-        }
-
-        /* Fix image ratio and layout breaking on hover */
-        .single_product .product_thumb {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 4 / 5;
-            overflow: hidden;
-            background: #f5f5f5;
-            /* Placeholder color for loading */
-        }
-
-        .single_product .product_thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        /* Ensure secondary image also fills correctly */
-        .single_product .product_thumb a.secondary_img {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Fix alignment for titles and prices */
-        .product_content {
-            padding-top: 10px;
-            text-align: left;
-        }
-
-    .product_content h3 {
-        margin-bottom: 5px;
-        font-size: 14px;
-        line-height: 1.2;
-        height: 2.4em; /* Max 2 lines height for alignment */
-        overflow: hidden;
-    }
-
-    /* Banner & Slider Custom Refining */
-    @media (min-width: 992px) {
-        /* Desktop: Ensure slider and side banners have matching heights */
-        .home_six_slider .single_slider {
-            height: 600px !important; /* Fixed base height for slider */
-            background-size: cover !important;
-            background-position: center !important;
-        }
-
-        .banner_slider_section .banner_area.banner_top .banner_thumb img {
-            height: 340px !important; /* Top big banner */
-            object-fit: cover !important;
-            width: 100%;
-        }
-
-        .banner_slider_section .banner_area:not(.banner_top) .banner_thumb img {
-            height: 240px !important; /* Two small banners below */
-            object-fit: cover !important;
-            width: 100%;
-        }
-    }
-
-    /* General aspect ratios for consistency */
-    .banner_thumb img {
+<style>
+    /* Normalize product image heights */
+    .single_product .product_thumb a img {
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
         width: 100%;
-        object-fit: cover !important;
+        height: auto;
+        background-color: #f5f5f5; /* Fallback background */
     }
+</style>
 
-    /* Smooth slider content overlay */
-    .slider_content {
-        background: rgba(255, 255, 255, 0.7);
-        padding: 30px;
-        display: inline-block;
-        border-radius: 4px;
-    }
-
-    /* Bottom banner refinement */
-    .section_fullwidth .banner_thumb img {
-        aspect-ratio: 21 / 6;
-        width: 100%;
-        object-fit: cover !important;
-    }
-</style> -->
-    <!--slider area start-->
+        <!--slider area start-->
     <div class="slider_section slider_section_six">
         <div class="container-fluid">
             <div class="row">
@@ -148,30 +21,30 @@
                         <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}">
                            <div class="slider_content_inner">
                                 <div class="slider_content">
-                                   <h2>top trending</h2>
-                                    <h1>handbag</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="{{ route('shop') }}">Discover Now</a>
+                                   <h2>xu hướng hàng đầu</h2>
+                                    <h1>túui xách</h1>
+                                    <p>Khám phá bộ sưu tập mới nhất <br> với thiết kế tiên phong và hiện đại.</p>
+                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
                                 </div>  
                             </div>     
                         </div>
                         <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider11.jpg') }}">
                            <div class="slider_content_inner">
                                 <div class="slider_content">
-                                    <h2>new arrivals</h2>
-                                    <h1>zip hoodie</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="{{ route('shop') }}">Discover Now</a>
+                                    <h2>hàng mới về</h2>
+                                    <h1>áo khoác</h1>
+                                    <p>Thiết kế trẻ trung, phù hợp mọi dịp <br> đi chơi hay đi làm đều đẹp.</p>
+                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
                                 </div> 
                             </div>   
                         </div>
                         <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider12.jpg') }}">
                            <div class="slider_content_inner">
                                 <div class="slider_content">
-                                    <h2>top trending</h2>
-                                    <h1>clothing</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="{{ route('shop') }}">Discover Now</a>
+                                    <h2>xu hướng hàng đầu</h2>
+                                    <h1>thời trang</h1>
+                                    <p>Bộ sưu tập thời trang đẳng cấp <br> dành riêng cho bạn.</p>
+                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
                                 </div> 
                             </div>         
                         </div>
@@ -186,8 +59,8 @@
                                     <div class="banner_thumb">
                                         <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner18.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
-                                           <h1>Men’s <br> Summer Sneaker</h1>
-                                           <h3>Big Sale Off This Week</h3>
+                                           <h1>Giày Thể Thao <br> Nam Hè 2025</h1>
+                                           <h3>Giảm Giá Lớn Tuần Này</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -197,8 +70,8 @@
                                     <div class="banner_thumb">
                                         <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner19.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
-                                           <h1>Clothing.No18</h1>
-                                           <h3>Sale Off 20% All Store</h3>
+                                           <h1>Thời Trang Nữ</h1>
+                                           <h3>Giảm 20% Toàn Bộ</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -208,8 +81,8 @@
                                     <div class="banner_thumb">
                                         <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner20.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
-                                           <h1>Bag.No1</h1>
-                                           <h3>Big Sale No Limited</h3>
+                                           <h1>Túi Xách #1</h1>
+                                           <h3>Sale Khủng Không Giới Hạn</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -258,7 +131,7 @@
                                             <div class="action_button">
                                                 <ul>
                                                     <li><a title="{{ __('messages.add_to_cart') }}" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="{{ __('messages.add_to_wishlist') }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                                    <li><a href="#" class="add-to-wishlist" data-id="{{ $product->id }}" title="{{ __('messages.add_to_wishlist') }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
                                                 </ul>
                                             </div>
                                        </div>
@@ -266,13 +139,13 @@
                                     <div class="quick_button">
                                         <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                     </div>
-                                    @if($product->price < $product->original_price)
                                     <div class="double_base">
+                                        @if($product->price < $product->original_price)
                                         <div class="product_sale">
                                             <span>{{ __('messages.sale') }}</span>
                                         </div>
+                                        @endif
                                     </div>
-                                    @endif
                                 </div>
                                 <div class="product_content">
                                     <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
@@ -291,7 +164,8 @@
                                 </div>
                             </div>
                         </div>
-                        @endforeach                    </div>
+                        @endforeach
+                    </div>
                 </div> 
             </div>
         </div>
@@ -403,8 +277,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Customer Favorites</h2>
-                        <p>Products that customers like and love the most.</p>
+                        <h2>{{ __('messages.top_wishlisted') }}</h2>
+                        <p>{{ __('messages.top_wishlisted_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -447,8 +321,7 @@
                                             </div>
                                         </div>
                                         <div class="quick_button">
-                                            <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick
-                                                view</a>
+                                            <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                         </div>
                                         <div class="double_base">
                                             @if($product->price < $product->original_price)
@@ -457,7 +330,7 @@
                                                 </div>
                                             @endif
                                             <div class="label_product">
-                                                <span>Top</span>
+                                                <span>Yêu Thích</span>
                                             </div>
                                         </div>
                                     </div>
@@ -477,7 +350,7 @@
                                             </ul>
                                         </div>
                                         <div style="font-size: 12px; color: #ff6a28; margin-top: 5px;">
-                                            <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} lượt yêu thích
+                                            <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} {{ __('lượt yêu thích') }}
                                         </div>
                                     </div>
                                 </div>
@@ -665,36 +538,34 @@
                             <div class="col-lg-7 col-md-7 col-sm-12">
                                 <div class="modal_right">
                                     <div class="modal_title mb-10">
-                                        <h2>Handbag feugiat</h2>
+                                        <h2>Túi Xách</h2>
                                     </div>
                                     <div class="modal_price mb-10">
-                                        <span class="new_price">$64.99</span>
-                                        <span class="old_price">$78.99</span>
+                                        <span class="new_price">1.299.000 đ</span>
+                                        <span class="old_price">1.599.000 đ</span>
                                     </div>
                                     <div class="modal_description mb-15">
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia iste laborum
-                                            ad impedit pariatur esse optio tempora sint ullam autem deleniti nam in quos qui
-                                            nemo ipsum numquam, reiciendis maiores quidem aperiam, rerum vel recusandae </p>
+                                        <p>Sản phẩm chất lượng cao, thiết kế hiện đại và sang trọng. Phù hợp với nhiều phong cách khác nhau.</p>
                                     </div>
                                     <div class="variants_selects">
                                         <div class="variants_size">
-                                            <h2>size</h2>
+                                            <h2>Kích cỡ</h2>
                                             <select class="select_option">
-                                                <option selected value="1">s</option>
-                                                <option value="1">m</option>
-                                                <option value="1">l</option>
-                                                <option value="1">xl</option>
-                                                <option value="1">xxl</option>
+                                                <option selected value="1">S</option>
+                                                <option value="1">M</option>
+                                                <option value="1">L</option>
+                                                <option value="1">XL</option>
+                                                <option value="1">XXL</option>
                                             </select>
                                         </div>
                                         <div class="variants_color">
-                                            <h2>color</h2>
+                                            <h2>Màu sắc</h2>
                                             <select class="select_option">
-                                                <option selected value="1">purple</option>
-                                                <option value="1">violet</option>
-                                                <option value="1">black</option>
-                                                <option value="1">pink</option>
-                                                <option value="1">orange</option>
+                                                <option selected value="1">Trắng</option>
+                                                <option value="1">Đen</option>
+                                                <option value="1">Đỏ</option>
+                                                <option value="1">Xanh</option>
+                                                <option value="1">Nâu</option>
                                             </select>
                                         </div>
                                         <div class="modal_add_to_cart">
@@ -705,7 +576,7 @@
                                         </div>
                                     </div>
                                     <div class="modal_social">
-                                        <h2>Share this product</h2>
+                                        <h2>Chia sẻ sản phẩm</h2>
                                         <ul>
                                             <li class="facebook"><a href="#"><i class="fa fa-facebook"></i></a></li>
                                             <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
@@ -742,18 +613,25 @@
                         },
                         success: function (response) {
                             if (response.status === 'success' || response.status === 'info') {
-                                // Change icon to filled heart
                                 icon.removeClass('fa-heart-o').addClass('fa-heart').css('color', 'red');
-                                alert(response.message);
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2500,
+                                    timerProgressBar: true,
+                                });
                             } else {
-                                alert(response.message);
+                                Swal.fire({ icon: 'info', title: response.message, confirmButtonColor: '#333' });
                             }
                         },
                         error: function (xhr) {
                             if (xhr.status === 401) {
                                 window.location.href = "{{ route('login') }}";
                             } else {
-                                alert('Có lỗi xảy ra, vui lòng thử lại!');
+                                Swal.fire({ icon: 'error', title: 'Lỗi!', text: 'Có lỗi xảy ra, vui lòng thử lại!' });
                             }
                         }
                     });

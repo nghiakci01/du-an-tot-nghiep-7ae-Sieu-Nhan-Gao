@@ -1,4 +1,4 @@
-@extends('layouts.public')
+﻿@extends('layouts.public')
 
 @section('title', __('messages.checkout') . ' | FashionStore')
 
@@ -387,7 +387,7 @@
                                     <div class="coupon-applied">
                                         <div>
                                             <i class="fa fa-check-circle"></i>
-                                            <span class="coupon-code">{{ $coupon->code }}</span> đã được áp dụng
+                                            <span class="coupon-code">{{ $coupon->code }}</span> {{ __('messages.applied') }}
                                         </div>
                                         <button type="button" class="btn btn-sm btn-outline-danger" id="removeCouponBtn">
                                             <i class="fa fa-times"></i> {{ __('messages.remove') }}
@@ -443,15 +443,15 @@
 
                                 <div class="col-12 mb-20">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="mb-0">Tỉnh / Thành phố <span>*</span></label>
+                                        <label class="mb-0">{{ __('messages.province_city') }} <span>*</span></label>
                                         <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-primary"
-                                            title="Sử dụng vị trí hiện tại của bạn">
-                                            <i class="fa fa-map-marker"></i> Định vị vị trí
+                                            title="Sá»­ dá»¥ng vá»‹ trÃ­ hiá»‡n táº¡i cá»§a báº¡n">
+                                            <i class="fa fa-map-marker"></i> {{ __('messages.locate_me') }}
                                         </button>
                                     </div>
                                     <select name="province" id="province" required
                                         class="form-control @error('province') is-invalid @enderror">
-                                        <option value="">{{ __('Chọn tỉnh thành') }}</option>
+                                        <option value="">{{ __('messages.select_province') }}</option>
                                         @foreach($provinces as $province)
                                             <option value="{{ $province }}" {{ (Auth::check() && str_contains(Auth::user()->address, $province)) || old('province') == $province ? 'selected' : '' }}>
                                                 {{ $province }}
@@ -495,36 +495,35 @@
                                     </thead>
                                     <tbody>
                                         @foreach($cart as $details)
-                                            <tr>
-                                                <td>{{ $details['name'] }}
-                                                    <strong>× {{ $details['quantity'] }}</strong>
-                                                    <br>
-                                                    <small
-                                                        class="text-muted">({{ $details['size'] }}/{{ $details['color'] }})</small>
-                                                </td>
-                                                <td>{{ number_format($details['price'] * $details['quantity']) }} đ</td>
-                                            </tr>
+                                        <tr>
+                                            <td>{{ $details['name'] }} 
+                                                <strong>Ã— {{ $details['quantity'] }}</strong>
+                                                <br>
+                                                <small class="text-muted">({{ $details['size'] }}/{{ $details['color'] }})</small>
+                                            </td>
+                                            <td>{{ number_format($details['price'] * $details['quantity']) }} Ä‘</td>
+                                        </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <th>{{ __('messages.subtotal') }}</th>
-                                            <td>{{ number_format($total) }} đ</td>
+                                            <td>{{ number_format($total) }} VND</td>
                                         </tr>
                                         @if($discount > 0)
-                                            <tr class="discount-row">
-                                                <th>{{ __('messages.discount') }}</th>
-                                                <td>-{{ number_format($discount) }} đ</td>
-                                            </tr>
+                                        <tr class="discount-row">
+                                            <th>{{ __('messages.discount') }}</th>
+                                            <td>-{{ number_format($discount) }} Ä‘</td>
+                                        </tr>
                                         @endif
                                         <tr>
                                             <th>{{ __('messages.shipping') }}</th>
-                                            <td><strong>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí' }}</strong>
+                                            <td><strong>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' Ä‘') : __('messages.free') }}</strong>
                                             </td>
                                         </tr>
                                         <tr class="order_total">
                                             <th>{{ __('messages.order_total') }}</th>
-                                            <td><strong>{{ number_format($finalTotal) }} đ</strong></td>
+                                            <td><strong>{{ number_format($finalTotal) }} VND</strong></td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -557,6 +556,23 @@
                                     <div id="method_bank" class="collapse" data-bs-parent="#accordion">
                                         <div class="card-body1">
                                             <p>{{ __('messages.bank_transfer_description') }}</p>
+                                            <div class="bank-details-qr mt-3 p-3 border rounded bg-light">
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-7">
+                                                        <ul class="list-unstyled mb-0">
+                                                            <li><strong>Ngân hàng:</strong> {{ \App\Models\Setting::get('bank_name', 'MB Bank') }}</li>
+                                                            <li><strong>Số tài khoản:</strong> <span class="text-primary fw-bold">{{ \App\Models\Setting::get('bank_account_number', '0359756805') }}</span></li>
+                                                            <li><strong>Chủ tài khoản:</strong> {{ \App\Models\Setting::get('bank_account_name', 'NGUYEN CONG BANG') }}</li>
+                                                            <li><strong>Nội dung:</strong> <span class="text-danger fw-bold">THANHTOAN DH[Mã đơn hàng]</span></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-md-5 text-center mt-3 mt-md-0">
+                                                        <img src="https://img.vietqr.io/image/{{ \App\Models\Setting::get('bank_id', 'MB') }}-{{ \App\Models\Setting::get('bank_account_number', '0359756805') }}-compact.png?amount={{ $finalTotal }}&addInfo=THANHTOAN%20DH&accountName={{ urlencode(\App\Models\Setting::get('bank_account_name', 'NGUYEN CONG BANG')) }}" 
+                                                             alt="Bank transfer QR" class="img-fluid rounded shadow-sm" style="max-width: 150px;">
+                                                        <p class="small text-muted mt-2 mb-0">Quét để thanh toán</p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -566,13 +582,12 @@
                                         data-bs-target="createp_account" required />
                                     <label for="payment_vnpay" data-bs-toggle="collapse" data-bs-target="#method_vnpay"
                                         aria-controls="method_vnpay">
-                                        Thanh toán qua VNPAY
+                                        {{ __('messages.vnpay_payment') }}
                                     </label>
 
                                     <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
                                         <div class="card-body1">
-                                            <p>Bạn sẽ được chuyển hướng sang cổng thanh toán VNPAY an toàn để hoàn tất đơn
-                                                hàng.</p>
+                                            <p>{{ __('messages.vnpay_description') }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -591,20 +606,20 @@
     <!--Checkout page section end-->
 @endsection
 
+
 @section('scripts')
     <script>
         $(document).ready(function () {
-            // Apply Coupon
+
+            // ============ COUPON ============
             $('#applyCouponBtn').click(function () {
                 const couponCode = $('#couponCode').val().trim();
-
                 if (!couponCode) {
-                    showMessage('{{ __("messages.enter_coupon_code") }}', 'danger');
+                    showCouponMessage('Vui lòng nhập mã giảm giá', 'danger');
                     return;
                 }
-
                 const btn = $(this);
-                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> {{ __("messages.processing") }}...');
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...');
 
                 $.ajax({
                     url: '{{ route("checkout.applyCoupon") }}',
@@ -615,219 +630,142 @@
                     },
                     success: function (response) {
                         if (response.success) {
-                            showMessage(response.message, 'success');
-
-                            // Reload page to show applied coupon
-                            setTimeout(function () {
-                                location.reload();
-                            }, 1000);
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: response.message,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true,
+                            }).then(function () { location.reload(); });
+                        } else {
+                            showCouponMessage(response.message, 'danger');
+                            btn.prop('disabled', false).html('Áp dụng');
                         }
                     },
                     error: function (xhr) {
-                        const message = xhr.responseJSON?.message || '{{ __("messages.error_occurred") }}';
-                        showMessage(message, 'danger');
-                        btn.prop('disabled', false).html('{{ __("messages.apply_coupon") }}');
+                        const message = xhr.responseJSON?.message || 'Có lỗi xảy ra, vui lòng thử lại!';
+                        showCouponMessage(message, 'danger');
+                        btn.prop('disabled', false).html('Áp dụng');
                     }
                 });
             });
 
-            // Remove Coupon
             $('#removeCouponBtn').click(function () {
-                if (!confirm('{{ __("messages.confirm_remove_coupon") }}')) {
-                    return;
-                }
-
-                const btn = $(this);
-                btn.prop('disabled', true);
-
-                $.ajax({
-                    url: '{{ route("checkout.removeCoupon") }}',
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            location.reload();
-                        }
-                    },
-                    error: function () {
-                        alert('{{ __("messages.error_occurred") }}');
-                        btn.prop('disabled', false);
+                Swal.fire({
+                    title: 'Xóa mã giảm giá?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy',
+                    confirmButtonColor: '#dc3545',
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ route("checkout.removeCoupon") }}',
+                            method: 'POST',
+                            data: { _token: '{{ csrf_token() }}' },
+                            success: function (response) {
+                                if (response.success) location.reload();
+                            },
+                            error: function () {
+                                Swal.fire({ icon: 'error', title: 'Lỗi!', text: 'Có lỗi xảy ra!' });
+                            }
+                        });
                     }
                 });
             });
 
-            // Enter key to apply coupon
             $('#couponCode').keypress(function (e) {
-                if (e.which === 13) {
-                    e.preventDefault();
-                    $('#applyCouponBtn').click();
-                }
+                if (e.which === 13) { e.preventDefault(); $('#applyCouponBtn').click(); }
             });
 
-            function showMessage(message, type) {
+            function showCouponMessage(message, type) {
                 const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-                const html = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>`;
-                $('#couponMessage').html(html);
+                $('#couponMessage').html(`<div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>`);
             }
 
             // ============ FORM VALIDATION ============
-
-            // Validation functions
             function validateName(value) {
-                if (!value || value.trim().length < 2) {
-                    return 'Vui lòng nhập họ tên (ít nhất 2 ký tự)';
-                }
+                if (!value || value.trim().length < 2) return 'Vui lòng nhập họ tên (ít nhất 2 ký tự)';
                 return '';
             }
-
             function validatePhone(value) {
-                if (!value) {
-                    return 'Vui lòng nhập số điện thoại';
-                }
-                const phoneRegex = /^[0-9]{10,11}$/;
-                if (!phoneRegex.test(value)) {
-                    return 'Số điện thoại phải có 10-11 chữ số';
-                }
+                if (!value) return 'Vui lòng nhập số điện thoại';
+                if (!/^[0-9]{10,11}$/.test(value)) return 'Số điện thoại phải có 10-11 chữ số';
                 return '';
             }
-
             function validateEmail(value) {
-                if (!value) {
-                    return 'Vui lòng nhập email';
-                }
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(value)) {
-                    return 'Email không hợp lệ';
-                }
+                if (!value) return 'Vui lòng nhập email';
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Email không hợp lệ';
                 return '';
             }
-
             function validateAddress(value) {
-                if (!value || value.trim().length < 5) {
-                    return 'Vui lòng nhập địa chỉ cụ thể (số nhà, tên đường)';
-                }
+                if (!value || value.trim().length < 5) return 'Vui lòng nhập địa chỉ cụ thể (số nhà, tên đường)';
                 return '';
             }
-
             function validateProvince(value) {
-                if (!value) {
-                    return 'Vui lòng chọn tỉnh thành';
-                }
+                if (!value) return 'Vui lòng chọn tỉnh thành';
                 return '';
             }
 
-            // Show validation feedback
             function showValidation(input, errorMessage) {
                 const $input = $(input);
                 const $feedback = $input.next('.invalid-feedback');
-
                 if (errorMessage) {
                     $input.removeClass('is-valid').addClass('is-invalid');
-                    if ($feedback.length) {
-                        $feedback.text(errorMessage);
-                    } else {
-                        $input.after(`<div class="invalid-feedback">${errorMessage}</div>`);
-                    }
+                    if ($feedback.length) $feedback.text(errorMessage);
+                    else $input.after(`<div class="invalid-feedback">${errorMessage}</div>`);
                 } else {
                     $input.removeClass('is-invalid').addClass('is-valid');
                     $feedback.remove();
                 }
             }
 
-            // Real-time validation on blur
-            $('input[name="name"]').on('blur', function () {
-                const error = validateName($(this).val());
-                showValidation(this, error);
+            $('input[name="name"]').on('blur', function () { showValidation(this, validateName($(this).val())); });
+            $('input[name="phone"]').on('blur', function () { showValidation(this, validatePhone($(this).val())); });
+            $('input[name="email"]').on('blur', function () { showValidation(this, validateEmail($(this).val())); });
+            $('input[name="address"]').on('blur', function () { showValidation(this, validateAddress($(this).val())); });
+            $('select[name="province"]').on('change', function () { showValidation(this, validateProvince($(this).val())); });
+            $('input[name="name"],input[name="phone"],input[name="email"],input[name="address"],select[name="province"]').on('input change', function () {
+                if ($(this).hasClass('is-invalid')) { $(this).removeClass('is-invalid').next('.invalid-feedback').remove(); }
             });
 
-            $('input[name="phone"]').on('blur', function () {
-                const error = validatePhone($(this).val());
-                showValidation(this, error);
-            });
-
-            $('input[name="email"]').on('blur', function () {
-                const error = validateEmail($(this).val());
-                showValidation(this, error);
-            });
-
-            $('input[name="address"]').on('blur', function () {
-                const error = validateAddress($(this).val());
-                showValidation(this, error);
-            });
-
-            $('select[name="province"]').on('change', function () {
-                const error = validateProvince($(this).val());
-                showValidation(this, error);
-            });
-
-            // Form submission validation
             $('form').on('submit', function (e) {
-                let hasError = false;
-
-                // Validate all fields
-                const nameError = validateName($('input[name="name"]').val());
-                const phoneError = validatePhone($('input[name="phone"]').val());
-                const emailError = validateEmail($('input[name="email"]').val());
+                const nameError     = validateName($('input[name="name"]').val());
+                const phoneError    = validatePhone($('input[name="phone"]').val());
+                const emailError    = validateEmail($('input[name="email"]').val());
                 const provinceError = validateProvince($('select[name="province"]').val());
-                const addressError = validateAddress($('input[name="address"]').val());
-
+                const addressError  = validateAddress($('input[name="address"]').val());
                 showValidation('input[name="name"]', nameError);
                 showValidation('input[name="phone"]', phoneError);
                 showValidation('input[name="email"]', emailError);
                 showValidation('select[name="province"]', provinceError);
                 showValidation('input[name="address"]', addressError);
-
                 if (nameError || phoneError || emailError || provinceError || addressError) {
-                    hasError = true;
-                }
-
-                // Check payment method
-                if (!$('input[name="payment_method"]:checked').length) {
-                    alert('Vui lòng chọn phương thức thanh toán');
-                    hasError = true;
-                }
-
-                if (hasError) {
                     e.preventDefault();
-                    // Scroll to first error
                     const firstError = $('.is-invalid').first();
-                    if (firstError.length) {
-                        $('html, body').animate({
-                            scrollTop: firstError.offset().top - 100
-                        }, 500);
-                    }
+                    if (firstError.length) $('html, body').animate({ scrollTop: firstError.offset().top - 100 }, 500);
                     return false;
                 }
-
-                // Show loading state
-                const $submitBtn = $(this).find('button[type="submit"]');
-                $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...');
-            });
-
-            // Remove validation on input
-            $('input[name="name"], input[name="phone"], input[name="email"], input[name="address"], select[name="province"]').on('input change', function () {
-                if ($(this).hasClass('is-invalid')) {
-                    $(this).removeClass('is-invalid');
-                    $(this).next('.invalid-feedback').remove();
+                if (!$('input[name="payment_method"]:checked').length) {
+                    e.preventDefault();
+                    Swal.fire({ icon: 'warning', title: 'Chưa chọn thanh toán', text: 'Vui lòng chọn phương thức thanh toán.' });
+                    return false;
                 }
+                $(this).find('button[type="submit"]').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...');
             });
 
             // ============ GEOLOCATION ============
             $('#btn-locate-me').click(function () {
                 if (!navigator.geolocation) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Lỗi',
-                        text: 'Trình duyệt của bạn không hỗ trợ định vị.'
-                    });
+                    Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Trình duyệt của bạn không hỗ trợ định vị.' });
                     return;
                 }
-
                 const $btn = $(this);
                 const originalHtml = $btn.html();
                 $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang định vị...');
@@ -836,75 +774,34 @@
                     function (position) {
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
-
-                        // Call Nominatim API for reverse geocoding
                         $.ajax({
                             url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&accept-language=vi`,
                             method: 'GET',
                             success: function (data) {
                                 if (data && data.address) {
                                     const address = data.address;
-
-                                    // Map Nominatim fields to our fields
-                                    // Nominatim often returns 'city', 'town', 'village', or 'state' for provinces in VN
                                     let provinceName = address.city || address.province || address.state || address.town;
-
-                                    // Clean up province name (Nominatim sometimes adds "Thành phố " or "Tỉnh ")
                                     if (provinceName) {
                                         provinceName = provinceName.replace('Thành phố ', '').replace('Tỉnh ', '').trim();
-
-                                        // Special case for HCMC
-                                        if (provinceName.toLowerCase().includes('hồ chí minh')) {
-                                            provinceName = 'TP Hồ Chí Minh';
-                                        }
-
-                                        // Try to match with our 63 provinces list
+                                        if (provinceName.toLowerCase().includes('hồ chí minh')) provinceName = 'TP Hồ Chí Minh';
                                         let matchedProvince = '';
                                         $('#province option').each(function () {
                                             const optionText = $(this).val();
-                                            if (provinceName.toLowerCase() === optionText.toLowerCase() ||
-                                                optionText.toLowerCase().includes(provinceName.toLowerCase())) {
-                                                matchedProvince = optionText;
-                                                return false;
+                                            if (provinceName.toLowerCase() === optionText.toLowerCase() || optionText.toLowerCase().includes(provinceName.toLowerCase())) {
+                                                matchedProvince = optionText; return false;
                                             }
                                         });
-
-                                        if (matchedProvince) {
-                                            $('#province').val(matchedProvince).trigger('change');
-                                        }
+                                        if (matchedProvince) $('#province').val(matchedProvince).trigger('change');
                                     }
-
-                                    // Build street address
-                                    const road = address.road || '';
-                                    const suburb = address.suburb || address.neighbourhood || '';
-                                    const quarter = address.quarter || '';
-                                    const district = address.district || address.city_district || '';
-
-                                    let streetAddress = [road, suburb, quarter, district].filter(Boolean).join(', ');
-                                    if (streetAddress) {
-                                        $('input[name="address"]').val(streetAddress);
-                                        showValidation($('input[name="address"]')[0], '');
-                                    }
-
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Thành công',
-                                        text: 'Đã cập nhật địa chỉ từ vị trí của bạn.',
-                                        timer: 2000,
-                                        showConfirmButton: false
-                                    });
+                                    const road = address.road || '', suburb = address.suburb || address.neighbourhood || '',
+                                          quarter = address.quarter || '', district = address.district || address.city_district || '';
+                                    const streetAddress = [road, suburb, quarter, district].filter(Boolean).join(', ');
+                                    if (streetAddress) { $('input[name="address"]').val(streetAddress); showValidation($('input[name="address"]')[0], ''); }
+                                    Swal.fire({ icon: 'success', title: 'Thành công', text: 'Đã cập nhật địa chỉ từ vị trí của bạn.', timer: 2000, showConfirmButton: false });
                                 }
                             },
-                            error: function () {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Lỗi',
-                                    text: 'Không thể lấy thông tin địa chỉ từ tọa độ.'
-                                });
-                            },
-                            complete: function () {
-                                $btn.prop('disabled', false).html(originalHtml);
-                            }
+                            error: function () { Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể lấy thông tin địa chỉ từ tọa độ.' }); },
+                            complete: function () { $btn.prop('disabled', false).html(originalHtml); }
                         });
                     },
                     function (error) {
@@ -912,18 +809,12 @@
                         if (error.code === 1) message = 'Bạn đã từ chối quyền truy cập vị trí.';
                         else if (error.code === 2) message = 'Không thể xác định vị trí.';
                         else if (error.code === 3) message = 'Hết thời gian yêu cầu vị trí.';
-
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Thông báo',
-                            text: message
-                        });
+                        Swal.fire({ icon: 'warning', title: 'Thông báo', text: message });
                         $btn.prop('disabled', false).html(originalHtml);
                     },
                     { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                 );
             });
         });
-
     </script>
 @endsection

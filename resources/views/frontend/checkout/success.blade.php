@@ -1,14 +1,14 @@
 @extends('layouts.public')
 
-@section('title', 'Đặt hàng thành công | FashionStore')
+@section('title', 'Order Success | FashionStore')
 
 @section('content')
 <div class="container py-5 text-center">
     <div class="mb-4">
         <i class="bi bi-check-circle-fill text-success display-1"></i>
     </div>
-    <h2 class="fw-bold mb-3">Đặt hàng thành công!</h2>
-    <p class="lead text-muted">Cảm ơn bạn đã mua hàng tại FashionStore.</p>
+    <h2 class="fw-bold mb-3">Order placed successfully!</h2>
+    <p class="lead text-muted">Thank you for shopping at FashionStore.</p>
     
     <div class="card d-inline-block shadow-sm p-4 mt-3">
         <h5>Mã đơn hàng: <span class="text-primary">#{{ $order->id }}</span></h5>
@@ -45,7 +45,7 @@
     </div>
 
     <div class="mt-5">
-        <a href="{{ route('shop') }}" class="btn btn-primary">Tiếp tục mua sắm</a>
+        <a href="{{ route('shop') }}" class="btn btn-primary">Continue shopping</a>
     </div>
 </div>
 @endsection

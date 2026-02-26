@@ -1,5 +1,5 @@
 @php
-    $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? ['Hàng mới về 🆕', 'Khuyến mãi 🔥', 'Áo thun', 'Váy đầm', 'Liên hệ']);
+    $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? ['Hàng mới về 🆕', 'Khuyến mãi 🔥', 'Áo thun', 'Váy đầm', 'Liên hệ'], JSON_HEX_APOS | JSON_HEX_QUOT);
 @endphp
 
 <!-- Alpine.js -->
@@ -423,7 +423,7 @@
     }
 </style>
 
-<div x-data="chatBot({ mode: '{{ $chatbot_mode ?? 'rules' }}', suggestedQuestions: {{ json_encode($chatbot_suggested_questions ?? []) }} })" x-init="initChat()" class="chatbot-widget chat-container">
+<div x-data='chatBot({ mode: "{{ $chatbot_mode ?? "rules" }}", suggestedQuestions: {!! $chatbot_suggested_questions_json !!} })' x-init="initChat()" class="chatbot-widget chat-container">
     
     <!-- Chat Window -->
     <div x-show="isOpen" 
@@ -444,12 +444,12 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="m5.2 6.8 1.4-1.4"/><path d="m17.4 5.4 1.4 1.4"/><path d="M5 13a7 7 0 1 0 14 0"/><path d="M8 12h8"/><path d="M12 12v4"/></svg>
                 </div>
                 <div class="chat-title">
-                    <h3>Trợ lý ảo Elite</h3>
-                    <p><span class="status-dot"></span> Sẵn sàng hỗ trợ</p>
+                    <h3>Elite Virtual Assistant</h3>
+                    <p><span class="status-dot"></span> Ready to help</p>
                 </div>
             </div>
             <div style="display: flex; gap: 8px;">
-                <button @click="toggleFullscreen" class="chat-close" :title="isFullscreen ? 'Thu nhỏ' : 'Phóng to'">
+                <button @click="toggleFullscreen" class="chat-close" :title="isFullscreen ? 'Minimize' : 'Maximize'">
                     <svg x-show="!isFullscreen" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                     </svg>
@@ -457,7 +457,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16h4v4m0-4L3 21m18-5h-4v4m0-4l4 5M3 8h4V4M7 8L3 3m18 5h-4V4m0 4l4-5" />
                     </svg>
                 </button>
-                <button @click="toggle" class="chat-close" title="Đóng">
+                <button @click="toggle" class="chat-close" title="Close">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -489,7 +489,7 @@
                                                 <div class="product-card-footer">
                                                     <p class="product-card-price" x-text="product.price_formatted"></p>
                                                     <span class="view-detail-btn">
-                                                        Xem chi tiết
+                                                        View details
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                                                     </span>
                                                 </div>
@@ -533,7 +533,7 @@
             <form @submit.prevent="sendMessage()" class="chat-form">
                 <input type="text" 
                        x-model="newMessage"
-                       placeholder="Nhập tin nhắn..." 
+                       placeholder="Type your message..." 
                        class="chat-input"
                        :disabled="isLoading">
                 

@@ -164,7 +164,6 @@
                                 </div>
                                 <div class="top_right text-right">
                                     <ul>
-
                                         <li class="top_links">
                                             @guest
                                                 <a href="#"><i class="ion-android-person"></i> {{ __('messages.account') }} <i class="ion-chevron-down"></i></a>
@@ -196,12 +195,13 @@
                                 </div>   
                                 @include('frontend.partials.mini-cart')
                             </div>
-                        </div>  
+                        </div>
+  
                     </div>
                 </div>
                 
                 <!-- Horizontal Menu -->
-                <div class="horizontal_menu horizontal_menu_six">
+                <!-- <div class="horizontal_menu horizontal_menu_six">
                     <div class="main_menu"> 
                         <nav>  
                             <ul>
@@ -233,7 +233,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <!--header middel end-->
 
     </header>
@@ -249,7 +249,7 @@
                             <nav>  
                                 <ul>
                                     <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
-                                    <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">{{ __('messages.shop') }}<i class="fa fa-angle-down"></i></a>
+                                    <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">{{ __('messages.shop') }} <i class="fa fa-angle-down"></i></a>
                                         <ul class="mega_menu">
                                             <li><a href="#">{{ __('messages.product_categories') }}</a>
                                                 <ul>
