@@ -21,6 +21,7 @@ Route::post('/cart/add', [App\Http\Controllers\Frontend\CartController::class, '
 Route::patch('/cart/update', [App\Http\Controllers\Frontend\CartController::class, 'updateCart'])->name('cart.update');
 Route::match(['get', 'post', 'delete'], '/cart/remove', [App\Http\Controllers\Frontend\CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/clear', [App\Http\Controllers\Frontend\CartController::class, 'clearCart'])->name('cart.clear');
+Route::post('/cart/change-variant', [App\Http\Controllers\Frontend\CartController::class, 'changeVariant'])->name('cart.changeVariant');
 Route::get('/cart/count', [App\Http\Controllers\Frontend\CartController::class, 'getCartCount'])->name('cart.count');
 
 Route::get('/home', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');

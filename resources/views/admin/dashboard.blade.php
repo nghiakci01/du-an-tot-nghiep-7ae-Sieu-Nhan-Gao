@@ -27,7 +27,7 @@
 
     <!-- Stats Cards -->
     <div class="col-md-6 col-xxl-3">
-      <div class="card">
+      <a href="{{ route('admin.orders.index') }}" class="card dashboard-card">
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class="flex-shrink-0">
@@ -50,11 +50,11 @@
             </div>
           </div>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-md-6 col-xxl-3">
-      <div class="card">
+      <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="card dashboard-card">
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class="flex-shrink-0">
@@ -77,11 +77,11 @@
             </div>
           </div>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-md-6 col-xxl-3">
-      <div class="card">
+      <a href="{{ route('admin.users.index') }}" class="card dashboard-card">
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class="flex-shrink-0">
@@ -104,11 +104,11 @@
             </div>
           </div>
         </div>
-      </div>
+      </a>
     </div>
 
     <div class="col-md-6 col-xxl-3">
-      <div class="card">
+      <a href="{{ route('admin.products.index') }}" class="card dashboard-card">
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class="flex-shrink-0">
@@ -131,7 +131,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </a>
     </div>
 
     <!-- Charts Row -->
@@ -265,6 +265,20 @@
 @endsection
 
 @section('scripts')
+  <style>
+    .dashboard-card {
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: block;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .dashboard-card .card-body {
+      color: inherit;
+    }
+  </style>
   <!-- ApexChart -->
   <script src="{{ asset('admin-assets/js/plugins/apexcharts.min.js') }}"></script>
   <script>

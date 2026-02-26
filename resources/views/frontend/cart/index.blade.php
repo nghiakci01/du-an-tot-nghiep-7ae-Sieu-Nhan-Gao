@@ -70,11 +70,63 @@
                                                         </a>
                                                     </td>
                                                     <td class="product_name">
-                                                        <a
-                                                            href="{{ route('product.detail', $details['slug']) }}">{{ $details['name'] }}</a>
-                                                        <br>
-                                                        <small class="text-muted">{{ __('messages.size') }}: {{ $details['size'] }} | {{ __('messages.color') }}:
-                                                            {{ $details['color'] }}</small>
+                                                        <a href="{{ route('product.detail', $details['slug']) }}" class="cart-product-link">{{ $details['name'] }}</a>
+                                                        <div class="cart-variant-info mt-2">
+                                                            <div class="text-muted small mb-1">
+                                                                {{ __('messages.size') }}: <strong>{{ $details['size'] }}</strong> | 
+                                                                {{ __('messages.color') }}: <strong>{{ $details['color'] }}</strong>
+                                                            </div>
+                                                            <button type="button" class="btn btn-sm edit-variant-btn p-0" 
+                                                                    style="font-size: 0.75rem; color: #ff6a28; text-decoration: none; border: none; background: transparent;">
+                                                                <i class="fa fa-pencil-square-o"></i> {{ __('messages.edit') }}
+                                                            </button>
+                                                        </div>
+
+                                                        <div class="cart-variant-selectors mt-2" style="display: none;">
+                                                            @if(isset($details['category_products']) && $details['category_products']->count() > 1)
+                                                                <div class="mb-2">
+                                                                    <label class="small text-muted d-block">{{ __('messages.product') }}</label>
+                                                                    <select class="form-select form-select-sm variant-select product-select" data-type="product">
+                                                                        @foreach($details['category_products'] as $catProduct)
+                                                                            <option value="{{ $catProduct->id }}" {{ $details['product_id'] == $catProduct->id ? 'selected' : '' }}>
+                                                                                {{ $catProduct->name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            @endif
+                                                            
+                                                            @if(isset($details['available_sizes']) && count($details['available_sizes']) > 0)
+                                                                <div class="d-inline-block me-2">
+                                                                    <label class="small text-muted d-block">{{ __('messages.size') }}</label>
+                                                                    <select class="form-select form-select-sm variant-select size-select" data-type="size">
+                                                                        @foreach($details['available_sizes'] as $size)
+                                                                            <option value="{{ $size->id }}" {{ (isset($details['size_id']) && $details['size_id'] == $size->id) ? 'selected' : '' }}>
+                                                                                {{ $size->name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            @endif
+
+                                                            @if(isset($details['available_colors']) && count($details['available_colors']) > 0)
+                                                                <div class="d-inline-block">
+                                                                    <label class="small text-muted d-block">{{ __('messages.color') }}</label>
+                                                                    <select class="form-select form-select-sm variant-select color-select" data-type="color">
+                                                                        @foreach($details['available_colors'] as $color)
+                                                                            <option value="{{ $color->id }}" {{ (isset($details['color_id']) && $details['color_id'] == $color->id) ? 'selected' : '' }}>
+                                                                                {{ $color->name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            @endif
+                                                            <div class="mt-1">
+                                                                <button type="button" class="btn btn-sm btn-secondary cancel-variant-btn">Hủy</button>
+                                                            </div>
+                                                        </div>
+                                                        <input type="hidden" class="product-id" value="{{ $details['product_id'] }}">
+                                                        <input type="hidden" class="current-variant-id" value="{{ $id }}">
                                                     </td>
                                                     <td class="product-price">{{ number_format($details['price']) }} VND</td>
                                                     <td class="product_quantity">
@@ -171,6 +223,16 @@
         </div>
     </div>
     <!--shopping cart area end -->
+    <style>
+        .cart-product-link {
+            color: inherit;
+            text-decoration: none;
+        }
+        .cart-product-link:hover {
+            color: inherit;
+            text-decoration: none;
+        }
+    </style>
 @endsection
 
 @section('scripts')
@@ -343,6 +405,72 @@
                 }
             });
         });
+        // Toggle variant selectors
+        $(".edit-variant-btn").on('click', function() {
+            var row = $(this).parents("td");
+            row.find(".cart-variant-info").hide();
+            row.find(".cart-variant-selectors").fadeIn();
+        });
+
+        $(".cancel-variant-btn").on('click', function() {
+            var row = $(this).parents("td");
+            row.find(".cart-variant-selectors").hide();
+            row.find(".cart-variant-info").fadeIn();
+        });
+
+        // Change variant (Product/Size/Color)
+        $(".variant-select").on('change', function() {
+            var ele = $(this);
+            var changedType = ele.data("type"); 
+            var row = ele.parents("tr");
+            var productId = row.find(".product-id").val();
+            var newProductId = row.find(".product-select").val() || productId;
+            var oldVariantId = row.find(".current-variant-id").val();
+            var sizeId = row.find(".size-select").val();
+            var colorId = row.find(".color-select").val();
+
+            $.ajax({
+                url: '{{ route('cart.changeVariant') }}',
+                method: "POST",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    old_variant_id: oldVariantId,
+                    product_id: productId,
+                    new_product_id: newProductId,
+                    size_id: sizeId,
+                    color_id: colorId,
+                    changed_type: changedType
+                },
+                beforeSend: function() {
+                    row.css('opacity', '0.5');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        }
+                    } else {
+                        alert(response.message || "{{ __('messages.error_occurred') }}");
+                        window.location.reload();
+                    }
+                },
+                error: function(xhr) {
+                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : "{{ __('messages.error_occurred') }}";
+                    alert(errorMsg);
+                    window.location.reload();
+                }
+            });
+        });
+
+        // Keep edit mode open after refresh if 'editing' param exists
+        @if(request('editing'))
+            var editingId = "{{ request('editing') }}";
+            var editRow = $("tr[data-id='" + editingId + "']");
+            if (editRow.length) {
+                editRow.find(".cart-variant-info").hide();
+                editRow.find(".cart-variant-selectors").show();
+            }
+        @endif
     });
 </script>
 @endsection
