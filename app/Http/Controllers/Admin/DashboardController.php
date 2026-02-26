@@ -24,7 +24,7 @@ class DashboardController extends Controller
         $newOrders = Order::where('status', Order::STATUS_PENDING)->count();
 
         // 4. Tổng số khách hàng
-        $totalCustomers = User::where('role', 'user')->count();
+        $totalCustomers = User::where('role', 'customer')->count();
 
         // 5. Tổng số sản phẩm đang bán
         $totalProducts = Product::where('is_active', true)->count();
