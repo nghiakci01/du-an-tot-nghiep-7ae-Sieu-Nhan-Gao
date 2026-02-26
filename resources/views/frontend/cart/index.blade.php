@@ -167,11 +167,15 @@
                                     <h3>{{ __('messages.coupon_code') }}</h3>
                                     <div class="coupon_inner">
                                         <p>{{ __('messages.enter_coupon_desc') }}</p>
-                                        <input placeholder="{{ __('messages.coupon_code') }}" type="text" disabled>
-                                        <button type="button" disabled>{{ __('messages.apply') }}</button>
-                                        <small class="text-muted d-block mt-2">
-                                            <i class="fa fa-info-circle"></i> {{ __('messages.feature_in_development') }}
-                                        </small>
+                                        <div class="input-group mb-2">
+                                            <input placeholder="{{ __('messages.coupon_code') }}" type="text" id="coupon_code" class="form-control" value="{{ session('coupon_code') }}" {{ session('coupon_code') ? 'readonly' : '' }}>
+                                            @if(session('coupon_code'))
+                                                <button type="button" class="btn btn-danger" id="remove-coupon">Gỡ</button>
+                                            @else
+                                                <button type="button" class="btn btn-dark" id="apply-coupon">{{ __('messages.apply') }}</button>
+                                            @endif
+                                        </div>
+                                        <div id="coupon-message"></div>
                                     </div>
                                 </div>
                             </div>
@@ -186,11 +190,16 @@
                                         <div class="cart_subtotal ">
                                             <p>{{ __('messages.shipping') }}</p>
                                             @php
-                                                $shippingFee = \App\Models\Setting::getShippingFee($total);
+                                                $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
                                             @endphp
                                             <p class="cart_amount" id="shipping-fee">
                                                 <span>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : __('messages.free') }}</span>
                                             </p>
+                                        </div>
+                                        
+                                        <div class="cart_subtotal" id="discount-row" style="{{ $discount > 0 ? '' : 'display: none;' }}">
+                                            <p>Giảm giá</p>
+                                            <p class="cart_amount text-danger" id="cart-discount">- {{ number_format($discount) }} đ</p>
                                         </div>
 
                                         <div class="cart_subtotal">
@@ -458,6 +467,58 @@
                     var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : "{{ __('messages.error_occurred') }}";
                     alert(errorMsg);
                     window.location.reload();
+                }
+            });
+        });
+
+        // Apply coupon
+        $(document).on('click', '#apply-coupon', function() {
+            var couponCode = $('#coupon_code').val();
+            if (!couponCode) {
+                Swal.fire({ icon: 'warning', title: 'Thông báo', text: 'Vui lòng nhập mã giảm giá' });
+                return;
+            }
+
+            $.ajax({
+                url: '{{ route('cart.apply_coupon') }}',
+                method: 'POST',
+                data: { coupon_code: couponCode },
+                success: function(response) {
+                    if (response.success) {
+                        $('#coupon_code').prop('readonly', true);
+                        $('#apply-coupon').replaceWith('<button type="button" class="btn btn-danger" id="remove-coupon">Gỡ</button>');
+                        
+                        $('#discount-row').show();
+                        $('#cart-discount').text('- ' + response.data.discount);
+                        $('#shipping-fee span').text(response.data.shipping_fee);
+                        $('#cart-grand-total').text(response.data.grand_total);
+                        
+                        Swal.fire({ icon: 'success', title: 'Thành công', text: response.message });
+                    }
+                },
+                error: function(xhr) {
+                    var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Có lỗi xảy ra';
+                    Swal.fire({ icon: 'error', title: 'Lỗi', text: msg });
+                }
+            });
+        });
+
+        // Remove coupon
+        $(document).on('click', '#remove-coupon', function() {
+            $.ajax({
+                url: '{{ route('cart.remove_coupon') }}',
+                method: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        $('#coupon_code').val('').prop('readonly', false);
+                        $('#remove-coupon').replaceWith('<button type="button" class="btn btn-dark" id="apply-coupon">{{ __("messages.apply") }}</button>');
+                        
+                        $('#discount-row').hide();
+                        $('#shipping-fee span').text(response.data.shipping_fee);
+                        $('#cart-grand-total').text(response.data.grand_total);
+                        
+                        Swal.fire({ icon: 'info', title: 'Đã gỡ', text: response.message });
+                    }
                 }
             });
         });
