@@ -34,6 +34,11 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
         /* Global Product Hover Effect */
         .single_product .product_thumb {
             overflow: hidden !important;
