@@ -15,8 +15,10 @@ class AccountController extends Controller
     {
         $user = Auth::user();
         $orders = $user->orders()->orderBy('created_at', 'desc')->get();
-        // Fetch active coupons belonging to the user
-        $coupons = \App\Models\Coupon::where('user_id', $user->id)
+        // Fetch active coupons: either general (user_id is null) or specific to this user
+        $coupons = \App\Models\Coupon::where(function($q) use ($user) {
+                $q->whereNull('user_id')->orWhere('user_id', $user->id);
+            })
             ->where('is_active', true)
             ->where(function ($q) {
                 $q->whereNull('end_date')->orWhere('end_date', '>=', now());

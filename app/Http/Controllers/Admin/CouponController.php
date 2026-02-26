@@ -24,7 +24,10 @@ class CouponController extends Controller
      */
     public function create()
     {
-        return view('admin.coupons.create');
+        $users = \App\Models\User::where('role', \App\Models\User::ROLE_USER)
+            ->orderBy('name')
+            ->get();
+        return view('admin.coupons.create', compact('users'));
     }
 
     /**
@@ -46,7 +49,10 @@ class CouponController extends Controller
      */
     public function edit(Coupon $coupon)
     {
-        return view('admin.coupons.edit', compact('coupon'));
+        $users = \App\Models\User::where('role', \App\Models\User::ROLE_USER)
+            ->orderBy('name')
+            ->get();
+        return view('admin.coupons.edit', compact('coupon', 'users'));
     }
 
     /**
