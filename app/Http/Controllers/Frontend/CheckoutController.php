@@ -225,6 +225,14 @@ class CheckoutController extends Controller
             ], 400);
         }
 
+        // Check if coupon belongs to this user
+        if ($coupon->user_id && $coupon->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This coupon is not valid for your account.'
+            ], 400);
+        }
+
         if ($coupon->min_order_amount && $total < $coupon->min_order_amount) {
             return response()->json([
                 'success' => false,
