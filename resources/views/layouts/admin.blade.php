@@ -74,7 +74,7 @@
 
   {{-- Include Sidebar --}}
   @include('layouts.partials.admin.sidebar')
-  
+
   <!-- [ Main Content ] start -->
   <div class="pc-container">
     <div class="pc-content">
@@ -84,7 +84,7 @@
 
   {{-- Footer --}}
   @include('layouts.partials.admin.footer')
-  
+
   {{-- Theme setting --}}
   @include('layouts.partials.admin.theme_settings')
 
@@ -130,6 +130,28 @@
     integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
     data-cf-beacon='{"version":"2024.11.0","token":"db59679aec724f808b8e535e8076f80c","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
     crossorigin="anonymous"></script> --}}
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function confirmDelete(formId) {
+      Swal.fire({
+        title: 'Bạn có chắc chắn muốn xóa?',
+        text: "Hành động này không thể hoàn tác!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById(formId).submit();
+        }
+      })
+    }
+  </script>
+
   @yield('scripts')
   <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
     @csrf
