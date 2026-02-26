@@ -178,3 +178,64 @@
     </section>
     <!-- my account end   -->
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle Copy Coupon
+        document.querySelectorAll('.copy-coupon').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.getAttribute('data-code');
+                
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(code).then(() => {
+                        showCopySuccess(code);
+                    }).catch(err => {
+                        fallbackCopyTextToClipboard(code);
+                    });
+                } else {
+                    fallbackCopyTextToClipboard(code);
+                }
+            });
+        });
+
+        function showCopySuccess(code) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: '{{ __("messages.applied") }}'.replace('đã được áp dụng', 'Đã sao chép') + ': ' + code,
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+            });
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            var textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showCopySuccess(text);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // Handle URL hash for tabs
+        const hash = window.location.hash;
+        if (hash) {
+            const targetTab = document.querySelector(`.dashboard_tab_button a[href*="${hash}"]`);
+            if (targetTab) {
+                const tabTrigger = new bootstrap.Tab(targetTab);
+                tabTrigger.show();
+            }
+        }
+    });
+</script>
+@endpush
