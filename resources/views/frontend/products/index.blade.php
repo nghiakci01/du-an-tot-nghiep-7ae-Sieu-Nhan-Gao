@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Shop | Elite')
+@section('title', (isset($currentCategory) && $currentCategory ? $currentCategory->name . ' - ' : '') . __('messages.shop') . ' | Elite')
 
 @section('content')
 <style>

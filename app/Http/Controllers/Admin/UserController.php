@@ -13,7 +13,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::latest()->paginate(10);
+        $query = User::withCount('orders')->latest();
+
+        if (request()->has('role') && request()->role != '') {
+            $query->where('role', request('role'));
+        }
+
+        $users = $query->paginate(10)->appends(request()->all());
         return view('admin.users.index', compact('users'));
     }
 
@@ -61,7 +67,7 @@ class UserController extends Controller
     public function update(\App\Http\Requests\UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
-        
+
         if ($request->filled('password')) {
             $data['password'] = bcrypt($data['password']);
         } else {

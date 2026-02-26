@@ -8,7 +8,8 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>@yield('title', ($settings['site_title'] ?? 'Elite') . ' - ' . __('messages.home'))</title>
-    <meta name="description" content="">
+    <meta name="description"
+        content="@yield('meta_description', $settings['site_description'] ?? 'Elite E-commerce Fashion Store')">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Favicon -->
@@ -33,6 +34,25 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <style>
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Global Product Hover Effect */
+        .single_product .product_thumb {
+            overflow: hidden !important;
+        }
+
+        .single_product .product_thumb img {
+            transition: transform 0.4s ease-in-out !important;
+        }
+
+        .single_product:hover .product_thumb img {
+            transform: scale(1.08) !important;
+        }
+    </style>
 </head>
 
 <body>
