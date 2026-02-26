@@ -33,6 +33,20 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <style>
+        /* Global Product Hover Effect */
+        .single_product .product_thumb {
+            overflow: hidden !important;
+        }
+
+        .single_product .product_thumb img {
+            transition: transform 0.4s ease-in-out !important;
+        }
+
+        .single_product:hover .product_thumb img {
+            transform: scale(1.08) !important;
+        }
+    </style>
 </head>
 
 <body>
