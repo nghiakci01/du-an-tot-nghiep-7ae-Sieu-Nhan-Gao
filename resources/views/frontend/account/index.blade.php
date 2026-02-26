@@ -82,6 +82,34 @@
                                     </table>
                                 </div>
                             </div>
+                            <div class="tab-pane fade" id="coupons">
+                                <h3>{{ __('messages.my_coupons') }}</h3>
+                                <div class="row">
+                                    @forelse($coupons as $coupon)
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card border-primary border-2 shadow-sm">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <h5 class="card-title text-primary mb-0">{{ $coupon->code }}</h5>
+                                                        <span class="badge bg-primary">{{ $coupon->getFormattedValue() }}</span>
+                                                    </div>
+                                                    <p class="card-text small text-muted mb-2">{{ $coupon->description }}</p>
+                                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                                        <span class="small fw-bold">{{ __('messages.welcome_coupon_desc') }}</span>
+                                                        <button class="btn btn-sm btn-outline-primary copy-coupon" data-code="{{ $coupon->code }}">
+                                                            <i class="fa fa-copy"></i> Copy
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="col-12">
+                                            <p class="text-center py-4">{{ __('messages.no_orders') }} (Chưa có mã giảm giá nào)</p>
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
                             <div class="tab-pane fade" id="account-details">
                                 <h3>{{ __('messages.account_details') }} </h3>
                                 <div class="login">
