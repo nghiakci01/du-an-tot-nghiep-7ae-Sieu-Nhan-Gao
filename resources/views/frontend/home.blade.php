@@ -21,30 +21,30 @@
                         <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}">
                            <div class="slider_content_inner">
                                 <div class="slider_content">
-                                   <h2>top trending</h2>
-                                    <h1>handbag</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="shop.html">Discover Now</a>
+                                   <h2>xu hướng hàng đầu</h2>
+                                    <h1>túui xách</h1>
+                                    <p>Khám phá bộ sưu tập mới nhất <br> với thiết kế tiên phong và hiện đại.</p>
+                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
                                 </div>  
                             </div>     
                         </div>
                         <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider11.jpg') }}">
                            <div class="slider_content_inner">
                                 <div class="slider_content">
-                                    <h2>new arrivals</h2>
-                                    <h1>zip hoodie</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="shop.html">Discover Now</a>
+                                    <h2>hàng mới về</h2>
+                                    <h1>áo khoác</h1>
+                                    <p>Thiết kế trẻ trung, phù hợp mọi dịp <br> đi chơi hay đi làm đều đẹp.</p>
+                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
                                 </div> 
                             </div>   
                         </div>
                         <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider12.jpg') }}">
                            <div class="slider_content_inner">
                                 <div class="slider_content">
-                                    <h2>top trending</h2>
-                                    <h1>clothing</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="shop.html">Discover Now</a>
+                                    <h2>xu hướng hàng đầu</h2>
+                                    <h1>thời trang</h1>
+                                    <p>Bộ sưu tập thời trang đẳng cấp <br> dành riêng cho bạn.</p>
+                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
                                 </div> 
                             </div>         
                         </div>
@@ -57,10 +57,10 @@
                            <div class="col-12">
                                 <div class="banner_area banner_top">
                                     <div class="banner_thumb">
-                                        <a href="shop.html"><img src="{{ asset('reid/assets/img/bg/banner18.jpg') }}" alt="#"></a>
+                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner18.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
-                                           <h1>Men’s <br> Summer Sneaker</h1>
-                                           <h3>Big Sale Off This Week</h3>
+                                           <h1>Giày Thể Thao <br> Nam Hè 2025</h1>
+                                           <h3>Giảm Giá Lớn Tuần Này</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -68,10 +68,10 @@
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="banner_area">
                                     <div class="banner_thumb">
-                                        <a href="shop.html"><img src="{{ asset('reid/assets/img/bg/banner19.jpg') }}" alt="#"></a>
+                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner19.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
-                                           <h1>Clothing.No18</h1>
-                                           <h3>Sale Off 20% All Store</h3>
+                                           <h1>Thời Trang Nữ</h1>
+                                           <h3>Giảm 20% Toàn Bộ</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -79,10 +79,10 @@
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="banner_area">
                                     <div class="banner_thumb">
-                                        <a href="shop.html"><img src="{{ asset('reid/assets/img/bg/banner20.jpg') }}" alt="#"></a>
+                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner20.jpg') }}" alt="#"></a>
                                         <div class="banner_content">
-                                           <h1>Bag.No1</h1>
-                                           <h3>Big Sale No Limited</h3>
+                                           <h1>Túi Xách #1</h1>
+                                           <h3>Sale Khủng Không Giới Hạn</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -321,7 +321,7 @@
                                             </div>
                                         </div>
                                         <div class="quick_button">
-                                            title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
+                                            <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                         </div>
                                         <div class="double_base">
                                             @if($product->price < $product->original_price)
@@ -330,7 +330,7 @@
                                                 </div>
                                             @endif
                                             <div class="label_product">
-                                                <span>Top</span>
+                                                <span>Yêu Thích</span>
                                             </div>
                                         </div>
                                     </div>
@@ -538,36 +538,34 @@
                             <div class="col-lg-7 col-md-7 col-sm-12">
                                 <div class="modal_right">
                                     <div class="modal_title mb-10">
-                                        <h2>Handbag feugiat</h2>
+                                        <h2>Túi Xách</h2>
                                     </div>
                                     <div class="modal_price mb-10">
-                                        <span class="new_price">$64.99</span>
-                                        <span class="old_price">$78.99</span>
+                                        <span class="new_price">1.299.000 đ</span>
+                                        <span class="old_price">1.599.000 đ</span>
                                     </div>
                                     <div class="modal_description mb-15">
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia iste laborum
-                                            ad impedit pariatur esse optio tempora sint ullam autem deleniti nam in quos qui
-                                            nemo ipsum numquam, reiciendis maiores quidem aperiam, rerum vel recusandae </p>
+                                        <p>Sản phẩm chất lượng cao, thiết kế hiện đại và sang trọng. Phù hợp với nhiều phong cách khác nhau.</p>
                                     </div>
                                     <div class="variants_selects">
                                         <div class="variants_size">
-                                            <h2>size</h2>
+                                            <h2>Kích cỡ</h2>
                                             <select class="select_option">
-                                                <option selected value="1">s</option>
-                                                <option value="1">m</option>
-                                                <option value="1">l</option>
-                                                <option value="1">xl</option>
-                                                <option value="1">xxl</option>
+                                                <option selected value="1">S</option>
+                                                <option value="1">M</option>
+                                                <option value="1">L</option>
+                                                <option value="1">XL</option>
+                                                <option value="1">XXL</option>
                                             </select>
                                         </div>
                                         <div class="variants_color">
-                                            <h2>color</h2>
+                                            <h2>Màu sắc</h2>
                                             <select class="select_option">
-                                                <option selected value="1">purple</option>
-                                                <option value="1">violet</option>
-                                                <option value="1">black</option>
-                                                <option value="1">pink</option>
-                                                <option value="1">orange</option>
+                                                <option selected value="1">Trắng</option>
+                                                <option value="1">Đen</option>
+                                                <option value="1">Đỏ</option>
+                                                <option value="1">Xanh</option>
+                                                <option value="1">Nâu</option>
                                             </select>
                                         </div>
                                         <div class="modal_add_to_cart">
@@ -578,7 +576,7 @@
                                         </div>
                                     </div>
                                     <div class="modal_social">
-                                        <h2>Share this product</h2>
+                                        <h2>Chia sẻ sản phẩm</h2>
                                         <ul>
                                             <li class="facebook"><a href="#"><i class="fa fa-facebook"></i></a></li>
                                             <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
@@ -615,18 +613,25 @@
                         },
                         success: function (response) {
                             if (response.status === 'success' || response.status === 'info') {
-                                // Change icon to filled heart
                                 icon.removeClass('fa-heart-o').addClass('fa-heart').css('color', 'red');
-                                alert(response.message);
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2500,
+                                    timerProgressBar: true,
+                                });
                             } else {
-                                alert(response.message);
+                                Swal.fire({ icon: 'info', title: response.message, confirmButtonColor: '#333' });
                             }
                         },
                         error: function (xhr) {
                             if (xhr.status === 401) {
                                 window.location.href = "{{ route('login') }}";
                             } else {
-                                alert('Có lỗi xảy ra, vui lòng thử lại!');
+                                Swal.fire({ icon: 'error', title: 'Lỗi!', text: 'Có lỗi xảy ra, vui lòng thử lại!' });
                             }
                         }
                     });

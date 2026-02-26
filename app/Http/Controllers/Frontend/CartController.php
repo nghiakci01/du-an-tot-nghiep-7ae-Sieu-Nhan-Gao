@@ -157,25 +157,50 @@ class CartController extends Controller
         $product = Product::findOrFail($request->product_id);
         $variantId = $request->variant_id;
 
-        // Auto-select variant if missing
+        // Validate: Nếu sản phẩm có variants thì bắt buộc phải chọn
         if (!$variantId) {
             $variants = $product->variants;
             if ($variants->count() === 1) {
+                // Tự động chọn nếu chỉ có 1 variant
                 $variantId = $variants->first()->id;
             } elseif ($variants->count() > 1) {
+                // Có nhiều variant → bắt buộc phải chọn
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.'
+                    ], 422);
+                }
                 return redirect()->route('product.detail', $product->slug)
-                    ->with('info', 'Please select size and color before adding to cart.');
+                    ->with('error', 'Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.');
             } else {
-                return redirect()->back()->with('error', 'This product has no available variants.');
+                return redirect()->back()->with('error', 'Sản phẩm này hiện không có biến thể nào.');
             }
         }
 
         $variant = ProductVariant::findOrFail($variantId);
         $cart = session()->get('cart', []);
 
-        // Check availability
-        if ($variant->stock_quantity < $request->quantity) {
-             return redirect()->back()->with('error', 'Product does not have enough stock.');
+        // Check tồn kho — tính cả số lượng đã có trong giỏ
+        $existingQty = isset($cart[$variant->id]) ? $cart[$variant->id]['quantity'] : 0;
+        $requestedQty = $request->quantity ?? 1;
+        $totalQty = $existingQty + $requestedQty;
+
+        if ($variant->stock_quantity <= 0) {
+            $msg = 'Sản phẩm này đã hết hàng.';
+            if ($request->expectsJson()) return response()->json(['success' => false, 'message' => $msg], 422);
+            return redirect()->back()->with('error', $msg);
+        }
+
+        if ($totalQty > $variant->stock_quantity) {
+            $available = $variant->stock_quantity - $existingQty;
+            if ($available <= 0) {
+                $msg = "Bạn đã có {$existingQty} sản phẩm này trong giỏ hàng. Không thể thêm, đã đạt giới hạn tồn kho ({$variant->stock_quantity}).";
+            } else {
+                $msg = "Chỉ còn {$variant->stock_quantity} sản phẩm trong kho. Bạn đã có {$existingQty} trong giỏ, chỉ có thể thêm tối đa {$available} sản phẩm.";
+            }
+            if ($request->expectsJson()) return response()->json(['success' => false, 'message' => $msg], 422);
+            return redirect()->back()->with('error', $msg);
         }
 
         if(isset($cart[$variant->id])) {

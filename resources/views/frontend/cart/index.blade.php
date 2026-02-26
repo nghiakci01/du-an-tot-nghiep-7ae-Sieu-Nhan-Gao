@@ -130,8 +130,15 @@
                                                     </td>
                                                     <td class="product-price">{{ number_format($details['price']) }} VND</td>
                                                     <td class="product_quantity">
-                                                        <input min="1" max="100" value="{{ $details['quantity'] }}" type="number"
-                                                            class="quantity update-cart">
+                                                        @php
+                                                            $stockQty = \App\Models\ProductVariant::find($id)?->stock_quantity ?? 100;
+                                                        @endphp
+                                                        <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
+                                                            class="quantity update-cart"
+                                                            data-stock="{{ $stockQty }}"
+                                                            title="Còn {{ $stockQty }} sản phẩm trong kho">
+                                                        <small class="d-block text-muted mt-1" style="font-size:11px;"
+                                                            data-stock-label>Kho: {{ $stockQty }}</small>
                                                     </td>
                                                     <td class="product_total">
                                                         {{ number_format($details['price'] * $details['quantity']) }} VND</td>
@@ -231,121 +238,172 @@
 @section('scripts')
 <script type="text/javascript">
     $(document).ready(function() {
-        // Set up CSRF token for all AJAX requests
         $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
         });
 
-        // Update cart quantity
-        $(".update-cart").on('change keyup', function (e) {
-            var ele = $(this);
-            var row = ele.parents("tr");
-            var id = row.attr("data-id");
-            var quantity = ele.val();
-            
-            // Prevent duplicate triggers for same value
+        // Realtime stock check khi nhập số lượng
+        $(document).on('input', '.update-cart', function() {
+            const max = parseInt($(this).attr('max')) || 100;
+            const val = parseInt($(this).val());
+            const productName = $(this).closest('tr').find('.product_name a').text().trim();
+
+            if (val > max) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: `Chỉ còn ${max} sản phẩm trong kho!`,
+                    text: productName,
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true,
+                });
+                $(this).val(max);
+            }
+            if (val < 1 || isNaN(val)) $(this).val(1);
+        });
+
+        // Update cart quantity (AJAX)
+        $(".update-cart").on('change', function (e) {
+            const ele = $(this);
+            const row = ele.closest("tr");
+            const id = row.attr("data-id");
+            const quantity = parseInt(ele.val());
+            const max = parseInt(ele.attr('max')) || 100;
+
             if (ele.data('prev-val') == quantity) return;
             ele.data('prev-val', quantity);
-
             if (quantity < 1) return;
 
+            // Block nếu vượt stock (double-check trước AJAX)
+            if (quantity > max) {
+                ele.val(max);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Vượt quá tồn kho!',
+                    html: `Chỉ còn <strong>${max}</strong> sản phẩm trong kho.`,
+                    confirmButtonColor: '#ef233c',
+                    confirmButtonText: 'Đồng ý',
+                });
+                return;
+            }
+
             $.ajax({
-                url: '{{ route('cart.update') }}',
+                url: '{{ route("cart.update") }}',
                 method: "PATCH",
-                data: {
-                    _token: '{{ csrf_token() }}', 
-                    id: id, 
-                    quantity: quantity
-                },
+                data: { _token: '{{ csrf_token() }}', id: id, quantity: quantity },
                 success: function (response) {
-                    if(response.success) {
-                        // Update item total
+                    if (response.success) {
                         row.find('.product_total').text(response.item_total);
-                        
-                        // Update cart totals
                         $('#cart-subtotal').text(response.cart_total);
                         $('#shipping-fee span').text(response.shipping_fee);
                         $('#cart-grand-total').text(response.grand_total);
-                        
-                        // Update header cart count
                         $('#cart-count').text(response.cart_count);
-                        
-                        // Optional: Show a small toast or visual feedback instead of alert
-                        // alert(response.message); 
+
+                        // Toast nhỏ xác nhận cập nhật
+                        Swal.fire({
+                            toast: true,
+                            position: 'bottom-end',
+                            icon: 'success',
+                            title: 'Đã cập nhật số lượng',
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
                     } else {
-                        alert("{{ __('messages.error_occurred') }}");
-                        window.location.reload(); // Fallback
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            html: response.message || '{{ __("messages.error_occurred") }}',
+                            confirmButtonColor: '#ef233c',
+                        });
+                        window.location.reload();
                     }
                 },
                 error: function(xhr) {
-                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : "{{ __('messages.cart_update_error') }}";
-                    alert(errorMsg);
-                    window.location.reload(); // Reset to valid state
+                    const msg = xhr.responseJSON ? xhr.responseJSON.message : '{{ __("messages.cart_update_error") }}';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Không thể cập nhật!',
+                        html: msg,
+                        confirmButtonColor: '#ef233c',
+                        confirmButtonText: 'Đóng',
+                    });
+                    window.location.reload();
                 }
             });
         });
 
-        // Remove item from cart
+        // Xóa sản phẩm khỏi giỏ
         $(".remove-from-cart").on('click', function (e) {
             e.preventDefault();
-            var ele = $(this);
-            var row = ele.parents("tr");
-            var id = row.attr("data-id");
-            
-            if(confirm("{{ __('messages.confirm_remove_cart_item') }}")) {
-                $.ajax({
-                    url: '{{ route('cart.remove') }}',
-                    method: "POST",
-                    data: {
-                        _token: '{{ csrf_token() }}', 
-                        _method: 'DELETE',
-                        id: id
-                    },
-                    success: function (response) {
-                        if(response.success) {
-                            row.fadeOut(300, function() { $(this).remove(); });
-                            
-                            // Update cart totals
-                            $('#cart-subtotal').text(response.cart_total);
-                            $('#shipping-fee span').text(response.shipping_fee);
-                            $('#cart-grand-total').text(response.grand_total);
-                            
-                             // Update header cart count
-                            $('#cart-count').text(response.cart_count);
-                            
-                            // Check if cart is empty
-                            if(response.cart_count == 0) {
-                                setTimeout(function() { window.location.reload(); }, 500);
+            const ele = $(this);
+            const row = ele.closest("tr");
+            const id = row.attr("data-id");
+            const productName = row.find('.product_name a').text().trim();
+
+            Swal.fire({
+                title: 'Xóa sản phẩm?',
+                html: `Bạn có chắc muốn xóa <strong>${productName}</strong> khỏi giỏ hàng?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ef233c',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("cart.remove") }}',
+                        method: "POST",
+                        data: { _token: '{{ csrf_token() }}', _method: 'DELETE', id: id },
+                        success: function (response) {
+                            if (response.success) {
+                                row.fadeOut(300, function() { $(this).remove(); });
+                                $('#cart-subtotal').text(response.cart_total);
+                                $('#shipping-fee span').text(response.shipping_fee);
+                                $('#cart-grand-total').text(response.grand_total);
+                                $('#cart-count').text(response.cart_count);
+                                if (response.cart_count == 0) {
+                                    setTimeout(function() { window.location.reload(); }, 600);
+                                }
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'Lỗi!', text: response.message || '{{ __("messages.error_occurred") }}' });
                             }
-                        } else {
-                            alert(response.message || "{{ __('messages.error_occurred') }}");
+                        },
+                        error: function() {
+                            Swal.fire({ icon: 'error', title: 'Lỗi!', text: '{{ __("messages.error_occurred") }}' });
                         }
-                    },
-                    error: function(xhr) {
-                        alert("{{ __('messages.error_occurred') }}");
-                    }
-                });
-            }
+                    });
+                }
+            });
         });
 
-        // Clear entire cart
+        // Xóa toàn bộ giỏ hàng
         $("#clear-cart").on('click', function(e) {
             e.preventDefault();
-            
-            if(confirm("{{ __('messages.confirm_clear_cart') }}")) {
-                $.ajax({
-                    url: '{{ route('cart.clear') }}',
-                    method: "POST",
-                    success: function (response) {
-                        window.location.reload();
-                    },
-                    error: function(xhr) {
-                        alert("{{ __('messages.error_occurred') }}");
-                    }
-                });
-            }
+            Swal.fire({
+                title: 'Xóa toàn bộ giỏ hàng?',
+                text: 'Tất cả sản phẩm trong giỏ sẽ bị xóa. Bạn chắc chưa?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef233c',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Xóa tất cả',
+                cancelButtonText: 'Hủy',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("cart.clear") }}',
+                        method: "POST",
+                        data: { _token: '{{ csrf_token() }}' },
+                        success: function() { window.location.reload(); },
+                        error: function() {
+                            Swal.fire({ icon: 'error', title: 'Lỗi!', text: '{{ __("messages.error_occurred") }}' });
+                        }
+                    });
+                }
+            });
         });
         // Toggle variant selectors
         $(".edit-variant-btn").on('click', function() {

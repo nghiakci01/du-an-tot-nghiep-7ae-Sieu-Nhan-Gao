@@ -136,21 +136,110 @@
                                         const colorInput = document.getElementById('select_color');
                                         const variantInput = document.getElementById('variant_select');
                                         const msg = document.getElementById('variant-message');
-                                        const addToCartBtn = document.querySelector('.button[value="add_to_cart"]');
-                                        const buyNowBtn = document.querySelector('.button[value="buy_now"]');
                                         const priceContainer = document.querySelector('.product_price');
+                                        const form = document.querySelector('form[action="{{ route("cart.add") }}"]');
 
                                         const originalPriceHtml = priceContainer.innerHTML;
 
                                         // Handle Nice Select changes
                                         $(niceSize).on('change', function () {
                                             sizeInput.value = this.value;
+                                            // Remove error highlight when user selects
+                                            $(this).closest('.product_variant').find('.nice-select').css('border-color', '');
                                             checkSelection();
                                         });
                                         $(niceColor).on('change', function () {
                                             colorInput.value = this.value;
+                                            $(this).closest('.product_variant').find('.nice-select').css('border-color', '');
                                             checkSelection();
                                         });
+
+                                        // Intercept form submit for validation
+                                        if (form) {
+                                            form.addEventListener('submit', function(e) {
+                                                const selectedSize = sizeInput ? sizeInput.value : '1';
+                                                const selectedColor = colorInput ? colorInput.value : '1';
+                                                const hasVariants = @json($product->variants->count() > 0 && $product->variants->min('price') > 0);
+
+                                                if (hasVariants && (!selectedSize || !selectedColor || !variantInput.value)) {
+                                                    e.preventDefault();
+
+                                                    let missingFields = [];
+                                                    if (!selectedSize) {
+                                                        missingFields.push('{{ __("messages.size") }}');
+                                                        // Highlight size select
+                                                        $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');
+                                                    }
+                                                    if (!selectedColor) {
+                                                        missingFields.push('{{ __("messages.color") }}');
+                                                        // Highlight color select
+                                                        $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');
+                                                    }
+
+                                                    let message = missingFields.length > 0
+                                                        ? `Vui lòng chọn: <strong>${missingFields.join(', ')}</strong> trước khi thêm vào giỏ hàng!`
+                                                        : 'Vui lòng chọn đầy đủ thuộc tính sản phẩm!';
+
+                                                    Swal.fire({
+                                                        icon: 'warning',
+                                                        title: 'Chưa chọn thuộc tính!',
+                                                        html: message,
+                                                        confirmButtonColor: '#ef233c',
+                                                        confirmButtonText: 'Chọn ngay',
+                                                        timer: 4000,
+                                                        timerProgressBar: true,
+                                                        showClass: {
+                                                            popup: 'animate__animated animate__fadeInDown'
+                                                        },
+                                                    });
+                                                        return false;
+                                                }
+
+                                                // Kiểm tra số lượng vượt tồn kho
+                                                const qtyInput = document.getElementById('quantity_input');
+                                                const requestedQty = parseInt(qtyInput ? qtyInput.value : 1);
+                                                const maxQty = parseInt(qtyInput ? qtyInput.max : 100);
+
+                                                if (maxQty && requestedQty > maxQty) {
+                                                    e.preventDefault();
+                                                    qtyInput.value = maxQty;
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: 'Vượt quá số lượng tồn kho!',
+                                                        html: `Sản phẩm này chỉ còn <strong>${maxQty}</strong> trong kho.<br>Số lượng đã được điều chỉnh về mức tối đa.`,
+                                                        confirmButtonColor: '#ef233c',
+                                                        confirmButtonText: 'Đồng ý',
+                                                        timer: 5000,
+                                                        timerProgressBar: true,
+                                                    });
+                                                    return false;
+                                                }
+                                            });
+
+                                            // Realtime check khi nhập số lượng
+                                            const qtyInputEl = document.getElementById('quantity_input');
+                                            if (qtyInputEl) {
+                                                qtyInputEl.addEventListener('input', function() {
+                                                    const max = parseInt(this.max);
+                                                    const val = parseInt(this.value);
+                                                    if (max && val > max) {
+                                                        Swal.fire({
+                                                            toast: true,
+                                                            position: 'top-end',
+                                                            icon: 'warning',
+                                                            title: `Chỉ còn ${max} sản phẩm trong kho!`,
+                                                            showConfirmButton: false,
+                                                            timer: 2500,
+                                                            timerProgressBar: true,
+                                                        });
+                                                        this.value = max;
+                                                    }
+                                                    if (val < 1 || isNaN(val)) {
+                                                        this.value = 1;
+                                                    }
+                                                });
+                                            }
+                                        }
 
                                         const formatCurrency = (amount) => {
                                             return new Intl.NumberFormat('en-US').format(amount) + ' VND';
@@ -159,12 +248,9 @@
                                         function checkSelection() {
                                             const selectedSize = sizeInput.value;
                                             const selectedColor = colorInput.value;
-                                            
-                                            // Reset variant input if either is missing
+
                                             if (!selectedSize || !selectedColor) {
                                                 variantInput.value = '';
-                                                addToCartBtn.disabled = true;
-                                                buyNowBtn.disabled = true;
                                             }
 
                                             let filteredVariants = variants;
@@ -193,37 +279,39 @@
                                                     if (matchedVariant.stock_quantity > 0) {
                                                         variantInput.value = matchedVariant.id;
                                                         msg.style.display = 'none';
-                                                        addToCartBtn.disabled = false;
-                                                        buyNowBtn.disabled = false;
-                                                        addToCartBtn.textContent = "{{ __('messages.add_to_cart') }}".toUpperCase();
-                                                        buyNowBtn.textContent = "{{ __('messages.buy_now') }}".toUpperCase();
+                                                        // Cập nhật stock info và max quantity
+                                                        const qtyInput = document.getElementById('quantity_input');
+                                                        const stockInfo = document.getElementById('stock-info');
+                                                        if (qtyInput) {
+                                                            qtyInput.max = matchedVariant.stock_quantity;
+                                                            if (parseInt(qtyInput.value) > matchedVariant.stock_quantity) {
+                                                                qtyInput.value = matchedVariant.stock_quantity;
+                                                            }
+                                                        }
+                                                        if (stockInfo) {
+                                                            stockInfo.textContent = `(Còn ${matchedVariant.stock_quantity} sản phẩm)`;
+                                                            stockInfo.style.display = 'inline';
+                                                            stockInfo.style.color = matchedVariant.stock_quantity <= 5 ? '#ef233c' : '#666';
+                                                        }
                                                     } else {
                                                         variantInput.value = '';
                                                         msg.textContent = "{{ __('messages.variant_out_of_stock') }}";
                                                         msg.style.display = 'block';
-                                                        addToCartBtn.disabled = true;
-                                                        buyNowBtn.disabled = true;
-                                                        addToCartBtn.textContent = "{{ __('messages.out_of_stock') }}".toUpperCase();
-                                                        buyNowBtn.textContent = "{{ __('messages.out_of_stock') }}".toUpperCase();
+                                                        const stockInfo = document.getElementById('stock-info');
+                                                        if (stockInfo) stockInfo.style.display = 'none';
                                                     }
                                                 } else {
-                                                    // Only one or none selected
                                                     const activePrices = filteredVariants.map(v => v.sale_price && v.sale_price < v.price ? v.sale_price : v.price).filter(p => p > 0);
                                                     const minPrice = Math.min(...activePrices);
                                                     const maxPrice = Math.max(...activePrices);
-                                                    
+
                                                     if (minPrice === maxPrice) {
                                                         html = `<span class="current_price">${formatCurrency(minPrice)}</span>`;
                                                     } else {
                                                         html = `<span class="current_price">${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}</span>`;
                                                     }
-                                                    
-                                                    // Don't enable buttons if not both selected
+
                                                     variantInput.value = '';
-                                                    addToCartBtn.disabled = true;
-                                                    buyNowBtn.disabled = true;
-                                                    addToCartBtn.textContent = "{{ __('messages.add_to_cart') }}".toUpperCase();
-                                                    buyNowBtn.textContent = "{{ __('messages.buy_now') }}".toUpperCase();
                                                     msg.style.display = 'none';
                                                 }
 
@@ -232,23 +320,22 @@
                                                 variantInput.value = '';
                                                 msg.textContent = "{{ __('messages.combination_not_available') }}";
                                                 msg.style.display = 'block';
-                                                addToCartBtn.disabled = true;
-                                                buyNowBtn.disabled = true;
                                                 priceContainer.innerHTML = originalPriceHtml;
                                             }
                                         }
-
-                                        addToCartBtn.disabled = true;
-                                        buyNowBtn.disabled = true;
                                     });
+                                
                                 </script>
                             @endif
 
                             <div class="product_variant quantity">
                                 <label>{{ __('messages.quantity') }}</label>
-                                <input min="1" max="100" value="1" type="number" name="quantity">
-                                <button class="button" type="submit" name="action" value="add_to_cart">{{ __('messages.add_to_cart') }}</button>
-                                <button class="button buy_now" type="submit" name="action" value="buy_now">{{ __('messages.buy_now') }}</button>  
+                                <input min="1" max="100" value="1" type="number" name="quantity" id="quantity_input">
+                                <span id="stock-info" style="display:none; font-size:13px; color:#666; margin-left:8px;"></span>
+                                <div style="margin-top:10px;">
+                                    <button class="button" type="submit" name="action" value="add_to_cart">{{ __('messages.add_to_cart') }}</button>
+                                    <button class="button buy_now" type="submit" name="action" value="buy_now">{{ __('messages.buy_now') }}</button>
+                                </div>
                             </div>
                             <style>
                                 .product_variant.quantity .button {
@@ -281,6 +368,17 @@
                                     border-color: #ebebeb !important;
                                     color: #999 !important;
                                     cursor: not-allowed;
+                                }
+                                /* Highlight chưa chọn thuộc tính */
+                                .nice-select[style*="border-color: rgb(239, 35, 60)"],
+                                .nice-select[style*="border-color: #ef233c"] {
+                                    border: 2px solid #ef233c !important;
+                                    animation: shake 0.4s ease;
+                                }
+                                @keyframes shake {
+                                    0%, 100% { transform: translateX(0); }
+                                    25% { transform: translateX(-5px); }
+                                    75% { transform: translateX(5px); }
                                 }
                                 .star-rating {
                                     display: inline-flex;
