@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', $product->name . ' | Reid')
+@section('meta_description', \Illuminate\Support\Str::limit(strip_tags($product->description), 150))
 
 @section('content')
     <!--breadcrumbs area start-->
