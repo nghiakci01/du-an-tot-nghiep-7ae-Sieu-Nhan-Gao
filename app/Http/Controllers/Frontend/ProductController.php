@@ -29,8 +29,10 @@ class ProductController extends Controller
         }
 
         // Filter by Category
+        $currentCategory = null;
         if ($request->has('category')) {
             $slug = $request->category;
+            $currentCategory = Category::where('slug', $slug)->first();
             $query->whereHas('category', function ($q) use ($slug) {
                 $q->where('slug', $slug);
             });
@@ -147,7 +149,8 @@ class ProductController extends Controller
             'brands',
             'colors',
             'tags',
-            'totalActiveProducts'
+            'totalActiveProducts',
+            'currentCategory'
         ));
     }
 
