@@ -154,6 +154,22 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="user_id">Gán cho người dùng (Không bắt buộc)</label>
+                        <select name="user_id" id="user_id" class="form-control select2 @error('user_id') is-invalid @enderror">
+                            <option value="">-- Tất cả người dùng --</option>
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
+                                    {{ $user->name }} ({{ $user->email }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('user_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="form-text text-muted">Nếu chọn người dùng, mã này sẽ chỉ hiển thị và áp dụng được cho người dùng đó.</small>
+                    </div>
+
+                    <div class="form-group">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="is_active" 
                                    name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
@@ -172,9 +188,19 @@
 </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Select2
+    $('.select2').select2({
+        placeholder: "-- Tất cả người dùng --",
+        allowClear: true,
+        width: '100%'
+    });
+
     const typeSelect = document.getElementById('type');
     const valueSuffix = document.getElementById('value-suffix');
     const valueHint = document.getElementById('value-hint');
@@ -211,4 +237,4 @@ document.addEventListener('DOMContentLoaded', function() {
     updateFormBasedOnType();
 });
 </script>
-@endpush
+@endsection
