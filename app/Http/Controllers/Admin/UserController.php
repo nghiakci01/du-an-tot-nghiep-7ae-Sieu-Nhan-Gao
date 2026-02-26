@@ -13,7 +13,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::latest()->paginate(10);
+        $users = User::withCount('orders')->latest()->paginate(10);
         return view('admin.users.index', compact('users'));
     }
 
@@ -61,7 +61,7 @@ class UserController extends Controller
     public function update(\App\Http\Requests\UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
-        
+
         if ($request->filled('password')) {
             $data['password'] = bcrypt($data['password']);
         } else {
