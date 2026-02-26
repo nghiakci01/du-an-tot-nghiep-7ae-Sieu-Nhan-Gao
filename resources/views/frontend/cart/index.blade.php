@@ -56,7 +56,7 @@
                                         </thead>
                                         <tbody>
                                             @foreach(session('cart') as $id => $details)
-                                                                                        <tr data-id="{{ $id }}">
+                                                <tr data-id="{{ $id }}">
                                                     <td class="product_remove">
                                                         <a href="javascript:void(0)" class="remove-from-cart">
                                                             <i class="fa fa-trash-o"></i>
@@ -73,7 +73,8 @@
                                                         <a
                                                             href="{{ route('product.detail', $details['slug']) }}">{{ $details['name'] }}</a>
                                                         <br>
-                                                        <small class="text-muted">{{ __('messages.size') }}: {{ $details['size'] }} | {{ __('messages.color') }}:
+                                                        <small class="text-muted">{{ __('messages.size') }}: {{ $details['size'] }}
+                                                            | {{ __('messages.color') }}:
                                                             {{ $details['color'] }}</small>
                                                     </td>
                                                     <td class="product-price">{{ number_format($details['price']) }} đ</td>
@@ -82,7 +83,8 @@
                                                             class="quantity update-cart">
                                                     </td>
                                                     <td class="product_total">
-                                                        {{ number_format($details['price'] * $details['quantity']) }} đ</td>
+                                                        {{ number_format($details['price'] * $details['quantity']) }} đ
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -136,7 +138,8 @@
 
                                         <div class="cart_subtotal">
                                             <p>{{ __('messages.grand_total') }}</p>
-                                            <p class="cart_amount" id="cart-grand-total">{{ number_format($total + $shippingFee) }} đ</p>
+                                            <p class="cart_amount" id="cart-grand-total">
+                                                {{ number_format($total + $shippingFee) }} đ</p>
                                         </div>
                                         <div class="checkout_btn">
                                             <a href="{{ route('checkout.index') }}">{{ __('messages.proceed_to_checkout') }}</a>
@@ -167,124 +170,146 @@
 @endsection
 
 @section('scripts')
-<script type="text/javascript">
-    $(document).ready(function() {
-        // Set up CSRF token for all AJAX requests
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-
-        // Update cart quantity
-        $(".update-cart").on('change keyup', function (e) {
-            var ele = $(this);
-            var row = ele.parents("tr");
-            var id = row.attr("data-id");
-            var quantity = ele.val();
-            
-            // Prevent duplicate triggers for same value
-            if (ele.data('prev-val') == quantity) return;
-            ele.data('prev-val', quantity);
-
-            if (quantity < 1) return;
-
-            $.ajax({
-                url: '{{ route('cart.update') }}',
-                method: "PATCH",
-                data: {
-                    _token: '{{ csrf_token() }}', 
-                    id: id, 
-                    quantity: quantity
-                },
-                success: function (response) {
-                    if(response.success) {
-                        // Update item total
-                        row.find('.product_total').text(response.item_total);
-                        
-                        // Update cart totals
-                        $('#cart-subtotal').text(response.cart_total);
-                        $('#shipping-fee span').text(response.shipping_fee);
-                        $('#cart-grand-total').text(response.grand_total);
-                        
-                        // Update header cart count
-                        $('#cart-count').text(response.cart_count);
-                        
-                        // Optional: Show a small toast or visual feedback instead of alert
-                        // alert(response.message); 
-                    } else {
-                        alert(response.message || 'Có lỗi xảy ra.');
-                        window.location.reload(); // Fallback
-                    }
-                },
-                error: function(xhr) {
-                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Số lượng vượt quá tồn kho hoặc có lỗi xảy ra.';
-                    alert(errorMsg);
-                    window.location.reload(); // Reset to valid state
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Set up CSRF token for all AJAX requests
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-        });
 
-        // Remove item from cart
-        $(".remove-from-cart").on('click', function (e) {
-            e.preventDefault();
-            var ele = $(this);
-            var row = ele.parents("tr");
-            var id = row.attr("data-id");
-            
-            if(confirm("Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+            // Update cart quantity
+            $(".update-cart").on('change keyup', function (e) {
+                var ele = $(this);
+                var row = ele.parents("tr");
+                var id = row.attr("data-id");
+                var quantity = ele.val();
+
+                // Prevent duplicate triggers for same value
+                if (ele.data('prev-val') == quantity) return;
+                ele.data('prev-val', quantity);
+
+                if (quantity < 1) return;
+
                 $.ajax({
-                    url: '{{ route('cart.remove') }}',
-                    method: "POST",
+                    url: '{{ route('cart.update') }}',
+                    method: "PATCH",
                     data: {
-                        _token: '{{ csrf_token() }}', 
-                        _method: 'DELETE',
-                        id: id
+                        _token: '{{ csrf_token() }}',
+                        id: id,
+                        quantity: quantity
                     },
                     success: function (response) {
-                        if(response.success) {
-                            row.fadeOut(300, function() { $(this).remove(); });
-                            
+                        if (response.success) {
+                            // Update item total
+                            row.find('.product_total').text(response.item_total);
+
                             // Update cart totals
                             $('#cart-subtotal').text(response.cart_total);
                             $('#shipping-fee span').text(response.shipping_fee);
                             $('#cart-grand-total').text(response.grand_total);
-                            
-                             // Update header cart count
+
+                            // Update header cart count
                             $('#cart-count').text(response.cart_count);
-                            
-                            // Check if cart is empty
-                            if(response.cart_count == 0) {
-                                setTimeout(function() { window.location.reload(); }, 500);
-                            }
+
+                            // Optional: Show a small toast or visual feedback instead of alert
+                            // alert(response.message); 
                         } else {
                             alert(response.message || 'Có lỗi xảy ra.');
+                            window.location.reload(); // Fallback
                         }
                     },
-                    error: function(xhr) {
-                        alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                    error: function (xhr) {
+                        var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : 'Số lượng vượt quá tồn kho hoặc có lỗi xảy ra.';
+                        alert(errorMsg);
+                        window.location.reload(); // Reset to valid state
                     }
                 });
-            }
-        });
+            });
 
-        // Clear entire cart
-        $("#clear-cart").on('click', function(e) {
-            e.preventDefault();
-            
-            if(confirm("Bạn có chắc muốn xóa sạch giỏ hàng?")) {
-                $.ajax({
-                    url: '{{ route('cart.clear') }}',
-                    method: "POST",
-                    success: function (response) {
-                        window.location.reload();
-                    },
-                    error: function(xhr) {
-                        alert('Có lỗi xảy ra. Vui lòng thử lại.');
+            // Remove item from cart
+            $(".remove-from-cart").on('click', function (e) {
+                e.preventDefault();
+                var ele = $(this);
+                var row = ele.parents("tr");
+                var id = row.attr("data-id");
+
+                Swal.fire({
+                    title: 'Xóa sản phẩm?',
+                    text: "Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ route('cart.remove') }}',
+                            method: "POST",
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                _method: 'DELETE',
+                                id: id
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    row.fadeOut(300, function () { $(this).remove(); });
+
+                                    // Update cart totals
+                                    $('#cart-subtotal').text(response.cart_total);
+                                    $('#shipping-fee span').text(response.shipping_fee);
+                                    $('#cart-grand-total').text(response.grand_total);
+
+                                    // Update header cart count
+                                    $('#cart-count').text(response.cart_count);
+
+                                    // Check if cart is empty
+                                    if (response.cart_count == 0) {
+                                        setTimeout(function () { window.location.reload(); }, 500);
+                                    }
+                                } else {
+                                    Swal.fire('Lỗi!', response.message || 'Có lỗi xảy ra.', 'error');
+                                }
+                            },
+                            error: function (xhr) {
+                                Swal.fire('Lỗi!', 'Có lỗi xảy ra. Vui lòng thử lại.', 'error');
+                            }
+                        });
                     }
                 });
-            }
+            });
+
+            // Clear entire cart
+            $("#clear-cart").on('click', function (e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Làm rỗng giỏ hàng?',
+                    text: "Toàn bộ sản phẩm sẽ bị xóa khỏi giỏ hàng!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ route('cart.clear') }}',
+                            method: "POST",
+                            success: function (response) {
+                                window.location.reload();
+                            },
+                            error: function (xhr) {
+                                Swal.fire('Lỗi!', 'Có lỗi xảy ra. Vui lòng thử lại.', 'error');
+                            }
+                        });
+                    }
+                });
+            });
         });
-    });
-</script>
+    </script>
 @endsection
