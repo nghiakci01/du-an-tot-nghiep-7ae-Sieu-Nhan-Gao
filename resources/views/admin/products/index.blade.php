@@ -28,6 +28,18 @@
                     <a href="{{ route('admin.products.create') }}" class="btn btn-primary btn-sm">Thêm mới</a>
                 </div>
                 <div class="card-body">
+                    <form action="{{ route('admin.products.index') }}" method="GET" class="mb-3 d-flex align-items-center">
+                        <label for="category_id" class="form-label mb-0 me-2 text-nowrap">Danh mục:</label>
+                        <select name="category_id" id="category_id" class="form-select form-select-sm w-auto me-2">
+                            <option value="">Tất cả</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
+                    </form>
                     @if(session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif

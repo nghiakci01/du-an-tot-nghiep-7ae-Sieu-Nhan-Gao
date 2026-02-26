@@ -17,8 +17,15 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['category', 'variants'])->withCount('variants')->paginate(10);
-        return view('admin.products.index', compact('products'));
+        $categories = Category::all();
+        $query = Product::with(['category', 'variants'])->withCount('variants');
+
+        if (request()->has('category_id') && request()->category_id != '') {
+            $query->where('category_id', request('category_id'));
+        }
+
+        $products = $query->paginate(10)->appends(request()->all());
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
     public function create()
