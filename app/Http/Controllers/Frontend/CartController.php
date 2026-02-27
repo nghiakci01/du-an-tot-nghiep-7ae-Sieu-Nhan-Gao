@@ -46,8 +46,30 @@ class CartController extends Controller
                 }
             }
         }
+
+        // Get applied coupon from session
+        $couponCode = session()->get('coupon_code');
+        $discount = session()->get('discount_amount', 0);
+        $coupon = null;
+
+        if ($couponCode) {
+            $coupon = \App\Models\Coupon::where('code', $couponCode)->first();
+            // Re-validate coupon if total changed
+            if ($coupon) {
+                if ($coupon->min_order_amount && $total < $coupon->min_order_amount) {
+                    // Remove coupon if min order not met
+                    session()->forget(['coupon_code', 'discount_amount']);
+                    $discount = 0;
+                    $coupon = null;
+                } else {
+                    // Recalculate discount
+                    $discount = $coupon->calculateDiscount($total);
+                    session()->put('discount_amount', $discount);
+                }
+            }
+        }
         
-        return view('frontend.cart.index', compact('cart', 'total'));
+        return view('frontend.cart.index', compact('cart', 'total', 'coupon', 'discount'));
     }
 
     public function changeVariant(Request $request)
@@ -257,13 +279,30 @@ class CartController extends Controller
                   }
 
                   $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
-                  $grandTotal = $subtotal + $shippingFee;
+                  
+                  // Recalculate discount if coupon applied
+                  $discount = 0;
+                  $couponCode = session()->get('coupon_code');
+                  if ($couponCode) {
+                      $coupon = \App\Models\Coupon::where('code', $couponCode)->first();
+                      if ($coupon) {
+                          if ($coupon->min_order_amount && $subtotal < $coupon->min_order_amount) {
+                              session()->forget(['coupon_code', 'discount_amount']);
+                          } else {
+                              $discount = $coupon->calculateDiscount($subtotal);
+                              session()->put('discount_amount', $discount);
+                          }
+                      }
+                  }
+
+                  $grandTotal = $subtotal - $discount + $shippingFee;
 
                   return response()->json([
                       'success' => true,
                       'message' => 'Giỏ hàng đã được cập nhật',
                       'item_total' => number_format($itemTotal) . ' đ',
                       'cart_total' => number_format($subtotal) . ' đ',
+                      'discount' => number_format($discount) . ' đ',
                       'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
                       'grand_total' => number_format($grandTotal) . ' đ',
                       'cart_count' => $cartCount
@@ -320,12 +359,29 @@ class CartController extends Controller
                  }
                 
                 $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
-                $grandTotal = $subtotal + $shippingFee;
+                
+                // Recalculate discount if coupon applied
+                $discount = 0;
+                $couponCode = session()->get('coupon_code');
+                if ($couponCode) {
+                    $coupon = \App\Models\Coupon::where('code', $couponCode)->first();
+                    if ($coupon) {
+                        if ($coupon->min_order_amount && $subtotal < $coupon->min_order_amount) {
+                            session()->forget(['coupon_code', 'discount_amount']);
+                        } else {
+                            $discount = $coupon->calculateDiscount($subtotal);
+                            session()->put('discount_amount', $discount);
+                        }
+                    }
+                }
+
+                $grandTotal = $subtotal - $discount + $shippingFee;
 
                 return response()->json([
                     'success' => true,
                     'message' => 'Sản phẩm đã được xóa khỏi giỏ hàng',
                     'cart_total' => number_format($subtotal) . ' đ',
+                    'discount' => number_format($discount) . ' đ',
                     'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
                     'grand_total' => number_format($grandTotal) . ' đ',
                     'cart_count' => $cartCount
@@ -358,5 +414,87 @@ class CartController extends Controller
             $count += $item['quantity'];
         }
         return response()->json(['count' => $count]);
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $request->validate([
+            'coupon_code' => 'required|string|max:50',
+        ]);
+
+        $cart = session()->get('cart', []);
+        if (count($cart) == 0) {
+            return response()->json(['success' => false, 'message' => 'Giỏ hàng của bạn đang trống.'], 400);
+        }
+
+        $total = 0;
+        foreach ($cart as $details) {
+            $total += $details['price'] * $details['quantity'];
+        }
+
+        $couponCode = strtoupper(trim($request->coupon_code));
+        $coupon = \App\Models\Coupon::where('code', $couponCode)->first();
+
+        if (!$coupon) {
+            return response()->json(['success' => false, 'message' => 'Mã giảm giá không tồn tại.'], 404);
+        }
+
+        if (!$coupon->is_active || $coupon->isExpired() || $coupon->isNotYetStarted() || $coupon->hasReachedUsageLimit()) {
+            return response()->json(['success' => false, 'message' => 'Mã giảm giá không hợp lệ hoặc đã hết hạn.'], 400);
+        }
+
+        if ($coupon->user_id && $coupon->user_id != \Auth::id()) {
+            return response()->json(['success' => false, 'message' => 'Mã giảm giá này không dành cho bạn.'], 400);
+        }
+
+        if ($coupon->min_order_amount && $total < $coupon->min_order_amount) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Đơn hàng tối thiểu ' . number_format($coupon->min_order_amount) . ' đ để sử dụng mã này.'
+            ], 400);
+        }
+
+        $discount = $coupon->calculateDiscount($total);
+        session()->put('coupon_code', $coupon->code);
+        session()->put('discount_amount', $discount);
+
+        $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
+        $grandTotal = $total - $discount + $shippingFee;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã áp dụng mã giảm giá thành công!',
+            'data' => [
+                'coupon_code' => $coupon->code,
+                'discount' => number_format($discount) . ' đ',
+                'subtotal' => number_format($total) . ' đ',
+                'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
+                'grand_total' => number_format($grandTotal) . ' đ',
+            ]
+        ]);
+    }
+
+    public function removeCoupon()
+    {
+        session()->forget(['coupon_code', 'discount_amount']);
+        
+        $cart = session()->get('cart', []);
+        $total = 0;
+        foreach ($cart as $details) {
+            $total += $details['price'] * $details['quantity'];
+        }
+        
+        $shippingFee = \App\Models\Setting::getShippingFee($total);
+        $grandTotal = $total + $shippingFee;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã gỡ bỏ mã giảm giá.',
+            'data' => [
+                'subtotal' => number_format($total) . ' đ',
+                'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
+                'grand_total' => number_format($grandTotal) . ' đ',
+            ]
+        ]);
     }
 }

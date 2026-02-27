@@ -187,12 +187,13 @@ class CheckoutController extends Controller
         }
 
         // Find coupon
-        $coupon = Coupon::where('code', strtoupper($request->coupon_code))->first();
+        $couponCode = strtoupper(trim($request->coupon_code));
+        $coupon = Coupon::where('code', $couponCode)->first();
 
         if (!$coupon) {
             return response()->json([
                 'success' => false,
-                'message' => 'Coupon code does not exist.'
+                'message' => __('Mã giảm giá không tồn tại.')
             ], 404);
         }
 
@@ -200,35 +201,43 @@ class CheckoutController extends Controller
         if (!$coupon->is_active) {
             return response()->json([
                 'success' => false,
-                'message' => 'Coupon code is no longer active.'
+                'message' => __('Mã giảm giá này hiện không còn hoạt động.')
             ], 400);
         }
 
         if ($coupon->isNotYetStarted()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Coupon code is not yet valid.'
+                'message' => __('Mã giảm giá này chưa đến thời gian sử dụng.')
             ], 400);
         }
 
         if ($coupon->isExpired()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Coupon code has expired.'
+                'message' => __('Mã giảm giá này đã hết hạn.')
             ], 400);
         }
 
         if ($coupon->hasReachedUsageLimit()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Coupon usage limit has been reached.'
+                'message' => __('Mã giảm giá này đã hết lượt sử dụng.')
+            ], 400);
+        }
+
+        // Check if coupon belongs to this user
+        if ($coupon->user_id && $coupon->user_id != Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Mã giảm giá này không dành cho tài khoản của bạn.')
             ], 400);
         }
 
         if ($coupon->min_order_amount && $total < $coupon->min_order_amount) {
             return response()->json([
                 'success' => false,
-                'message' => 'Minimum order amount is ' . number_format($coupon->min_order_amount) . ' to use this coupon.'
+                'message' => __('Đơn hàng tối thiểu :amount để sử dụng mã này.', ['amount' => number_format($coupon->min_order_amount) . ' đ'])
             ], 400);
         }
 

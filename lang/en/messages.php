@@ -246,4 +246,8 @@ return [
     'validate_address_required' => 'Please enter your address',
     'validate_province_required' => 'Please select province',
     'applied' => 'has been applied',
+    'welcome_coupon' => 'Welcome Coupon',
+    'welcome_coupon_code' => 'Use code: :code',
+    'welcome_coupon_desc' => '100k discount for orders over 1,000,000 VNĐ',
+    'my_coupons' => 'My Coupons',
 ];

@@ -15,7 +15,18 @@ class AccountController extends Controller
     {
         $user = Auth::user();
         $orders = $user->orders()->orderBy('created_at', 'desc')->get();
-        return view('frontend.account.index', compact('user', 'orders'));
+        // Fetch active coupons: either general (user_id is null) or specific to this user
+        $coupons = \App\Models\Coupon::where(function($q) use ($user) {
+                $q->whereNull('user_id')->orWhere('user_id', $user->id);
+            })
+            ->where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+            })
+            ->whereRaw('used_count < usage_limit')
+            ->get();
+
+        return view('frontend.account.index', compact('user', 'orders', 'coupons'));
     }
 
     public function showOrder($id)

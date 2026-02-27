@@ -8,6 +8,7 @@ use Carbon\Carbon;
 class Coupon extends Model
 {
     protected $fillable = [
+        'user_id',
         'code',
         'type',
         'value',
@@ -22,6 +23,7 @@ class Coupon extends Model
     ];
 
     protected $casts = [
+        'user_id' => 'integer',
         'value' => 'decimal:2',
         'min_order_amount' => 'decimal:2',
         'max_discount_amount' => 'decimal:2',
@@ -31,6 +33,11 @@ class Coupon extends Model
         'used_count' => 'integer',
         'usage_limit' => 'integer',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * Scope to filter active coupons
