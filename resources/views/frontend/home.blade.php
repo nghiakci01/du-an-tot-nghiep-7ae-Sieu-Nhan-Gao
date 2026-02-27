@@ -60,26 +60,32 @@
         /* Fix image ratio and layout breaking on hover */
         .single_product .product_thumb {
             position: relative;
-            width: 100%;
-            aspect-ratio: 4 / 5;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto;
             overflow: hidden;
             background: #f5f5f5;
             /* Placeholder color for loading */
         }
 
+        .single_product .product_thumb a.primary_img,
+        .single_product .product_thumb a.secondary_img {
+            display: block;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
         .single_product .product_thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            width: 280px !important;
+            height: 280px !important;
+            object-fit: cover !important;
             position: absolute;
             top: 0;
             left: 0;
-        }
-
-        /* Ensure secondary image also fills correctly */
-        .single_product .product_thumb a.secondary_img {
-            width: 100%;
-            height: 100%;
+            margin: auto;
         }
 
         /* Fix alignment for titles and prices */
