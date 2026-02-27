@@ -140,87 +140,66 @@
     }
 </style> -->
     <!--slider area start-->
-    <div class="slider_section slider_section_six">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="slider_area home_six_slider owl-carousel">
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}">
-                           <div class="slider_content_inner">
+    <div class="slider_section slider_section_six mb-30" style="background: #fff; width: 100%;">
+        <div class="slider_container" style="width: 1521px; max-width: 100%; margin: 0 auto; position: relative;">
+            <div class="slider_area home_six_slider owl-carousel banner-wide-slider">
+                @if($sliders->count() > 0)
+                    @foreach($sliders as $slider)
+                        <div class="single_slider" data-bgimg="{{ asset('storage/' . $slider->image) }}" style="height: 856px !important;">
+                            @if($slider->link)
+                                <a href="{{ $slider->link }}" style="display: block; width: 100%; height: 100%;"></a>
+                            @endif
+                            <div class="slider_content_inner">
                                 <div class="slider_content">
-                                   <h2>top trending</h2>
-                                    <h1>handbag</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="{{ route('shop') }}">Discover Now</a>
-                                </div>  
-                            </div>     
-                        </div>
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider11.jpg') }}">
-                           <div class="slider_content_inner">
-                                <div class="slider_content">
-                                    <h2>new arrivals</h2>
-                                    <h1>zip hoodie</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="{{ route('shop') }}">Discover Now</a>
-                                </div> 
-                            </div>   
-                        </div>
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider12.jpg') }}">
-                           <div class="slider_content_inner">
-                                <div class="slider_content">
-                                    <h2>top trending</h2>
-                                    <h1>clothing</h1>
-                                    <p>Lorem ipsum dolor amet, consectetur adipisicing <br> elit. Vel similique perspiciatis, tempore unde </p>
-                                    <a href="{{ route('shop') }}">Discover Now</a>
-                                </div> 
-                            </div>         
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <!--banner area start-->
-                    <div class="banner_slider_section">
-                        <div class="row ">
-                           <div class="col-12">
-                                <div class="banner_area banner_top">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner18.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Men’s <br> Summer Sneaker</h1>
-                                           <h3>Big Sale Off This Week</h3>
-                                        </div>
-                                    </div>
+                                    <h2>{{ $slider->title }}</h2>
                                 </div>
                             </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="banner_area">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner19.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Clothing.No18</h1>
-                                           <h3>Sale Off 20% All Store</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="banner_area">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner20.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Bag.No1</h1>
-                                           <h3>Big Sale No Limited</h3>
-                                        </div>
-                                    </div>
-                                </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}" style="height: 856px !important;">
+                        <div class="slider_content_inner">
+                            <div class="slider_content">
+                                <h2>Wide Banner Placeholder</h2>
+                                <p>1521 x 856 px</p>
                             </div>
                         </div>
                     </div>
-                    <!--banner area end-->
-                </div>
+                @endif
             </div>
         </div>
     </div>
+    <style>
+        .banner-wide-slider .single_slider {
+            height: 856px !important;
+            background-size: cover !important;
+            background-position: center !important;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .banner-wide-slider .owl-nav div {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            background: rgba(255,255,255,0.8);
+            text-align: center;
+            border-radius: 50%;
+            font-size: 20px;
+            transition: 0.3s;
+            z-index: 10;
+        }
+        .banner-wide-slider .owl-nav div:hover {
+            background: #ff6a28;
+            color: #fff;
+        }
+        .banner-wide-slider .owl-nav .owl-prev { left: 20px; }
+        .banner-wide-slider .owl-nav .owl-next { right: 20px; }
+        .slider_section_six.mb-30 { margin-bottom: 30px; }
+    </style>
     <!--slider area end-->
 
     <!--product section area start-->
@@ -301,21 +280,7 @@
     </section>
     <!--product section area end-->
 
-    <!--banner area start-->
-    <div class="banner_slider_section section_fullwidth">
-       <div class="container-fluid">
-           <div class="row ">
-               <div class="col-12">
-                    <div class="banner_area">
-                        <div class="banner_thumb">
-                            <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner21.jpg') }}" alt="#"></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-       </div>  
-    </div>
-    <!--banner area end-->
+    <!-- banner area removed as per request -->
 
     <!--product section area start-->
     <section class="product_section womens_product product_section_six bottom">
