@@ -182,26 +182,9 @@
             overflow: hidden;
             position: relative;
         }
-        .banner-wide-slider .owl-nav div {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            background: rgba(255,255,255,0.8);
-            text-align: center;
-            border-radius: 50%;
-            font-size: 20px;
-            transition: 0.3s;
-            z-index: 10;
+        .banner-wide-slider .owl-nav {
+            display: none !important;
         }
-        .banner-wide-slider .owl-nav div:hover {
-            background: #ff6a28;
-            color: #fff;
-        }
-        .banner-wide-slider .owl-nav .owl-prev { left: 20px; }
-        .banner-wide-slider .owl-nav .owl-next { right: 20px; }
         .slider_section_six.mb-30 { margin-bottom: 30px; }
     </style>
     <!--slider area end-->
