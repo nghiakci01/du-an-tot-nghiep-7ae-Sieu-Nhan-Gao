@@ -919,16 +919,18 @@
                         function submitAddToCartForm(isBuyNow) {
                             var form = $('#add-to-cart-form');
                             var url = form.attr('action');
+                            var allVariants = @json($product->variants);
 
-                            // Kiểm tra thuộc tính
+                            // Kiểm tra thuộc tính bắt buộc
                             var hasVariants = @json($product->variants->count() > 0 && $product->variants->min('price') > 0);
+
                             if (hasVariants) {
-                                // Đọc trực tiếp từ select gốc (niceselect vẫn cập nhật select gốc)
+                                // Đọc giá trị size & color từ select gốc
                                 var selectedSize = $('#select_size_nice').val();
                                 var selectedColor = $('#select_color_nice').val();
-                                var variantVal = document.getElementById('variant_select') ? document.getElementById('variant_select').value : '';
 
-                                if (!selectedSize || !selectedColor || !variantVal) {
+                                // Validate: phải chọn đủ size và color
+                                if (!selectedSize || !selectedColor) {
                                     var missingFields = [];
                                     if (!selectedSize) {
                                         missingFields.push('{{ __("messages.size") }}');
@@ -957,13 +959,46 @@
                                     });
                                     return;
                                 }
+
+                                // Tự tìm variant khớp với size + color đã chọn
+                                var matchedVariant = null;
+                                for (var i = 0; i < allVariants.length; i++) {
+                                    var v = allVariants[i];
+                                    if (String(v.size_id) === String(selectedSize) && String(v.color_id) === String(selectedColor)) {
+                                        matchedVariant = v;
+                                        break;
+                                    }
+                                }
+
+                                if (!matchedVariant) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Tổ hợp không có!',
+                                        text: 'Không tìm thấy sản phẩm với size và màu sắc này.',
+                                        confirmButtonColor: '#ef233c',
+                                    });
+                                    return;
+                                }
+
+                                if (matchedVariant.stock_quantity <= 0) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Hết hàng!',
+                                        text: 'Sản phẩm này đã hết hàng với lựa chọn của bạn.',
+                                        confirmButtonColor: '#ef233c',
+                                    });
+                                    return;
+                                }
+
+                                // Gán variant_id vào form trước khi serialize
+                                $('#variant_select').val(matchedVariant.id);
                             }
 
                             var data = form.serialize();
 
                             if (isBuyNow) {
                                 $('#action_input').val('buy_now');
-                                data = form.serialize(); // re-serialize after setting action
+                                data = form.serialize();
                             }
 
                             if (!isBuyNow) {
