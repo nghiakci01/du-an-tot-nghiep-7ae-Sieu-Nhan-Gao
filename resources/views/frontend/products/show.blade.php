@@ -1027,15 +1027,13 @@
                                         showConfirmButton: false,
                                         timer: 1500
                                     });
-                                    // Cập nhật số lượng giỏ hàng
+                                    // Cập nhật số lượng giỏ hàng trên header
                                     if (response.count !== undefined) {
-                                        $('.cart_count').text(response.count);
-                                        $('.cart_text_quantity').text(response.count);
+                                        $('#cart-count').text(response.count);
                                     } else {
                                         $.get('{{ route("cart.count") }}', function(res) {
                                             if (res && res.count !== undefined) {
-                                                $('.cart_count').text(res.count);
-                                                $('.cart_text_quantity').text(res.count);
+                                                $('#cart-count').text(res.count);
                                             }
                                         });
                                     }
