@@ -30,11 +30,11 @@ class CheckoutController extends Controller
         $couponCode = session()->get('coupon_code');
         $discount = session()->get('discount_amount', 0);
         $coupon = null;
-        
+
         if ($couponCode) {
             $coupon = Coupon::where('code', $couponCode)->first();
         }
-        
+
         $finalTotal = $total - $discount;
         $shippingFee = \App\Models\Setting::getShippingFee($finalTotal);
         $finalTotal += $shippingFee;
@@ -53,7 +53,7 @@ class CheckoutController extends Controller
             'province' => 'required|string|in:' . implode(',', $provinces),
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
         ], [
             'province.required' => 'Vui lòng chọn tỉnh thành.',
             'province.in' => 'Tỉnh thành không hợp lệ.',
@@ -75,14 +75,19 @@ class CheckoutController extends Controller
             // Get coupon and shipping data
             $couponCode = session()->get('coupon_code');
             $discount = session()->get('discount_amount', 0);
-            
+
             // Calculate shipping fee
             $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
-            
+
             $finalTotal = $total - $discount + $shippingFee;
 
             $order = Order::create([
                 'user_id' => Auth::id(), // Nullable if guest
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'province' => $request->province,
+                'address' => $request->address,
                 'status' => 'pending',
                 'total_price' => $total,
                 'coupon_code' => $couponCode,
@@ -122,9 +127,20 @@ class CheckoutController extends Controller
             }
 
             DB::commit();
-            
+
             // Clear cart and coupon session
             Session::forget(['cart', 'coupon_code', 'discount_amount']);
+
+            if ($request->payment_method === 'VNPAY') {
+                return app(VnpayController::class)->createPayment($order);
+            }
+
+            // Send confirmation email for COD and BANK_TRANSFER
+            try {
+                \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
+            } catch (\Exception $e) {
+                \Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: ' . $e->getMessage());
+            }
 
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');
 
@@ -137,7 +153,7 @@ class CheckoutController extends Controller
     public function success($id)
     {
         $order = Order::findOrFail($id);
-        
+
         // Security check: Only allow viewing if Auth user matches Or if just created (session check could be added here for strictness)
         $bankName = \App\Models\Setting::get('bank_name', 'Vietcombank');
         $bankAccount = \App\Models\Setting::get('bank_account_number', '0071001234567');

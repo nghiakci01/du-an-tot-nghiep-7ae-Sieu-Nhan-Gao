@@ -21,7 +21,7 @@
     .chat-container {
         position: fixed;
         bottom: 30px;
-        right: 30px;
+        right: 80px;
         z-index: 99999;
         display: flex;
         flex-direction: column;
@@ -423,7 +423,7 @@
     }
 </style>
 
-<div x-data="chatBot({ mode: '{{ $chatbot_mode ?? 'rules' }}', suggestedQuestions: {{ json_encode($chatbot_suggested_questions ?? []) }} })" x-init="initChat()" class="chatbot-widget chat-container">
+<div x-data="chatBot({ mode: '{{ $chatbot_mode ?? 'rules' }}', suggestedQuestions: {!! $chatbot_suggested_questions_json !!} })" x-init="initChat()" class="chatbot-widget chat-container">
     
     <!-- Chat Window -->
     <div x-show="isOpen" 

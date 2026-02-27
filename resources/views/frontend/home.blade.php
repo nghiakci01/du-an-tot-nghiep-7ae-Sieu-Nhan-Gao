@@ -140,32 +140,36 @@
     }
 </style> -->
     <!--slider area start-->
-    <div class="slider_section slider_section_six mb-30" style="background: #fff; width: 100%;">
-        <div class="slider_container" style="width: 1521px; max-width: 100%; margin: 0 auto; position: relative;">
-            <div class="slider_area home_six_slider owl-carousel banner-wide-slider">
-                @if($sliders->count() > 0)
-                    @foreach($sliders as $slider)
-                        <div class="single_slider" data-bgimg="{{ asset('storage/' . $slider->image) }}" style="height: 856px !important;">
-                            @if($slider->link)
-                                <a href="{{ $slider->link }}" style="display: block; width: 100%; height: 100%;"></a>
-                            @endif
-                            <div class="slider_content_inner">
-                                <div class="slider_content">
-                                    <h2>{{ $slider->title }}</h2>
+    <div class="slider_section slider_section_six mb-30" style="background: #fff;">
+        <div style="padding: 0; width: 1521px; max-width: 100%; margin: 0 auto;">
+            <div class="row no-gutters">
+                <div class="col-12">
+                    <div class="slider_area home_six_slider owl-carousel banner-wide-slider">
+                        @if($sliders->count() > 0)
+                            @foreach($sliders as $slider)
+                                <div class="single_slider" data-bgimg="{{ asset('storage/' . $slider->image) }}" style="height: 856px !important;">
+                                    @if($slider->link)
+                                        <a href="{{ $slider->link }}" style="display: block; width: 100%; height: 100%;"></a>
+                                    @endif
+                                    <div class="slider_content_inner">
+                                        <div class="slider_content">
+                                            <h2>{{ $slider->title }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}" style="height: 856px !important;">
+                                <div class="slider_content_inner">
+                                    <div class="slider_content">
+                                        <h2>Wide Banner Placeholder</h2>
+                                        <p>1521 x 856 px</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}" style="height: 856px !important;">
-                        <div class="slider_content_inner">
-                            <div class="slider_content">
-                                <h2>Wide Banner Placeholder</h2>
-                                <p>1521 x 856 px</p>
-                            </div>
-                        </div>
+                        @endif
                     </div>
-                @endif
+                </div>
             </div>
         </div>
     </div>
