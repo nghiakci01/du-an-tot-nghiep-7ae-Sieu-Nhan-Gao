@@ -251,9 +251,23 @@ class CartController extends Controller
         }
 
         session()->put('cart', $cart);
-        
+
         if ($request->input('action') === 'buy_now') {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('checkout.index')
+                ]);
+            }
             return redirect()->route('checkout.index');
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Sản phẩm đã được thêm vào giỏ hàng!',
+                'count' => array_sum(array_column(session()->get('cart', []), 'quantity'))
+            ]);
         }
 
         return redirect()->route('cart.index')->with('success', 'Product added to cart!');
