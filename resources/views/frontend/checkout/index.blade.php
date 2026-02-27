@@ -445,7 +445,7 @@
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <label class="mb-0">{{ __('messages.province_city') }} <span>*</span></label>
                                         <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-primary"
-                                            title="Sá»­ dá»¥ng vá»‹ trÃ­ hiá»‡n táº¡i cá»§a báº¡n">
+                                            title="Sá»­ dá»¥ng vá»‹ tr­ hiá»‡n táº¡i cá»§a báº¡n">
                                             <i class="fa fa-map-marker"></i> {{ __('messages.locate_me') }}
                                         </button>
                                     </div>
@@ -497,11 +497,11 @@
                                         @foreach($cart as $details)
                                         <tr>
                                             <td>{{ $details['name'] }} 
-                                                <strong>Ã— {{ $details['quantity'] }}</strong>
+                                                <strong>&times; {{ $details['quantity'] }}</strong>
                                                 <br>
                                                 <small class="text-muted">({{ $details['size'] }}/{{ $details['color'] }})</small>
                                             </td>
-                                            <td>{{ number_format($details['price'] * $details['quantity']) }} Ä‘</td>
+                                            <td>{{ number_format($details['price'] * $details['quantity']) }} đ</td>
                                         </tr>
                                         @endforeach
                                     </tbody>
@@ -513,12 +513,12 @@
                                         @if($discount > 0)
                                         <tr class="discount-row">
                                             <th>{{ __('messages.discount') }}</th>
-                                            <td>-{{ number_format($discount) }} Ä‘</td>
+                                            <td>-{{ number_format($discount) }} đ</td>
                                         </tr>
                                         @endif
                                         <tr>
                                             <th>{{ __('messages.shipping') }}</th>
-                                            <td><strong>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' Ä‘') : __('messages.free') }}</strong>
+                                            <td><strong>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : __('messages.free') }}</strong>
                                             </td>
                                         </tr>
                                         <tr class="order_total">
@@ -563,7 +563,7 @@
                                                             <li><strong>Ngân hàng:</strong> {{ \App\Models\Setting::get('bank_name', 'MB Bank') }}</li>
                                                             <li><strong>Số tài khoản:</strong> <span class="text-primary fw-bold">{{ \App\Models\Setting::get('bank_account_number', '0359756805') }}</span></li>
                                                             <li><strong>Chủ tài khoản:</strong> {{ \App\Models\Setting::get('bank_account_name', 'NGUYEN CONG BANG') }}</li>
-                                                            <li><strong>Nội dung:</strong> <span class="text-danger fw-bold">THANHTOAN DH[Mã đơn hàng]</span></li>
+                                                            <li><strong>Nội dung:</strong> <span class="text-danger fw-bold">THANHTOAN DH[M đơn hàng]</span></li>
                                                         </ul>
                                                     </div>
                                                     <div class="col-md-5 text-center mt-3 mt-md-0">
@@ -615,7 +615,7 @@
             $('#applyCouponBtn').click(function () {
                 const couponCode = $('#couponCode').val().trim();
                 if (!couponCode) {
-                    showCouponMessage('Vui lòng nhập mã giảm giá', 'danger');
+                    showCouponMessage('Vui lòng nhập m giảm giá', 'danger');
                     return;
                 }
                 const btn = $(this);
@@ -654,7 +654,7 @@
 
             $('#removeCouponBtn').click(function () {
                 Swal.fire({
-                    title: 'Xóa mã giảm giá?',
+                    title: 'Xóa m giảm giá?',
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Xóa',
@@ -797,7 +797,7 @@
                                           quarter = address.quarter || '', district = address.district || address.city_district || '';
                                     const streetAddress = [road, suburb, quarter, district].filter(Boolean).join(', ');
                                     if (streetAddress) { $('input[name="address"]').val(streetAddress); showValidation($('input[name="address"]')[0], ''); }
-                                    Swal.fire({ icon: 'success', title: 'Thành công', text: 'Đã cập nhật địa chỉ từ vị trí của bạn.', timer: 2000, showConfirmButton: false });
+                                    Swal.fire({ icon: 'success', title: 'Thành công', text: 'Đ cập nhật địa chỉ từ vị trí của bạn.', timer: 2000, showConfirmButton: false });
                                 }
                             },
                             error: function () { Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể lấy thông tin địa chỉ từ tọa độ.' }); },
@@ -806,7 +806,7 @@
                     },
                     function (error) {
                         let message = 'Không thể lấy vị trí của bạn.';
-                        if (error.code === 1) message = 'Bạn đã từ chối quyền truy cập vị trí.';
+                        if (error.code === 1) message = 'Bạn đ từ chối quyền truy cập vị trí.';
                         else if (error.code === 2) message = 'Không thể xác định vị trí.';
                         else if (error.code === 3) message = 'Hết thời gian yêu cầu vị trí.';
                         Swal.fire({ icon: 'warning', title: 'Thông báo', text: message });
@@ -818,3 +818,4 @@
         });
     </script>
 @endsection
+
