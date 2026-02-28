@@ -248,4 +248,8 @@ return [
     'validate_address_required' => 'Vui lòng nhập địa chỉ cụ thể (số nhà, tên đường)',
     'validate_province_required' => 'Vui lòng chọn tỉnh thành',
     'applied' => 'đã được áp dụng',
+    'welcome_coupon' => 'Mã giảm giá thành viên mới',
+    'welcome_coupon_code' => 'Sử dụng mã: :code',
+    'welcome_coupon_desc' => 'Giảm 100k cho đơn hàng từ 1 triệu VNĐ',
+    'my_coupons' => 'Mã giảm giá của tôi',
 ];

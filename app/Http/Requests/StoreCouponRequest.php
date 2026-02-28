@@ -44,6 +44,7 @@ class StoreCouponRequest extends FormRequest
             'end_date' => 'nullable|date|after:start_date',
             'is_active' => 'boolean',
             'description' => 'nullable|string|max:500',
+            'user_id' => 'nullable|exists:users,id',
         ];
 
         // Additional validation based on type

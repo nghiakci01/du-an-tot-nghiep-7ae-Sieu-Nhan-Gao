@@ -82,4 +82,25 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
         ]);
     }
+
+    /**
+     * The user has been registered.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function registered(\Illuminate\Http\Request $request, $user)
+    {
+        \App\Models\Coupon::create([
+            'user_id' => $user->id,
+            'code' => 'WELCOME-' . strtoupper(\Illuminate\Support\Str::of(\Illuminate\Support\Str::random(8))->upper()),
+            'type' => 'fixed',
+            'value' => 100000,
+            'min_order_amount' => 1000000,
+            'usage_limit' => 1,
+            'is_active' => true,
+            'description' => 'Mã giảm giá chào mừng thành viên mới (Giảm 100k cho đơn hàng từ 1M)',
+        ]);
+    }
 }
