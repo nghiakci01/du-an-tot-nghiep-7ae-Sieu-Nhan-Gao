@@ -15,6 +15,7 @@ class PostCategoryController extends Controller
         $categories = \App\Models\PostCategory::withCount('posts')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
+
         return view('admin.post-categories.index', compact('categories'));
     }
 
@@ -50,6 +51,7 @@ class PostCategoryController extends Controller
     public function edit($id)
     {
         $category = \App\Models\PostCategory::findOrFail($id);
+
         return view('admin.post-categories.edit', compact('category'));
     }
 
@@ -59,9 +61,9 @@ class PostCategoryController extends Controller
     public function update(Request $request, $id)
     {
         $category = \App\Models\PostCategory::findOrFail($id);
-        
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:post_categories,name,' . $category->id,
+            'name' => 'required|string|max:255|unique:post_categories,name,'.$category->id,
             'description' => 'nullable|string',
             'is_active' => 'required|boolean',
         ]);
@@ -79,7 +81,7 @@ class PostCategoryController extends Controller
     public function destroy($id)
     {
         $category = \App\Models\PostCategory::findOrFail($id);
-        
+
         if ($category->posts()->count() > 0) {
             return redirect()->back()->with('error', 'Không thể xóa danh mục đang có bài viết.');
         }

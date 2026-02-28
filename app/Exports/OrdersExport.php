@@ -4,15 +4,16 @@ namespace App\Exports;
 
 use App\Models\Order;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class OrdersExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
+class OrdersExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
     protected $startDate;
+
     protected $endDate;
 
     public function __construct($startDate, $endDate)
@@ -22,8 +23,8 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping, ShouldA
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         return Order::with('user')
@@ -46,14 +47,14 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping, ShouldA
             'Trạng Thái',
             'PT Thanh Toán',
             'Ngày Đặt',
-            'Địa Chỉ Giao Hàng'
+            'Địa Chỉ Giao Hàng',
         ];
     }
 
     public function map($order): array
     {
         return [
-            '#' . $order->id,
+            '#'.$order->id,
             $order->user ? $order->user->name : $order->name,
             $order->email,
             $order->phone,
@@ -64,7 +65,7 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping, ShouldA
             $order->status_text,
             $order->payment_method,
             $order->created_at->format('d/m/Y H:i'),
-            $order->address . ', ' . $order->province
+            $order->address.', '.$order->province,
         ];
     }
 

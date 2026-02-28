@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Product;
+use Illuminate\Console\Command;
 
 class UpdateProductImages extends Command
 {
@@ -30,9 +30,10 @@ class UpdateProductImages extends Command
 
         // Get all products
         $products = Product::all();
-        
+
         if ($products->isEmpty()) {
             $this->warn('No products found in database.');
+
             return Command::FAILURE;
         }
 
@@ -48,16 +49,16 @@ class UpdateProductImages extends Command
         foreach ($products as $product) {
             // Cycle through available images
             $imagePath = $availableImages[$imageIndex % count($availableImages)];
-            
+
             $product->update(['image' => $imagePath]);
             $this->line("✅ {$product->name} → {$imagePath}");
-            
+
             $updated++;
             $imageIndex++;
         }
 
         $this->newLine();
-        $this->info("📊 Summary:");
+        $this->info('📊 Summary:');
         $this->info("   Total products: {$products->count()}");
         $this->info("   Updated: {$updated} products");
         $this->newLine();

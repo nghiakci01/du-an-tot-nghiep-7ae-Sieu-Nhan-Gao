@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Services\ChatService;
+use Illuminate\Console\Command;
 
 class TestGeminiChat extends Command
 {
@@ -41,30 +41,30 @@ class TestGeminiChat extends Command
         // Test 1: Simple greeting
         $this->info('Test 1: Simple Greeting');
         $this->line('User: Xin chào, bạn có thể giúp gì cho tôi?');
-        
+
         $response1 = $this->chatService->generateResponse('Xin chào, bạn có thể giúp gì cho tôi?');
-        $this->line('AI: ' . $response1);
+        $this->line('AI: '.$response1);
         $this->newLine();
 
         // Test 2: Product query (will trigger RAG)
         $this->info('Test 2: Product Query (RAG Test)');
         $this->line('User: Có sản phẩm laptop không?');
-        
+
         $response2 = $this->chatService->generateResponse('Có sản phẩm laptop không?');
-        $this->line('AI: ' . $response2);
+        $this->line('AI: '.$response2);
         $this->newLine();
 
         // Test 3: Specific product search
         $this->info('Test 3: Specific Product Search');
         $this->line('User: Cho tôi xem sản phẩm iPhone');
-        
+
         $response3 = $this->chatService->generateResponse('Cho tôi xem sản phẩm iPhone');
-        $this->line('AI: ' . $response3);
+        $this->line('AI: '.$response3);
         $this->newLine();
 
         $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         $this->info('✅ All tests completed!');
-        
+
         return Command::SUCCESS;
     }
 }

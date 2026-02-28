@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\InventoryVoucher;
-use App\Models\InventoryVoucherDetail;
-use App\Models\Warehouse;
-use App\Models\Supplier;
 use App\Models\ProductVariant;
+use App\Models\Supplier;
+use App\Models\Warehouse;
 use App\Models\WarehouseStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +17,7 @@ class InventoryVoucherController extends Controller
     public function index()
     {
         $vouchers = InventoryVoucher::with(['warehouse', 'supplier', 'user'])->latest()->paginate(10);
+
         return view('admin.vouchers.index', compact('vouchers'));
     }
 
@@ -25,6 +25,7 @@ class InventoryVoucherController extends Controller
     {
         $warehouses = Warehouse::active()->get();
         $suppliers = Supplier::active()->get();
+
         return view('admin.vouchers.create', compact('warehouses', 'suppliers'));
     }
 
@@ -43,7 +44,7 @@ class InventoryVoucherController extends Controller
             DB::beginTransaction();
 
             $voucher = InventoryVoucher::create([
-                'voucher_code' => 'IV' . date('YmdHis') . strtoupper(Str::random(4)),
+                'voucher_code' => 'IV'.date('YmdHis').strtoupper(Str::random(4)),
                 'type' => $request->type,
                 'warehouse_id' => $request->warehouse_id,
                 'supplier_id' => $request->supplier_id,
@@ -67,16 +68,19 @@ class InventoryVoucherController extends Controller
             $voucher->update(['total_amount' => $total]);
 
             DB::commit();
+
             return redirect()->route('admin.vouchers.index')->with('success', 'Phiếu kho đã được tạo.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+
+            return back()->with('error', 'Có lỗi xảy ra: '.$e->getMessage());
         }
     }
 
     public function show(InventoryVoucher $voucher)
     {
         $voucher->load('details.variant.product');
+
         return view('admin.vouchers.show', compact('voucher'));
     }
 
@@ -113,9 +117,11 @@ class InventoryVoucherController extends Controller
             $voucher->update(['status' => 'COMPLETED']);
 
             DB::commit();
+
             return back()->with('success', 'Đã xác nhận hoàn tất phiếu kho và cập nhật tồn kho.');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return back()->with('error', $e->getMessage());
         }
     }
@@ -139,8 +145,8 @@ class InventoryVoucherController extends Controller
                 'color' => $variant->color,
                 'price' => $variant->price ?? ($variant->product->price ?? 0),
                 'product' => [
-                    'name' => $variant->product->name
-                ]
+                    'name' => $variant->product->name,
+                ],
             ];
         });
 
@@ -153,6 +159,7 @@ class InventoryVoucherController extends Controller
             return back()->with('error', 'Không thể xóa phiếu đã hoàn tất.');
         }
         $voucher->delete();
+
         return redirect()->route('admin.vouchers.index')->with('success', 'Đã xóa phiếu kho.');
     }
 }

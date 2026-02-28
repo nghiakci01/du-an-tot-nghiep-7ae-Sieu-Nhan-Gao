@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Product;
+use Illuminate\Console\Command;
 
 class SupplementProductInfo extends Command
 {
@@ -30,16 +30,17 @@ class SupplementProductInfo extends Command
 
         // Find products missing description or short_description
         $products = Product::with('category')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->whereNull('description')
-                      ->orWhere('description', '')
-                      ->orWhereNull('short_description')
-                      ->orWhere('short_description', '');
+                    ->orWhere('description', '')
+                    ->orWhereNull('short_description')
+                    ->orWhere('short_description', '');
             })
             ->get();
 
         if ($products->isEmpty()) {
             $this->info('✅ All products already have complete information.');
+
             return Command::SUCCESS;
         }
 
@@ -53,13 +54,13 @@ class SupplementProductInfo extends Command
             $updates = [];
 
             // Generate short description if missing
-            if (!$product->short_description || strlen($product->short_description) == 0) {
+            if (! $product->short_description || strlen($product->short_description) == 0) {
                 $updates['short_description'] = $this->generateShortDescription($product);
                 $needsUpdate = true;
             }
 
             // Generate description if missing
-            if (!$product->description || strlen($product->description) == 0) {
+            if (! $product->description || strlen($product->description) == 0) {
                 $updates['description'] = $this->generateDescription($product);
                 $needsUpdate = true;
             }
@@ -72,7 +73,7 @@ class SupplementProductInfo extends Command
         }
 
         $this->newLine();
-        $this->info("📊 Summary:");
+        $this->info('📊 Summary:');
         $this->info("   Updated: {$updated} products");
         $this->newLine();
         $this->info('✨ Done! All products now have complete information.');
@@ -98,7 +99,7 @@ class SupplementProductInfo extends Command
     {
         $category = $product->category ? $product->category->name : 'Sản phẩm';
         $price = number_format($product->price, 0, ',', '.');
-        
+
         $saleInfo = '';
         if ($product->sale_price && $product->sale_price < $product->price) {
             $salePrice = number_format($product->sale_price, 0, ',', '.');
