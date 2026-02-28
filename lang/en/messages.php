@@ -238,6 +238,8 @@ return [
     'select_province' => 'Select Province',
     'vnpay_payment' => 'VNPAY Payment',
     'vnpay_description' => 'You will be redirected to VNPAY to complete your order.',
+    'zalopay_payment' => 'ZaloPay Payment',
+    'zalopay_description' => 'You will be redirected to ZaloPay to complete your order.',
     'validate_name' => 'Please enter your full name',
     'validate_phone_required' => 'Please enter your phone number',
     'validate_phone_digits' => 'Phone must be 10-11 digits',
