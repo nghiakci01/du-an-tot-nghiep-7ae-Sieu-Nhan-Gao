@@ -13,7 +13,14 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::with('user')->latest()->paginate(10);
+        $query = Order::with('user')->latest();
+
+        if (request()->has('status') && request()->status != '') {
+            $query->where('status', request('status'));
+        }
+
+        $orders = $query->paginate(10)->appends(request()->all());
+
         return view('admin.orders.index', compact('orders'));
     }
 

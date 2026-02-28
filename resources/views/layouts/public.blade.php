@@ -8,7 +8,8 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>@yield('title', ($settings['site_title'] ?? 'Elite') . ' - ' . __('messages.home'))</title>
-    <meta name="description" content="">
+    <meta name="description"
+        content="@yield('meta_description', $settings['site_description'] ?? 'Elite E-commerce Fashion Store')">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Favicon -->
@@ -33,6 +34,25 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <style>
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Global Product Hover Effect */
+        .single_product .product_thumb {
+            overflow: hidden !important;
+        }
+
+        .single_product .product_thumb img {
+            transition: transform 0.4s ease-in-out !important;
+        }
+
+        .single_product:hover .product_thumb img {
+            transform: scale(1.08) !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -69,17 +89,53 @@
             if (window.history && history.pushState) {
                 window.history.pushState("", document.title, window.location.pathname + window.location.search);
             } else {
-                // Prevent scrolling by storing the page's current scroll offset
-                var scroll = {
-                    top: document.body.scrollTop,
-                    left: document.body.scrollLeft
-                };
+                var scroll = { top: document.body.scrollTop, left: document.body.scrollLeft };
                 window.location.hash = '';
-                // Restore the scroll offset, as setting # will cause the page to scroll to the top
                 document.body.scrollTop = scroll.top;
                 document.body.scrollLeft = scroll.left;
             }
         }
+
+        // Flash session messages → SweetAlert2
+        @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Lỗi!',
+            html: '{!! session('error') !!}',
+            confirmButtonColor: '#ef233c',
+            confirmButtonText: 'Đóng',
+        });
+        @endif
+
+        @if(session('success'))
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: '{{ session('success') }}',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+        });
+        @endif
+
+        @if(session('warning'))
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cảnh báo',
+            html: '{{ session('warning') }}',
+            confirmButtonColor: '#ef233c',
+        });
+        @endif
+
+        @if(session('info'))
+        Swal.fire({
+            icon: 'info',
+            title: 'Thông báo',
+            html: '{{ session('info') }}',
+            confirmButtonColor: '#333',
+        });
+        @endif
     </script>
 </body>
 

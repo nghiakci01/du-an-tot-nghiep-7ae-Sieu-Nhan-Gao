@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Danh sách yêu thích')
+@section('title', 'Wishlist')
 
 @section('content')
     <div class="breadcrumb-area bg-gray-4 breadcrumb-padding-1">
         <div class="container">
             <div class="breadcrumb-content text-center">
-                <h2 data-aos="fade-up" data-aos-delay="200">Danh sách yêu thích</h2>
+                <h2 data-aos="fade-up" data-aos-delay="200">Wishlist</h2>
                 <ul data-aos="fade-up" data-aos-delay="400">
-                    <li><a href="{{ route('home') }}">Trang chủ</a></li>
+                    <li><a href="{{ route('home') }}">Home</a></li>
                     <li><i class="ti-angle-right"></i></li>
-                    <li>Danh sách yêu thích</li>
+                    <li>Wishlist</li>
                 </ul>
             </div>
         </div>
@@ -31,11 +31,11 @@
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>Ảnh</th>
-                                            <th>Tên sản phẩm</th>
-                                            <th>Giá</th>
-                                            <th>Thêm vào giỏ</th>
-                                            <th>Hành động</th>
+                                            <th>Image</th>
+                                            <th>Product Name</th>
+                                            <th>Price</th>
+                                            <th>Add to Cart</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -60,7 +60,7 @@
                                                     @endif
                                                 </td>
                                                 <td class="product-wishlist-cart">
-                                                    <a href="{{ route('product.detail', $item->product->slug) }}">Xem chi tiết</a>
+                                                    <a href="{{ route('product.detail', $item->product->slug) }}">View Details</a>
                                                 </td>
                                                 <td class="product-remove">
                                                     <a href="{{ route('wishlist.destroy', $item->id) }}"
@@ -82,8 +82,8 @@
                         </form>
                     @else
                         <div class="text-center">
-                            <p>Danh sách yêu thích của bạn đang trống.</p>
-                            <a href="{{ route('shop') }}" class="btn btn-primary">Mua sắm ngay</a>
+                            <p>Your wishlist is empty.</p>
+                            <a href="{{ route('shop') }}" class="btn btn-primary">Shop Now</a>
                         </div>
                     @endif
                 </div>

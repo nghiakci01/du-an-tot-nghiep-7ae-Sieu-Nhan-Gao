@@ -25,8 +25,8 @@ class Setting extends Model
      */
     public static function getShippingFee($subtotal)
     {
-        // Free shipping for orders >= 500,000 đ
-        if ($subtotal >= 500000) {
+        // Free shipping for orders >= 799,000 đ
+        if ($subtotal >= 799000) {
             return 0;
         }
 

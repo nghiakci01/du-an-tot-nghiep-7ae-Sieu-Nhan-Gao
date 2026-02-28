@@ -127,16 +127,10 @@
     /* General aspect ratios for consistency */
     .banner_thumb img {
         width: 100%;
-        object-fit: cover !important;
+        height: auto;
+        background-color: #f5f5f5; /* Fallback background */
     }
-
-    /* Smooth slider content overlay */
-    .slider_content {
-        background: rgba(255, 255, 255, 0.7);
-        padding: 30px;
-        display: inline-block;
-        border-radius: 4px;
-    }
+</style>
 
     /* Bottom banner refinement */
     .section_fullwidth .banner_thumb img {
@@ -230,7 +224,7 @@
                                             <div class="action_button">
                                                 <ul>
                                                     <li><a title="{{ __('messages.add_to_cart') }}" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="{{ __('messages.add_to_wishlist') }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                                    <li><a href="#" class="add-to-wishlist" data-id="{{ $product->id }}" title="{{ __('messages.add_to_wishlist') }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
                                                 </ul>
                                             </div>
                                        </div>
@@ -238,13 +232,13 @@
                                     <div class="quick_button">
                                         <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                     </div>
-                                    @if($product->price < $product->original_price)
                                     <div class="double_base">
+                                        @if($product->price < $product->original_price)
                                         <div class="product_sale">
                                             <span>{{ __('messages.sale') }}</span>
                                         </div>
+                                        @endif
                                     </div>
-                                    @endif
                                 </div>
                                 <div class="product_content">
                                     <h3><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></h3>
@@ -263,7 +257,8 @@
                                 </div>
                             </div>
                         </div>
-                        @endforeach                    </div>
+                        @endforeach
+                    </div>
                 </div> 
             </div>
         </div>
@@ -361,8 +356,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                        <h2>Customer Favorites</h2>
-                        <p>Products that customers like and love the most.</p>
+                        <h2>{{ __('messages.top_wishlisted') }}</h2>
+                        <p>{{ __('messages.top_wishlisted_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -405,8 +400,7 @@
                                             </div>
                                         </div>
                                         <div class="quick_button">
-                                            <a href="{{ route('product.detail', $product->slug) }}" title="quick_view">+ quick
-                                                view</a>
+                                            <a href="{{ route('product.detail', $product->slug) }}" title="{{ __('messages.quick_view') }}">+ {{ __('messages.quick_view') }}</a>
                                         </div>
                                         <div class="double_base">
                                             @if($product->price < $product->original_price)
@@ -415,7 +409,7 @@
                                                 </div>
                                             @endif
                                             <div class="label_product">
-                                                <span>Top</span>
+                                                <span>Yêu Thích</span>
                                             </div>
                                         </div>
                                     </div>
@@ -435,7 +429,7 @@
                                             </ul>
                                         </div>
                                         <div style="font-size: 12px; color: #ff6a28; margin-top: 5px;">
-                                            <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} lượt yêu thích
+                                            <i class="fa fa-heart"></i> {{ $product->wishlisted_by_count }} {{ __('lượt yêu thích') }}
                                         </div>
                                     </div>
                                 </div>
@@ -623,36 +617,34 @@
                             <div class="col-lg-7 col-md-7 col-sm-12">
                                 <div class="modal_right">
                                     <div class="modal_title mb-10">
-                                        <h2>Handbag feugiat</h2>
+                                        <h2>Túi Xách</h2>
                                     </div>
                                     <div class="modal_price mb-10">
-                                        <span class="new_price">$64.99</span>
-                                        <span class="old_price">$78.99</span>
+                                        <span class="new_price">1.299.000 đ</span>
+                                        <span class="old_price">1.599.000 đ</span>
                                     </div>
                                     <div class="modal_description mb-15">
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia iste laborum
-                                            ad impedit pariatur esse optio tempora sint ullam autem deleniti nam in quos qui
-                                            nemo ipsum numquam, reiciendis maiores quidem aperiam, rerum vel recusandae </p>
+                                        <p>Sản phẩm chất lượng cao, thiết kế hiện đại và sang trọng. Phù hợp với nhiều phong cách khác nhau.</p>
                                     </div>
                                     <div class="variants_selects">
                                         <div class="variants_size">
-                                            <h2>size</h2>
+                                            <h2>Kích cỡ</h2>
                                             <select class="select_option">
-                                                <option selected value="1">s</option>
-                                                <option value="1">m</option>
-                                                <option value="1">l</option>
-                                                <option value="1">xl</option>
-                                                <option value="1">xxl</option>
+                                                <option selected value="1">S</option>
+                                                <option value="1">M</option>
+                                                <option value="1">L</option>
+                                                <option value="1">XL</option>
+                                                <option value="1">XXL</option>
                                             </select>
                                         </div>
                                         <div class="variants_color">
-                                            <h2>color</h2>
+                                            <h2>Màu sắc</h2>
                                             <select class="select_option">
-                                                <option selected value="1">purple</option>
-                                                <option value="1">violet</option>
-                                                <option value="1">black</option>
-                                                <option value="1">pink</option>
-                                                <option value="1">orange</option>
+                                                <option selected value="1">Trắng</option>
+                                                <option value="1">Đen</option>
+                                                <option value="1">Đỏ</option>
+                                                <option value="1">Xanh</option>
+                                                <option value="1">Nâu</option>
                                             </select>
                                         </div>
                                         <div class="modal_add_to_cart">
@@ -663,7 +655,7 @@
                                         </div>
                                     </div>
                                     <div class="modal_social">
-                                        <h2>Share this product</h2>
+                                        <h2>Chia sẻ sản phẩm</h2>
                                         <ul>
                                             <li class="facebook"><a href="#"><i class="fa fa-facebook"></i></a></li>
                                             <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
@@ -700,18 +692,25 @@
                         },
                         success: function (response) {
                             if (response.status === 'success' || response.status === 'info') {
-                                // Change icon to filled heart
                                 icon.removeClass('fa-heart-o').addClass('fa-heart').css('color', 'red');
-                                alert(response.message);
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2500,
+                                    timerProgressBar: true,
+                                });
                             } else {
-                                alert(response.message);
+                                Swal.fire({ icon: 'info', title: response.message, confirmButtonColor: '#333' });
                             }
                         },
                         error: function (xhr) {
                             if (xhr.status === 401) {
                                 window.location.href = "{{ route('login') }}";
                             } else {
-                                alert('Có lỗi xảy ra, vui lòng thử lại!');
+                                Swal.fire({ icon: 'error', title: 'Lỗi!', text: 'Có lỗi xảy ra, vui lòng thử lại!' });
                             }
                         }
                     });

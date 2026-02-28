@@ -6,6 +6,8 @@ use App\Models\Order;
 use App\Models\OrderHistory;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderShippedMail;
 use Exception;
 
 class OrderService
@@ -42,6 +44,18 @@ class OrderService
             $this->handleStockAdjustment($order, $oldStatus, $newStatus);
         });
 
+        // Send email if shipped
+        if ($newStatus === Order::STATUS_SHIPPED) {
+            try {
+                $email = $order->user_email ?? ($order->user->email ?? null);
+                if ($email) {
+                    Mail::to($email)->send(new OrderShippedMail($order));
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send shipped email for order ' . $order->id . ': ' . $e->getMessage());
+            }
+        }
+
         return $order;
     }
 
@@ -51,7 +65,7 @@ class OrderService
         // Assuming stock IS deducted on Order Placement (which is standard).
         // So any transition TO Cancelled/Returned/Failed requires restoration.
         // UNLESS the old status was ALSO Cancelled/Returned/Failed (which shouldn't happen due to transition rules, but good to be safe)
-        
+
         $isCancelledState = in_array($newStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_FAILED]);
         $wasCancelledState = in_array($oldStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_FAILED]);
 
@@ -80,12 +94,12 @@ class OrderService
         foreach ($order->items as $item) {
             if ($item->variant) {
                 if ($item->variant->stock_quantity >= $item->quantity) {
-                     $item->variant->decrement('stock_quantity', $item->quantity);
+                    $item->variant->decrement('stock_quantity', $item->quantity);
                 } else {
-                     // potentially throw exception or allow negative if configured? 
-                     // For now, let's just decrement, or we could strict check.
-                     // Assuming admin overrides, we just decrement.
-                     $item->variant->decrement('stock_quantity', $item->quantity);
+                    // potentially throw exception or allow negative if configured? 
+                    // For now, let's just decrement, or we could strict check.
+                    // Assuming admin overrides, we just decrement.
+                    $item->variant->decrement('stock_quantity', $item->quantity);
                 }
             }
         }

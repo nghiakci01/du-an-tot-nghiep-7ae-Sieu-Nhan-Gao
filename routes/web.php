@@ -21,6 +21,9 @@ Route::post('/cart/add', [App\Http\Controllers\Frontend\CartController::class, '
 Route::patch('/cart/update', [App\Http\Controllers\Frontend\CartController::class, 'updateCart'])->name('cart.update');
 Route::match(['get', 'post', 'delete'], '/cart/remove', [App\Http\Controllers\Frontend\CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/clear', [App\Http\Controllers\Frontend\CartController::class, 'clearCart'])->name('cart.clear');
+Route::post('/cart/apply-coupon', [App\Http\Controllers\Frontend\CartController::class, 'applyCoupon'])->name('cart.apply_coupon');
+Route::post('/cart/remove-coupon', [App\Http\Controllers\Frontend\CartController::class, 'removeCoupon'])->name('cart.remove_coupon');
+Route::post('/cart/change-variant', [App\Http\Controllers\Frontend\CartController::class, 'changeVariant'])->name('cart.changeVariant');
 Route::get('/cart/count', [App\Http\Controllers\Frontend\CartController::class, 'getCartCount'])->name('cart.count');
 
 Route::get('/home', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
@@ -29,7 +32,10 @@ Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::clas
 Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
 Route::post('/checkout/remove-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeCoupon'])->name('checkout.removeCoupon');
 Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
+// VNPAY Payment Routes
+Route::get('/vnpay/payment/{order_id}', [App\Http\Controllers\Frontend\VnpayController::class, 'createPayment'])->name('vnpay.payment');
 Route::get('/vnpay/callback', [App\Http\Controllers\Frontend\VnpayController::class, 'callback'])->name('vnpay.callback');
+Route::get('/vnpay/return', [App\Http\Controllers\Frontend\VnpayController::class, 'vnpayReturn'])->name('vnpay.return');
 Auth::routes();
 
 // Social Login

@@ -59,22 +59,22 @@ class SettingSeeder extends Seeder
             // Payment Information (kept for backup/logic)
             [
                 'key' => 'bank_name',
-                'value' => 'Vietcombank',
+                'value' => 'MB Bank (Ngân hàng Quân Đội)',
                 'group' => 'payment',
             ],
             [
                 'key' => 'bank_account_number',
-                'value' => '0071001234567',
+                'value' => '0359756805',
                 'group' => 'payment',
             ],
             [
                 'key' => 'bank_account_name',
-                'value' => 'CÔNG TY TNHH SIÊU NHÂN GAO',
+                'value' => 'NGUYEN CONG BANG',
                 'group' => 'payment',
             ],
             [
                 'key' => 'bank_id',
-                'value' => 'vcb',
+                'value' => 'MB',
                 'group' => 'payment',
             ],
         ];

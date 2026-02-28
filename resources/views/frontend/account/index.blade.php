@@ -8,9 +8,9 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">home</a></li>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
-                            <li>my account</li>
+                            <li>{{ __('messages.my_account') }}</li>
                         </ul>
                     </div>
                 </div>
@@ -20,6 +20,55 @@
     <!--breadcrumbs area end-->
 
     <!-- my account start  -->
+    <style>
+        /* Mobile Responsive Account Page */
+        @media (max-width: 767px) {
+            .dashboard-list {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .dashboard-list li {
+                display: inline-block;
+                width: auto;
+                margin-right: 15px;
+            }
+
+            .dashboard_content {
+                padding: 15px;
+                background: #f9f9f9;
+                border-radius: 5px;
+                margin-top: 15px;
+            }
+
+            .account_dashboard .table {
+                font-size: 13px;
+            }
+
+            .account_dashboard .table th,
+            .account_dashboard .table td {
+                padding: 10px 5px;
+                white-space: nowrap;
+            }
+
+            /* Style buttons inside table */
+            .account_dashboard .table .btn {
+                padding: 4px 8px;
+                font-size: 12px;
+                margin-bottom: 2px;
+            }
+
+            #avatar-preview {
+                width: 90px !important;
+                height: 90px !important;
+            }
+        }
+    </style>
     <section class="main_content_area">
         <div class="container">
             <div class="account_dashboard">
@@ -32,7 +81,7 @@
                         <div class="tab-content dashboard_content">
                             <div class="tab-pane fade show active" id="dashboard">
                                 <h3>{{ __('messages.dashboard') }} </h3>
-                                <p>From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a> and <a href="#">Edit your password and account details.</a></p>
+                                <p>{!! __('messages.dashboard_desc') !!}</p>
                             </div>
                             <div class="tab-pane fade" id="orders">
                                 <h3>{{ __('messages.orders') }}</h3>
@@ -82,37 +131,77 @@
                                     </table>
                                 </div>
                             </div>
+                            <div class="tab-pane fade" id="coupons">
+                                <h3>{{ __('messages.my_coupons') }}</h3>
+                                <div class="row">
+                                    @forelse($coupons as $coupon)
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card border-primary border-2 shadow-sm">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <h5 class="card-title text-primary mb-0">{{ $coupon->code }}</h5>
+                                                        <span class="badge bg-primary">{{ $coupon->getFormattedValue() }}</span>
+                                                    </div>
+                                                    <p class="card-text small text-muted mb-2">{{ $coupon->description }}</p>
+                                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                                        <span class="small fw-bold">{{ __('messages.welcome_coupon_desc') }}</span>
+                                                        <button class="btn btn-sm btn-outline-primary copy-coupon" data-code="{{ $coupon->code }}">
+                                                            <i class="fa fa-copy"></i> Copy
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="col-12">
+                                            <p class="text-center py-4">{{ __('messages.no_orders') }} (Chưa có mã giảm giá nào)</p>
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
                             <div class="tab-pane fade" id="account-details">
                                 <h3>{{ __('messages.account_details') }} </h3>
                                 <div class="login">
                                     <div class="login_form_container">
                                         <div class="account_login_form">
-                                            <form action="{{ route('account.update') }}" method="POST" enctype="multipart/form-data">
+                                            <form action="{{ route('account.update') }}" method="POST"
+                                                enctype="multipart/form-data">
                                                 @csrf
                                                 <div class="mb-4 text-center">
                                                     @if($user->avatar)
-                                                        <img id="avatar-preview" src="{{ Storage::url($user->avatar) }}" alt="Avatar" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
+                                                        <img id="avatar-preview" src="{{ Storage::url($user->avatar) }}"
+                                                            alt="Avatar" class="rounded-circle img-thumbnail"
+                                                            style="width: 120px; height: 120px; object-fit: cover;">
                                                     @else
-                                                        <img id="avatar-preview" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random" alt="Avatar" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
+                                                        <img id="avatar-preview"
+                                                            src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random"
+                                                            alt="Avatar" class="rounded-circle img-thumbnail"
+                                                            style="width: 120px; height: 120px; object-fit: cover;">
                                                     @endif
                                                     <div class="mt-2">
-                                                        <label for="avatar" class="btn btn-sm btn-outline-primary">{{ __('messages.choose_image') }}</label>
-                                                        <input type="file" name="avatar" id="avatar" class="d-none" accept="image/*" onchange="document.getElementById('avatar-preview').src = window.URL.createObjectURL(this.files[0])">
+                                                        <label for="avatar"
+                                                            class="btn btn-sm btn-outline-primary">{{ __('messages.choose_image') }}</label>
+                                                        <input type="file" name="avatar" id="avatar" class="d-none"
+                                                            accept="image/*"
+                                                            onchange="document.getElementById('avatar-preview').src = window.URL.createObjectURL(this.files[0])">
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="row">
                                                     <div class="col-12">
                                                         <label>{{ __('messages.full_name') }}</label>
-                                                        <input type="text" name="name" value="{{ old('name', $user->name) }}">
+                                                        <input type="text" name="name"
+                                                            value="{{ old('name', $user->name) }}">
                                                     </div>
                                                     <div class="col-12">
                                                         <label>{{ __('messages.phone_number') }}</label>
-                                                        <input type="text" name="phone" value="{{ old('phone', $user->phone) }}">
+                                                        <input type="text" name="phone"
+                                                            value="{{ old('phone', $user->phone) }}">
                                                     </div>
                                                     <div class="col-12">
                                                         <label>{{ __('messages.email') }}</label>
-                                                        <input type="text" name="email" value="{{ $user->email }}" readonly disabled>
+                                                        <input type="text" name="email" value="{{ $user->email }}" readonly
+                                                            disabled>
                                                     </div>
                                                 </div>
 
@@ -135,7 +224,7 @@
                                                 </div>
 
                                                 <div class="save_button primary_btn default_button mt-3">
-                                                    <button type="submit">Save Changes</button>
+                                                    <button type="submit">{{ __('messages.save_changes') }}</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -150,3 +239,64 @@
     </section>
     <!-- my account end   -->
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle Copy Coupon
+        document.querySelectorAll('.copy-coupon').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.getAttribute('data-code');
+                
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(code).then(() => {
+                        showCopySuccess(code);
+                    }).catch(err => {
+                        fallbackCopyTextToClipboard(code);
+                    });
+                } else {
+                    fallbackCopyTextToClipboard(code);
+                }
+            });
+        });
+
+        function showCopySuccess(code) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: '{{ __("messages.applied") }}'.replace('đã được áp dụng', 'Đã sao chép') + ': ' + code,
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+            });
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            var textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showCopySuccess(text);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // Handle URL hash for tabs
+        const hash = window.location.hash;
+        if (hash) {
+            const targetTab = document.querySelector(`.dashboard_tab_button a[href*="${hash}"]`);
+            if (targetTab) {
+                const tabTrigger = new bootstrap.Tab(targetTab);
+                tabTrigger.show();
+            }
+        }
+    });
+</script>
+@endpush
