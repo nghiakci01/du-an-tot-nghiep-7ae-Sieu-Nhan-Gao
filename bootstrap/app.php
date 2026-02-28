@@ -36,5 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, \Illuminate\Http\Request $request) {
+            return redirect()->back()->withInput()->with('error', __('messages.session_expired') ?? 'Phiên làm việc đã hết hạn. Vui lòng thử lại.');
+        });
     })->create();
