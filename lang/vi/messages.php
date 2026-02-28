@@ -240,6 +240,8 @@ return [
     'select_province' => 'Chọn tỉnh thành',
     'vnpay_payment' => 'Thanh toán qua VNPAY',
     'vnpay_description' => 'Bạn sẽ được chuyển hướng sang cổng thanh toán VNPAY an toàn để hoàn tất đơn hàng.',
+    'zalopay_payment' => 'Thanh toán qua ZaloPay',
+    'zalopay_description' => 'Bạn sẽ được chuyển hướng sang cổng thanh toán ZaloPay an toàn để hoàn tất đơn hàng.',
     'validate_name' => 'Vui lòng nhập họ tên đầy đủ (tối thiểu 2 ký tự)',
     'validate_phone_required' => 'Vui lòng nhập số điện thoại',
     'validate_phone_digits' => 'Số điện thoại phải có 10-11 chữ số',

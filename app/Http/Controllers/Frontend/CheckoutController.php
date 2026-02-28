@@ -53,7 +53,7 @@ class CheckoutController extends Controller
             'province' => 'required|string|in:' . implode(',', $provinces),
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY,ZALOPAY',
         ], [
             'province.required' => 'Vui lòng chọn tỉnh thành.',
             'province.in' => 'Tỉnh thành không hợp lệ.',
@@ -133,6 +133,10 @@ class CheckoutController extends Controller
 
             if ($request->payment_method === 'VNPAY') {
                 return app(VnpayController::class)->createPayment($order);
+            }
+
+            if ($request->payment_method === 'ZALOPAY') {
+                return app(ZaloPayController::class)->pay($order);
             }
 
             // Send confirmation email for COD and BANK_TRANSFER

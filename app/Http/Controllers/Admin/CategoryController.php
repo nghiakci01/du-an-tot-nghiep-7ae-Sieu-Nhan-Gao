@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Http\Requests\StoreCategoryRequest;
-use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Requests\Admin\StoreCategoryRequest;
+use App\Http\Requests\Admin\UpdateCategoryRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -39,8 +39,12 @@ class CategoryController extends Controller
         $data['slug'] = Str::slug($data['name']);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('categories', 'public');
-            $data['image'] = $path;
+            $file = $request->file('image');
+            if ($file->isValid()) {
+                $filename = 'categories/' . $file->hashName();
+                Storage::disk('public')->put($filename, file_get_contents($file->getPathname()));
+                $data['image'] = $filename;
+            }
         }
 
         Category::create($data);
@@ -65,7 +69,6 @@ class CategoryController extends Controller
         $data = $request->validated();
         $data['slug'] = Str::slug($data['name']);
 
-        // Kiểm tra nếu danh mục đang có children và muốn đổi thành child
         if ($request->filled('parent_id') && $category->children()->count() > 0) {
             return redirect()
                 ->back()
@@ -74,12 +77,15 @@ class CategoryController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            // Delete old image
-            if ($category->image) {
-                Storage::disk('public')->delete($category->image);
+            $file = $request->file('image');
+            if ($file->isValid()) {
+                if ($category->image) {
+                    Storage::disk('public')->delete($category->image);
+                }
+                $filename = 'categories/' . $file->hashName();
+                Storage::disk('public')->put($filename, file_get_contents($file->getPathname()));
+                $data['image'] = $filename;
             }
-            $path = $request->file('image')->store('categories', 'public');
-            $data['image'] = $path;
         }
 
         $category->update($data);

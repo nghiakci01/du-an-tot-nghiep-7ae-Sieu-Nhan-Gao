@@ -2,28 +2,45 @@
 
 @section('content')
   <div class="row">
-    <!-- Welcome Banner (Optional) -->
-    <div class="col-12">
-      <div class="card welcome-banner bg-blue-800">
+    <!-- Filter & Export Toolbar -->
+    <div class="col-12 mb-4">
+      <div class="card shadow-sm">
         <div class="card-body">
-          <div class="row">
-            <div class="col-sm-6">
-              <div class="p-4">
-                <h2 class="text-white">Xin chào, Quản trị viên!</h2>
-                <p class="text-white">
-                  Đây là bảng điều khiển tổng quan tình hình kinh doanh của cửa hàng.
-                </p>
+          <form action="{{ route('admin.dashboard') }}" method="GET" class="row align-items-end g-3">
+            <div class="col-md-3">
+              <label class="form-label fw-bold">Từ ngày</label>
+              <input type="date" name="start_date" class="form-control" value="{{ $startDate }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-bold">Đến ngày</label>
+              <input type="date" name="end_date" class="form-control" value="{{ $endDate }}">
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="ti ti-filter me-1"></i> Lọc dữ liệu
+              </button>
+            </div>
+            <div class="col-md-4 text-md-end">
+              <div class="btn-group">
+                <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="ti ti-download me-1"></i> Xuất Báo Cáo
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="{{ route('admin.reports.orders.excel', request()->all()) }}">
+                    <i class="ti ti-file-spreadsheet me-2"></i> Xuất Excel Đơn hàng
+                  </a></li>
+                  <li><a class="dropdown-item" href="{{ route('admin.reports.revenue.pdf', request()->all()) }}">
+                    <i class="ti ti-file-description me-2"></i> Xuất PDF Doanh thu
+                  </a></li>
+                </ul>
               </div>
             </div>
-            <div class="col-sm-6 text-center">
-              <div class="img-welcome-banner">
-                <img src="{{ asset('admin-assets/images/widget/welcome-banner.png') }}" alt="img" class="img-fluid" />
-              </div>
-            </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
+
+    <!-- Welcome Banner (Optional) -->
 
     <!-- Stats Cards -->
     <div class="col-md-6 col-xxl-3">

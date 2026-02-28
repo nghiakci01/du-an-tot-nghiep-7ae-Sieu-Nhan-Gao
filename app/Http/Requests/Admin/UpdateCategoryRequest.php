@@ -2,51 +2,94 @@
 
 namespace App\Http\Requests\Admin;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
+use App\Models\Category;
 
-class UpdateCategoryRequest extends FormRequest
+class UpdateCategoryRequest extends BaseAdminFormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:categories,name,' . $this->category->id,
+            'name'      => 'required|string|max:50|unique:categories,name,' . $this->category->id,
             'parent_id' => [
                 'nullable',
                 'exists:categories,id',
                 function ($attribute, $value, $fail) {
+                    // Không cho phép tự làm parent của chính mình
                     if ($value == $this->category->id) {
-                        $fail('Danh mục cha không thể là chính nó.');
+                        $fail('Danh mục không thể là danh mục cha của chính nó.');
+                        return;
+                    }
+                    
+                    // Kiểm tra circular reference
+                    if ($value && $this->wouldCreateCircularReference($value)) {
+                        $fail('Không thể chọn danh mục con làm danh mục cha.');
+                        return;
+                    }
+                    
+                    // Kiểm tra 2-level hierarchy
+                    if ($value) {
+                        $parent = Category::find($value);
+                        if ($parent && $parent->parent_id !== null) {
+                            $fail('Không thể tạo danh mục cấp 3. Chỉ cho phép 2 cấp danh mục.');
+                        }
                     }
                 },
             ],
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image'     => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if (! $value instanceof UploadedFile) {
+                        return;
+                    }
+                    try {
+                        $ext  = strtolower($value->getClientOriginalExtension());
+                        $size = @$value->getSize();
+                    } catch (\Throwable $e) {
+                        return;
+                    }
+                    if (! in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                        $fail('Hình ảnh phải có định dạng: jpg, jpeg, png, gif, webp.');
+                    }
+                    if ($size !== false && $size > 2 * 1024 * 1024) {
+                        $fail('Kích thước hình ảnh không được vượt quá 2MB.');
+                    }
+                },
+            ],
             'is_active' => 'boolean',
         ];
     }
 
-    public function messages()
+    /**
+     * Kiểm tra xem việc đổi parent có tạo circular reference không
+     */
+    private function wouldCreateCircularReference($newParentId): bool
+    {
+        $current = Category::find($newParentId);
+        
+        while ($current) {
+            if ($current->id == $this->category->id) {
+                return true;
+            }
+            $current = $current->parent;
+        }
+        
+        return false;
+    }
+
+    public function messages(): array
     {
         return [
-            'name.required' => 'Tên danh mục là bắt buộc.',
-            'name.unique' => 'Tên danh mục đã tồn tại.',
-            'name.max' => 'Tên danh mục không được vượt quá 255 ký tự.',
+            'name.required'    => 'Tên danh mục không được để trống.',
+            'name.string'      => 'Tên danh mục phải là chuỗi ký tự.',
+            'name.max'         => 'Tên danh mục không được vượt quá 50 ký tự.',
+            'name.unique'      => 'Tên danh mục này đã tồn tại.',
             'parent_id.exists' => 'Danh mục cha không hợp lệ.',
-            'image.image' => 'File tải lên phải là hình ảnh.',
-            'image.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif.',
-            'image.max' => 'Kích thước hình ảnh không được vượt quá 2MB.',
         ];
     }
 }

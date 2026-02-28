@@ -146,6 +146,7 @@
                                             <li><a href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
                                             <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
                                             <li><a href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
+                                            <li><a href="{{ route('order-tracking.index') }}">Tra cứu đơn hàng</a></li>
                                         </ul>
                                     </nav>
                                 </div>

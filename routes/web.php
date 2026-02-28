@@ -36,6 +36,17 @@ Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutCont
 Route::get('/vnpay/payment/{order_id}', [App\Http\Controllers\Frontend\VnpayController::class, 'createPayment'])->name('vnpay.payment');
 Route::get('/vnpay/callback', [App\Http\Controllers\Frontend\VnpayController::class, 'callback'])->name('vnpay.callback');
 Route::get('/vnpay/return', [App\Http\Controllers\Frontend\VnpayController::class, 'vnpayReturn'])->name('vnpay.return');
+
+// ZaloPay Payment Routes
+Route::get('/zalopay/pay/{order}', [App\Http\Controllers\Frontend\ZaloPayController::class, 'pay'])->name('zalopay.pay');
+Route::get('/zalopay/mock-gateway', [App\Http\Controllers\Frontend\ZaloPayController::class, 'mockGateway'])->name('zalopay.mock_gateway');
+Route::post('/zalopay/process-mock', [App\Http\Controllers\Frontend\ZaloPayController::class, 'processMock'])->name('zalopay.process_mock');
+Route::get('/zalopay/return', [App\Http\Controllers\Frontend\ZaloPayController::class, 'return'])->name('zalopay.return');
+Route::post('/zalopay/callback', [App\Http\Controllers\Frontend\ZaloPayController::class, 'callback'])->name('zalopay.callback');
+
+// Guest Order Tracking Routes
+Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'index'])->name('order-tracking.index');
+Route::post('/order-tracking/search', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'search'])->name('order-tracking.search');
 Auth::routes();
 
 // Social Login
@@ -106,6 +117,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             })->name('stock.index');
 
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
+
+            // Blog Management
+            Route::resource('post-categories', App\Http\Controllers\Admin\PostCategoryController::class);
+            Route::resource('posts', App\Http\Controllers\Admin\PostController::class);
+
+            // Loyalty Points
+            Route::get('loyalty-points', [App\Http\Controllers\Admin\LoyaltyPointController::class, 'index'])->name('loyalty-points.index');
         });
 
         // Admin & Staff Routes (Stock only)
@@ -146,6 +164,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
                 Route::post('/chatbot/test', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'testConnection'])->name('chatbot.test');
             });
         });
+        // Reports & Statistics
+        Route::get('/reports/orders/excel', [App\Http\Controllers\Admin\ReportController::class, 'exportOrdersExcel'])->name('reports.orders.excel');
+        Route::get('/reports/revenue/pdf', [App\Http\Controllers\Admin\ReportController::class, 'exportRevenuePDF'])->name('reports.revenue.pdf');
     });
 });
 
