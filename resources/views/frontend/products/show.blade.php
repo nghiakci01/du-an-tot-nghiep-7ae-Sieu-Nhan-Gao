@@ -4,6 +4,97 @@
 @section('meta_description', \Illuminate\Support\Str::limit(strip_tags($product->description), 150))
 
 @section('content')
+    <style>
+        .product_variant.quantity .button {
+            height: 50px;
+            line-height: 50px;
+            padding: 0 35px;
+            background: #111;
+            border: 1px solid #111;
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .product_variant.quantity .button:hover {
+            background: #ef233c;
+            border-color: #ef233c;
+        }
+
+        .product_variant.quantity .button.buy_now {
+            background: #ef233c;
+            border-color: #ef233c;
+            margin-left: 10px;
+        }
+
+        .product_variant.quantity .button.buy_now:hover {
+            background: #111;
+            border-color: #111;
+        }
+
+        .product_variant.quantity .button:disabled {
+            background: #ebebeb !important;
+            border-color: #ebebeb !important;
+            color: #999 !important;
+            cursor: not-allowed;
+        }
+
+        /* Highlight chưa chọn thuộc tính */
+        .nice-select[style*="border-color: rgb(239, 35, 60)"],
+        .nice-select[style*="border-color: #ef233c"] {
+            border: 2px solid #ef233c !important;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .star-rating {
+            display: inline-flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 24px;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.2s;
+            margin: 0;
+        }
+
+        .star-rating label:hover i,
+        .star-rating label:hover~label i,
+        .star-rating input:checked~label i {
+            color: #f39c12 !important;
+        }
+
+        .star-rating label i {
+            pointer-events: none;
+        }
+    </style>
+
+    
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area product_bread">
         <div class="container">
@@ -358,95 +449,6 @@
                                         id="btn-buy-now">{{ __('messages.buy_now') }}</button>
                                 </div>
                             </div>
-                            <style>
-                                .product_variant.quantity .button {
-                                    height: 50px;
-                                    line-height: 50px;
-                                    padding: 0 35px;
-                                    background: #111;
-                                    border: 1px solid #111;
-                                    color: #fff;
-                                    font-weight: 700;
-                                    text-transform: uppercase;
-                                    letter-spacing: 1px;
-                                    transition: all 0.3s ease;
-                                }
-
-                                .product_variant.quantity .button:hover {
-                                    background: #ef233c;
-                                    border-color: #ef233c;
-                                }
-
-                                .product_variant.quantity .button.buy_now {
-                                    background: #ef233c;
-                                    border-color: #ef233c;
-                                    margin-left: 10px;
-                                }
-
-                                .product_variant.quantity .button.buy_now:hover {
-                                    background: #111;
-                                    border-color: #111;
-                                }
-
-                                .product_variant.quantity .button:disabled {
-                                    background: #ebebeb !important;
-                                    border-color: #ebebeb !important;
-                                    color: #999 !important;
-                                    cursor: not-allowed;
-                                }
-
-                                /* Highlight chưa chọn thuộc tính */
-                                .nice-select[style*="border-color: rgb(239, 35, 60)"],
-                                .nice-select[style*="border-color: #ef233c"] {
-                                    border: 2px solid #ef233c !important;
-                                    animation: shake 0.4s ease;
-                                }
-
-                                @keyframes shake {
-
-                                    0%,
-                                    100% {
-                                        transform: translateX(0);
-                                    }
-
-                                    25% {
-                                        transform: translateX(-5px);
-                                    }
-
-                                    75% {
-                                        transform: translateX(5px);
-                                    }
-                                }
-
-                                .star-rating {
-                                    display: inline-flex;
-                                    flex-direction: row-reverse;
-                                    justify-content: flex-end;
-                                    gap: 5px;
-                                }
-
-                                .star-rating input {
-                                    display: none;
-                                }
-
-                                .star-rating label {
-                                    font-size: 24px;
-                                    color: #ccc;
-                                    cursor: pointer;
-                                    transition: color 0.2s;
-                                    margin: 0;
-                                }
-
-                                .star-rating label:hover i,
-                                .star-rating label:hover~label i,
-                                .star-rating input:checked~label i {
-                                    color: #f39c12 !important;
-                                }
-
-                                .star-rating label i {
-                                    pointer-events: none;
-                                }
-                            </style>
                             <div class="product_d_action">
                                 <ul>
                                     <li>
@@ -475,7 +477,8 @@
                                 <h4
                                     style="font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 10px; color: #333;">
                                     <i class="fa fa-tags" style="color: #ef233c; margin-right: 5px;"></i>
-                                    {{ __('messages.tags') === 'messages.tags' ? 'Thẻ' : __('messages.tags') }}</h4>
+                                    {{ __('messages.tags') === 'messages.tags' ? 'Thẻ' : __('messages.tags') }}
+                                </h4>
                                 <ul
                                     style="list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px;">
                                     @foreach ($product->tags as $tag)
@@ -915,7 +918,7 @@
                             // Calculate scaling to somewhat fit the center chest area roughly
                             // This simulates the UI "max-height: 180px" logic but mapped to original resolution
                             const scaleRatio = (baseImgContent.height * 0.75) / prodImg
-                            .height; // Product takes 75% height of origin image
+                                .height; // Product takes 75% height of origin image
                             const newProdWidth = prodImg.width * scaleRatio;
                             const newProdHeight = prodImg.height * scaleRatio;
 
