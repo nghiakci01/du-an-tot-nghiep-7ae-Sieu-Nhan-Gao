@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
 {
@@ -18,8 +17,9 @@ class ProductSeeder extends Seeder
 
         // Nếu không tìm thấy category thì srr skip hoặc tạo mới (tùy logic, ở đây assume có rồi từ CategorySeeder)
         // Tuy nhiên tốt nhất là check null
-        if (!$aoThunNam || !$vayDamNu) {
+        if (! $aoThunNam || ! $vayDamNu) {
             $this->command->error('Categories not found. Please run CategorySeeder first.');
+
             return;
         }
 
@@ -36,7 +36,7 @@ class ProductSeeder extends Seeder
                     ['size' => 'S', 'color' => 'Trắng', 'stock_quantity' => 10, 'sku' => 'TS-W-S'],
                     ['size' => 'M', 'color' => 'Trắng', 'stock_quantity' => 20, 'sku' => 'TS-W-M'],
                     ['size' => 'L', 'color' => 'Trắng', 'stock_quantity' => 15, 'sku' => 'TS-W-L'],
-                ]
+                ],
             ],
             [
                 'category_id' => $aoThunNam->id,
@@ -49,7 +49,7 @@ class ProductSeeder extends Seeder
                 'variants' => [
                     ['size' => 'S', 'color' => 'Đen', 'stock_quantity' => 10, 'sku' => 'TS-B-S'],
                     ['size' => 'M', 'color' => 'Đen', 'stock_quantity' => 20, 'sku' => 'TS-B-M'],
-                ]
+                ],
             ],
             [
                 'category_id' => $vayDamNu->id,
@@ -59,7 +59,7 @@ class ProductSeeder extends Seeder
                 'short_description' => 'Váy hoa nhí vintage xinh xắn dành cho nữ.',
                 'price' => 350000,
                 'is_active' => true,
-                'variants' => [] // Add variants if needed
+                'variants' => [], // Add variants if needed
             ],
         ];
 
@@ -76,15 +76,15 @@ class ProductSeeder extends Seeder
             foreach ($variants as $variant) {
                 // Ensure unique SKU per variant
                 ProductVariant::firstOrCreate(
-                    ['sku' => $variant['sku'] . '-' . $product->id],
+                    ['sku' => $variant['sku'].'-'.$product->id],
                     array_merge($variant, [
                         'product_id' => $product->id,
-                        'sku' => $variant['sku'] . '-' . $product->id // update SKU to include product ID as per original logic if needed, or just keep unique SKU
+                        'sku' => $variant['sku'].'-'.$product->id, // update SKU to include product ID as per original logic if needed, or just keep unique SKU
                     ])
                 );
             }
         }
 
-        echo "\n✅ Đã thêm thành công " . count($products) . " sản phẩm với " . (count($products) * 4) . " biến thể!\n";
+        echo "\n✅ Đã thêm thành công ".count($products).' sản phẩm với '.(count($products) * 4)." biến thể!\n";
     }
 }

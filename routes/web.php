@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('welcome');
 Route::get('/shop', [App\Http\Controllers\Frontend\ProductController::class, 'index'])->name('shop');
@@ -113,7 +113,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             Route::post('vouchers/{voucher}/complete', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'complete'])->name('vouchers.complete');
             Route::get('api/variants/search', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'variantsSearch'])->name('api.variants.search');
             Route::get('stock', function () {
-                return "Stock Report Page (Coming Soon)";
+                return 'Stock Report Page (Coming Soon)';
             })->name('stock.index');
 
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
@@ -186,7 +186,7 @@ Route::get('/test-gemini', function () {
         $results[] = [
             'test' => $testName,
             'question' => $question,
-            'response' => $response
+            'response' => $response,
         ];
     }
 
@@ -198,5 +198,6 @@ Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'vi'])) {
         session(['locale' => $locale]);
     }
+
     return redirect()->back();
 })->name('lang.switch');

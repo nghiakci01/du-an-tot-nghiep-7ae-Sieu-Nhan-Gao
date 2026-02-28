@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-use App\Models\Post;
-use App\Models\PostCategory;
 use App\Http\Requests\Admin\StorePostRequest;
 use App\Http\Requests\Admin\UpdatePostRequest;
+use App\Models\Post;
+use App\Models\PostCategory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
@@ -23,6 +20,7 @@ class PostController extends Controller
         $posts = Post::with('category')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
+
         return view('admin.posts.index', compact('posts'));
     }
 
@@ -32,6 +30,7 @@ class PostController extends Controller
     public function create()
     {
         $categories = PostCategory::where('is_active', true)->get();
+
         return view('admin.posts.create', compact('categories'));
     }
 
@@ -45,7 +44,7 @@ class PostController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             if ($file->isValid()) {
-                $filename = 'posts/' . $file->hashName();
+                $filename = 'posts/'.$file->hashName();
                 Storage::disk('public')->put($filename, file_get_contents($file->getPathname()));
                 $data['image'] = $filename;
             }
@@ -66,6 +65,7 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($id);
         $categories = PostCategory::where('is_active', true)->get();
+
         return view('admin.posts.edit', compact('post', 'categories'));
     }
 
@@ -83,7 +83,7 @@ class PostController extends Controller
                 if ($post->image) {
                     Storage::disk('public')->delete($post->image);
                 }
-                $filename = 'posts/' . $file->hashName();
+                $filename = 'posts/'.$file->hashName();
                 Storage::disk('public')->put($filename, file_get_contents($file->getPathname()));
                 $data['image'] = $filename;
             }

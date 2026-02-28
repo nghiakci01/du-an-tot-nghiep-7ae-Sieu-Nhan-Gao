@@ -76,7 +76,6 @@ class CategoryTest extends TestCase
         $response->assertSessionHasErrors(['image']);
     }
 
-
     /** @test */
     public function category_name_is_required()
     {

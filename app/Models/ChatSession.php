@@ -12,11 +12,11 @@ class ChatSession extends Model
     protected $fillable = [
         'session_id',
         'is_bot_enabled',
-        'last_activity'
+        'last_activity',
     ];
 
     protected $casts = [
         'is_bot_enabled' => 'boolean',
-        'last_activity' => 'datetime'
+        'last_activity' => 'datetime',
     ];
 }

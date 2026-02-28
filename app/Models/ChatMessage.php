@@ -17,12 +17,12 @@ class ChatMessage extends Model
         'message',
         'sender_type',
         'is_read',
-        'payload'
+        'payload',
     ];
 
     protected $casts = [
         'payload' => 'array',
-        'is_read' => 'boolean'
+        'is_read' => 'boolean',
     ];
 
     public function user()

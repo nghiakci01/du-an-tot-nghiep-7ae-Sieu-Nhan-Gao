@@ -11,6 +11,7 @@ class SizeController extends Controller
     public function index()
     {
         $sizes = Size::orderBy('display_order')->paginate(15);
+
         return view('admin.sizes.index', compact('sizes'));
     }
 
@@ -44,7 +45,7 @@ class SizeController extends Controller
     public function update(Request $request, Size $size)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:sizes,name,' . $size->id,
+            'name' => 'required|string|max:255|unique:sizes,name,'.$size->id,
             'display_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);

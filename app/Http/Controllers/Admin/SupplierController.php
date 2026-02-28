@@ -11,6 +11,7 @@ class SupplierController extends Controller
     public function index()
     {
         $suppliers = Supplier::latest()->paginate(10);
+
         return view('admin.suppliers.index', compact('suppliers'));
     }
 
@@ -58,6 +59,7 @@ class SupplierController extends Controller
     public function destroy(Supplier $supplier)
     {
         $supplier->delete();
+
         return redirect()->route('admin.suppliers.index')->with('success', 'Nhà cung cấp đã được xóa thành công.');
     }
 }

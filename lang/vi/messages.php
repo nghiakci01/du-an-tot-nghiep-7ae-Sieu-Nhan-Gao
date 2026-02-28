@@ -172,7 +172,7 @@ return [
     'size' => 'Kích thước',
     'color' => 'Màu sắc',
     'edit' => 'thêm sản phẩm tương tự',
-    
+
     // Checkout - Reid Template
     'returning_customer' => 'Khách hàng cũ',
     'click_here_to_login' => 'Nhấn vào đây để đăng nhập',

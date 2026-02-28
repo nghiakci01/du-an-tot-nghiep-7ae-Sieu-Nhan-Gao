@@ -11,8 +11,6 @@ class AdminLockMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
@@ -29,7 +27,7 @@ class AdminLockMiddleware
         }
 
         // Prevent accessing lock screen if not locked
-        if ($request->routeIs('admin.unlock') && (!Session::has('locked') || Session::get('locked') !== true)) {
+        if ($request->routeIs('admin.unlock') && (! Session::has('locked') || Session::get('locked') !== true)) {
             return redirect()->route('admin.dashboard');
         }
 

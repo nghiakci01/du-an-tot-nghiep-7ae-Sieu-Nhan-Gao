@@ -28,20 +28,23 @@ class UpdateProductRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     if ($value instanceof \Illuminate\Http\UploadedFile && $value->isValid()) {
                         $path = $value->getRealPath() ?: $value->getPathname();
-                        if (empty($path)) return;
+                        if (empty($path)) {
+                            return;
+                        }
 
                         $dimensions = @getimagesize($path);
-                        if (!$dimensions) {
-                            $fail("Không thể đọc định dạng hình ảnh chính.");
+                        if (! $dimensions) {
+                            $fail('Không thể đọc định dạng hình ảnh chính.');
+
                             return;
                         }
 
                         [$width, $height] = $dimensions;
                         if ($width < 400 || $height < 400) {
-                            $fail("Hình ảnh chính phải có kích thước tối thiểu 400x400px.");
+                            $fail('Hình ảnh chính phải có kích thước tối thiểu 400x400px.');
                         }
                     }
-                }
+                },
             ],
             'gallery_images' => 'nullable|array|max:6',
             'gallery_images.*' => [
@@ -51,20 +54,23 @@ class UpdateProductRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     if ($value instanceof \Illuminate\Http\UploadedFile && $value->isValid()) {
                         $path = $value->getRealPath() ?: $value->getPathname();
-                        if (empty($path)) return;
+                        if (empty($path)) {
+                            return;
+                        }
 
                         $dimensions = @getimagesize($path);
-                        if (!$dimensions) {
-                            $fail("Không thể đọc định dạng hình ảnh gallery.");
+                        if (! $dimensions) {
+                            $fail('Không thể đọc định dạng hình ảnh gallery.');
+
                             return;
                         }
 
                         [$width, $height] = $dimensions;
                         if ($width < 400 || $height < 400) {
-                            $fail("Hình ảnh gallery phải có kích thước tối thiểu 400x400px.");
+                            $fail('Hình ảnh gallery phải có kích thước tối thiểu 400x400px.');
                         }
                     }
-                }
+                },
             ],
             'is_active' => 'boolean',
 
@@ -81,13 +87,14 @@ class UpdateProductRequest extends FormRequest
                         if ($sizeId && $colorId) {
                             $key = "{$sizeId}-{$colorId}";
                             if (in_array($key, $combinations)) {
-                                $fail("Sản phẩm không được có các biến thể trùng lặp về Kích thước và Màu sắc.");
+                                $fail('Sản phẩm không được có các biến thể trùng lặp về Kích thước và Màu sắc.');
+
                                 return;
                             }
                             $combinations[] = $key;
                         }
                     }
-                }
+                },
             ],
             'variants.*.id' => 'nullable|exists:product_variants,id',
             'variants.*.size_id' => 'required|exists:sizes,id',
@@ -101,9 +108,9 @@ class UpdateProductRequest extends FormRequest
                     $index = explode('.', $attribute)[1];
                     $price = request()->input("variants.{$index}.price");
                     if ($price && $value >= $price) {
-                        $fail("Giá khuyến mãi phải nhỏ hơn giá gốc.");
+                        $fail('Giá khuyến mãi phải nhỏ hơn giá gốc.');
                     }
-                }
+                },
             ],
             'variants.*.stock_quantity' => 'required|integer|min:0',
             'variants.*.sku' => 'nullable|string|max:100',
@@ -139,4 +146,3 @@ class UpdateProductRequest extends FormRequest
         ];
     }
 }
-

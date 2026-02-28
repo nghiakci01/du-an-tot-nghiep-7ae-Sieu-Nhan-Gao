@@ -14,15 +14,15 @@ class UpdateBannerRequest extends BaseAdminFormRequest
     public function rules(): array
     {
         return [
-            'title'      => 'nullable|string|max:255',
-            'image'      => [
+            'title' => 'nullable|string|max:255',
+            'image' => [
                 'nullable',
                 function ($attribute, $value, $fail) {
                     if (! $value instanceof UploadedFile) {
                         return;
                     }
                     try {
-                        $ext  = strtolower($value->getClientOriginalExtension());
+                        $ext = strtolower($value->getClientOriginalExtension());
                         $size = @$value->getSize();
                     } catch (\Throwable $e) {
                         return;
@@ -35,34 +35,34 @@ class UpdateBannerRequest extends BaseAdminFormRequest
                     }
                 },
             ],
-            'link'       => 'nullable|string|max:255',
-            'position'   => 'required|string|in:slider,banner_top,banner_bottom',
+            'link' => 'nullable|string|max:255',
+            'position' => 'required|string|in:slider,banner_top,banner_bottom',
             'sort_order' => 'nullable|integer|min:0',
-            'is_active'  => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'title'      => 'Tiêu đề',
-            'image'      => 'Hình ảnh',
-            'link'       => 'Liên kết',
-            'position'   => 'Vị trí hiển thị',
+            'title' => 'Tiêu đề',
+            'image' => 'Hình ảnh',
+            'link' => 'Liên kết',
+            'position' => 'Vị trí hiển thị',
             'sort_order' => 'Thứ tự ưu tiên',
-            'is_active'  => 'Trạng thái hiển thị',
+            'is_active' => 'Trạng thái hiển thị',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'required'   => ':attribute không được để trống.',
-            'max'        => ':attribute không được vượt quá :max ký tự.',
-            'integer'    => ':attribute phải dưới dạng số nguyên.',
-            'min'        => ':attribute phải lớn hơn hoặc bằng :min.',
-            'in'         => ':attribute không hợp lệ.',
-            'string'     => ':attribute phải là chuỗi ký tự.',
+            'required' => ':attribute không được để trống.',
+            'max' => ':attribute không được vượt quá :max ký tự.',
+            'integer' => ':attribute phải dưới dạng số nguyên.',
+            'min' => ':attribute phải lớn hơn hoặc bằng :min.',
+            'in' => ':attribute không hợp lệ.',
+            'string' => ':attribute phải là chuỗi ký tự.',
         ];
     }
 }

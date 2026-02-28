@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
+use App\Mail\OrderShippedMail;
 use App\Models\Order;
 use App\Models\OrderHistory;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\OrderShippedMail;
-use Exception;
 
 class OrderService
 {
@@ -17,7 +17,7 @@ class OrderService
      */
     public function updateOrderStatus(Order $order, string $newStatus, ?User $user = null, ?string $note = null)
     {
-        if (!$order->canTransitionTo($newStatus)) {
+        if (! $order->canTransitionTo($newStatus)) {
             throw new Exception("Không thể chuyển đổi trạng thái từ {$order->status} sang {$newStatus}");
         }
 
@@ -37,7 +37,7 @@ class OrderService
                 'user_id' => $user ? $user->id : null,
                 'previous_status' => $oldStatus,
                 'new_status' => $newStatus,
-                'note' => $note
+                'note' => $note,
             ]);
 
             // Handle stock logic
@@ -52,7 +52,7 @@ class OrderService
                     Mail::to($email)->send(new OrderShippedMail($order));
                 }
             } catch (\Exception $e) {
-                \Log::error('Failed to send shipped email for order ' . $order->id . ': ' . $e->getMessage());
+                \Log::error('Failed to send shipped email for order '.$order->id.': '.$e->getMessage());
             }
         }
 
@@ -69,13 +69,13 @@ class OrderService
         $isCancelledState = in_array($newStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_FAILED]);
         $wasCancelledState = in_array($oldStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_FAILED]);
 
-        if ($isCancelledState && !$wasCancelledState) {
+        if ($isCancelledState && ! $wasCancelledState) {
             $this->restoreStock($order);
         }
 
         // 2. If transition FROM Cancelled/Returned/Failed TO Processing statuses -> Deduct Stock again
         // (Just in case specific admin flow allows un-cancelling, though usually hard. But good to handle)
-        if (!$isCancelledState && $wasCancelledState) {
+        if (! $isCancelledState && $wasCancelledState) {
             $this->deductStock($order);
         }
     }
@@ -96,7 +96,7 @@ class OrderService
                 if ($item->variant->stock_quantity >= $item->quantity) {
                     $item->variant->decrement('stock_quantity', $item->quantity);
                 } else {
-                    // potentially throw exception or allow negative if configured? 
+                    // potentially throw exception or allow negative if configured?
                     // For now, let's just decrement, or we could strict check.
                     // Assuming admin overrides, we just decrement.
                     $item->variant->decrement('stock_quantity', $item->quantity);

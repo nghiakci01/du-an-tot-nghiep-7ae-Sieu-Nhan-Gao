@@ -171,7 +171,7 @@ return [
     'size' => 'Size',
     'color' => 'Color',
     'edit' => 'Add similar product',
-    
+
     // Checkout - Reid Template
     'returning_customer' => 'Returning customer',
     'click_here_to_login' => 'Click here to login',

@@ -13,7 +13,9 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     const ROLE_ADMIN = 'admin';
+
     const ROLE_STAFF = 'staff';
+
     const ROLE_USER = 'user';
 
     /**
@@ -81,7 +83,7 @@ class User extends Authenticatable
 
     public function getAvatarUrlAttribute()
     {
-        if (!$this->avatar) {
+        if (! $this->avatar) {
             return null;
         }
 
@@ -89,6 +91,6 @@ class User extends Authenticatable
             return $this->avatar;
         }
 
-        return asset('storage/' . $this->avatar);
+        return asset('storage/'.$this->avatar);
     }
 }

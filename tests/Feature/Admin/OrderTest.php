@@ -13,6 +13,7 @@ class OrderTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private User $customer;
 
     protected function setUp(): void
@@ -37,19 +38,18 @@ class OrderTest extends TestCase
     private function makeOrder(string $status = 'pending'): Order
     {
         return Order::create([
-            'user_id'          => $this->customer->id,
-            'total_price'      => 500000,
-            'final_total'      => 500000,
-            'status'           => $status,
-            'payment_method'   => 'cod',
+            'user_id' => $this->customer->id,
+            'total_price' => 500000,
+            'final_total' => 500000,
+            'status' => $status,
+            'payment_method' => 'cod',
             'shipping_address' => '123 Đường Test, TP.HCM',
-            'name'             => 'Nguyen Van A',
-            'phone'            => '0901234567',
-            'province'         => 'TP.HCM',
-            'address'          => '123 Đường Test',
+            'name' => 'Nguyen Van A',
+            'phone' => '0901234567',
+            'province' => 'TP.HCM',
+            'address' => '123 Đường Test',
         ]);
     }
-
 
     /** @test */
     public function admin_can_view_orders_list()
@@ -93,7 +93,7 @@ class OrderTest extends TestCase
         $this->mock(OrderService::class, function ($mock) use ($order) {
             $mock->shouldReceive('updateOrderStatus')
                 ->once()
-                ->with(\Mockery::on(fn($o) => $o->id === $order->id), 'confirmed', \Mockery::any())
+                ->with(\Mockery::on(fn ($o) => $o->id === $order->id), 'confirmed', \Mockery::any())
                 ->andReturnNull();
         });
 

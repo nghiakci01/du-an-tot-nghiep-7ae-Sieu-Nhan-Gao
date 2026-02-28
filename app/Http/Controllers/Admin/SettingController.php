@@ -11,6 +11,7 @@ class SettingController extends Controller
     public function index()
     {
         $settings = Setting::all()->pluck('value', 'key');
+
         return view('admin.settings.index', compact('settings'));
     }
 
@@ -24,7 +25,7 @@ class SettingController extends Controller
                 ['value' => $value]
             );
         }
-        
+
         // Clear settings cache
         \Illuminate\Support\Facades\Cache::forget('global_settings');
 

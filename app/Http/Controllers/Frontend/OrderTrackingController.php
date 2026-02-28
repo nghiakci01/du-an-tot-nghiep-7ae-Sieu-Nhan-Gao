@@ -26,12 +26,12 @@ class OrderTrackingController extends Controller
         $order = Order::where('id', $request->order_id)
             ->where(function ($query) use ($request) {
                 $query->where('email', $request->contact)
-                      ->orWhere('phone', $request->contact);
+                    ->orWhere('phone', $request->contact);
             })
             ->with(['items.product', 'items.variant'])
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             return redirect()->back()
                 ->with('error', 'Không tìm thấy đơn hàng phù hợp với thông tin cung cấp.')
                 ->withInput();

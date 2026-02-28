@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class InventoryVoucher extends Model
 {
     const TYPE_INBOUND = 'INBOUND';
+
     const TYPE_OUTBOUND = 'OUTBOUND';
 
     const STATUS_PENDING = 'PENDING';
+
     const STATUS_COMPLETED = 'COMPLETED';
+
     const STATUS_CANCELLED = 'CANCELLED';
 
     protected $fillable = [
