@@ -21,7 +21,7 @@ class ReportService
 
         $totalRevenue = Order::where('status', Order::STATUS_COMPLETED)
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->sum('total_price');
+            ->sum('final_total');
 
         $totalOrders = Order::whereBetween('created_at', [$startDate, $endDate])->count();
         
@@ -55,7 +55,7 @@ class ReportService
             ->whereBetween('created_at', [$startDate, $endDate])
             ->select(
                 DB::raw('DATE(created_at) as date'),
-                DB::raw('SUM(total_price) as total')
+                DB::raw('SUM(final_total) as total')
             )
             ->groupBy('date')
             ->orderBy('date', 'asc')

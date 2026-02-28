@@ -268,7 +268,30 @@
     </section>
     <!--product section area end-->
 
-    <!-- banner area removed as per request -->
+    <!-- banner area start -->
+    @if($topBanners->count() > 0)
+    <div class="banner_area banner_column3 mb-30">
+        <div class="container-fluid">
+            <div class="row">
+                @foreach($topBanners as $banner)
+                <div class="col-lg-4 col-md-4">
+                    <div class="single_banner">
+                        <div class="banner_thumb">
+                            <a href="{{ $banner->link ?? '#' }}"><img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}"></a>
+                            @if($banner->title)
+                                <div class="banner_content">
+                                    <h3>{{ $banner->title }}</h3>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
+    <!-- banner area end -->
 
     <!--product section area start-->
     <section class="product_section womens_product product_section_six bottom">
@@ -348,7 +371,25 @@
     </section>
     <!--product section area end-->
 
-    <!--product section area end-->
+    <!-- banner area start -->
+    @if($bottomBanners->count() > 0)
+    <div class="banner_area mb-30">
+        <div class="container-fluid">
+            <div class="row">
+                @foreach($bottomBanners as $banner)
+                <div class="col-lg-6 col-md-6">
+                    <div class="single_banner">
+                        <div class="banner_thumb">
+                            <a href="{{ $banner->link ?? '#' }}"><img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}"></a>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
+    <!-- banner area end -->
 
     <!--product section area start (Top Wishlisted)-->
     <section class="product_section womens_product product_section_six bottom">
