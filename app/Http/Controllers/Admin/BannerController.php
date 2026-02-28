@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\UpdateBannerRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class BannerController extends Controller
@@ -36,14 +37,29 @@ class BannerController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('banners', 'public');
+            $file = $request->file('image');
+
+            if (! $file->isValid()) {
+                Log::error('Banner upload thất bại: file không hợp lệ', [
+                    'error_code' => $file->getError(),
+                    'original_name' => $file->getClientOriginalName(),
+                ]);
+
+                return back()->withInput()->withErrors([
+                    'image' => 'Tải ảnh thất bại (lỗi server). Vui lòng thử lại.',
+                ]);
+            }
+
+            $filename = 'banners/' . $file->hashName();
+            Storage::disk('public')->put($filename, file_get_contents($file->getPathname()));
+            $data['image'] = $filename;
         }
 
         $data['is_active'] = $request->boolean('is_active', true);
 
         Banner::create($data);
 
-        return redirect()->route('admin.banners.index')->with('success', 'Banner created successfully.');
+        return redirect()->route('admin.banners.index')->with('success', 'Banner được tạo thành công.');
     }
 
     /**
@@ -62,18 +78,33 @@ class BannerController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            // Delete old image
+            $file = $request->file('image');
+
+            if (! $file->isValid()) {
+                Log::error('Banner update upload thất bại: file không hợp lệ', [
+                    'error_code' => $file->getError(),
+                    'original_name' => $file->getClientOriginalName(),
+                ]);
+
+                return back()->withInput()->withErrors([
+                    'image' => 'Tải ảnh thất bại (lỗi server). Vui lòng thử lại.',
+                ]);
+            }
+
             if ($banner->image) {
                 Storage::disk('public')->delete($banner->image);
             }
-            $data['image'] = $request->file('image')->store('banners', 'public');
+
+            $filename = 'banners/' . $file->hashName();
+            Storage::disk('public')->put($filename, file_get_contents($file->getPathname()));
+            $data['image'] = $filename;
         }
 
         $data['is_active'] = $request->boolean('is_active');
 
         $banner->update($data);
 
-        return redirect()->route('admin.banners.index')->with('success', 'Banner updated successfully.');
+        return redirect()->route('admin.banners.index')->with('success', 'Banner được cập nhật thành công.');
     }
 
     /**
