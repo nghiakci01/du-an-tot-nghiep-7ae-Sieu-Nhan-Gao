@@ -93,8 +93,6 @@
             pointer-events: none;
         }
     </style>
-
-
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area product_bread">
         <div class="container">
@@ -444,18 +442,18 @@
                                 <div style="margin-top:10px;">
                                     <input type="hidden" name="action" id="action_input" value="add_to_cart">
                                     <button class="button" type="button"
-                                        id="btn-add-to-cart">Thêm vào giỏ hàng</button>
+                                        id="btn-add-to-cart">{{ __('messages.add_to_cart') }}</button>
                                     <button class="button buy_now" type="button"
-                                        id="btn-buy-now">Mua ngay</button>
+                                        id="btn-buy-now">{{ __('messages.buy_now') }}</button>
                                 </div>
                             </div>
                             <div class="product_d_action">
                                 <ul>
                                     <li>
                                         <a href="#" class="add-to-wishlist" data-id="{{ $product->id }}"
-                                            title="Thêm vào danh sách yêu thích">
+                                            title="{{ __('messages.add_to_wishlist') }}">
                                             <i class="fa fa-heart-o" aria-hidden="true"></i>
-                                            Thêm vào danh sách yêu thích
+                                            {{ __('messages.add_to_wishlist') }}
                                         </a>
                                     </li>
                                 </ul>
@@ -463,7 +461,7 @@
 
                         </form>
                         <div class="priduct_social">
-                            <h3>Chia sẻ</h3>
+                            <h3>{{ __('messages.share_on') }}</h3>
                             <ul>
                                 <li><a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
                                         target="_blank" title="Share on Facebook"><i class="fa fa-facebook"></i></a></li>
