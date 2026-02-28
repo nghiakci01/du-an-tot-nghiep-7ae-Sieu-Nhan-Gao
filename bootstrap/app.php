@@ -25,12 +25,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             \App\Http\Middleware\SetLanguage::class,
+            \App\Http\Middleware\PreventBackHistory::class,
         ]);
 
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'admin.only' => \App\Http\Middleware\AdminOnlyMiddleware::class,
             'admin.lock' => \App\Http\Middleware\AdminLockMiddleware::class,
+            'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
