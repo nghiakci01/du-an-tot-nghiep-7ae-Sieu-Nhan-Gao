@@ -592,6 +592,21 @@
                                     </div>
                                 </div>
 
+                                <div class="panel-default">
+                                    <input id="payment_zalopay" name="payment_method" type="radio" value="ZALOPAY"
+                                        data-bs-target="createp_account" required />
+                                    <label for="payment_zalopay" data-bs-toggle="collapse" data-bs-target="#method_zalopay"
+                                        aria-controls="method_zalopay">
+                                        Thanh toán qua Ví điện tử ZaloPay
+                                    </label>
+
+                                    <div id="method_zalopay" class="collapse" data-bs-parent="#accordion">
+                                        <div class="card-body1">
+                                            <p>Thanh toán nhanh chóng, an toàn qua ứng dụng ZaloPay hoặc quét mã QR.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
 
                                 <div class="order_button">
                                     <button type="submit">{{ __('messages.place_order') }}</button>

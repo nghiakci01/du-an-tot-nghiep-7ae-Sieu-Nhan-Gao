@@ -191,6 +191,39 @@
                     </a>
                 </li>
                 @if (auth()->user()->isAdmin())
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-news"></i>
+                            </span>
+                            <span class="pc-mtext">Quản lý Blog</span>
+                            <span class="pc-arrow">
+                                <i data-feather="chevron-right"></i>
+                            </span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item">
+                                <a href="{{ route('admin.post-categories.index') }}" class="pc-link">
+                                    <span class="pc-mtext">Danh mục tin</span>
+                                </a>
+                            </li>
+                            <li class="pc-item">
+                                <a href="{{ route('admin.posts.index') }}" class="pc-link">
+                                    <span class="pc-mtext">Bài viết</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('admin.loyalty-points.index') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-coin"></i>
+                            </span>
+                            <span class="pc-mtext">Cấu hình Tích điểm</span>
+                        </a>
+                    </li>
+                @endif
+                @if (auth()->user()->isAdmin())
                     <li class="pc-item">
                         <a href="{{ route('admin.users.index') }}" class="pc-link">
                             <span class="pc-micon">
