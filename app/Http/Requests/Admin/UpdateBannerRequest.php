@@ -33,6 +33,14 @@ class UpdateBannerRequest extends BaseAdminFormRequest
                     if ($size !== false && $size > 2 * 1024 * 1024) {
                         $fail('Kích thước hình ảnh không được vượt quá 2MB (2048 KB).');
                     }
+
+                    // Check dimensions for sharp display
+                    if ($this->input('position') === 'slider') {
+                        [$width, $height] = getimagesize($value->getRealPath());
+                        if ($width < 1521) {
+                            $fail('Ảnh cho Slider phải có chiều rộng tối thiểu 1521px để đảm bảo độ sắc nét. Khuyên dùng 3042px cho màn hình Retina.');
+                        }
+                    }
                 },
             ],
             'link' => 'nullable|string|max:255',
