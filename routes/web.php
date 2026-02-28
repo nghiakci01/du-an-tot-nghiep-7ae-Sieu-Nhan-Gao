@@ -164,6 +164,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
                 Route::post('/chatbot/test', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'testConnection'])->name('chatbot.test');
             });
         });
+        // Reports & Statistics
+        Route::get('/reports/orders/excel', [App\Http\Controllers\Admin\ReportController::class, 'exportOrdersExcel'])->name('reports.orders.excel');
+        Route::get('/reports/revenue/pdf', [App\Http\Controllers\Admin\ReportController::class, 'exportRevenuePDF'])->name('reports.revenue.pdf');
     });
 });
 
