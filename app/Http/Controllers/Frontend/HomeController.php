@@ -19,12 +19,11 @@ class HomeController extends Controller
     {
         $categories = Category::whereNull('parent_id')->take(6)->get();
 
-        // Banners
-        $sliders = Banner::where('position', 'slider')->where('is_active', true)->orderBy('sort_order')->get();
-        // Banner Top (Bên phải Slider - lấy 3 cái)
-        $bannerTop = Banner::where('position', 'banner_top')->where('is_active', true)->orderBy('sort_order')->take(3)->get();
-        // Banner Bottom (Cuối trang - lấy 1 cái)
-        $bannerBottom = Banner::where('position', 'banner_bottom')->where('is_active', true)->orderBy('sort_order')->first();
+        // Banners - only fetch slider banners for the new layout
+        $sliders = Banner::where('position', 'slider')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
 
         // Sản phẩm nổi bật cho section "New Arrivals"
         $featuredProducts = Product::where('is_active', true)
@@ -48,7 +47,7 @@ class HomeController extends Controller
             ->take(10)
             ->get();
 
-        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders', 'bannerTop', 'bannerBottom'));
+        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders'));
     }
 
     public function about()

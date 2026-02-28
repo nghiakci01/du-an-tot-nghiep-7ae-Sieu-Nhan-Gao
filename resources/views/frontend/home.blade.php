@@ -1,99 +1,192 @@
 @extends('layouts.public')
 
 @section('content')
-<style>
-    /* Normalize product image heights */
-    .single_product .product_thumb a img {
-        aspect-ratio: 3 / 4;
-        object-fit: cover;
+    <!-- <style>
+        /* Nuclear fix: Direct embedded CSS for the 10-product grid */
+        .custom_product_grid_10 {
+            display: -webkit-box !important;
+            display: -ms-flexbox !important;
+            display: flex !important;
+            -ms-flex-wrap: wrap !important;
+            flex-wrap: wrap !important;
+            margin-left: -15px !important;
+            margin-right: -15px !important;
+        }
+
+        .custom_product_grid_10 .product_item_5 {
+            position: relative !important;
+            width: 100% !important;
+            padding-right: 15px !important;
+            padding-left: 15px !important;
+            -webkit-box-flex: 0 !important;
+            -ms-flex: 0 0 100% !important;
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            margin-bottom: 30px;
+        }
+
+        @media (min-width: 576px) {
+            .custom_product_grid_10 .product_item_5 {
+                -ms-flex: 0 0 50% !important;
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .custom_product_grid_10 .product_item_5 {
+                -ms-flex: 0 0 33.333333% !important;
+                flex: 0 0 33.333333% !important;
+                max-width: 33.333333% !important;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .custom_product_grid_10 .product_item_5 {
+                -ms-flex: 0 0 25% !important;
+                flex: 0 0 25% !important;
+                max-width: 25% !important;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .custom_product_grid_10 .product_item_5 {
+                -ms-flex: 0 0 20% !important;
+                flex: 0 0 20% !important;
+                max-width: 20% !important;
+            }
+        }
+
+        /* Fix image ratio and layout breaking on hover */
+        .single_product .product_thumb {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto;
+            overflow: hidden;
+            background: #f5f5f5;
+            /* Placeholder color for loading */
+        }
+
+        .single_product .product_thumb a.primary_img,
+        .single_product .product_thumb a.secondary_img {
+            display: block;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .single_product .product_thumb img {
+            width: 280px !important;
+            height: 280px !important;
+            object-fit: cover !important;
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: auto;
+        }
+
+        /* Fix alignment for titles and prices */
+        .product_content {
+            padding-top: 10px;
+            text-align: left;
+        }
+
+    .product_content h3 {
+        margin-bottom: 5px;
+        font-size: 14px;
+        line-height: 1.2;
+        height: 2.4em; /* Max 2 lines height for alignment */
+        overflow: hidden;
+    }
+
+    /* Banner & Slider Custom Refining */
+    @media (min-width: 992px) {
+        /* Desktop: Ensure slider and side banners have matching heights */
+        .home_six_slider .single_slider {
+            height: 600px !important; /* Fixed base height for slider */
+            background-size: cover !important;
+            background-position: center !important;
+        }
+
+        .banner_slider_section .banner_area.banner_top .banner_thumb img {
+            height: 340px !important; /* Top big banner */
+            object-fit: cover !important;
+            width: 100%;
+        }
+
+        .banner_slider_section .banner_area:not(.banner_top) .banner_thumb img {
+            height: 240px !important; /* Two small banners below */
+            object-fit: cover !important;
+            width: 100%;
+        }
+    }
+
+    /* General aspect ratios for consistency */
+    .banner_thumb img {
         width: 100%;
         height: auto;
         background-color: #f5f5f5; /* Fallback background */
     }
 </style>
 
-        <!--slider area start-->
-    <div class="slider_section slider_section_six">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="slider_area home_six_slider owl-carousel">
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}">
-                           <div class="slider_content_inner">
-                                <div class="slider_content">
-                                   <h2>xu hướng hàng đầu</h2>
-                                    <h1>túui xách</h1>
-                                    <p>Khám phá bộ sưu tập mới nhất <br> với thiết kế tiên phong và hiện đại.</p>
-                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
-                                </div>  
-                            </div>     
-                        </div>
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider11.jpg') }}">
-                           <div class="slider_content_inner">
-                                <div class="slider_content">
-                                    <h2>hàng mới về</h2>
-                                    <h1>áo khoác</h1>
-                                    <p>Thiết kế trẻ trung, phù hợp mọi dịp <br> đi chơi hay đi làm đều đẹp.</p>
-                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
-                                </div> 
-                            </div>   
-                        </div>
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider12.jpg') }}">
-                           <div class="slider_content_inner">
-                                <div class="slider_content">
-                                    <h2>xu hướng hàng đầu</h2>
-                                    <h1>thời trang</h1>
-                                    <p>Bộ sưu tập thời trang đẳng cấp <br> dành riêng cho bạn.</p>
-                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
-                                </div> 
-                            </div>         
-                        </div>
+    /* Bottom banner refinement */
+    .section_fullwidth .banner_thumb img {
+        aspect-ratio: 21 / 6;
+        width: 100%;
+        object-fit: cover !important;
+    }
+</style> -->
+    <!--slider area start-->
+    <div class="slider_section slider_section_six mb-30" style="background: #fff;">
+        <div style="padding: 0; width: 1521px; max-width: 100%; margin: 0 auto;">
+            <div class="row no-gutters">
+                <div class="col-12">
+                    <div class="slider_area home_six_slider owl-carousel banner-wide-slider">
+                        @if($sliders->count() > 0)
+                            @foreach($sliders as $slider)
+                                <div class="single_slider" data-bgimg="{{ asset('storage/' . $slider->image) }}" style="height: 856px !important;">
+                                    @if($slider->link)
+                                        <a href="{{ $slider->link }}" style="display: block; width: 100%; height: 100%;"></a>
+                                    @endif
+                                    <div class="slider_content_inner">
+                                        <div class="slider_content">
+                                            <h2>{{ $slider->title }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}" style="height: 856px !important;">
+                                <div class="slider_content_inner">
+                                    <div class="slider_content">
+                                        <h2>Wide Banner Placeholder</h2>
+                                        <p>1521 x 856 px</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
-                </div>
-                <div class="col-lg-4">
-                    <!--banner area start-->
-                    <div class="banner_slider_section">
-                        <div class="row ">
-                           <div class="col-12">
-                                <div class="banner_area banner_top">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner18.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Giày Thể Thao <br> Nam Hè 2025</h1>
-                                           <h3>Giảm Giá Lớn Tuần Này</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="banner_area">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner19.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Thời Trang Nữ</h1>
-                                           <h3>Giảm 20% Toàn Bộ</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="banner_area">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner20.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Túi Xách #1</h1>
-                                           <h3>Sale Khủng Không Giới Hạn</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--banner area end-->
                 </div>
             </div>
         </div>
     </div>
+    <style>
+        .banner-wide-slider .single_slider {
+            height: 856px !important;
+            background-size: cover !important;
+            background-position: center !important;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .banner-wide-slider .owl-nav {
+            display: none !important;
+        }
+        .slider_section_six.mb-30 { margin-bottom: 30px; }
+    </style>
     <!--slider area end-->
 
     <!--product section area start-->
@@ -175,21 +268,7 @@
     </section>
     <!--product section area end-->
 
-    <!--banner area start-->
-    <div class="banner_slider_section section_fullwidth">
-       <div class="container-fluid">
-           <div class="row ">
-               <div class="col-12">
-                    <div class="banner_area">
-                        <div class="banner_thumb">
-                            <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner21.jpg') }}" alt="#"></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-       </div>  
-    </div>
-    <!--banner area end-->
+    <!-- banner area removed as per request -->
 
     <!--product section area start-->
     <section class="product_section womens_product product_section_six bottom">

@@ -43,19 +43,13 @@
                                                     </div>
                                                 @endif
                                             </td>
-                                            <td>
+                                             <td>
                                                 @switch($banner->position)
                                                     @case('slider')
-                                                        <span class="badge bg-light-info text-info">Slider</span>
-                                                        @break
-                                                    @case('banner_top')
-                                                        <span class="badge bg-light-warning text-warning">Top Banner</span>
-                                                        @break
-                                                    @case('banner_bottom')
-                                                        <span class="badge bg-light-danger text-danger">Bottom Banner</span>
+                                                        <span class="badge bg-light-info text-info">Wide Slider (1521x856)</span>
                                                         @break
                                                     @default
-                                                        {{ $banner->position }}
+                                                        <span class="badge bg-light-secondary text-secondary">Legacy: {{ $banner->position }}</span>
                                                 @endswitch
                                             </td>
                                             <td>

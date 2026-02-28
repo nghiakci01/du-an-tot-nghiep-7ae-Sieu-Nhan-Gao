@@ -61,19 +61,16 @@
                                     <div class="mb-3">
                                         <label for="position" class="form-label">Vị trí hiển thị <span class="text-danger">*</span></label>
                                         <select class="form-select @error('position') is-invalid @enderror" id="position" name="position">
-                                            <option value="slider" {{ old('position', $banner->position) == 'slider' ? 'selected' : '' }}>Slider Chính (Trang chủ)</option>
-                                            <option value="banner_top" {{ old('position', $banner->position) == 'banner_top' ? 'selected' : '' }}>Banner Top (Bên phải Slider)</option>
-                                            <option value="banner_bottom" {{ old('position', $banner->position) == 'banner_bottom' ? 'selected' : '' }}>Banner Bottom (Cuối trang)</option>
+                                            <option value="slider" {{ $banner->position == 'slider' ? 'selected' : '' }}>Slider Chính (1521x856px)</option>
+                                            @if($banner->position != 'slider')
+                                                <option value="{{ $banner->position }}" selected>Legacy: {{ $banner->position }}</option>
+                                            @endif
                                         </select>
                                         @error('position')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                         <div class="mt-2 small text-muted">
-                                            <ul class="ps-3 mb-0">
-                                                <li><strong>Slider:</strong> Chạy ngang ở đầu trang chủ.</li>
-                                                <li><strong>Top:</strong> 2 ảnh nhỏ bên phải slider.</li>
-                                                <li><strong>Bottom:</strong> Banner lớn ở giữa trang.</li>
-                                            </ul>
+                                            <p><strong>Lưu ý:</strong> Hiện tại trang chủ chỉ sử dụng 1 loại slider rộng 1521px và cao 856px.</p>
                                         </div>
                                     </div>
 
