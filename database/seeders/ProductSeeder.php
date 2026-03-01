@@ -11,80 +11,61 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        // Lấy category theo slug
-        $aoThunNam = Category::where('slug', 'ao-thun')->first();
-        $vayDamNu = Category::where('slug', 'vay-dam')->first();
+        $categories = Category::whereNotNull('parent_id')->get();
+        $brands = Brand::all();
+        $colors = Color::all();
+        $sizes = Size::all();
 
-        // Nếu không tìm thấy category thì srr skip hoặc tạo mới (tùy logic, ở đây assume có rồi từ CategorySeeder)
-        // Tuy nhiên tốt nhất là check null
-        if (! $aoThunNam || ! $vayDamNu) {
-            $this->command->error('Categories not found. Please run CategorySeeder first.');
-
+        if ($categories->isEmpty() || $brands->isEmpty() || $colors->isEmpty() || $sizes->isEmpty()) {
+            $this->command->error('Missing required seeders (Category, Brand, Color, Size).');
             return;
         }
 
-        $products = [
-            [
-                'category_id' => $aoThunNam->id,
-                'name' => 'Áo Thun Basic Trắng',
-                'slug' => 'ao-thun-basic-trang',
-                'description' => 'Áo thun cotton 100% thoáng mát.',
-                'short_description' => 'Áo thun cotton trắng thoáng mát dành cho nam ngầu.',
-                'price' => 150000,
-                'is_active' => true,
-                'variants' => [
-                    ['size' => 'S', 'color' => 'Trắng', 'stock_quantity' => 10, 'sku' => 'TS-W-S'],
-                    ['size' => 'M', 'color' => 'Trắng', 'stock_quantity' => 20, 'sku' => 'TS-W-M'],
-                    ['size' => 'L', 'color' => 'Trắng', 'stock_quantity' => 15, 'sku' => 'TS-W-L'],
-                ],
-            ],
-            [
-                'category_id' => $aoThunNam->id,
-                'name' => 'Áo Thun Basic Đen',
-                'slug' => 'ao-thun-basic-den',
-                'description' => 'Áo thun đen phong cách.',
-                'short_description' => 'Áo thun đen năng động phong cách lịch sự.',
-                'price' => 150000,
-                'is_active' => true,
-                'variants' => [
-                    ['size' => 'S', 'color' => 'Đen', 'stock_quantity' => 10, 'sku' => 'TS-B-S'],
-                    ['size' => 'M', 'color' => 'Đen', 'stock_quantity' => 20, 'sku' => 'TS-B-M'],
-                ],
-            ],
-            [
-                'category_id' => $vayDamNu->id,
-                'name' => 'Váy Hoa Nhí Vintage',
-                'slug' => 'vay-hoa-nhi-vintage',
-                'description' => 'Váy hoa nhẹ nhàng cho mùa hè.',
-                'short_description' => 'Váy hoa nhí vintage xinh xắn dành cho nữ.',
-                'price' => 350000,
-                'is_active' => true,
-                'variants' => [], // Add variants if needed
-            ],
+        $productNames = [
+            'Áo Thun', 'Áo Sơ Mi', 'Quần Jean', 'Quần Tây', 'Váy Hoa Nam', 'Đầm Dạ Hội',
+            'Áo Khoác Gió', 'Áo Hoodie', 'Quần Short', 'Áo Polo', 'Váy Chân Bút Chì'
         ];
 
-        foreach ($products as $data) {
-            $variants = $data['variants'];
-            unset($data['variants']);
+        $adjectives = ['Cao Cấp', 'Basic', 'Năng Động', 'Thanh Lịch', 'Vintage', 'Mùa Hè'];
 
-            $product = Product::firstOrCreate(
-                ['slug' => $data['slug']],
-                $data
-            );
+        for ($i = 1; $i <= 20; $i++) {
+            $name = $productNames[array_rand($productNames)] . ' ' . $adjectives[array_rand($adjectives)] . ' ' . $i;
+            $slug = Str::slug($name) . '-' . uniqid();
 
-            // Create variants
-            foreach ($variants as $variant) {
-                // Ensure unique SKU per variant
-                ProductVariant::firstOrCreate(
-                    ['sku' => $variant['sku'].'-'.$product->id],
-                    array_merge($variant, [
-                        'product_id' => $product->id,
-                        'sku' => $variant['sku'].'-'.$product->id, // update SKU to include product ID as per original logic if needed, or just keep unique SKU
-                    ])
-                );
+            $product = Product::create([
+                'category_id' => $categories->random()->id,
+                'brand_id' => $brands->random()->id,
+                'name' => $name,
+                'slug' => $slug,
+                'description' => 'Mô tả chi tiết cho sản phẩm ' . $name . '. Chất liệu bền đẹp, form dáng chuẩn, phù hợp với nhiều phong cách thời trang khác nhau.',
+                'short_description' => 'Sản phẩm ' . $name . ' chất lượng cao cho phong cách hiện đại.',
+                'price' => rand(100, 1000) * 1000,
+                'is_active' => true,
+            ]);
+
+            // Create 3-6 variants per product
+            $numVariants = rand(3, 6);
+            $usedConfigs = [];
+
+            for ($j = 0; $j < $numVariants; $j++) {
+                $color = $colors->random();
+                $size = $sizes->random();
+                $configKey = $color->id . '-' . $size->id;
+
+                if (in_array($configKey, $usedConfigs)) continue;
+                $usedConfigs[] = $configKey;
+
+                ProductVariant::create([
+                    'product_id' => $product->id,
+                    'color_id' => $color->id,
+                    'size_id' => $size->id,
+                    'sku' => strtoupper(substr($slug, 0, 4)) . '-' . $color->id . $size->id . '-' . $i . $j,
+                    'stock_quantity' => rand(10, 100),
+                    'price' => $product->price + (rand(0, 5) * 10000), // Slightly different price for variants
+                ]);
             }
         }
 
-        echo "\n✅ Đã thêm thành công ".count($products).' sản phẩm với '.(count($products) * 4)." biến thể!\n";
+        echo "\n✅ Đã tạo thành công 20 sản phẩm với các biến thể ngẫu nhiên!\n";
     }
 }
