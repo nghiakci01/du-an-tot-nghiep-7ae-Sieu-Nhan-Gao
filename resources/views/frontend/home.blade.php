@@ -372,7 +372,7 @@
     <!--product section area end-->
 
     <!-- banner area start -->
-    @if($bottomBanners->count() > 0)
+    <!-- @if($bottomBanners->count() > 0)
     <div class="banner_area mb-30">
         <div class="container-fluid">
             <div class="row">
@@ -388,7 +388,7 @@
             </div>
         </div>
     </div>
-    @endif
+    @endif -->
     <!-- banner area end -->
 
     <!--product section area start (Top Wishlisted)-->
