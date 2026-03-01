@@ -38,7 +38,7 @@
                                     <div class="mb-3">
                                         <label for="image" class="form-label">Hình ảnh (Chỉ chọn nếu muốn thay đổi)</label>
                                         <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" onchange="previewImage(this)">
-                                        <div class="form-text">Định dạng hỗ trợ: jpeg, png, jpg, gif. Tối đa 2MB.</div>
+                                        <div class="form-text">Định dạng hỗ trợ: jpeg, png, jpg, gif, webp. Tối đa 2MB. <br><strong>Khuyên dùng:</strong> Chiều rộng tối thiểu 1521px. Để sắc nét nhất trên mọi màn hình, hãy dùng 3042px.</div>
                                         @error('image')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -61,16 +61,13 @@
                                     <div class="mb-3">
                                         <label for="position" class="form-label">Vị trí hiển thị <span class="text-danger">*</span></label>
                                         <select class="form-select @error('position') is-invalid @enderror" id="position" name="position">
-                                            <option value="slider" {{ $banner->position == 'slider' ? 'selected' : '' }}>Slider Chính (1521x856px)</option>
-                                            @if($banner->position != 'slider')
-                                                <option value="{{ $banner->position }}" selected>Legacy: {{ $banner->position }}</option>
-                                            @endif
+                                            <option value="slider" selected>Slider Chính (1521x856px)</option>
                                         </select>
                                         @error('position')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                         <div class="mt-2 small text-muted">
-                                            <p><strong>Lưu ý:</strong> Hiện tại trang chủ chỉ sử dụng 1 loại slider rộng 1521px và cao 856px.</p>
+                                            <p><strong>Lưu ý:</strong> Hiện tại trang chủ sử dụng slider rộng 1521px. Để banner <strong>không bị mờ</strong>, vui lòng tải ảnh có chiều rộng từ 1521px đến 3042px.</p>
                                         </div>
                                     </div>
 

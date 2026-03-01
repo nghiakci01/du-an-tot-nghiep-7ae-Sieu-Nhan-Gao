@@ -13,6 +13,7 @@ class ChatbotSettingController extends Controller
     {
         $settings = ChatbotSetting::all()->pluck('value', 'key');
         $questions = \App\Models\ChatbotSuggestedQuestion::orderBy('order')->orderBy('created_at', 'desc')->get();
+
         return view('admin.settings.chatbot', compact('settings', 'questions'));
     }
 
@@ -33,17 +34,17 @@ class ChatbotSettingController extends Controller
         ]);
 
         $data = $request->except('_token');
-        
+
         // Handle checkbox (if not checked, Laravel request doesn't include it)
         $data['chatbot_enabled'] = $request->has('chatbot_enabled') ? '1' : '0';
 
         foreach ($data as $key => $value) {
             ChatbotSetting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
             Cache::forget("chatbot_setting_{$key}");
-            
+
             // Special case for enabled status which might be used in providers
             if ($key === 'chatbot_enabled') {
-                 Cache::forget('chatbot_enabled'); 
+                Cache::forget('chatbot_enabled');
             }
         }
 
@@ -55,10 +56,10 @@ class ChatbotSettingController extends Controller
         $provider = $request->input('ai_provider');
         $apiKey = $request->input('api_key');
 
-        if (!$apiKey) {
+        if (! $apiKey) {
             return response()->json([
                 'success' => false,
-                'message' => 'Vui lòng nhập API Key trước khi kiểm tra!'
+                'message' => 'Vui lòng nhập API Key trước khi kiểm tra!',
             ]);
         }
 
@@ -81,7 +82,7 @@ class ChatbotSettingController extends Controller
                 ],
                 'timeout' => 30,
             ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={$apiKey}", [
-                'contents' => [['parts' => [['text' => 'Hello']]]]
+                'contents' => [['parts' => [['text' => 'Hello']]]],
             ]);
 
             if ($response->successful()) {
@@ -89,9 +90,10 @@ class ChatbotSettingController extends Controller
             }
 
             $error = $response->json()['error']['message'] ?? 'Lỗi không xác định';
+
             return response()->json(['success' => false, 'message' => "Gemini: {$error} (Mã: {$response->status()})"]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Lỗi Gemini: ' . $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Lỗi Gemini: '.$e->getMessage()]);
         }
     }
 
@@ -107,10 +109,10 @@ class ChatbotSettingController extends Controller
             ])->withHeaders([
                 'Authorization' => "Bearer {$apiKey}",
                 'Content-Type' => 'application/json',
-            ])->post("https://api.openai.com/v1/chat/completions", [
+            ])->post('https://api.openai.com/v1/chat/completions', [
                 'model' => 'gpt-3.5-turbo',
                 'messages' => [['role' => 'user', 'content' => 'Hello']],
-                'max_tokens' => 20
+                'max_tokens' => 20,
             ]);
 
             if ($response->successful()) {
@@ -118,9 +120,10 @@ class ChatbotSettingController extends Controller
             }
 
             $error = $response->json()['error']['message'] ?? 'Lỗi không xác định';
+
             return response()->json(['success' => false, 'message' => "OpenAI: {$error} (Mã: {$response->status()})"]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Lỗi OpenAI: ' . $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Lỗi OpenAI: '.$e->getMessage()]);
         }
     }
 }

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\ZaloPayService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ZaloPayController extends Controller
 {
@@ -20,6 +19,7 @@ class ZaloPayController extends Controller
     public function pay(Order $order)
     {
         $paymentUrl = $this->zaloPayService->createPayment($order);
+
         return redirect($paymentUrl);
     }
 
@@ -41,9 +41,9 @@ class ZaloPayController extends Controller
             // Success: update order status (In real life, this happens via callback)
             $order->update([
                 'status' => 'processing', // or 'paid'
-                'payment_status' => 'paid'
+                'payment_status' => 'paid',
             ]);
-            
+
             return redirect()->route('checkout.success', $order->id)->with('success', 'Thanh toán ZaloPay thành công!');
         } else {
             // Fail/Cancel: redirect back to cart as requested
@@ -60,11 +60,11 @@ class ZaloPayController extends Controller
 
             if ($this->zaloPayService->verifyCallback(['data' => $dataStr, 'mac' => $mac])) {
                 $dataJson = json_decode($dataStr, true);
-                
+
                 // Extract order from app_trans_id or embed_data
                 // For mock, we've already handled status in processMock,
                 // but we implement this for architectural completeness.
-                
+
                 $result['return_code'] = 1;
                 $result['return_message'] = 'success';
             } else {

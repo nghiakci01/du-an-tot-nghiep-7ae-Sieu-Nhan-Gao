@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('welcome');
 Route::get('/shop', [App\Http\Controllers\Frontend\ProductController::class, 'index'])->name('shop');
@@ -55,6 +55,9 @@ Route::get('auth/{provider}/callback', [App\Http\Controllers\Auth\SocialLoginCon
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])->name('account.index');
+    Route::get('/my-account/orders', function() {
+        return redirect()->route('account.index', ['#orders']);
+    })->name('account.orders');
     Route::post('/my-account/update', [App\Http\Controllers\Frontend\AccountController::class, 'update'])->name('account.update');
     Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'showOrder'])->name('account.orders.show');
     Route::post('/my-account/orders/{id}/cancel', [App\Http\Controllers\Frontend\AccountController::class, 'cancelOrder'])->name('account.orders.cancel');
@@ -113,7 +116,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             Route::post('vouchers/{voucher}/complete', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'complete'])->name('vouchers.complete');
             Route::get('api/variants/search', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'variantsSearch'])->name('api.variants.search');
             Route::get('stock', function () {
-                return "Stock Report Page (Coming Soon)";
+                return 'Stock Report Page (Coming Soon)';
             })->name('stock.index');
 
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
@@ -186,7 +189,7 @@ Route::get('/test-gemini', function () {
         $results[] = [
             'test' => $testName,
             'question' => $question,
-            'response' => $response
+            'response' => $response,
         ];
     }
 
@@ -198,5 +201,6 @@ Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'vi'])) {
         session(['locale' => $locale]);
     }
+
     return redirect()->back();
 })->name('lang.switch');

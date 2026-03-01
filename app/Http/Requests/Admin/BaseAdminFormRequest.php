@@ -23,6 +23,7 @@ abstract class BaseAdminFormRequest extends FormRequest
         // Lần đầu: thử validate bình thường
         try {
             parent::validateResolved();
+
             return;
         } catch (\ValueError $e) {
             // Chỉ retry nếu lỗi do empty path
@@ -30,7 +31,7 @@ abstract class BaseAdminFormRequest extends FormRequest
                 throw $e;
             }
 
-            Log::warning(static::class . ': ValueError caught — removing broken file uploads and retrying.', [
+            Log::warning(static::class.': ValueError caught — removing broken file uploads and retrying.', [
                 'error' => $e->getMessage(),
             ]);
         }
@@ -42,7 +43,7 @@ abstract class BaseAdminFormRequest extends FormRequest
             parent::validateResolved();
         } catch (\ValueError $e) {
             // Nếu vẫn lỗi, log và fail-safe (không crash)
-            Log::error(static::class . ': ValueError persists after cleanup — aborting file validation.', [
+            Log::error(static::class.': ValueError persists after cleanup — aborting file validation.', [
                 'error' => $e->getMessage(),
             ]);
             throw $e;
@@ -57,7 +58,9 @@ abstract class BaseAdminFormRequest extends FormRequest
         foreach ($this->files->all() as $key => $file) {
             $files = is_array($file) ? $file : [$file];
             foreach ($files as $f) {
-                if (! $f) continue;
+                if (! $f) {
+                    continue;
+                }
                 try {
                     if ($f->getError() !== UPLOAD_ERR_OK) {
                         $this->files->remove($key);

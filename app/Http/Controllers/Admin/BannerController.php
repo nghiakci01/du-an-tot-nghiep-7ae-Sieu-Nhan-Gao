@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreBannerRequest;
 use App\Http\Requests\Admin\UpdateBannerRequest;
-use App\Http\Controllers\Controller;
 use App\Models\Banner;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,6 +17,7 @@ class BannerController extends Controller
     public function index()
     {
         $banners = Banner::orderBy('position')->orderBy('sort_order')->latest()->get();
+
         return view('admin.banners.index', compact('banners'));
     }
 
@@ -50,7 +50,7 @@ class BannerController extends Controller
                 ]);
             }
 
-            $filename = 'banners/' . $file->hashName();
+            $filename = 'banners/'.$file->hashName();
             Storage::disk('public')->put($filename, file_get_contents($file->getPathname()));
             $data['image'] = $filename;
         }
@@ -95,7 +95,7 @@ class BannerController extends Controller
                 Storage::disk('public')->delete($banner->image);
             }
 
-            $filename = 'banners/' . $file->hashName();
+            $filename = 'banners/'.$file->hashName();
             Storage::disk('public')->put($filename, file_get_contents($file->getPathname()));
             $data['image'] = $filename;
         }

@@ -46,6 +46,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $order->load(['user', 'items.product', 'items.variant']);
+
         return view('admin.orders.show', compact('order'));
     }
 
@@ -84,6 +85,7 @@ class OrderController extends Controller
     public function print(Order $order)
     {
         $order->load(['user', 'items.product', 'items.variant']);
+
         return view('admin.orders.print', compact('order'));
     }
 

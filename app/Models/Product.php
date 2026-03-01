@@ -83,8 +83,9 @@ class Product extends Model
     public function getImageUrlAttribute()
     {
         if ($this->image && \Storage::disk('public')->exists($this->image)) {
-            return asset('storage/' . $this->image);
+            return asset('storage/'.$this->image);
         }
+
         return asset('frontend-assets/img/product/product21.jpg');
     }
 }

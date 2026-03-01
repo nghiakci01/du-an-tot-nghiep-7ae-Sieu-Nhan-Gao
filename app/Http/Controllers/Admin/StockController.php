@@ -12,6 +12,7 @@ class StockController extends Controller
     public function index()
     {
         $products = Product::with('variants')->latest()->paginate(10);
+
         return view('admin.stock.index', compact('products'));
     }
 
@@ -24,12 +25,12 @@ class StockController extends Controller
 
         $variant = ProductVariant::findOrFail($request->variant_id);
         $variant->update([
-            'stock_quantity' => $request->quantity
+            'stock_quantity' => $request->quantity,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Cập nhật tồn kho thành công cho SKU: ' . $variant->sku
+            'message' => 'Cập nhật tồn kho thành công cho SKU: '.$variant->sku,
         ]);
     }
 }

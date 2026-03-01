@@ -43,7 +43,6 @@ class RegisterController extends Controller
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
@@ -53,11 +52,11 @@ class RegisterController extends Controller
             'phone' => ['required', 'string', 'regex:/^0[0-9]{9}$/'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/'],
             'password' => [
-                'required', 
-                'string', 
-                'min:8', 
-                'confirmed', 
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
             ],
         ], [
             'name.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng.',
@@ -70,7 +69,6 @@ class RegisterController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
      * @return \App\Models\User
      */
     protected function create(array $data)
@@ -86,7 +84,6 @@ class RegisterController extends Controller
     /**
      * The user has been registered.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $user
      * @return mixed
      */
@@ -94,7 +91,7 @@ class RegisterController extends Controller
     {
         \App\Models\Coupon::create([
             'user_id' => $user->id,
-            'code' => 'WELCOME-' . strtoupper(\Illuminate\Support\Str::of(\Illuminate\Support\Str::random(8))->upper()),
+            'code' => 'WELCOME-'.strtoupper(\Illuminate\Support\Str::of(\Illuminate\Support\Str::random(8))->upper()),
             'type' => 'fixed',
             'value' => 100000,
             'min_order_amount' => 1000000,

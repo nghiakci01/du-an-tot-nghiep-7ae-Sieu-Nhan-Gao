@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Admin;
 
-use Illuminate\Http\UploadedFile;
 use App\Models\Category;
+use Illuminate\Http\UploadedFile;
 
 class StoreCategoryRequest extends BaseAdminFormRequest
 {
@@ -15,7 +15,7 @@ class StoreCategoryRequest extends BaseAdminFormRequest
     public function rules(): array
     {
         return [
-            'name'      => 'required|string|max:50|unique:categories,name',
+            'name' => 'required|string|max:50|unique:categories,name',
             'parent_id' => [
                 'nullable',
                 'exists:categories,id',
@@ -29,14 +29,14 @@ class StoreCategoryRequest extends BaseAdminFormRequest
                     }
                 },
             ],
-            'image'     => [
+            'image' => [
                 'nullable',
                 function ($attribute, $value, $fail) {
                     if (! $value instanceof UploadedFile) {
                         return;
                     }
                     try {
-                        $ext  = strtolower($value->getClientOriginalExtension());
+                        $ext = strtolower($value->getClientOriginalExtension());
                         $size = @$value->getSize();
                     } catch (\Throwable $e) {
                         return; // file lỗi, bỏ qua
@@ -57,10 +57,10 @@ class StoreCategoryRequest extends BaseAdminFormRequest
     public function messages(): array
     {
         return [
-            'name.required'    => 'Tên danh mục không được để trống.',
-            'name.string'      => 'Tên danh mục phải là chuỗi ký tự.',
-            'name.max'         => 'Tên danh mục không được vượt quá 50 ký tự.',
-            'name.unique'      => 'Tên danh mục này đã tồn tại.',
+            'name.required' => 'Tên danh mục không được để trống.',
+            'name.string' => 'Tên danh mục phải là chuỗi ký tự.',
+            'name.max' => 'Tên danh mục không được vượt quá 50 ký tự.',
+            'name.unique' => 'Tên danh mục này đã tồn tại.',
             'parent_id.exists' => 'Danh mục cha không hợp lệ.',
         ];
     }

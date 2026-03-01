@@ -4,10 +4,10 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\User;
 use App\Models\ProductVariant;
-use Illuminate\Support\Facades\DB;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ReportService
 {
@@ -24,7 +24,7 @@ class ReportService
             ->sum('final_total');
 
         $totalOrders = Order::whereBetween('created_at', [$startDate, $endDate])->count();
-        
+
         $newOrders = Order::where('status', Order::STATUS_PENDING)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->count();
@@ -62,7 +62,7 @@ class ReportService
             ->get();
 
         return [
-            'labels' => $revenueData->pluck('date')->map(fn($d) => Carbon::parse($d)->format('d/m'))->toArray(),
+            'labels' => $revenueData->pluck('date')->map(fn ($d) => Carbon::parse($d)->format('d/m'))->toArray(),
             'values' => $revenueData->pluck('total')->toArray(),
         ];
     }
@@ -83,6 +83,7 @@ class ReportService
 
         $labels = array_map(function ($status) {
             $order = new Order(['status' => $status]);
+
             return $order->status_text;
         }, array_keys($data));
 

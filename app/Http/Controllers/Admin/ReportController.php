@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Exports\OrdersExport;
+use App\Http\Controllers\Controller;
 use App\Services\ReportService;
-use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -28,8 +28,8 @@ class ReportController extends Controller
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : now()->endOfDay();
 
         return Excel::download(
-            new OrdersExport($startDate, $endDate), 
-            'orders-report-' . $startDate->format('Ymd') . '-' . $endDate->format('Ymd') . '.xlsx'
+            new OrdersExport($startDate, $endDate),
+            'orders-report-'.$startDate->format('Ymd').'-'.$endDate->format('Ymd').'.xlsx'
         );
     }
 
@@ -51,9 +51,9 @@ class ReportController extends Controller
             'topProducts' => $topProducts,
             'startDate' => $startDate->format('d/m/Y'),
             'endDate' => $endDate->format('d/m/Y'),
-            'generatedAt' => now()->format('d/m/Y H:i')
+            'generatedAt' => now()->format('d/m/Y H:i'),
         ]);
 
-        return $pdf->download('revenue-report-' . $startDate->format('Ymd') . '-' . $endDate->format('Ymd') . '.pdf');
+        return $pdf->download('revenue-report-'.$startDate->format('Ymd').'-'.$endDate->format('Ymd').'.pdf');
     }
 }

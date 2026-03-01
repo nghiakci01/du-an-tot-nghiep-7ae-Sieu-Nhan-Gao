@@ -23,9 +23,27 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            CategorySeeder::class,
-            ProductSeeder::class,
+            // Localized Lookups
+            SettingSeeder::class,
             ChatbotSettingSeeder::class,
+            
+            // Core Entities (Lookups first)
+            UserSeeder::class,
+            CategorySeeder::class,
+            BrandSeeder::class,
+            ColorSeeder::class,
+            SizeSeeder::class,
+            SupplierSeeder::class,
+            WarehouseSeeder::class,
+            
+            // Content & Products (Depends on above)
+            PostCategorySeeder::class,
+            PostSeeder::class,
+            ProductSeeder::class,
+            
+            // Interaction & Marketing (Depends on products/users)
+            ReviewSeeder::class,
+            CouponSeeder::class,
             BannerSeeder::class,
         ]);
     }

@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Order;
 
 class AccountController extends Controller
 {
@@ -16,9 +16,9 @@ class AccountController extends Controller
         $user = Auth::user();
         $orders = $user->orders()->orderBy('created_at', 'desc')->get();
         // Fetch active coupons: either general (user_id is null) or specific to this user
-        $coupons = \App\Models\Coupon::where(function($q) use ($user) {
-                $q->whereNull('user_id')->orWhere('user_id', $user->id);
-            })
+        $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
+            $q->whereNull('user_id')->orWhere('user_id', $user->id);
+        })
             ->where('is_active', true)
             ->where(function ($q) {
                 $q->whereNull('end_date')->orWhere('end_date', '>=', now());
@@ -67,7 +67,7 @@ class AccountController extends Controller
         }
 
         if ($request->filled('new_password')) {
-            if (!Hash::check($request->current_password, $user->password)) {
+            if (! Hash::check($request->current_password, $user->password)) {
                 return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
             }
             $user->password = Hash::make($request->new_password);
@@ -84,7 +84,7 @@ class AccountController extends Controller
         $order = $user->orders()->findOrFail($id);
 
         if ($order->status !== Order::STATUS_PENDING) {
-             return redirect()->back()->with('error', 'Orders can only be cancelled when the status is Pending.');
+            return redirect()->back()->with('error', 'Orders can only be cancelled when the status is Pending.');
         }
 
         try {

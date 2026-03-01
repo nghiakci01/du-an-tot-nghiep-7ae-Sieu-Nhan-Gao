@@ -14,6 +14,9 @@ return [
     'cart' => 'Cart',
     'checkout' => 'Checkout',
     'my_account' => 'My Account',
+    'my_orders' => 'My Orders',
+    'my_wishlist' => 'My Wish List',
+    'track_order' => 'Track Order',
     'admin' => 'Admin',
     'staff' => 'Staff',
     'language' => 'Language',
@@ -171,7 +174,7 @@ return [
     'size' => 'Size',
     'color' => 'Color',
     'edit' => 'Add similar product',
-    
+
     // Checkout - Reid Template
     'returning_customer' => 'Returning customer',
     'click_here_to_login' => 'Click here to login',

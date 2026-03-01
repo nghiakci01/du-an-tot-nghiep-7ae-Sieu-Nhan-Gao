@@ -50,7 +50,7 @@ class CheckoutController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'province' => 'required|string|in:' . implode(',', $provinces),
+            'province' => 'required|string|in:'.implode(',', $provinces),
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
             'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY,ZALOPAY',
@@ -95,7 +95,7 @@ class CheckoutController extends Controller
                 'shipping_fee' => $shippingFee,
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
-                'shipping_address' => $request->address . ', ' . $request->province . ' - ' . $request->phone . ' - ' . $request->name,
+                'shipping_address' => $request->address.', '.$request->province.' - '.$request->phone.' - '.$request->name,
                 'note' => $request->note,
             ]);
 
@@ -110,8 +110,8 @@ class CheckoutController extends Controller
             foreach ($cart as $id => $details) {
                 // Verify stock again
                 $variant = ProductVariant::find($details['variant_id']);
-                if (!$variant || $variant->stock_quantity < $details['quantity']) {
-                    throw new \Exception('Product ' . $details['name'] . ' (' . $details['size'] . '/' . $details['color'] . ') is out of stock.');
+                if (! $variant || $variant->stock_quantity < $details['quantity']) {
+                    throw new \Exception('Product '.$details['name'].' ('.$details['size'].'/'.$details['color'].') is out of stock.');
                 }
 
                 // Deduct stock
@@ -143,14 +143,15 @@ class CheckoutController extends Controller
             try {
                 \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
             } catch (\Exception $e) {
-                \Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: ' . $e->getMessage());
+                \Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: '.$e->getMessage());
             }
 
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Order error: ' . $e->getMessage())->withInput();
+
+            return redirect()->back()->with('error', 'Order error: '.$e->getMessage())->withInput();
         }
     }
 
@@ -180,7 +181,7 @@ class CheckoutController extends Controller
         if (count($cart) == 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Your cart is empty.'
+                'message' => 'Your cart is empty.',
             ], 400);
         }
 
@@ -194,39 +195,39 @@ class CheckoutController extends Controller
         $couponCode = strtoupper(trim($request->coupon_code));
         $coupon = Coupon::where('code', $couponCode)->first();
 
-        if (!$coupon) {
+        if (! $coupon) {
             return response()->json([
                 'success' => false,
-                'message' => __('Mã giảm giá không tồn tại.')
+                'message' => __('Mã giảm giá không tồn tại.'),
             ], 404);
         }
 
         // Validate coupon
-        if (!$coupon->is_active) {
+        if (! $coupon->is_active) {
             return response()->json([
                 'success' => false,
-                'message' => __('Mã giảm giá này hiện không còn hoạt động.')
+                'message' => __('Mã giảm giá này hiện không còn hoạt động.'),
             ], 400);
         }
 
         if ($coupon->isNotYetStarted()) {
             return response()->json([
                 'success' => false,
-                'message' => __('Mã giảm giá này chưa đến thời gian sử dụng.')
+                'message' => __('Mã giảm giá này chưa đến thời gian sử dụng.'),
             ], 400);
         }
 
         if ($coupon->isExpired()) {
             return response()->json([
                 'success' => false,
-                'message' => __('Mã giảm giá này đã hết hạn.')
+                'message' => __('Mã giảm giá này đã hết hạn.'),
             ], 400);
         }
 
         if ($coupon->hasReachedUsageLimit()) {
             return response()->json([
                 'success' => false,
-                'message' => __('Mã giảm giá này đã hết lượt sử dụng.')
+                'message' => __('Mã giảm giá này đã hết lượt sử dụng.'),
             ], 400);
         }
 
@@ -234,14 +235,14 @@ class CheckoutController extends Controller
         if ($coupon->user_id && $coupon->user_id != Auth::id()) {
             return response()->json([
                 'success' => false,
-                'message' => __('Mã giảm giá này không dành cho tài khoản của bạn.')
+                'message' => __('Mã giảm giá này không dành cho tài khoản của bạn.'),
             ], 400);
         }
 
         if ($coupon->min_order_amount && $total < $coupon->min_order_amount) {
             return response()->json([
                 'success' => false,
-                'message' => __('Đơn hàng tối thiểu :amount để sử dụng mã này.', ['amount' => number_format($coupon->min_order_amount) . ' đ'])
+                'message' => __('Đơn hàng tối thiểu :amount để sử dụng mã này.', ['amount' => number_format($coupon->min_order_amount).' đ']),
             ], 400);
         }
 
@@ -259,10 +260,10 @@ class CheckoutController extends Controller
             'data' => [
                 'coupon_code' => $coupon->code,
                 'discount' => $discount,
-                'discount_formatted' => number_format($discount) . ' đ',
+                'discount_formatted' => number_format($discount).' đ',
                 'final_total' => $finalTotal,
-                'final_total_formatted' => number_format($finalTotal) . ' đ',
-            ]
+                'final_total_formatted' => number_format($finalTotal).' đ',
+            ],
         ]);
     }
 
@@ -275,7 +276,7 @@ class CheckoutController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Coupon removed.'
+            'message' => 'Coupon removed.',
         ]);
     }
 }

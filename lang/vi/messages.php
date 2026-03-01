@@ -14,6 +14,9 @@ return [
     'cart' => 'Giỏ hàng',
     'checkout' => 'Thanh toán',
     'my_account' => 'Tài khoản của tôi',
+    'my_orders' => 'Đơn hàng của tôi',
+    'my_wishlist' => 'Sp yêu thích',
+    'track_order' => 'Đơn hàng',
     'admin' => 'Quản trị',
     'staff' => 'Nhân viên',
     'language' => 'Ngôn ngữ',
@@ -172,7 +175,7 @@ return [
     'size' => 'Kích thước',
     'color' => 'Màu sắc',
     'edit' => 'thêm sản phẩm tương tự',
-    
+
     // Checkout - Reid Template
     'returning_customer' => 'Khách hàng cũ',
     'click_here_to_login' => 'Nhấn vào đây để đăng nhập',

@@ -5,8 +5,8 @@ namespace Tests\Feature\Admin;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Maatwebsite\Excel\Facades\Excel;
+use Tests\TestCase;
 
 class ReportTest extends TestCase
 {
@@ -34,7 +34,7 @@ class ReportTest extends TestCase
 
         $response = $this->get(route('admin.dashboard', [
             'start_date' => $startDate,
-            'end_date' => $endDate
+            'end_date' => $endDate,
         ]));
 
         $response->assertStatus(200);
@@ -51,7 +51,7 @@ class ReportTest extends TestCase
         $response = $this->get(route('admin.reports.orders.excel'));
 
         $response->assertStatus(200);
-        Excel::assertDownloaded('orders-report-' . now()->subDays(30)->format('Ymd') . '-' . now()->format('Ymd') . '.xlsx');
+        Excel::assertDownloaded('orders-report-'.now()->subDays(30)->format('Ymd').'-'.now()->format('Ymd').'.xlsx');
     }
 
     /** @test */

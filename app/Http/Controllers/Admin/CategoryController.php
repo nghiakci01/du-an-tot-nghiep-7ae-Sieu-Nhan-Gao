@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Http\Requests\Admin\StoreCategoryRequest;
 use App\Http\Requests\Admin\UpdateCategoryRequest;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -18,6 +17,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::with('parent')->paginate(10);
+
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -27,6 +27,7 @@ class CategoryController extends Controller
     public function create()
     {
         $categories = Category::whereNull('parent_id')->get(); // Only allowing 2 levels for simplicity initially, or list all for parent selection
+
         return view('admin.categories.create', compact('categories'));
     }
 
@@ -41,7 +42,7 @@ class CategoryController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             if ($file->isValid()) {
-                $filename = 'categories/' . $file->hashName();
+                $filename = 'categories/'.$file->hashName();
                 Storage::disk('public')->put($filename, file_get_contents($file->getPathname()));
                 $data['image'] = $filename;
             }
@@ -58,6 +59,7 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         $categories = Category::where('id', '!=', $category->id)->whereNull('parent_id')->get();
+
         return view('admin.categories.edit', compact('category', 'categories'));
     }
 
@@ -82,7 +84,7 @@ class CategoryController extends Controller
                 if ($category->image) {
                     Storage::disk('public')->delete($category->image);
                 }
-                $filename = 'categories/' . $file->hashName();
+                $filename = 'categories/'.$file->hashName();
                 Storage::disk('public')->put($filename, file_get_contents($file->getPathname()));
                 $data['image'] = $filename;
             }
@@ -101,9 +103,9 @@ class CategoryController extends Controller
         if ($category->children()->count() > 0) {
             return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục có danh mục con.');
         }
-        
+
         if ($category->products()->count() > 0) {
-             return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục có chứa sản phẩm.');
+            return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục có chứa sản phẩm.');
         }
 
         if ($category->image) {

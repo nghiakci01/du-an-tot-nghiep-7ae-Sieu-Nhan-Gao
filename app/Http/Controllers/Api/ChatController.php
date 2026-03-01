@@ -31,18 +31,18 @@ class ChatController extends Controller
                 'session_id' => $sessionId,
                 'user_id' => $userId,
                 'message' => $message,
-                'sender_type' => 'user'
+                'sender_type' => 'user',
             ]);
-            
+
             // 2. Check if Bot is enabled for this session
             $chatSession = \App\Models\ChatSession::where('session_id', $sessionId)->first();
             $isBotEnabled = $chatSession ? $chatSession->is_bot_enabled : true;
 
-            if (!$isBotEnabled) {
+            if (! $isBotEnabled) {
                 return response()->json([
                     'status' => 'success',
                     'reply' => null, // No bot reply
-                    'is_muted' => true
+                    'is_muted' => true,
                 ]);
             }
 
@@ -56,22 +56,23 @@ class ChatController extends Controller
                 'message' => $result['message'],
                 'sender_type' => 'bot',
                 'payload' => [
-                    'products' => $result['products'] ?? []
-                ]
+                    'products' => $result['products'] ?? [],
+                ],
             ]);
 
             return response()->json([
                 'status' => 'success',
                 'reply' => $result['message'],
                 'products' => $result['products'] ?? [],
-                'type' => $result['type'] ?? 'text'
+                'type' => $result['type'] ?? 'text',
             ]);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error("Chat API Error: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Chat API Error: '.$e->getMessage());
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Something went wrong',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -79,23 +80,23 @@ class ChatController extends Controller
     public function getMessages(Request $request)
     {
         $sessionId = $request->session()->getId();
-        
+
         $messages = \App\Models\ChatMessage::where('session_id', $sessionId)
             ->orderBy('created_at', 'asc')
             ->get();
 
         return response()->json([
             'status' => 'success',
-            'messages' => $messages->map(function($msg) {
+            'messages' => $messages->map(function ($msg) {
                 return [
                     'id' => $msg->id,
                     'text' => $msg->message,
                     'isUser' => $msg->sender_type === 'user',
                     'sender_type' => $msg->sender_type,
                     'time' => $msg->created_at->format('H:i'),
-                    'products' => $msg->payload['products'] ?? []
+                    'products' => $msg->payload['products'] ?? [],
                 ];
-            })
+            }),
         ]);
     }
 }

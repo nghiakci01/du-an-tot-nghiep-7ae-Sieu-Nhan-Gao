@@ -4,7 +4,6 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Color;
 use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\Size;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,7 +36,7 @@ class ProductVariantTest extends TestCase
     public function test_can_create_product_with_variants()
     {
         $category = \App\Models\Category::create(['name' => 'Test Category', 'slug' => 'test-category']);
-        
+
         $size = Size::first();
         $color = Color::first();
 
@@ -53,8 +52,8 @@ class ProductVariantTest extends TestCase
                     'price' => 110,
                     'stock_quantity' => 10,
                     'sku' => 'NP-S-RED',
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $response->assertStatus(302);
@@ -80,7 +79,7 @@ class ProductVariantTest extends TestCase
             'variants' => [
                 ['size_id' => $size->id, 'color_id' => $color->id, 'stock_quantity' => 10],
                 ['size_id' => $size->id, 'color_id' => $color->id, 'stock_quantity' => 10], // Duplicate
-            ]
+            ],
         ]);
 
         $response->assertSessionHasErrors(['variants']);
@@ -102,9 +101,9 @@ class ProductVariantTest extends TestCase
                     'color_id' => $color->id,
                     'price' => 100,
                     'sale_price' => 120, // Invalid: sale > regular
-                    'stock_quantity' => 10
+                    'stock_quantity' => 10,
                 ],
-            ]
+            ],
         ]);
 
         $response->assertSessionHasErrors(['variants.0.sale_price']);
@@ -119,10 +118,10 @@ class ProductVariantTest extends TestCase
             'category_id' => $category->id,
             'price' => 100,
         ]);
-        
+
         $size = Size::first();
         $color = Color::first();
-        
+
         $variant = $product->variants()->create([
             'size_id' => $size->id,
             'color_id' => $color->id,
@@ -145,8 +144,8 @@ class ProductVariantTest extends TestCase
                     'size_id' => $size->id,
                     'color_id' => $newColor->id, // Change color
                     'stock_quantity' => 20,
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $response->assertStatus(302);

@@ -21,10 +21,12 @@
                 <ul>
                     <li class="top_links">
                         @guest
-                            <a href="#">{{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
+                            <a href="{{ route('account.index') }}">{{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
                             <ul class="dropdown_links">
+                                <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li>
+                                <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
+                                <li><a href="{{ route('order-tracking.index') }}">{{ __('messages.track_order') }}</a></li>
                                 <li><a href="{{ route('login') }}">{{ __('messages.login') }}</a></li>
-                                <li><a href="{{ route('register') }}">{{ __('messages.register') }}</a></li>
                             </ul>
                         @else
                             <a href="#" style="display: flex; align-items: center; gap: 8px;">
@@ -41,6 +43,7 @@
                                 @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                                     <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? __('messages.admin') : __('messages.staff') }}</a></li>
                                 @endif
+                                <li><a href="{{ route('account.orders') }}">{{ __('messages.my_orders') }}</a></li>
                                 <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-offcanvas').submit();">{{ __('messages.logout') }}</a></li>
                                 <form id="logout-form-offcanvas" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                             </ul>
@@ -167,10 +170,12 @@
                                     <ul>
                                         <li class="top_links">
                                             @guest
-                                                <a href="#"><i class="ion-android-person"></i> {{ __('messages.account') }} <i class="ion-chevron-down"></i></a>
+                                                <a href="{{ route('account.index') }}"><i class="ion-android-person"></i> {{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
                                                 <ul class="dropdown_links">
+                                                    <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li>
+                                                    <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
+                                                    <li><a href="{{ route('order-tracking.index') }}">{{ __('messages.track_order') }}</a></li>
                                                     <li><a href="{{ route('login') }}">{{ __('messages.login') }}</a></li>
-                                                    <li><a href="{{ route('register') }}">{{ __('messages.register') }}</a></li>
                                                 </ul>
                                             @else
                                                 <a href="#" style="display: flex; align-items: center; gap: 8px;">
@@ -187,6 +192,7 @@
                                                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                                                         <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? __('messages.admin') : __('messages.staff') }}</a></li>
                                                     @endif
+                                                    <li><a href="{{ route('account.orders') }}">{{ __('messages.my_orders') }}</a></li>
                                                     <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('messages.logout') }}</a></li>
                                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                                                 </ul>

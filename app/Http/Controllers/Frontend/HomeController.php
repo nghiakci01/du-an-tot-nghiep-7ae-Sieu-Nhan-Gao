@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -25,16 +24,7 @@ class HomeController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        $topBanners = Banner::where('position', 'banner_top')
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->get();
 
-        $bottomBanners = Banner::where('position', 'banner_bottom')
-            ->where('is_active', true)
-            ->latest()
-            ->take(3)
-            ->get();
 
         // Sản phẩm nổi bật cho section "New Arrivals"
         $featuredProducts = Product::where('is_active', true)
@@ -58,7 +48,7 @@ class HomeController extends Controller
             ->take(10)
             ->get();
 
-        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders', 'topBanners', 'bottomBanners'));
+        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders'));
     }
 
     public function about()

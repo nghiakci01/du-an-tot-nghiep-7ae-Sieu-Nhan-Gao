@@ -11,6 +11,7 @@ class WarehouseController extends Controller
     public function index()
     {
         $warehouses = Warehouse::latest()->paginate(10);
+
         return view('admin.warehouses.index', compact('warehouses'));
     }
 
@@ -54,6 +55,7 @@ class WarehouseController extends Controller
     public function destroy(Warehouse $warehouse)
     {
         $warehouse->delete();
+
         return redirect()->route('admin.warehouses.index')->with('success', 'Kho hàng đã được xóa thành công.');
     }
 }

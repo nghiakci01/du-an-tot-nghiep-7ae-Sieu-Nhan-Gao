@@ -12,9 +12,10 @@ class UpdatePostRequest extends BaseAdminFormRequest
     public function rules(): array
     {
         $id = $this->route('post');
+
         return [
             'post_category_id' => 'required|exists:post_categories,id',
-            'title' => 'required|string|max:255|unique:posts,title,' . $id,
+            'title' => 'required|string|max:255|unique:posts,title,'.$id,
             'summary' => 'nullable|string|max:500',
             'content' => 'required|string',
             'image' => [

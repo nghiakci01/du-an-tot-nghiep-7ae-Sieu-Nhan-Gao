@@ -58,19 +58,20 @@ class ChatManagementController extends Controller
         $chatSession = \App\Models\ChatSession::where('session_id', $sessionId)->first();
 
         if ($chatSession) {
-            $chatSession->is_bot_enabled = !$chatSession->is_bot_enabled;
+            $chatSession->is_bot_enabled = ! $chatSession->is_bot_enabled;
             $chatSession->save();
             $status = $chatSession->is_bot_enabled ? 'đã bật' : 'đã tắt';
+
             return redirect()->back()->with('success', "Chatbot tự động {$status} cho hội thoại này!");
         }
 
-        return redirect()->back()->with('error', "Không tìm thấy phiên hội thoại.");
+        return redirect()->back()->with('error', 'Không tìm thấy phiên hội thoại.');
     }
 
     public function reply(Request $request, $sessionId)
     {
         $request->validate([
-            'message' => 'required|string'
+            'message' => 'required|string',
         ]);
 
         ChatMessage::create([
@@ -78,7 +79,7 @@ class ChatManagementController extends Controller
             'user_id' => auth()->id(),
             'message' => $request->message,
             'sender_type' => 'staff',
-            'is_read' => true
+            'is_read' => true,
         ]);
 
         // Auto-disable bot when staff replies to prevent interference
@@ -93,6 +94,7 @@ class ChatManagementController extends Controller
     public function destroy($sessionId)
     {
         ChatMessage::where('session_id', $sessionId)->delete();
+
         return redirect()->route('admin.chat.index')->with('success', 'Đã chuyển hội thoại vào thùng rác!');
     }
 
@@ -124,12 +126,14 @@ class ChatManagementController extends Controller
     public function restore($sessionId)
     {
         ChatMessage::onlyTrashed()->where('session_id', $sessionId)->restore();
+
         return redirect()->route('admin.chat.trash')->with('success', 'Đã khôi phục hội thoại!');
     }
 
     public function permanentDelete($sessionId)
     {
         ChatMessage::onlyTrashed()->where('session_id', $sessionId)->forceDelete();
+
         return redirect()->route('admin.chat.trash')->with('success', 'Đã xóa vĩnh viễn hội thoại!');
     }
 

@@ -13,6 +13,7 @@ class ContactMessageController extends Controller
     public function index()
     {
         $messages = \App\Models\ContactMessage::latest()->paginate(10);
+
         return view('admin.contact-messages.index', compact('messages'));
     }
 
@@ -22,11 +23,11 @@ class ContactMessageController extends Controller
     public function show(string $id)
     {
         $message = \App\Models\ContactMessage::findOrFail($id);
-        
+
         if ($message->status == 'unread') {
             $message->update(['status' => 'read']);
         }
-        
+
         return view('admin.contact-messages.show', compact('message'));
     }
 
@@ -36,7 +37,7 @@ class ContactMessageController extends Controller
     public function reply(Request $request, string $id)
     {
         $message = \App\Models\ContactMessage::findOrFail($id);
-        
+
         $request->validate([
             'reply_message' => 'required|string',
         ]);
@@ -56,7 +57,7 @@ class ContactMessageController extends Controller
                 ->with('success', 'Email phản hồi đã được gửi thành công.');
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Có lỗi xảy ra khi gửi email: ' . $e->getMessage());
+                ->with('error', 'Có lỗi xảy ra khi gửi email: '.$e->getMessage());
         }
     }
 
@@ -67,7 +68,7 @@ class ContactMessageController extends Controller
     {
         $message = \App\Models\ContactMessage::findOrFail($id);
         $message->delete();
-        
+
         return redirect()->route('admin.contact-messages.index')
             ->with('success', 'Xóa tin nhắn thành công.');
     }
