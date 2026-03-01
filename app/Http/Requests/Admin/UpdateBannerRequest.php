@@ -36,9 +36,11 @@ class UpdateBannerRequest extends BaseAdminFormRequest
 
                     // Check dimensions for sharp display
                     if ($this->input('position') === 'slider') {
-                        [$width, $height] = getimagesize($value->getRealPath());
-                        if ($width < 1521) {
-                            $fail('Ảnh cho Slider phải có chiều rộng tối thiểu 1521px để đảm bảo độ sắc nét. Khuyên dùng 3042px cho màn hình Retina.');
+                        if ($value->isValid() && ($path = $value->getRealPath())) {
+                            [$width, $height] = getimagesize($path);
+                            if ($width < 1521) {
+                                $fail('Ảnh cho Slider phải có chiều rộng tối thiểu 1521px để đảm bảo độ sắc nét. Khuyên dùng 3042px cho màn hình Retina.');
+                            }
                         }
                     }
                 },

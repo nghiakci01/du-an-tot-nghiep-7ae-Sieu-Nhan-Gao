@@ -181,4 +181,28 @@ class BannerTest extends TestCase
 
         $response->assertSessionHasErrors(['image']);
     }
+
+    /** @test */
+    public function banner_upload_with_invalid_file_does_not_trigger_500_error()
+    {
+        // Giả lập một file UploadedFile nhưng bị lỗi (ví dụ vượt quá kích thước PHP cho phép)
+        // Khi đó isValid() sẽ trả về false và getRealPath() có thể là false/empty
+        $file = new \Illuminate\Http\UploadedFile(
+            path: '',
+            originalName: 'large_image.jpg',
+            mimeType: 'image/jpeg',
+            error: UPLOAD_ERR_INI_SIZE,
+            test: true
+        );
+
+        $response = $this->actingAs($this->admin)->post(route('admin.banners.store'), [
+            'title' => 'Large Image',
+            'image' => $file,
+            'position' => 'slider',
+        ]);
+
+        // Thay vì lỗi 500 (ValueError), nó nên trả về lỗi validation bình thường
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors(['image']);
+    }
 }
