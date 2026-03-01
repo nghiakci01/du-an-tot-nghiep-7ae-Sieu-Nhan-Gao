@@ -13,16 +13,16 @@ class ColorSeeder extends Seeder
     public function run(): void
     {
         $colors = [
-            ['name' => 'Trắng', 'code' => '#FFFFFF'],
-            ['name' => 'Đen', 'code' => '#000000'],
-            ['name' => 'Đỏ', 'code' => '#FF0000'],
-            ['name' => 'Xanh dương', 'code' => '#0000FF'],
-            ['name' => 'Xanh lá', 'code' => '#00FF00'],
-            ['name' => 'Vàng', 'code' => '#FFFF00'],
-            ['name' => 'Xám', 'code' => '#808080'],
-            ['name' => 'Hồng', 'code' => '#FFC0CB'],
-            ['name' => 'Cam', 'code' => '#FFA500'],
-            ['name' => 'Nâu', 'code' => '#A52A2A'],
+            ['name' => 'Trắng', 'hex_code' => '#FFFFFF', 'is_active' => true],
+            ['name' => 'Đen', 'hex_code' => '#000000', 'is_active' => true],
+            ['name' => 'Đỏ', 'hex_code' => '#FF0000', 'is_active' => true],
+            ['name' => 'Xanh dương', 'hex_code' => '#0000FF', 'is_active' => true],
+            ['name' => 'Xanh lá', 'hex_code' => '#00FF00', 'is_active' => true],
+            ['name' => 'Vàng', 'hex_code' => '#FFFF00', 'is_active' => true],
+            ['name' => 'Xám', 'hex_code' => '#808080', 'is_active' => true],
+            ['name' => 'Hồng', 'hex_code' => '#FFC0CB', 'is_active' => true],
+            ['name' => 'Cam', 'hex_code' => '#FFA500', 'is_active' => true],
+            ['name' => 'Nâu', 'hex_code' => '#A52A2A', 'is_active' => true],
         ];
 
         foreach ($colors as $color) {

@@ -15,7 +15,7 @@ class SizeSeeder extends Seeder
         $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '28', '29', '30', '31', '32', '33', '34', '35', '36'];
 
         foreach ($sizes as $size) {
-            Size::firstOrCreate(['name' => $size]);
+            Size::firstOrCreate(['name' => $size], ['is_active' => true]);
         }
     }
 }
