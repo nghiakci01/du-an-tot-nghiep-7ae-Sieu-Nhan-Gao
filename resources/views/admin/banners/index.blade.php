@@ -48,6 +48,7 @@
                                                     @case('slider')
                                                         <span class="badge bg-light-info text-info">Wide Slider (1521x856)</span>
                                                         @break
+
                                                     @default
                                                         <span class="badge bg-light-secondary text-secondary">Legacy: {{ $banner->position }}</span>
                                                 @endswitch

@@ -61,10 +61,7 @@
                                     <div class="mb-3">
                                         <label for="position" class="form-label">Vị trí hiển thị <span class="text-danger">*</span></label>
                                         <select class="form-select @error('position') is-invalid @enderror" id="position" name="position">
-                                            <option value="slider" {{ $banner->position == 'slider' ? 'selected' : '' }}>Slider Chính (1521x856px)</option>
-                                            @if($banner->position != 'slider')
-                                                <option value="{{ $banner->position }}" selected>Legacy: {{ $banner->position }}</option>
-                                            @endif
+                                            <option value="slider" selected>Slider Chính (1521x856px)</option>
                                         </select>
                                         @error('position')
                                             <div class="invalid-feedback">{{ $message }}</div>

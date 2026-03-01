@@ -46,7 +46,7 @@ class StoreBannerRequest extends BaseAdminFormRequest
                 },
             ],
             'link' => 'nullable|string|max:255',
-            'position' => 'required|string|in:slider,banner_top,banner_bottom',
+            'position' => 'required|string|in:slider',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ];
