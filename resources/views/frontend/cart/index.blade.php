@@ -138,13 +138,13 @@
                                                             $stockQty = \App\Models\ProductVariant::find($id)?->stock_quantity ?? 100;
                                                         @endphp
                                                         <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
-                                                            class="quantity update-cart"
+                                                            class="quantity update-cart item-quantity"
                                                             data-stock="{{ $stockQty }}"
                                                             title="Còn {{ $stockQty }} sản phẩm trong kho">
                                                         <small class="d-block text-muted mt-1" style="font-size:11px;"
                                                             data-stock-label>Kho: {{ $stockQty }}</small>
                                                     </td>
-                                                    <td class="product_total">
+                                                    <td class="product_total item-total-price" data-price="{{ $details['price'] }}">
                                                         {{ number_format($details['price'] * $details['quantity']) }} VND</td>
                                                 </tr>
                                             @endforeach
@@ -317,6 +317,10 @@
                         $('#cart-grand-total').text(response.grand_total);
                         $('#cart-count').text(response.cart_count);
 
+                        // Cập nhật giá trị html cho item
+                        row.find('.product_total').text(response.item_total);
+                        calculateCartTotal(); // Tính toán lại theo các dòng được check
+
                         // Toast nhỏ xác nhận cập nhật
                         Swal.fire({
                             toast: true,
@@ -395,10 +399,53 @@
             });
         });
 
+        // Tính toán lại tổng tiền dựa trên các sản phẩm được check
+        function calculateCartTotal() {
+            let subtotal = 0;
+            
+            $('.check-item:checked').each(function() {
+                var row = $(this).closest('tr');
+                var price = parseFloat(row.find('.item-total-price').attr('data-price'));
+                var quantity = parseInt(row.find('.item-quantity').val());
+                if (!isNaN(price) && !isNaN(quantity)) {
+                    subtotal += (price * quantity);
+                }
+            });
+
+            // Cập nhật Subtotal
+            $('#cart-subtotal').text(new Intl.NumberFormat('vi-VN').format(subtotal) + ' đ');
+
+            // Phí ship (Giả lập logic: > 500k free ship, dưới thì 30k)
+            let shippingFee = 0;
+            if (subtotal > 0 && subtotal < 500000) {
+                shippingFee = 30000;
+            }
+            
+            if (shippingFee > 0) {
+                $('#shipping-fee span').text(new Intl.NumberFormat('vi-VN').format(shippingFee) + ' đ');
+            } else {
+                $('#shipping-fee span').text('{{ __("messages.free") }}');
+            }
+
+            // Tính discount nếu có mã (logic cơ bản hiển thị lại session discount)
+            let discountDoc = $('#cart-discount').text().replace(/[^\d]/g, '');
+            let discount = discountDoc ? parseInt(discountDoc) : 0;
+            if (!$("#discount-row").is(":visible")) {
+                discount = 0; 
+            }
+            
+            // Grand Total
+            let grandTotal = subtotal + shippingFee - discount;
+            if (grandTotal < 0) grandTotal = 0;
+            
+            $('#cart-grand-total').text(new Intl.NumberFormat('vi-VN').format(grandTotal) + ' đ');
+        }
+
         // Check All logic
         $('#check-all').on('change', function() {
             $('.check-item').prop('checked', $(this).prop('checked'));
             toggleDeleteSelectedBtn();
+            calculateCartTotal();
         });
 
         // Check Item logic
@@ -407,7 +454,12 @@
             var checkedItems = $('.check-item:checked').length;
             $('#check-all').prop('checked', totalItems === checkedItems && totalItems > 0);
             toggleDeleteSelectedBtn();
+            calculateCartTotal();
         });
+
+        // Initialize total calculation on page load (nếu cần tự check sẵn hoặc không)
+        // Mặc định tick tất cả khi load file
+        $('#check-all').prop('checked', true).trigger('change');
 
         function toggleDeleteSelectedBtn() {
             if ($('.check-item:checked').length > 0) {
