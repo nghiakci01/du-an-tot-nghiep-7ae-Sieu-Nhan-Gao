@@ -186,7 +186,7 @@
                                     </div>
                                 </div>
                             </div> -->
-                            <div class="col-lg-6 col-md-6 float-right">
+                            <div class="col-lg-6 col-md-6 offset-lg-6 offset-md-6">
                                 <div class="coupon_code right">
                                     <h3>{{ __('messages.cart_totals') }}</h3>
                                     <div class="coupon_inner">
