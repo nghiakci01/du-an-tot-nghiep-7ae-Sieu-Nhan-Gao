@@ -95,19 +95,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/system-settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
         Route::post('/system-settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 
+        // Admin & Staff Routes
+        Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+        Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
+        Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
+        Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
+        Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
+
+        // Product Attributes
+        Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
+        Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
+
         // Admin Only Routes
         Route::middleware(['admin.only'])->group(function () {
-            Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
-            Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
-            Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
             Route::get('payment-history', [App\Http\Controllers\Admin\PaymentHistoryController::class, 'index'])->name('payment-history.index');
             Route::resource('users', App\Http\Controllers\Admin\UserController::class);
-            Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
-            Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
-
-            // Product Attributes
-            Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
-            Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
             Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
 
             // Inventory Management

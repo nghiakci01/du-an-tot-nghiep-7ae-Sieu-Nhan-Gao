@@ -68,7 +68,7 @@
                         <use xlink:href="#custom-presentation-chart"></use>
                     </svg>
                 </li>
-                @if (auth()->user()->isAdmin())
+                @if (auth()->user()->isAdmin() || auth()->user()->isStaff())
                     <li class="pc-item">
                         <a href="{{ route('admin.categories.index') }}" class="pc-link">
                             <span class="pc-micon">
@@ -86,35 +86,11 @@
                         </a>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ route('admin.payment-history.index') }}" class="pc-link">
-                            <span class="pc-micon">
-                                <i class="ti ti-receipt"></i>
-                            </span>
-                            <span class="pc-mtext">Lịch sử thanh toán</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
                         <a href="{{ route('admin.products.index') }}" class="pc-link">
                             <span class="pc-micon">
                                 <i class="ti ti-box"></i>
                             </span>
                             <span class="pc-mtext">Sản phẩm</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('admin.banners.index') }}" class="pc-link">
-                            <span class="pc-micon">
-                                <i class="ti ti-photo"></i>
-                            </span>
-                            <span class="pc-mtext">Quản lý Banner</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('admin.coupons.index') }}" class="pc-link">
-                            <span class="pc-micon">
-                                <i class="ti ti-ticket"></i>
-                            </span>
-                            <span class="pc-mtext">Mã Giảm Giá</span>
                         </a>
                     </li>
                     <li class="pc-item pc-hasmenu">
@@ -139,6 +115,32 @@
                                 </a>
                             </li>
                         </ul>
+                    </li>
+                @endif
+                @if (auth()->user()->isAdmin())
+                    <li class="pc-item">
+                        <a href="{{ route('admin.payment-history.index') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-receipt"></i>
+                            </span>
+                            <span class="pc-mtext">Lịch sử thanh toán</span>
+                        </a>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('admin.banners.index') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-photo"></i>
+                            </span>
+                            <span class="pc-mtext">Quản lý Banner</span>
+                        </a>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('admin.coupons.index') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-ticket"></i>
+                            </span>
+                            <span class="pc-mtext">Mã Giảm Giá</span>
+                        </a>
                     </li>
                 @endif
                 <li class="pc-item pc-hasmenu">
