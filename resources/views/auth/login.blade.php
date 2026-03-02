@@ -281,8 +281,8 @@
 
                             <div class="input-group">
                                 <input type="tel" name="phone" class="auth-input" placeholder="Phone"
-                                    value="{{ old('phone') }}" required pattern="^0[0-9]{9}$" maxlength="10"
-                                    title="Phone number must be 10 digits and start with 0">
+                                    value="{{ old('phone') }}" required pattern="^(03|05|07|08|09)\d{8}$" maxlength="10"
+                                    title="Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số">
                                 @error('phone')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
@@ -290,8 +290,8 @@
 
                             <div class="input-group">
                                 <input type="email" name="email" class="auth-input" placeholder="Email"
-                                    value="{{ old('email') }}" required pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
-                                    title="Please enter a valid email format">
+                                    value="{{ old('email') }}" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                    title="Địa chỉ email không hợp lệ">
                                 @error('email')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror

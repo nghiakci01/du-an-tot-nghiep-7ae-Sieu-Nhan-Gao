@@ -33,7 +33,6 @@
         <p class="mb-0">Phương thức: 
             @if($order->payment_method == 'COD') Thanh toán khi nhận hàng (COD)
             @elseif($order->payment_method == 'BANK_TRANSFER') Chuyển khoản ngân hàng
-            @elseif($order->payment_method == 'VNPAY') Thanh toán qua VNPAY
             @else {{ $order->payment_method }}
             @endif
         </p>

@@ -426,7 +426,7 @@
                                     <label>{{ __('messages.phone_number') }} <span>*</span></label>
                                     <input type="tel" name="phone"
                                         value="{{ Auth::check() ? Auth::user()->phone : old('phone') }}" required
-                                        pattern="[0-9]{10,11}" class="@error('phone') is-invalid @enderror">
+                                        pattern="^(03|05|07|08|09)\d{8}$" class="@error('phone') is-invalid @enderror">
                                     @error('phone')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -577,35 +577,6 @@
                                     </div>
                                 </div>
 
-                                <div class="panel-default">
-                                    <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY"
-                                        data-bs-target="createp_account" required />
-                                    <label for="payment_vnpay" data-bs-toggle="collapse" data-bs-target="#method_vnpay"
-                                        aria-controls="method_vnpay">
-                                        {{ __('messages.vnpay_payment') }}
-                                    </label>
-
-                                    <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
-                                        <div class="card-body1">
-                                            <p>{{ __('messages.vnpay_description') }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="panel-default">
-                                    <input id="payment_zalopay" name="payment_method" type="radio" value="ZALOPAY"
-                                        data-bs-target="createp_account" required />
-                                    <label for="payment_zalopay" data-bs-toggle="collapse" data-bs-target="#method_zalopay"
-                                        aria-controls="method_zalopay">
-                                        Thanh toán qua Ví điện tử ZaloPay
-                                    </label>
-
-                                    <div id="method_zalopay" class="collapse" data-bs-parent="#accordion">
-                                        <div class="card-body1">
-                                            <p>Thanh toán nhanh chóng, an toàn qua ứng dụng ZaloPay hoặc quét mã QR.</p>
-                                        </div>
-                                    </div>
-                                </div>
 
 
                                 <div class="order_button">
@@ -711,12 +682,12 @@
             }
             function validatePhone(value) {
                 if (!value) return 'Vui lòng nhập số điện thoại';
-                if (!/^[0-9]{10,11}$/.test(value)) return 'Số điện thoại phải có 10-11 chữ số';
+                if (!/^(03|05|07|08|09)\d{8}$/.test(value)) return 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số';
                 return '';
             }
             function validateEmail(value) {
                 if (!value) return 'Vui lòng nhập email';
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Email không hợp lệ';
+                if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) return 'Email không hợp lệ';
                 return '';
             }
             function validateAddress(value) {
