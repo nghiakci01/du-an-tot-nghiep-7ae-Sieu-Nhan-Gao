@@ -458,68 +458,56 @@
                     <div class="instagram_wrapper instagram_column5 owl-carousel">
                         <div class="col-lg-3">
                             <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram.png" alt=""></a>
+                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram.png" alt=""></a>
                                 <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram.png"><i
-                                            class="fa fa-instagram"></i></a>
+                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-3">
                             <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram1.png" alt=""></a>
+                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram1.png" alt=""></a>
                                 <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram1.png"><i
-                                            class="fa fa-instagram"></i></a>
+                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-3">
                             <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram2.png" alt=""></a>
+                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram2.png" alt=""></a>
                                 <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram2.png"><i
-                                            class="fa fa-instagram"></i></a>
+                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-3">
                             <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram3(1).png" alt=""></a>
+                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram3(1).png" alt=""></a>
                                 <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram3(1).png"><i
-                                            class="fa fa-instagram"></i></a>
+                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-3">
                             <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram4(1).png" alt=""></a>
+                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram4(1).png" alt=""></a>
                                 <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram4(1).png"><i
-                                            class="fa fa-instagram"></i></a>
+                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-3">
                             <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram1.png" alt=""></a>
+                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram1.png" alt=""></a>
                                 <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram1.png"><i
-                                            class="fa fa-instagram"></i></a>
+                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="text_follow">
-                            <a href="#">{{ __('messages.follow_us_hashtag') }}</a>
+                            <a href="https://www.instagram.com/" target="_blank">{{ __('messages.follow_us_hashtag') }}</a>
                         </div>
                     </div>
                 </div>
