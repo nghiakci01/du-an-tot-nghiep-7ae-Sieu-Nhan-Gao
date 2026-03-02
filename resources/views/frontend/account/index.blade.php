@@ -195,8 +195,10 @@
                                                     </div>
                                                     <div class="col-12">
                                                         <label>{{ __('messages.phone_number') }}</label>
-                                                        <input type="text" name="phone"
-                                                            value="{{ old('phone', $user->phone) }}">
+                                                        <input type="tel" name="phone"
+                                                            value="{{ old('phone', $user->phone) }}"
+                                                            pattern="^(03|05|07|08|09)\d{8}$"
+                                                            title="Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số">
                                                     </div>
                                                     <div class="col-12">
                                                         <label>{{ __('messages.email') }}</label>

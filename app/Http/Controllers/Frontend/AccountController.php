@@ -50,10 +50,12 @@ class AccountController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
+            'phone' => ['nullable', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'current_password' => 'required_with:new_password|nullable',
             'new_password' => 'nullable|min:8|confirmed',
+        ], [
+            'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
         ]);
 
         $user->name = $request->name;
