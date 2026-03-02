@@ -169,7 +169,7 @@
                     <!--coupon code area start-->
                     <div class="coupon_area">
                         <div class="row">
-                            <div class="col-lg-6 col-md-6">
+                            <!-- <div class="col-lg-6 col-md-6">
                                 <div class="coupon_code left">
                                     <h3>{{ __('messages.coupon_code') }}</h3>
                                     <div class="coupon_inner">
@@ -185,8 +185,8 @@
                                         <div id="coupon-message"></div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6">
+                            </div> -->
+                            <div class="col-lg-6 col-md-6 float-right">
                                 <div class="coupon_code right">
                                     <h3>{{ __('messages.cart_totals') }}</h3>
                                     <div class="coupon_inner">
@@ -194,7 +194,7 @@
                                             <p>{{ __('messages.subtotal') }}</p>
                                             <p class="cart_amount" id="cart-subtotal">{{ number_format($total) }} VND</p>
                                         </div>
-                                        <div class="cart_subtotal ">
+                                        <div class="cart_subtotal">
                                             <p>{{ __('messages.shipping') }}</p>
                                             @php
                                                 $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
