@@ -577,35 +577,6 @@
                                     </div>
                                 </div>
 
-                                <div class="panel-default">
-                                    <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY"
-                                        data-bs-target="createp_account" required />
-                                    <label for="payment_vnpay" data-bs-toggle="collapse" data-bs-target="#method_vnpay"
-                                        aria-controls="method_vnpay">
-                                        {{ __('messages.vnpay_payment') }}
-                                    </label>
-
-                                    <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
-                                        <div class="card-body1">
-                                            <p>{{ __('messages.vnpay_description') }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="panel-default">
-                                    <input id="payment_zalopay" name="payment_method" type="radio" value="ZALOPAY"
-                                        data-bs-target="createp_account" required />
-                                    <label for="payment_zalopay" data-bs-toggle="collapse" data-bs-target="#method_zalopay"
-                                        aria-controls="method_zalopay">
-                                        Thanh toán qua Ví điện tử ZaloPay
-                                    </label>
-
-                                    <div id="method_zalopay" class="collapse" data-bs-parent="#accordion">
-                                        <div class="card-body1">
-                                            <p>Thanh toán nhanh chóng, an toàn qua ứng dụng ZaloPay hoặc quét mã QR.</p>
-                                        </div>
-                                    </div>
-                                </div>
 
 
                                 <div class="order_button">
