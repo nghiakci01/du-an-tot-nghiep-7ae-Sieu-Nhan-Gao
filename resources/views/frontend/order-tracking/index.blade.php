@@ -1,10 +1,29 @@
-@extends('layouts.app')
+@extends('layouts.public')
 
-@section('title', 'Tra cứu đơn hàng')
+@section('title', 'Tra cứu đơn hàng | FashionStore')
 
 @section('content')
-<div class="container py-5">
-    <div class="row justify-content-center">
+    <!--breadcrumbs area start-->
+    <div class="breadcrumbs_area other_bread">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb_content">
+                        <ul>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
+                            <li>/</li>
+                            <li>Tra cứu đơn hàng</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs area end-->
+
+<div class="tracking-area mt-5 mb-5">
+    <div class="container py-5">
+        <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
             <div class="text-center mb-4">
                 <h2 class="fw-bold">Tra cứu đơn hàng</h2>
@@ -42,10 +61,14 @@
                 </div>
             </div>
 
+                </div>
+            </div>
+
             <div class="mt-4 text-center">
                 <p class="text-muted small">Cần hỗ trợ? Liên hệ hotline: <a href="tel:0123456789" class="text-decoration-none fw-bold">0123.456.789</a></p>
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection

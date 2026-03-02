@@ -79,7 +79,7 @@
                     <div class="col-sm-12 col-md-9 col-lg-9">
                         <!-- Tab panes -->
                         <div class="tab-content dashboard_content">
-                            <div class="tab-pane fade show active" id="dashboard">
+                            <div class="tab-pane fade" id="dashboard">
                                 <h3>{{ __('messages.dashboard') }} </h3>
                                 <p>{!! __('messages.dashboard_desc') !!}</p>
                             </div>
@@ -159,7 +159,7 @@
                                     @endforelse
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="account-details">
+                            <div class="tab-pane fade show active" id="account-details">
                                 <h3>{{ __('messages.account_details') }} </h3>
                                 <div class="login">
                                     <div class="login_form_container">
