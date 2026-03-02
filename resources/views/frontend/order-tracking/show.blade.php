@@ -1,8 +1,29 @@
-@extends('layouts.app')
+@extends('layouts.public')
 
-@section('title', 'Chi tiết đơn hàng #' . $order->id)
+@section('title', 'Chi tiết đơn hàng #' . $order->id . ' | FashionStore')
 
 @section('content')
+    <!--breadcrumbs area start-->
+    <div class="breadcrumbs_area other_bread">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb_content">
+                        <ul>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
+                            <li>/</li>
+                            <li><a href="{{ route('order-tracking.index') }}">Tra cứu đơn hàng</a></li>
+                            <li>/</li>
+                            <li>Đơn hàng #{{ $order->id }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs area end-->
+
+<div class="tracking-area mt-5 mb-5">
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-10">
@@ -133,10 +154,10 @@
                 @if($order->status == 'completed')
                 <div class="col-12 mt-4">
                     <div class="alert alert-success border-0 shadow-sm p-4 d-flex align-items-center">
-                        <i class="fas fa-check-circle fs-1 me-4"></i>
+                        <i class="fa fa-check-circle fs-1 me-4"></i>
                         <div>
                             <h4 class="mb-1">Đơn hàng đã được hoàn tất!</h4>
-                            <p class="mb-0">Cảm ơn bạn đã lựa chọn Elite Fashion Store. Hy vọng sớm được phục vụ bạn lần nữa.</p>
+                            <p class="mb-0">Cảm ơn bạn đã lựa chọn cửa hàng chúng tôi. Hy vọng sớm được phục vụ bạn lần nữa.</p>
                         </div>
                     </div>
                 </div>
@@ -144,5 +165,6 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection
