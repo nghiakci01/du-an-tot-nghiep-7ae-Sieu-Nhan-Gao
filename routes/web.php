@@ -32,17 +32,6 @@ Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::clas
 Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
 Route::post('/checkout/remove-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeCoupon'])->name('checkout.removeCoupon');
 Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
-// VNPAY Payment Routes
-Route::get('/vnpay/payment/{order_id}', [App\Http\Controllers\Frontend\VnpayController::class, 'createPayment'])->name('vnpay.payment');
-Route::get('/vnpay/callback', [App\Http\Controllers\Frontend\VnpayController::class, 'callback'])->name('vnpay.callback');
-Route::get('/vnpay/return', [App\Http\Controllers\Frontend\VnpayController::class, 'vnpayReturn'])->name('vnpay.return');
-
-// ZaloPay Payment Routes
-Route::get('/zalopay/pay/{order}', [App\Http\Controllers\Frontend\ZaloPayController::class, 'pay'])->name('zalopay.pay');
-Route::get('/zalopay/mock-gateway', [App\Http\Controllers\Frontend\ZaloPayController::class, 'mockGateway'])->name('zalopay.mock_gateway');
-Route::post('/zalopay/process-mock', [App\Http\Controllers\Frontend\ZaloPayController::class, 'processMock'])->name('zalopay.process_mock');
-Route::get('/zalopay/return', [App\Http\Controllers\Frontend\ZaloPayController::class, 'return'])->name('zalopay.return');
-Route::post('/zalopay/callback', [App\Http\Controllers\Frontend\ZaloPayController::class, 'callback'])->name('zalopay.callback');
 
 // Guest Order Tracking Routes
 Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'index'])->name('order-tracking.index');

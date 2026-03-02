@@ -54,7 +54,7 @@ class CheckoutController extends Controller
             'province' => 'required|string|in:'.implode(',', $provinces),
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY,ZALOPAY',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER',
         ], [
             'phone.required' => 'Vui lòng nhập số điện thoại.',
             'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
@@ -136,13 +136,6 @@ class CheckoutController extends Controller
             // Clear cart and coupon session
             Session::forget(['cart', 'coupon_code', 'discount_amount']);
 
-            if ($request->payment_method === 'VNPAY') {
-                return app(VnpayController::class)->createPayment($order);
-            }
-
-            if ($request->payment_method === 'ZALOPAY') {
-                return app(ZaloPayController::class)->pay($order);
-            }
 
             // Send confirmation email for COD and BANK_TRANSFER
             try {
