@@ -46,6 +46,7 @@
                                     <table>
                                         <thead>
                                             <tr>
+                                                <th class="product_check" style="width: 50px;"><input type="checkbox" id="check-all" style="width: 18px; height: 18px; cursor: pointer;"></th>
                                                 <th class="product_remove">{{ __('messages.remove') }}</th>
                                                 <th class="product_thumb">{{ __('messages.image') }}</th>
                                                 <th class="product_name">{{ __('messages.product') }}</th>
@@ -57,6 +58,9 @@
                                         <tbody>
                                             @foreach(session('cart') as $id => $details)
                                                                                         <tr data-id="{{ $id }}">
+                                                    <td class="product_check" style="vertical-align: middle;">
+                                                        <input type="checkbox" class="check-item" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;">
+                                                    </td>
                                                     <td class="product_remove">
                                                         <a href="javascript:void(0)" class="remove-from-cart">
                                                             <i class="fa fa-trash-o"></i>
@@ -151,6 +155,9 @@
                                     <a href="{{ route('shop') }}" class="btn btn-secondary">
                                         <i class="fa fa-arrow-left"></i> {{ __('messages.continue_shopping') }}
                                     </a>
+                                    <button type="button" class="btn btn-warning" id="delete-selected" style="display: none; margin-left: 10px; color: #fff;">
+                                        <i class="fa fa-trash"></i> Xóa mục đã chọn
+                                    </button>
                                     <button type="button" class="btn btn-danger" id="clear-cart">
                                         <i class="fa fa-trash"></i> {{ __('messages.clear_cart') }}
                                     </button>
@@ -383,6 +390,71 @@
                         error: function() {
                             Swal.fire({ icon: 'error', title: 'Lỗi!', text: '{{ __("messages.error_occurred") }}' });
                         }
+                    });
+                }
+            });
+        });
+
+        // Check All logic
+        $('#check-all').on('change', function() {
+            $('.check-item').prop('checked', $(this).prop('checked'));
+            toggleDeleteSelectedBtn();
+        });
+
+        // Check Item logic
+        $(document).on('change', '.check-item', function() {
+            var totalItems = $('.check-item').length;
+            var checkedItems = $('.check-item:checked').length;
+            $('#check-all').prop('checked', totalItems === checkedItems && totalItems > 0);
+            toggleDeleteSelectedBtn();
+        });
+
+        function toggleDeleteSelectedBtn() {
+            if ($('.check-item:checked').length > 0) {
+                $('#delete-selected').fadeIn(200);
+            } else {
+                $('#delete-selected').fadeOut(200);
+            }
+        }
+
+        // Xóa các item đã chọn
+        $('#delete-selected').on('click', function() {
+            var selectedRows = $('.check-item:checked').closest('tr');
+            if (selectedRows.length === 0) return;
+
+            Swal.fire({
+                title: 'Xóa các sản phẩm đã chọn?',
+                text: `Bạn có chắc muốn xóa ${selectedRows.length} sản phẩm đã chọn khỏi giỏ hàng?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ef233c',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Đang xóa...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
+                    var promises = [];
+                    selectedRows.each(function() {
+                        var id = $(this).attr('data-id');
+                        promises.push(
+                            $.ajax({
+                                url: '{{ route("cart.remove") }}',
+                                method: 'POST',
+                                data: { _token: '{{ csrf_token() }}', _method: 'DELETE', id: id }
+                            })
+                        );
+                    });
+
+                    Promise.all(promises).then(function() {
+                        window.location.reload();
+                    }).catch(function() {
+                        window.location.reload();
                     });
                 }
             });
