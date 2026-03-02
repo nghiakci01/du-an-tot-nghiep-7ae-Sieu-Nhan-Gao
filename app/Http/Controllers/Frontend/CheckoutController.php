@@ -49,12 +49,17 @@ class CheckoutController extends Controller
         $provinces = config('vietnam_provinces');
         $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
+            'email' => 'required|email:rfc,dns|max:255',
             'province' => 'required|string|in:'.implode(',', $provinces),
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
             'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY,ZALOPAY',
         ], [
+            'phone.required' => 'Vui lòng nhập số điện thoại.',
+            'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
+            'email.required' => 'Vui lòng nhập địa chỉ email.',
+            'email.email' => 'Địa chỉ email không hợp lệ.',
             'province.required' => 'Vui lòng chọn tỉnh thành.',
             'province.in' => 'Tỉnh thành không hợp lệ.',
         ]);

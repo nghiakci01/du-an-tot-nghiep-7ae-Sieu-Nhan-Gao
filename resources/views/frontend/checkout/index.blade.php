@@ -426,7 +426,7 @@
                                     <label>{{ __('messages.phone_number') }} <span>*</span></label>
                                     <input type="tel" name="phone"
                                         value="{{ Auth::check() ? Auth::user()->phone : old('phone') }}" required
-                                        pattern="[0-9]{10,11}" class="@error('phone') is-invalid @enderror">
+                                        pattern="^(03|05|07|08|09)\d{8}$" class="@error('phone') is-invalid @enderror">
                                     @error('phone')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -711,12 +711,12 @@
             }
             function validatePhone(value) {
                 if (!value) return 'Vui lòng nhập số điện thoại';
-                if (!/^[0-9]{10,11}$/.test(value)) return 'Số điện thoại phải có 10-11 chữ số';
+                if (!/^(03|05|07|08|09)\d{8}$/.test(value)) return 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số';
                 return '';
             }
             function validateEmail(value) {
                 if (!value) return 'Vui lòng nhập email';
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Email không hợp lệ';
+                if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) return 'Email không hợp lệ';
                 return '';
             }
             function validateAddress(value) {
