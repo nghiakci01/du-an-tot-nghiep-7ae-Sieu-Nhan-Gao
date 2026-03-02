@@ -89,7 +89,7 @@
                                                 class="btn btn-info btn-sm">Xem</a>
                                             <a href="{{ route('admin.orders.edit', $order) }}"
                                                 class="btn btn-warning btn-sm">Sửa</a>
-                                            @if($order->status === \App\Models\Order::STATUS_CANCELLED || $order->status === \App\Models\Order::STATUS_COMPLETED)
+                                            <!-- @if($order->status === \App\Models\Order::STATUS_CANCELLED || $order->status === \App\Models\Order::STATUS_COMPLETED)
                                                 <form id="delete-form-odr-{{ $order->id }}"
                                                     action="{{ route('admin.orders.destroy', $order) }}" method="POST"
                                                     class="d-inline">
@@ -98,7 +98,7 @@
                                                     <button type="button" class="btn btn-danger btn-sm"
                                                         onclick="confirmDelete('delete-form-odr-{{ $order->id }}')">Xóa</button>
                                                 </form>
-                                            @endif
+                                            @endif -->
                                         </td>
                                     </tr>
                                 @empty
