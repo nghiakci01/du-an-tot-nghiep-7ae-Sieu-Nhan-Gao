@@ -271,9 +271,9 @@
                             class="auth-form {{ request('tab') == 'register' ? 'active' : '' }}" id="register-form">
                             @csrf
                             <div class="input-group">
-                                <input type="text" name="name" class="auth-input" placeholder="Full Name"
+                                <input type="text" name="name" class="auth-input" placeholder=""
                                     value="{{ old('name') }}" required minlength="2" maxlength="50"
-                                    pattern="^[a-zA-ZÀ-ỹ\s]+$" title="Name can only contain letters and spaces">
+                                    pattern="^[a-zA-ZÀ-ỹ\s]+$" title="{{ __('messages.full_name.regex') }}">
                                 @error('name')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror

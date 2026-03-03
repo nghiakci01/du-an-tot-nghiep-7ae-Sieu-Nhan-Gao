@@ -269,5 +269,8 @@ return [
     'messages.forgot_password' => 'Quên mật khẩu?',
     'or_login_with'  => 'Hoặc đăng nhập bằng',
     'fb_login' => 'Đăng nhập bằng Facebook',
-    'google_login' => 'Đăng nhập bằng Google'
+    'google_login' => 'Đăng nhập bằng Google',
+    'full_name.regex' => 'Vui lòng nhập chỉ nhập chữ cái và dấu cách',
+    
+
 ];
