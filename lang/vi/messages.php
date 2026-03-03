@@ -266,5 +266,6 @@ return [
 
     //login/register 
     'email_or_username' => 'Nhập Email hoặc Tên người dùng',
-   'messages.forgot_password' => 'Quên mật khẩu?'
+    'messages.forgot_password' => 'Quên mật khẩu?',
+    'or_login_with'  => 'Hoặc đăng nhập bằng'
 ];

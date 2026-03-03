@@ -254,14 +254,14 @@
 
                             <a href="{{ route('password.request') }}" class="forgot-link">{{ __('messages.forgot_password') }}</a>
 
-                            <div class="social-divider">Or login with</div>
+                            <div class="social-divider">{{ __('messages.or_login_with') }}</div>
 
                             <div class="social-buttons">
                                 <a href="{{ route('social.login', 'facebook') }}" class="social-btn social-btn-facebook">
-                                    <i class="fa fa-facebook"></i> Login with Facebook
+                                    <i class="fa fa-facebook"></i> Login with Facebook {{ __('messages.fb_login') }}
                                 </a>
                                 <a href="{{ route('social.login', 'google') }}" class="social-btn social-btn-google">
-                                    <i class="fa fa-google"></i> Login with Google
+                                    <i class="fa fa-google"></i> Login with Google {{ __('messages.google_login') }}
                                 </a>
                             </div>
                         </form>
