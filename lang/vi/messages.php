@@ -62,7 +62,7 @@ return [
     'site_map' => 'Sơ đồ trang web',
     'contact_us' => 'Liên hệ',
     'address' => 'Địa chỉ',
-    'phone' => 'Điện thoại',
+    'phone' => 'Số điện thoại',
     'email' => 'Email',
     'join_newsletter' => 'Đăng ký nhận bản tin',
     'newsletter_desc' => 'Chất lượng vượt trội. Nhà máy đạo đức. Đăng ký để được miễn phí vận chuyển và đổi trả cho đơn hàng đầu tiên của bạn.',

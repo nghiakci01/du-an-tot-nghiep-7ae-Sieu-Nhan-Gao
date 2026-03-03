@@ -280,7 +280,7 @@
                             </div>
 
                             <div class="input-group">
-                                <input type="tel" name="phone" class="auth-input" placeholder="Phone"
+                                <input type="tel" name="phone" class="auth-input" placeholder="{{ __('messages.phone') }}"
                                     value="{{ old('phone') }}" required pattern="^(03|05|07|08|09)\d{8}$" maxlength="10"
                                     title="Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số">
                                 @error('phone')
