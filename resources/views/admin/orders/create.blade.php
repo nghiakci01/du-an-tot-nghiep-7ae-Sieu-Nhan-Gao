@@ -282,6 +282,7 @@ $(document).ready(function() {
         let price = $(this).data('price');
         let size = $(this).data('size');
         let color = $(this).data('color');
+        let img = $(this).data('img');
 
         // Check if exists
         let existing = orderItems.find(i => i.variant_id == variantId);
@@ -295,6 +296,7 @@ $(document).ready(function() {
                 price: price,
                 size: size,
                 color: color,
+                img: img,
                 quantity: 1
             });
         }
@@ -338,23 +340,28 @@ $(document).ready(function() {
             subtotal += itemTotal;
             
             let details = [];
-            if (item.size) details.push(item.size);
-            if (item.color) details.push(item.color);
+            if (item.size && item.size !== 'undefined') details.push(item.size);
+            if (item.color && item.color !== 'undefined') details.push(item.color);
             let detailStr = details.length > 0 ? ` | ${details.join('/')}` : '';
 
             tbody.append(`
                 <tr>
                     <td>
-                        <strong>${item.name}</strong><br>
-                        <small class="text-muted">SKU: ${item.sku}${detailStr}</small>
-                        <input type="hidden" name="items[${idx}][variant_id]" value="${item.variant_id}">
+                        <div class="d-flex align-items-center">
+                            <img src="${item.img}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 15px; border: 1px solid #eee;">
+                            <div>
+                                <strong style="white-space: normal;">${item.name}</strong><br>
+                                <small class="text-muted">SKU: ${item.sku}${detailStr}</small>
+                                <input type="hidden" name="items[${idx}][variant_id]" value="${item.variant_id}">
+                            </div>
+                        </div>
                     </td>
-                    <td>${new Intl.NumberFormat('vi-VN').format(item.price)}đ</td>
-                    <td>
+                    <td class="align-middle">${new Intl.NumberFormat('vi-VN').format(item.price)}đ</td>
+                    <td class="align-middle">
                         <input type="number" name="items[${idx}][quantity]" class="form-control form-control-sm item-qty" data-idx="${idx}" value="${item.quantity}" min="1">
                     </td>
-                    <td>${new Intl.NumberFormat('vi-VN').format(itemTotal)}đ</td>
-                    <td>
+                    <td class="align-middle fw-bold text-primary">${new Intl.NumberFormat('vi-VN').format(itemTotal)}đ</td>
+                    <td class="align-middle text-center">
                         <button type="button" class="btn btn-danger btn-sm remove-item" data-idx="${idx}"><i class="feather icon-trash-2"></i></button>
                     </td>
                 </tr>
