@@ -200,7 +200,7 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">Home</a></li>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
                             <li>Account</li>
                         </ul>
