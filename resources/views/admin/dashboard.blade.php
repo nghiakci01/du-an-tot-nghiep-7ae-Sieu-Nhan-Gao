@@ -250,6 +250,45 @@
       </div>
     </div>
 
+    <!-- Recent Notifications Row -->
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-header d-flex justify-content-between align-items-center bg-transparent border-bottom-0 pb-0">
+            <h5 class="mb-0 fw-bold"><i class="ti ti-bell me-2 text-primary"></i>Thông báo mới nhất</h5>
+            <a href="{{ route('admin.notifications.index') }}" class="btn btn-sm btn-link-primary">Xem tất cả</a>
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              @forelse($admin_notifications ?? [] as $notification)
+                <a href="{{ route('admin.notifications.markAsRead', $notification->id) }}" 
+                   class="list-group-item list-group-item-action border-0 mb-2 rounded p-3 {{ $notification->read_at ? 'bg-light' : 'bg-light-primary border-start border-primary border-4' }}">
+                  <div class="d-flex w-100 justify-content-between align-items-start">
+                    <div>
+                      <h6 class="mb-1 fw-semibold text-dark">{{ $notification->data['message'] ?? 'Thông báo' }}</h6>
+                      <small class="text-muted d-block mt-1">
+                        <i class="ti ti-clock me-1"></i>{{ $notification->created_at->diffForHumans() }}
+                      </small>
+                    </div>
+                    @if(!$notification->read_at)
+                      <span class="badge bg-primary rounded-pill px-2 py-1">Mới</span>
+                    @endif
+                  </div>
+                </a>
+              @empty
+                <div class="text-center py-5">
+                  <i class="ti ti-bell-off f-40 text-muted opacity-50"></i>
+                  <p class="text-muted mb-0 mt-2">Tuyệt vời! Không có thông báo mới.</p>
+                </div>
+              @endforelse
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- You could add another card here for Balance/Quick Actions or leave it half-width -->
+    </div>
+
     <!-- Recent Orders Table -->
     <div class="col-lg-12">
       <div class="card">

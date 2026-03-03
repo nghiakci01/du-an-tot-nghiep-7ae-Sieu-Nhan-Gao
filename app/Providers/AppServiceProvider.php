@@ -25,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 
+        \App\Models\Order::observe(\App\Observers\OrderObserver::class);
+
         try {
             // Share categories globally for header menu
             // Using View::composer to avoid query on console commands if DB not ready,
@@ -74,6 +76,14 @@ class AppServiceProvider extends ServiceProvider
                     $view->with('settings', $settings);
                 } else {
                     $view->with('settings', []);
+                }
+
+                // Share notifications for Admin
+                if (auth()->check() && auth()->user()->role === \App\Models\User::ROLE_ADMIN) {
+                    $notifications = auth()->user()->unreadNotifications()->latest()->limit(5)->get();
+                    $unreadCount = auth()->user()->unreadNotifications()->count();
+                    $view->with('admin_notifications', $notifications);
+                    $view->with('admin_unread_count', $unreadCount);
                 }
             });
         } catch (\Exception $e) {

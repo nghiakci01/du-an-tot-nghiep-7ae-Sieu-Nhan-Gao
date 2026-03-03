@@ -76,6 +76,11 @@ class User extends Authenticatable
         return $this->hasMany(SocialAccount::class);
     }
 
+    public static function getAdmins()
+    {
+        return self::where('role', self::ROLE_ADMIN)->get();
+    }
+
     public function wishlists()
     {
         return $this->hasMany(Wishlist::class);
