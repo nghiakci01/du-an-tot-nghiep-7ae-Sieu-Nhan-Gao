@@ -106,10 +106,19 @@
                         alt="{{ config('app.name') }}"><br>
                     HÓA ĐƠN BÁN HÀNG
                 </td>
-                <td class="text-right">
+                <td class="text-right" style="vertical-align: top;">
+                    @php
+                        // Tạo nội dung QR Code: Mã đơn, SĐT Khách, Tổng tiền
+                        $qrContent = "DonHang:" . $order->id . "|SDT:" . ($order->user ? ($order->user->phone ?? 'N/A') : ($order->phone ? $order->phone : 'N/A')) . "|Tien:" . number_format($order->final_total ?? $order->total_price, 0, '', '');
+                        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=" . urlencode($qrContent);
+                    @endphp
                     Mã đơn: #{{ $order->id }}<br>
                     Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}<br>
                     Ngày in: {{ now()->format('d/m/Y H:i') }}
+                </td>
+                <td style="width: 90px; text-align: right; vertical-align: top;">
+                    <img src="{{ $qrCodeUrl }}" alt="Mã QR Đơn Hàng" style="width: 80px; height: 80px; border: 1px solid #ddd; padding: 2px;">
+                    <div style="font-size: 10px; margin-top: 3px; color: #666; text-align: center;">Mã theo dõi</div>
                 </td>
             </tr>
         </table>
