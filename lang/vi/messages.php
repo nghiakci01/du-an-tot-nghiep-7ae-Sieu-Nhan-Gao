@@ -100,6 +100,8 @@ return [
     'full_name_pattern' => 'Vui lòng nhập chỉ nhập chữ cái và dấu cách',
     'phone_pattern' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số',
     'email_pattern' => 'Địa chỉ email không hợp lệ',
+    'password_pattern' => 'Mật khẩu phải có độ dài từ 8 kí tự trở lên',
+    'confirm_password_pattern' => 'Mật khẩu phải có độ dài từ 8 kí tự trở lên',
 
     // News
     'latest_news' => 'Tin tức mới nhất',

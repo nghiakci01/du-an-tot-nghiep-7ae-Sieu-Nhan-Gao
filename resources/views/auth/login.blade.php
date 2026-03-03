@@ -299,7 +299,7 @@
 
                             <div class="input-group">
                                 <input type="password" name="password" class="auth-input" placeholder="{{ __('messages.password') }}"
-                                    required minlength="8" title="">
+                                    required minlength="8" title="{{ __('messages.password_pattern') }}">
                                 @error('password')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
