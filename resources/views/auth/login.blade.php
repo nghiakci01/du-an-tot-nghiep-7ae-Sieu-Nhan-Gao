@@ -271,7 +271,7 @@
                             class="auth-form {{ request('tab') == 'register' ? 'active' : '' }}" id="register-form">
                             @csrf
                             <div class="input-group">
-                                <input type="text" name="name" class="auth-input" placeholder=""
+                                <input type="text" name="name" class="auth-input" placeholder="{{ __('messages.full_name') }}"
                                     value="{{ old('name') }}" required minlength="2" maxlength="50"
                                     pattern="^[a-zA-ZÀ-ỹ\s]+$" title="{{ __('messages.full_name.regex') }}">
                                 @error('name')
