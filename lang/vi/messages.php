@@ -186,6 +186,7 @@ return [
     'click_here_to_login' => 'Nhấn vào đây để đăng nhập',
     'login_message' => 'Nếu bạn đã mua hàng với chúng tôi trước đây, vui lòng nhập thông tin bên dưới. Nếu bạn là khách hàng mới, vui lòng tiến hành điền thông tin thanh toán.',
     'password' => 'Mật khẩu',
+    'confirm_password' => 'Xác nhận mật khẩu',
     'remember_me' => 'Ghi nhớ đăng nhập',
     'lost_password' => 'Quên mật khẩu',
     'have_coupon' => 'Có mã giảm giá',
@@ -271,7 +272,6 @@ return [
 
     //login/register 
     'email_or_username' => 'Nhập Email hoặc Tên người dùng',
-    'messages.forgot_password' => 'Quên mật khẩu?',
     'or_login_with'  => 'Hoặc đăng nhập bằng',
     'fb_login' => 'Đăng nhập bằng Facebook',
     'google_login' => 'Đăng nhập bằng Google',

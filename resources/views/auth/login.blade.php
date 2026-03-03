@@ -252,7 +252,7 @@
 
                             <button type="submit" class="auth-btn auth-btn-login">{{ __('messages.login') }}</button>
 
-                            <a href="{{ route('password.request') }}" class="forgot-link">{{ __('messages.forgot_password') }}</a>
+                            <a href="{{ route('password.request') }}" class="forgot-link">{{ __('messages.lost_password') }}</a>
 
                             <div class="social-divider">{{ __('messages.or_login_with') }}</div>
 
@@ -307,7 +307,7 @@
 
                             <div class="input-group">
                                 <input type="password" name="password_confirmation" class="auth-input"
-                                    placeholder="Confirm password" required minlength="8">
+                                    placeholder="{{ __('messages.confirm_password') }}" required minlength="8">
                             </div>
 
                             <button type="submit" class="auth-btn auth-btn-register">Register</button>
