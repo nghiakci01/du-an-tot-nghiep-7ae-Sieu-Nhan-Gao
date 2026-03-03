@@ -15,7 +15,6 @@
                     <li class="breadcrumb-item"><a href="{{ route('admin.orders.index') }}">Đơn hàng</a></li>
                     <li class="breadcrumb-item"><a href="#!">Chi tiết</a></li>
                 </ul>
-            </div>
             <div class="col-md-12 text-end mt-3 d-flex justify-content-end align-items-center">
                 @php
                     $phone = $order->user ? ($order->user->phone ?? 'N/A') : ($order->phone ? $order->phone : 'N/A');
@@ -26,7 +25,12 @@
 
                     $qrContent = "Mã Đơn: #" . $order->id . "\nKhách: " . $name . "\nSĐT: " . $phone . "\nĐịa Chỉ: " . $address . "\nTổng Tiền: " . $total . "\nTrạng Thái: " . $status;
                     $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . urlencode($qrContent);
+                    $barcodeUrl = "https://barcode.tec-it.com/barcode.ashx?data=" . $order->id . "&code=Code128&translate-esc=true&dpi=96";
                 @endphp
+                <div class="me-3 text-center border p-1 bg-white rounded shadow-sm d-inline-block">
+                    <img src="{{ $barcodeUrl }}" alt="Mã Vạch Đơn Hàng" style="height: 60px; padding: 5px;">
+                    <div style="font-size: 10px; color: #555; margin-top: 2px;">Barcode Đơn</div>
+                </div>
                 <div class="me-3 text-center border p-1 bg-white rounded shadow-sm d-inline-block">
                     <img src="{{ $qrCodeUrl }}" alt="Mã QR Đơn Hàng" style="width: 80px; height: 80px;">
                     <div style="font-size: 10px; color: #555; margin-top: 2px;">Quét để xem</div>

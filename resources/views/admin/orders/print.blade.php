@@ -116,10 +116,15 @@
 
                         $qrContent = "Mã Đơn: #" . $order->id . "\nKhách: " . $name . "\nSĐT: " . $phone . "\nĐịa Chỉ: " . $address . "\nTổng Tiền: " . $total . "\nTrạng Thái: " . $status;
                         $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=" . urlencode($qrContent);
+                        // Tạo mã vạch (Barcode Code128) để quét bằng máy tít mã vạch
+                        $barcodeUrl = "https://barcode.tec-it.com/barcode.ashx?data=" . $order->id . "&code=Code128&translate-esc=true&dpi=96";
                     @endphp
                     Mã đơn: #{{ $order->id }}<br>
                     Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}<br>
                     Ngày in: {{ now()->format('d/m/Y H:i') }}
+                    <div style="margin-top: 10px;">
+                        <img src="{{ $barcodeUrl }}" alt="Mã Vạch Đơn Hàng" style="width: 150px; height: 50px;">
+                    </div>
                 </td>
                 <td style="width: 130px; text-align: right; vertical-align: top;">
                     <img src="{{ $qrCodeUrl }}" alt="Mã QR Đơn Hàng" style="width: 120px; height: 120px; border: 1px solid #ddd; padding: 2px;">
