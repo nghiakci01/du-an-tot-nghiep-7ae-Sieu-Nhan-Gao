@@ -3,7 +3,6 @@
 @section('title', 'Tất cả thông báo')
 
 @section('content')
-<div class="pc-container">
     <div class="pc-content">
         <div class="page-header">
             <div class="page-block">
@@ -79,5 +78,4 @@
             </div>
         </div>
     </div>
-</div>
 @endsection
