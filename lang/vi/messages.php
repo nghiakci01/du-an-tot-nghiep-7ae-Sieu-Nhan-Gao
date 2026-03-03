@@ -264,6 +264,7 @@ return [
     'in_stock' => 'Còn hàng',
     'please_login' => 'Vui lòng đăng nhập để tiếp tục',
 
-    //login/register
+    //login/register 
     'email_or_username' => 'Nhập Email hoặc Tên người dùng',
+   'messages.forgot_password' => 'Quên mật khẩu?'
 ];

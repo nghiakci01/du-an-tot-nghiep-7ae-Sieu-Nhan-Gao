@@ -252,7 +252,7 @@
 
                             <button type="submit" class="auth-btn auth-btn-login">{{ __('messages.login') }}</button>
 
-                            <a href="{{ route('password.request') }}" class="forgot-link">Forgot password?</a>
+                            <a href="{{ route('password.request') }}" class="forgot-link">{{ __('messages.forgot_password') }}</a>
 
                             <div class="social-divider">Or login with</div>
 
