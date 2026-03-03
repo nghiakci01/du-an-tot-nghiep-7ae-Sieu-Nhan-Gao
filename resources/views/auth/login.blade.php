@@ -226,7 +226,7 @@
                             </button>
                             <button type="button" class="auth-tab {{ request('tab') == 'register' ? 'active' : '' }}"
                                 data-tab="register">
-                                Register
+                                {{ __('messages.register') }}
                             </button>
                         </div>
 
