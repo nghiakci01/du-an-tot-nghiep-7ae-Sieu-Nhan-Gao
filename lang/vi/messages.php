@@ -267,5 +267,6 @@ return [
     //login/register 
     'email_or_username' => 'Nhập Email hoặc Tên người dùng',
     'messages.forgot_password' => 'Quên mật khẩu?',
-    'or_login_with'  => 'Hoặc đăng nhập bằng'
+    'or_login_with'  => 'Hoặc đăng nhập bằng',
+    'fb_login' => 'Đăng nhập bằng tài khoản Facebook',
 ];
