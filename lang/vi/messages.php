@@ -97,6 +97,9 @@ return [
     'phone_label' => 'Điện thoại',
     'email_label' => 'Email',
     'contact_success' => 'Cảm ơn bạn đã liên hệ với chúng tôi! Chúng tôi sẽ phản hồi sớm nhất có thể.',
+    'full_name_pattern' => 'Vui lòng nhập chỉ nhập chữ cái và dấu cách',
+    'phone_pattern' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số',
+    
 
     // News
     'latest_news' => 'Tin tức mới nhất',
@@ -270,7 +273,7 @@ return [
     'or_login_with'  => 'Hoặc đăng nhập bằng',
     'fb_login' => 'Đăng nhập bằng Facebook',
     'google_login' => 'Đăng nhập bằng Google',
-    'full_name.regex' => 'Vui lòng nhập chỉ nhập chữ cái và dấu cách',
+
     
 
 ];
