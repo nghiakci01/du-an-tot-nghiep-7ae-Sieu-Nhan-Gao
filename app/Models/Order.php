@@ -21,6 +21,8 @@ class Order extends Model
         'coupon_code',
         'discount_amount',
         'shipping_fee',
+        'shipping_provider',
+        'shipping_service_name',
         'final_total',
         'payment_method',
         'payment_status',
