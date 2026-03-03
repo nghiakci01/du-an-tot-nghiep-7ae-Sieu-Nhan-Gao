@@ -40,12 +40,19 @@
             scroll-behavior: smooth;
         }
 
-        /* Global Product Hover Effect */
+        /* Global Product Hover Effect & Consistent Sizing */
         .single_product .product_thumb {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Force square ratio */
             overflow: hidden !important;
+            background: #f9f9f9;
         }
 
         .single_product .product_thumb img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
             transition: transform 0.4s ease-in-out !important;
         }
 
