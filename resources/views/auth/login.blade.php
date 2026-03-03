@@ -244,7 +244,7 @@
                             </div>
 
                             <div class="input-group">
-                                <input type="password" name="password" class="auth-input" placeholder="Password" required>
+                                <input type="password" name="password" class="auth-input" placeholder="{{ __('messages.password') }}" required>
                                 @error('password')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
