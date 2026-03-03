@@ -263,4 +263,11 @@ return [
     'view_detail' => 'Xem chi tiết',
     'in_stock' => 'Còn hàng',
     'please_login' => 'Vui lòng đăng nhập để tiếp tục',
+
+    //login/register 
+    'email_or_username' => 'Nhập Email hoặc Tên người dùng',
+    'messages.forgot_password' => 'Quên mật khẩu?',
+    'or_login_with'  => 'Hoặc đăng nhập bằng',
+    'fb_login' => 'Đăng nhập bằng Facebook',
+    'google_login' => 'Đăng nhập bằng Google'
 ];

@@ -222,11 +222,11 @@
                             <button type="button"
                                 class="auth-tab {{ !request()->has('tab') || request('tab') == 'login' ? 'active' : '' }}"
                                 data-tab="login">
-                                Login
+                                {{ __('messages.login') }}
                             </button>
                             <button type="button" class="auth-tab {{ request('tab') == 'register' ? 'active' : '' }}"
                                 data-tab="register">
-                                Register
+                                {{ __('messages.register') }}
                             </button>
                         </div>
 
@@ -237,31 +237,31 @@
                             @csrf
                             <div class="input-group">
                                 <input type="email" name="email" class="auth-input"
-                                    placeholder="Enter email or Username" value="{{ old('email') }}" required>
+                                    placeholder="{{ __('messages.email_or_username') }}" value="{{ old('email') }}" required>
                                 @error('email')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="input-group">
-                                <input type="password" name="password" class="auth-input" placeholder="Password" required>
+                                <input type="password" name="password" class="auth-input" placeholder="{{ __('messages.password') }}" required>
                                 @error('password')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <button type="submit" class="auth-btn auth-btn-login">Login</button>
+                            <button type="submit" class="auth-btn auth-btn-login">{{ __('messages.login') }}</button>
 
-                            <a href="{{ route('password.request') }}" class="forgot-link">Forgot password?</a>
+                            <a href="{{ route('password.request') }}" class="forgot-link">{{ __('messages.forgot_password') }}</a>
 
-                            <div class="social-divider">Or login with</div>
+                            <div class="social-divider">{{ __('messages.or_login_with') }}</div>
 
                             <div class="social-buttons">
                                 <a href="{{ route('social.login', 'facebook') }}" class="social-btn social-btn-facebook">
-                                    <i class="fa fa-facebook"></i> Login with Facebook
+                                    <i class="fa fa-facebook"></i>{{ __('messages.fb_login') }}
                                 </a>
                                 <a href="{{ route('social.login', 'google') }}" class="social-btn social-btn-google">
-                                    <i class="fa fa-google"></i> Login with Google
+                                    <i class="fa fa-google"></i> {{ __('messages.google_login') }}
                                 </a>
                             </div>
                         </form>
