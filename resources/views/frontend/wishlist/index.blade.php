@@ -24,46 +24,34 @@
 </div>
 <!--breadcrumbs area end-->
 
-<div class="wishlist_area mt-60 mb-60">
-    <div class="container">
-        <div class="wishlist_container">
-            <!-- Sidebar -->
-            <aside class="wishlist_sidebar" id="wishlistSidebar">
-                <h4 class="mb-4">{{ __('messages.my_account') }}</h4>
-                @include('frontend.account.partials.sidebar')
-            </aside>
-
-            <!-- Main Content -->
-            <div class="wishlist_main">
-                <div class="mobile_sidebar_toggle" id="toggleSidebar">
-                    <i class="fa fa-bars mr-2"></i> {{ __('messages.account_menu') }}
-                </div>
-
-                @if(count($wishlists) > 0)
-                    <div class="table_desc wishlist bg-white p-3 rounded shadow-sm">
-                        <div class="cart_page table-responsive">
-                            <table>
+<!--wishlist area start -->
+<div class="wishlist_area mt-60">
+    <div class="container">   
+        <form action="#"> 
+            <div class="row">
+                <div class="col-12">
+                    @if(count($wishlists) > 0)
+                        <div class="wishlist_table table-responsive">
+                            <table class="table">
                                 <thead>
                                     <tr>
-                                        <th class="product_remove">{{ __('messages.remove') }}</th>
-                                        <th class="product_thumb">{{ __('messages.image') }}</th>
-                                        <th class="product_name">{{ __('messages.product') }}</th>
-                                        <th class="product-price">{{ __('messages.price') }}</th>
-                                        <th class="product_quantity">{{ __('messages.status') }}</th>
-                                        <th class="product_total">{{ __('messages.add_to_cart') }}</th>
+                                        <th class="product_remove">DELETE</th>
+                                        <th class="product_thumb">IMAGE</th>
+                                        <th class="product_name">PRODUCT</th>
+                                        <th class="product-price">PRICE</th>
+                                        <th class="product_quantity">STOCK STATUS</th>
+                                        <th class="product_total">ADD TO CART</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="bg-white">
                                     @foreach($wishlists as $wish)
                                         @php $product = $wish->product; @endphp
                                         <tr>
                                             <td class="product_remove">
-                                                <form action="{{ route('wishlist.destroy', $wish->id) }}" method="POST">
+                                                <form action="{{ route('wishlist.destroy', $wish->id) }}" method="POST" id="delete-form-{{ $wish->id }}">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-link text-danger" onclick="return confirm('{{ __('messages.confirm_remove_item') }}')">
-                                                        X
-                                                    </button>
+                                                    <a href="javascript:void(0)" onclick="if(confirm('{{ __('messages.confirm_remove_item') }}')) document.getElementById('delete-form-{{ $wish->id }}').submit();" class="text-danger">X</a>
                                                 </form>
                                             </td>
                                             <td class="product_thumb">
@@ -76,10 +64,9 @@
                                             </td>
                                             <td class="product-price">
                                                 @if($product->sale_price)
-                                                    <span class="old-price text-muted text-decoration-line-through">{{ number_format($product->price, 0, ',', '.') }}đ</span>
-                                                    <span class="new-price font-weight-bold ml-2">{{ number_format($product->sale_price, 0, ',', '.') }}đ</span>
+                                                    {{ number_format($product->sale_price, 0, ',', '.') }}đ
                                                 @else
-                                                    <span>{{ number_format($product->price, 0, ',', '.') }}đ</span>
+                                                    {{ number_format($product->price, 0, ',', '.') }}đ
                                                 @endif
                                             </td>
                                             <td class="product_quantity">
@@ -91,11 +78,11 @@
                                             </td>
                                             <td class="product_total">
                                                 @if($product->stock > 0)
-                                                    <a href="javascript:void(0)" class="btn btn-primary add-to-cart-btn" data-id="{{ $product->id }}">
-                                                        {{ __('messages.add_to_cart') }}
+                                                    <a href="javascript:void(0)" class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ $product->id }}">
+                                                        ADD TO CART
                                                     </a>
                                                 @else
-                                                    <button class="btn btn-secondary disabled" disabled>{{ __('messages.out_of_stock') }}</button>
+                                                    <button class="btn btn-secondary btn-sm disabled" disabled>OUT OF STOCK</button>
                                                 @endif
                                             </td>
                                         </tr>
@@ -103,33 +90,37 @@
                                 </tbody>
                             </table>   
                         </div>  
-                    </div>
-                @else
-                    <div class="text-center bg-white p-5 border-radius-8 shadow-sm">
-                        <i class="fa fa-heart-o text-muted mb-4" style="font-size: 60px; opacity: 0.3;"></i>
-                        <h3>{{ __('messages.wishlist_empty') }}</h3>
-                        <p class="text-muted">{{ __('messages.wishlist_empty_desc') }}</p>
-                        <a href="{{ route('shop') }}" class="btn btn-primary mt-3">{{ __('messages.continue_shopping') }}</a>
-                    </div>
-                @endif
-
-                <div class="row mt-4">
-                    <div class="col-12">
-                         <div class="wishlist_share">
-                            <h4>{{ __('messages.share_on') }}</h4>
-                            <ul>
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>           
-                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>           
-                                <li><a href="#"><i class="fa fa-instagram"></i></a></li>           
-                                <li><a href="#"><i class="fa fa-pinterest"></i></a></li>        
-                            </ul>      
+                    @else
+                        <div class="text-center bg-white p-5 border-radius-8 shadow-sm">
+                            <i class="fa fa-heart-o text-muted mb-4" style="font-size: 60px; opacity: 0.3;"></i>
+                            <h3>{{ __('messages.wishlist_empty') }}</h3>
+                            <p class="text-muted">{{ __('messages.wishlist_empty_desc') }}</p>
+                            <a href="{{ route('shop') }}" class="btn btn-primary mt-3">{{ __('messages.continue_shopping') }}</a>
                         </div>
-                    </div> 
+                    @endif
                 </div>
             </div>
-        </div>
+        </form> 
+        
+        @if(count($wishlists) > 0)
+            <div class="row">
+                <div class="col-12">
+                     <div class="wishlist_share">
+                        <h4>Share on:</h4>
+                        <ul>
+                            <li><a href="#"><i class="fa fa-rss"></i></a></li>           
+                            <li><a href="#"><i class="fa fa-vimeo"></i></a></li>           
+                            <li><a href="#"><i class="fa fa-tumblr"></i></a></li>           
+                            <li><a href="#"><i class="fa fa-pinterest"></i></a></li>        
+                            <li><a href="#"><i class="fa fa-linkedin"></i></a></li>        
+                        </ul>      
+                    </div>
+                </div> 
+            </div>
+        @endif
     </div>
 </div>
+<!--wishlist area end -->
 @endsection
 
 @section('scripts')

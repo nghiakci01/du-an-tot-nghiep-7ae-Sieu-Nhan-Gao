@@ -539,9 +539,9 @@
                                     </label>
 
                                     <div id="method_cod" class="collapse show" data-bs-parent="#accordion">
-                                        <div class="card-body1">
+                                        <!-- <div class="card-body1">
                                             <p>{{ __('messages.cod_description') }}</p>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
 
