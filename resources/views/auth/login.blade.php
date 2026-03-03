@@ -252,7 +252,7 @@
 
                             <button type="submit" class="auth-btn auth-btn-login">{{ __('messages.login') }}</button>
 
-                            <a href="{{ route('password.request') }}" class="forgot-link">{{ __('messages.forgot_password') }}</a>
+                            <a href="{{ route('password.request') }}" class="forgot-link">{{ __('messages.lost_password') }}</a>
 
                             <div class="social-divider">{{ __('messages.or_login_with') }}</div>
 
@@ -271,18 +271,18 @@
                             class="auth-form {{ request('tab') == 'register' ? 'active' : '' }}" id="register-form">
                             @csrf
                             <div class="input-group">
-                                <input type="text" name="name" class="auth-input" placeholder="Full Name"
+                                <input type="text" name="name" class="auth-input" placeholder="{{ __('messages.full_name') }}"
                                     value="{{ old('name') }}" required minlength="2" maxlength="50"
-                                    pattern="^[a-zA-ZÀ-ỹ\s]+$" title="Name can only contain letters and spaces">
+                                    pattern="^[a-zA-ZÀ-ỹ\s]+$" title="{{ __('messages.full_name_pattern') }}">
                                 @error('name')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="input-group">
-                                <input type="tel" name="phone" class="auth-input" placeholder="Phone"
+                                <input type="tel" name="phone" class="auth-input" placeholder="{{ __('messages.phone') }}"
                                     value="{{ old('phone') }}" required pattern="^(03|05|07|08|09)\d{8}$" maxlength="10"
-                                    title="Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số">
+                                    title="{{ __('messages.phone_pattern') }}">
                                 @error('phone')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
@@ -291,15 +291,15 @@
                             <div class="input-group">
                                 <input type="email" name="email" class="auth-input" placeholder="Email"
                                     value="{{ old('email') }}" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                                    title="Địa chỉ email không hợp lệ">
+                                    title="{{ __('messages.email_pattern') }}">
                                 @error('email')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="input-group">
-                                <input type="password" name="password" class="auth-input" placeholder="Your password"
-                                    required minlength="8" title="Password must be at least 8 characters">
+                                <input type="password" name="password" class="auth-input" placeholder="{{ __('messages.password') }}"
+                                    required minlength="8" title="{{ __('messages.password_pattern') }}">
                                 @error('password')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
@@ -307,10 +307,10 @@
 
                             <div class="input-group">
                                 <input type="password" name="password_confirmation" class="auth-input"
-                                    placeholder="Confirm password" required minlength="8">
+                                    placeholder="{{ __('messages.confirm_password') }}" required minlength="8">
                             </div>
 
-                            <button type="submit" class="auth-btn auth-btn-register">Register</button>
+                            <button type="submit" class="auth-btn auth-btn-register">{{ __('messages.register') }}</button>
                         </form>
                     </div>
                 </div>
