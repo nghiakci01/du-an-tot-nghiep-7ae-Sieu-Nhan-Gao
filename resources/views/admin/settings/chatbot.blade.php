@@ -60,45 +60,50 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Cấu hình chung</h5>
                             <div class="form-check form-switch mr-3">
-                                <input class="form-check-input" type="checkbox" name="chatbot_enabled" id="chatbot_enabled" value="1" {{ ($settings['chatbot_enabled'] ?? '0') == '1' ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" name="chatbot_enabled" id="chatbot_enabled" value="1" {{ old('chatbot_enabled', $chatbotSettings['chatbot_enabled'] ?? '0') == '1' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="chatbot_enabled">Kích hoạt Chatbot</label>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label">Chế độ hoạt động</label>
-                                <select name="chatbot_mode" id="chatbot_mode" class="form-select">
-                                    <option value="rules" {{ ($settings['chatbot_mode'] ?? '') == 'rules' ? 'selected' : '' }}>Rule-based (Từ khóa)</option>
-                                    <option value="ai" {{ ($settings['chatbot_mode'] ?? '') == 'ai' ? 'selected' : '' }}>AI Assistant (AI thông minh)</option>
+                                <select name="chatbot_mode" id="chatbot_mode" class="form-select @error('chatbot_mode') is-invalid @enderror">
+                                    <option value="rules" {{ old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'rules' ? 'selected' : '' }}>Rule-based (Từ khóa)</option>
+                                    <option value="ai" {{ old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai' ? 'selected' : '' }}>AI Assistant (AI thông minh)</option>
                                 </select>
+                                @error('chatbot_mode') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
-                            <div id="ai_provider_section" style="display: {{ ($settings['chatbot_mode'] ?? '') == 'ai' ? 'block' : 'none' }};">
+                            <div id="ai_provider_section" style="display: {{ old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai' ? 'block' : 'none' }};">
                                 <div class="mb-3">
                                     <label class="form-label">Nhà cung cấp AI</label>
-                                    <select name="ai_provider" id="ai_provider" class="form-select">
-                                        <option value="gemini" {{ ($settings['ai_provider'] ?? '') == 'gemini' ? 'selected' : '' }}>Google Gemini (Khuyên dùng)</option>
-                                        <option value="openai" {{ ($settings['ai_provider'] ?? '') == 'openai' ? 'selected' : '' }}>OpenAI (GPT-3.5/4)</option>
+                                    <select name="ai_provider" id="ai_provider" class="form-select @error('ai_provider') is-invalid @enderror">
+                                        <option value="gemini" {{ old('ai_provider', $chatbotSettings['ai_provider'] ?? '') == 'gemini' ? 'selected' : '' }}>Google Gemini (Khuyên dùng)</option>
+                                        <option value="openai" {{ old('ai_provider', $chatbotSettings['ai_provider'] ?? '') == 'openai' ? 'selected' : '' }}>OpenAI (GPT-3.5/4)</option>
                                     </select>
+                                    @error('ai_provider') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Câu chào mừng</label>
-                                <textarea name="greeting_message" class="form-control" rows="3">{{ $settings['greeting_message'] ?? '' }}</textarea>
+                                <textarea name="greeting_message" class="form-control @error('greeting_message') is-invalid @enderror" rows="3">{{ old('greeting_message', $chatbotSettings['greeting_message'] ?? '') }}</textarea>
+                                @error('greeting_message') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 <small class="text-muted">Hiển thị khi khách hàng lần đầu mở khung chat.</small>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Câu phản hồi khi không hiểu (Fallback)</label>
-                                <textarea name="fallback_message" class="form-control" rows="3">{{ $settings['fallback_message'] ?? '' }}</textarea>
+                                <textarea name="fallback_message" class="form-control @error('fallback_message') is-invalid @enderror" rows="3">{{ old('fallback_message', $chatbotSettings['fallback_message'] ?? '') }}</textarea>
+                                @error('fallback_message') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 <small class="text-muted">Sử dụng {hotline} để tự động chèn số điện thoại hỗ trợ.</small>
                             </div>
 
-                            <div id="system_instruction_section" style="display: {{ ($settings['chatbot_mode'] ?? '') == 'ai' ? 'block' : 'none' }};">
+                            <div id="system_instruction_section" style="display: {{ old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai' ? 'block' : 'none' }};">
                                 <div class="mb-3">
                                     <label class="form-label">System Instruction (Chỉ dẫn cho AI)</label>
-                                    <textarea name="system_instruction" class="form-control" rows="10">{{ $settings['system_instruction'] ?? '' }}</textarea>
+                                    <textarea name="system_instruction" class="form-control @error('system_instruction') is-invalid @enderror" rows="10">{{ old('system_instruction', $chatbotSettings['system_instruction'] ?? '') }}</textarea>
+                                    @error('system_instruction') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     <div class="mt-2">
                                         <small class="text-muted d-block">Đây là "linh hồn" của AI. Hãy định nghĩa <b>Bạn là ai</b>, <b>Bạn phải làm gì</b> và <b>Dữ liệu</b>.</small>
                                         <small class="text-info d-block">Có thể dùng biến: {hotline}, {email}, {categories}</small>
@@ -152,34 +157,38 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Số Hotline</label>
-                                    <input type="text" name="hotline" class="form-control" value="{{ $settings['hotline'] ?? '' }}">
+                                    <input type="text" name="hotline" class="form-control @error('hotline') is-invalid @enderror" value="{{ old('hotline', $chatbotSettings['hotline'] ?? '') }}">
+                                    @error('hotline') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Email hỗ trợ</label>
-                                    <input type="email" name="email" class="form-control" value="{{ $settings['email'] ?? '' }}">
+                                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $chatbotSettings['email'] ?? '') }}">
+                                    @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                             </div>
 
-                            <div id="gemini_key_section" class="provider-key-section" style="display: {{ ($settings['ai_provider'] ?? 'gemini') == 'gemini' ? 'block' : 'none' }};">
+                            <div id="gemini_key_section" class="provider-key-section" style="display: {{ old('ai_provider', $chatbotSettings['ai_provider'] ?? 'gemini') == 'gemini' ? 'block' : 'none' }};">
                                 <div class="mb-3">
                                     <label class="form-label">Gemini API Key</label>
                                     <div class="input-group">
-                                        <input type="password" name="gemini_api_key" id="gemini_api_key" class="form-control" value="{{ $settings['gemini_api_key'] ?? '' }}">
+                                        <input type="password" name="gemini_api_key" id="gemini_api_key" class="form-control @error('gemini_api_key') is-invalid @enderror" value="{{ old('gemini_api_key', $chatbotSettings['gemini_api_key'] ?? '') }}">
                                         <button type="button" class="btn btn-outline-info btn-test-connection" data-provider="gemini">
                                             <i class="ti ti-plug me-1"></i> Kiểm tra Gemini
                                         </button>
+                                        @error('gemini_api_key') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </div>
                                 </div>
                             </div>
 
-                            <div id="openai_key_section" class="provider-key-section" style="display: {{ ($settings['ai_provider'] ?? '') == 'openai' ? 'block' : 'none' }};">
+                            <div id="openai_key_section" class="provider-key-section" style="display: {{ old('ai_provider', $chatbotSettings['ai_provider'] ?? '') == 'openai' ? 'block' : 'none' }};">
                                 <div class="mb-3">
                                     <label class="form-label">OpenAI API Key</label>
                                     <div class="input-group">
-                                        <input type="password" name="openai_api_key" id="openai_api_key" class="form-control" value="{{ $settings['openai_api_key'] ?? '' }}">
+                                        <input type="password" name="openai_api_key" id="openai_api_key" class="form-control @error('openai_api_key') is-invalid @enderror" value="{{ old('openai_api_key', $chatbotSettings['openai_api_key'] ?? '') }}">
                                         <button type="button" class="btn btn-outline-info btn-test-connection" data-provider="openai">
                                             <i class="ti ti-plug me-1"></i> Kiểm tra OpenAI
                                         </button>
+                                        @error('openai_api_key') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </div>
                                 </div>
                             </div>
@@ -278,19 +287,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const geminiSection = document.getElementById('gemini_key_section');
     const openaiSection = document.getElementById('openai_key_section');
 
-    // Chuyển đổi hiển thị AI Provider & System Instruction
-    chatbotMode.addEventListener('change', function() {
-        const isAI = this.value === 'ai';
+    function syncSections() {
+        const isAI = chatbotMode.value === 'ai';
         aiProviderSection.style.display = isAI ? 'block' : 'none';
         systemInstructionSection.style.display = isAI ? 'block' : 'none';
-    });
+        
+        const provider = aiProvider.value;
+        const sections = document.querySelectorAll('.provider-key-section');
+        sections.forEach(s => s.style.display = 'none');
+        
+        if (isAI) {
+            const activeSection = document.getElementById(provider + '_key_section');
+            if (activeSection) activeSection.style.display = 'block';
+        }
+    }
 
-    // Chuyển đổi hiển thị API Keys
-    aiProvider.addEventListener('change', function() {
-        geminiSection.style.display = this.value === 'gemini' ? 'block' : 'none';
-        openaiSection.style.display = this.value === 'openai' ? 'block' : 'none';
-        document.getElementById('test-connection-result').style.display = 'none';
-    });
+    // Chuyển đổi hiển thị AI Provider & System Instruction
+    chatbotMode.addEventListener('change', syncSections);
+    aiProvider.addEventListener('change', syncSections);
+
+    // Run on load
+    syncSections();
 
     // Xử lý kiểm tra kết nối
     document.querySelectorAll('.btn-test-connection').forEach(btn => {
@@ -354,7 +371,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load existing rules - Safely pass from PHP to JS
     let rules = [];
     try {
-        const rawJson = @json($settings['keyword_rules'] ?? '[]');
+        // Ưu tiên lấy từ old() nếu có (khi validation lỗi), sau đó mới lấy từ database
+        const oldRules = @json(old('keyword_rules'));
+        const dbRules = @json($chatbotSettings['keyword_rules'] ?? '[]');
+        
+        const rawJson = (oldRules !== null && typeof oldRules !== 'undefined') ? oldRules : dbRules;
         rules = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
         if (!Array.isArray(rules)) rules = [];
     } catch (e) {
