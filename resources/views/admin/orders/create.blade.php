@@ -257,10 +257,15 @@ $(document).ready(function() {
                         if (colorStr) details.push(colorStr);
                         let detailStr = details.length > 0 ? ` - ${details.join('/')}` : '';
 
-                        html += `<a href="#" class="list-group-item list-group-item-action select-variant" 
-                            data-id="${variant.id}" data-name="${variant.product.name}" data-sku="${variant.sku}" data-price="${variant.price}" data-size="${sizeStr}" data-color="${colorStr}">
-                            [${variant.sku}] <strong>${variant.product.name}</strong>${detailStr}
-                            <span class="float-end text-primary fw-bold">${new Intl.NumberFormat('vi-VN').format(variant.price)}đ</span>
+                        html += `<a href="#" class="list-group-item list-group-item-action select-variant d-flex align-items-center" 
+                            data-id="${variant.id}" data-name="${variant.product.name}" data-sku="${variant.sku}" data-price="${variant.price}" data-size="${sizeStr}" data-color="${colorStr}" data-img="${variant.product.image}">
+                            <img src="${variant.product.image}" alt="${variant.product.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 15px;">
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>[${variant.sku}] <strong>${variant.product.name}</strong>${detailStr}</span>
+                                    <span class="text-primary fw-bold">${new Intl.NumberFormat('vi-VN').format(variant.price)}đ</span>
+                                </div>
+                            </div>
                         </a>`;
                     });
                 }

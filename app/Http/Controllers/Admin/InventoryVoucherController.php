@@ -146,6 +146,7 @@ class InventoryVoucherController extends Controller
                 'price' => $variant->price ?? ($variant->product->price ?? 0),
                 'product' => [
                     'name' => $variant->product->name,
+                    'image' => $variant->product->image_url,
                 ],
             ];
         });
