@@ -99,7 +99,7 @@ return [
     'contact_success' => 'Cảm ơn bạn đã liên hệ với chúng tôi! Chúng tôi sẽ phản hồi sớm nhất có thể.',
     'full_name_pattern' => 'Vui lòng nhập chỉ nhập chữ cái và dấu cách',
     'phone_pattern' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số',
-    
+    'email_pattern' => 'Địa chỉ email không hợp lệ',
 
     // News
     'latest_news' => 'Tin tức mới nhất',

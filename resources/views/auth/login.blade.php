@@ -291,15 +291,15 @@
                             <div class="input-group">
                                 <input type="email" name="email" class="auth-input" placeholder="Email"
                                     value="{{ old('email') }}" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                                    title="Địa chỉ email không hợp lệ">
+                                    title="{{ __('messages.email_pattern') }}">
                                 @error('email')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="input-group">
-                                <input type="password" name="password" class="auth-input" placeholder="Your password"
-                                    required minlength="8" title="Password must be at least 8 characters">
+                                <input type="password" name="password" class="auth-input" placeholder="{{ __('messages.password') }}"
+                                    required minlength="8" title="">
                                 @error('password')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
