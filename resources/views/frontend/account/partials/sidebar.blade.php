@@ -1,7 +1,8 @@
 <div class="dashboard_tab_button">
     <ul role="tablist" class="nav flex-column dashboard-list">
-        <li><a href="{{ route('account.index') }}#account-details" data-bs-toggle="tab" class="nav-link active">{{ __('messages.account_details') }}</a></li>
         <li><a href="{{ route('account.index') }}#dashboard" data-bs-toggle="tab" class="nav-link">{{ __('messages.dashboard') }}</a></li>
+        <li><a href="{{ route('wishlist.index') }}" class="{{ request()->routeIs('wishlist.index') ? 'nav-link active' : 'nav-link' }}">{{ __('messages.my_wishlist') }}</a></li>
+        <li><a href="{{ route('account.index') }}#account-details" data-bs-toggle="tab" class="nav-link active">{{ __('messages.account_details') }}</a></li>
         <li> <a href="{{ route('account.index') }}#orders" data-bs-toggle="tab" class="nav-link">{{ __('messages.orders') }}</a></li>
         <li> <a href="{{ route('account.index') }}#coupons" data-bs-toggle="tab" class="nav-link">{{ __('messages.my_coupons') }}</a></li>
         <li>
