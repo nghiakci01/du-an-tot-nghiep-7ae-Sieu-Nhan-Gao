@@ -51,7 +51,7 @@
     <div class="col-md-8">
         <div class="card shadow-sm">
             <div class="card-header bg-white border-bottom">
-                <h5 class="mb-0"><i class="feather icon-shopping-cart text-primary me-2"></i>Sản phẩm trong đơn</h5>
+                <h5 class="mb-0 text-dark"><i class="feather icon-shopping-cart text-primary me-2"></i>Sản phẩm trong đơn</h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -120,7 +120,7 @@
         <!-- Order History -->
         <div class="card shadow-sm mt-4">
             <div class="card-header bg-white border-bottom">
-                <h5 class="mb-0"><i class="feather icon-clock text-info me-2"></i>Lịch sử trạng thái đơn hàng</h5>
+                <h5 class="mb-0 text-dark"><i class="feather icon-clock text-info me-2"></i>Lịch sử trạng thái đơn hàng</h5>
             </div>
             <div class="card-body">
                 @if($order->histories->count() > 0)
@@ -156,7 +156,7 @@
         <!-- Status Update Card -->
         <div class="card shadow-sm mb-4 border-top border-primary border-3">
             <div class="card-header bg-white border-bottom">
-                <h5 class="mb-0">Trạng thái hiện tại</h5>
+                <h5 class="mb-0 text-dark">Trạng thái hiện tại</h5>
             </div>
             <div class="card-body text-center">
                 <h4 class="mb-3">
