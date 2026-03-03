@@ -16,7 +16,15 @@
                     <li class="breadcrumb-item"><a href="#!">Chi tiết</a></li>
                 </ul>
             </div>
-            <div class="col-md-12 text-end mt-3">
+            <div class="col-md-12 text-end mt-3 d-flex justify-content-end align-items-center">
+                @php
+                    $qrContent = "DonHang:" . $order->id . "|SDT:" . ($order->user ? ($order->user->phone ?? 'N/A') : ($order->phone ? $order->phone : 'N/A')) . "|Tien:" . number_format($order->final_total ?? $order->total_price, 0, '', '');
+                    $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=" . urlencode($qrContent);
+                @endphp
+                <div class="me-3 text-center border p-1 bg-white rounded shadow-sm d-inline-block">
+                    <img src="{{ $qrCodeUrl }}" alt="Mã QR Đơn Hàng" style="width: 60px; height: 60px;">
+                    <div style="font-size: 10px; color: #555; margin-top: 2px;">Mã theo dõi</div>
+                </div>
                 <a href="{{ route('admin.orders.print', $order->id) }}" target="_blank" class="btn btn-primary">
                     <i class="feather icon-printer"></i> In Hóa Đơn
                 </a>
