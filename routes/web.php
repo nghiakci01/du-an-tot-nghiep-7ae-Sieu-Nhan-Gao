@@ -42,8 +42,9 @@ Auth::routes();
 Route::get('auth/{provider}', [App\Http\Controllers\Auth\SocialLoginController::class, 'redirectToProvider'])->name('social.login');
 Route::get('auth/{provider}/callback', [App\Http\Controllers\Auth\SocialLoginController::class, 'handleProviderCallback'])->name('social.callback');
 
+Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])->name('account.index');
+
 Route::group(['middleware' => 'auth'], function () {
-    Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])->name('account.index');
     Route::get('/my-account/orders', function() {
         return redirect()->route('account.index', ['#orders']);
     })->name('account.orders');

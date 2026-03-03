@@ -31,7 +31,12 @@
                 </div>
                 <div class="col-sm-12 col-md-9 col-lg-9">
                     <div class="dashboard_content">
-                        <h3>Order Details (#{{ $order->id }})</h3>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3>Order Details (#{{ $order->id }})</h3>
+                            <a href="{{ route('order-tracking.index', ['order_id' => $order->id]) }}" class="btn btn-info text-white">
+                                <i class="fa fa-truck"></i> {{ __('messages.track_order') }}
+                            </a>
+                        </div>
 
                         {{-- Flash Messages --}}
                         @if(session('success'))

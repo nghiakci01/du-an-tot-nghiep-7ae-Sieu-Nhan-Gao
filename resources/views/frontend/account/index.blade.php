@@ -79,12 +79,25 @@
                     <div class="col-sm-12 col-md-9 col-lg-9">
                         <!-- Tab panes -->
                         <div class="tab-content dashboard_content">
-                            <div class="tab-pane fade" id="dashboard">
-                                <h3>{{ __('messages.dashboard') }} </h3>
-                                <p>{!! __('messages.dashboard_desc') !!}</p>
-                            </div>
+                             <div class="tab-pane fade" id="dashboard">
+                                 <h3>{{ __('messages.dashboard') }} </h3>
+                                 @if($user)
+                                    <p>{!! __('messages.dashboard_desc') !!}</p>
+                                 @else
+                                    <p>Chào mừng bạn đến với Elite! Hãy đăng nhập để quản lý đơn hàng và nhận ưu đãi riêng.</p>
+                                 @endif
+                             </div>
                             <div class="tab-pane fade" id="orders">
-                                <h3>{{ __('messages.orders') }}</h3>
+                                <div class="row align-items-center mb-3">
+                                    <div class="col">
+                                        <h3 class="mb-0">{{ __('messages.orders') }}</h3>
+                                    </div>
+                                    <div class="col-auto">
+                                        <a href="{{ route('order-tracking.index') }}" class="btn btn-info text-white">
+                                            <i class="fa fa-truck"></i> {{ __('messages.track_order') }}
+                                        </a>
+                                    </div>
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table">
                                         <thead>
@@ -111,6 +124,8 @@
                                                     <td>
                                                         <a href="{{ route('account.orders.show', $order->id) }}"
                                                             class="view btn btn-sm btn-primary">{{ __('messages.view') }}</a>
+                                                        <a href="{{ route('order-tracking.index', ['order_id' => $order->id]) }}"
+                                                            class="btn btn-sm btn-info text-white">{{ __('messages.track_order') }}</a>
                                                         @if($order->status == 'PENDING')
                                                             <form action="{{ route('account.orders.cancel', $order->id) }}"
                                                                 method="POST" class="d-inline"
@@ -124,7 +139,16 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="5" class="text-center">{{ __('messages.no_orders') }}</td>
+                                                    <td colspan="5" class="text-center">
+                                                        @if(!$user)
+                                                           <div class="py-4">
+                                                               <p>Tính năng xem lịch sử mua hàng chỉ dành cho thành viên.</p>
+                                                               <a href="{{ route('login') }}" class="btn btn-primary mt-2">Đăng nhập ngay</a>
+                                                           </div>
+                                                        @else
+                                                           {{ __('messages.no_orders') }}
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                             @endforelse
                                         </tbody>
@@ -237,8 +261,9 @@
                                     @endforelse
                                 </div>
                             </div>
-                            <div class="tab-pane fade show active" id="account-details">
-                                <h3>{{ __('messages.account_details') }} </h3>
+                             <div class="tab-pane fade show active" id="account-details">
+                                 <h3>{{ __('messages.account_details') }} </h3>
+                                 @if($user)
                                 <div class="login">
                                     <div class="login_form_container">
                                         <div class="account_login_form">
@@ -310,8 +335,14 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                                 @else
+                                 <div class="py-4 text-center">
+                                     <p>Vui lòng đăng nhập để xem và cập nhật thông tin tài khoản.</p>
+                                     <a href="{{ route('login') }}" class="btn btn-primary" style="background-color: #000;">Đăng nhập</a>
+                                 </div>
+                                 @endif
+                             </div>
+                         </div>
                     </div>
                 </div>
             </div>

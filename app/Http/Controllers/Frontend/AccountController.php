@@ -14,18 +14,26 @@ class AccountController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $orders = $user->orders()->orderBy('created_at', 'desc')->get();
-        // Fetch active coupons: either general (user_id is null) or specific to this user
-        $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
-            $q->whereNull('user_id')->orWhere('user_id', $user->id);
-        })
-            ->where('is_active', true)
-            ->where(function ($q) {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+        
+        if ($user) {
+            $orders = $user->orders()->orderBy('created_at', 'desc')->get();
+            // Fetch active coupons: either general (user_id is null) or specific to this user
+            $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
+                $q->whereNull('user_id')->orWhere('user_id', $user->id);
             })
-            ->whereRaw('used_count < usage_limit')
-            ->get();
-        $wishlists = $user->wishlists()->with('product')->get();
+                ->where('is_active', true)
+                ->where(function ($q) {
+                    $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+                })
+                ->whereRaw('used_count < usage_limit')
+                ->get();
+            $wishlists = $user->wishlists()->with('product')->get();
+        } else {
+            $orders = collect();
+            $coupons = collect();
+            $wishlists = collect();
+        }
+
         return view('frontend.account.index', compact('user', 'orders', 'coupons', 'wishlists'));
     }
 
