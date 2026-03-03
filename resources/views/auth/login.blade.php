@@ -261,7 +261,7 @@
                                     <i class="fa fa-facebook"></i>{{ __('messages.fb_login') }}
                                 </a>
                                 <a href="{{ route('social.login', 'google') }}" class="social-btn social-btn-google">
-                                    <i class="fa fa-google"></i> Login with Google {{ __('messages.google_login') }}
+                                    <i class="fa fa-google"></i> {{ __('messages.google_login') }}
                                 </a>
                             </div>
                         </form>
