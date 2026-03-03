@@ -129,7 +129,7 @@ class InventoryVoucherController extends Controller
     public function variantsSearch(Request $request)
     {
         $q = $request->q;
-        $variants = ProductVariant::with('product')
+        $variants = ProductVariant::with(['product.images', 'sizeRelationship', 'colorRelationship'])
             ->where('sku', 'like', "%$q%")
             ->orWhereHas('product', function ($query) use ($q) {
                 $query->where('name', 'like', "%$q%");
