@@ -189,6 +189,7 @@
                                                     <i class="ion-chevron-down"></i>
                                                 </a>
                                                 <ul class="dropdown_links">
+                                                    <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li>
                                                     <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
                                                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                                                         <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? __('messages.admin') : __('messages.staff') }}</a></li>
