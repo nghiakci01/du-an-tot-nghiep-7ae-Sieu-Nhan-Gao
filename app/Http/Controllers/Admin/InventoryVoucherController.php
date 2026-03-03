@@ -94,31 +94,43 @@ class InventoryVoucherController extends Controller
             DB::beginTransaction();
 
             foreach ($voucher->details as $detail) {
+                $variant = $detail->variant;
+                $currentStock = $variant->stock_quantity;
+                $currentCostPrice = $variant->cost_price;
+
+                // 1. Update Warehouse specific stock
                 $stock = WarehouseStock::firstOrNew([
                     'warehouse_id' => $voucher->warehouse_id,
                     'product_variant_id' => $detail->product_variant_id,
                 ]);
 
                 if ($voucher->type === 'INBOUND') {
+                    // Weighted Average Cost Calculation
+                    $newTotalStock = $currentStock + $detail->quantity;
+                    if ($newTotalStock > 0) {
+                        $newCostPrice = (($currentCostPrice * $currentStock) + ($detail->unit_price * $detail->quantity)) / $newTotalStock;
+                        $variant->cost_price = $newCostPrice;
+                    }
+
                     $stock->quantity += $detail->quantity;
                 } else {
                     if ($stock->quantity < $detail->quantity) {
-                        throw new \Exception("Sản phẩm {$detail->variant->sku} không đủ tồn kho trong kho này.");
+                        throw new \Exception("Sản phẩm {$variant->sku} không đủ tồn kho trong kho này.");
                     }
                     $stock->quantity -= $detail->quantity;
                 }
                 $stock->save();
 
-                // Sync global stock in product_variants
-                $globalStock = WarehouseStock::where('product_variant_id', $detail->product_variant_id)->sum('quantity');
-                $detail->variant->update(['stock_quantity' => $globalStock]);
+                // 2. Update Global stock
+                $variant->stock_quantity = WarehouseStock::where('product_variant_id', $detail->product_variant_id)->sum('quantity');
+                $variant->save();
             }
 
             $voucher->update(['status' => 'COMPLETED']);
 
             DB::commit();
 
-            return back()->with('success', 'Đã xác nhận hoàn tất phiếu kho và cập nhật tồn kho.');
+            return back()->with('success', 'Đã xác nhận hoàn tất phiếu kho. Hệ thống đã cập nhật tồn kho và tính toán lại giá vốn.');
         } catch (\Exception $e) {
             DB::rollBack();
 

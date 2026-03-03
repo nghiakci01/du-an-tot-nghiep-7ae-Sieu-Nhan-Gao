@@ -61,13 +61,40 @@
               <div class="col-12">
                 <h3 class="mb-1">{{ number_format($totalRevenue) }} VND</h3>
                 <p class="text-primary mb-0">
-                  <i class="ti ti-arrow-up-right"></i> Đơn hàng hoàn thành
+                  <i class="ti ti-arrow-up-right"></i> Đơn hoàn thành
                 </p>
               </div>
             </div>
           </div>
         </div>
       </a>
+    </div>
+
+    <div class="col-md-6 col-xxl-3">
+      <div class="card dashboard-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="avtar avtar-s bg-light-success">
+                <i class="ti ti-chart-arrows-vertical f-24"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="mb-0">Lợi Nhuận Ước Tính</h6>
+            </div>
+          </div>
+          <div class="bg-body p-3 mt-3 rounded">
+            <div class="mt-3 row align-items-center">
+              <div class="col-12">
+                <h3 class="mb-1">{{ number_format($totalProfit) }} VND</h3>
+                <p class="text-success mb-0">
+                  <i class="ti ti-trending-up"></i> Tỉ suất: {{ $totalRevenue > 0 ? number_format(($totalProfit / $totalRevenue) * 100, 1) : 0 }}%
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="col-md-6 col-xxl-3">

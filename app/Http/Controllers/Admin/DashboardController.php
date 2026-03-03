@@ -31,6 +31,7 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', [
             'totalRevenue' => $stats['total_revenue'],
+            'totalProfit' => $stats['total_profit'],
             'totalOrders' => $stats['total_orders'],
             'newOrders' => $stats['new_orders'],
             'totalCustomers' => $stats['total_customers'],
