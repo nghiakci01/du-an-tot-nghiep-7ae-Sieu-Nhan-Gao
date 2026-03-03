@@ -237,7 +237,7 @@
                             @csrf
                             <div class="input-group">
                                 <input type="email" name="email" class="auth-input"
-                                    placeholder="Enter email or Username" value="{{ old('email') }}" required>
+                                    placeholder="{{ __('messages.email_or_username') }}" value="{{ old('email') }}" required>
                                 @error('email')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
