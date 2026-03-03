@@ -222,7 +222,7 @@
                             <button type="button"
                                 class="auth-tab {{ !request()->has('tab') || request('tab') == 'login' ? 'active' : '' }}"
                                 data-tab="login">
-                                Login
+                                {{ __('messages.login') }}
                             </button>
                             <button type="button" class="auth-tab {{ request('tab') == 'register' ? 'active' : '' }}"
                                 data-tab="register">
