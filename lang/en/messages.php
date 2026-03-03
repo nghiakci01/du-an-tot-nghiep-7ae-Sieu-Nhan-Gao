@@ -255,4 +255,10 @@ return [
     'welcome_coupon_code' => 'Use code: :code',
     'welcome_coupon_desc' => '100k discount for orders over 1,000,000 VNĐ',
     'my_coupons' => 'My Coupons',
+    'account_menu' => 'Account Menu',
+    'wishlist_empty' => 'Your wishlist is empty',
+    'wishlist_empty_desc' => 'You haven\'t added any products to your wishlist yet.',
+    'view_detail' => 'View Detail',
+    'in_stock' => 'In Stock',
+    'please_login' => 'Please login to continue',
 ];

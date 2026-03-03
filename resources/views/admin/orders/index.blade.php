@@ -25,6 +25,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5>Danh sách Đơn hàng</h5>
+                    <a href="{{ route('admin.orders.create') }}" class="btn btn-primary btn-sm"><i class="feather icon-plus"></i> Thêm đơn hàng</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.orders.index') }}" method="GET" class="mb-3 d-flex align-items-center">

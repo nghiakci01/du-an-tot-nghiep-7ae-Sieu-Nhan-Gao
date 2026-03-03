@@ -131,6 +131,84 @@
                                     </table>
                                 </div>
                             </div>
+                            <div class="tab-pane fade" id="wishlist">
+                                <h3>{{ __('messages.my_wishlist') }}</h3>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="product_remove">Delete</th>
+                                                <th class="product_thumb">Image</th>
+                                                <th class="product_name">Product</th>
+                                                <th class="product-price">Price</th>
+                                                <th class="product_quantity">Stock Status</th>
+                                                <th class="product_total">Add To Cart</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($wishlists as $wish)
+                                                @php $product = $wish->product; @endphp
+                                                <tr>
+                                                    <td class="product_remove">
+                                                        <form action="{{ route('wishlist.destroy', $wish->id) }}" method="POST" id="delete-dash-{{ $wish->id }}">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <a href="javascript:void(0)" onclick="if(confirm('{{ __('messages.confirm_remove_item') }}')) document.getElementById('delete-dash-{{ $wish->id }}').submit();" class="text-danger">X</a>
+                                                        </form>
+                                                    </td>
+                                                    <td class="product_thumb">
+                                                        <a href="{{ route('product.detail', $product->slug) }}">
+                                                            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}" alt="{{ $product->name }}" style="width: 50px;">
+                                                        </a>
+                                                    </td>
+                                                    <td class="product_name">
+                                                        <a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a>
+                                                    </td>
+                                                    <td class="product-price">
+                                                        @if($product->sale_price)
+                                                            {{ number_format($product->sale_price, 0, ',', '.') }}đ
+                                                        @else
+                                                            {{ number_format($product->price, 0, ',', '.') }}đ
+                                                        @endif
+                                                    </td>
+                                                    <td class="product_quantity">
+                                                        @if($product->stock > 0)
+                                                            <span class="text-success">{{ __('messages.in_stock') }}</span>
+                                                        @else
+                                                            <span class="text-danger">{{ __('messages.out_of_stock') }}</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="product_total">
+                                                        @if($product->stock > 0)
+                                                            <a href="javascript:void(0)" class="btn btn-sm btn-primary add-to-cart-btn" data-id="{{ $product->id }}">
+                                                                Add To Cart
+                                                            </a>
+                                                        @else
+                                                            <button class="btn btn-sm btn-secondary disabled" disabled>Out Of Stock</button>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center py-4">{{ __('messages.wishlist_empty') }}</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                @if(count($wishlists) > 0)
+                                    <div class="wishlist_share mt-3">
+                                        <h4>Share on:</h4>
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>           
+                                            <li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>           
+                                            <li class="list-inline-item"><a href="#"><i class="fa fa-instagram"></i></a></li>           
+                                            <li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li>        
+                                        </ul>      
+                                    </div>
+                                @endif
+                            </div>
                             <div class="tab-pane fade" id="coupons">
                                 <h3>{{ __('messages.my_coupons') }}</h3>
                                 <div class="row">

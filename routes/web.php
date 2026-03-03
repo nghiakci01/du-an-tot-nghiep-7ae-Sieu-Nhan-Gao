@@ -87,6 +87,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         // Admin & Staff Routes
         Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
         Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
+        Route::get('orders/customers/search', [App\Http\Controllers\Admin\OrderController::class, 'customersSearch'])->name('orders.customers.search');
         Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
         Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
         Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');

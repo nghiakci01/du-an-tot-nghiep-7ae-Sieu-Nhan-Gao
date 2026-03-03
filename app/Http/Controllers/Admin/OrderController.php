@@ -4,7 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\ProductVariant;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -29,7 +34,8 @@ class OrderController extends Controller
      */
     public function create()
     {
-        return abort(404);
+        $provinces = config('vietnam_provinces', []);
+        return view('admin.orders.create', compact('provinces'));
     }
 
     /**
@@ -37,7 +43,98 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        return abort(404);
+        $request->validate([
+            'customer_type' => 'required|in:EXISTING,NEW',
+            'user_id' => 'required_if:customer_type,EXISTING|exists:users,id',
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'email' => 'required|email|max:255',
+            'province' => 'required|string',
+            'address' => 'required|string|max:500',
+            'items' => 'required|array|min:1',
+            'items.*.variant_id' => 'required|exists:product_variants,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,CASH',
+            'status' => 'required|string',
+            'manual_discount' => 'nullable|numeric|min:0',
+            'note' => 'nullable|string',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $totalPrice = 0;
+            foreach ($request->items as $item) {
+                $variant = ProductVariant::find($item['variant_id']);
+                $totalPrice += ($variant->price ?? $variant->product->price) * $item['quantity'];
+            }
+
+            $discount = $request->input('manual_discount', 0);
+            $finalTotal = $totalPrice - $discount;
+            $shippingFee = \App\Models\Setting::getShippingFee($finalTotal);
+            $finalTotal += $shippingFee;
+
+            $order = Order::create([
+                'user_id' => $request->customer_type === 'EXISTING' ? $request->user_id : null,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'province' => $request->province,
+                'address' => $request->address,
+                'status' => $request->status,
+                'total_price' => $totalPrice,
+                'discount_amount' => $discount,
+                'shipping_fee' => $shippingFee,
+                'final_total' => $finalTotal,
+                'payment_method' => $request->payment_method,
+                'shipping_address' => $request->address . ', ' . $request->province . ' - ' . $request->phone . ' - ' . $request->name,
+                'note' => $request->note,
+            ]);
+
+            foreach ($request->items as $item) {
+                $variant = ProductVariant::find($item['variant_id']);
+                
+                // Deduct stock
+                $variant->decrement('stock_quantity', $item['quantity']);
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $variant->product_id,
+                    'variant_id' => $variant->id,
+                    'quantity' => $item['quantity'],
+                    'price' => $variant->price ?? $variant->product->price,
+                ]);
+            }
+
+            // Log history
+            \App\Models\OrderHistory::create([
+                'order_id' => $order->id,
+                'user_id' => auth()->id(),
+                'new_status' => $order->status,
+                'note' => 'Đơn hàng được tạo thủ công bởi ' . auth()->user()->name,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.orders.show', $order)
+                ->with('success', 'Đơn hàng đã được tạo thành công.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    public function customersSearch(Request $request)
+    {
+        $q = $request->q;
+        $users = User::where('name', 'like', "%$q%")
+            ->orWhere('email', 'like', "%$q%")
+            ->orWhere('phone', 'like', "%$q%")
+            ->limit(10)
+            ->get();
+
+        return response()->json($users);
     }
 
     /**

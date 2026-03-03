@@ -14,6 +14,9 @@ class WishlistController extends Controller
      */
     public function index()
     {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', __('messages.please_login'));
+        }
         $wishlists = Wishlist::where('user_id', Auth::id())
             ->with('product')
             ->latest()

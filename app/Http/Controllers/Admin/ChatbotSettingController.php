@@ -7,14 +7,16 @@ use App\Models\ChatbotSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
+use Illuminate\Support\Facades\Log;
+
 class ChatbotSettingController extends Controller
 {
     public function index()
     {
-        $settings = ChatbotSetting::all()->pluck('value', 'key');
+        $chatbotSettings = ChatbotSetting::all()->pluck('value', 'key');
         $questions = \App\Models\ChatbotSuggestedQuestion::orderBy('order')->orderBy('created_at', 'desc')->get();
 
-        return view('admin.settings.chatbot', compact('settings', 'questions'));
+        return view('admin.settings.chatbot', compact('chatbotSettings', 'questions'));
     }
 
     public function update(Request $request)
