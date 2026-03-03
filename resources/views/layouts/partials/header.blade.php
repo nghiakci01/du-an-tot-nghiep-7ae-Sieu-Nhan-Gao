@@ -193,10 +193,10 @@
                                                     <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
                                                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                                                         <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? __('messages.admin') : __('messages.staff') }}</a></li>
-                                                    @endif
+                                                    @endif  
                                                     <li><a href="{{ route('account.orders') }}">{{ __('messages.my_orders') }}</a></li>
-                                                    <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('messages.logout') }}</a></li>
-                                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+                                                    <!-- <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('messages.logout') }}</a></li>
+                                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form> -->
                                                 </ul>
                                             @endguest
                                         </li> 
