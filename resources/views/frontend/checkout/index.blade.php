@@ -518,15 +518,24 @@
                                         @endif
                                         <tr>
                                             <th>{{ __('messages.shipping') }}</th>
-                                            <td><strong>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : __('messages.free') }}</strong>
+                                            <td id="shipping_fee_display"><strong>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : __('messages.free') }}</strong>
                                             </td>
                                         </tr>
                                         <tr class="order_total">
                                             <th>{{ __('messages.order_total') }}</th>
-                                            <td><strong>{{ number_format($finalTotal) }} VND</strong></td>
+                                            <td id="final_total_display"><strong>{{ number_format($finalTotal) }} VND</strong></td>
                                         </tr>
                                     </tfoot>
                                 </table>
+                            </div>
+
+                            <div class="shipping_method mb-4" id="shipping_method_container" style="display: none; margin-top: 30px;">
+                                <h4 style="font-size: 18px; font-weight: 600; margin-bottom: 15px;">Phương thức vận chuyển</h4>
+                                <div id="shipping_options">
+                                    <!-- Options will be loaded via AJAX -->
+                                </div>
+                                <input type="hidden" name="shipping_fee" id="hidden_shipping_fee" value="0">
+                                <input type="hidden" name="shipping_service_name" id="hidden_shipping_service_name" value="">
                             </div>
 
                             <div class="payment_method">
@@ -716,7 +725,102 @@
             $('input[name="phone"]').on('blur', function () { showValidation(this, validatePhone($(this).val())); });
             $('input[name="email"]').on('blur', function () { showValidation(this, validateEmail($(this).val())); });
             $('input[name="address"]').on('blur', function () { showValidation(this, validateAddress($(this).val())); });
-            $('select[name="province"]').on('change', function () { showValidation(this, validateProvince($(this).val())); });
+            
+            // ============ SHIPPING FEES CALCULATION ============
+            let baseTotal = {{ $total - $discount }}; 
+
+            function calculateShippingFees(province) {
+                if (!province) {
+                    $('#shipping_method_container').hide();
+                    updateTotals(0);
+                    return;
+                }
+
+                $('#shipping_method_container').show();
+                $('#shipping_options').html('<div class="text-center p-3"><span class="spinner-border spinner-border-sm text-primary"></span> Đang tính phí vận chuyển...</div>');
+
+                $.ajax({
+                    url: '/api/checkout/shipping-fees',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        province: province,
+                        district: 'Quận/Huyện',
+                        ward: 'Phường/Xã',
+                        weight: 1000
+                    },
+                    success: function (response) {
+                        if (response.success && response.data && response.data.length > 0) {
+                            let html = '';
+                            response.data.forEach((option, index) => {
+                                let checked = index === 0 ? 'checked' : '';
+                                html += `
+                                    <div class="panel-default mb-2 border rounded p-3" style="border: 1px solid #dee2e6; margin-bottom: 10px;">
+                                        <input id="shipping_${option.provider}" name="shipping_provider" type="radio" value="${option.provider}" 
+                                            data-fee="${option.fee}" data-service-name="${option.service_name}" ${checked} required style="margin-right: 10px;" />
+                                        <label for="shipping_${option.provider}" class="mb-0" style="cursor: pointer; font-weight: 500; display: inline-block;">
+                                            ${option.service_name} - <span class="text-primary fw-bold">${new Intl.NumberFormat('vi-VN').format(option.fee)} đ</span>
+                                        </label>
+                                        <small class="d-block text-muted" style="margin-left: 25px; margin-top: 5px;">Thời gian dự kiến: ${option.expected_delivery_time}</small>
+                                    </div>
+                                `;
+                            });
+                            $('#shipping_options').html(html);
+                            
+                            // Trigger selection for the first one
+                            $('input[name="shipping_provider"]:checked').trigger('change');
+                        } else {
+                            $('#shipping_options').html('<div class="alert alert-warning">Không thể tính phí vận chuyển lúc này.</div>');
+                        }
+                    },
+                    error: function () {
+                        $('#shipping_options').html('<div class="alert alert-danger">Lỗi kết nối khi tính phí vận chuyển.</div>');
+                    }
+                });
+            }
+
+            $(document).on('change', 'input[name="shipping_provider"]', function() {
+                let fee = $(this).data('fee');
+                let serviceName = $(this).data('service-name');
+                
+                $('#hidden_shipping_fee').val(fee);
+                $('#hidden_shipping_service_name').val(serviceName);
+                
+                updateTotals(fee);
+            });
+
+            function updateTotals(shippingFee) {
+                let finalTotal = baseTotal + parseInt(shippingFee);
+                
+                // Update shipping display
+                if (shippingFee > 0) {
+                    $('#shipping_fee_display').html('<strong>' + new Intl.NumberFormat('vi-VN').format(shippingFee) + ' đ</strong>');
+                } else {
+                    $('#shipping_fee_display').html('<strong>Miễn phí</strong>');
+                }
+
+                // Update final total display
+                $('#final_total_display').html('<strong>' + new Intl.NumberFormat('vi-VN').format(finalTotal) + ' VND</strong>');
+                
+                // Update QR code amount if banking selected
+                let bankAccount = "{{ \App\Models\Setting::get('bank_account_number', '0359756805') }}";
+                let bankId = "{{ \App\Models\Setting::get('bank_id', 'MB') }}";
+                let bankName = "{{ urlencode(\App\Models\Setting::get('bank_account_name', 'NGUYEN CONG BANG')) }}";
+                let qrUrl = `https://img.vietqr.io/image/${bankId}-${bankAccount}-compact.png?amount=${finalTotal}&addInfo=THANHTOAN%20DH&accountName=${bankName}`;
+                
+                $('.bank-details-qr img').attr('src', qrUrl);
+            }
+
+            // Trigger on load if province is already selected
+            if ($('select[name="province"]').val()) {
+                calculateShippingFees($('select[name="province"]').val());
+            }
+
+            $('select[name="province"]').on('change', function () { 
+                showValidation(this, validateProvince($(this).val())); 
+                calculateShippingFees($(this).val());
+            });
+
             $('input[name="name"],input[name="phone"],input[name="email"],input[name="address"],select[name="province"]').on('input change', function () {
                 if ($(this).hasClass('is-invalid')) { $(this).removeClass('is-invalid').next('.invalid-feedback').remove(); }
             });

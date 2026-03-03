@@ -16,8 +16,8 @@ class ShippingController extends Controller
         try {
             $request->validate([
                 'province' => 'required|string',
-                'district' => 'required|string',
-                'ward' => 'required|string',
+                'district' => 'nullable|string',
+                'ward' => 'nullable|string',
                 'weight' => 'nullable|integer',
             ]);
 
