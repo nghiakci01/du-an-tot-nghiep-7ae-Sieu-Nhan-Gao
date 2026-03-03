@@ -246,13 +246,24 @@ $(document).ready(function() {
             data: { q: q },
             success: function(data) {
                 let html = '';
-                data.forEach(variant => {
-                    html += `<a href="#" class="list-group-item list-group-item-action select-variant" 
-                        data-id="${variant.id}" data-name="${variant.product.name}" data-sku="${variant.sku}" data-price="${variant.price}" data-size="${variant.size?.name || ''}" data-color="${variant.color?.name || ''}">
-                        [${variant.sku}] <strong>${variant.product.name}</strong> - ${variant.size?.name || ''}/${variant.color?.name || ''} 
-                        <span class="float-end text-primary">${new Intl.NumberFormat('vi-VN').format(variant.price)}đ</span>
-                    </a>`;
-                });
+                if (data.length === 0) {
+                    html = '<div class="list-group-item text-muted">Không tìm thấy sản phẩm...</div>';
+                } else {
+                    data.forEach(variant => {
+                        let sizeStr = variant.size ? variant.size : (variant.sizeRelationship ? variant.sizeRelationship.name : '');
+                        let colorStr = variant.color ? variant.color : (variant.colorRelationship ? variant.colorRelationship.name : '');
+                        let details = [];
+                        if (sizeStr) details.push(sizeStr);
+                        if (colorStr) details.push(colorStr);
+                        let detailStr = details.length > 0 ? ` - ${details.join('/')}` : '';
+
+                        html += `<a href="#" class="list-group-item list-group-item-action select-variant" 
+                            data-id="${variant.id}" data-name="${variant.product.name}" data-sku="${variant.sku}" data-price="${variant.price}" data-size="${sizeStr}" data-color="${colorStr}">
+                            [${variant.sku}] <strong>${variant.product.name}</strong>${detailStr}
+                            <span class="float-end text-primary fw-bold">${new Intl.NumberFormat('vi-VN').format(variant.price)}đ</span>
+                        </a>`;
+                    });
+                }
                 $('#product_results').html(html).show();
             }
         });
@@ -320,11 +331,17 @@ $(document).ready(function() {
         orderItems.forEach((item, idx) => {
             let itemTotal = item.price * item.quantity;
             subtotal += itemTotal;
+            
+            let details = [];
+            if (item.size) details.push(item.size);
+            if (item.color) details.push(item.color);
+            let detailStr = details.length > 0 ? ` | ${details.join('/')}` : '';
+
             tbody.append(`
                 <tr>
                     <td>
                         <strong>${item.name}</strong><br>
-                        <small class="text-muted">SKU: ${item.sku} | ${item.size}/${item.color}</small>
+                        <small class="text-muted">SKU: ${item.sku}${detailStr}</small>
                         <input type="hidden" name="items[${idx}][variant_id]" value="${item.variant_id}">
                     </td>
                     <td>${new Intl.NumberFormat('vi-VN').format(item.price)}đ</td>
