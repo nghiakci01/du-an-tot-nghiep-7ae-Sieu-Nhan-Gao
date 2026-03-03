@@ -19,9 +19,14 @@
 
     <section class="main_content_area">
         <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card mb-4">
+            <div class="account_dashboard">
+                <div class="row">
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        @include('frontend.account.partials.sidebar')
+                    </div>
+                    <div class="col-sm-12 col-md-9 col-lg-9">
+                        <div class="dashboard_content">
+                            <div class="card mb-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="mb-0">{{ __('messages.order_details') }} - #{{ $order->id }}</h4>
                             <span
@@ -100,6 +105,8 @@
                                         <button type="submit" class="btn btn-danger">{{ __('messages.cancel_order') }}</button>
                                     </form>
                                 @endif
+                            </div>
+                        </div>
                             </div>
                         </div>
                     </div>
