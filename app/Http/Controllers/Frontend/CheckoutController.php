@@ -7,9 +7,12 @@ use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
+use App\Models\User;
+use App\Notifications\NewOrderNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
 
 class CheckoutController extends Controller
@@ -144,6 +147,10 @@ class CheckoutController extends Controller
             }
 
             DB::commit();
+
+            // Notify Admins
+            $admins = User::getAdmins();
+            Notification::send($admins, new NewOrderNotification($order));
 
             // Clear cart and coupon session
             Session::forget(['cart', 'coupon_code', 'discount_amount']);

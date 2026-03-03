@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Review;
+use App\Models\User;
+use App\Notifications\NewReviewNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 class ReviewController extends Controller
 {
@@ -40,12 +43,16 @@ class ReviewController extends Controller
             'comment' => 'required|string|max:1000',
         ]);
 
-        Review::create([
+        $review = Review::create([
             'product_id' => $productId,
             'user_id' => Auth::id(),
             'rating' => $request->rating,
             'comment' => $request->comment,
         ]);
+
+        // Notify Admins
+        $admins = User::getAdmins();
+        Notification::send($admins, new NewReviewNotification($review));
 
         return back()->with('success', 'Cảm ơn bạn đã đánh giá sản phẩm!');
     }

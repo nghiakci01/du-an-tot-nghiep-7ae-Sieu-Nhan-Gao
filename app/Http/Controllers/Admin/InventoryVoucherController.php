@@ -8,8 +8,11 @@ use App\Models\ProductVariant;
 use App\Models\Supplier;
 use App\Models\Warehouse;
 use App\Models\WarehouseStock;
+use App\Models\User;
+use App\Notifications\LowStockNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class InventoryVoucherController extends Controller
@@ -124,6 +127,12 @@ class InventoryVoucherController extends Controller
                 // 2. Update Global stock
                 $variant->stock_quantity = WarehouseStock::where('product_variant_id', $detail->product_variant_id)->sum('quantity');
                 $variant->save();
+
+                // Check for low stock notification
+                if ($variant->stock_quantity <= $variant->alert_threshold) {
+                    $admins = User::getAdmins();
+                    Notification::send($admins, new LowStockNotification($variant));
+                }
             }
 
             $voucher->update(['status' => 'COMPLETED']);
