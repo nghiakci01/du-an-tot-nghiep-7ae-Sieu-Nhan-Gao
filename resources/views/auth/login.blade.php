@@ -310,7 +310,7 @@
                                     placeholder="{{ __('messages.confirm_password') }}" required minlength="8">
                             </div>
 
-                            <button type="submit" class="auth-btn auth-btn-register">Register</button>
+                            <button type="submit" class="auth-btn auth-btn-register">{{ __('messages.register') }}</button>
                         </form>
                     </div>
                 </div>
