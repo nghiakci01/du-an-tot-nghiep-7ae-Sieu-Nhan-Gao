@@ -131,6 +131,57 @@
                                     </table>
                                 </div>
                             </div>
+                            <div class="tab-pane fade" id="wishlist">
+                                <h3>{{ __('messages.my_wishlist') }}</h3>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>{{ __('messages.image') }}</th>
+                                                <th>{{ __('messages.product') }}</th>
+                                                <th>{{ __('messages.price') }}</th>
+                                                <th>{{ __('messages.status') }}</th>
+                                                <th>{{ __('messages.actions') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($wishlists as $wish)
+                                                @php $product = $wish->product; @endphp
+                                                <tr>
+                                                    <td>
+                                                        <a href="{{ route('product.detail', $product->slug) }}">
+                                                            <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}" alt="{{ $product->name }}" style="width: 50px;">
+                                                        </a>
+                                                    </td>
+                                                    <td><a href="{{ route('product.detail', $product->slug) }}">{{ $product->name }}</a></td>
+                                                    <td>{{ number_format($product->sale_price ?? $product->price, 0, ',', '.') }}đ</td>
+                                                    <td>
+                                                        @if($product->stock > 0)
+                                                            <span class="text-success">{{ __('messages.in_stock') }}</span>
+                                                        @else
+                                                            <span class="text-danger">{{ __('messages.out_of_stock') }}</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex gap-2">
+                                                            <a href="{{ route('product.detail', $product->slug) }}" class="btn btn-sm btn-primary">{{ __('messages.view') }}</a>
+                                                            <form action="{{ route('wishlist.destroy', $wish->id) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_remove_item') }}');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-center py-4">{{ __('messages.wishlist_empty') }}</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                             <div class="tab-pane fade" id="coupons">
                                 <h3>{{ __('messages.my_coupons') }}</h3>
                                 <div class="row">

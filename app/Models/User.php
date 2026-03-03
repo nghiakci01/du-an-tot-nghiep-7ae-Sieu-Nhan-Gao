@@ -76,7 +76,7 @@ class User extends Authenticatable
         return $this->hasMany(SocialAccount::class);
     }
 
-    public function wishlist()
+    public function wishlists()
     {
         return $this->hasMany(Wishlist::class);
     }

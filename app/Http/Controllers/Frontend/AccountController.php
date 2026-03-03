@@ -25,8 +25,8 @@ class AccountController extends Controller
             })
             ->whereRaw('used_count < usage_limit')
             ->get();
-
-        return view('frontend.account.index', compact('user', 'orders', 'coupons'));
+        $wishlists = $user->wishlists()->with('product')->get();
+        return view('frontend.account.index', compact('user', 'orders', 'coupons', 'wishlists'));
     }
 
     public function showOrder($id)
