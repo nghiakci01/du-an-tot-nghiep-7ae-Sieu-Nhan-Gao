@@ -37,6 +37,11 @@ class OrderTrackingController extends Controller
                 ->withInput();
         }
 
-        return view('frontend.order-tracking.show', compact('order'));
+        // Set session for guest verification if not logged in
+        if (!auth()->check()) {
+            session(['verified_order_id' => $order->id]);
+        }
+
+        return redirect()->route('guest.order.show', $order->id);
     }
 }

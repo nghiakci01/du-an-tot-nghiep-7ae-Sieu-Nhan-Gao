@@ -40,14 +40,28 @@ class AccountController extends Controller
     public function showOrder($id)
     {
         $user = Auth::user();
-        $order = $user->orders()->with(['items.product', 'histories'])->findOrFail($id);
+        
+        if ($user) {
+            $order = $user->orders()->with(['items.product', 'histories'])->findOrFail($id);
+        } else {
+            // Guest access verification
+            if (session('verified_order_id') != $id) {
+                return redirect()->route('order-tracking.index')
+                    ->with('error', 'Vui lòng xác thực thông tin đơn hàng để xem chi tiết.');
+            }
+            $order = Order::with(['items.product', 'histories'])->findOrFail($id);
+        }
 
         // Lấy danh sách product_id đã được user review trong đơn hàng này
         $productIds = $order->items->pluck('product_id')->filter()->unique();
-        $userReviews = Review::where('user_id', $user->id)
-            ->whereIn('product_id', $productIds)
-            ->get()
-            ->keyBy('product_id');
+        $userReviews = collect();
+        
+        if ($user) {
+            $userReviews = Review::where('user_id', $user->id)
+                ->whereIn('product_id', $productIds)
+                ->get()
+                ->keyBy('product_id');
+        }
 
         return view('frontend.account.orders.show', compact('user', 'order', 'userReviews'));
     }

@@ -43,13 +43,14 @@ Route::get('auth/{provider}', [App\Http\Controllers\Auth\SocialLoginController::
 Route::get('auth/{provider}/callback', [App\Http\Controllers\Auth\SocialLoginController::class, 'handleProviderCallback'])->name('social.callback');
 
 Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])->name('account.index');
+Route::get('/view-order/{id}', [App\Http\Controllers\Frontend\GuestOrderController::class, 'show'])->name('guest.order.show');
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/my-account/orders', function() {
         return redirect()->route('account.index', ['#orders']);
     })->name('account.orders');
-    Route::post('/my-account/update', [App\Http\Controllers\Frontend\AccountController::class, 'update'])->name('account.update');
     Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'showOrder'])->name('account.orders.show');
+    Route::post('/my-account/update', [App\Http\Controllers\Frontend\AccountController::class, 'update'])->name('account.update');
     Route::post('/my-account/orders/{id}/cancel', [App\Http\Controllers\Frontend\AccountController::class, 'cancelOrder'])->name('account.orders.cancel');
 
     // Wishlist Routes
