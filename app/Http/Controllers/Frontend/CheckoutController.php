@@ -55,6 +55,9 @@ class CheckoutController extends Controller
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
             'payment_method' => 'required|in:COD,BANK_TRANSFER',
+            'shipping_provider' => 'nullable|string',
+            'shipping_service_name' => 'nullable|string',
+            'shipping_fee' => 'nullable|numeric',
         ], [
             'phone.required' => 'Vui lòng nhập số điện thoại.',
             'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
@@ -81,8 +84,14 @@ class CheckoutController extends Controller
             $couponCode = session()->get('coupon_code');
             $discount = session()->get('discount_amount', 0);
 
-            // Calculate shipping fee
-            $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
+            // Calculate shipping fee (Get from request or default to old way)
+            $shippingFee = $request->input('shipping_fee');
+            if ($shippingFee === null) {
+                // Dự phòng nếu không có phí ship gửi lên
+                $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
+            }
+            $shippingProvider = $request->input('shipping_provider');
+            $shippingServiceName = $request->input('shipping_service_name');
 
             $finalTotal = $total - $discount + $shippingFee;
 
@@ -98,6 +107,8 @@ class CheckoutController extends Controller
                 'coupon_code' => $couponCode,
                 'discount_amount' => $discount,
                 'shipping_fee' => $shippingFee,
+                'shipping_provider' => $shippingProvider,
+                'shipping_service_name' => $shippingServiceName,
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
                 'shipping_address' => $request->address.', '.$request->province.' - '.$request->phone.' - '.$request->name,
