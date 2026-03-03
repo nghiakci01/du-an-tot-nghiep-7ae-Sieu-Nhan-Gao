@@ -250,7 +250,7 @@
                                 @enderror
                             </div>
 
-                            <button type="submit" class="auth-btn auth-btn-login">Login</button>
+                            <button type="submit" class="auth-btn auth-btn-login">{{ __('messages.login') }}</button>
 
                             <a href="{{ route('password.request') }}" class="forgot-link">Forgot password?</a>
 
