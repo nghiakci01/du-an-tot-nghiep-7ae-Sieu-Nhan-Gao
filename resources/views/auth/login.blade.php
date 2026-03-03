@@ -202,7 +202,7 @@
                         <ul>
                             <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
-                            <li>Account</li>
+                            <li>{{ __('messages.account') }}</li>
                         </ul>
                     </div>
                 </div>
