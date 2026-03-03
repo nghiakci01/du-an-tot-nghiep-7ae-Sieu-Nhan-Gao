@@ -18,6 +18,7 @@ class ProductVariant extends Model
         'color',
         'price',
         'sale_price',
+        'cost_price',
         'stock_quantity',
         'sku',
         'alert_threshold',

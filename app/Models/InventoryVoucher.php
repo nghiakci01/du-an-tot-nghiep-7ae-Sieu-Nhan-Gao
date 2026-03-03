@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\Auditable;
+
 class InventoryVoucher extends Model
 {
+    use Auditable;
     const TYPE_INBOUND = 'INBOUND';
 
     const TYPE_OUTBOUND = 'OUTBOUND';

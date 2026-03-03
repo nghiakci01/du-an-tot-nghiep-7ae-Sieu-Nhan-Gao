@@ -43,13 +43,13 @@
                         <div class="mb-3">
                             <label for="order_id" class="form-label">Mã đơn hàng <span class="text-danger">*</span></label>
                             <input type="text" name="order_id" id="order_id" class="form-control" 
-                                   placeholder="VD: 123456" value="{{ old('order_id') }}" required>
+                                   placeholder="VD: 123456" value="{{ request('order_id', old('order_id')) }}" required>
                         </div>
 
                         <div class="mb-4">
                             <label for="contact" class="form-label">Email hoặc Số điện thoại <span class="text-danger">*</span></label>
                             <input type="text" name="contact" id="contact" class="form-control" 
-                                   placeholder="Email hoặc SĐT bạn đã dùng khi đặt hàng" value="{{ old('contact') }}" required>
+                                   placeholder="Email hoặc SĐT bạn đã dùng khi đặt hàng" value="{{ old('contact', auth()->check() ? (auth()->user()->email ?? auth()->user()->phone) : '') }}" required>
                         </div>
 
                         <div class="d-grid">

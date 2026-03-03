@@ -16,7 +16,7 @@ return [
     'my_account' => 'Tài khoản của tôi',
     'my_orders' => 'Đơn hàng của tôi',
     'my_wishlist' => 'Danh sách yêu thích',
-    'track_order' => 'Đơn hàng',
+    'track_order' => 'Tra cứu đơn hàng',
     'admin' => 'Quản trị',
     'staff' => 'Nhân viên',
     'language' => 'Ngôn ngữ',

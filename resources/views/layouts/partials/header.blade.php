@@ -150,7 +150,7 @@
                                             <li><a href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
                                             <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
                                             <li><a href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
-                                            <li><a href="{{ route('order-tracking.index') }}">Tra cứu đơn hàng</a></li>
+                                            <!-- <li><a href="{{ route('order-tracking.index') }}">Tra cứu đơn hàng</a></li> -->
                                         </ul>
                                     </nav>
                                 </div>
@@ -174,9 +174,11 @@
                                                 <a href="{{ route('account.index') }}"><i class="ion-android-person"></i> {{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
                                                 <ul class="dropdown_links">
                                                     <!-- <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li> -->
-                                                    <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
+                                                    <!-- <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li> -->
+                                                    <li><a href="{{ route('account.index') }}#dashboard">{{ __('messages.dashboard') }}</a></li>
                                                     <!-- <li><a href="{{ route('order-tracking.index') }}">{{ __('messages.track_order') }}</a></li> -->
                                                     <li><a href="{{ route('login') }}">{{ __('messages.login') }}</a></li>
+                                                    <li><a href="{{ route('logout') }}">{{ __('messages.logout') }}</a></li>
                                                 </ul>
                                             @else
                                                 <a href="#" style="display: flex; align-items: center; gap: 8px;">
@@ -190,7 +192,8 @@
                                                 </a>
                                                 <ul class="dropdown_links">
                                                     <!-- <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li> -->
-                                                    <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
+                                                    <!-- <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li> -->
+                                                    <li><a href="{{ route('account.index') }}#dashboard">{{ __('messages.dashboard') }}</a></li>
                                                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                                                         <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? __('messages.admin') : __('messages.staff') }}</a></li>
                                                     @endif  

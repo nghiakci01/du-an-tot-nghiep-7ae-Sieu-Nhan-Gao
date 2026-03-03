@@ -139,6 +139,7 @@ class CheckoutController extends Controller
                     'variant_id' => $details['variant_id'],
                     'quantity' => $details['quantity'],
                     'price' => $details['price'],
+                    'cost_price' => $variant->cost_price ?? 0,
                 ]);
             }
 

@@ -14,32 +14,54 @@ class AccountController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $orders = $user->orders()->orderBy('created_at', 'desc')->get();
-        // Fetch active coupons: either general (user_id is null) or specific to this user
-        $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
-            $q->whereNull('user_id')->orWhere('user_id', $user->id);
-        })
-            ->where('is_active', true)
-            ->where(function ($q) {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+        
+        if ($user) {
+            $orders = $user->orders()->orderBy('created_at', 'desc')->get();
+            // Fetch active coupons: either general (user_id is null) or specific to this user
+            $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
+                $q->whereNull('user_id')->orWhere('user_id', $user->id);
             })
-            ->whereRaw('used_count < usage_limit')
-            ->get();
-        $wishlists = $user->wishlists()->with('product')->get();
+                ->where('is_active', true)
+                ->where(function ($q) {
+                    $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+                })
+                ->whereRaw('used_count < usage_limit')
+                ->get();
+            $wishlists = $user->wishlists()->with('product')->get();
+        } else {
+            $orders = collect();
+            $coupons = collect();
+            $wishlists = collect();
+        }
+
         return view('frontend.account.index', compact('user', 'orders', 'coupons', 'wishlists'));
     }
 
     public function showOrder($id)
     {
         $user = Auth::user();
-        $order = $user->orders()->with(['items.product', 'histories'])->findOrFail($id);
+        
+        if ($user) {
+            $order = $user->orders()->with(['items.product', 'histories'])->findOrFail($id);
+        } else {
+            // Guest access verification
+            if (session('verified_order_id') != $id) {
+                return redirect()->route('order-tracking.index')
+                    ->with('error', 'Vui lòng xác thực thông tin đơn hàng để xem chi tiết.');
+            }
+            $order = Order::with(['items.product', 'histories'])->findOrFail($id);
+        }
 
         // Lấy danh sách product_id đã được user review trong đơn hàng này
         $productIds = $order->items->pluck('product_id')->filter()->unique();
-        $userReviews = Review::where('user_id', $user->id)
-            ->whereIn('product_id', $productIds)
-            ->get()
-            ->keyBy('product_id');
+        $userReviews = collect();
+        
+        if ($user) {
+            $userReviews = Review::where('user_id', $user->id)
+                ->whereIn('product_id', $productIds)
+                ->get()
+                ->keyBy('product_id');
+        }
 
         return view('frontend.account.orders.show', compact('user', 'order', 'userReviews'));
     }

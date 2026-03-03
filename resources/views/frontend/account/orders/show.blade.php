@@ -31,7 +31,12 @@
                 </div>
                 <div class="col-sm-12 col-md-9 col-lg-9">
                     <div class="dashboard_content">
-                        <h3>Order Details (#{{ $order->id }})</h3>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3>Order Details (#{{ $order->id }})</h3>
+                            <a href="{{ route('order-tracking.index', ['order_id' => $order->id]) }}" class="btn btn-info text-white">
+                                <i class="fa fa-truck"></i> {{ __('messages.track_order') }}
+                            </a>
+                        </div>
 
                         {{-- Flash Messages --}}
                         @if(session('success'))
@@ -82,7 +87,7 @@
                             </div>
 
                             <h4>Shipping Address</h4>
-                            <p>{{ $order->shipping_address ?? $user->address ?? 'N/A' }}</p>
+                            <p>{{ $order->shipping_address ?? ($user ? $user->address : 'N/A') }}</p>
                         </div>
 
                         <div class="mt-4">
@@ -108,8 +113,8 @@
                             </div>
                         </div>
 
-                        {{-- ===== REVIEW SECTION (chỉ hiện khi đơn hàng hoàn thành) ===== --}}
-                        @if($order->status === \App\Models\Order::STATUS_COMPLETED)
+                        {{-- ===== REVIEW SECTION (chỉ hiện khi user đăng nhập và đơn hàng hoàn thành) ===== --}}
+                        @if($user && $order->status === \App\Models\Order::STATUS_COMPLETED)
                             <div class="mt-5" id="review-section">
                                 <h4 style="border-bottom: 2px solid #ef233c; padding-bottom: 8px; color: #333;">
                                     <i class="fa fa-star" style="color:#f39c12;"></i> Đánh giá sản phẩm
@@ -195,7 +200,7 @@
                         @endif
                         {{-- ===== END REVIEW SECTION ===== --}}
 
-                        @if($order->status === \App\Models\Order::STATUS_PENDING)
+                        @if($user && $order->status === \App\Models\Order::STATUS_PENDING)
                             <div class="mt-4">
                                 <form action="{{ route('account.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
                                     @csrf
