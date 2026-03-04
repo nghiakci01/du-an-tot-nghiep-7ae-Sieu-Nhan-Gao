@@ -279,6 +279,7 @@ return [
 
     // Reset pasword
     'reset_password' => 'Đặt lại mật khẩu',
+    'send_verification_code' => "Gửi mã xác nhận",
 
     
 

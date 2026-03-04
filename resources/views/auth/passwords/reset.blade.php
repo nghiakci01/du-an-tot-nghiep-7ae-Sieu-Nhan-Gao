@@ -8,9 +8,9 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">Trang Chủ</a></li>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
-                            <li>Đặt lại mật khẩu</li>
+                            <li>{{ __('messages.reset_password') }}</li>
                         </ul>   
                     </div>
                 </div>
@@ -24,22 +24,22 @@
             <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6">
                     <div class="account_form">
-                        <h2>Đặt lại mật khẩu</h2>
+                        <h2>{{ __('messages.reset_password') }}</h2>
                         <form method="POST" action="{{ route('password.update') }}">
                             @csrf
                             <input type="hidden" name="token" value="{{ $token }}">
 
                             <p>
-                                <label>Email Address <span>*</span></label>
+                                <label>{{ __('messages.email') }}<span>*</span></label>
                                 <input type="email" name="email" value="{{ $email ?? old('email') }}" required
-                                    autocomplete="email" autofocus>
+                                    autocomplete="email" readonly autofocus>
                                 @error('email')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </p>
 
                             <p>
-                                <label>New Password <span>*</span></label>
+                                <label>{{ __('messages.new_password') }}<span>*</span></label>
                                 <input type="password" name="password" required autocomplete="new-password">
                                 @error('password')
                                     <span class="text-danger">{{ $message }}</span>
@@ -47,12 +47,12 @@
                             </p>
 
                             <p>
-                                <label>Confirm Password <span>*</span></label>
+                                <label>{{ __('messages.confirm_new_password') }}<span>*</span></label>
                                 <input type="password" name="password_confirmation" required autocomplete="new-password">
                             </p>
 
                             <div class="login_submit">
-                                <button type="submit">Reset Password</button>
+                                <button type="submit">{{ __('messages.reset_password') }}</button>
                             </div>
                         </form>
                     </div>
