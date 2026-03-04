@@ -72,13 +72,22 @@
             </div>
           </li> --}}
 
+          {{-- Notification Sound Toggle --}}
+          <li class="pc-h-item">
+            <a href="#" class="pc-head-link me-0" id="notif-sound-toggle" title="Bật/Tắt âm thanh thông báo">
+              <i class="ti ti-volume fs-5" id="notif-sound-icon"></i>
+            </a>
+          </li>
+
           <li class="dropdown pc-h-item">
             <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
               aria-haspopup="false" aria-expanded="false"><svg class="pc-icon">
                 <use xlink:href="#custom-notification"></use>
               </svg>
               @if(isset($admin_unread_count) && $admin_unread_count > 0)
-                <span class="badge bg-danger pc-h-badge">{{ $admin_unread_count }}</span>
+                <span class="badge bg-danger pc-h-badge" id="notif-badge">{{ $admin_unread_count }}</span>
+              @else
+                <span class="badge bg-danger pc-h-badge d-none" id="notif-badge">0</span>
               @endif
             </a>
             <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
