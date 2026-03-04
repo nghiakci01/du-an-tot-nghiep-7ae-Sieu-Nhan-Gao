@@ -30,7 +30,7 @@
                             <input type="hidden" name="token" value="{{ $token }}">
 
                             <p>
-                                <label>Email Address <span>*</span></label>
+                                <label>{{ __('messages.email') }}<span>*</span></label>
                                 <input type="email" name="email" value="{{ $email ?? old('email') }}" required
                                     autocomplete="email" autofocus>
                                 @error('email')
