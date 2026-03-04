@@ -42,6 +42,7 @@
                 <span>Mặc định</span></a>
             </div>
           </li>
+          {{-- Language Switcher (Removed)
           <li class="dropdown pc-h-item">
             <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
               aria-haspopup="false" aria-expanded="false"><svg class="pc-icon">
@@ -54,6 +55,7 @@
                 class="dropdown-item" data-lng="cn"><span>中国人 <small>(Chinese)</small></span></a>
             </div>
           </li>
+          --}}
 
           {{-- Setting --}}
           {{-- <li class="dropdown pc-h-item">
