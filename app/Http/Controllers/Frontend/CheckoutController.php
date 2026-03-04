@@ -127,14 +127,14 @@ class CheckoutController extends Controller
             }
 
             foreach ($cart as $id => $details) {
-                // Verify stock again
-                $variant = ProductVariant::find($details['variant_id']);
+                // Verify stock again with a lock to prevent race condition
+                $variant = clone ProductVariant::where('id', $details['variant_id'])->lockForUpdate()->first();
                 if (! $variant || $variant->stock_quantity < $details['quantity']) {
                     throw new \Exception('Product '.$details['name'].' ('.$details['size'].'/'.$details['color'].') is out of stock.');
                 }
 
                 // Deduct stock
-                $variant->decrement('stock_quantity', $details['quantity']);
+                ProductVariant::where('id', $details['variant_id'])->decrement('stock_quantity', $details['quantity']);
 
                 OrderItem::create([
                     'order_id' => $order->id,
