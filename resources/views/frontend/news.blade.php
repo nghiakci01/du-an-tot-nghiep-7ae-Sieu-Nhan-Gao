@@ -38,16 +38,16 @@
                     <article class="single_blog">
                         <figure>
                             <div class="blog_thumb">
-                                <a href="#"><img src="{{ $post->image ? asset('storage/'.$post->image) : asset('frontend-assets/img/blog/blog1.jpg') }}" alt="{{ $post->title }}"></a>
+                                <a href="{{ route('news.detail', $post->slug) }}"><img src="{{ $post->image ? asset('storage/'.$post->image) : asset('frontend-assets/img/blog/blog1.jpg') }}" alt="{{ $post->title }}"></a>
                             </div>
                             <figcaption class="blog_content">
-                                <h4 class="post_title" style="min-height: 50px;"><a href="#">{{ $post->title }}</a></h4>
+                                <h4 class="post_title" style="min-height: 50px;"><a href="{{ route('news.detail', $post->slug) }}">{{ $post->title }}</a></h4>
                                 <div class="articles_date">
                                     <p>{{ $post->created_at->format('M d, Y') }} | <a href="#">{{ $post->category ? $post->category->name : 'Tin tức' }}</a> </p>
                                 </div>
                                 <p class="post_desc">{{ Str::limit(strip_tags($post->content), 120) }}</p>
                                 <footer class="btn_more">
-                                    <a href="#"> {{ __('messages.read_more') }}</a>
+                                    <a href="{{ route('news.detail', $post->slug) }}"> {{ __('messages.read_more') }}</a>
                                 </footer>
                             </figcaption>
                         </figure>
