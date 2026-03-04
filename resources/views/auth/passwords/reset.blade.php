@@ -32,7 +32,7 @@
                             <p>
                                 <label>{{ __('messages.email') }}<span>*</span></label>
                                 <input type="email" name="email" value="{{ $email ?? old('email') }}" required
-                                    autocomplete="email" autofocus>
+                                    autocomplete="email" readonly autofocus>
                                 @error('email')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
