@@ -16,7 +16,7 @@ class AccountController extends Controller
         $user = Auth::user();
         
         if ($user) {
-            $orders = $user->orders()->orderBy('created_at', 'desc')->get();
+            $orders = $user->orders()->orderBy('created_at', 'desc')->paginate(10);
             // Fetch active coupons: either general (user_id is null) or specific to this user
             $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
                 $q->whereNull('user_id')->orWhere('user_id', $user->id);
