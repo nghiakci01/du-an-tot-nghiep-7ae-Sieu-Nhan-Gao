@@ -85,7 +85,7 @@
     </style>
     <!--slider area end-->
 
-    <!--product section area start-->
+    <!--featured products section area start-->
     <section class="product_section womens_product product_section_six">
         <div class="container-fluid">
             <div class="row">
