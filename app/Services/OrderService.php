@@ -83,8 +83,12 @@ class OrderService
     protected function restoreStock(Order $order)
     {
         foreach ($order->items as $item) {
-            if ($item->variant) {
-                $item->variant->increment('stock_quantity', $item->quantity);
+            if ($item->variant_id) {
+                // Sử dụng lockForUpdate để tránh Race Condition khi cộng lại kho
+                $variant = \App\Models\ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
+                if ($variant) {
+                    $variant->increment('stock_quantity', $item->quantity);
+                }
             }
         }
     }
@@ -92,14 +96,11 @@ class OrderService
     protected function deductStock(Order $order)
     {
         foreach ($order->items as $item) {
-            if ($item->variant) {
-                if ($item->variant->stock_quantity >= $item->quantity) {
-                    $item->variant->decrement('stock_quantity', $item->quantity);
-                } else {
-                    // potentially throw exception or allow negative if configured?
-                    // For now, let's just decrement, or we could strict check.
-                    // Assuming admin overrides, we just decrement.
-                    $item->variant->decrement('stock_quantity', $item->quantity);
+            if ($item->variant_id) {
+                // Sử dụng lockForUpdate để tránh Race Condition khi trừ kho lại
+                $variant = \App\Models\ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
+                if ($variant && $variant->stock_quantity >= $item->quantity) {
+                    $variant->decrement('stock_quantity', $item->quantity);
                 }
             }
         }
