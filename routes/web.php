@@ -11,6 +11,7 @@ Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 
 Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'send'])->name('contact.send');
 Route::get('/about', [App\Http\Controllers\Frontend\HomeController::class, 'about'])->name('about');
 Route::get('/news', [App\Http\Controllers\Frontend\HomeController::class, 'news'])->name('news');
+Route::get('/news/{slug}', [App\Http\Controllers\Frontend\HomeController::class, 'newsDetail'])->name('news.detail');
 
 // Search Routes
 Route::get('/search', [App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('search.index');

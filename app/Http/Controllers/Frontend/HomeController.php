@@ -64,4 +64,20 @@ class HomeController extends Controller
 
         return view('frontend.news', compact('posts'));
     }
+    public function newsDetail($slug)
+    {
+        $post = \App\Models\Post::where('slug', $slug)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        // Lấy các bài viết liên quan (cùng danh mục)
+        $relatedPosts = \App\Models\Post::where('post_category_id', $post->post_category_id)
+            ->where('id', '!=', $post->id)
+            ->where('is_active', true)
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('frontend.news_detail', compact('post', 'relatedPosts'));
+    }
 }
