@@ -58,6 +58,10 @@ class HomeController extends Controller
 
     public function news()
     {
-        return view('frontend.news');
+        $posts = \App\Models\Post::where('is_published', true)
+            ->latest()
+            ->paginate(9);
+
+        return view('frontend.news', compact('posts'));
     }
 }

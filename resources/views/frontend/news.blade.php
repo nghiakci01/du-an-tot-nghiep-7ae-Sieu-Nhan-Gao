@@ -33,18 +33,19 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-4 col-md-6">
+                @forelse($posts as $post)
+                <div class="col-lg-4 col-md-6 mb-4">
                     <article class="single_blog">
                         <figure>
                             <div class="blog_thumb">
-                                <a href="#"><img src="{{ asset('frontend-assets/img/blog/blog1.jpg') }}" alt=""></a>
+                                <a href="#"><img src="{{ $post->image ? asset('storage/'.$post->image) : asset('frontend-assets/img/blog/blog1.jpg') }}" alt="{{ $post->title }}"></a>
                             </div>
                             <figcaption class="blog_content">
-                                <h4 class="post_title"><a href="#">Spring - Summer 2026 Fashion Trends</a></h4>
+                                <h4 class="post_title" style="min-height: 50px;"><a href="#">{{ $post->title }}</a></h4>
                                 <div class="articles_date">
-                                    <p>February 04, 2026 | <a href="#">Fashion</a> </p>
+                                    <p>{{ $post->created_at->format('M d, Y') }} | <a href="#">{{ $post->category ? $post->category->name : 'Tin tức' }}</a> </p>
                                 </div>
-                                <p class="post_desc">Discover the latest collections with a youthful, dynamic style for this year's festive season...</p>
+                                <p class="post_desc">{{ Str::limit(strip_tags($post->content), 120) }}</p>
                                 <footer class="btn_more">
                                     <a href="#"> {{ __('messages.read_more') }}</a>
                                 </footer>
@@ -52,43 +53,17 @@
                         </figure>
                     </article>
                 </div>
-                <div class="col-lg-4 col-md-6">
-                    <article class="single_blog">
-                        <figure>
-                            <div class="blog_thumb">
-                                <a href="#"><img src="{{ asset('frontend-assets/img/blog/blog2.jpg') }}" alt=""></a>
-                            </div>
-                            <figcaption class="blog_content">
-                                <h4 class="post_title"><a href="#">Minimalist styling tips for men</a></h4>
-                                <div class="articles_date">
-                                    <p>February 01, 2026 | <a href="#">Tips & Tricks</a> </p>
-                                </div>
-                                <p class="post_desc">Minimalist style never goes out of fashion. Let's learn standard fashion mixes with Elite...</p>
-                                <footer class="btn_more">
-                                    <a href="#"> {{ __('messages.read_more') }}</a>
-                                </footer>
-                            </figcaption>
-                        </figure>
-                    </article>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <article class="single_blog">
-                        <figure>
-                            <div class="blog_thumb">
-                                <a href="#"><img src="{{ asset('frontend-assets/img/blog/blog3.jpg') }}" alt=""></a>
-                            </div>
-                            <figcaption class="blog_content">
-                                <h4 class="post_title"><a href="#">Notice: Opening of new branch</a></h4>
-                                <div class="articles_date">
-                                    <p>January 25, 2026 | <a href="#">Notice</a> </p>
-                                </div>
-                                <p class="post_desc">Elite is pleased to announce the opening of its 5th branch in Ho Chi Minh City with many attractive deals...</p>
-                                <footer class="btn_more">
-                                    <a href="#"> {{ __('messages.read_more') }}</a>
-                                </footer>
-                            </figcaption>
-                        </figure>
-                    </article>
+                @empty
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-file-earmark-text text-muted" style="font-size: 3rem;"></i>
+                        <p class="mt-3 text-muted">Chưa có bài viết nào.</p>
+                    </div>
+                @endforelse
+            </div>
+            
+            <div class="row">
+                <div class="col-12 mt-4 d-flex justify-content-center">
+                    {{ $posts->links() }}
                 </div>
             </div>
         </div>
