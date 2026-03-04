@@ -1,10 +1,10 @@
 <nav class="pc-sidebar">
     <div class="navbar-wrapper">
-        <div class="m-header">
+        <div class="m-header d-flex align-items-center justify-content-center">
             <a href="{{ route('admin.dashboard') }}"
-                class="b-brand text-primary"><!-- ========   Change your logo from here   ============ -->
-                <img src="{{ asset('admin-assets') }}/images/logo-dark.svg" class="img-fluid logo-lg" alt="logo" />
-                <span class="badge bg-light-success rounded-pill ms-2 theme-version">v9.6.2</span></a>
+                class="b-brand text-primary d-flex align-items-center" style="text-decoration: none;">
+                <h3 class="mb-0 fw-bolder text-primary ls-1">Elite Admin</h3>
+            </a>
         </div>
         <div class="navbar-content">
             <div class="card pc-user-card">
