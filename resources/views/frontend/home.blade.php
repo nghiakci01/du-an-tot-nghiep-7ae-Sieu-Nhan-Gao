@@ -9,7 +9,7 @@
                     <div class="slider_area home_six_slider owl-carousel banner-wide-slider">
                         @if($sliders->count() > 0)
                             @foreach($sliders as $slider)
-                                <div class="single_slider" data-bgimg="{{ asset('storage/' . $slider->image) }}" style="height: 856px !important;">
+                                <div class="single_slider" data-bgimg="{{ asset('storage/' . $slider->image) }}">
                                     @if($slider->link)
                                         <a href="{{ $slider->link }}" style="display: block; width: 100%; height: 100%;"></a>
                                     @endif
@@ -36,18 +36,52 @@
         </div>
     </div>
     <style>
+        /* Responsive Banner Styles */
         .banner-wide-slider .single_slider {
-            height: 856px !important;
             background-size: cover !important;
-            background-position: center !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
             border-radius: 8px;
             overflow: hidden;
             position: relative;
+            width: 100%;
+            /* Default height for desktop */
+            height: 856px !important; 
+        }
+        .banner-wide-slider .slider_content_inner {
+            display: flex;
+            align-items: center;
+            height: 100%;
         }
         .banner-wide-slider .owl-nav {
             display: none !important;
         }
         .slider_section_six.mb-30 { margin-bottom: 30px; }
+
+        /* Tablet (lg, md) */
+        @media only screen and (max-width: 1199px) {
+            .banner-wide-slider .single_slider {
+                height: 600px !important;
+            }
+        }
+        @media only screen and (max-width: 991px) {
+            .banner-wide-slider .single_slider {
+                height: 500px !important;
+            }
+        }
+        /* Mobile (sm, xs) */
+        @media only screen and (max-width: 767px) {
+            .banner-wide-slider .single_slider {
+                /* For aspect ratio close to 16:9 or similar to original width/height */
+                height: 350px !important; 
+                background-position: center top !important; /* Keep the top part in focus on mobile */
+            }
+        }
+        @media only screen and (max-width: 575px) {
+            .banner-wide-slider .single_slider {
+                height: 250px !important; 
+            }
+        }
     </style>
     <!--slider area end-->
 
