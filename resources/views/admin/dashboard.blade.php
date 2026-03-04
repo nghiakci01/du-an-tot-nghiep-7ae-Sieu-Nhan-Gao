@@ -216,32 +216,63 @@
           </div>
           <div class="card-body p-0">
             <div class="table-responsive">
-              <table class="table table-hover mb-0">
-                <thead>
+              <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
                   <tr>
+                    <th style="width: 50px;">#</th>
                     <th>Sản Phẩm</th>
-                    <th>Giá</th>
-                    <th>Đã Bán</th>
-                    <th>Doanh Thu (Ước tính)</th>
+                    <th class="text-end">Giá Bán</th>
+                    <th class="text-center">Đã Bán</th>
+                    <th class="text-end">Doanh Thu (Ước tính)</th>
+                    <th>Tỷ Trọng Doanh Số</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @forelse($topProducts as $product)
+                  @forelse($topProducts as $index => $product)
+                    @php
+                        $percentage = min(100, round(($product->total_sold / $totalProductsSold) * 100, 1));
+                        
+                        // Pick color based on rank
+                        $bgClass = 'bg-primary';
+                        if($index == 0) $bgClass = 'bg-success';
+                        else if($index == 1) $bgClass = 'bg-info';
+                        else if($index == 2) $bgClass = 'bg-warning';
+                    @endphp
                     <tr>
                       <td>
+                        <span class="badge {{ $bgClass }} rounded-pill">{{ $index + 1 }}</span>
+                      </td>
+                      <td>
                         <div class="d-flex align-items-center">
-                          <img src="{{ asset('storage/' . $product->image) }}" alt="" class="img-fluid wid-40 rounded me-2"
-                            style="height: 40px; object-fit: cover;">
-                          <h6 class="mb-0">{{ $product->name }}</h6>
+                          <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-fluid wid-40 rounded me-3 shadow-sm"
+                            style="height: 48px; width: 48px; object-fit: cover;">
+                          <div>
+                            <h6 class="mb-0 text-truncate" style="max-width: 250px;" title="{{ $product->name }}">{{ $product->name }}</h6>
+                          </div>
                         </div>
                       </td>
-                      <td>{{ number_format($product->price) }} VND</td>
-                      <td>{{ $product->total_sold }}</td>
-                      <td>{{ number_format($product->price * $product->total_sold) }} VND</td>
+                      <td class="text-end fw-medium">{{ number_format($product->price) }} ₫</td>
+                      <td class="text-center">
+                        <span class="badge bg-light-secondary text-secondary fw-bold px-3 py-2">{{ $product->total_sold }}</span>
+                      </td>
+                      <td class="text-end fw-bold text-success">{{ number_format($product->price * $product->total_sold) }} ₫</td>
+                      <td style="width: 200px;">
+                        <div class="d-flex align-items-center">
+                          <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                            <div class="progress-bar {{ $bgClass }}" role="progressbar" style="width: {{ $percentage }}%" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                          </div>
+                          <span class="text-muted small fw-medium">{{ $percentage }}%</span>
+                        </div>
+                      </td>
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="4" class="text-center">Chưa có dữ liệu bán hàng</td>
+                      <td colspan="6" class="text-center py-4">
+                        <div class="text-muted">
+                           <i class="ti ti-chart-bar f-24 d-block mb-2"></i>
+                           Chưa có dữ liệu bán hàng trong thời gian này
+                        </div>
+                      </td>
                     </tr>
                   @endforelse
                 </tbody>

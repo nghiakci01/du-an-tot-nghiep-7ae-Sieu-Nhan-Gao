@@ -27,6 +27,13 @@ class DashboardController extends Controller
         $orderStatus = $this->reportService->getOrderStatusData($startDate, $endDate);
         $topProducts = $this->reportService->getTopProducts($startDate, $endDate);
 
+        // Tính tổng số lượng sản phẩm đã bán trong kỳ để làm thanh tiến trình
+        $totalProductsSold = \DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.status', \App\Models\Order::STATUS_COMPLETED)
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->sum('order_items.quantity');
+
         $recentOrders = Order::with('user')->latest()->take(5)->get();
 
         return view('admin.dashboard', [
@@ -43,6 +50,7 @@ class DashboardController extends Controller
             'statusLabels' => $orderStatus['labels'],
             'statusValues' => $orderStatus['values'],
             'topProducts' => $topProducts,
+            'totalProductsSold' => $totalProductsSold > 0 ? $totalProductsSold : 1, // Tránh chia cho 0
             'startDate' => $startDate->format('Y-m-d'),
             'endDate' => $endDate->format('Y-m-d'),
         ]);
