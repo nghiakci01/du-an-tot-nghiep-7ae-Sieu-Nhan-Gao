@@ -187,9 +187,7 @@
             <h5>Doanh Thu 30 Ngày Gần Nhất</h5>
           </div>
           <div class="card-body">
-            <!-- Xóa div cũ của ApexCharts, dùng canvas cho Chart.js -->
-            <!-- <div id="revenue-chart"></div> -->
-            <canvas id="revenueLineChart" style="max-height: 350px;"></canvas>
+            <div id="revenue-chart"></div>
           </div>
         </div>
       </div>
@@ -216,32 +214,63 @@
           </div>
           <div class="card-body p-0">
             <div class="table-responsive">
-              <table class="table table-hover mb-0">
-                <thead>
+              <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
                   <tr>
+                    <th style="width: 50px;">#</th>
                     <th>Sản Phẩm</th>
-                    <th>Giá</th>
-                    <th>Đã Bán</th>
-                    <th>Doanh Thu (Ước tính)</th>
+                    <th class="text-end">Giá Bán</th>
+                    <th class="text-center">Đã Bán</th>
+                    <th class="text-end">Doanh Thu (Ước tính)</th>
+                    <th>Tỷ Trọng Doanh Số</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @forelse($topProducts as $product)
+                  @forelse($topProducts as $index => $product)
+                    @php
+                        $percentage = min(100, round(($product->total_sold / $totalProductsSold) * 100, 1));
+                        
+                        // Pick color based on rank
+                        $bgClass = 'bg-primary';
+                        if($index == 0) $bgClass = 'bg-success';
+                        else if($index == 1) $bgClass = 'bg-info';
+                        else if($index == 2) $bgClass = 'bg-warning';
+                    @endphp
                     <tr>
                       <td>
+                        <span class="badge {{ $bgClass }} rounded-pill">{{ $index + 1 }}</span>
+                      </td>
+                      <td>
                         <div class="d-flex align-items-center">
-                          <img src="{{ asset('storage/' . $product->image) }}" alt="" class="img-fluid wid-40 rounded me-2"
-                            style="height: 40px; object-fit: cover;">
-                          <h6 class="mb-0">{{ $product->name }}</h6>
+                          <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-fluid wid-40 rounded me-3 shadow-sm"
+                            style="height: 48px; width: 48px; object-fit: cover;">
+                          <div>
+                            <h6 class="mb-0 text-truncate" style="max-width: 250px;" title="{{ $product->name }}">{{ $product->name }}</h6>
+                          </div>
                         </div>
                       </td>
-                      <td>{{ number_format($product->price) }} VND</td>
-                      <td>{{ $product->total_sold }}</td>
-                      <td>{{ number_format($product->price * $product->total_sold) }} VND</td>
+                      <td class="text-end fw-medium">{{ number_format($product->price) }} ₫</td>
+                      <td class="text-center">
+                        <span class="badge bg-light-secondary text-secondary fw-bold px-3 py-2">{{ $product->total_sold }}</span>
+                      </td>
+                      <td class="text-end fw-bold text-success">{{ number_format($product->price * $product->total_sold) }} ₫</td>
+                      <td style="width: 200px;">
+                        <div class="d-flex align-items-center">
+                          <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                            <div class="progress-bar {{ $bgClass }}" role="progressbar" style="width: {{ $percentage }}%" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                          </div>
+                          <span class="text-muted small fw-medium">{{ $percentage }}%</span>
+                        </div>
+                      </td>
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="4" class="text-center">Chưa có dữ liệu bán hàng</td>
+                      <td colspan="6" class="text-center py-4">
+                        <div class="text-muted">
+                           <i class="ti ti-chart-bar f-24 d-block mb-2"></i>
+                           Chưa có dữ liệu bán hàng trong thời gian này
+                        </div>
+                      </td>
                     </tr>
                   @endforelse
                 </tbody>
@@ -364,83 +393,51 @@
       color: inherit;
     }
   </style>
-  
-  <!-- Giữ lại ApexCharts cho Biểu đồ Trạng Thái (Donut) nếu muốn -->
+  <!-- ApexChart -->
   <script src="{{ asset('admin-assets/js/plugins/apexcharts.min.js') }}"></script>
-  
-  <!-- Thêm Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      
-      // 1. Tải và Vẽ biểu đồ Line Chart bằng Chart.js cho Doanh Thu (Gọi API trực tiếp)
-      const urlParams = new URLSearchParams(window.location.search);
-      const startDate = urlParams.get('start_date');
-      const endDate = urlParams.get('end_date');
-      
-      let apiUrl = '{{ route('admin.api.dashboard.revenue') }}?filter=month';
-      if(startDate && endDate) {
-          apiUrl = `{{ route('admin.api.dashboard.revenue') }}?start_date=${startDate}&end_date=${endDate}`;
-      }
-
-      fetch(apiUrl)
-        .then(response => response.json())
-        .then(res => {
-            if(res.success && res.data && res.data.chart) {
-                const ctx = document.getElementById('revenueLineChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: res.data.chart.labels,
-                        datasets: [{
-                            label: 'Doanh Thu (VND)',
-                            data: res.data.chart.values,
-                            borderColor: '#4680ff',
-                            backgroundColor: 'rgba(70, 128, 255, 0.2)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4 // Làm mượt đường line
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        if (context.parsed.y !== null) {
-                                            label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
-                                        }
-                                        return label;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value, index, values) {
-                                        return new Intl.NumberFormat('vi-VN', { notation: "compact", compactDisplay: "short" }).format(value);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+      // Revenue Chart
+      var revenueOptions = {
+        series: [{
+          name: 'Doanh Thu',
+          data: @json($revenueValues)
+        }],
+        chart: {
+          type: 'area', // or line, bar
+          height: 350,
+          toolbar: {
+            show: false
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'smooth'
+        },
+        xaxis: {
+          categories: @json($revenueLabels),
+        },
+        yaxis: {
+          labels: {
+            formatter: function (value) {
+              return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
             }
-        })
-        .catch(error => console.error('Error loading chart data:', error));
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: function (value) {
+              return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+            }
+          }
+        },
+        colors: ['#4680ff']
+      };
+
+      var revenueChart = new ApexCharts(document.querySelector("#revenue-chart"), revenueOptions);
+      revenueChart.render();
 
       // 2. Order Status Chart (Dùng Data từ Backend truyền thẳng vào view qua $statusValues)
       var statusOptions = {

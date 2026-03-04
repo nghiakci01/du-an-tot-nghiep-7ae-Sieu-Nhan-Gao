@@ -10,7 +10,7 @@ class PaymentHistoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::query()->orderBy('created_at', 'desc');
+        $query = Order::with('user')->orderBy('created_at', 'desc');
 
         if ($request->has('payment_method') && $request->payment_method != '') {
             $query->where('payment_method', $request->payment_method);
