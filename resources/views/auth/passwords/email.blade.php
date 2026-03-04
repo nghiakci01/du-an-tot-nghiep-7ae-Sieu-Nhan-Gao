@@ -10,7 +10,7 @@
                         <ul>
                             <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
-                            <li>Đặt lại mật khẩu</li>
+                            <li>{{ __('messages.reset_password') }}</li>
                         </ul>
                     </div>
                 </div>
