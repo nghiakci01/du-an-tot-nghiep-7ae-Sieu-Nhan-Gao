@@ -24,7 +24,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6">
                     <div class="account_form">
-                        <h2>Đặt lại mật khẩu</h2>
+                        <h2>{{ __('messages.reset_password') }}</h2>
                         @if (session('status'))
                             <div class="alert alert-success" role="alert">
                                 {{ session('status') }}
@@ -34,8 +34,8 @@
                         <form method="POST" action="{{ route('password.email') }}">
                             @csrf
                             <p>
-                                <label>Email <span>*</span></label>
-                                <input type="email" name="email" value="{{ old('email') }}" required autofocus>
+                                <label>{{ __('messages.email') }} <span>*</span></label>
+                                <input type="email" name="email" value="{{ old('email') }}" required autofocus >
                                 @error('email')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
