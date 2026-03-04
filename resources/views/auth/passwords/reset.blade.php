@@ -39,7 +39,7 @@
                             </p>
 
                             <p>
-                                <label>New Password <span>*</span></label>
+                                <label>{{ __('messages.new_password') }}<span>*</span></label>
                                 <input type="password" name="password" required autocomplete="new-password">
                                 @error('password')
                                     <span class="text-danger">{{ $message }}</span>
@@ -47,12 +47,12 @@
                             </p>
 
                             <p>
-                                <label>Confirm Password <span>*</span></label>
+                                <label>{{ __('messages.confirm_new_password') }}<span>*</span></label>
                                 <input type="password" name="password_confirmation" required autocomplete="new-password">
                             </p>
 
                             <div class="login_submit">
-                                <button type="submit">Reset Password</button>
+                                <button type="submit">{{ __('messages.reset_password') }}</button>
                             </div>
                         </form>
                     </div>
