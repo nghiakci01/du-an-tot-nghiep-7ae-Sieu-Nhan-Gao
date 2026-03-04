@@ -222,7 +222,7 @@
             {{-- ORDER ITEMS --}}
             <div class="col-12">
               <p class="section-label">Sản phẩm đã đặt</p>
-              @foreach($order->orderItems as $item)
+              @foreach($order->items as $item)
               <div class="item-row">
                 @if(isset($item->product) && $item->product?->image)
                   <img src="{{ asset('storage/' . $item->product->image) }}" class="item-img" alt="{{ $item->product_name }}">
@@ -230,11 +230,9 @@
                   <div class="item-img-placeholder"><i class="bi bi-image"></i></div>
                 @endif
                 <div class="flex-grow-1">
-                  <div class="fw-semibold">{{ $item->product_name }}</div>
-                  @if($item->variant_info)
-                    <small class="text-muted">{{ $item->variant_info }}</small>
-                  @elseif(isset($item->productVariant))
-                    <small class="text-muted">{{ $item->productVariant?->size }} / {{ $item->productVariant?->color }}</small>
+                  <div class="fw-semibold">{{ $item->product?->name ?? 'Sản phẩm #' . $item->product_id }}</div>
+                  @if($item->variant)
+                    <small class="text-muted">{{ $item->variant->size }} / {{ $item->variant->color }}</small>
                   @endif
                   <div class="text-muted small">Số lượng: {{ $item->quantity }}</div>
                 </div>
@@ -247,12 +245,12 @@
             <div class="col-md-6">
               <p class="section-label">Địa chỉ nhận hàng</p>
               <div class="p-3 rounded-3" style="background:#f9fafb;border:1px solid #eee;">
-                <div class="fw-semibold">{{ $order->customer_name }}</div>
+                <div class="fw-semibold">{{ $order->name }}</div>
                 <div class="text-muted small">📞 {{ $order->phone }}</div>
                 <div class="text-muted small">📧 {{ $order->email }}</div>
-                <div class="text-muted small mt-1">📍 {{ $order->address }}{{ $order->city ? ', ' . $order->city : '' }}</div>
-                @if($order->notes)
-                  <div class="text-muted small mt-1">📝 Ghi chú: <em>{{ $order->notes }}</em></div>
+                <div class="text-muted small mt-1">📍 {{ $order->address }}{{ $order->province ? ', ' . $order->province : '' }}</div>
+                @if($order->note)
+                  <div class="text-muted small mt-1">📝 Ghi chú: <em>{{ $order->note }}</em></div>
                 @endif
               </div>
             </div>
