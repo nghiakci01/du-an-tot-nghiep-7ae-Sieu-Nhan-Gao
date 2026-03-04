@@ -1,4 +1,4 @@
-@extends('backend.layouts.master')
+@extends('layouts.admin')
 
 @section('title', 'Quản lý Tài Khoản Ngân Hàng')
 
