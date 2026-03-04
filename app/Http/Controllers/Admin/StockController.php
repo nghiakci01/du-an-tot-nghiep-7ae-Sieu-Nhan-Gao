@@ -9,9 +9,24 @@ use Illuminate\Http\Request;
 
 class StockController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('variants')->latest()->paginate(10);
+        $query = Product::with('variants')->latest();
+
+        if ($request->has('search') && $request->search != '') {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                // Tìm kiếm theo tên sản phẩm
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  // Hoặc tìm kiếm theo SKU củabiến thể
+                  ->orWhereHas('variants', function($sq) use ($searchTerm) {
+                      $sq->where('sku', 'like', '%' . $searchTerm . '%');
+                  });
+            });
+        }
+
+        $products = $query->paginate(10);
+        $products->appends(['search' => $request->search]); // keep context for pagination
 
         return view('admin.stock.index', compact('products'));
     }

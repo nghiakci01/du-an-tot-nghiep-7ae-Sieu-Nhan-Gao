@@ -22,8 +22,15 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="card">
-            <div class="card-header">
-                <h5>Kiểm kê sản phẩm</h5>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Kiểm kê sản phẩm</h5>
+                <form action="{{ route('admin.stock.index') }}" method="GET" class="d-flex">
+                    <input type="text" name="search" class="form-control form-control-sm me-2" placeholder="Tìm tên SP, SKU..." value="{{ request('search') }}">
+                    <button type="submit" class="btn btn-primary btn-sm">Tìm kiếm</button>
+                    @if(request('search'))
+                        <a href="{{ route('admin.stock.index') }}" class="btn btn-secondary btn-sm ms-2">Xóa lọc</a>
+                    @endif
+                </form>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
