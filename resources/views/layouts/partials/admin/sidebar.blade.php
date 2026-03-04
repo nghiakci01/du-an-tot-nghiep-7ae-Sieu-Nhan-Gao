@@ -3,7 +3,7 @@
         <div class="m-header d-flex align-items-center justify-content-center">
             <a href="{{ route('admin.dashboard') }}"
                 class="b-brand text-primary d-flex align-items-center" style="text-decoration: none;">
-                <h3 class="mb-0 fw-bolder text-primary ls-1">Elite Admin</h3>
+                <img src="{{ asset('admin-assets/images/logo-elite-new.png') }}" alt="logo" class="img-fluid logo-lg" style="max-height: 40px; margin-top: 5px;">
             </a>
         </div>
         <div class="navbar-content">
