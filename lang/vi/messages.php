@@ -277,6 +277,9 @@ return [
     'google_login' => 'Đăng nhập bằng Google',
     'already_have_account' => 'Đã có tài khoản?',
 
+    // Reset pasword
+    'reset_password' => 'Đặt lại mật khẩu',
+
     
 
 ];

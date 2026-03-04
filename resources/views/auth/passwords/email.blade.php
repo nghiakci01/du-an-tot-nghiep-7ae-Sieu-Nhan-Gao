@@ -8,7 +8,7 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">Trang chủ</a></li>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
                             <li>Đặt lại mật khẩu</li>
                         </ul>
