@@ -1,6 +1,6 @@
 ﻿@extends('layouts.public')
 
-@section('title', __('messages.checkout') . ' | FashionStore')
+@section('title', __('messages.checkout') . ' | Elite')
 
 @section('styles')
     <style>

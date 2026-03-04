@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Tra cứu đơn hàng | FashionStore')
+@section('title', 'Tra cứu đơn hàng | Elite')
 
 @section('content')
     <!--breadcrumbs area start-->

@@ -16,7 +16,7 @@ class SettingSeeder extends Seeder
             // Website Information
             [
                 'key' => 'site_title',
-                'value' => 'Sieu Nhan Gao Shop',
+                'value' => 'Elite',
                 'group' => 'general',
             ],
             [

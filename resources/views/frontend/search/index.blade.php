@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Search Results | FashionStore')
+@section('title', 'Search Results | Elite')
 
 @section('content')
     <!--breadcrumbs area start-->
