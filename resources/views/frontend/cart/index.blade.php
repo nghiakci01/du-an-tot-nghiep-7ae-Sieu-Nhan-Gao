@@ -61,11 +61,11 @@
                                                     <td class="product_check" style="vertical-align: middle;">
                                                         <input type="checkbox" class="check-item" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;">
                                                     </td>
-                                                    <td class="product_remove">
+                                                    <!-- <td class="product_remove">
                                                         <a href="javascript:void(0)" class="remove-from-cart">
                                                             <i class="fa fa-trash-o"></i>
                                                         </a>
-                                                    </td>
+                                                    </td> -->
                                                     <td class="product_thumb">
                                                         <a href="{{ route('product.detail', $details['slug']) }}">
                                                             <img src="{{ $details['image'] ? asset('storage/' . $details['image']) : asset('frontend-assets/img/s-product/product.jpg') }}"
