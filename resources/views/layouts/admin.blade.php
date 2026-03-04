@@ -69,11 +69,11 @@
     </div>
   </div>
 
-  {{-- Include Header --}}
-  @include('layouts.partials.admin.header')
-
   {{-- Include Sidebar --}}
   @include('layouts.partials.admin.sidebar')
+
+  {{-- Include Header --}}
+  @include('layouts.partials.admin.header')
 
   <!-- [ Main Content ] start -->
   <div class="pc-container">
