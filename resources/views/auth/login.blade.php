@@ -309,8 +309,11 @@
                                 <input type="password" name="password_confirmation" class="auth-input"
                                     placeholder="{{ __('messages.confirm_password') }}" required minlength="8">
                             </div>
+                            
+                            <a href="{{ route('login') }}" class="forgot-link">{{ __('messages.already_have_account') }}</a>
 
                             <button type="submit" class="auth-btn auth-btn-register">{{ __('messages.register') }}</button>
+                            
                         </form>
                     </div>
                 </div>

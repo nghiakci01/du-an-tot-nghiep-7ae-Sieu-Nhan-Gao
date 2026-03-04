@@ -275,6 +275,7 @@ return [
     'or_login_with'  => 'Hoặc đăng nhập bằng',
     'fb_login' => 'Đăng nhập bằng Facebook',
     'google_login' => 'Đăng nhập bằng Google',
+    'already_have_account' => 'Đã có tài khoản?',
 
     
 
