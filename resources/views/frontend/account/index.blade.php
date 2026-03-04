@@ -154,6 +154,11 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                @if(method_exists($orders, 'links'))
+                                <div class="mt-3">
+                                    {{ $orders->links('pagination::bootstrap-5') }}
+                                </div>
+                                @endif
                             </div>
                             <div class="tab-pane fade" id="wishlist">
                                 <h3>{{ __('messages.my_wishlist') }}</h3>
