@@ -58,7 +58,7 @@ class HomeController extends Controller
 
     public function news()
     {
-        $posts = \App\Models\Post::where('is_published', true)
+        $posts = \App\Models\Post::where('is_active', true)
             ->latest()
             ->paginate(9);
 
