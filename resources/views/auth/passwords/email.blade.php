@@ -35,13 +35,13 @@
                             @csrf
                             <p>
                                 <label>{{ __('messages.email') }} <span>*</span></label>
-                                <input type="email" name="email" value="{{ old('email') }}" required autofocus >
+                                <input type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="{{ __('messages.validate_email_required') }}">
                                 @error('email')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </p>
                             <div class="login_submit">
-                                <button type="submit">Gửi Link Đặt lại Mật Khẩu</button>
+                                <button type="submit">{{ __('messages.send_verification_code') }}</button>
                             </div>
                         </form>
                     </div>
