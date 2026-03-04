@@ -541,8 +541,8 @@
                             <div class="payment_method">
                                 <div class="panel-default">
                                     <input id="payment_cod" name="payment_method" type="radio" value="COD"
-                                        data-bs-target="createp_account" checked required />
-                                    <label for="payment_cod" data-bs-toggle="collapse" data-bs-target="#method_cod"
+                                        data-bs-target="#method_cod" checked required />
+                                    <label for="payment_cod" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_cod"
                                         aria-controls="method_cod">
                                         {{ __('messages.cash_on_delivery') }}
                                     </label>
@@ -554,10 +554,10 @@
                                     </div>
                                 </div>
 
-                                <div class="panel-default">
+                                <div class="panel-default mt-3">
                                     <input id="payment_bank" name="payment_method" type="radio" value="BANK_TRANSFER"
-                                        data-bs-target="createp_account" required />
-                                    <label for="payment_bank" data-bs-toggle="collapse" data-bs-target="#method_bank"
+                                        data-bs-target="#method_bank" required />
+                                    <label for="payment_bank" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_bank"
                                         aria-controls="method_bank">
                                         {{ __('messages.bank_transfer') }}
                                     </label>
@@ -819,6 +819,16 @@
             $('select[name="province"]').on('change', function () { 
                 showValidation(this, validateProvince($(this).val())); 
                 calculateShippingFees($(this).val());
+            });
+
+            $('input[name="payment_method"]').on('change', function() {
+                var targetId = $(this).attr('data-bs-target');
+                
+                // Ẩn tất cả các panel thanh toán
+                $('#method_cod, #method_bank').collapse('hide');
+                
+                // Hiện panel của phương thức được chọn
+                $(targetId).collapse('show');
             });
 
             $('input[name="name"],input[name="phone"],input[name="email"],input[name="address"],select[name="province"]').on('input change', function () {
