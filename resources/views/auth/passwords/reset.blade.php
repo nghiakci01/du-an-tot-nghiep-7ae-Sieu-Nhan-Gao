@@ -8,10 +8,10 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">home</a></li>
+                            <li><a href="{{ route('welcome') }}">Trang Chủ</a></li>
                             <li>/</li>
-                            <li>Reset Password</li>
-                        </ul>
+                            <li>Đặt lại mật khẩu</li>
+                        </ul>   
                     </div>
                 </div>
             </div>
@@ -24,7 +24,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6">
                     <div class="account_form">
-                        <h2>Reset Password</h2>
+                        <h2>Đặt lại mật khẩu</h2>
                         <form method="POST" action="{{ route('password.update') }}">
                             @csrf
                             <input type="hidden" name="token" value="{{ $token }}">
