@@ -47,4 +47,50 @@ class DashboardController extends Controller
             'endDate' => $endDate->format('Y-m-d'),
         ]);
     }
+
+    /**
+     * API Thống kê doanh thu (Trình diễn dạng JSON cho filter Tuần/Tháng)
+     */
+    public function revenueApi(Request $request)
+    {
+        $filter = $request->get('filter', 'month');
+
+        if ($filter === 'week') {
+            $startDate = now()->startOfWeek();
+            $endDate = now()->endOfWeek();
+        } else {
+            // Default is current month
+            $startDate = now()->startOfMonth();
+            $endDate = now()->endOfMonth();
+        }
+
+        // Nếu client muốn custom date
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
+        }
+
+        $overviewStats = $this->reportService->getOverviewStats($startDate, $endDate);
+        $revenueChart = $this->reportService->getRevenueChartData($startDate, $endDate);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'period' => [
+                    'start' => $startDate->format('Y-m-d'),
+                    'end' => $endDate->format('Y-m-d'),
+                    'filter' => $filter
+                ],
+                'summary' => [
+                    'total_revenue' => $overviewStats['total_revenue'],
+                    'total_orders' => $overviewStats['total_orders'],
+                    'successful_orders' => \App\Models\Order::where('status', \App\Models\Order::STATUS_COMPLETED)->whereBetween('created_at', [$startDate, $endDate])->count(),
+                ],
+                'chart' => [
+                    'labels' => $revenueChart['labels'],
+                    'values' => $revenueChart['values'],
+                ]
+            ]
+        ]);
+    }
 }
