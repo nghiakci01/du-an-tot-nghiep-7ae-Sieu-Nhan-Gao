@@ -22,7 +22,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Tên Website (Site Title)</label>
                                 <input type="text" class="form-control" name="site_title"
-                                    value="{{ $settings['site_title'] ?? 'Sieu Nhan Gao Shop' }}">
+                                    value="{{ $settings['site_title'] ?? 'Elite' }}">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phí Ship Mặc Định (VND)</label>
@@ -36,7 +36,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email Liên Hệ</label>
                                 <input type="text" class="form-control" name="site_email"
-                                    value="{{ $settings['site_email'] ?? 'contact@sieunhangao.com' }}">
+                                    value="{{ $settings['site_email'] ?? 'contact@elite.com' }}">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Hotline</label>

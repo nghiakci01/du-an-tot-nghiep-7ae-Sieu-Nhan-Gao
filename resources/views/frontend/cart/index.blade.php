@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', __('messages.shopping_cart') . ' | FashionStore')
+@section('title', __('messages.shopping_cart') . ' | Elite')
 
 @section('content')
     <!--breadcrumbs area start-->

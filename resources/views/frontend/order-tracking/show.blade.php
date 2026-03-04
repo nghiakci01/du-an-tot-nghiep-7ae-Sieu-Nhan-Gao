@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Chi tiết đơn hàng #' . $order->id . ' | FashionStore')
+@section('title', 'Chi tiết đơn hàng #' . $order->id . ' | Elite')
 
 @section('content')
     <!--breadcrumbs area start-->
