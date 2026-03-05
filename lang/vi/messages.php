@@ -288,10 +288,6 @@ return [
     'theme_mode_light' => 'Sáng',
     'theme_mode_dark' => 'Tối',
     'theme_mode_auto' => 'Tự động thiết lập chế độ giao diện dựa trên chủ đề của trình duyệt người dùng.',
-    'theme_contrast_title' => 'Chế độ tương phản',
-    'theme_contrast_desc' => 'Chọn chế độ tương phản',
-    'false' => 'Sai',
-    'true' => 'Đúng',
     
 
     'theme_layout_title' => 'Bố cục giao diện',
