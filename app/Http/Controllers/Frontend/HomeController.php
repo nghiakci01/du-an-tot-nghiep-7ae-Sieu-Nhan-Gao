@@ -53,7 +53,12 @@ class HomeController extends Controller
 
     public function about()
     {
-        return view('frontend.about');
+        $aboutBanner = \App\Models\Banner::where('position', 'about_us')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->first();
+
+        return view('frontend.about', compact('aboutBanner'));
     }
 
     public function news()
