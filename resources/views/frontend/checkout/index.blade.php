@@ -598,6 +598,23 @@
 
 
 
+                                <div class="panel-default mt-3">
+                                    <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY"
+                                        data-bs-target="#method_vnpay" required />
+                                    <label for="payment_vnpay" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_vnpay"
+                                        aria-controls="method_vnpay">
+                                        <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-VNPAY-QR.png"
+                                             alt="VNPAY" style="height:24px; margin-right:8px; vertical-align:middle;">
+                                        Thanh toán qua VNPAY (ATM / Internet Banking / QR Code)
+                                    </label>
+                                    <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
+                                        <div class="card-body1">
+                                            <p>Bạn sẽ được chuyển đến cổng thanh toán VNPAY để hoàn tất thanh toán an toàn.</p>
+                                            <p class="text-muted small">Hỗ trợ: Thẻ ATM nội địa, Visa/MasterCard, QR Code, Ví điện tử.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="order_button">
                                     <button type="submit">{{ __('messages.place_order') }}</button>
                                 </div>

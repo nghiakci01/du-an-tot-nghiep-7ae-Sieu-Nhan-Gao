@@ -57,7 +57,7 @@ class CheckoutController extends Controller
             'province' => 'required|string|in:'.implode(',', $provinces),
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
             'shipping_provider' => 'nullable|string',
             'shipping_service_name' => 'nullable|string',
             'shipping_fee' => 'nullable|numeric',
@@ -155,8 +155,12 @@ class CheckoutController extends Controller
             // Clear cart and coupon session
             Session::forget(['cart', 'coupon_code', 'discount_amount']);
 
+            // Nếu chọn VNPAY -> redirect sang trang thanh toán VNPAY
+            if ($request->payment_method === 'VNPAY') {
+                return redirect()->route('vnpay.payment', $order->id);
+            }
 
-            // Send confirmation email for COD and BANK_TRANSFER
+            // COD & BANK_TRANSFER: gửi email xác nhận và chuyển đến trang thành công
             try {
                 \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
             } catch (\Exception $e) {
@@ -176,13 +180,93 @@ class CheckoutController extends Controller
     {
         $order = Order::with(['items.product', 'items.variant'])->findOrFail($id);
 
-        // Security check: Only allow viewing if Auth user matches Or if just created (session check could be added here for strictness)
-        $bankName = \App\Models\Setting::get('bank_name', 'Vietcombank');
-        $bankAccount = \App\Models\Setting::get('bank_account_number', '0071001234567');
-        $bankOwner = \App\Models\Setting::get('bank_account_name', 'CÔNG TY TNHH SIÊU NHÂN GAO');
-        $bankId = \App\Models\Setting::get('bank_id', 'vcb');
+        // Lấy thông tin tài khoản ngân hàng mặc định
+        $bank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first();
+        
+        // Nếu không có mặc định, lấy cái đầu tiên đang hoạt động
+        if (!$bank) {
+            $bank = \App\Models\BankSetting::where('is_active', true)->first();
+        }
+
+        $bankName = $bank->bank_name ?? 'Vietcombank';
+        $bankAccount = $bank->account_number ?? '0071001234567';
+        $bankOwner = $bank->account_name ?? 'CÔNG TY TNHH SIÊU NHÂN GAO';
+        $bankId = $bank->bank_id ?? 'vcb';
 
         return view('frontend.checkout.success', compact('order', 'bankName', 'bankAccount', 'bankOwner', 'bankId'));
+    }
+
+    /**
+     * Xác nhận đã chuyển khoản
+     */
+    public function confirmTransfer($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->payment_method !== 'BANK_TRANSFER') {
+            return redirect()->back()->with('error', 'Phương thức thanh toán không hợp lệ.');
+        }
+
+        if ($order->payment_status !== 'pending') {
+            return redirect()->back()->with('error', 'Trạng thái thanh toán không hợp lệ.');
+        }
+
+        $order->update([
+            'payment_status' => 'waiting_confirmation'
+        ]);
+
+        // Ghi lại lịch sử (nếu có hệ thống lịch sử đơn hàng)
+        if (class_exists(\App\Models\OrderHistory::class)) {
+            \App\Models\OrderHistory::create([
+                'order_id' => $order->id,
+                'status' => $order->status,
+                'note' => 'Khách hàng xác nhận đã chuyển khoản. Chờ Admin kiểm tra.',
+                'user_id' => Auth::id()
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Thông báo đã được gửi. Vui lòng chờ chúng tôi xác nhận giao dịch.');
+    }
+
+    /**
+     * Hủy đơn hàng khi đang chờ thanh toán
+     */
+    public function cancelOrder($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->status !== 'pending') {
+            return redirect()->back()->with('error', 'Không thể hủy đơn hàng ở trạng thái hiện tại.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $order->update(['status' => 'cancelled']);
+
+            // Hoàn lại số lượng tồn kho
+            foreach ($order->items as $item) {
+                if ($item->variant_id) {
+                    ProductVariant::where('id', $item->variant_id)->increment('stock_quantity', $item->quantity);
+                }
+            }
+
+            if (class_exists(\App\Models\OrderHistory::class)) {
+                \App\Models\OrderHistory::create([
+                    'order_id' => $order->id,
+                    'status' => 'cancelled',
+                    'note' => 'Khách hàng tự hủy đơn hàng.',
+                    'user_id' => Auth::id()
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('shop')->with('success', 'Đơn hàng đã được hủy thành công.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi hủy đơn hàng: ' . $e->getMessage());
+        }
     }
 
     /**

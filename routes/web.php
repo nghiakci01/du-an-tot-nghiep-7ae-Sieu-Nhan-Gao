@@ -33,6 +33,13 @@ Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::clas
 Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
 Route::post('/checkout/remove-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeCoupon'])->name('checkout.removeCoupon');
 Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
+Route::post('/checkout/order/{id}/confirm-transfer', [App\Http\Controllers\Frontend\CheckoutController::class, 'confirmTransfer'])->name('checkout.confirm_transfer');
+Route::post('/checkout/order/{id}/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancelOrder'])->name('checkout.cancel_order');
+
+// VNPAY Routes
+Route::get('/vnpay/payment/{order_id}', [App\Http\Controllers\Frontend\PaymentController::class, 'createPayment'])->name('vnpay.payment');
+Route::get('/vnpay/callback', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('vnpay.callback');
+Route::get('/vnpay/return', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('vnpay.return');
 
 // Guest Order Tracking Routes
 Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'index'])->name('order-tracking.index');
@@ -94,6 +101,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
         Route::get('orders/customers/search', [App\Http\Controllers\Admin\OrderController::class, 'customersSearch'])->name('orders.customers.search');
         Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
+        Route::post('orders/{order}/confirm-payment', [App\Http\Controllers\Admin\OrderController::class, 'confirmPayment'])->name('orders.confirm-payment');
         Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
         Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
 
@@ -129,7 +137,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             Route::get('loyalty-points', [App\Http\Controllers\Admin\LoyaltyPointController::class, 'index'])->name('loyalty-points.index');
             
             // Cài đặt ngân hàng thanh toán (QR Bank Settings)
-            Route::resource('bank-settings', App\Http\Controllers\Backend\BankSettingController::class);
+            Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
         });
 
         // Admin & Staff Routes (Stock only)

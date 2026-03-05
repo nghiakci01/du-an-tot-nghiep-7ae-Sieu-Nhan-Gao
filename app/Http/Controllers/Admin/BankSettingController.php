@@ -1,21 +1,22 @@
 <?php
 
-namespace App\Http\Controllers\Backend;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BankSetting;
 use Illuminate\Http\Request;
 
 class BankSettingController extends Controller
 {
     public function index()
     {
-        $banks = \App\Models\BankSetting::latest()->paginate(10);
-        return view('backend.bank-settings.index', compact('banks'));
+        $banks = BankSetting::latest()->paginate(10);
+        return view('admin.bank-settings.index', compact('banks'));
     }
 
     public function create()
     {
-        return view('backend.bank-settings.create');
+        return view('admin.bank-settings.create');
     }
 
     public function store(Request $request)
@@ -28,18 +29,18 @@ class BankSettingController extends Controller
         ]);
 
         if ($request->is_default) {
-            \App\Models\BankSetting::where('is_default', true)->update(['is_default' => false]);
+            BankSetting::where('is_default', true)->update(['is_default' => false]);
         }
 
-        \App\Models\BankSetting::create($request->all());
+        BankSetting::create($request->all());
 
         return redirect()->route('admin.bank-settings.index')->with('success', 'Thêm ngân hàng thành công.');
     }
 
     public function edit($id)
     {
-        $bank = \App\Models\BankSetting::findOrFail($id);
-        return view('backend.bank-settings.edit', compact('bank'));
+        $bank = BankSetting::findOrFail($id);
+        return view('admin.bank-settings.edit', compact('bank'));
     }
 
     public function update(Request $request, $id)
@@ -51,10 +52,10 @@ class BankSettingController extends Controller
             'account_name' => 'required|string|max:255',
         ]);
 
-        $bank = \App\Models\BankSetting::findOrFail($id);
+        $bank = BankSetting::findOrFail($id);
 
         if ($request->has('is_default') && $request->is_default) {
-            \App\Models\BankSetting::where('id', '!=', $id)->update(['is_default' => false]);
+            BankSetting::where('id', '!=', $id)->update(['is_default' => false]);
         }
 
         $bank->update([
@@ -71,7 +72,7 @@ class BankSettingController extends Controller
 
     public function destroy($id)
     {
-        $bank = \App\Models\BankSetting::findOrFail($id);
+        $bank = BankSetting::findOrFail($id);
         $bank->delete();
 
         return redirect()->route('admin.bank-settings.index')->with('success', 'Xóa ngân hàng thành công.');
