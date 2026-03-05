@@ -50,32 +50,6 @@
               </div>
             </div>
           </li>
-          <li class="list-group-item">
-            <h6 class="mb-1">{{ __('messages.theme_contrast_title') }}</h6>
-            <p class="text-muted text-sm">{{ __('messages.theme_contrast_desc') }}</p>
-            <div class="row theme-contrast">
-              <div class="col-6">
-                <div class="d-grid">
-                  <button class="preset-btn btn" data-value="true" onclick="layout_theme_contrast_change('true');"
-                    data-bs-toggle="tooltip" title="{{ __('messages.true') }}">
-                    <svg class="pc-icon">
-                      <use xlink:href="#custom-mask"></use>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="d-grid">
-                  <button class="preset-btn btn active" data-value="false"
-                    onclick="layout_theme_contrast_change('false');" data-bs-toggle="tooltip" title="{{ __('messages.false') }}">
-                    <svg class="pc-icon">
-                      <use xlink:href="#custom-mask-1-outline"></use>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </li>
 
           <li class="list-group-item">
             <h6 class="mb-1">{{ __('messages.theme_layout_title') }}</h6>
@@ -96,7 +70,7 @@
           <li class="list-group-item">
             <div class="d-grid">
               <button class="btn btn-light-danger" id="layoutreset">
-                Reset Layout
+                {{ __('messages.reset_layout') }}
               </button>
             </div>
           </li>

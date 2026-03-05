@@ -288,8 +288,7 @@ return [
     'theme_mode_light' => 'Sáng',
     'theme_mode_dark' => 'Tối',
     'theme_mode_auto' => 'Tự động thiết lập chế độ giao diện dựa trên chủ đề của trình duyệt người dùng.',
-    
-
     'theme_layout_title' => 'Bố cục giao diện',
     'theme_layout_desc' => 'Chọn bố cục của bạn',
+    'reset_layout' => 'Đặt lại mặc định'
 ];
