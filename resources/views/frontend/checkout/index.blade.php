@@ -568,24 +568,15 @@
                                             @php
                                                 $defaultBank = \App\Models\BankSetting::where('is_active', true)->orderBy('is_default', 'desc')->first();
                                             @endphp
-                                            
                                             @if($defaultBank)
-                                            <div class="bank-details-qr mt-3 p-3 border rounded bg-light">
-                                                <div class="row align-items-center">
-                                                    <div class="col-md-7">
-                                                        <ul class="list-unstyled mb-0">
-                                                            <li><strong>Ngân hàng:</strong> <span class="text-primary fw-bold" id="bank_name_display">{{ $defaultBank->bank_name }}</span></li>
-                                                            <li><strong>Số tài khoản:</strong> <span class="text-primary fw-bold" id="bank_account_number_display">{{ $defaultBank->account_number }}</span></li>
-                                                            <li><strong>Chủ tài khoản:</strong> <span class="text-primary fw-bold" id="bank_account_name_display">{{ $defaultBank->account_name }}</span></li>
-                                                            <li><strong>Nội dung:</strong> <span class="text-danger fw-bold">THANHTOAN DH[Mã đơn hàng]</span></li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="col-md-5 text-center mt-3 mt-md-0">
-                                                        <img src="https://img.vietqr.io/image/{{ $defaultBank->bank_id }}-{{ $defaultBank->account_number }}-compact.png?amount={{ $finalTotal }}&addInfo=THANHTOAN%20DH&accountName={{ urlencode($defaultBank->account_name) }}" 
-                                                             alt="Bank transfer QR" class="img-fluid rounded shadow-sm" style="max-width: 150px;" id="bank_qr_image">
-                                                        <p class="small text-muted mt-2 mb-0">Quét mã để thanh toán</p>
-                                                    </div>
-                                                </div>
+                                            <div class="bank-details-info mt-3 p-3 border rounded bg-light">
+                                                <ul class="list-unstyled mb-0">
+                                                    <li><strong>Ngân hàng:</strong> <span class="text-primary fw-bold" id="bank_name_display">{{ $defaultBank->bank_name }}</span></li>
+                                                    <li><strong>Số tài khoản:</strong> <span class="text-primary fw-bold" id="bank_account_number_display">{{ $defaultBank->account_number }}</span></li>
+                                                    <li><strong>Chủ tài khoản:</strong> <span class="text-primary fw-bold" id="bank_account_name_display">{{ $defaultBank->account_name }}</span></li>
+                                                    <li><strong>Nội dung:</strong> <span class="text-danger fw-bold">THANHTOAN DH[Mã đơn hàng]</span></li>
+                                                </ul>
+                                                <p class="small text-muted mt-2 mb-0">⚠️ <em>Lưu ý: Mã QR thanh toán chính xác sẽ được hiển thị sau khi bạn nhấn đặt hàng.</em></p>
                                             </div>
                                             @else
                                             <div class="alert alert-warning mt-3">
