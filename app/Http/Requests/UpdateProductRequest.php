@@ -43,29 +43,6 @@ class UpdateProductRequest extends FormRequest
                     }
                 }
             ],
-            'gallery_images' => 'nullable|array|max:6',
-            'gallery_images.*' => [
-                'image',
-                'mimes:jpeg,png,jpg,webp',
-                'max:2048',
-                function ($attribute, $value, $fail) {
-                    if ($value instanceof \Illuminate\Http\UploadedFile && $value->isValid()) {
-                        $path = $value->getRealPath() ?: $value->getPathname();
-                        if (empty($path)) return;
-
-                        $dimensions = @getimagesize($path);
-                        if (!$dimensions) {
-                            $fail("Không thể đọc định dạng hình ảnh gallery.");
-                            return;
-                        }
-
-                        [$width, $height] = $dimensions;
-                        if ($width < 400 || $height < 400) {
-                            $fail("Hình ảnh gallery phải có kích thước tối thiểu 400x400px.");
-                        }
-                    }
-                }
-            ],
             'is_active' => 'boolean',
 
             // Variants validation
@@ -135,7 +112,6 @@ class UpdateProductRequest extends FormRequest
     {
         return [
             'sale_price.lt' => 'Giá khuyến mãi phải nhỏ hơn giá gốc.',
-            'gallery_images.max' => 'Bạn chỉ có thể tải lên tối đa :max ảnh bộ sưu tập.',
         ];
     }
 }
