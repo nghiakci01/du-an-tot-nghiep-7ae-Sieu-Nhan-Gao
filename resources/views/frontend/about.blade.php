@@ -27,7 +27,11 @@
             <div class="row align-items-center">
                 <div class="col-lg-6 col-md-12">
                     <div class="about_thumb">
-                        <img src="{{ asset('frontend-assets/img/about/about1.jpg') }}" alt="{{ __('messages.about_us') }}">
+                        @if(isset($aboutBanner) && $aboutBanner->image)
+                            <img src="{{ asset('storage/' . $aboutBanner->image) }}" alt="{{ $aboutBanner->title ?? __('messages.about_us') }}">
+                        @else
+                            <img src="{{ asset('frontend-assets/img/about/about1.jpg') }}" alt="{{ __('messages.about_us') }}">
+                        @endif
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-12">
