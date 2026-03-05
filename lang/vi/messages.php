@@ -281,6 +281,16 @@ return [
     'reset_password' => 'Đặt lại mật khẩu',
     'send_verification_code' => "Gửi mã xác nhận",
 
-    
-
+    // Theme Setting Admin
+    'settings' => 'Cài đặt',
+    'theme_mode_title' => 'Chế độ giao diện',
+    'theme_mode_desc' => 'Chọn chế độ Sáng, Tối hoặc Tự động',
+    'theme_mode_light' => 'Sáng',
+    'theme_mode_dark' => 'Tối',
+    'theme_mode_auto' => 'Tự động thiết lập chế độ giao dện dựa trên chủ đề của trình duyệt người dùng.',
+    'theme_contrast_title' => 'Chế độ tương phản',
+    'theme_contrast_desc' => 'Chọn chế độ tương phản',
+    'false' => 'Sai',
+    'true' => 'Đúng',
+    ''
 ];
