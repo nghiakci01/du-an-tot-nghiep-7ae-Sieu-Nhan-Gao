@@ -140,32 +140,7 @@
               </div>
             </div>
           </li>
-          <li class="list-group-item pc-box-width">
-            <div class="pc-container-width">
-              <h6 class="mb-1">Layout Width</h6>
-              <p class="text-muted text-sm">
-                Choose Full or Container Layout
-              </p>
-              <div class="row theme-color theme-container">
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button class="preset-btn btn-img btn active" data-value="false"
-                      onclick="change_box_container('false')" data-bs-toggle="tooltip" title="Full Width">
-                      <img src="{{ asset('admin-assets') }}/images/customizer/full.svg" alt="img" class="img-fluid" />
-                    </button>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button class="preset-btn btn-img btn" data-value="true" onclick="change_box_container('true')"
-                      data-bs-toggle="tooltip" title="Fixed Width">
-                      <img src="{{ asset('admin-assets') }}/images/customizer/fixed.svg" alt="img" class="img-fluid" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
+
           <li class="list-group-item">
             <div class="d-grid">
               <button class="btn btn-light-danger" id="layoutreset">
