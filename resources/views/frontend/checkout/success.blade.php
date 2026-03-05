@@ -165,7 +165,13 @@
         <i class="bi bi-check-lg text-white" style="font-size:2.8rem;"></i>
       </div>
     </div>
-    <h2 class="fw-bold mb-1" style="font-size:2rem;">Đặt hàng thành công!</h2>
+    <h2 class="fw-bold mb-1" style="font-size:2rem;">
+      @if($isBankTransfer && $order->payment_status == 'pending')
+        Chờ thanh toán
+      @else
+        Đặt hàng thành công!
+      @endif
+    </h2>
     <p class="text-muted mb-0">Cảm ơn bạn đã tin tưởng mua sắm tại <strong>{{ $settings['site_title'] ?? 'Elite' }}</strong></p>
     <p class="text-muted">Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
 
