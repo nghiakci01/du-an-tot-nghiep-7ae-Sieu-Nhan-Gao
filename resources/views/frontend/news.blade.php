@@ -75,59 +75,6 @@
             </div>
         </div>
     </div>
-        <div class="counterup_section">
-        <div class="container">   
-            <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="single_counterup">
-                       <div class="counter_img">
-                            <img src="assets/img/about/count.png" alt="">
-                        </div>
-                        <div class="counter_info">
-                            <h2 class="counter_number">2170</h2>
-                            <p>happy customers</p>
-                        </div>
-                    </div>
-                </div>
-                 <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="single_counterup count-two">
-                        <div class="counter_img">
-                            <img src="assets/img/about/count2.png" alt="">
-                        </div>
-                        <div class="counter_info">
-                            <h2 class="counter_number">8080</h2>
-                            <p>AWARDS won</p>
-                        </div>
-                    </div>
-                </div>
-                 <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="single_counterup">
-                        <div class="counter_img">
-                            <img src="assets/img/about/count3.png" alt="">
-                        </div>
-                        <div class="counter_info">
-                            <h2 class="counter_number">2150</h2>
-                            <p>HOURS WORKED</p>
-                        </div>
-                    </div>
-                </div>
-                 <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="single_counterup count-two">
-                        <div class="counter_img">
-                            <img src="assets/img/about/count4.png" alt="">
-                        </div>
-                        <div class="counter_info">
-                            <h2 class="counter_number">2170</h2>
-                            <p>COMPLETE PROJECTS</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>    
-    </div>
-    <!--counterup end-->
-
-
     <!--news section end-->
 
     <!--newsletter area start-->
