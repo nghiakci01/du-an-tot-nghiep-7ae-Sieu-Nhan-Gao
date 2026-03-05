@@ -39,7 +39,6 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Hình ảnh</th>
                                 <th>Tên danh mục</th>
                                 <th>Slug</th>
                                 <th>Danh mục cha</th>
@@ -50,13 +49,6 @@
                             @foreach($categories as $category)
                             <tr>
                                 <td>{{ $category->id }}</td>
-                                <td>
-                                    @if($category->image)
-                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" width="50">
-                                    @else
-                                        <span class="text-muted">No Image</span>
-                                    @endif
-                                </td>
                                 <td>{{ $category->name }}</td>
                                 <td>{{ $category->slug }}</td>
                                 <td>
