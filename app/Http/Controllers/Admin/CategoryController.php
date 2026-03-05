@@ -38,11 +38,6 @@ class CategoryController extends Controller
         $data = $request->validated();
         $data['slug'] = Str::slug($data['name']);
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('categories', 'public');
-            $data['image'] = $path;
-        }
-
         Category::create($data);
 
         return redirect()->route('admin.categories.index')->with('success', 'Danh mục đã được tạo thành công.');
@@ -73,15 +68,6 @@ class CategoryController extends Controller
                 ->with('error', 'Không thể chuyển danh mục có danh mục con thành danh mục con.');
         }
 
-        if ($request->hasFile('image')) {
-            // Delete old image
-            if ($category->image) {
-                Storage::disk('public')->delete($category->image);
-            }
-            $path = $request->file('image')->store('categories', 'public');
-            $data['image'] = $path;
-        }
-
         $category->update($data);
 
         return redirect()->route('admin.categories.index')->with('success', 'Danh mục đã được cập nhật thành công.');
@@ -98,10 +84,6 @@ class CategoryController extends Controller
         
         if ($category->products()->count() > 0) {
              return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục có chứa sản phẩm.');
-        }
-
-        if ($category->image) {
-            Storage::disk('public')->delete($category->image);
         }
 
         $category->delete();
