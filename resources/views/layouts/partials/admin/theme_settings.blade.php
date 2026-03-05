@@ -76,41 +76,20 @@
               </div>
             </div>
           </li>
+
           <li class="list-group-item">
-            <h6 class="mb-1">Custom Theme</h6>
-            <p class="text-muted text-sm">Choose your primary theme color</p>
-            <div class="theme-color preset-color">
-              <a href="#!" data-bs-toggle="tooltip" title="Blue" class="active" data-value="preset-1"><i
-                  class="ti ti-checks"></i></a>
-              <a href="#!" data-bs-toggle="tooltip" title="Indigo" data-value="preset-2"><i
-                  class="ti ti-checks"></i></a>
-              <a href="#!" data-bs-toggle="tooltip" title="Purple" data-value="preset-3"><i
-                  class="ti ti-checks"></i></a>
-              <a href="#!" data-bs-toggle="tooltip" title="Pink" data-value="preset-4"><i class="ti ti-checks"></i></a>
-              <a href="#!" data-bs-toggle="tooltip" title="Red" data-value="preset-5"><i class="ti ti-checks"></i></a>
-              <a href="#!" data-bs-toggle="tooltip" title="Orange" data-value="preset-6"><i
-                  class="ti ti-checks"></i></a>
-              <a href="#!" data-bs-toggle="tooltip" title="Yellow" data-value="preset-7"><i
-                  class="ti ti-checks"></i></a>
-              <a href="#!" data-bs-toggle="tooltip" title="Green" data-value="preset-8"><i class="ti ti-checks"></i></a>
-              <a href="#!" data-bs-toggle="tooltip" title="Teal" data-value="preset-9"><i class="ti ti-checks"></i></a>
-              <a href="#!" data-bs-toggle="tooltip" title="Cyan" data-value="preset-10"><i class="ti ti-checks"></i></a>
-            </div>
-          </li>
-          <li class="list-group-item">
-            <h6 class="mb-1">Theme layout</h6>
-            <p class="text-muted text-sm">Choose your layout</p>
+            <h6 class="mb-1">{{ __('messages.theme_layout_title') }}</h6>
+            <p class="text-muted text-sm">{{ __('messages.theme_layout_desc') }}</p>
             <div class="theme-main-layout d-flex align-center gap-1 w-100">
               <a href="#!" data-bs-toggle="tooltip" title="Vertical" class="active" data-value="vertical"><img
                   src="{{ asset('admin-assets') }}/images/customizer/caption-on.svg" alt="img" class="img-fluid" />
-              </a><a href="#!" data-bs-toggle="tooltip" title="Horizontal" data-value="horizontal"><img
-                  src="{{ asset('admin-assets') }}/images/customizer/horizontal.svg" alt="img" class="img-fluid" />
-              </a><a href="#!" data-bs-toggle="tooltip" title="Color Header" data-value="color-header"><img
-                  src="{{ asset('admin-assets') }}/images/customizer/color-header.svg" alt="img" class="img-fluid" />
-              </a><a href="#!" data-bs-toggle="tooltip" title="Compact" data-value="compact"><img
-                  src="{{ asset('admin-assets') }}/images/customizer/compact.svg" alt="img" class="img-fluid" /> </a><a
-                href="#!" data-bs-toggle="tooltip" title="Tab" data-value="tab"><img
-                  src="{{ asset('admin-assets') }}/images/customizer/tab.svg" alt="img" class="img-fluid" /></a>
+              </a>
+              <a href="#!" data-bs-toggle="tooltip" title="Compact" data-value="compact"><img
+                  src="{{ asset('admin-assets') }}/images/customizer/compact.svg" alt="img" class="img-fluid" />
+                </a>
+              <a href="#!" data-bs-toggle="tooltip" title="Tab" data-value="tab"><img
+                  src="{{ asset('admin-assets') }}/images/customizer/tab.svg" alt="img" class="img-fluid" />
+              </a>
             </div>
           </li>
           <li class="list-group-item">
