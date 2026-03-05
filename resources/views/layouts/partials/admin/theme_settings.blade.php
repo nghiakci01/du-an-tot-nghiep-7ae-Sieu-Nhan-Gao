@@ -92,30 +92,6 @@
               </a>
             </div>
           </li>
-          <li class="list-group-item">
-            <div class="pc-rtl">
-              <h6 class="mb-1">Theme Layout</h6>
-              <p class="text-muted text-sm">LTR/RTL</p>
-              <div class="row theme-color theme-direction">
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button class="preset-btn btn-img btn active" data-value="false"
-                      onclick="layout_rtl_change('false');" data-bs-toggle="tooltip" title="LTR">
-                      <img src="{{ asset('admin-assets') }}/images/customizer/ltr.svg" alt="img" class="img-fluid" />
-                    </button>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button class="preset-btn btn-img btn" data-value="true" onclick="layout_rtl_change('true');"
-                      data-bs-toggle="tooltip" title="RTL">
-                      <img src="{{ asset('admin-assets') }}/images/customizer/rtl.svg" alt="img" class="img-fluid" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
 
           <li class="list-group-item">
             <div class="d-grid">
