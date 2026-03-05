@@ -225,7 +225,7 @@
     <div class="shipping-label">
         <div class="header-section">
             <div class="logo-area">
-                <img src="{{ asset('assets/images/logo.png') }}" alt="{{ config('app.name') }}">
+                <img src="{{ asset('frontend-assets/img/logo/logo-elite-new.png') }}" alt="{{ config('app.name') }}">
                 <div style="font-weight: bold; font-size: 16px; margin-top: 5px;">{{ $order->shipping_service_name ?? 'Giao Hàng Tiêu Chuẩn' }}</div>
             </div>
             <div class="barcode-area">
