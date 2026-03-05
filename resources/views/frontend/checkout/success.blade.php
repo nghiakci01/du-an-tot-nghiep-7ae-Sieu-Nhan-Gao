@@ -161,8 +161,8 @@
   {{-- ===== SUCCESS HEADER ===== --}}
   <div class="text-center mb-5">
     <div class="success-icon-animate d-inline-block mb-3">
-      <div style="width:90px;height:90px;background:linear-gradient(135deg,#28a745,#20c997);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 8px 24px rgba(40,167,69,0.3);">
-        <i class="bi bi-check-lg text-white" style="font-size:2.8rem;"></i>
+      <div style="width:90px;height:90px;background:linear-gradient(135deg,@if($isBankTransfer && $order->payment_status == 'pending') #ffc107, #ff9800 @else #28a745,#20c997 @endif);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 8px 24px rgba(@if($isBankTransfer && $order->payment_status == 'pending') 255,193,7,0.3 @else 40,167,69,0.3 @endif);">
+        <i class="bi @if($isBankTransfer && $order->payment_status == 'pending') bi-clock-history @else bi-check-lg @endif text-white" style="font-size:2.8rem;"></i>
       </div>
     </div>
     <h2 class="fw-bold mb-1" style="font-size:2rem;">
