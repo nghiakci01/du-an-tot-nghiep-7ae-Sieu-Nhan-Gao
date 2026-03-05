@@ -239,13 +239,23 @@
                 </div>
                 <div class="mb-3">
                     <p class="mb-1 text-muted small">TRẠNG THÁI THANH TOÁN</p>
-                    <p class="mb-0">
-                        @if($order->payment_status == 'PAID')
+                    <p class="mb-2">
+                        @if($order->payment_status == 'paid')
                             <span class="badge bg-success"><i class="feather icon-check"></i> Đã thanh toán</span>
+                        @elseif($order->payment_status == 'waiting_confirmation')
+                            <span class="badge bg-info text-white"><i class="feather icon-clock"></i> Chờ xác nhận</span>
                         @else
                             <span class="badge bg-warning text-dark"><i class="feather icon-clock"></i> Chưa thanh toán</span>
                         @endif
                     </p>
+                    @if($order->payment_method == 'BANK_TRANSFER' && $order->payment_status == 'waiting_confirmation')
+                        <form action="{{ route('admin.orders.confirm-payment', $order->id) }}" method="POST" onsubmit="return confirm('Bạn đã chắc chắn nhận được tiền cho đơn hàng này?')">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-success w-100">
+                                <i class="feather icon-check-circle"></i> Xác nhận ĐÃ NHẬN TIỀN
+                            </button>
+                        </form>
+                    @endif
                 </div>
                 @if($order->shipping_service_name)
                 <div class="mb-0">
