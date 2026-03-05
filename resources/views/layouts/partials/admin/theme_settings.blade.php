@@ -93,30 +93,6 @@
             </div>
           </li>
           <li class="list-group-item">
-            <h6 class="mb-1">Sidebar Caption</h6>
-            <p class="text-muted text-sm">Sidebar Caption Hide/Show</p>
-            <div class="row theme-color theme-nav-caption">
-              <div class="col-6">
-                <div class="d-grid">
-                  <button class="preset-btn btn-img btn active" data-value="true"
-                    onclick="layout_caption_change('true');" data-bs-toggle="tooltip" title="Caption Show">
-                    <img src="{{ asset('admin-assets') }}/images/customizer/caption-on.svg" alt="img"
-                      class="img-fluid" />
-                  </button>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="d-grid">
-                  <button class="preset-btn btn-img btn" data-value="false" onclick="layout_caption_change('false');"
-                    data-bs-toggle="tooltip" title="Caption Hide">
-                    <img src="{{ asset('admin-assets') }}/images/customizer/caption-off.svg" alt="img"
-                      class="img-fluid" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="list-group-item">
             <div class="pc-rtl">
               <h6 class="mb-1">Theme Layout</h6>
               <p class="text-muted text-sm">LTR/RTL</p>
