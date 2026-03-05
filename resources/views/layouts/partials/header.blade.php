@@ -213,7 +213,7 @@
                                                         @endphp
                                                         @foreach($megaMenuProducts as $product)
                                                         <div class="custom-shop-product">
-                                                            <a href="{{ route('products.show', $product->slug) }}">
+                                                            <a href="{{ route('product.detail', $product->slug) }}">
                                                                 <div class="custom-shop-product-img">
                                                                     <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('frontend-assets/img/product/product1.jpg') }}" alt="{{ $product->name }}">
                                                                 </div>
@@ -353,7 +353,7 @@
                                                         @endphp
                                                         @foreach($megaMenuProducts as $product)
                                                         <div class="custom-shop-product">
-                                                            <a href="{{ route('products.show', $product->slug) }}">
+                                                            <a href="{{ route('product.detail', $product->slug) }}">
                                                                 <div class="custom-shop-product-img">
                                                                     <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('frontend-assets/img/product/product1.jpg') }}" alt="{{ $product->name }}">
                                                                 </div>
