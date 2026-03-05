@@ -13,7 +13,7 @@
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i
                                      class="feather icon-home"></i></a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.post-categories.index') }}">Danh mục tin</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.post-categories.index') }}">Danh mục tin tức</a></li>
                         <li class="breadcrumb-item"><a href="#!">Thêm mới</a></li>
                     </ul>
                 </div>
