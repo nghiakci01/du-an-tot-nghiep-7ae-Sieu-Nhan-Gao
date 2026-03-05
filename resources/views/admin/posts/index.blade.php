@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý Bài viết')
+@section('title', 'Quản lý Tin tức')
 
 @section('content')
     <div class="page-header">
@@ -8,13 +8,13 @@
             <div class="row align-items-center">
                 <div class="col-md-12">
                     <div class="page-header-title">
-                        <h5 class="m-b-10">Quản lý Bài viết</h5>
+                        <h5 class="m-b-10">Quản lý Tin tức</h5>
                     </div>
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i
                                      class="feather icon-home"></i></a></li>
-                        <li class="breadcrumb-item"><a href="#!">Blog</a></li>
-                        <li class="breadcrumb-item"><a href="#!">Bài viết</a></li>
+                        <li class="breadcrumb-item"><a href="#!">Tin tức</a></li>
+                        <li class="breadcrumb-item"><a href="#!">Danh sách tin tức</a></li>
                     </ul>
                 </div>
             </div>
@@ -25,8 +25,8 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5>Danh sách Bài viết</h5>
-                    <a href="{{ route('admin.posts.create') }}" class="btn btn-primary btn-sm">Thêm bài viết mới</a>
+                    <h5>Danh sách Tin tức</h5>
+                    <a href="{{ route('admin.posts.create') }}" class="btn btn-primary btn-sm">Thêm tin tức mới</a>
                 </div>
                 <div class="card-body">
                     @if(session('success'))
