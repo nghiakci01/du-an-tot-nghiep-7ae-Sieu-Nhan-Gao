@@ -19,11 +19,15 @@ class ProductController extends Controller
         $categories = Category::all();
         $query = Product::with(['category', 'variants'])->withCount('variants');
 
-        if (request()->has('category_id') && request()->category_id != '') {
+        if (request()->filled('category_id')) {
             $query->where('category_id', request('category_id'));
         }
 
-        $products = $query->paginate(10)->appends(request()->all());
+        if (request()->filled('search')) {
+            $query->where('name', 'like', '%' . request('search') . '%');
+        }
+
+        $products = $query->latest()->paginate(10)->appends(request()->all());
 
         return view('admin.products.index', compact('products', 'categories'));
     }

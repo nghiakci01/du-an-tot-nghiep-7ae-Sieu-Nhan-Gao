@@ -11,6 +11,7 @@ Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 
 Route::post('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'send'])->name('contact.send');
 Route::get('/about', [App\Http\Controllers\Frontend\HomeController::class, 'about'])->name('about');
 Route::get('/news', [App\Http\Controllers\Frontend\HomeController::class, 'news'])->name('news');
+Route::get('/news/{slug}', [App\Http\Controllers\Frontend\HomeController::class, 'newsDetail'])->name('news.detail');
 
 // Search Routes
 Route::get('/search', [App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('search.index');
@@ -126,6 +127,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
             // Loyalty Points
             Route::get('loyalty-points', [App\Http\Controllers\Admin\LoyaltyPointController::class, 'index'])->name('loyalty-points.index');
+            
+            // Cài đặt ngân hàng thanh toán (QR Bank Settings)
+            Route::resource('bank-settings', App\Http\Controllers\Backend\BankSettingController::class);
         });
 
         // Admin & Staff Routes (Stock only)
@@ -178,6 +182,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             Route::get('notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
             Route::post('notifications/mark-all-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
             Route::get('notifications/{id}/mark-as-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+            Route::get('notifications/unread-count', [App\Http\Controllers\Admin\NotificationController::class, 'unreadCount'])->name('notifications.unread_count');
         });
     });
 });

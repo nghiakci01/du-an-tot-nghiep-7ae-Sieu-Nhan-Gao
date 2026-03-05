@@ -30,4 +30,9 @@ class NotificationController extends Controller
 
         return back();
     }
+    public function unreadCount()
+    {
+        $count = auth()->user()->unreadNotifications()->count();
+        return response()->json(['count' => $count]);
+    }
 }

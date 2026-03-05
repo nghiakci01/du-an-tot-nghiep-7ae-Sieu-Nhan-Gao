@@ -174,7 +174,7 @@ class CheckoutController extends Controller
 
     public function success($id)
     {
-        $order = Order::findOrFail($id);
+        $order = Order::with(['items.product', 'items.variant'])->findOrFail($id);
 
         // Security check: Only allow viewing if Auth user matches Or if just created (session check could be added here for strictness)
         $bankName = \App\Models\Setting::get('bank_name', 'Vietcombank');

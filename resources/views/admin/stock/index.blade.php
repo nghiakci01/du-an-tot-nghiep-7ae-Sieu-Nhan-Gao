@@ -22,8 +22,17 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="card">
-            <div class="card-header">
-                <h5>Kiểm kê sản phẩm</h5>
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                <h5 class="mb-0">Kiểm kê sản phẩm</h5>
+                <form action="{{ route('admin.stock.index') }}" method="GET" class="d-flex align-items-center mt-2 mt-md-0" style="max-width: 400px; width: 100%;">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Tìm kiếm tên SP, SKU..." value="{{ request('search') }}">
+                        <button type="submit" class="btn btn-primary px-3"><i class="ti ti-search m-0"></i> Tìm kiếm</button>
+                        @if(request('search'))
+                            <a href="{{ route('admin.stock.index') }}" class="btn btn-outline-secondary px-3" title="Xóa bộ lọc"><i class="ti ti-x m-0"></i></a>
+                        @endif
+                    </div>
+                </form>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
