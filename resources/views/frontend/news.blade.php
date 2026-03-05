@@ -3,6 +3,13 @@
 @section('title', 'News | Elite')
 
 @section('content')
+    <style>
+        .blog_thumb img {
+            width: 378px;
+            height: 240px;
+            object-fit: cover;
+        }
+    </style>
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area">
         <div class="container">
