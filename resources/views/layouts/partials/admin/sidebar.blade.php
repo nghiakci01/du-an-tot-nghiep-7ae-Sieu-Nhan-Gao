@@ -200,13 +200,13 @@
                         <span class="pc-mtext">Đánh giá sản phẩm</span>
                     </a>
                 </li>
-                @if (auth()->user()->isAdmin())
+                @if (auth()->user()->isAdmin() || auth()->user()->isStaff())
                     <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link">
                             <span class="pc-micon">
                                 <i class="ti ti-news"></i>
                             </span>
-                            <span class="pc-mtext">Quản lý Blog</span>
+                            <span class="pc-mtext">Quản lý Tin tức</span>
                             <span class="pc-arrow">
                                 <i data-feather="chevron-right"></i>
                             </span>
@@ -214,23 +214,15 @@
                         <ul class="pc-submenu">
                             <li class="pc-item">
                                 <a href="{{ route('admin.post-categories.index') }}" class="pc-link">
-                                    <span class="pc-mtext">Danh mục tin</span>
+                                    <span class="pc-mtext">Danh mục tin tức</span>
                                 </a>
                             </li>
                             <li class="pc-item">
                                 <a href="{{ route('admin.posts.index') }}" class="pc-link">
-                                    <span class="pc-mtext">Bài viết</span>
+                                    <span class="pc-mtext">Danh sách tin tức</span>
                                 </a>
                             </li>
                         </ul>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('admin.loyalty-points.index') }}" class="pc-link">
-                            <span class="pc-micon">
-                                <i class="ti ti-coin"></i>
-                            </span>
-                            <span class="pc-mtext">Cấu hình Tích điểm</span>
-                        </a>
                     </li>
                 @endif
                 @if (auth()->user()->isAdmin())
