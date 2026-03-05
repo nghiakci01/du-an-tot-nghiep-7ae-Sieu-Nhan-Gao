@@ -46,11 +46,14 @@
                                              <td>
                                                 @switch($banner->position)
                                                     @case('slider')
-                                                        <span class="badge bg-light-info text-info">Wide Slider (1521x856)</span>
+                                                        <span class="badge bg-light-info text-info">Wide Slider (1521x856px)</span>
+                                                        @break
+                                                    @case('about_us')
+                                                        <span class="badge bg-light-primary text-primary">Banner Về Chúng Tôi</span>
                                                         @break
 
                                                     @default
-                                                        <span class="badge bg-light-secondary text-secondary">Legacy: {{ $banner->position }}</span>
+                                                        <span class="badge bg-light-secondary text-secondary">Khác: {{ $banner->position }}</span>
                                                 @endswitch
                                             </td>
                                             <td>
