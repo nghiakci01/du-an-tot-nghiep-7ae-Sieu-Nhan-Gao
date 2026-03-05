@@ -4,7 +4,10 @@
 
 @section('content')
     <!--breadcrumbs area start-->
-    <div class="breadcrumbs_area other_bread">
+    <div class="breadcrumbs_area other_bread" 
+        @if(isset($settings['contact_banner']) && $settings['contact_banner'])
+            style="background: url('{{ asset('storage/' . $settings['contact_banner']) }}') no-repeat center center / cover;"
+        @endif>
         <div class="container">
             <div class="row">
                 <div class="col-12">
