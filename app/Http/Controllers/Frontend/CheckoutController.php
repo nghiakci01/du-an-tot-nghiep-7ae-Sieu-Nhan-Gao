@@ -57,7 +57,7 @@ class CheckoutController extends Controller
             'province' => 'required|string|in:'.implode(',', $provinces),
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
             'shipping_provider' => 'nullable|string',
             'shipping_service_name' => 'nullable|string',
             'shipping_fee' => 'nullable|numeric',
@@ -155,8 +155,12 @@ class CheckoutController extends Controller
             // Clear cart and coupon session
             Session::forget(['cart', 'coupon_code', 'discount_amount']);
 
+            // Nếu chọn VNPAY -> redirect sang trang thanh toán VNPAY
+            if ($request->payment_method === 'VNPAY') {
+                return redirect()->route('vnpay.payment', $order->id);
+            }
 
-            // Send confirmation email for COD and BANK_TRANSFER
+            // COD & BANK_TRANSFER: gửi email xác nhận và chuyển đến trang thành công
             try {
                 \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
             } catch (\Exception $e) {
