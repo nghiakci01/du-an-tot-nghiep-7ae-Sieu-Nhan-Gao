@@ -126,15 +126,7 @@ class CheckoutController extends Controller
                 }
             }
 
-            foreach ($cart as $id => $details) {
-                // Verify stock again with a lock to prevent race condition
-                $variant = clone ProductVariant::where('id', $details['variant_id'])->lockForUpdate()->first();
-                if (! $variant || $variant->stock_quantity < $details['quantity']) {
-                    throw new \Exception('Product '.$details['name'].' ('.$details['size'].'/'.$details['color'].') is out of stock.');
-                }
-
-                // Deduct stock
-                ProductVariant::where('id', $details['variant_id'])->decrement('stock_quantity', $details['quantity']);
+                // Removed stock verification and deduction logic as warehouse management is removed
 
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -244,12 +236,7 @@ class CheckoutController extends Controller
 
             $order->update(['status' => 'cancelled']);
 
-            // Hoàn lại số lượng tồn kho
-            foreach ($order->items as $item) {
-                if ($item->variant_id) {
-                    ProductVariant::where('id', $item->variant_id)->increment('stock_quantity', $item->quantity);
-                }
-            }
+            // Hoàn lại số lượng tồn kho logic removed
 
             if (class_exists(\App\Models\OrderHistory::class)) {
                 \App\Models\OrderHistory::create([

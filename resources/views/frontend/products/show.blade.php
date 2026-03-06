@@ -426,10 +426,7 @@
 
                             <div class="product_variant quantity">
                                 <label>{{ __('messages.quantity') }}</label>
-                                <input min="1" max="100" value="1" type="number" name="quantity"
-                                    id="quantity_input">
-                                <span id="stock-info"
-                                    style="display:none; font-size:13px; color:#666; margin-left:8px;"></span>
+                                <input min="1" value="1" type="number" name="quantity" id="quantity_input">
                                 <div style="margin-top:10px;">
                                     <input type="hidden" name="action" id="action_input" value="add_to_cart">
                                     <button class="button" type="button"
