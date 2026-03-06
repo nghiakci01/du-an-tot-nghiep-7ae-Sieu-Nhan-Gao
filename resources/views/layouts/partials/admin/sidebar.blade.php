@@ -144,33 +144,6 @@
                     </li>
                 @endif
                 <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon">
-                            <i class="ti ti-archive"></i>
-                        </span>
-                        <span class="pc-mtext">Quản lý Kho</span>
-                        <span class="pc-arrow">
-                            <i data-feather="chevron-right"></i>
-                        </span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item">
-                            <a href="{{ route('admin.vouchers.index') }}" class="pc-link">
-                                <span class="pc-mtext">Phiếu Nhập/Xuất</span>
-                            </a>
-                        </li>
-                        <li class="pc-item">
-                            <a href="{{ route('admin.warehouses.index') }}" class="pc-link">
-                                <span class="pc-mtext">Danh sách Kho</span>
-                            </a>
-                        </li>
-                        <li class="pc-item">
-                            <a href="{{ route('admin.suppliers.index') }}" class="pc-link">
-                                <span class="pc-mtext">Nhà cung cấp</span>
-                            </a>
-                        </li>
-                        <li class="pc-item">
-                            <a href="{{ route('admin.stock.index') }}" class="pc-link">
                                 <span class="pc-mtext">Báo cáo tồn kho</span>
                             </a>
                         </li>

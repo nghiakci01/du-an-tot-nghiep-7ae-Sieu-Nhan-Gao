@@ -76,26 +76,6 @@ class OrderService
         // 2. If transition FROM Cancelled/Returned/Failed TO Processing statuses -> Deduct Stock again
         // (Just in case specific admin flow allows un-cancelling, though usually hard. But good to handle)
         if (! $isCancelledState && $wasCancelledState) {
-            $this->deductStock($order);
-        }
-    }
-
-    protected function restoreStock(Order $order)
-    {
-        foreach ($order->items as $item) {
-            if ($item->variant_id) {
-                // Sử dụng lockForUpdate để tránh Race Condition khi cộng lại kho
-                $variant = \App\Models\ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
-                if ($variant) {
-                    $variant->increment('stock_quantity', $item->quantity);
-                }
-            }
-        }
-    }
-
-    protected function deductStock(Order $order)
-    {
-        foreach ($order->items as $item) {
             if ($item->variant_id) {
                 // Sử dụng lockForUpdate để tránh Race Condition khi trừ kho lại
                 $variant = \App\Models\ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();

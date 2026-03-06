@@ -333,16 +333,16 @@ class CartController extends Controller
                     'grand_total' => number_format($grandTotal).' đ',
                     'cart_count' => $cartCount,
                 ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid quantity or exceeds stock',
-                ], 400);
-            }
+            // } else {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'Invalid quantity or exceeds stock',
+            //     ], 400);
+            // }
 
-            session()->flash('error', 'Invalid quantity or exceeds stock');
+            // session()->flash('error', 'Invalid quantity or exceeds stock');
 
-            return response()->json(['success' => false], 400);
+            // return response()->json(['success' => false], 400);
         }
 
         return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
@@ -422,11 +422,22 @@ class CartController extends Controller
     public function clearCart(Request $request)
     {
         session()->forget('cart');
+        session()->forget(['coupon_code', 'discount_amount']); // Also clear coupon info
+
+        // Recalculate totals for an empty cart
+        $subtotal = 0;
+        $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
+        $grandTotal = $subtotal + $shippingFee;
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Cart has been cleared',
+                'message' => 'Giỏ hàng đã được xóa!',
+                'cart_total' => number_format($subtotal).' đ',
+                'discount' => number_format(0).' đ',
+                'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee).' đ') : 'Miễn phí',
+                'grand_total' => number_format($grandTotal).' đ',
+                'cart_count' => 0,
             ]);
         }
 

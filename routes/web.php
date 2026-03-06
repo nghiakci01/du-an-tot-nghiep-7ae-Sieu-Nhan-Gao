@@ -140,9 +140,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::resource('post-categories', App\Http\Controllers\Admin\PostCategoryController::class);
         Route::resource('posts', App\Http\Controllers\Admin\PostController::class);
 
-        // Admin & Staff Routes (Stock only)
-        Route::get('stock', [App\Http\Controllers\Admin\StockController::class, 'index'])->name('stock.index');
-        Route::post('stock/update', [App\Http\Controllers\Admin\StockController::class, 'update'])->name('stock.update');
 
         // Chatbot Management (Admin & Staff)
         Route::prefix('chat')->name('chat.')->group(function () {
