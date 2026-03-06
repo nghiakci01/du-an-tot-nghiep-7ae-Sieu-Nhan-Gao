@@ -791,7 +791,7 @@
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                                 <h5 style="font-weight: 600; color: #333;">AI Đang Xử Lý...</h5>
-                                <p style="color: #666; font-size: 14px; max-width: 250px; margin: 0 auto;">Quá trình này có thể kéo dài từ 15 đến 30 giây, vui lòng không đóng cửa sổ này.</p>
+                                <p style="color: #666; font-size: 14px; max-width: 250px; margin: 0 auto;">Quá trình này có thể kéo dài từ 30 đến 120 giây (đặc biệt trong lần chạy đầu tiên), vui lòng không đóng cửa sổ này.</p>
                             </div>
                             
                             <!-- Result State -->

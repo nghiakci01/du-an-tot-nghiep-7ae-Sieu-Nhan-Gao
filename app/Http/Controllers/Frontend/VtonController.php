@@ -87,8 +87,8 @@ class VtonController extends Controller
             $pollUrl = $prediction['urls']['get'];
 
             // 4. Poll the result
-            // AI Try-on usually takes 10-30 seconds. We'll poll up to 30 times (60s).
-            $maxAttempts = 30;
+            // AI Try-on usually takes 10-30 seconds, but cold boots can take longer. We'll poll up to 75 times (150s).
+            $maxAttempts = 75;
             $attempt = 0;
             $resultUrl = null;
 
