@@ -63,6 +63,7 @@
                                         <select class="form-select @error('position') is-invalid @enderror" id="position" name="position">
                                             <option value="slider" {{ old('position', $banner->position) == 'slider' ? 'selected' : '' }}>Slider Chính Trang Chủ</option>
                                             <option value="about_us" {{ old('position', $banner->position) == 'about_us' ? 'selected' : '' }}>Banner Trang Về Chúng Tôi</option>
+                                            <option value="home_middle" {{ old('position', $banner->position) == 'home_middle' ? 'selected' : '' }}>Banner Giữa Trang Chủ (Thay Instagram)</option>
                                         </select>
                                         @error('position')
                                             <div class="invalid-feedback">{{ $message }}</div>
