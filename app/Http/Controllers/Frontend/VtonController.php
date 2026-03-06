@@ -59,12 +59,11 @@ class VtonController extends Controller
             $userDataUri = 'data:' . $userImageMime . ';base64,' . $userImageBase64;
 
             // 3. Call Replicate API to create prediction
-            // Using Kolors Virtual Try-On model
-            $modelVersion = "c871fc9b1d5f228e48b5309d17ecce3dfcdbed731abaf3b08e2f0ac0b3e6c0c2";
+            // Using Kolors Virtual Try-On model via official models prediction endpoint
+            // Endpoint: POST https://api.replicate.com/v1/models/cuiapp/kolors-virtual-try-on/predictions
             
             $response = Http::withToken($apiToken)
-                ->post('https://api.replicate.com/v1/predictions', [
-                    'version' => $modelVersion,
+                ->post('https://api.replicate.com/v1/models/cuiapp/kolors-virtual-try-on/predictions', [
                     'input' => [
                         'human_image' => $userDataUri,
                         'garment_image' => $productDataUri,
