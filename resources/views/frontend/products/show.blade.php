@@ -149,7 +149,13 @@
                                 @endforeach
                             </ul>
                         </div>
-
+                        
+                        <!-- AI Try On Button -->
+                        <div class="mt-4 text-center">
+                            <button type="button" class="btn w-100 py-3 d-flex align-items-center justify-content-center" style="background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); color: white; font-weight: bold; border-radius: 8px; border: none; box-shadow: 0 4px 15px rgba(253, 29, 29, 0.4); transition: transform 0.2s; font-size: 16px;" data-bs-toggle="modal" data-bs-target="#aiTryOnModal" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                                <i class="fa fa-magic" style="margin-right: 8px; font-size: 20px;"></i> ✨ {{ __('messages.ai_try_on') ?? 'Thử Đồ Thực Tế Ảo (AI)' }}
+                            </button>
+                        </div>
 
                     </div>
                 </div>
@@ -421,6 +427,61 @@
                                             }
                                         }
                                     });
+
+            // VTON handling
+            $('#vtonForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                var formData = new FormData(this);
+                var btn = $('#btn-vton-submit');
+                
+                // UI Changes
+                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang tải lên...');
+                $('#vton-initial, #vton-result').hide();
+                $('#vton-loading').fadeIn();
+                
+                $.ajax({
+                    url: '{{ route("api.vton.tryOn") }}',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        btn.prop('disabled', false).text('Thử ảnh khác');
+                        $('#vton-loading').hide();
+                        
+                        if(response.success && response.image_url) {
+                            $('#vton-result-image').attr('src', response.image_url);
+                            $('#vton-download').attr('href', response.image_url);
+                            $('#vton-result').fadeIn();
+                        } else {
+                            $('#vton-initial').fadeIn();
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Thử đồ thất bại',
+                                text: response.message || 'Đã có lỗi xảy ra',
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        btn.prop('disabled', false).text('Thử đồ lại');
+                        $('#vton-loading').hide();
+                        $('#vton-initial').fadeIn();
+                        
+                        let msg = 'Máy chủ AI hiện không phản hồi hoặc đang quá tải. Hãy thử lại.';
+                        if(xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi hệ thống',
+                            title: 'Lỗi hệ thống',
+                            text: msg,
+                        });
+                    }
+                });
+            });
                                 </script>
                             @endif
 
@@ -682,6 +743,72 @@
     </section>
     <!--product section area end-->
 
+    <!-- AI Try On Modal -->
+    <div class="modal fade" id="aiTryOnModal" tabindex="-1" aria-labelledby="aiTryOnModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px; overflow: hidden; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                <div class="modal-header" style="background: linear-gradient(45deg, #111, #333); color: white; border-bottom: none; padding: 20px 25px;">
+                    <h5 class="modal-title" id="aiTryOnModalLabel" style="font-weight: 700; letter-spacing: 1px; margin: 0; color: white;">
+                        <i class="fa fa-magic text-warning" style="margin-right: 8px;"></i> {{ __('messages.ai_try_on_modal_title') ?? 'Trải nghiệm Phòng Thử Đồ AI' }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="row g-0">
+                        <!-- Left side: Instructions & Upload -->
+                        <div class="col-md-5 p-4" style="background: #f8f9fa; border-right: 1px solid #eee;">
+                            <h6 style="font-weight: 600; color: #ef233c; margin-bottom: 15px;">Hướng dẫn:</h6>
+                            <ol style="padding-left: 15px; font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 25px;">
+                                <li>Tải lên một bức ảnh rõ nét của bạn.</li>
+                                <li>Nên chọn ảnh chụp toàn thân hoặc bán thân thẳng đứng.</li>
+                                <li>Đợi AI xử lý trang phục (<span style="color: #ef233c; font-weight: bold;">~15-30 giây</span>).</li>
+                            </ol>
+                            
+                            <form id="vtonForm">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <div class="mb-4">
+                                    <label for="user_image" class="form-label fw-bold" style="font-size: 14px;">Tải ảnh của bạn lên:</label>
+                                    <input class="form-control" type="file" id="user_image" name="user_image" accept="image/jpeg, image/png, image/webp" required style="font-size: 14px; padding: 10px;">
+                                </div>
+                                <button type="submit" class="btn w-100 py-3" id="btn-vton-submit" style="background: #111; color: white; font-weight: bold; border-radius: 6px; border: none; transition: 0.3s;">
+                                    Bắt đầu thử đồ
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Right side: Preview area -->
+                        <div class="col-md-7 p-4 d-flex flex-column align-items-center justify-content-center" style="min-height: 400px; background: #fff; position: relative;">
+                            <!-- Initial State -->
+                            <div id="vton-initial" class="text-center text-muted">
+                                <i class="fa fa-picture-o" style="font-size: 50px; color: #ddd; margin-bottom: 15px;"></i>
+                                <p style="font-size: 15px; margin: 0;">Kết quả thử đồ sẽ hiển thị tại đây</p>
+                            </div>
+                            
+                            <!-- Loading State -->
+                            <div id="vton-loading" class="text-center" style="display: none;">
+                                <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <h5 style="font-weight: 600; color: #333;">AI Đang Xử Lý...</h5>
+                                <p style="color: #666; font-size: 14px; max-width: 250px; margin: 0 auto;">Quá trình này có thể kéo dài từ 15 đến 30 giây, vui lòng không đóng cửa sổ này.</p>
+                            </div>
+                            
+                            <!-- Result State -->
+                            <div id="vton-result" class="text-center" style="display: none; width: 100%;">
+                                <img id="vton-result-image" src="" alt="Virtual Try On Result" style="max-height: 500px; max-width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                <div class="mt-3">
+                                    <a id="vton-download" href="#" download="ai-try-on.jpg" class="btn btn-outline-dark btn-sm rounded-pill px-4">
+                                        <i class="fa fa-download"></i> Tải ảnh về
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 @endsection
