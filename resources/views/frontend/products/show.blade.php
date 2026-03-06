@@ -227,7 +227,7 @@
                                     style="font-weight: bold; display: none;"></div>
 
                                 <script>
-                                    document.addEventListener('DOMContentLoad                                           ed', fun ction() {
+                                    document.addEventListener('DOMContentLoaded', function() {
                                         const variants = @json($product->variants);
                                         const niceSize = document.getElementById('select_size_nice');
                                         const niceColor = document.getElementById('select_color_nice');
@@ -426,62 +426,6 @@
                                                 priceContainer.innerHTML = originalPriceHtml;
                                             }
                                         }
-                                    });
-
-            // VTON handling
-            $('#vtonForm').on('submit', function(e) {
-                e.preventDefault();
-                
-                var formData = new FormData(this);
-                var btn = $('#btn-vton-submit');
-                
-                // UI Changes
-                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang tải lên...');
-                $('#vton-initial, #vton-result').hide();
-                $('#vton-loading').fadeIn();
-                
-                $.ajax({
-                    url: '{{ route("api.vton.tryOn") }}',
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        btn.prop('disabled', false).text('Thử ảnh khác');
-                        $('#vton-loading').hide();
-                        
-                        if(response.success && response.image_url) {
-                            $('#vton-result-image').attr('src', response.image_url);
-                            $('#vton-download').attr('href', response.image_url);
-                            $('#vton-result').fadeIn();
-                        } else {
-                            $('#vton-initial').fadeIn();
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Thử đồ thất bại',
-                                text: response.message || 'Đã có lỗi xảy ra',
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        btn.prop('disabled', false).text('Thử đồ lại');
-                        $('#vton-loading').hide();
-                        $('#vton-initial').fadeIn();
-                        
-                        let msg = 'Máy chủ AI hiện không phản hồi hoặc đang quá tải. Hãy thử lại.';
-                        if(xhr.responseJSON && xhr.responseJSON.message) {
-                            msg = xhr.responseJSON.message;
-                        }
-                        
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Lỗi hệ thống',
-                            title: 'Lỗi hệ thống',
-                            text: msg,
-                        });
-                    }
-                });
-            });
                                 </script>
                             @endif
 
@@ -1053,5 +997,60 @@
                 });
             }
         });
+
+        // VTON handling
+        $('#vtonForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = new FormData(this);
+            var btn = $('#btn-vton-submit');
+            
+            // UI Changes
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang tải lên...');
+            $('#vton-initial, #vton-result').hide();
+            $('#vton-loading').fadeIn();
+            
+            $.ajax({
+                url: '{{ route("api.vton.tryOn") }}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    btn.prop('disabled', false).text('Thử ảnh khác');
+                    $('#vton-loading').hide();
+                    
+                    if(response.success && response.image_url) {
+                        $('#vton-result-image').attr('src', response.image_url);
+                        $('#vton-download').attr('href', response.image_url);
+                        $('#vton-result').fadeIn();
+                    } else {
+                        $('#vton-initial').fadeIn();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Thử đồ thất bại',
+                            text: response.message || 'Đã có lỗi xảy ra',
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).text('Thử đồ lại');
+                    $('#vton-loading').hide();
+                    $('#vton-initial').fadeIn();
+                    
+                    let msg = 'Máy chủ AI hiện không phản hồi hoặc đang quá tải. Hãy thử lại.';
+                    if(xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi hệ thống',
+                        text: msg,
+                    });
+                }
+            });
+        });
+
     </script>
 @endsection
