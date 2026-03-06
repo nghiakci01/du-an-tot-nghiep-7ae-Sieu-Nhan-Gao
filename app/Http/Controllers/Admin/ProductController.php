@@ -101,7 +101,7 @@ class ProductController extends Controller
                         'color' => $colorName,
                         'price' => $variantData['price'] ?? null,
                         'sale_price' => $variantData['sale_price'] ?? null,
-                        'stock_quantity' => $variantData['stock_quantity'],
+                        'stock_quantity' => $variantData['stock_quantity'] ?? 100, // Default value since it's removed from UI
                         'sku' => $sku,
                     ]);
                 }
@@ -233,7 +233,7 @@ class ProductController extends Controller
                     'color' => $colorName,
                     'price' => $variantData['price'] ?? null,
                     'sale_price' => $variantData['sale_price'] ?? null,
-                    'stock_quantity' => $variantData['stock_quantity'],
+                    'stock_quantity' => $variantData['stock_quantity'] ?? 100, // Default value since it's removed from UI
                     'sku' => $sku,
                 ];
 

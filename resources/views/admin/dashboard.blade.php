@@ -169,7 +169,7 @@
               <div class="col-12">
                 <h3 class="mb-1">{{ number_format($totalProducts) }}</h3>
                 <p class="text-danger mb-0">
-                  <i class="ti ti-alert-circle"></i> {{ $lowStockProducts }} Mẫu sắp hết hàng
+                  <i class="ti ti-alert-circle"></i> Sản phẩm đang kinh doanh
                 </p>
               </div>
             </div>

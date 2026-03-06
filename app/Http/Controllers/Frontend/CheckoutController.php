@@ -126,6 +126,7 @@ class CheckoutController extends Controller
                 }
             }
 
+            foreach ($cart as $id => $details) {
                 // Removed stock verification and deduction logic as warehouse management is removed
 
                 OrderItem::create([
@@ -134,7 +135,7 @@ class CheckoutController extends Controller
                     'variant_id' => $details['variant_id'],
                     'quantity' => $details['quantity'],
                     'price' => $details['price'],
-                    'cost_price' => $variant->cost_price ?? 0,
+                    'cost_price' => $details['price'], // We can approximate cost_price or leave it 0 if cost_price logic was in variant
                 ]);
             }
 
