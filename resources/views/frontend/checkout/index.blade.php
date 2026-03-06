@@ -554,7 +554,7 @@
                                     </div>
                                 </div>
 
-                                <div class="panel-default mt-3">
+                                <!-- <div class="panel-default mt-3">
                                     <input id="payment_bank" name="payment_method" type="radio" value="BANK_TRANSFER"
                                         data-bs-target="#method_bank" required />
                                     <label for="payment_bank" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_bank"
@@ -567,7 +567,7 @@
                                             <p>{{ __('messages.bank_transfer_description') }}</p>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
 
 
 
@@ -576,8 +576,8 @@
                                         data-bs-target="#method_vnpay" required />
                                     <label for="payment_vnpay" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_vnpay"
                                         aria-controls="method_vnpay">
-                                        <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-VNPAY-QR.png"
-                                             alt="VNPAY" style="height:24px; margin-right:8px; vertical-align:middle;">
+                                        <!-- <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-VNPAY-QR.png"
+                                             alt="VNPAY" style="height:24px; margin-right:8px; vertical-align:middle;"> -->
                                         Thanh toán qua VNPAY (ATM / Internet Banking / QR Code)
                                     </label>
                                     <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
