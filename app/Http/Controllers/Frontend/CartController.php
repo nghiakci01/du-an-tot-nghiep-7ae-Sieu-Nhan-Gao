@@ -333,16 +333,12 @@ class CartController extends Controller
                     'grand_total' => number_format($grandTotal).' đ',
                     'cart_count' => $cartCount,
                 ]);
-            // } else {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'Invalid quantity or exceeds stock',
-            //     ], 400);
-            // }
-
-            // session()->flash('error', 'Invalid quantity or exceeds stock');
-
-            // return response()->json(['success' => false], 400);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Số lượng không hợp lệ hoặc vượt quá tồn kho.',
+                ], 400);
+            }
         }
 
         return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
