@@ -338,79 +338,43 @@
     </section>
     <!--product section area end (Top Wishlisted)-->
 
-    <!--Instagram area start-->
-    <section class="instagram_area instagram_six">
+    @if($midBanner)
+    <!--Middle Banner area start-->
+    <section class="middle_banner_section mb-30">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <div class="section_title">
-                        <h2>{{ __('messages.follow_instagram') }}</h2>
-                        <p>{{ __('messages.instagram_desc') }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="instagram_home_block">
-                <div class="row">
-                    <div class="instagram_wrapper instagram_column5 owl-carousel">
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram.png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram1.png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram2.png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram3(1).png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram4(1).png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="https://www.instagram.com/" target="_blank"><img src="{{ asset('frontend-assets') }}/img/about/intagram1.png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a target="_blank" href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="text_follow">
-                            <a href="https://www.instagram.com/" target="_blank">{{ __('messages.follow_us_hashtag') }}</a>
-                        </div>
+                    <div class="middle_banner_thumb">
+                        @if($midBanner->link)
+                            <a href="{{ $midBanner->link }}">
+                                <img src="{{ asset('storage/' . $midBanner->image) }}" alt="{{ $midBanner->title ?? 'Banner' }}">
+                            </a>
+                        @else
+                            <img src="{{ asset('storage/' . $midBanner->image) }}" alt="{{ $midBanner->title ?? 'Banner' }}">
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <!--Instagram area end-->
+    <style>
+        .middle_banner_thumb img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .middle_banner_thumb img:hover {
+            transform: translateY(-5px);
+        }
+        .middle_banner_section {
+            margin-bottom: 40px;
+            margin-top: 20px;
+        }
+    </style>
+    <!--Middle Banner area end-->
+    @endif
 
     <!-- modal area start-->
     <div class="modal fade" id="modal_box" tabindex="-1" role="dialog" aria-hidden="true">
