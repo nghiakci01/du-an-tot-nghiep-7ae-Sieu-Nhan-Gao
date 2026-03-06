@@ -39,8 +39,8 @@
                                 value="{{ \App\Models\Setting::where('key', 'auto_cancel_unpaid_order_hours')->value('value') ?? '24' }}" 
                                 style="width: 80px;" min="1" required>
                         </div>
-                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Hệ thống sẽ lưu cấu hình này và ngay lập tức chạy quét đối soát để hủy các đơn hàng chưa thanh toán quá thời gian quy định theo hệ thống giờ bạn vừa nhập. Bạn có chắc chắn?')">
-                            Lưu cấu hình & Chạy kiểm tra dọn dẹp ngay
+                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Hệ thống sẽ lưu cấu hình này và quét để HỦY các đơn hàng chưa thanh toán quá thời gian quy định theo hệ thống giờ bạn vừa nhập. Dữ liệu đơn hàng VẪN ĐƯỢC GIỮ LẠI với trạng thái Đã Hủy, sản phẩm sẽ được hoàn lại vào kho. Bạn có chắc chắn?')">
+                            Lưu cấu hình & Chạy kiểm tra hủy đơn ngay
                         </button>
                     </form>
                 </div>
