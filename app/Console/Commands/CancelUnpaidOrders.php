@@ -30,6 +30,14 @@ class CancelUnpaidOrders extends Command
     public function handle(OrderService $orderService)
     {
         $hours = $this->option('hours');
+
+        // Nếu chạy không truyền params (mặc định 24), ta ưu tiên đọc từ Cài đặt Admin
+        if ($hours == 24) {
+            $settingHours = \App\Models\Setting::where('key', 'auto_cancel_unpaid_order_hours')->value('value');
+            if (is_numeric($settingHours) && $settingHours > 0) {
+                $hours = $settingHours;
+            }
+        }
         $timeLimit = Carbon::now()->subHours($hours);
 
         $this->info("Đang tìm kiếm các đơn hàng chưa thanh toán trước {$timeLimit}...");

@@ -29,6 +29,12 @@
                                 <input type="number" class="form-control" name="shipping_fee"
                                     value="{{ $settings['shipping_fee'] ?? '30000' }}">
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Hủy đơn chưa thanh toán sau (Giờ)</label>
+                                <input type="number" class="form-control" name="auto_cancel_unpaid_order_hours"
+                                    value="{{ $settings['auto_cancel_unpaid_order_hours'] ?? '24' }}">
+                                <small class="text-muted">Đơn hàng thanh toán online sẽ tự động hủy nếu sau số giờ này khách không thanh toán.</small>
+                            </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Ảnh Banner Trang Liên Hệ</label>
                                 @if(isset($settings['contact_banner']) && $settings['contact_banner'])
