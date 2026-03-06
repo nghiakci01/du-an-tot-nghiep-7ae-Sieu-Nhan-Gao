@@ -27,6 +27,24 @@
                     <h5>Danh sách Đơn hàng</h5>
                     <a href="{{ route('admin.orders.create') }}" class="btn btn-primary btn-sm"><i class="feather icon-plus"></i> Thêm đơn hàng</a>
                 </div>
+                
+                <div class="card-body border-bottom bg-light bg-opacity-50">
+                    <form action="{{ route('admin.orders.trigger-auto-cancel') }}" method="POST" class="d-flex align-items-center flex-wrap gap-2">
+                        @csrf
+                        <div class="d-flex align-items-center">
+                            <label for="auto_cancel_unpaid_order_hours" class="form-label mb-0 me-2 text-nowrap font-weight-bold text-danger">
+                                <i class="feather icon-trash-2"></i> Tự động Hủy đơn chưa thanh toán sau (Giờ):
+                            </label>
+                            <input type="number" class="form-control form-control-sm" name="auto_cancel_unpaid_order_hours" id="auto_cancel_unpaid_order_hours" 
+                                value="{{ \App\Models\Setting::where('key', 'auto_cancel_unpaid_order_hours')->value('value') ?? '24' }}" 
+                                style="width: 80px;" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Hệ thống sẽ lưu cấu hình này và quét để HỦY các đơn hàng chưa thanh toán quá thời gian quy định theo hệ thống giờ bạn vừa nhập. Dữ liệu đơn hàng VẪN ĐƯỢC GIỮ LẠI với trạng thái Đã Hủy, sản phẩm sẽ được hoàn lại vào kho. Bạn có chắc chắn?')">
+                            Lưu cấu hình & Chạy kiểm tra hủy đơn ngay
+                        </button>
+                    </form>
+                </div>
+
                 <div class="card-body">
                     <form action="{{ route('admin.orders.index') }}" method="GET" class="mb-3 d-flex align-items-center">
                         <label for="status" class="form-label mb-0 me-2 text-nowrap">Trạng thái:</label>

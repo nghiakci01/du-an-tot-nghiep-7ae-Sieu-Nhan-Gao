@@ -243,4 +243,35 @@ class OrderController extends Controller
             default => 'Không xác định',
         };
     }
+
+    /**
+     * Kích hoạt ép buộc lệnh tự động hủy đơn ngay lập tức từ Admin Panel.
+     */
+    public function triggerAutoCancel(Request $request)
+    {
+        try {
+            // Lấy thời gian do admin vừa điền trên Form (nếu có, mặc định là 24)
+            $hours = $request->input('auto_cancel_unpaid_order_hours', 24);
+
+            // Lưu lại mức này vào CSDL để áp dụng cho cả hệ thống chạy ngầm
+            \App\Models\Setting::updateOrCreate(
+                ['key' => 'auto_cancel_unpaid_order_hours'],
+                ['value' => $hours]
+            );
+            
+            \Illuminate\Support\Facades\Cache::forget('global_settings');
+
+            // Gọi chạy ngay lệnh Artisan trong nền
+            \Illuminate\Support\Facades\Artisan::call('orders:cancel-unpaid', [
+                '--hours' => $hours
+            ]);
+
+            $output = \Illuminate\Support\Facades\Artisan::output();
+
+            return back()->with('success', 'Đã lưu cấu hình và đối chiếu xử lý: ' . $output);
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Có lỗi xảy ra khi thực thi lệnh tự động hủy: ' . $e->getMessage());
+        }
+    }
 }
