@@ -214,8 +214,56 @@
                                             <p class="cart_amount" id="cart-grand-total">{{ number_format($total + $shippingFee) }} đ</p>
                                         </div>
                                         <div class="checkout_btn">
-                                            <a href="{{ route('checkout.index') }}">{{ __('messages.proceed_to_checkout') }}</a>
+                                            <a href="#" id="btn-proceed-checkout">{{ __('messages.proceed_to_checkout') }}</a>
                                         </div>
+
+                                        <script>
+                                        document.getElementById('btn-proceed-checkout').addEventListener('click', function(e) {
+                                            e.preventDefault();
+                                            var btn = this;
+                                            btn.style.opacity = '0.7';
+                                            btn.style.pointerEvents = 'none';
+
+                                            fetch('{{ route('cart.validate') }}', {
+                                                method: 'GET',
+                                                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                                            })
+                                            .then(r => r.json())
+                                            .then(data => {
+                                                btn.style.opacity = '';
+                                                btn.style.pointerEvents = '';
+
+                                                if (data.valid) {
+                                                    window.location.href = '{{ route('checkout.index') }}';
+                                                } else if (data.errors && data.errors.length > 0) {
+                                                    var list = data.errors.map(function(e) {
+                                                        var icon = e.type === 'out_of_stock' ? '🚫' :
+                                                                   e.type === 'not_found'    ? '❌' :
+                                                                   e.type === 'inactive'     ? '⛔' : '⚠️';
+                                                        return '<li style="text-align:left;margin-bottom:6px;">' + icon + ' <strong>' + e.name + '</strong>: ' + e.issue + '</li>';
+                                                    }).join('');
+
+                                                    Swal.fire({
+                                                        icon: 'warning',
+                                                        title: 'Giỏ hàng có vấn đề!',
+                                                        html: '<p style="margin-bottom:10px;">Vui lòng xử lý các mục sau trước khi thanh toán:</p><ul style="padding-left:10px;">' + list + '</ul>',
+                                                        confirmButtonColor: '#ef233c',
+                                                        confirmButtonText: 'Cập nhật giỏ hàng',
+                                                        showCancelButton: true,
+                                                        cancelButtonText: 'Đóng',
+                                                        cancelButtonColor: '#6c757d',
+                                                    });
+                                                } else {
+                                                    Swal.fire({ icon: 'error', title: 'Lỗi!', text: data.message || 'Không thể tiến hành thanh toán.', confirmButtonColor: '#ef233c' });
+                                                }
+                                            })
+                                            .catch(function() {
+                                                btn.style.opacity = '';
+                                                btn.style.pointerEvents = '';
+                                                window.location.href = '{{ route('checkout.index') }}';
+                                            });
+                                        });
+                                        </script>
                                     </div>
                                 </div>
                             </div>
