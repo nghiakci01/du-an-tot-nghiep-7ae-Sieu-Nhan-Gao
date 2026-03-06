@@ -36,22 +36,8 @@
                 <span>Mặc định</span></a>
             </div>
           </li>
-          {{-- Language Switcher (Removed)
-          <li class="dropdown pc-h-item">
-            <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
-              aria-haspopup="false" aria-expanded="false"><svg class="pc-icon">
-                <use xlink:href="#custom-language"></use>
-              </svg></a>
-            <div class="dropdown-menu dropdown-menu-end pc-h-dropdown lng-dropdown">
-              <a href="#!" class="dropdown-item" data-lng="en"><span>English <small>(UK)</small> </span></a><a href="#!"
-                class="dropdown-item" data-lng="fr"><span>français <small>(French)</small> </span></a><a href="#!"
-                class="dropdown-item" data-lng="ro"><span>Română <small>(Romanian)</small> </span></a><a href="#!"
-                class="dropdown-item" data-lng="cn"><span>中国人 <small>(Chinese)</small></span></a>
-            </div>
-          </li>
-          --}}
 
-          {{-- Setting --}}
+          <!-- {{-- Setting --}}
           {{-- <li class="dropdown pc-h-item">
             <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
               aria-haspopup="false" aria-expanded="false"><svg class="pc-icon">
@@ -64,7 +50,7 @@
                 class="dropdown-item"><i class="ti ti-lock"></i> <span>Lock Screen</span> </a><a href="#!"
                 class="dropdown-item"><i class="ti ti-power"></i> <span>Logout</span></a>
             </div>
-          </li> --}}
+          </li> --}} -->
 
           {{-- Notification Sound Toggle --}}
           <li class="pc-h-item">
@@ -153,7 +139,7 @@
             </a>
             <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
               <div class="dropdown-header d-flex align-items-center justify-content-between">
-                <h5 class="m-0">Profile</h5>
+                <h5 class="m-0">Hồ sơ</h5>
               </div>
               <div class="dropdown-body">
                 <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
@@ -177,7 +163,7 @@
                         <h5 class="mb-0 d-inline-flex align-items-center">
                           <svg class="pc-icon text-muted me-2">
                             <use xlink:href="#custom-notification-outline"></use>
-                          </svg>Notification
+                          </svg>Thông báo
                         </h5>
                         <div class="form-check form-switch form-check-reverse m-0">
                           <input class="form-check-input f-18" type="checkbox" role="switch" />
@@ -186,15 +172,15 @@
                     </div>
                   </div>
                   <hr class="border-secondary border-opacity-50" />
-                  <p class="text-span">Manage</p>
+                  <p class="text-span">Quản lý</p>
                   <a href="{{ route('admin.profile.index') }}" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
                         <use xlink:href="#custom-setting-outline"></use>
                       </svg>
-                      <span>Settings</span>
+                      <span>Cài đặt</span>
                     </span></a><a href="{{ route('admin.profile.index') }}" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
                         <use xlink:href="#custom-lock-outline"></use>
                       </svg>
-                      <span>Change Password</span></span></a>
+                      <span>Đổi mật khẩu</span></span></a>
                   <hr class="border-secondary border-opacity-50" />
                   <div class="d-grid mb-3 mt-3">
                     <form method="POST" action="{{ route('logout') }}">
@@ -202,7 +188,7 @@
                       <button class="btn btn-primary w-100" type="submit">
                         <svg class="pc-icon me-2">
                           <use xlink:href="#custom-logout-1-outline"></use>
-                        </svg>Logout
+                        </svg>Đăng xuất
                       </button>
                     </form>
                   </div>
