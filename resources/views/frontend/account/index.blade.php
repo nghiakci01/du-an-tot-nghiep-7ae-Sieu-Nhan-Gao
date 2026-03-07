@@ -232,6 +232,12 @@
           </a>
         </li>
         <li>
+          <a href="#loyalty" data-tab="loyalty" class="nav-tab-link">
+            <i class="bi bi-star-fill"></i> Điểm thưởng
+            @if($loyaltyPoints > 0)<span class="badge bg-success ms-auto">{{ $loyaltyPoints }}</span>@endif
+          </a>
+        </li>
+        <li>
           <a href="#account-details" data-tab="account-details" class="nav-tab-link">
             <i class="bi bi-person-gear"></i> Thông tin tài khoản
           </a>
@@ -265,25 +271,32 @@
         @if($user)
           {{-- Stat Cards --}}
           <div class="row g-3 mb-4">
-            <div class="col-4">
+            <div class="col-3">
               <div class="stat-card">
                 <div class="stat-icon" style="background:#e8f5e9; color:#28a745;"><i class="bi bi-bag-check-fill"></i></div>
                 <div class="stat-number">{{ $totalOrders }}</div>
                 <div class="stat-label">Đơn hàng</div>
               </div>
             </div>
-            <div class="col-4">
+            <div class="col-3">
               <div class="stat-card">
                 <div class="stat-icon" style="background:#fff3e0; color:#f57c00;"><i class="bi bi-cash-stack"></i></div>
                 <div class="stat-number" style="font-size:1.3rem;">{{ number_format($totalSpent) }}đ</div>
                 <div class="stat-label">Đã chi tiêu</div>
               </div>
             </div>
-            <div class="col-4">
+            <div class="col-3">
               <div class="stat-card">
                 <div class="stat-icon" style="background:#fce4ec; color:#e91e63;"><i class="bi bi-heart-fill"></i></div>
                 <div class="stat-number">{{ $wishCount }}</div>
                 <div class="stat-label">Yêu thích</div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="stat-card">
+                <div class="stat-icon" style="background:#e8eaf6; color:#3f51b5;"><i class="bi bi-star-fill"></i></div>
+                <div class="stat-number">{{ $loyaltyPoints }}</div>
+                <div class="stat-label">Điểm thưởng</div>
               </div>
             </div>
           </div>
@@ -456,6 +469,63 @@
       </div>
     </div>
 
+    {{-- =============== TAB: LOYALTY POINTS =============== --}}
+    <div class="account-content tab-pane-block d-none" id="tab-loyalty">
+      <div class="tab-head">
+        <h4><i class="bi bi-star me-2"></i>Điểm thưởng</h4>
+      </div>
+      <div class="tab-body">
+        {{-- Points Summary --}}
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <div class="p-4 rounded-3 text-center" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white;">
+              <div style="font-size: 3rem; font-weight: 900;">{{ number_format($loyaltyPoints) }}</div>
+              <div class="opacity-75">Điểm tích lũy</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-4 rounded-3 text-center" style="background: #f9fafb; border: 1px solid #eee;">
+              <div style="font-size: 2rem; font-weight: 800; color: #28a745;">{{ number_format($loyaltyPointsValue) }}đ</div>
+              <div class="text-muted">Giá trị quy đổi</div>
+              <div class="text-muted small mt-1">1 điểm = 1.000đ giảm giá</div>
+            </div>
+          </div>
+        </div>
+
+        {{-- How it works --}}
+        <div class="p-3 rounded-3 mb-4" style="background: #fff8e1; border: 1px solid #ffe082;">
+          <h6 class="fw-bold mb-2"><i class="bi bi-info-circle me-1"></i>Cách tích điểm</h6>
+          <ul class="mb-0 small">
+            <li>Mỗi <strong>10.000đ</strong> trong đơn hàng hoàn thành = <strong>1 điểm</strong></li>
+            <li>Điểm được cộng khi đơn hàng chuyển sang trạng thái <strong>"Hoàn thành"</strong></li>
+            <li>Điểm sẽ bị thu hồi nếu đơn hàng bị hủy hoặc trả hàng</li>
+          </ul>
+        </div>
+
+        {{-- Points History --}}
+        <h6 class="fw-bold mb-3">Lịch sử điểm thưởng</h6>
+        @if($loyaltyHistory->isNotEmpty())
+          @foreach($loyaltyHistory as $point)
+          <div class="d-flex align-items-center gap-3 p-3 mb-2 rounded-3" style="background:#f9fafb; border:1px solid #eee;">
+            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:40px; height:40px; {{ $point->points > 0 ? 'background:#d1e7dd; color:#0a3622;' : 'background:#f8d7da; color:#842029;' }}">
+              <i class="bi {{ $point->points > 0 ? 'bi-plus-lg' : 'bi-dash-lg' }}"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">{{ $point->description }}</div>
+              <div class="text-muted small">{{ $point->created_at->format('d/m/Y H:i') }}</div>
+            </div>
+            <div class="fw-bold {{ $point->points > 0 ? 'text-success' : 'text-danger' }}">{{ $point->points > 0 ? '+' : '' }}{{ $point->points }} điểm</div>
+          </div>
+          @endforeach
+        @else
+          <div class="text-center py-4 text-muted">
+            <i class="bi bi-star" style="font-size:2rem; color:#eee;"></i>
+            <p class="mt-2 mb-0">Chưa có lịch sử điểm thưởng. Hãy mua sắm để tích điểm!</p>
+          </div>
+        @endif
+      </div>
+    </div>
+
     {{-- =============== TAB: ACCOUNT DETAILS =============== --}}
     <div class="account-content tab-pane-block d-none" id="tab-account-details">
       <div class="tab-head">
@@ -543,6 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
     'orders'          : 'tab-orders',
     'wishlist'        : 'tab-wishlist',
     'coupons'         : 'tab-coupons',
+    'loyalty'         : 'tab-loyalty',
     'account-details' : 'tab-account-details',
   };
 

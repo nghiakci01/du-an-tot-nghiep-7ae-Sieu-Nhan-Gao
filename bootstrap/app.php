@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\SetLanguage::class,
             \App\Http\Middleware\PreventBackHistory::class,
+            \App\Http\Middleware\TrackRecentlyViewed::class,
         ]);
 
         $middleware->alias([

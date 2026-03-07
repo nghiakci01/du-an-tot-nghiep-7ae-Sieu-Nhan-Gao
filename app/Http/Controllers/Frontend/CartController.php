@@ -69,7 +69,18 @@ class CartController extends Controller
             }
         }
 
-        return view('frontend.cart.index', compact('cart', 'total', 'coupon', 'discount'));
+        // Cross-sell: products from same categories, excluding items already in cart
+    $cartProductIds = collect($cart)->pluck('product_id')->unique()->toArray();
+    $cartCategoryIds = Product::whereIn('id', $cartProductIds)->pluck('category_id')->unique()->toArray();
+    $crossSellProducts = Product::where('is_active', true)
+        ->whereIn('category_id', $cartCategoryIds)
+        ->whereNotIn('id', $cartProductIds)
+        ->with(['variants', 'reviews', 'images'])
+        ->inRandomOrder()
+        ->take(8)
+        ->get();
+
+        return view('frontend.cart.index', compact('cart', 'total', 'coupon', 'discount', 'crossSellProducts'));
     }
 
     public function changeVariant(Request $request)

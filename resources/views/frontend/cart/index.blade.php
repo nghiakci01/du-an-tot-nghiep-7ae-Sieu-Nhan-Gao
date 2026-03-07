@@ -271,6 +271,34 @@
                     </div>
                     <!--coupon code area end-->
 
+                    <!--cross-sell section start-->
+                    @if(isset($crossSellProducts) && $crossSellProducts->count() > 0)
+                    <div class="mt-5">
+                        <div class="section_title" style="margin-bottom: 20px;">
+                            <h2>{{ __('messages.you_may_also_like') ?? 'Có thể bạn cũng thích' }}</h2>
+                        </div>
+                        <div class="row">
+                            @foreach($crossSellProducts->take(4) as $crossSell)
+                            <div class="col-lg-3 col-md-4 col-6 mb-3">
+                                <div class="single_product">
+                                    <div class="product_thumb">
+                                        <a class="primary_img" href="{{ route('product.detail', $crossSell->slug) }}">
+                                            <img src="{{ $crossSell->image ? asset('storage/' . $crossSell->image) : asset('frontend-assets/img/product/product21.jpg') }}"
+                                                alt="{{ $crossSell->name }}" style="height: 200px; object-fit: cover;">
+                                        </a>
+                                    </div>
+                                    <div class="product_content">
+                                        <h3><a href="{{ route('product.detail', $crossSell->slug) }}">{{ Str::limit($crossSell->name, 40) }}</a></h3>
+                                        @include('frontend.partials.product-price', ['product' => $crossSell])
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                    <!--cross-sell section end-->
+
                 </form>
             @else
                 <div class="text-center py-5">

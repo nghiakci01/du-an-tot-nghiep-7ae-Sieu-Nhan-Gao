@@ -85,6 +85,86 @@
     </style>
     <!--slider area end-->
 
+    <!--flash sale section start-->
+    @if(isset($flashSaleProducts) && $flashSaleProducts->count() > 0)
+    <section class="flash-sale-section" style="padding: 30px 0; background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);">
+        <div class="container-fluid">
+            <div class="row align-items-center mb-3">
+                <div class="col-auto">
+                    <h2 style="color: white; font-weight: 900; margin: 0; font-size: 1.8rem;">
+                        <i class="fa fa-bolt"></i> FLASH SALE
+                    </h2>
+                </div>
+                <div class="col-auto">
+                    <div id="flash-sale-countdown" style="display: flex; gap: 8px;">
+                        <div style="background: rgba(0,0,0,0.3); color: white; padding: 6px 12px; border-radius: 6px; text-align: center; min-width: 50px;">
+                            <span id="fs-hours" style="font-size: 1.4rem; font-weight: 800;">00</span>
+                            <div style="font-size: 10px; opacity: 0.8;">GIỜ</div>
+                        </div>
+                        <div style="color: white; font-size: 1.4rem; font-weight: 800; line-height: 2.4;">:</div>
+                        <div style="background: rgba(0,0,0,0.3); color: white; padding: 6px 12px; border-radius: 6px; text-align: center; min-width: 50px;">
+                            <span id="fs-minutes" style="font-size: 1.4rem; font-weight: 800;">00</span>
+                            <div style="font-size: 10px; opacity: 0.8;">PHÚT</div>
+                        </div>
+                        <div style="color: white; font-size: 1.4rem; font-weight: 800; line-height: 2.4;">:</div>
+                        <div style="background: rgba(0,0,0,0.3); color: white; padding: 6px 12px; border-radius: 6px; text-align: center; min-width: 50px;">
+                            <span id="fs-seconds" style="font-size: 1.4rem; font-weight: 800;">00</span>
+                            <div style="font-size: 10px; opacity: 0.8;">GIÂY</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                @foreach($flashSaleProducts as $fsProduct)
+                <div class="col-lg-3 col-md-4 col-6 mb-3">
+                    <div class="single_product" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                        <div class="product_thumb" style="position: relative;">
+                            <a href="{{ route('product.detail', $fsProduct->slug) }}">
+                                <img src="{{ $fsProduct->image_url }}" alt="{{ $fsProduct->name }}" style="height: 220px; object-fit: cover; width: 100%;">
+                            </a>
+                            @php
+                                $discountPercent = $fsProduct->price > 0 ? round((1 - $fsProduct->sale_price / $fsProduct->price) * 100) : 0;
+                            @endphp
+                            <span style="position: absolute; top: 10px; left: 10px; background: #ff4b2b; color: white; padding: 4px 10px; border-radius: 4px; font-weight: 800; font-size: 13px;">
+                                -{{ $discountPercent }}%
+                            </span>
+                        </div>
+                        <div class="product_content" style="padding: 12px;">
+                            <h3 style="margin: 0 0 8px;"><a href="{{ route('product.detail', $fsProduct->slug) }}" style="font-size: 14px;">{{ Str::limit($fsProduct->name, 35) }}</a></h3>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-weight: 800; color: #ff4b2b; font-size: 16px;">{{ number_format($fsProduct->sale_price) }}đ</span>
+                                <span style="text-decoration: line-through; color: #999; font-size: 13px;">{{ number_format($fsProduct->price) }}đ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var endTimes = @json($flashSaleProducts->pluck('flash_sale_ends_at')->filter()->values());
+        if (endTimes.length === 0) return;
+        var earliest = new Date(Math.min(...endTimes.map(t => new Date(t).getTime())));
+        function updateCountdown() {
+            var now = new Date().getTime();
+            var diff = earliest.getTime() - now;
+            if (diff <= 0) { location.reload(); return; }
+            var h = Math.floor(diff / (1000 * 60 * 60));
+            var m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            var s = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById('fs-hours').textContent = String(h).padStart(2, '0');
+            document.getElementById('fs-minutes').textContent = String(m).padStart(2, '0');
+            document.getElementById('fs-seconds').textContent = String(s).padStart(2, '0');
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    });
+    </script>
+    @endif
+    <!--flash sale section end-->
+
     <!--featured products section area start-->
     <section class="product_section womens_product product_section_six">
         <div class="container-fluid">

@@ -274,4 +274,55 @@ class OrderController extends Controller
             return back()->with('error', 'Có lỗi xảy ra khi thực thi lệnh tự động hủy: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Query VNPAY payment status for an order (QueryDR).
+     */
+    public function queryPayment(Order $order, \App\Services\VnpayService $vnpayService)
+    {
+        if ($order->payment_method !== 'VNPAY') {
+            return response()->json(['success' => false, 'message' => 'Đơn hàng không thanh toán qua VNPAY.']);
+        }
+
+        $result = $vnpayService->queryTransaction($order);
+
+        return response()->json([
+            'success' => true,
+            'data' => $result,
+            'message' => \App\Services\VnpayService::getResponseMessage($result['vnp_ResponseCode'] ?? '99'),
+        ]);
+    }
+
+    /**
+     * Request refund via VNPAY for an order.
+     */
+    public function refundPayment(Request $request, Order $order, \App\Services\VnpayService $vnpayService)
+    {
+        if ($order->payment_method !== 'VNPAY' || $order->payment_status !== 'paid') {
+            return back()->with('error', 'Chỉ có thể hoàn tiền cho đơn VNPAY đã thanh toán.');
+        }
+
+        $amount = $request->input('refund_amount', $order->final_total);
+        $transactionType = $amount >= $order->final_total ? '02' : '03'; // 02 = full, 03 = partial
+
+        $result = $vnpayService->refundTransaction($order, (int) $amount, auth()->user()->email, $transactionType);
+
+        $responseCode = $result['vnp_ResponseCode'] ?? '99';
+        $message = \App\Services\VnpayService::getResponseMessage($responseCode);
+
+        if ($responseCode === '00') {
+            $order->update(['payment_status' => 'refunded']);
+
+            \App\Models\OrderHistory::create([
+                'order_id' => $order->id,
+                'user_id' => auth()->id(),
+                'new_status' => $order->status,
+                'note' => 'Hoàn tiền VNPAY thành công: ' . number_format($amount) . 'đ',
+            ]);
+
+            return back()->with('success', 'Hoàn tiền VNPAY thành công: ' . number_format($amount) . 'đ');
+        }
+
+        return back()->with('error', 'Hoàn tiền VNPAY thất bại: ' . $message);
+    }
 }

@@ -184,6 +184,32 @@
                                     </li>
                                 </ul>
                             </div>
+
+                            {{-- Social Proof badges --}}
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0;">
+                                @php $totalSold = $product->total_sold; @endphp
+                                @if($totalSold > 0)
+                                <span style="display: inline-flex; align-items: center; gap: 4px; background: #f0f0f0; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #555;">
+                                    <i class="fa fa-shopping-bag" style="color: #ef233c;"></i> Đã bán {{ $totalSold }}
+                                </span>
+                                @endif
+                                @if($totalSold >= 10)
+                                <span style="display: inline-flex; align-items: center; gap: 4px; background: #fff3e0; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #e65100; font-weight: 600;">
+                                    <i class="fa fa-fire"></i> Best Seller
+                                </span>
+                                @endif
+                                @if($product->isOnFlashSale())
+                                <span style="display: inline-flex; align-items: center; gap: 4px; background: #ff4b2b; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: white; font-weight: 600;">
+                                    <i class="fa fa-bolt"></i> Flash Sale
+                                </span>
+                                @endif
+                                @if($ratingAvg >= 4.5 && $product->reviews->count() >= 3)
+                                <span style="display: inline-flex; align-items: center; gap: 4px; background: #e8f5e9; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #2e7d32; font-weight: 600;">
+                                    <i class="fa fa-star"></i> Đánh giá cao
+                                </span>
+                                @endif
+                            </div>
+
                             <div class="product_desc">
                                 <p>{{ $product->short_description }}</p>
                             </div>
@@ -754,6 +780,8 @@
         </div>
     </div>
 
+
+    @include('frontend.partials.recently-viewed')
 
 @endsection
 

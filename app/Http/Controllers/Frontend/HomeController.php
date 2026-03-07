@@ -53,7 +53,13 @@ class HomeController extends Controller
             ->take(10)
             ->get();
 
-        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders', 'midBanner'));
+        // Flash Sale products
+        $flashSaleProducts = Product::flashSale()
+            ->with(['variants', 'reviews', 'images'])
+            ->take(8)
+            ->get();
+
+        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders', 'midBanner', 'flashSaleProducts'));
     }
 
     public function about()

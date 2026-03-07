@@ -6,15 +6,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\ConversionTrackingService;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     protected $reportService;
+    protected $conversionService;
 
-    public function __construct(\App\Services\ReportService $reportService)
+    public function __construct(\App\Services\ReportService $reportService, ConversionTrackingService $conversionService)
     {
         $this->reportService = $reportService;
+        $this->conversionService = $conversionService;
     }
 
     public function index(Request $request)
@@ -36,6 +39,9 @@ class DashboardController extends Controller
 
         $recentOrders = Order::with('user')->latest()->take(5)->get();
 
+        // Conversion funnel stats
+        $funnelStats = $this->conversionService->getFunnelStats('30d');
+
         return view('admin.dashboard', [
             'totalRevenue' => $stats['total_revenue'],
             'totalProfit' => $stats['total_profit'],
@@ -53,6 +59,7 @@ class DashboardController extends Controller
             'totalProductsSold' => $totalProductsSold > 0 ? $totalProductsSold : 1, // Tránh chia cho 0
             'startDate' => $startDate->format('Y-m-d'),
             'endDate' => $endDate->format('Y-m-d'),
+            'funnelStats' => $funnelStats,
         ]);
     }
 
