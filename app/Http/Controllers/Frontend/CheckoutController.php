@@ -209,7 +209,12 @@ class CheckoutController extends Controller
             }
 
             foreach ($cart as $id => $details) {
-                // Removed stock verification and deduction logic as warehouse management is removed
+                // Trừ kho với lockForUpdate để tránh race condition
+                $variant = ProductVariant::where('id', $details['variant_id'])->lockForUpdate()->first();
+                if (!$variant || $variant->stock_quantity < $details['quantity']) {
+                    throw new \Exception('Sản phẩm "' . $details['name'] . '" không đủ số lượng tồn kho.');
+                }
+                $variant->decrement('stock_quantity', $details['quantity']);
 
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -217,7 +222,7 @@ class CheckoutController extends Controller
                     'variant_id' => $details['variant_id'],
                     'quantity' => $details['quantity'],
                     'price' => $details['price'],
-                    'cost_price' => $details['price'], // We can approximate cost_price or leave it 0 if cost_price logic was in variant
+                    'cost_price' => $details['price'],
                 ]);
             }
 
@@ -306,7 +311,7 @@ class CheckoutController extends Controller
     /**
      * Hủy đơn hàng khi đang chờ thanh toán
      */
-    public function cancelOrder($id)
+    public function cancelOrder($id, \App\Services\OrderService $orderService)
     {
         $order = Order::findOrFail($id);
 
@@ -315,26 +320,10 @@ class CheckoutController extends Controller
         }
 
         try {
-            DB::beginTransaction();
-
-            $order->update(['status' => 'cancelled']);
-
-            // Hoàn lại số lượng tồn kho logic removed
-
-            if (class_exists(\App\Models\OrderHistory::class)) {
-                \App\Models\OrderHistory::create([
-                    'order_id' => $order->id,
-                    'status' => 'cancelled',
-                    'note' => 'Khách hàng tự hủy đơn hàng.',
-                    'user_id' => Auth::id()
-                ]);
-            }
-
-            DB::commit();
+            $orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, Auth::user(), 'Khách hàng tự hủy đơn hàng từ trang thanh toán.');
 
             return redirect()->route('shop')->with('success', 'Đơn hàng đã được hủy thành công.');
         } catch (\Exception $e) {
-            DB::rollBack();
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi hủy đơn hàng: ' . $e->getMessage());
         }
     }
