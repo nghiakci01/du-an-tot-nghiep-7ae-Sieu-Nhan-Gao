@@ -24,6 +24,11 @@ class HomeController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        $midBanner = Banner::where('position', 'home_middle')
+            ->where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->first();
+
 
 
         // Sản phẩm nổi bật cho section "New Arrivals"
@@ -48,7 +53,7 @@ class HomeController extends Controller
             ->take(10)
             ->get();
 
-        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders'));
+        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders', 'midBanner'));
     }
 
     public function about()

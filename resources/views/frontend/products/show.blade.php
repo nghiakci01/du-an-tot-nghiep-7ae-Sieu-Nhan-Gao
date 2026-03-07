@@ -918,9 +918,24 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Hết hàng!',
-                            text: 'Sản phẩm này đã hết hàng với lựa chọn của bạn.',
+                            html: 'Sản phẩm với lựa chọn này hiện đã <strong>hết hàng</strong>.<br>Vui lòng chọn thuộc tính khác.',
                             confirmButtonColor: '#ef233c',
+                            confirmButtonText: 'Chọn lại',
                         });
+                        return;
+                    }
+
+                    // Kiểm tra số lượng yêu cầu vượt tồn kho
+                    var requestedQty = parseInt($('#quantity_input').val()) || 1;
+                    if (requestedQty > matchedVariant.stock_quantity) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Vượt quá tồn kho!',
+                            html: `Chỉ còn <strong>${matchedVariant.stock_quantity}</strong> sản phẩm trong kho.<br>Số lượng đã được điều chỉnh về mức tối đa.`,
+                            confirmButtonColor: '#ef233c',
+                            confirmButtonText: 'Đồng ý',
+                        });
+                        $('#quantity_input').val(matchedVariant.stock_quantity);
                         return;
                     }
 

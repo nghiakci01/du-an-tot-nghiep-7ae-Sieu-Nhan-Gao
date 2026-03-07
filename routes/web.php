@@ -26,6 +26,7 @@ Route::post('/cart/apply-coupon', [App\Http\Controllers\Frontend\CartController:
 Route::post('/cart/remove-coupon', [App\Http\Controllers\Frontend\CartController::class, 'removeCoupon'])->name('cart.remove_coupon');
 Route::post('/cart/change-variant', [App\Http\Controllers\Frontend\CartController::class, 'changeVariant'])->name('cart.changeVariant');
 Route::get('/cart/count', [App\Http\Controllers\Frontend\CartController::class, 'getCartCount'])->name('cart.count');
+Route::get('/cart/validate', [App\Http\Controllers\Frontend\CheckoutController::class, 'validateCart'])->name('cart.validate');
 
 Route::get('/home', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
 Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('checkout.index');

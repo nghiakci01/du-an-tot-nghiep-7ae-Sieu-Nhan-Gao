@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Notifications\NewOrderNotification;
@@ -21,7 +22,29 @@ class CheckoutController extends Controller
     {
         $cart = session()->get('cart', []);
         if (count($cart) == 0) {
-            return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
+            return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
+        }
+
+        // Validate tồn kho trước khi vào trang checkout
+        $invalidItems = [];
+        foreach ($cart as $variantId => $item) {
+            $variant = ProductVariant::find($variantId);
+            if (!$variant || !$variant->product) {
+                $invalidItems[] = '“' . ($item['name'] ?? 'Sản phẩm') . '” đã không còn tồn tại.';
+                continue;
+            }
+            if ($variant->stock_quantity <= 0) {
+                $invalidItems[] = '“' . $item['name'] . '” (đã hết hàng).';
+                continue;
+            }
+            if ($item['quantity'] > $variant->stock_quantity) {
+                $invalidItems[] = '“' . $item['name'] . '” - chỉ còn ' . $variant->stock_quantity . ' sản phẩm.';
+            }
+        }
+
+        if (!empty($invalidItems)) {
+            $msg = 'Giỏ hàng có sản phẩm không hợp lệ: ' . implode(' ', $invalidItems) . ' Vui lòng cập nhật giỏ hàng trước khi thanh toán.';
+            return redirect()->route('cart.index')->with('error', $msg);
         }
 
         $total = 0;
@@ -45,6 +68,65 @@ class CheckoutController extends Controller
         $provinces = config('vietnam_provinces');
 
         return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces'));
+    }
+
+    /**
+     * AJAX: Kiểm tra giỏ hàng trước khi chuyển sang checkout
+     */
+    public function validateCart()
+    {
+        $cart = session()->get('cart', []);
+
+        if (empty($cart)) {
+            return response()->json(['valid' => false, 'message' => 'Giỏ hàng trống!']);
+        }
+
+        $errors = [];
+        foreach ($cart as $variantId => $item) {
+            $variant = ProductVariant::with('product')->find($variantId);
+
+            if (!$variant || !$variant->product) {
+                $errors[] = [
+                    'name' => $item['name'] ?? 'Sản phẩm',
+                    'issue' => 'không còn tồn tại trong hệ thống',
+                    'type' => 'not_found',
+                ];
+                continue;
+            }
+
+            if (!$variant->product->is_active) {
+                $errors[] = [
+                    'name' => $item['name'],
+                    'issue' => 'đã ngưng kinh doanh',
+                    'type' => 'inactive',
+                ];
+                continue;
+            }
+
+            if ($variant->stock_quantity <= 0) {
+                $errors[] = [
+                    'name' => $item['name'],
+                    'issue' => 'đã hết hàng',
+                    'type' => 'out_of_stock',
+                ];
+                continue;
+            }
+
+            if ($item['quantity'] > $variant->stock_quantity) {
+                $errors[] = [
+                    'name' => $item['name'],
+                    'issue' => 'chỉ còn ' . $variant->stock_quantity . ' sản phẩm (bạn chọn ' . $item['quantity'] . ')',
+                    'type' => 'insufficient_stock',
+                    'available' => $variant->stock_quantity,
+                ];
+            }
+        }
+
+        if (!empty($errors)) {
+            return response()->json(['valid' => false, 'errors' => $errors]);
+        }
+
+        return response()->json(['valid' => true]);
     }
 
     public function store(Request $request)
