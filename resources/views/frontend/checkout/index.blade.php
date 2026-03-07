@@ -323,6 +323,40 @@
     </div>
     <!--breadcrumbs area end-->
 
+    <!--checkout progress bar start-->
+    <div class="container" style="padding: 30px 0 10px;">
+        <div class="d-flex justify-content-center align-items-center" style="gap: 0;">
+            <div class="text-center" style="flex: 1; max-width: 160px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: #28a745; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: 700;">
+                    <i class="fa fa-check"></i>
+                </div>
+                <div style="font-size: 12px; font-weight: 600; color: #28a745;">Giỏ hàng</div>
+            </div>
+            <div style="flex: 1; max-width: 100px; height: 3px; background: #28a745; margin-bottom: 20px;"></div>
+            <div class="text-center" style="flex: 1; max-width: 160px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: #007bff; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: 700; box-shadow: 0 0 0 4px rgba(0,123,255,0.2);">
+                    2
+                </div>
+                <div style="font-size: 12px; font-weight: 700; color: #007bff;">Thanh toán</div>
+            </div>
+            <div style="flex: 1; max-width: 100px; height: 3px; background: #dee2e6; margin-bottom: 20px;"></div>
+            <div class="text-center" style="flex: 1; max-width: 160px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: #dee2e6; color: #999; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: 700;">
+                    3
+                </div>
+                <div style="font-size: 12px; color: #999;">Xác nhận</div>
+            </div>
+            <div style="flex: 1; max-width: 100px; height: 3px; background: #dee2e6; margin-bottom: 20px;"></div>
+            <div class="text-center" style="flex: 1; max-width: 160px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: #dee2e6; color: #999; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: 700;">
+                    4
+                </div>
+                <div style="font-size: 12px; color: #999;">Hoàn tất</div>
+            </div>
+        </div>
+    </div>
+    <!--checkout progress bar end-->
+
     <!--Checkout page section-->
     <div class="Checkout_section" id="accordion">
         <div class="container">

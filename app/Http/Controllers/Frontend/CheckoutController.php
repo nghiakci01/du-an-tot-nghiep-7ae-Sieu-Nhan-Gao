@@ -240,6 +240,16 @@ class CheckoutController extends Controller
                 return redirect()->route('vnpay.payment', $order->id);
             }
 
+            // Mark any abandoned carts as recovered for this user/session
+            try {
+                app(\App\Services\ConversionTrackingService::class)->markRecovered(
+                    Auth::id(),
+                    session()->getId()
+                );
+            } catch (\Exception $e) {
+                \Log::warning('Cart abandonment recovery tracking failed: ' . $e->getMessage());
+            }
+
             // COD & BANK_TRANSFER: gửi email xác nhận và chuyển đến trang thành công
             try {
                 \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));

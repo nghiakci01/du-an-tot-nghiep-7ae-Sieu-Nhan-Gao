@@ -781,6 +781,8 @@
     </div>
 
 
+    @include('frontend.partials.recently-viewed')
+
 @endsection
 
 @section('scripts')
