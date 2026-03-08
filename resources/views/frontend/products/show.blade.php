@@ -771,7 +771,7 @@
                                     <!-- Tiêu đề / Chỉ dẫn 3D -->
                                     <div style="position: absolute; top: 15px; left: 0; right: 0; text-align: center; z-index: 10; pointer-events: none;">
                                         <span class="badge bg-dark rounded-pill px-3 py-2 shadow-sm" style="font-size: 12px; letter-spacing: 0.5px;">
-                                            <i class="fa fa-hand-pointer-o me-1"></i> Dùng chuột kéo để xoay 360°
+                                            <i class="fa fa-child me-1"></i> Trãi nghiệm thực tế ảo xoay 360° với quần áo mẫu
                                         </span>
                                     </div>
                                     
@@ -785,7 +785,8 @@
                                         shadow-softness="1"
                                         environment-image="neutral"
                                         exposure="1.2"
-                                        style="width: 100%; height: 100%; outline: none;">
+                                        style="width: 100%; height: 100%; outline: none;"
+                                        camera-orbit="45deg 75deg 2.5m">
                                         
                                         <!-- Nút loading của model viewer -->
                                         <div class="progress-bar hide" slot="progress-bar">
@@ -796,7 +797,7 @@
                                 </div>
                                 <div class="mt-4 d-flex justify-content-center gap-2">
                                     <button type="button" id="vton-add-to-cart" class="btn text-white rounded-pill px-4 shadow-sm" style="background: linear-gradient(45deg, #ef233c, #d90429); border: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                        <i class="fa fa-shopping-cart"></i> Giữ ản phẩm & Thêm vào giỏ
                                     </button>
                                 </div>
                             </div>
@@ -1142,9 +1143,10 @@
                     $('#vton-loading').hide();
                     
                     if(response.success && response.image_url) {
-                        // Tạm thời dùng model-viewer với một mẫu 3D để biểu diễn (ảnh từ API chỉ là 2D)
-                        // Trong thực tế, bạn sẽ lấy URL `.glb` thực thụ từ `response.model_3d_url`
-                        const fallback3dModel = "{{ asset('frontend-assets/models/avatar.glb') }}";
+                        
+                        // User yêu cầu show một Avatar 3D đứng xoay được có đồ.
+                        // Tại file này gán URL mẫu 3D có sẵn trang phục cho tính năng demo.
+                        const fallback3dModel = "{{ asset('frontend-assets/models/avatar-clothed.glb') }}";
                         $('#vton-model-viewer').attr('src', fallback3dModel);
                         
                         $('#vton-result').fadeIn();
