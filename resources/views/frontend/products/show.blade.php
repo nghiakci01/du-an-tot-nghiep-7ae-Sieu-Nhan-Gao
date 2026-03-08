@@ -152,7 +152,7 @@
                         
                         <!-- AI Try On Button -->
                         <div class="mt-4 text-center">
-                            <button type="button" class="btn w-100 py-3 d-flex align-items-center justify-content-center" style="background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); color: white; font-weight: bold; border-radius: 8px; border: none; box-shadow: 0 4px 15px rgba(253, 29, 29, 0.4); transition: transform 0.2s; font-size: 16px;" data-bs-toggle="modal" data-bs-target="#aiTryOnModal" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                            <button type="button" id="btn-open-vton-modal" class="btn w-100 py-3 d-flex align-items-center justify-content-center" style="background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); color: white; font-weight: bold; border-radius: 8px; border: none; box-shadow: 0 4px 15px rgba(253, 29, 29, 0.4); transition: transform 0.2s; font-size: 16px;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                                 <i class="fa fa-magic" style="margin-right: 8px; font-size: 20px;"></i> ✨ {{ __('messages.ai_try_on') ?? 'Thử Đồ Thực Tế Ảo (AI)' }}
                             </button>
                         </div>
@@ -1041,7 +1041,56 @@
                         });
                     }
                 });
+                    }
+                });
             }
+
+            // VTON Modal Open Handling
+            $('#btn-open-vton-modal').on('click', function(e) {
+                e.preventDefault();
+
+                var hasVariants = @json($product->variants->count() > 0 && $product->variants->min('price') > 0);
+
+                if (hasVariants) {
+                    var selectedSize = $('#select_size_nice').val();
+                    var selectedColor = $('#select_color_nice').val();
+
+                    if (!selectedSize || !selectedColor) {
+                        var missingFields = [];
+                        if (!selectedSize) {
+                            missingFields.push('{{ __('messages.size') }}');
+                            $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');
+                        }
+                        if (!selectedColor) {
+                            missingFields.push('{{ __('messages.color') }}');
+                            $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');
+                        }
+                        setTimeout(function() {
+                            $('.niceselect_option').next('.nice-select').css('border-color', '');
+                        }, 3000);
+
+                        var message = missingFields.length > 0 ?
+                            'Vui lòng chọn: <strong>' + missingFields.join(', ') + '</strong> trước khi thử đồ!' :
+                            'Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thử đồ!';
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Chưa chọn thuộc tính!',
+                            html: message,
+                            confirmButtonColor: '#ef233c',
+                            confirmButtonText: 'Chọn ngay',
+                            timer: 4000,
+                            timerProgressBar: true,
+                        });
+                        return;
+                    }
+                }
+
+                // If validation passes or no variants, open the modal
+                var myModal = new bootstrap.Modal(document.getElementById('aiTryOnModal'));
+                myModal.show();
+            });
+
         });
 
         // VTON handling
