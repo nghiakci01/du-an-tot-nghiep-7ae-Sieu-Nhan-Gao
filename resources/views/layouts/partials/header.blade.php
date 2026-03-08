@@ -228,7 +228,7 @@
                                                 <a href="{{ route('news') }}">{{ __('messages.news') }} <i class="fa fa-angle-down"></i></a>
                                                 @php
                                                     $navNewsCategories = \App\Models\PostCategory::withCount('posts')->get();
-                                                    $navRecentPosts = \App\Models\Post::where('is_published', true)->latest()->take(2)->get();
+                                                    $navRecentPosts = \App\Models\Post::where('is_active', true)->latest()->take(2)->get();
                                                 @endphp
                                                 <style>
                                                     .news-mega-menu {
@@ -311,7 +311,7 @@
                                                         <h6 style="font-size:11px; text-transform:uppercase; color:#999; letter-spacing:1px; margin-bottom:4px;">Bài viết mới nhất</h6>
                                                         @foreach($navRecentPosts as $post)
                                                         <a href="{{ route('news.detail', $post->slug) }}" class="news-mega-post">
-                                                            <img src="{{ $post->thumbnail ? asset('storage/' . $post->thumbnail) : asset('frontend-assets/img/blog/blog1.jpg') }}" alt="{{ $post->title }}">
+                                                            <img src="{{ $post->image ? asset('storage/' . $post->image) : asset('frontend-assets/img/blog/blog1.jpg') }}" alt="{{ $post->title }}">
                                                             <div>
                                                                 <div class="news-mega-post-title">{{ \Illuminate\Support\Str::limit($post->title, 50) }}</div>
                                                                 <div class="news-mega-post-date"><i class="fa fa-clock-o"></i> {{ $post->created_at->format('d/m/Y') }}</div>
