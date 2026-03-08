@@ -1047,8 +1047,6 @@
                         });
                     }
                 });
-                    }
-                });
             }
 
             // VTON Modal Open Handling
