@@ -81,7 +81,7 @@ class ConversionTrackingService
         // Revenue
         $totalRevenue = Order::where('created_at', '>=', $startDate)
             ->where('status', 'completed')
-            ->sum('total');
+            ->sum('final_total');
 
         // Average order value
         $avgOrderValue = $ordersCompleted > 0 ? $totalRevenue / $ordersCompleted : 0;
@@ -98,7 +98,7 @@ class ConversionTrackingService
 
         // Daily order trend
         $dailyOrders = Order::where('created_at', '>=', $startDate)
-            ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'), DB::raw('SUM(total) as revenue'))
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'), DB::raw('SUM(final_total) as revenue'))
             ->groupBy('date')
             ->orderBy('date')
             ->get();
