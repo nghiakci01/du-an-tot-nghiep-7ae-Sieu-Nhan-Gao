@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ai_model_previews', function (Blueprint $table) {
-            $table->text('consultation_text')->after('original_image_url')->nullable();
-        });
+        if (Schema::hasTable('ai_model_previews') && !Schema::hasColumn('ai_model_previews', 'consultation_text')) {
+            Schema::table('ai_model_previews', function (Blueprint $table) {
+                $table->text('consultation_text')->after('original_image_url')->nullable();
+            });
+        }
     }
 
     /**
