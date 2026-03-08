@@ -767,8 +767,11 @@
                             <!-- Result State -->
                             <div id="vton-result" class="text-center" style="display: none; width: 100%;">
                                 <img id="vton-result-image" src="" alt="Virtual Try On Result" style="max-height: 500px; max-width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                                <div class="mt-3">
-                                    <a id="vton-download" href="#" download="ai-try-on.jpg" class="btn btn-outline-dark btn-sm rounded-pill px-4">
+                                <div class="mt-3 d-flex justify-content-center gap-2">
+                                    <button type="button" id="vton-add-to-cart" class="btn text-white rounded-pill px-4" style="background: #ef233c; border: none;">
+                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                    </button>
+                                    <a id="vton-download" href="#" download="ai-try-on.jpg" class="btn btn-outline-dark rounded-pill px-4">
                                         <i class="fa fa-download"></i> Tải ảnh về
                                     </a>
                                 </div>
@@ -1093,6 +1096,18 @@
                     });
                 }
             });
+        });
+
+        // Add to cart from VTON modal
+        $('#vton-add-to-cart').on('click', function(e) {
+            e.preventDefault();
+            
+            // Close the modal
+            $('#aiTryOnModal').modal('hide');
+            
+            // Trigger the main add to cart button
+            // If variants exist, it will show the alert if not selected
+            $('#btn-add-to-cart').trigger('click');
         });
 
     </script>
