@@ -765,13 +765,18 @@
                             </div>
                             
                             <!-- Result State -->
-                            <div id="vton-result" class="text-center" style="display: none; width: 100%;">
-                                <img id="vton-result-image" src="" alt="Virtual Try On Result" style="max-height: 500px; max-width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                                <div class="mt-3 d-flex justify-content-center gap-2">
-                                    <button type="button" id="vton-add-to-cart" class="btn text-white rounded-pill px-4" style="background: #ef233c; border: none;">
+                            <div id="vton-result" class="text-center" style="display: none; width: 100%; perspective: 1000px;">
+                                <div id="vton-3d-card" style="display: inline-block; padding: 12px; background: linear-gradient(135deg, rgba(239, 35, 60, 0.05), rgba(255, 255, 255, 0.5)); backdrop-filter: blur(10px); border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.8); transform-style: preserve-3d; cursor: pointer; transition: all 0.3s ease;">
+                                    <img id="vton-result-image" src="" alt="Virtual Try On Result" style="max-height: 480px; max-width: 100%; border-radius: 10px; transform: translateZ(40px); filter: drop-shadow(0 15px 25px rgba(0,0,0,0.25)); transition: transform 0.3s ease;">
+                                    
+                                    <!-- Hiệu ứng đổ bóng dưới cùng cho cảm giác đứng trong không gian -->
+                                    <div style="position: absolute; bottom: -15px; left: 10%; right: 10%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 70%); filter: blur(5px); transform: translateZ(-20px); z-index: -1;"></div>
+                                </div>
+                                <div class="mt-4 d-flex justify-content-center gap-2">
+                                    <button type="button" id="vton-add-to-cart" class="btn text-white rounded-pill px-4 shadow-sm" style="background: linear-gradient(45deg, #ef233c, #d90429); border: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                                         <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
                                     </button>
-                                    <a id="vton-download" href="#" download="ai-try-on.jpg" class="btn btn-outline-dark rounded-pill px-4">
+                                    <a id="vton-download" href="#" download="ai-try-on.jpg" class="btn btn-dark rounded-pill px-4 shadow-sm" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                                         <i class="fa fa-download"></i> Tải ảnh về
                                     </a>
                                 </div>
@@ -789,6 +794,7 @@
 @endsection
 
 @section('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
     <script>
         // Likert scale labels
         var likertLabels = {
@@ -1041,8 +1047,6 @@
                         });
                     }
                 });
-                    }
-                });
             }
 
             // VTON Modal Open Handling
@@ -1118,7 +1122,19 @@
                     if(response.success && response.image_url) {
                         $('#vton-result-image').attr('src', response.image_url);
                         $('#vton-download').attr('href', response.image_url);
-                        $('#vton-result').fadeIn();
+                        $('#vton-result').fadeIn(400, function() {
+                            // Init 3D Tilt Effect
+                            if (typeof VanillaTilt !== 'undefined') {
+                                VanillaTilt.init(document.querySelector("#vton-3d-card"), {
+                                    max: 12,
+                                    speed: 400,
+                                    glare: true,
+                                    "max-glare": 0.4,
+                                    perspective: 1000,
+                                    scale: 1.03
+                                });
+                            }
+                        });
                     } else {
                         $('#vton-initial').fadeIn();
                         Swal.fire({
