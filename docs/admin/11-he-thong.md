@@ -36,10 +36,17 @@ Module cấu hình toàn bộ hệ thống, bao gồm thông tin shop, banner qu
 - **Route:** `GET /admin/bank-settings` (resource)
 - **Controller:** `Admin\BankSettingController`
 - **Thông tin:**
-  - Tên ngân hàng, số tài khoản, chủ tài khoản
-  - Ảnh mã QR
-  - Nội dung chuyển khoản mẫu
+  | Trường | Mô tả |
+  |--------|-------|
+  | `bank_name` | Tên ngân hàng (VD: Vietcombank, MB Bank) |
+  | `bank_id` | Mã ngân hàng cho VietQR API |
+  | `account_number` | Số tài khoản |
+  | `account_name` | Tên chủ tài khoản |
+  | `is_active` | Bật/tắt hiển thị |
+  | `is_default` | Ngân hàng mặc định khi checkout *(chỉ 1 tại 1 thời điểm)* |
 - **Model:** `BankSetting` — Bảng `bank_settings`
+- **Nghiệp vụ:** Khi đặt `is_default = true`, hệ thống tự hủy default các ngân hàng khác.
+
 
 ---
 
