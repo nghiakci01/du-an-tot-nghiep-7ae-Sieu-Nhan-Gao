@@ -47,7 +47,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="product_check" style="width: 50px;"><input type="checkbox" id="check-all" style="width: 18px; height: 18px; cursor: pointer;"></th>
-                                                <th class="product_remove">{{ __('messages.remove') }}</th>
+                                                <!-- <th class="product_remove">{{ __('messages.remove') }}</th> -->
                                                 <th class="product_thumb">{{ __('messages.image') }}</th>
                                                 <th class="product_name">{{ __('messages.product') }}</th>
                                                 <th class="product-price">{{ __('messages.price') }}</th>
