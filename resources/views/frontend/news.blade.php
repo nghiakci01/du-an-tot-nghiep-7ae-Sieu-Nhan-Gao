@@ -52,7 +52,7 @@
                                 <div class="articles_date">
                                     <p>{{ $post->created_at->format('M d, Y') }} | <a href="#">{{ $post->category ? $post->category->name : 'Tin tức' }}</a> </p>
                                 </div>
-                                <p class="post_desc">{{ Str::limit(strip_tags($post->content), 120) }}</p>
+                                <p class="post_desc">{{ Str::limit(strip_tags(html_entity_decode($post->content)), 120) }}</p>
                                 <footer class="btn_more">
                                     <a href="{{ route('news.detail', $post->slug) }}"> {{ __('messages.read_more') }}</a>
                                 </footer>
