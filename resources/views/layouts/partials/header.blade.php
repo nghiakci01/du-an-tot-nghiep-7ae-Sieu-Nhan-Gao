@@ -1,5 +1,13 @@
    
-    <div class="off_canvars_overlay">
+    <style>
+    .main_menu nav > ul > li > a, 
+    .sticky-header .main_menu nav > ul > li > a {
+        font-family: 'Quicksand', sans-serif !important;
+        font-size: 15px !important;
+        font-weight: 1000 !important;
+    }
+</style>
+<div class="off_canvars_overlay">
                 
     </div>
     <div class="offcanvas_menu offcanvas_six">
