@@ -45,7 +45,7 @@ class OrderController extends Controller
     {
         $request->validate([
             'customer_type' => 'required|in:EXISTING,NEW',
-            'user_id' => 'required_if:customer_type,EXISTING|exists:users,id',
+            'user_id' => 'required_if:customer_type,EXISTING|nullable|exists:users,id',
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|max:255',
@@ -65,7 +65,20 @@ class OrderController extends Controller
 
             $totalPrice = 0;
             foreach ($request->items as $item) {
-                $variant = ProductVariant::find($item['variant_id']);
+                $variant = ProductVariant::where('id', $item['variant_id'])->lockForUpdate()->first();
+                
+                if (!$variant) {
+                    throw new \Exception('Sản phẩm không tồn tại.');
+                }
+
+                if ($variant->stock_quantity < $item['quantity']) {
+                    $productName = $variant->product->name;
+                    $variantInfo = ($variant->sizeRelationship ? $variant->sizeRelationship->name : ( $variant->size ?: '' )) . 
+                                   ' - ' . 
+                                   ($variant->colorRelationship ? $variant->colorRelationship->name : ( $variant->color ?: '' ));
+                    throw new \Exception("Sản phẩm '{$productName}' ({$variantInfo}) chỉ còn {$variant->stock_quantity} trong kho.");
+                }
+
                 $totalPrice += ($variant->price ?? $variant->product->price) * $item['quantity'];
             }
 

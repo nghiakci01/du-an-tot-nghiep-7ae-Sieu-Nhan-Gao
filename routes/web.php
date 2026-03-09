@@ -118,7 +118,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
         
         // General APIs for Admin Panel
-        Route::get('api/variants/search', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'variantsSearch'])->name('api.variants.search');
+        Route::get('api/variants/search', [App\Http\Controllers\Admin\ProductController::class, 'variantsSearch'])->name('api.variants.search');
 
         // Admin Only Routes
         Route::middleware(['admin.only'])->group(function () {

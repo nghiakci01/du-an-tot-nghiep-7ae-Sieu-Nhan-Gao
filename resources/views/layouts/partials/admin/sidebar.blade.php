@@ -143,12 +143,7 @@
                         </a>
                     </li>
                 @endif
-                <li class="pc-item pc-hasmenu">
-                                <span class="pc-mtext">Báo cáo tồn kho</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                {{-- Removed corrupted stock report item --}}
                 <li class="pc-item">
                     <a href="{{ route('admin.chat.index') }}" class="pc-link">
                         <span class="pc-micon">
