@@ -366,6 +366,7 @@ class ProductController extends Controller
                 'price' => (float)$variant->price,
                 'size' => $variant->size ?: ($variant->sizeRelationship ? $variant->sizeRelationship->name : ''),
                 'color' => $variant->color ?: ($variant->colorRelationship ? $variant->colorRelationship->name : ''),
+                'stock' => $variant->stock_quantity,
                 'product' => [
                     'name' => $variant->product->name,
                     'image' => $variant->product->image_url,

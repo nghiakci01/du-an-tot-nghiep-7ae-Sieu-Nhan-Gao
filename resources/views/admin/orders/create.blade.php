@@ -32,6 +32,18 @@
                             <h5>Thông tin khách hàng</h5>
                         </div>
                         <div class="card-body">
+                            @if($errors->any())
+                                <div class="alert alert-danger pb-0">
+                                    <ul>
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                            @if(session('error'))
+                                <div class="alert alert-danger">{{ session('error') }}</div>
+                            @endif
                             <div class="form-group mb-3">
                                 <label class="form-label">Loại khách hàng</label>
                                 <select name="customer_type" id="customer_type" class="form-control">
@@ -172,9 +184,11 @@
                     </div>
                 </div>
             </div>
+            </div>
         </form>
     </div>
 </div>
+@endsection
 
 @section('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -277,13 +291,19 @@ $(document).ready(function() {
                         if (colorStr) details.push(colorStr);
                         let detailStr = details.length > 0 ? ` - ${details.join('/')}` : '';
 
-                        html += `<a href="#" class="list-group-item list-group-item-action select-variant d-flex align-items-center" 
-                            data-id="${variant.id}" data-name="${variant.product.name}" data-sku="${variant.sku}" data-price="${variant.price}" data-size="${sizeStr}" data-color="${colorStr}" data-img="${variant.product.image}">
+                        let stockStatus = variant.stock > 0 ? `<span class="badge bg-success-light text-success">Còn ${variant.stock}</span>` : `<span class="badge bg-danger-light text-danger">Hết hàng</span>`;
+                        let isOutOfStock = variant.stock <= 0;
+
+                        html += `<a href="#" class="list-group-item list-group-item-action select-variant d-flex align-items-center ${isOutOfStock ? 'disabled opacity-50' : ''}" 
+                            data-id="${variant.id}" data-name="${variant.product.name}" data-sku="${variant.sku}" data-price="${variant.price}" data-size="${sizeStr}" data-color="${colorStr}" data-img="${variant.product.image}" data-stock="${variant.stock}">
                             <img src="${variant.product.image}" alt="${variant.product.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 15px;">
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span>[${variant.sku}] <strong>${variant.product.name}</strong>${detailStr}</span>
-                                    <span class="text-primary fw-bold">${new Intl.NumberFormat('vi-VN').format(variant.price)}đ</span>
+                                    <div>
+                                        <span class="text-primary fw-bold me-2">${new Intl.NumberFormat('vi-VN').format(variant.price)}đ</span>
+                                        ${stockStatus}
+                                    </div>
                                 </div>
                             </div>
                         </a>`;
@@ -304,9 +324,28 @@ $(document).ready(function() {
         let color = $(this).data('color');
         let img = $(this).data('img');
 
+        let stock = parseInt($(this).data('stock'));
+
+        if (stock <= 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Hết hàng',
+                text: 'Sản phẩm này đã hết hàng, không thể thêm vào đơn hàng.'
+            });
+            return;
+        }
+
         // Check if exists
         let existing = orderItems.find(i => i.variant_id == variantId);
         if (existing) {
+            if (existing.quantity >= stock) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Giới hạn tồn kho',
+                    text: `Sản phẩm này chỉ còn ${stock} trong kho.`
+                });
+                return;
+            }
             existing.quantity++;
         } else {
             orderItems.push({
@@ -317,7 +356,8 @@ $(document).ready(function() {
                 size: size,
                 color: color,
                 img: img,
-                quantity: 1
+                quantity: 1,
+                stock: stock
             });
         }
 
@@ -335,7 +375,22 @@ $(document).ready(function() {
     $(document).on('change', '.item-qty', function() {
         let idx = $(this).data('idx');
         let qty = parseInt($(this).val());
-        if (qty < 1) qty = 1;
+        let item = orderItems[idx];
+
+        if (qty > item.stock) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Giới hạn tồn kho',
+                text: `Sản phẩm này chỉ còn ${item.stock} trong kho.`
+            });
+            qty = item.stock;
+            $(this).val(qty);
+        }
+
+        if (qty < 1 || isNaN(qty)) {
+            qty = 1;
+            $(this).val(qty);
+        }
         orderItems[idx].quantity = qty;
         renderTable();
     });
@@ -419,7 +474,18 @@ $(document).ready(function() {
             $('#product_results').hide();
         }
     });
+    // Prevent submit if no products
+    $('#create-order-form').on('submit', function(e) {
+        if (orderItems.length === 0) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Vui lòng chọn ít nhất một sản phẩm trước khi tạo đơn hàng.'
+            });
+            return false;
+        }
+    });
 });
 </script>
-@endsection
 @endsection
