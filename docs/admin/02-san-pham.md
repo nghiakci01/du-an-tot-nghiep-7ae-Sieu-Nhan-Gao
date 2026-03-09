@@ -17,7 +17,7 @@ Module quản lý toàn bộ catalog sản phẩm: CRUD sản phẩm, biến th�
 
 ### A2.2 Thêm Sản Phẩm Mới
 - **Route:** `GET/POST /admin/products/create`
-- **Controller:** `Admin\ProductController@create` / `store`
+- **Controller:** `Admin\\ProductController@create` / `store`
 - **Thông tin sản phẩm:**
   | Trường | Bắt buộc | Mô tả |
   |--------|----------|-------|
@@ -27,6 +27,8 @@ Module quản lý toàn bộ catalog sản phẩm: CRUD sản phẩm, biến th�
   | brand_id | ❌ | Thương hiệu |
   | price | ✅ | Giá gốc |
   | sale_price | ❌ | Giá khuyến mãi |
+  | sale_start_date | ❌ | Ngày bắt đầu khuyến mãi *(mới)* |
+  | sale_end_date | ❌ | Ngày kết thúc khuyến mãi *(mới)* |
   | short_description | ❌ | Mô tả ngắn |
   | description | ❌ | Mô tả chi tiết (rich text) |
   | image | ✅ | Ảnh đại diện chính |
@@ -43,8 +45,11 @@ Module quản lý toàn bộ catalog sản phẩm: CRUD sản phẩm, biến th�
   - `size_id` — Kích thước
   - `stock` — Số lượng tồn kho
   - `price_override` — Ghi đè giá (nếu khác giá base)
+  - `cost_price` — Giá vốn để tính lợi nhuận *(mới)*
+  - `alert_threshold` — Ngưỡng cảnh báo tồn kho thấp *(mới)*
   - `sku` — Mã SKU riêng
 - **Nghiệp vụ:** Mỗi tổ hợp màu+size là duy nhất trong 1 sản phẩm.
+
 
 ---
 
