@@ -37,3 +37,4 @@ Module xuất báo cáo doanh thu và đơn hàng dưới dạng file Excel và 
 |-----------|-------|-------|
 | Xuất Excel đơn hàng | ✅ | ✅ |
 | Xuất PDF doanh thu | ✅ | ✅ |
+| Xem Payment History | ❌ | ✅ |

@@ -71,6 +71,15 @@ Module xử lý toàn bộ vòng đời đơn hàng từ khi nhận đến khi h
 - **Mô tả:** Trigger thủ công để hủy các đơn `pending` quá N giờ không được xác nhận.
 - **Nghiệp vụ:** Thường được gọi bởi Scheduler/Cron job.
 
+### A4.8 Truy Vấn & Hoàn Tiền VNPAY *(MỚI)*
+- **Route (query):** `POST /admin/orders/{id}/query-payment`
+- **Route (refund):** `POST /admin/orders/{id}/refund-payment`
+- **Controller:** `Admin\\OrderController@queryPayment` / `@refundPayment`
+- **Mô tả:**
+  - **Query:** Tra cứu trạng thái thanh toán thực tế từ cổng VNPAY (phòng trường hợp callback thất bại)
+  - **Refund:** Khởi tạo yêu cầu hoàn tiền tự động về thẻ/ví khách hàng qua VNPAY API
+- **Phân quyền:** Chỉ Admin
+
 ---
 
 ## Phân Quyền
@@ -80,6 +89,9 @@ Module xử lý toàn bộ vòng đời đơn hàng từ khi nhận đến khi h
 | Cập nhật trạng thái | ✅ | ✅ |
 | Xác nhận thanh toán | ✅ | ✅ |
 | In hóa đơn | ✅ | ✅ |
+| VNPAY Query / Refund | ❌ | ✅ |
 
 ## Models Liên Quan
 - `Order`, `OrderItem`, `OrderHistory`
+- `Order.shipping_provider` — Nhà vận chuyển được gắn với đơn hàng
+
