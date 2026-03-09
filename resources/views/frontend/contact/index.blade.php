@@ -55,7 +55,7 @@
                             </div>
                         @endif
 
-                        <form id="main-contact-form" method="POST" action="{{ route('contact.send') }}">
+                        <form id="contact-us-form" method="POST" action="{{ route('contact.send') }}">
                             @csrf
                             <p>
                                 <label>{{ __('messages.name_required') }}</label>
@@ -106,15 +106,54 @@
 @endsection
 
 @section('scripts')
-    @if (session('success'))
-        <script>
-            Swal.fire({
-                title: 'Success!',
-                text: "{{ session('success') }}",
-                icon: 'success',
-                confirmButtonText: 'Close',
-                confirmButtonColor: '#fe4536'
+    <script>
+        $(document).ready(function() {
+            $('#contact-us-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                var form = $(this);
+                var submitBtn = form.find('button[type="submit"]');
+                var originalBtnText = submitBtn.text();
+                
+                // Disable button and show loading state
+                submitBtn.prop('disabled', true).text('{{ __("messages.processing") }}...');
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '{{ __("messages.home") === "Trang chủ" ? "Thành công!" : "Success!" }}',
+                            text: response.message,
+                            confirmButtonColor: '#fe4536'
+                        });
+                        form[0].reset();
+                    },
+                    error: function(xhr) {
+                        var message = '{{ __("messages.error_occurred") }}';
+                        if (xhr.status === 422) {
+                            var errors = xhr.responseJSON.errors;
+                            message = '';
+                            $.each(errors, function(key, value) {
+                                message += value[0] + '<br>';
+                            });
+                        }
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: '{{ __("messages.home") === "Trang chủ" ? "Lỗi!" : "Error!" }}',
+                            html: message,
+                            confirmButtonColor: '#fe4536'
+                        });
+                    },
+                    complete: function() {
+                        // Re-enable button
+                        submitBtn.prop('disabled', false).text(originalBtnText);
+                    }
+                });
             });
-        </script>
-    @endif
+        });
+    </script>
 @endsection

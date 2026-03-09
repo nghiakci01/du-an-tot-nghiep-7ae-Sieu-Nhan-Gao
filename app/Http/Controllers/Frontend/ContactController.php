@@ -43,6 +43,10 @@ class ContactController extends Controller
             \Log::error('Failed to send contact notification: '.$e->getMessage());
         }
 
+        if ($request->ajax()) {
+            return response()->json(['message' => __('messages.contact_success')]);
+        }
+
         return redirect()->route('contact.index')
             ->with('success', __('messages.contact_success'));
     }
