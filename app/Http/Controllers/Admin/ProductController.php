@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -337,5 +338,41 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Search product variants for autocomplete (e.g., in Order Creation)
+     */
+    public function variantsSearch(Request $request)
+    {
+        $q = $request->get('q');
+        if (empty($q)) {
+            return response()->json([]);
+        }
+
+        $variants = ProductVariant::with(['product', 'sizeRelationship', 'colorRelationship'])
+            ->where('sku', 'like', "%{$q}%")
+            ->orWhereHas('product', function($query) use ($q) {
+                $query->where('name', 'like', "%{$q}%");
+            })
+            ->latest()
+            ->get();
+
+        $results = $variants->map(function($variant) {
+            return [
+                'id' => $variant->id,
+                'name' => $variant->product->name,
+                'sku' => $variant->sku,
+                'price' => (float)$variant->price,
+                'size' => $variant->size ?: ($variant->sizeRelationship ? $variant->sizeRelationship->name : ''),
+                'color' => $variant->color ?: ($variant->colorRelationship ? $variant->colorRelationship->name : ''),
+                'product' => [
+                    'name' => $variant->product->name,
+                    'image' => $variant->product->image_url,
+                ]
+            ];
+        });
+
+        return response()->json($results);
     }
 }

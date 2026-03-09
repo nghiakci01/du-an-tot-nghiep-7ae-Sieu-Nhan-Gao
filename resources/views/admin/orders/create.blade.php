@@ -176,7 +176,27 @@
     </div>
 </div>
 
-@push('scripts')
+@section('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    #product_results {
+        max-height: 400px;
+        overflow-y: auto;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        border: 1px solid #ddd;
+        border-top: none;
+        display: none;
+    }
+    .select-variant:hover {
+        background-color: #f8f9fa;
+    }
+    #customer_results {
+        max-height: 300px;
+        overflow-y: auto;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        display: none;
+    }
+</style>
 <script>
 $(document).ready(function() {
     let orderItems = [];
@@ -401,5 +421,5 @@ $(document).ready(function() {
     });
 });
 </script>
-@endpush
+@endsection
 @endsection
