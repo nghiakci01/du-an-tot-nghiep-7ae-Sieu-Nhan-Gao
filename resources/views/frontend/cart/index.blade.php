@@ -74,14 +74,14 @@
                                                         </a>
                                                     </td>
                                                     <td class="product_name">
-                                                        <a href="{{ route('product.detail', $details['slug']) }}" class="cart-product-link">{{ $details['name'] }}</a>
-                                                        <div class="cart-variant-info mt-2">
-                                                            <div class="text-muted small mb-1">
+                                                        <a href="{{ route('product.detail', $details['slug']) }}" class="cart-product-link font-weight-bold" style="font-size: 16px;">{{ $details['name'] }}</a>
+                                                        <div class="cart-variant-info mt-2 text-center" style="display: flex; flex-direction: column; align-items: center;">
+                                                            <div class="text-muted small mb-1" style="font-size: 15px;">
                                                                 {{ __('messages.size') }}: <strong>{{ $details['size'] }}</strong> | 
                                                                 {{ __('messages.color') }}: <strong>{{ $details['color'] }}</strong>
                                                             </div>
-                                                            <button type="button" class="btn btn-sm edit-variant-btn p-0" 
-                                                                    style="font-size: 0.75rem; color: #ff6a28; text-decoration: none; border: none; background: transparent;">
+                                                            <button type="button" class="btn btn-sm edit-variant-btn mt-2" 
+                                                                    style="font-size: 0.85rem; color: #ff6a28; border: 1px solid #ff6a28; background: transparent; padding: 3px 10px; border-radius: 4px;">
                                                                 <i class="fa fa-pencil-square-o"></i> {{ __('messages.edit') }}
                                                             </button>
                                                         </div>
