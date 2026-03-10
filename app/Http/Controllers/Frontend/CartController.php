@@ -21,9 +21,22 @@ class CartController extends Controller
 
             $product = Product::with('variants.sizeRelationship', 'variants.colorRelationship')->find($details['product_id']);
             if ($product) {
-                // Get unique sizes and colors available for this product
-                $details['available_sizes'] = $product->variants->pluck('sizeRelationship')->unique('id')->whereNotNull();
-                $details['available_colors'] = $product->variants->pluck('colorRelationship')->unique('id')->whereNotNull();
+                // Get unique sizes and colors available for this product (supporting both legacy strings and IDs)
+                $details['available_sizes_array'] = [];
+                $details['available_colors_array'] = [];
+                foreach ($product->variants as $variant) {
+                    if ($variant->size_id && $variant->sizeRelationship) {
+                        $details['available_sizes_array'][$variant->size_id] = $variant->sizeRelationship->name;
+                    } elseif ($variant->size) {
+                        $details['available_sizes_array'][$variant->size] = $variant->size;
+                    }
+                    
+                    if ($variant->color_id && $variant->colorRelationship) {
+                        $details['available_colors_array'][$variant->color_id] = $variant->colorRelationship->name;
+                    } elseif ($variant->color) {
+                        $details['available_colors_array'][$variant->color] = $variant->color;
+                    }
+                }
 
                 // Also get all valid variant combinations for this product to help client-side selection
                 $details['product_variants'] = $product->variants;
@@ -112,10 +125,14 @@ class CartController extends Controller
         // Try to find the exact combination first
         $query = ProductVariant::where('product_id', $productId);
         if ($sizeId) {
-            $query->where('size_id', $sizeId);
+            $query->where(function ($q) use ($sizeId) {
+                $q->where('size_id', $sizeId)->orWhere('size', $sizeId);
+            });
         }
         if ($colorId) {
-            $query->where('color_id', $colorId);
+            $query->where(function ($q) use ($colorId) {
+                $q->where('color_id', $colorId)->orWhere('color', $colorId);
+            });
         }
         $newVariant = $query->first();
 
@@ -123,9 +140,13 @@ class CartController extends Controller
         if (! $newVariant && $changedType) {
             $query = ProductVariant::where('product_id', $productId);
             if ($changedType === 'size' && $sizeId) {
-                $query->where('size_id', $sizeId);
+                $query->where(function ($q) use ($sizeId) {
+                    $q->where('size_id', $sizeId)->orWhere('size', $sizeId);
+                });
             } elseif ($changedType === 'color' && $colorId) {
-                $query->where('color_id', $colorId);
+                $query->where(function ($q) use ($colorId) {
+                    $q->where('color_id', $colorId)->orWhere('color', $colorId);
+                });
             } elseif ($changedType === 'product') {
                 // If product changed, just pick the first available variant
             }

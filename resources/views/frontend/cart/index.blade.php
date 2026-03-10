@@ -100,26 +100,26 @@
                                                                 </div>
                                                             @endif
                                                             
-                                                            @if(isset($details['available_sizes']) && count($details['available_sizes']) > 0)
+                                                            @if(isset($details['available_sizes_array']) && count($details['available_sizes_array']) > 0)
                                                                 <div class="d-inline-block me-2">
                                                                     <label class="small text-muted d-block">{{ __('messages.size') }}</label>
                                                                     <select class="form-select form-select-sm variant-select size-select" data-type="size">
-                                                                        @foreach($details['available_sizes'] as $size)
-                                                                            <option value="{{ $size->id }}" {{ (isset($details['size_id']) && $details['size_id'] == $size->id) ? 'selected' : '' }}>
-                                                                                {{ $size->name }}
+                                                                        @foreach($details['available_sizes_array'] as $key => $name)
+                                                                            <option value="{{ $key }}" {{ (isset($details['size_id']) && $details['size_id'] == $key) || (empty($details['size_id']) && isset($details['size']) && $details['size'] == $key) ? 'selected' : '' }}>
+                                                                                {{ $name }}
                                                                             </option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
                                                             @endif
 
-                                                            @if(isset($details['available_colors']) && count($details['available_colors']) > 0)
+                                                            @if(isset($details['available_colors_array']) && count($details['available_colors_array']) > 0)
                                                                 <div class="d-inline-block">
                                                                     <label class="small text-muted d-block">{{ __('messages.color') }}</label>
                                                                     <select class="form-select form-select-sm variant-select color-select" data-type="color">
-                                                                        @foreach($details['available_colors'] as $color)
-                                                                            <option value="{{ $color->id }}" {{ (isset($details['color_id']) && $details['color_id'] == $color->id) ? 'selected' : '' }}>
-                                                                                {{ $color->name }}
+                                                                        @foreach($details['available_colors_array'] as $key => $name)
+                                                                            <option value="{{ $key }}" {{ (isset($details['color_id']) && $details['color_id'] == $key) || (empty($details['color_id']) && isset($details['color']) && $details['color'] == $key) ? 'selected' : '' }}>
+                                                                                {{ $name }}
                                                                             </option>
                                                                         @endforeach
                                                                     </select>
