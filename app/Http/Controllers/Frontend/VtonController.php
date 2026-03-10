@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Product;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Client\ConnectionException;
 
 class VtonController extends Controller
 {
@@ -133,6 +134,7 @@ class VtonController extends Controller
             // Endpoint: POST https://api.replicate.com/v1/models/cuiapp/kolors-virtual-try-on/predictions
             
             $response = Http::withToken($apiToken)
+                ->timeout(30)
                 ->post('https://api.replicate.com/v1/models/cuiapp/kolors-virtual-try-on/predictions', [
                     'input' => [
                         'human_image' => $userDataUri,
@@ -202,6 +204,12 @@ class VtonController extends Controller
                 'success' => false,
                 'message' => $firstError
             ], 422);
+        } catch (ConnectionException $e) {
+            Log::error('VTON API Timeout/Connection Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Hệ thống đang bận, vui lòng thử lại sau ít phút.'
+            ], 504); // 504 Gateway Timeout
         } catch (\Exception $e) {
             Log::error('VTON Controller Error: ' . $e->getMessage());
             return response()->json([
