@@ -34,6 +34,8 @@
     <!-- Search Autocomplete CSS -->
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/search-autocomplete.css') }}">
 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -147,6 +149,42 @@
         });
         @endif
     </script>
+
+    <script type="module">
+        if (window.Echo) {
+            let channel;
+            @if(auth()->check())
+                channel = window.Echo.private('App.Models.User.{{ auth()->id() }}');
+            @else
+                channel = window.Echo.channel('cart.{{ session()->getId() }}');
+            @endif
+
+            channel.listen('CartUpdatedEvent', (e) => {
+                // e.cartCount is from the CartUpdatedEvent constructor
+                let cartCountElements = document.querySelectorAll('.cart-count');
+                cartCountElements.forEach(el => {
+                    el.innerText = e.cartCount;
+                    
+                    // Thêm class nháy nhẹ (animation)
+                    el.classList.remove('pulse-animation');
+                    void el.offsetWidth; // trigger reflow
+                    el.classList.add('pulse-animation');
+                });
+            });
+        }
+    </script>
+
+    <style>
+        @keyframes cartPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); color: #ef233c; }
+            100% { transform: scale(1); }
+        }
+        .pulse-animation {
+            animation: cartPulse 0.5s ease-in-out;
+            display: inline-block;
+        }
+    </style>
 </body>
 
 

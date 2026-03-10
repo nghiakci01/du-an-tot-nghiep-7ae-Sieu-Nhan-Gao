@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Events\CartUpdatedEvent;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -176,6 +177,10 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
+        // Fire event
+        $cartCount = array_sum(array_column($cart, 'quantity'));
+        CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+
         return response()->json([
             'success' => true,
             'message' => 'Đã cập nhật giỏ hàng',
@@ -274,6 +279,10 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
+        // Fire Event
+        $cartCount = array_sum(array_column($cart, 'quantity'));
+        CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+
         if ($request->input('action') === 'buy_now') {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -333,6 +342,8 @@ class CartController extends Controller
                 }
 
                 $grandTotal = $subtotal - $discount + $shippingFee;
+
+                CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
 
                 return response()->json([
                     'success' => true,
@@ -411,6 +422,8 @@ class CartController extends Controller
 
                 $grandTotal = $subtotal - $discount + $shippingFee;
 
+                CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Sản phẩm đã được xóa khỏi giỏ hàng',
@@ -435,6 +448,8 @@ class CartController extends Controller
         $subtotal = 0;
         $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
         $grandTotal = $subtotal + $shippingFee;
+
+        CartUpdatedEvent::dispatch(0, session()->getId(), auth()->id());
 
         if ($request->ajax()) {
             return response()->json([
