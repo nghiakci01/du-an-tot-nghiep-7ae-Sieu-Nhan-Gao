@@ -304,20 +304,17 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
 
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            // Variants deleted via cascade if set in DB, but manually here to be safe if not
+            // Variants will be soft deleted if manually called or via cascade (if setup)
+            // Since we added SoftDeletes trait, this will now only set deleted_at
             $product->variants()->delete();
             $product->delete();
 
             DB::commit();
-
-            return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
+            return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được xóa thành công.');
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return redirect()->route('admin.products.index')->with('error', 'Error deleting product.');
+            \Log::error('Lỗi khi xóa sản phẩm ID ' . $product->id . ': ' . $e->getMessage());
+            return redirect()->route('admin.products.index')->with('error', 'Có lỗi xảy ra khi xóa sản phẩm. Vui lòng kiểm tra lại.');
         }
     }
 

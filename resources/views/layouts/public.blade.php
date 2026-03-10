@@ -64,6 +64,21 @@
         .single_product:hover .product_thumb img {
             transform: scale(1.08) !important;
         }
+
+        /* Remove underlines from header and breadcrumb links */
+        .header_area a, 
+        .breadcrumbs_area a, 
+        .main_menu a, 
+        .offcanvas_menu a {
+            text-decoration: none !important;
+        }
+
+        .header_area a:hover, 
+        .breadcrumbs_area a:hover, 
+        .main_menu a:hover, 
+        .offcanvas_menu a:hover {
+            text-decoration: none !important;
+        }
     </style>
 </head>
 

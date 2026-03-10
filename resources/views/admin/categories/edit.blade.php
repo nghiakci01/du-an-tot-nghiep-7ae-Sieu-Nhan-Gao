@@ -55,20 +55,6 @@
                         @enderror
                     </div>
 
-                    <div class="mb-3">
-                        <label for="image" class="form-label">Hình ảnh</label>
-                        @if($category->image)
-                            <div class="mb-2">
-                                <img src="{{ asset('storage/' . $category->image) }}" alt="Current Image" width="100">
-                            </div>
-                        @endif
-                        <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image">
-                        <small class="text-muted">Để trống nếu không thay đổi hình ảnh.</small>
-                        @error('image')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
                     <div class="mt-3">
                         <button type="submit" class="btn btn-primary">Cập nhật</button>
                         <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">Quay lại</a>

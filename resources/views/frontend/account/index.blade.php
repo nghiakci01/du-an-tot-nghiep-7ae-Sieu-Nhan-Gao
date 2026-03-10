@@ -312,14 +312,16 @@
           <div class="mt-4">
             <h6 class="fw-bold mb-3">Đơn hàng gần đây</h6>
             @foreach($orders->take(3) as $order)
-            <div class="d-flex align-items-center gap-3 p-3 mb-2 rounded-3" style="background:#f9fafb; border:1px solid #eee;">
-              <div class="flex-grow-1">
-                <div class="fw-bold">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</div>
-                <div class="text-muted small">{{ $order->created_at->format('d/m/Y') }}</div>
-              </div>
-              <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
-              <span class="fw-bold">{{ number_format($order->final_total ?: $order->total_price) }}đ</span>
-            </div>
+            <a href="{{ route('account.orders.show', $order->id) }}" class="text-decoration-none text-dark d-block">
+                <div class="d-flex align-items-center gap-3 p-3 mb-2 rounded-3" style="background:#f9fafb; border:1px solid #eee; transition: background 0.2s;">
+                  <div class="flex-grow-1">
+                    <div class="fw-bold">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</div>
+                    <div class="text-muted small">{{ $order->created_at->format('d/m/Y') }}</div>
+                  </div>
+                  <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
+                  <span class="fw-bold">{{ number_format($order->final_total ?: $order->total_price) }}đ</span>
+                </div>
+            </a>
             @endforeach
           </div>
           @endif
@@ -355,7 +357,11 @@
           <tbody>
             @forelse($orders as $order)
             <tr>
-              <td style="padding-left:28px;" class="order-id">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</td>
+              <td style="padding-left:28px;" class="order-id">
+                <a href="{{ route('account.orders.show', $order->id) }}" class="text-decoration-none text-dark">
+                  #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
+                </a>
+              </td>
               <td class="text-muted">{{ $order->created_at->format('d/m/Y') }}</td>
               <td>
                 <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
@@ -573,15 +579,30 @@
           <div class="row g-3">
             <div class="col-md-4">
               <label>Mật khẩu hiện tại</label>
-              <input type="password" name="current_password" class="form-control" placeholder="••••••••">
+              <div class="position-relative">
+                <input type="password" name="current_password" class="form-control pe-5" placeholder="••••••••">
+                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-muted toggle-password" style="z-index: 10; text-decoration: none;">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
             </div>
             <div class="col-md-4">
               <label>Mật khẩu mới</label>
-              <input type="password" name="new_password" class="form-control" placeholder="••••••••">
+              <div class="position-relative">
+                <input type="password" name="new_password" class="form-control pe-5" placeholder="••••••••">
+                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-muted toggle-password" style="z-index: 10; text-decoration: none;">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
             </div>
             <div class="col-md-4">
               <label>Xác nhận mật khẩu mới</label>
-              <input type="password" name="new_password_confirmation" class="form-control" placeholder="••••••••">
+              <div class="position-relative">
+                <input type="password" name="new_password_confirmation" class="form-control pe-5" placeholder="••••••••">
+                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-muted toggle-password" style="z-index: 10; text-decoration: none;">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -665,6 +686,22 @@ document.addEventListener('DOMContentLoaded', function() {
         document.execCommand('copy');
         document.body.removeChild(ta);
       });
+    });
+  });
+
+  // Toggle password visibility
+  document.querySelectorAll('.toggle-password').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const input = this.parentElement.querySelector('input');
+        const icon = this.querySelector('i');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
     });
   });
 });
