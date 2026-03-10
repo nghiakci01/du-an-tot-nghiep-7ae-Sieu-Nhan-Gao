@@ -19,6 +19,7 @@ class ProductVariant extends Model
         'color',
         'price',
         'sale_price',
+        'cost_price',
         'stock_quantity',
         'sku',
         'alert_threshold',
@@ -41,7 +42,6 @@ class ProductVariant extends Model
         return $this->hasMany(WarehouseStock::class, 'product_variant_id');
     }
 
-
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
@@ -56,5 +56,4 @@ class ProductVariant extends Model
     {
         return $this->belongsTo(Color::class, 'color_id');
     }
-
 }

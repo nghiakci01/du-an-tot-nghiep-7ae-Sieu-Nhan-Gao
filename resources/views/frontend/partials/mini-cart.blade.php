@@ -12,7 +12,7 @@
 <div class="cart_link">
     <a href="{{ route('cart.index') }}">
         <i class="fa fa-shopping-basket"></i>
-        <span id="cart-count">{{ $cartCount }}</span> {{ __('messages.product') }}
+        <span class="cart-count">{{ $cartCount }}</span> {{ __('messages.product') }}
     </a>
     
     <!--mini cart-->

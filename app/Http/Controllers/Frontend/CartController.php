@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Events\CartUpdatedEvent;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -13,22 +14,22 @@ class CartController extends Controller
     {
         $cart = session()->get('cart', []);
         $total = 0;
-        
+
         // Enrich cart data with available variants for selection in UI
         foreach ($cart as $id => &$details) {
             $total += $details['price'] * $details['quantity'];
-            
+
             $product = Product::with('variants.sizeRelationship', 'variants.colorRelationship')->find($details['product_id']);
             if ($product) {
                 // Get unique sizes and colors available for this product
                 $details['available_sizes'] = $product->variants->pluck('sizeRelationship')->unique('id')->whereNotNull();
                 $details['available_colors'] = $product->variants->pluck('colorRelationship')->unique('id')->whereNotNull();
-                
+
                 // Also get all valid variant combinations for this product to help client-side selection
                 $details['product_variants'] = $product->variants;
-                
+
                 // Set current IDs if not present (for migration of existing carts)
-                if (!isset($details['size_id']) || !isset($details['color_id'])) {
+                if (! isset($details['size_id']) || ! isset($details['color_id'])) {
                     $variant = ProductVariant::find($id);
                     if ($variant) {
                         $details['size_id'] = $variant->size_id;
@@ -68,8 +69,19 @@ class CartController extends Controller
                 }
             }
         }
-        
-        return view('frontend.cart.index', compact('cart', 'total', 'coupon', 'discount'));
+
+        // Cross-sell: products from same categories, excluding items already in cart
+    $cartProductIds = collect($cart)->pluck('product_id')->unique()->toArray();
+    $cartCategoryIds = Product::whereIn('id', $cartProductIds)->pluck('category_id')->unique()->toArray();
+    $crossSellProducts = Product::where('is_active', true)
+        ->whereIn('category_id', $cartCategoryIds)
+        ->whereNotIn('id', $cartProductIds)
+        ->with(['variants', 'reviews', 'images'])
+        ->inRandomOrder()
+        ->take(8)
+        ->get();
+
+        return view('frontend.cart.index', compact('cart', 'total', 'coupon', 'discount', 'crossSellProducts'));
     }
 
     public function changeVariant(Request $request)
@@ -80,7 +92,7 @@ class CartController extends Controller
             'new_product_id' => 'nullable|exists:products,id',
             'size_id' => 'nullable',
             'color_id' => 'nullable',
-            'changed_type' => 'nullable|string' // 'size', 'color', or 'product'
+            'changed_type' => 'nullable|string', // 'size', 'color', or 'product'
         ]);
 
         $oldVariantId = $request->old_variant_id;
@@ -93,18 +105,22 @@ class CartController extends Controller
 
         $cart = session()->get('cart', []);
 
-        if (!isset($cart[$oldVariantId])) {
+        if (! isset($cart[$oldVariantId])) {
             return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại trong giỏ hàng'], 404);
         }
 
         // Try to find the exact combination first
         $query = ProductVariant::where('product_id', $productId);
-        if ($sizeId) $query->where('size_id', $sizeId);
-        if ($colorId) $query->where('color_id', $colorId);
+        if ($sizeId) {
+            $query->where('size_id', $sizeId);
+        }
+        if ($colorId) {
+            $query->where('color_id', $colorId);
+        }
         $newVariant = $query->first();
 
         // If exact combination doesn't exist, try to find a variant matching the CHANGED attribute
-        if (!$newVariant && $changedType) {
+        if (! $newVariant && $changedType) {
             $query = ProductVariant::where('product_id', $productId);
             if ($changedType === 'size' && $sizeId) {
                 $query->where('size_id', $sizeId);
@@ -116,12 +132,12 @@ class CartController extends Controller
             $newVariant = $query->first(); // Get first available alternative
         }
 
-        if (!$newVariant) {
+        if (! $newVariant) {
             return response()->json(['success' => false, 'message' => 'Không tìm thấy phiên bản phù hợp cho sản phẩm này'], 404);
         }
 
         $product = Product::find($productId);
-        if (!$product) {
+        if (! $product) {
             return response()->json(['success' => false, 'message' => 'Sản phẩm không hợp lệ'], 404);
         }
 
@@ -131,7 +147,7 @@ class CartController extends Controller
         }
 
         $oldQuantity = $cart[$oldVariantId]['quantity'];
-        
+
         // Determine price
         $itemPrice = $newVariant->price ?? $product->price;
         if ($newVariant->sale_price && $newVariant->sale_price < ($newVariant->price ?? PHP_INT_MAX)) {
@@ -145,26 +161,30 @@ class CartController extends Controller
         } else {
             // Add new variant
             $cart[$newVariant->id] = [
-                "product_id" => $productId,
-                "variant_id" => $newVariant->id,
-                "name" => $product->name,
-                "quantity" => $oldQuantity,
-                "price" => $itemPrice,
-                "image" => $product->image,
-                "size" => $newVariant->sizeRelationship ? $newVariant->sizeRelationship->name : $newVariant->size,
-                "color" => $newVariant->colorRelationship ? $newVariant->colorRelationship->name : $newVariant->color,
-                "size_id" => $newVariant->size_id,
-                "color_id" => $newVariant->color_id,
-                "slug" => $product->slug
+                'product_id' => $productId,
+                'variant_id' => $newVariant->id,
+                'name' => $product->name,
+                'quantity' => $oldQuantity,
+                'price' => $itemPrice,
+                'image' => $product->image,
+                'size' => $newVariant->sizeRelationship ? $newVariant->sizeRelationship->name : $newVariant->size,
+                'color' => $newVariant->colorRelationship ? $newVariant->colorRelationship->name : $newVariant->color,
+                'size_id' => $newVariant->size_id,
+                'color_id' => $newVariant->color_id,
+                'slug' => $product->slug,
             ];
         }
 
         session()->put('cart', $cart);
 
+        // Fire event
+        $cartCount = array_sum(array_column($cart, 'quantity'));
+        CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+
         return response()->json([
             'success' => true,
             'message' => 'Đã cập nhật giỏ hàng',
-            'redirect' => route('cart.index', ['editing' => $newVariant->id])
+            'redirect' => route('cart.index', ['editing' => $newVariant->id]),
         ]);
     }
 
@@ -173,14 +193,14 @@ class CartController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'variant_id' => 'nullable|exists:product_variants,id',
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
         ]);
 
         $product = Product::findOrFail($request->product_id);
         $variantId = $request->variant_id;
 
         // Validate: Nếu sản phẩm có variants thì bắt buộc phải chọn
-        if (!$variantId) {
+        if (! $variantId) {
             $variants = $product->variants;
             if ($variants->count() === 1) {
                 // Tự động chọn nếu chỉ có 1 variant
@@ -190,9 +210,10 @@ class CartController extends Controller
                 if ($request->expectsJson()) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.'
+                        'message' => 'Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.',
                     ], 422);
                 }
+
                 return redirect()->route('product.detail', $product->slug)
                     ->with('error', 'Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.');
             } else {
@@ -210,7 +231,10 @@ class CartController extends Controller
 
         if ($variant->stock_quantity <= 0) {
             $msg = 'Sản phẩm này đã hết hàng.';
-            if ($request->expectsJson()) return response()->json(['success' => false, 'message' => $msg], 422);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+
             return redirect()->back()->with('error', $msg);
         }
 
@@ -221,11 +245,14 @@ class CartController extends Controller
             } else {
                 $msg = "Chỉ còn {$variant->stock_quantity} sản phẩm trong kho. Bạn đã có {$existingQty} trong giỏ, chỉ có thể thêm tối đa {$available} sản phẩm.";
             }
-            if ($request->expectsJson()) return response()->json(['success' => false, 'message' => $msg], 422);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+
             return redirect()->back()->with('error', $msg);
         }
 
-        if(isset($cart[$variant->id])) {
+        if (isset($cart[$variant->id])) {
             $cart[$variant->id]['quantity'] += $request->quantity;
         } else {
             // Determine price: Use variant's sale_price if it exists and is less than price, else use variant price
@@ -236,24 +263,43 @@ class CartController extends Controller
             }
 
             $cart[$variant->id] = [
-                "product_id" => $product->id,
-                "variant_id" => $variant->id,
-                "name" => $product->name,
-                "quantity" => $request->quantity,
-                "price" => $itemPrice,
-                "image" => $product->image,
-                "size" => $variant->sizeRelationship ? $variant->sizeRelationship->name : $variant->size,
-                "color" => $variant->colorRelationship ? $variant->colorRelationship->name : $variant->color,
-                "size_id" => $variant->size_id,
-                "color_id" => $variant->color_id,
-                "slug" => $product->slug
+                'product_id' => $product->id,
+                'variant_id' => $variant->id,
+                'name' => $product->name,
+                'quantity' => $request->quantity,
+                'price' => $itemPrice,
+                'image' => $product->image,
+                'size' => $variant->sizeRelationship ? $variant->sizeRelationship->name : $variant->size,
+                'color' => $variant->colorRelationship ? $variant->colorRelationship->name : $variant->color,
+                'size_id' => $variant->size_id,
+                'color_id' => $variant->color_id,
+                'slug' => $product->slug,
             ];
         }
 
         session()->put('cart', $cart);
-        
+
+        // Fire Event
+        $cartCount = array_sum(array_column($cart, 'quantity'));
+        CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+
         if ($request->input('action') === 'buy_now') {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('checkout.index'),
+                ]);
+            }
+
             return redirect()->route('checkout.index');
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Sản phẩm đã được thêm vào giỏ hàng!',
+                'count' => array_sum(array_column(session()->get('cart', []), 'quantity')),
+            ]);
         }
 
         return redirect()->route('cart.index')->with('success', 'Product added to cart!');
@@ -261,105 +307,25 @@ class CartController extends Controller
 
     public function updateCart(Request $request)
     {
-        if($request->id && $request->quantity){
+        if ($request->id && $request->quantity) {
             $cart = session()->get('cart', []);
             $variant = ProductVariant::find($request->id);
 
             if ($variant && $variant->stock_quantity >= $request->quantity) {
-                 $cart[$request->id]["quantity"] = $request->quantity;
-                 session()->put('cart', $cart);
-                 
-                  // Calculate new totals
-                  $itemTotal = $cart[$request->id]['price'] * $request->quantity;
-                  $subtotal = 0;
-                  $cartCount = 0;
-                  foreach($cart as $item) {
-                     $subtotal += $item['price'] * $item['quantity'];
-                     $cartCount += $item['quantity'];
-                  }
-
-                  $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
-                  
-                  // Recalculate discount if coupon applied
-                  $discount = 0;
-                  $couponCode = session()->get('coupon_code');
-                  if ($couponCode) {
-                      $coupon = \App\Models\Coupon::where('code', $couponCode)->first();
-                      if ($coupon) {
-                          if ($coupon->min_order_amount && $subtotal < $coupon->min_order_amount) {
-                              session()->forget(['coupon_code', 'discount_amount']);
-                          } else {
-                              $discount = $coupon->calculateDiscount($subtotal);
-                              session()->put('discount_amount', $discount);
-                          }
-                      }
-                  }
-
-                  $grandTotal = $subtotal - $discount + $shippingFee;
-
-                  return response()->json([
-                      'success' => true,
-                      'message' => 'Giỏ hàng đã được cập nhật',
-                      'item_total' => number_format($itemTotal) . ' đ',
-                      'cart_total' => number_format($subtotal) . ' đ',
-                      'discount' => number_format($discount) . ' đ',
-                      'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
-                      'grand_total' => number_format($grandTotal) . ' đ',
-                      'cart_count' => $cartCount
-                  ]);
-            } else {
-                 return response()->json([
-                     'success' => false,
-                     'message' => 'Invalid quantity or exceeds stock'
-                 ], 400);
-            }
-            
-            session()->flash('error', 'Invalid quantity or exceeds stock');
-            return response()->json(['success' => false], 400);
-        }
-        
-        return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
-    }
-
-    public function remove(Request $request)
-    {
-        $id = $request->id ?: $request->get('id');
-        $cart = session()->get('cart', []);
-        
-        \Log::info('Cart Remove Request', [
-            'method' => $request->method(),
-            'id' => $id,
-            'cart_keys' => array_keys($cart)
-        ]);
-
-        if ($id !== null) {
-            // Find the key in the cart - sometimes keys might be strings even if numeric
-            $foundKey = null;
-            if (isset($cart[$id])) {
-                $foundKey = $id;
-            } else {
-                foreach (array_keys($cart) as $key) {
-                    if ((string)$key === (string)$id) {
-                        $foundKey = $key;
-                        break;
-                    }
-                }
-            }
-
-            if ($foundKey !== null) {
-                unset($cart[$foundKey]);
+                $cart[$request->id]['quantity'] = $request->quantity;
                 session()->put('cart', $cart);
-                
+
                 // Calculate new totals
-                 $subtotal = 0;
-                 $cartCount = 0;
-                 foreach($cart as $item) {
+                $itemTotal = $cart[$request->id]['price'] * $request->quantity;
+                $subtotal = 0;
+                $cartCount = 0;
+                foreach ($cart as $item) {
                     $subtotal += $item['price'] * $item['quantity'];
                     $cartCount += $item['quantity'];
-                 }
-                
+                }
+
                 $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
-                
+
                 // Recalculate discount if coupon applied
                 $discount = 0;
                 $couponCode = session()->get('coupon_code');
@@ -377,32 +343,126 @@ class CartController extends Controller
 
                 $grandTotal = $subtotal - $discount + $shippingFee;
 
+                CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Giỏ hàng đã được cập nhật',
+                    'item_total' => number_format($itemTotal).' đ',
+                    'cart_total' => number_format($subtotal).' đ',
+                    'discount' => number_format($discount).' đ',
+                    'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee).' đ') : 'Miễn phí',
+                    'grand_total' => number_format($grandTotal).' đ',
+                    'cart_count' => $cartCount,
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Số lượng không hợp lệ hoặc vượt quá tồn kho.',
+                ], 400);
+            }
+        }
+
+        return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
+    }
+
+    public function remove(Request $request)
+    {
+        $id = $request->id ?: $request->get('id');
+        $cart = session()->get('cart', []);
+
+        \Log::info('Cart Remove Request', [
+            'method' => $request->method(),
+            'id' => $id,
+            'cart_keys' => array_keys($cart),
+        ]);
+
+        if ($id !== null) {
+            // Find the key in the cart - sometimes keys might be strings even if numeric
+            $foundKey = null;
+            if (isset($cart[$id])) {
+                $foundKey = $id;
+            } else {
+                foreach (array_keys($cart) as $key) {
+                    if ((string) $key === (string) $id) {
+                        $foundKey = $key;
+                        break;
+                    }
+                }
+            }
+
+            if ($foundKey !== null) {
+                unset($cart[$foundKey]);
+                session()->put('cart', $cart);
+
+                // Calculate new totals
+                $subtotal = 0;
+                $cartCount = 0;
+                foreach ($cart as $item) {
+                    $subtotal += $item['price'] * $item['quantity'];
+                    $cartCount += $item['quantity'];
+                }
+
+                $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
+
+                // Recalculate discount if coupon applied
+                $discount = 0;
+                $couponCode = session()->get('coupon_code');
+                if ($couponCode) {
+                    $coupon = \App\Models\Coupon::where('code', $couponCode)->first();
+                    if ($coupon) {
+                        if ($coupon->min_order_amount && $subtotal < $coupon->min_order_amount) {
+                            session()->forget(['coupon_code', 'discount_amount']);
+                        } else {
+                            $discount = $coupon->calculateDiscount($subtotal);
+                            session()->put('discount_amount', $discount);
+                        }
+                    }
+                }
+
+                $grandTotal = $subtotal - $discount + $shippingFee;
+
+                CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Sản phẩm đã được xóa khỏi giỏ hàng',
-                    'cart_total' => number_format($subtotal) . ' đ',
-                    'discount' => number_format($discount) . ' đ',
-                    'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
-                    'grand_total' => number_format($grandTotal) . ' đ',
-                    'cart_count' => $cartCount
+                    'cart_total' => number_format($subtotal).' đ',
+                    'discount' => number_format($discount).' đ',
+                    'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee).' đ') : 'Miễn phí',
+                    'grand_total' => number_format($grandTotal).' đ',
+                    'cart_count' => $cartCount,
                 ]);
             }
         }
-        
+
         return response()->json(['success' => false, 'message' => 'Product not found in cart'], 404);
     }
 
     public function clearCart(Request $request)
     {
         session()->forget('cart');
-        
+        session()->forget(['coupon_code', 'discount_amount']); // Also clear coupon info
+
+        // Recalculate totals for an empty cart
+        $subtotal = 0;
+        $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
+        $grandTotal = $subtotal + $shippingFee;
+
+        CartUpdatedEvent::dispatch(0, session()->getId(), auth()->id());
+
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Cart has been cleared'
+                'message' => 'Giỏ hàng đã được xóa!',
+                'cart_total' => number_format($subtotal).' đ',
+                'discount' => number_format(0).' đ',
+                'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee).' đ') : 'Miễn phí',
+                'grand_total' => number_format($grandTotal).' đ',
+                'cart_count' => 0,
             ]);
         }
-        
+
         return redirect()->route('cart.index')->with('success', 'Cart has been cleared');
     }
 
@@ -410,9 +470,10 @@ class CartController extends Controller
     {
         $cart = session()->get('cart', []);
         $count = 0;
-        foreach($cart as $item) {
+        foreach ($cart as $item) {
             $count += $item['quantity'];
         }
+
         return response()->json(['count' => $count]);
     }
 
@@ -435,11 +496,11 @@ class CartController extends Controller
         $couponCode = strtoupper(trim($request->coupon_code));
         $coupon = \App\Models\Coupon::where('code', $couponCode)->first();
 
-        if (!$coupon) {
+        if (! $coupon) {
             return response()->json(['success' => false, 'message' => 'Mã giảm giá không tồn tại.'], 404);
         }
 
-        if (!$coupon->is_active || $coupon->isExpired() || $coupon->isNotYetStarted() || $coupon->hasReachedUsageLimit()) {
+        if (! $coupon->is_active || $coupon->isExpired() || $coupon->isNotYetStarted() || $coupon->hasReachedUsageLimit()) {
             return response()->json(['success' => false, 'message' => 'Mã giảm giá không hợp lệ hoặc đã hết hạn.'], 400);
         }
 
@@ -449,8 +510,8 @@ class CartController extends Controller
 
         if ($coupon->min_order_amount && $total < $coupon->min_order_amount) {
             return response()->json([
-                'success' => false, 
-                'message' => 'Đơn hàng tối thiểu ' . number_format($coupon->min_order_amount) . ' đ để sử dụng mã này.'
+                'success' => false,
+                'message' => 'Đơn hàng tối thiểu '.number_format($coupon->min_order_amount).' đ để sử dụng mã này.',
             ], 400);
         }
 
@@ -466,24 +527,24 @@ class CartController extends Controller
             'message' => 'Đã áp dụng mã giảm giá thành công!',
             'data' => [
                 'coupon_code' => $coupon->code,
-                'discount' => number_format($discount) . ' đ',
-                'subtotal' => number_format($total) . ' đ',
-                'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
-                'grand_total' => number_format($grandTotal) . ' đ',
-            ]
+                'discount' => number_format($discount).' đ',
+                'subtotal' => number_format($total).' đ',
+                'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee).' đ') : 'Miễn phí',
+                'grand_total' => number_format($grandTotal).' đ',
+            ],
         ]);
     }
 
     public function removeCoupon()
     {
         session()->forget(['coupon_code', 'discount_amount']);
-        
+
         $cart = session()->get('cart', []);
         $total = 0;
         foreach ($cart as $details) {
             $total += $details['price'] * $details['quantity'];
         }
-        
+
         $shippingFee = \App\Models\Setting::getShippingFee($total);
         $grandTotal = $total + $shippingFee;
 
@@ -491,10 +552,10 @@ class CartController extends Controller
             'success' => true,
             'message' => 'Đã gỡ bỏ mã giảm giá.',
             'data' => [
-                'subtotal' => number_format($total) . ' đ',
-                'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
-                'grand_total' => number_format($grandTotal) . ' đ',
-            ]
+                'subtotal' => number_format($total).' đ',
+                'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee).' đ') : 'Miễn phí',
+                'grand_total' => number_format($grandTotal).' đ',
+            ],
         ]);
     }
 }

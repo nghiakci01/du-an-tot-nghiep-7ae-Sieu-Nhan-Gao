@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Coupon;
 use App\Http\Requests\StoreCouponRequest;
 use App\Http\Requests\UpdateCouponRequest;
-use Illuminate\Http\Request;
+use App\Models\Coupon;
 
 class CouponController extends Controller
 {
@@ -16,6 +15,7 @@ class CouponController extends Controller
     public function index()
     {
         $coupons = Coupon::orderBy('created_at', 'desc')->paginate(10);
+
         return view('admin.coupons.index', compact('coupons'));
     }
 
@@ -27,6 +27,7 @@ class CouponController extends Controller
         $users = \App\Models\User::where('role', \App\Models\User::ROLE_USER)
             ->orderBy('name')
             ->get();
+
         return view('admin.coupons.create', compact('users'));
     }
 
@@ -36,7 +37,7 @@ class CouponController extends Controller
     public function store(StoreCouponRequest $request)
     {
         $data = $request->validated();
-        
+
         Coupon::create($data);
 
         return redirect()
@@ -52,6 +53,7 @@ class CouponController extends Controller
         $users = \App\Models\User::where('role', \App\Models\User::ROLE_USER)
             ->orderBy('name')
             ->get();
+
         return view('admin.coupons.edit', compact('coupon', 'users'));
     }
 
@@ -61,7 +63,7 @@ class CouponController extends Controller
     public function update(UpdateCouponRequest $request, Coupon $coupon)
     {
         $data = $request->validated();
-        
+
         $coupon->update($data);
 
         return redirect()

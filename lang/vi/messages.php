@@ -14,6 +14,9 @@ return [
     'cart' => 'Giỏ hàng',
     'checkout' => 'Thanh toán',
     'my_account' => 'Tài khoản của tôi',
+    'my_orders' => 'Đơn hàng của tôi',
+    'my_wishlist' => 'Danh sách yêu thích',
+    'track_order' => 'Tra cứu đơn hàng',
     'admin' => 'Quản trị',
     'staff' => 'Nhân viên',
     'language' => 'Ngôn ngữ',
@@ -59,7 +62,7 @@ return [
     'site_map' => 'Sơ đồ trang web',
     'contact_us' => 'Liên hệ',
     'address' => 'Địa chỉ',
-    'phone' => 'Điện thoại',
+    'phone' => 'Số điện thoại',
     'email' => 'Email',
     'join_newsletter' => 'Đăng ký nhận bản tin',
     'newsletter_desc' => 'Chất lượng vượt trội. Nhà máy đạo đức. Đăng ký để được miễn phí vận chuyển và đổi trả cho đơn hàng đầu tiên của bạn.',
@@ -94,6 +97,11 @@ return [
     'phone_label' => 'Điện thoại',
     'email_label' => 'Email',
     'contact_success' => 'Cảm ơn bạn đã liên hệ với chúng tôi! Chúng tôi sẽ phản hồi sớm nhất có thể.',
+    'full_name_pattern' => 'Vui lòng nhập chỉ nhập chữ cái và dấu cách',
+    'phone_pattern' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số',
+    'email_pattern' => 'Địa chỉ email không hợp lệ',
+    'password_pattern' => 'Mật khẩu phải có độ dài từ 8 kí tự trở lên',
+    'confirm_password_pattern' => 'Mật khẩu phải có độ dài từ 8 kí tự trở lên',
 
     // News
     'latest_news' => 'Tin tức mới nhất',
@@ -172,12 +180,13 @@ return [
     'size' => 'Kích thước',
     'color' => 'Màu sắc',
     'edit' => 'thêm sản phẩm tương tự',
-    
+
     // Checkout - Reid Template
     'returning_customer' => 'Khách hàng cũ',
     'click_here_to_login' => 'Nhấn vào đây để đăng nhập',
     'login_message' => 'Nếu bạn đã mua hàng với chúng tôi trước đây, vui lòng nhập thông tin bên dưới. Nếu bạn là khách hàng mới, vui lòng tiến hành điền thông tin thanh toán.',
     'password' => 'Mật khẩu',
+    'confirm_password' => 'Xác nhận mật khẩu',
     'remember_me' => 'Ghi nhớ đăng nhập',
     'lost_password' => 'Quên mật khẩu',
     'have_coupon' => 'Có mã giảm giá',
@@ -240,6 +249,8 @@ return [
     'select_province' => 'Chọn tỉnh thành',
     'vnpay_payment' => 'Thanh toán qua VNPAY',
     'vnpay_description' => 'Bạn sẽ được chuyển hướng sang cổng thanh toán VNPAY an toàn để hoàn tất đơn hàng.',
+    'zalopay_payment' => 'Thanh toán qua ZaloPay',
+    'zalopay_description' => 'Bạn sẽ được chuyển hướng sang cổng thanh toán ZaloPay an toàn để hoàn tất đơn hàng.',
     'validate_name' => 'Vui lòng nhập họ tên đầy đủ (tối thiểu 2 ký tự)',
     'validate_phone_required' => 'Vui lòng nhập số điện thoại',
     'validate_phone_digits' => 'Số điện thoại phải có 10-11 chữ số',
@@ -252,4 +263,32 @@ return [
     'welcome_coupon_code' => 'Sử dụng mã: :code',
     'welcome_coupon_desc' => 'Giảm 100k cho đơn hàng từ 1 triệu VNĐ',
     'my_coupons' => 'Mã giảm giá của tôi',
+    'account_menu' => 'Danh mục tài khoản',
+    'wishlist_empty' => 'Danh sách yêu thích trống',
+    'wishlist_empty_desc' => 'Bạn chưa có sản phẩm nào trong danh sách yêu thích.',
+    'view_detail' => 'Xem chi tiết',
+    'in_stock' => 'Còn hàng',
+    'please_login' => 'Vui lòng đăng nhập để tiếp tục',
+
+    //login/register 
+    'email_or_username' => 'Nhập Email hoặc Tên người dùng',
+    'or_login_with'  => 'Hoặc đăng nhập bằng',
+    'fb_login' => 'Đăng nhập bằng Facebook',
+    'google_login' => 'Đăng nhập bằng Google',
+    'already_have_account' => 'Đã có tài khoản?',
+
+    // Reset pasword
+    'reset_password' => 'Đặt lại mật khẩu',
+    'send_verification_code' => "Gửi mã xác nhận",
+
+    // Theme Setting Admin
+    'settings' => 'Cài đặt',
+    'theme_mode_title' => 'Chế độ giao diện',
+    'theme_mode_desc' => 'Chọn chế độ Sáng, Tối hoặc Tự động',
+    'theme_mode_light' => 'Sáng',
+    'theme_mode_dark' => 'Tối',
+    'theme_mode_auto' => 'Tự động thiết lập chế độ giao diện dựa trên chủ đề của trình duyệt người dùng.',
+    'theme_layout_title' => 'Bố cục giao diện',
+    'theme_layout_desc' => 'Chọn bố cục của bạn',
+    'reset_layout' => 'Đặt lại mặc định'
 ];

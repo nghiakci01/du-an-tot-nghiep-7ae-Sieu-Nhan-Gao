@@ -1,0 +1,119 @@
+@extends('layouts.admin')
+
+@section('title', 'Thêm Tin tức Mới')
+
+@section('content')
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">Thêm Tin tức Mới</h5>
+                    </div>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i
+                                     class="feather icon-home"></i></a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.posts.index') }}">Tin tức</a></li>
+                        <li class="breadcrumb-item"><a href="#!">Thêm mới</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-horizontal">
+                <form action="{{ route('admin.posts.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header"><h5>Nội dung tin tức</h5></div>
+                                <div class="card-body">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Tiêu đề tin tức <span class="text-danger">*</span></label>
+                                        <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" required>
+                                        @error('title') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Tóm tắt ngắn (Summary)</label>
+                                        <textarea name="summary" class="form-control" rows="3">{{ old('summary') }}</textarea>
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label">Nội dung tin tức <span class="text-danger">*</span></label>
+                                        <textarea name="content" id="editor" class="form-control @error('content') is-invalid @enderror">{{ old('content') }}</textarea>
+                                        @error('content') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header"><h5>Phân loại & Cài đặt</h5></div>
+                                <div class="card-body">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Danh mục <span class="text-danger">*</span></label>
+                                        <select name="post_category_id" class="form-select @error('post_category_id') is-invalid @enderror" required>
+                                            <option value="">-- Chọn danh mục --</option>
+                                            @foreach($categories as $cat)
+                                                <option value="{{ $cat->id }}" {{ old('post_category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('post_category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Ảnh đại diện</label>
+                                        <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" onchange="previewImage(this)">
+                                        @error('image') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        <div class="mt-2 d-none" id="previewContainer">
+                                            <img id="imagePreview" src="#" alt="Preview" class="img-fluid rounded border shadow-sm">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Trạng thái</label>
+                                        <select name="is_active" class="form-select">
+                                            <option value="1" {{ old('is_active', 1) == 1 ? 'selected' : '' }}>Hiển thị</option>
+                                            <option value="0" {{ old('is_active') === '0' ? 'selected' : '' }}>Ẩn</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Ngày đăng (Tùy chọn)</label>
+                                        <input type="date" name="published_at" class="form-control" value="{{ old('published_at') }}">
+                                    </div>
+
+                                    <div class="mt-4 d-grid">
+                                        <button type="submit" class="btn btn-primary">Lưu tin tức</button>
+                                        <a href="{{ route('admin.posts.index') }}" class="btn btn-link-secondary mt-2">Hủy</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('scripts')
+<script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+<script>
+    CKEDITOR.replace('editor');
+
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('imagePreview').src = e.target.result;
+                document.getElementById('previewContainer').classList.remove('d-none');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+@endsection

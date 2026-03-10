@@ -2,14 +2,12 @@
 
 namespace App\Mail;
 
+use App\Models\ContactMessage;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-
-use App\Models\ContactMessage;
 
 class ContactNotification extends Mailable
 {
@@ -31,7 +29,7 @@ class ContactNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Thông báo: Tin nhắn liên hệ mới từ ' . $this->contactMessage->name,
+            subject: 'Thông báo: Tin nhắn liên hệ mới từ '.$this->contactMessage->name,
         );
     }
 

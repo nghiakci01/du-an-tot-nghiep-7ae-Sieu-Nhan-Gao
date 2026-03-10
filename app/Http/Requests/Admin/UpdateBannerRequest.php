@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Admin;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 
-class UpdateBannerRequest extends FormRequest
+class UpdateBannerRequest extends BaseAdminFormRequest
 {
     public function authorize(): bool
     {
@@ -15,9 +15,41 @@ class UpdateBannerRequest extends FormRequest
     {
         return [
             'title' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if (! $value instanceof UploadedFile) {
+                        return;
+                    }
+                    try {
+                        $ext = strtolower($value->getClientOriginalExtension());
+                        $size = @$value->getSize();
+                    } catch (\Throwable $e) {
+                        return;
+                    }
+                    if (! in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                        $fail('Hình ảnh phải có định dạng: jpg, jpeg, png, gif, webp.');
+                    }
+                    if ($size !== false && $size > 2 * 1024 * 1024) {
+                        $fail('Kích thước hình ảnh không được vượt quá 2MB (2048 KB).');
+                    }
+
+                    // Check dimensions for sharp display
+                    if ($this->input('position') === 'slider' && in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                        if ($value->isValid() && ($path = $value->getRealPath())) {
+                            $dimensions = @getimagesize($path);
+                            if ($dimensions) {
+                                [$width, $height] = $dimensions;
+                                if ($width < 1521) {
+                                    $fail('Ảnh cho Slider phải có chiều rộng tối thiểu 1521px để đảm bảo độ sắc nét. Khuyên dùng 3042px cho màn hình Retina.');
+                                }
+                            }
+                        }
+                    }
+                },
+            ],
             'link' => 'nullable|string|max:255',
-            'position' => 'required|string|in:slider,banner_top,banner_bottom',
+            'position' => 'required|string|in:slider,about_us,home_middle',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ];
@@ -39,10 +71,7 @@ class UpdateBannerRequest extends FormRequest
     {
         return [
             'required' => ':attribute không được để trống.',
-            'image' => ':attribute phải là định dạng hình ảnh.',
-            'mimes' => ':attribute phải có định dạng: :values.',
             'max' => ':attribute không được vượt quá :max ký tự.',
-            'image.max' => ':attribute không được vượt quá :max KB.',
             'integer' => ':attribute phải dưới dạng số nguyên.',
             'min' => ':attribute phải lớn hơn hoặc bằng :min.',
             'in' => ':attribute không hợp lệ.',

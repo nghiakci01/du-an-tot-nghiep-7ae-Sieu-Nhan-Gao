@@ -2,20 +2,30 @@
 
 namespace App\Services;
 
+use App\Mail\OrderShippedMail;
 use App\Models\Order;
 use App\Models\OrderHistory;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Services\LoyaltyPointService;
 use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class OrderService
 {
+    protected LoyaltyPointService $loyaltyPointService;
+
+    public function __construct(LoyaltyPointService $loyaltyPointService)
+    {
+        $this->loyaltyPointService = $loyaltyPointService;
+    }
+
     /**
      * Update order status with history tracking and stock management
      */
     public function updateOrderStatus(Order $order, string $newStatus, ?User $user = null, ?string $note = null)
     {
-        if (!$order->canTransitionTo($newStatus)) {
+        if (! $order->canTransitionTo($newStatus)) {
             throw new Exception("Không thể chuyển đổi trạng thái từ {$order->status} sang {$newStatus}");
         }
 
@@ -35,12 +45,27 @@ class OrderService
                 'user_id' => $user ? $user->id : null,
                 'previous_status' => $oldStatus,
                 'new_status' => $newStatus,
-                'note' => $note
+                'note' => $note,
             ]);
 
             // Handle stock logic
             $this->handleStockAdjustment($order, $oldStatus, $newStatus);
+
+            // Handle loyalty points
+            $this->handleLoyaltyPoints($order, $oldStatus, $newStatus);
         });
+
+        // Send email if shipped
+        if ($newStatus === Order::STATUS_SHIPPED) {
+            try {
+                $email = $order->email ?? ($order->user->email ?? null);
+                if ($email) {
+                    Mail::to($email)->send(new OrderShippedMail($order));
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send shipped email for order '.$order->id.': '.$e->getMessage());
+            }
+        }
 
         return $order;
     }
@@ -51,43 +76,57 @@ class OrderService
         // Assuming stock IS deducted on Order Placement (which is standard).
         // So any transition TO Cancelled/Returned/Failed requires restoration.
         // UNLESS the old status was ALSO Cancelled/Returned/Failed (which shouldn't happen due to transition rules, but good to be safe)
-        
+
         $isCancelledState = in_array($newStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_FAILED]);
         $wasCancelledState = in_array($oldStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_FAILED]);
 
-        if ($isCancelledState && !$wasCancelledState) {
+        if ($isCancelledState && ! $wasCancelledState) {
             $this->restoreStock($order);
         }
 
         // 2. If transition FROM Cancelled/Returned/Failed TO Processing statuses -> Deduct Stock again
         // (Just in case specific admin flow allows un-cancelling, though usually hard. But good to handle)
-        if (!$isCancelledState && $wasCancelledState) {
-            $this->deductStock($order);
+        if (! $isCancelledState && $wasCancelledState) {
+            foreach ($order->items as $item) {
+                if ($item->variant_id) {
+                    // Sử dụng lockForUpdate để tránh Race Condition khi trừ kho lại
+                    $variant = \App\Models\ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
+                    if ($variant && $variant->stock_quantity >= $item->quantity) {
+                        $variant->decrement('stock_quantity', $item->quantity);
+                    }
+                }
+            }
         }
     }
 
+    /**
+     * Khôi phục số lượng tồn kho cho các sản phẩm trong đơn hàng
+     */
     protected function restoreStock(Order $order)
     {
         foreach ($order->items as $item) {
-            if ($item->variant) {
-                $item->variant->increment('stock_quantity', $item->quantity);
+            if ($item->variant_id) {
+                // Sử dụng lockForUpdate để tránh Race Condition
+                $variant = \App\Models\ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
+                if ($variant) {
+                    $variant->increment('stock_quantity', $item->quantity);
+                }
             }
         }
     }
 
-    protected function deductStock(Order $order)
+    /**
+     * Xử lý tích/thu hồi loyalty points khi trạng thái đơn hàng thay đổi
+     */
+    protected function handleLoyaltyPoints(Order $order, string $oldStatus, string $newStatus): void
     {
-        foreach ($order->items as $item) {
-            if ($item->variant) {
-                if ($item->variant->stock_quantity >= $item->quantity) {
-                     $item->variant->decrement('stock_quantity', $item->quantity);
-                } else {
-                     // potentially throw exception or allow negative if configured? 
-                     // For now, let's just decrement, or we could strict check.
-                     // Assuming admin overrides, we just decrement.
-                     $item->variant->decrement('stock_quantity', $item->quantity);
-                }
-            }
+        if ($newStatus === Order::STATUS_COMPLETED && $oldStatus !== Order::STATUS_COMPLETED) {
+            $this->loyaltyPointService->earnPoints($order);
+        }
+
+        $cancelledStates = [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_FAILED];
+        if (in_array($newStatus, $cancelledStates) && !in_array($oldStatus, $cancelledStates)) {
+            $this->loyaltyPointService->revokePoints($order);
         }
     }
 }

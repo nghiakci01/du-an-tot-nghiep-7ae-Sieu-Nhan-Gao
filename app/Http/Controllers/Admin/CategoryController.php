@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreCategoryRequest;
+use App\Http\Requests\Admin\UpdateCategoryRequest;
 use App\Models\Category;
-use App\Http\Requests\StoreCategoryRequest;
-use App\Http\Requests\UpdateCategoryRequest;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -18,6 +17,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::with('parent')->paginate(10);
+
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -27,6 +27,7 @@ class CategoryController extends Controller
     public function create()
     {
         $categories = Category::whereNull('parent_id')->get(); // Only allowing 2 levels for simplicity initially, or list all for parent selection
+
         return view('admin.categories.create', compact('categories'));
     }
 
@@ -37,6 +38,7 @@ class CategoryController extends Controller
     {
         $data = $request->validated();
         $data['slug'] = Str::slug($data['name']);
+
 
         Category::create($data);
 
@@ -49,6 +51,7 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         $categories = Category::where('id', '!=', $category->id)->whereNull('parent_id')->get();
+
         return view('admin.categories.edit', compact('category', 'categories'));
     }
 
@@ -60,13 +63,13 @@ class CategoryController extends Controller
         $data = $request->validated();
         $data['slug'] = Str::slug($data['name']);
 
-        // Kiểm tra nếu danh mục đang có children và muốn đổi thành child
         if ($request->filled('parent_id') && $category->children()->count() > 0) {
             return redirect()
                 ->back()
                 ->withInput()
                 ->with('error', 'Không thể chuyển danh mục có danh mục con thành danh mục con.');
         }
+
 
         $category->update($data);
 
@@ -81,9 +84,9 @@ class CategoryController extends Controller
         if ($category->children()->count() > 0) {
             return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục có danh mục con.');
         }
-        
+
         if ($category->products()->count() > 0) {
-             return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục có chứa sản phẩm.');
+            return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục có chứa sản phẩm.');
         }
 
         $category->delete();

@@ -8,11 +8,15 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>@yield('title', ($settings['site_title'] ?? 'Elite') . ' - ' . __('messages.home'))</title>
-    <meta name="description" content="">
+    <meta name="description"
+        content="@yield('meta_description', $settings['site_description'] ?? 'Elite E-commerce Fashion Store')">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend-assets/img/favicon.ico') }}">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS 
     ========================= -->
@@ -30,9 +34,37 @@
     <!-- Search Autocomplete CSS -->
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/search-autocomplete.css') }}">
 
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <style>
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Global Product Hover Effect & Consistent Sizing */
+        .single_product .product_thumb {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Force square ratio */
+            overflow: hidden !important;
+            background: #f9f9f9;
+        }
+
+        .single_product .product_thumb img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            transition: transform 0.4s ease-in-out !important;
+        }
+
+        .single_product:hover .product_thumb img {
+            transform: scale(1.08) !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -117,6 +149,42 @@
         });
         @endif
     </script>
+
+    <script type="module">
+        if (window.Echo) {
+            let channel;
+            @if(auth()->check())
+                channel = window.Echo.private('App.Models.User.{{ auth()->id() }}');
+            @else
+                channel = window.Echo.channel('cart.{{ session()->getId() }}');
+            @endif
+
+            channel.listen('CartUpdatedEvent', (e) => {
+                // e.cartCount is from the CartUpdatedEvent constructor
+                let cartCountElements = document.querySelectorAll('.cart-count');
+                cartCountElements.forEach(el => {
+                    el.innerText = e.cartCount;
+                    
+                    // Thêm class nháy nhẹ (animation)
+                    el.classList.remove('pulse-animation');
+                    void el.offsetWidth; // trigger reflow
+                    el.classList.add('pulse-animation');
+                });
+            });
+        }
+    </script>
+
+    <style>
+        @keyframes cartPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); color: #ef233c; }
+            100% { transform: scale(1); }
+        }
+        .pulse-animation {
+            animation: cartPulse 0.5s ease-in-out;
+            display: inline-block;
+        }
+    </style>
 </body>
 
 

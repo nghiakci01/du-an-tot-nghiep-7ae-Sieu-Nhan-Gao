@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             // Only add columns that don't exist yet
-            if (!Schema::hasColumn('products', 'sale_price')) {
+            if (! Schema::hasColumn('products', 'sale_price')) {
                 $table->decimal('sale_price', 10, 2)->nullable()->after('price');
             }
-            if (!Schema::hasColumn('products', 'short_description')) {
+            if (! Schema::hasColumn('products', 'short_description')) {
                 $table->text('short_description')->nullable()->after('description');
             }
         });

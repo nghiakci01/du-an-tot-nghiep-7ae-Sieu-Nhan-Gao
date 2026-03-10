@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Setting;
+use Illuminate\Database\Seeder;
 
 class SettingSeeder extends Seeder
 {
@@ -16,7 +16,7 @@ class SettingSeeder extends Seeder
             // Website Information
             [
                 'key' => 'site_title',
-                'value' => 'Sieu Nhan Gao Shop',
+                'value' => 'Elite',
                 'group' => 'general',
             ],
             [

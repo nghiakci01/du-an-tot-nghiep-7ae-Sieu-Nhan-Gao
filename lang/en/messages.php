@@ -14,6 +14,9 @@ return [
     'cart' => 'Cart',
     'checkout' => 'Checkout',
     'my_account' => 'My Account',
+    'my_orders' => 'My Orders',
+    'my_wishlist' => 'My Wish List',
+    'track_order' => 'Track Order',
     'admin' => 'Admin',
     'staff' => 'Staff',
     'language' => 'Language',
@@ -171,7 +174,7 @@ return [
     'size' => 'Size',
     'color' => 'Color',
     'edit' => 'Add similar product',
-    
+
     // Checkout - Reid Template
     'returning_customer' => 'Returning customer',
     'click_here_to_login' => 'Click here to login',
@@ -238,6 +241,8 @@ return [
     'select_province' => 'Select Province',
     'vnpay_payment' => 'VNPAY Payment',
     'vnpay_description' => 'You will be redirected to VNPAY to complete your order.',
+    'zalopay_payment' => 'ZaloPay Payment',
+    'zalopay_description' => 'You will be redirected to ZaloPay to complete your order.',
     'validate_name' => 'Please enter your full name',
     'validate_phone_required' => 'Please enter your phone number',
     'validate_phone_digits' => 'Phone must be 10-11 digits',
@@ -250,4 +255,10 @@ return [
     'welcome_coupon_code' => 'Use code: :code',
     'welcome_coupon_desc' => '100k discount for orders over 1,000,000 VNĐ',
     'my_coupons' => 'My Coupons',
+    'account_menu' => 'Account Menu',
+    'wishlist_empty' => 'Your wishlist is empty',
+    'wishlist_empty_desc' => 'You haven\'t added any products to your wishlist yet.',
+    'view_detail' => 'View Detail',
+    'in_stock' => 'In Stock',
+    'please_login' => 'Please login to continue',
 ];

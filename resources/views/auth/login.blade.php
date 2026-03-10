@@ -200,9 +200,9 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">Home</a></li>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
-                            <li>Account</li>
+                            <li>{{ __('messages.account') }}</li>
                         </ul>
                     </div>
                 </div>
@@ -222,11 +222,11 @@
                             <button type="button"
                                 class="auth-tab {{ !request()->has('tab') || request('tab') == 'login' ? 'active' : '' }}"
                                 data-tab="login">
-                                Login
+                                {{ __('messages.login') }}
                             </button>
                             <button type="button" class="auth-tab {{ request('tab') == 'register' ? 'active' : '' }}"
                                 data-tab="register">
-                                Register
+                                {{ __('messages.register') }}
                             </button>
                         </div>
 
@@ -237,31 +237,38 @@
                             @csrf
                             <div class="input-group">
                                 <input type="email" name="email" class="auth-input"
-                                    placeholder="Enter email or Username" value="{{ old('email') }}" required>
+                                    placeholder="{{ __('messages.email_or_username') }}" value="{{ old('email') }}" required>
                                 @error('email')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="input-group">
-                                <input type="password" name="password" class="auth-input" placeholder="Password" required>
+                                <input type="password" name="password" class="auth-input" placeholder="{{ __('messages.password') }}" required>
                                 @error('password')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <button type="submit" class="auth-btn auth-btn-login">Login</button>
+                            <div class="input-group" style="display: flex; align-items: center; margin-bottom: 5px; margin-top: 10px;">
+                                <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }} style="margin-right: 8px; cursor: pointer; width: auto; height: 16px;">
+                                <label for="remember" style="font-size: 14px; color: #666; cursor: pointer; margin-bottom: 0; user-select: none;">
+                                    {{ __('messages.remember_me') }}
+                                </label>
+                            </div>
 
-                            <a href="{{ route('password.request') }}" class="forgot-link">Forgot password?</a>
+                            <button type="submit" class="auth-btn auth-btn-login">{{ __('messages.login') }}</button>
 
-                            <div class="social-divider">Or login with</div>
+                            <a href="{{ route('password.request') }}" class="forgot-link">{{ __('messages.lost_password') }}</a>
+
+                            <div class="social-divider">{{ __('messages.or_login_with') }}</div>
 
                             <div class="social-buttons">
                                 <a href="{{ route('social.login', 'facebook') }}" class="social-btn social-btn-facebook">
-                                    <i class="fa fa-facebook"></i> Login with Facebook
+                                    <i class="fa fa-facebook"></i>{{ __('messages.fb_login') }}
                                 </a>
                                 <a href="{{ route('social.login', 'google') }}" class="social-btn social-btn-google">
-                                    <i class="fa fa-google"></i> Login with Google
+                                    <i class="fa fa-google"></i> {{ __('messages.google_login') }}
                                 </a>
                             </div>
                         </form>
@@ -271,18 +278,18 @@
                             class="auth-form {{ request('tab') == 'register' ? 'active' : '' }}" id="register-form">
                             @csrf
                             <div class="input-group">
-                                <input type="text" name="name" class="auth-input" placeholder="Full Name"
+                                <input type="text" name="name" class="auth-input" placeholder="{{ __('messages.full_name') }}"
                                     value="{{ old('name') }}" required minlength="2" maxlength="50"
-                                    pattern="^[a-zA-ZÀ-ỹ\s]+$" title="Name can only contain letters and spaces">
+                                    pattern="^[a-zA-ZÀ-ỹ\s]+$" title="{{ __('messages.full_name_pattern') }}">
                                 @error('name')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="input-group">
-                                <input type="tel" name="phone" class="auth-input" placeholder="Phone"
-                                    value="{{ old('phone') }}" required pattern="^0[0-9]{9}$" maxlength="10"
-                                    title="Phone number must be 10 digits and start with 0">
+                                <input type="tel" name="phone" class="auth-input" placeholder="{{ __('messages.phone') }}"
+                                    value="{{ old('phone') }}" required pattern="^(03|05|07|08|09)\d{8}$" maxlength="10"
+                                    title="{{ __('messages.phone_pattern') }}">
                                 @error('phone')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
@@ -290,16 +297,16 @@
 
                             <div class="input-group">
                                 <input type="email" name="email" class="auth-input" placeholder="Email"
-                                    value="{{ old('email') }}" required pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
-                                    title="Please enter a valid email format">
+                                    value="{{ old('email') }}" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                    title="{{ __('messages.email_pattern') }}">
                                 @error('email')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="input-group">
-                                <input type="password" name="password" class="auth-input" placeholder="Your password"
-                                    required minlength="8" title="Password must be at least 8 characters">
+                                <input type="password" name="password" class="auth-input" placeholder="{{ __('messages.password') }}"
+                                    required minlength="8" title="{{ __('messages.password_pattern') }}">
                                 @error('password')
                                     <span class="error-message">{{ $message }}</span>
                                 @enderror
@@ -307,10 +314,13 @@
 
                             <div class="input-group">
                                 <input type="password" name="password_confirmation" class="auth-input"
-                                    placeholder="Confirm password" required minlength="8">
+                                    placeholder="{{ __('messages.confirm_password') }}" required minlength="8">
                             </div>
+                            
+                            <a href="{{ route('login') }}" class="forgot-link">{{ __('messages.already_have_account') }}</a>
 
-                            <button type="submit" class="auth-btn auth-btn-register">Register</button>
+                            <button type="submit" class="auth-btn auth-btn-register">{{ __('messages.register') }}</button>
+                            
                         </form>
                     </div>
                 </div>

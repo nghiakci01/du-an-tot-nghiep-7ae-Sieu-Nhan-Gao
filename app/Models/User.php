@@ -13,7 +13,9 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     const ROLE_ADMIN = 'admin';
+
     const ROLE_STAFF = 'staff';
+
     const ROLE_USER = 'user';
 
     /**
@@ -74,14 +76,29 @@ class User extends Authenticatable
         return $this->hasMany(SocialAccount::class);
     }
 
-    public function wishlist()
+    public static function getAdmins()
+    {
+        return self::where('role', self::ROLE_ADMIN)->get();
+    }
+
+    public function wishlists()
     {
         return $this->hasMany(Wishlist::class);
     }
 
+    public function loyaltyPoints()
+    {
+        return $this->hasMany(LoyaltyPoint::class);
+    }
+
+    public function getTotalLoyaltyPointsAttribute(): int
+    {
+        return (int) $this->loyaltyPoints()->sum('points');
+    }
+
     public function getAvatarUrlAttribute()
     {
-        if (!$this->avatar) {
+        if (! $this->avatar) {
             return null;
         }
 
@@ -89,6 +106,6 @@ class User extends Authenticatable
             return $this->avatar;
         }
 
-        return asset('storage/' . $this->avatar);
+        return asset('storage/'.$this->avatar);
     }
 }

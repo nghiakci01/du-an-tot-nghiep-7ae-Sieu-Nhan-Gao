@@ -1,10 +1,10 @@
 <nav class="pc-sidebar">
     <div class="navbar-wrapper">
-        <div class="m-header">
+        <div class="m-header d-flex align-items-center justify-content-center">
             <a href="{{ route('admin.dashboard') }}"
-                class="b-brand text-primary"><!-- ========   Change your logo from here   ============ -->
-                <img src="{{ asset('admin-assets') }}/images/logo-dark.svg" class="img-fluid logo-lg" alt="logo" />
-                <span class="badge bg-light-success rounded-pill ms-2 theme-version">v9.6.2</span></a>
+                class="b-brand text-primary d-flex align-items-center" style="text-decoration: none;">
+                <h3 class="mb-0 fw-bolder text-dark ls-1">Elite Admin</h3>
+            </a>
         </div>
         <div class="navbar-content">
             <div class="card pc-user-card">
@@ -68,7 +68,7 @@
                         <use xlink:href="#custom-presentation-chart"></use>
                     </svg>
                 </li>
-                @if (auth()->user()->isAdmin())
+                @if (auth()->user()->isAdmin() || auth()->user()->isStaff())
                     <li class="pc-item">
                         <a href="{{ route('admin.categories.index') }}" class="pc-link">
                             <span class="pc-micon">
@@ -91,22 +91,6 @@
                                 <i class="ti ti-box"></i>
                             </span>
                             <span class="pc-mtext">Sản phẩm</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('admin.banners.index') }}" class="pc-link">
-                            <span class="pc-micon">
-                                <i class="ti ti-photo"></i>
-                            </span>
-                            <span class="pc-mtext">Quản lý Banner</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('admin.coupons.index') }}" class="pc-link">
-                            <span class="pc-micon">
-                                <i class="ti ti-ticket"></i>
-                            </span>
-                            <span class="pc-mtext">Mã Giảm Giá</span>
                         </a>
                     </li>
                     <li class="pc-item pc-hasmenu">
@@ -133,39 +117,33 @@
                         </ul>
                     </li>
                 @endif
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon">
-                            <i class="ti ti-archive"></i>
-                        </span>
-                        <span class="pc-mtext">Quản lý Kho</span>
-                        <span class="pc-arrow">
-                            <i data-feather="chevron-right"></i>
-                        </span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item">
-                            <a href="{{ route('admin.vouchers.index') }}" class="pc-link">
-                                <span class="pc-mtext">Phiếu Nhập/Xuất</span>
-                            </a>
-                        </li>
-                        <li class="pc-item">
-                            <a href="{{ route('admin.warehouses.index') }}" class="pc-link">
-                                <span class="pc-mtext">Danh sách Kho</span>
-                            </a>
-                        </li>
-                        <li class="pc-item">
-                            <a href="{{ route('admin.suppliers.index') }}" class="pc-link">
-                                <span class="pc-mtext">Nhà cung cấp</span>
-                            </a>
-                        </li>
-                        <li class="pc-item">
-                            <a href="{{ route('admin.stock.index') }}" class="pc-link">
-                                <span class="pc-mtext">Báo cáo tồn kho</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                @if (auth()->user()->isAdmin())
+                    <li class="pc-item">
+                        <a href="{{ route('admin.payment-history.index') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-receipt"></i>
+                            </span>
+                            <span class="pc-mtext">Lịch sử thanh toán</span>
+                        </a>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('admin.banners.index') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-photo"></i>
+                            </span>
+                            <span class="pc-mtext">Quản lý Banner</span>
+                        </a>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('admin.coupons.index') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-ticket"></i>
+                            </span>
+                            <span class="pc-mtext">Mã Giảm Giá</span>
+                        </a>
+                    </li>
+                @endif
+                {{-- Removed corrupted stock report item --}}
                 <li class="pc-item">
                     <a href="{{ route('admin.chat.index') }}" class="pc-link">
                         <span class="pc-micon">
@@ -190,13 +168,62 @@
                         <span class="pc-mtext">Đánh giá sản phẩm</span>
                     </a>
                 </li>
+                @if (auth()->user()->isAdmin() || auth()->user()->isStaff())
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-news"></i>
+                            </span>
+                            <span class="pc-mtext">Quản lý Tin tức</span>
+                            <span class="pc-arrow">
+                                <i data-feather="chevron-right"></i>
+                            </span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item">
+                                <a href="{{ route('admin.post-categories.index') }}" class="pc-link">
+                                    <span class="pc-mtext">Danh mục tin tức</span>
+                                </a>
+                            </li>
+                            <li class="pc-item">
+                                <a href="{{ route('admin.posts.index') }}" class="pc-link">
+                                    <span class="pc-mtext">Danh sách tin tức</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
                 @if (auth()->user()->isAdmin())
+                    <li class="pc-item">
+                        <a href="{{ route('admin.loyalty-points.index') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-coin"></i>
+                            </span>
+                            <span class="pc-mtext">Cấu hình Tích điểm</span>
+                        </a>
+                    </li>
                     <li class="pc-item">
                         <a href="{{ route('admin.users.index') }}" class="pc-link">
                             <span class="pc-micon">
                                 <i class="ti ti-users"></i>
                             </span>
                             <span class="pc-mtext">Người dùng</span>
+                        </a>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('admin.audit-logs.index') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-history"></i>
+                            </span>
+                            <span class="pc-mtext">Nhật ký hệ thống</span>
+                        </a>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('admin.bank-settings.index') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-credit-card"></i>
+                            </span>
+                            <span class="pc-mtext">Cấu hình Ngân hàng (QR)</span>
                         </a>
                     </li>
                     <li class="pc-item">

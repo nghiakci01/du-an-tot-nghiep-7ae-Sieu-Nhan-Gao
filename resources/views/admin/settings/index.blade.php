@@ -14,7 +14,7 @@
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
 
-                    <form action="{{ route('admin.settings.update') }}" method="POST">
+                    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <h6 class="mb-3 text-primary"><i class="ti ti-info-circle"></i> Thông tin Website</h6>
@@ -22,12 +22,22 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Tên Website (Site Title)</label>
                                 <input type="text" class="form-control" name="site_title"
-                                    value="{{ $settings['site_title'] ?? 'Sieu Nhan Gao Shop' }}">
+                                    value="{{ $settings['site_title'] ?? 'Elite' }}">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phí Ship Mặc Định (VND)</label>
                                 <input type="number" class="form-control" name="shipping_fee"
                                     value="{{ $settings['shipping_fee'] ?? '30000' }}">
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Ảnh Banner Trang Liên Hệ</label>
+                                @if(isset($settings['contact_banner']) && $settings['contact_banner'])
+                                    <div class="mb-2">
+                                        <img src="{{ asset('storage/' . $settings['contact_banner']) }}" alt="Contact Banner" style="max-height: 100px; display: block;">
+                                    </div>
+                                @endif
+                                <input type="file" class="form-control" name="contact_banner" accept="image/*">
+                                <small class="text-muted">Định dạng hỗ trợ: JPG, PNG, GIF. Kích thước khuyến nghị: 1920x400px.</small>
                             </div>
                         </div>
 
@@ -36,7 +46,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email Liên Hệ</label>
                                 <input type="text" class="form-control" name="site_email"
-                                    value="{{ $settings['site_email'] ?? 'contact@sieunhangao.com' }}">
+                                    value="{{ $settings['site_email'] ?? 'contact@elite.com' }}">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Hotline</label>

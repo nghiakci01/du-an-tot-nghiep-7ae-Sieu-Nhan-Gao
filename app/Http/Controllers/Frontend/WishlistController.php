@@ -14,6 +14,9 @@ class WishlistController extends Controller
      */
     public function index()
     {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', __('messages.please_login'));
+        }
         $wishlists = Wishlist::where('user_id', Auth::id())
             ->with('product')
             ->latest()
@@ -27,7 +30,7 @@ class WishlistController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['status' => 'error', 'message' => 'Bạn cần đăng nhập để thêm vào danh sách yêu thích!'], 401);
         }
 

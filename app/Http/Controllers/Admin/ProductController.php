@@ -3,22 +3,34 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\ProductVariant;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['category', 'variants'])->withCount('variants')->paginate(10);
-        return view('admin.products.index', compact('products'));
+        $categories = Category::all();
+        $query = Product::with(['category', 'variants'])->withCount('variants');
+
+        if (request()->filled('category_id')) {
+            $query->where('category_id', request('category_id'));
+        }
+
+        if (request()->filled('search')) {
+            $query->where('name', 'like', '%' . request('search') . '%');
+        }
+
+        $products = $query->latest()->paginate(10)->appends(request()->all());
+
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
     public function create()
@@ -26,6 +38,7 @@ class ProductController extends Controller
         $categories = Category::all();
         $sizes = \App\Models\Size::active()->orderBy('display_order')->get();
         $colors = \App\Models\Color::active()->orderBy('display_order')->get();
+
         return view('admin.products.create', compact('categories', 'sizes', 'colors'));
     }
 
@@ -38,7 +51,7 @@ class ProductController extends Controller
             if (empty($data['price'])) {
                 $data['price'] = 0;
             }
-            $data['slug'] = Str::slug($data['name']) . '-' . uniqid(); // Ensure unique slug
+            $data['slug'] = Str::slug($data['name']).'-'.uniqid(); // Ensure unique slug
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
             $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
             $data['image'] = null; // Default to null
@@ -47,23 +60,23 @@ class ProductController extends Controller
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $path = $file->getRealPath() ?: $file->getPathname();
-                if ($file->isValid() && !empty($path)) {
+                if ($file->isValid() && ! empty($path)) {
                     try {
                         $filename = $file->hashName();
                         $stream = fopen($path, 'r');
-                        $storedPath = Storage::disk('public')->put('products/' . $filename, $stream);
+                        $storedPath = Storage::disk('public')->put('products/'.$filename, $stream);
                         if (is_resource($stream)) {
                             fclose($stream);
                         }
 
                         if ($storedPath) {
-                            $data['image'] = 'products/' . $filename;
+                            $data['image'] = 'products/'.$filename;
                         }
                     } catch (\Exception $e) {
-                        \Log::error('Image upload failed: ' . $e->getMessage());
+                        \Log::error('Image upload failed: '.$e->getMessage());
                     }
                 } else {
-                    \Log::warning('Main image upload attempted but file is invalid or path is empty: ' . $file->getClientOriginalName());
+                    \Log::warning('Main image upload attempted but file is invalid or path is empty: '.$file->getClientOriginalName());
                 }
             }
 
@@ -79,7 +92,7 @@ class ProductController extends Controller
 
                     $sku = $variantData['sku'] ?? null;
                     if (empty($sku)) {
-                        $sku = strtoupper(Str::slug($product->name . '-' . $sizeName . '-' . $colorName . '-' . uniqid()));
+                        $sku = strtoupper(Str::slug($product->name.'-'.$sizeName.'-'.$colorName.'-'.uniqid()));
                     }
 
                     $product->variants()->create([
@@ -89,37 +102,36 @@ class ProductController extends Controller
                         'color' => $colorName,
                         'price' => $variantData['price'] ?? null,
                         'sale_price' => $variantData['sale_price'] ?? null,
-                        'stock_quantity' => $variantData['stock_quantity'],
+                        'stock_quantity' => $variantData['stock_quantity'] ?? 100, // Default value since it's removed from UI
                         'sku' => $sku,
                     ]);
                 }
             }
 
-
             // Handle gallery images
             if ($request->hasFile('gallery_images')) {
                 foreach ($request->file('gallery_images') as $index => $image) {
                     $path = $image->getRealPath() ?: $image->getPathname();
-                    if ($image->isValid() && !empty($path)) {
+                    if ($image->isValid() && ! empty($path)) {
                         try {
                             $filename = $image->hashName();
                             $stream = fopen($path, 'r');
-                            $storedPath = Storage::disk('public')->put('products/gallery/' . $filename, $stream);
+                            $storedPath = Storage::disk('public')->put('products/gallery/'.$filename, $stream);
                             if (is_resource($stream)) {
                                 fclose($stream);
                             }
 
                             if ($storedPath) {
                                 $product->images()->create([
-                                    'image_path' => 'products/gallery/' . $filename,
-                                    'sort_order' => $index
+                                    'image_path' => 'products/gallery/'.$filename,
+                                    'sort_order' => $index,
                                 ]);
                             }
                         } catch (\Exception $e) {
-                            \Log::error('Gallery image upload failed: ' . $e->getMessage());
+                            \Log::error('Gallery image upload failed: '.$e->getMessage());
                         }
                     } else {
-                        \Log::warning('Gallery image upload attempted but file is invalid or path is empty: ' . $image->getClientOriginalName());
+                        \Log::warning('Gallery image upload attempted but file is invalid or path is empty: '.$image->getClientOriginalName());
                     }
                 }
             }
@@ -132,11 +144,13 @@ class ProductController extends Controller
             }
 
             DB::commit();
+
             return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Error creating product: ' . $e->getMessage())->withInput();
+
+            return redirect()->back()->with('error', 'Error creating product: '.$e->getMessage())->withInput();
         }
     }
 
@@ -146,6 +160,7 @@ class ProductController extends Controller
         $categories = Category::all();
         $sizes = \App\Models\Size::active()->orderBy('display_order')->get();
         $colors = \App\Models\Color::active()->orderBy('display_order')->get();
+
         return view('admin.products.edit', compact('product', 'categories', 'sizes', 'colors'));
     }
 
@@ -158,7 +173,7 @@ class ProductController extends Controller
             if (empty($data['price'])) {
                 $data['price'] = 0;
             }
-            $data['slug'] = Str::slug($data['name']) . '-' . $product->id;
+            $data['slug'] = Str::slug($data['name']).'-'.$product->id;
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
             $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
@@ -166,7 +181,7 @@ class ProductController extends Controller
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $path = $file->getRealPath() ?: $file->getPathname();
-                if ($file->isValid() && !empty($path)) {
+                if ($file->isValid() && ! empty($path)) {
                     try {
                         // Delete old image
                         if ($product->image) {
@@ -175,19 +190,19 @@ class ProductController extends Controller
 
                         $filename = $file->hashName();
                         $stream = fopen($path, 'r');
-                        $storedPath = Storage::disk('public')->put('products/' . $filename, $stream);
+                        $storedPath = Storage::disk('public')->put('products/'.$filename, $stream);
                         if (is_resource($stream)) {
                             fclose($stream);
                         }
 
                         if ($storedPath) {
-                            $data['image'] = 'products/' . $filename;
+                            $data['image'] = 'products/'.$filename;
                         }
                     } catch (\Exception $e) {
-                        \Log::error('Image update failed: ' . $e->getMessage());
+                        \Log::error('Image update failed: '.$e->getMessage());
                     }
                 } else {
-                    \Log::warning('Main image update attempted but file is invalid or path is empty: ' . $file->getClientOriginalName());
+                    \Log::warning('Main image update attempted but file is invalid or path is empty: '.$file->getClientOriginalName());
                 }
             }
 
@@ -209,7 +224,7 @@ class ProductController extends Controller
 
                 $sku = $variantData['sku'] ?? null;
                 if (empty($sku)) {
-                    $sku = strtoupper(Str::slug($product->name . '-' . $sizeName . '-' . $colorName . '-' . uniqid()));
+                    $sku = strtoupper(Str::slug($product->name.'-'.$sizeName.'-'.$colorName.'-'.uniqid()));
                 }
 
                 $variantAttributes = [
@@ -219,7 +234,7 @@ class ProductController extends Controller
                     'color' => $colorName,
                     'price' => $variantData['price'] ?? null,
                     'sale_price' => $variantData['sale_price'] ?? null,
-                    'stock_quantity' => $variantData['stock_quantity'],
+                    'stock_quantity' => $variantData['stock_quantity'] ?? 100, // Default value since it's removed from UI
                     'sku' => $sku,
                 ];
 
@@ -233,7 +248,6 @@ class ProductController extends Controller
                 }
             }
 
-
             // Handle gallery images
             if ($request->hasFile('gallery_images')) {
                 $currentCount = $product->images()->count();
@@ -242,26 +256,26 @@ class ProductController extends Controller
                 if ($currentCount + $newCount <= 6) {
                     foreach ($request->file('gallery_images') as $index => $image) {
                         $path = $image->getRealPath() ?: $image->getPathname();
-                        if ($image->isValid() && !empty($path)) {
+                        if ($image->isValid() && ! empty($path)) {
                             try {
                                 $filename = $image->hashName();
                                 $stream = fopen($path, 'r');
-                                $storedPath = Storage::disk('public')->put('products/gallery/' . $filename, $stream);
+                                $storedPath = Storage::disk('public')->put('products/gallery/'.$filename, $stream);
                                 if (is_resource($stream)) {
                                     fclose($stream);
                                 }
 
                                 if ($storedPath) {
                                     $product->images()->create([
-                                        'image_path' => 'products/gallery/' . $filename,
-                                        'sort_order' => $currentCount + $index
+                                        'image_path' => 'products/gallery/'.$filename,
+                                        'sort_order' => $currentCount + $index,
                                     ]);
                                 }
                             } catch (\Exception $e) {
-                                \Log::error('Gallery image update failed: ' . $e->getMessage());
+                                \Log::error('Gallery image update failed: '.$e->getMessage());
                             }
                         } else {
-                            \Log::warning('Gallery image update attempted but file is invalid or path is empty: ' . $image->getClientOriginalName());
+                            \Log::warning('Gallery image update attempted but file is invalid or path is empty: '.$image->getClientOriginalName());
                         }
                     }
                 }
@@ -275,11 +289,13 @@ class ProductController extends Controller
             }
 
             DB::commit();
+
             return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Error updating product: ' . $e->getMessage())->withInput();
+
+            return redirect()->back()->with('error', 'Error updating product: '.$e->getMessage())->withInput();
         }
     }
 
@@ -319,5 +335,42 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Search product variants for autocomplete (e.g., in Order Creation)
+     */
+    public function variantsSearch(Request $request)
+    {
+        $q = $request->get('q');
+        if (empty($q)) {
+            return response()->json([]);
+        }
+
+        $variants = ProductVariant::with(['product', 'sizeRelationship', 'colorRelationship'])
+            ->where('sku', 'like', "%{$q}%")
+            ->orWhereHas('product', function($query) use ($q) {
+                $query->where('name', 'like', "%{$q}%");
+            })
+            ->latest()
+            ->get();
+
+        $results = $variants->map(function($variant) {
+            return [
+                'id' => $variant->id,
+                'name' => $variant->product->name,
+                'sku' => $variant->sku,
+                'price' => (float)$variant->price,
+                'size' => $variant->size ?: ($variant->sizeRelationship ? $variant->sizeRelationship->name : ''),
+                'color' => $variant->color ?: ($variant->colorRelationship ? $variant->colorRelationship->name : ''),
+                'stock' => $variant->stock_quantity,
+                'product' => [
+                    'name' => $variant->product->name,
+                    'image' => $variant->product->image_url,
+                ]
+            ];
+        });
+
+        return response()->json($results);
     }
 }

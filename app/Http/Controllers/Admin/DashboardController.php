@@ -1,101 +1,111 @@
 <?php
 
 // app/Http/Controllers/Admin/DashboardController.php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Models\Product;
-use App\Models\User;
+use App\Services\ConversionTrackingService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    protected $reportService;
+    protected $conversionService;
+
+    public function __construct(\App\Services\ReportService $reportService, ConversionTrackingService $conversionService)
     {
-        // 1. Tổng doanh thu (Chỉ tính các đơn hàng đã hoàn thành)
-        $totalRevenue = Order::where('status', Order::STATUS_COMPLETED)->sum('total_price');
+        $this->reportService = $reportService;
+        $this->conversionService = $conversionService;
+    }
 
-        // 2. Tổng số đơn hàng
-        $totalOrders = Order::count();
+    public function index(Request $request)
+    {
+        $startDate = $request->start_date ? \Carbon\Carbon::parse($request->start_date)->startOfDay() : now()->subDays(30)->startOfDay();
+        $endDate = $request->end_date ? \Carbon\Carbon::parse($request->end_date)->endOfDay() : now()->endOfDay();
 
-        // 3. Đơn hàng mới (Pending)
-        $newOrders = Order::where('status', Order::STATUS_PENDING)->count();
+        $stats = $this->reportService->getOverviewStats($startDate, $endDate);
+        $revenueChart = $this->reportService->getRevenueChartData($startDate, $endDate);
+        $orderStatus = $this->reportService->getOrderStatusData($startDate, $endDate);
+        $topProducts = $this->reportService->getTopProducts($startDate, $endDate);
 
-        // 4. Tổng số khách hàng
-        $totalCustomers = User::where('role', 'user')->count();
+        // Tính tổng số lượng sản phẩm đã bán trong kỳ để làm thanh tiến trình
+        $totalProductsSold = \DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.status', \App\Models\Order::STATUS_COMPLETED)
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->sum('order_items.quantity');
 
-        // 5. Tổng số sản phẩm đang bán
-        $totalProducts = Product::where('is_active', true)->count();
-
-        // 6. Sản phẩm sắp hết hàng (Stock < 10)
-        $lowStockProducts = \App\Models\ProductVariant::where('stock_quantity', '<', 10)->count();
-
-        // 7. Lấy 5 đơn hàng mới nhất
         $recentOrders = Order::with('user')->latest()->take(5)->get();
 
-        // --- NEW: Data for Charts ---
+        // Conversion funnel stats
+        $funnelStats = $this->conversionService->getFunnelStats('30d');
 
-        // 8. Doanh thu 30 ngày gần nhất
-        $revenueData = Order::where('status', Order::STATUS_COMPLETED)
-            ->where('created_at', '>=', now()->subDays(30))
-            ->select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('SUM(total_price) as total')
-            )
-            ->groupBy('date')
-            ->orderBy('date', 'asc') // Order by date ascending for the chart
-            ->get();
+        return view('admin.dashboard', [
+            'totalRevenue' => $stats['total_revenue'],
+            'totalProfit' => $stats['total_profit'],
+            'totalOrders' => $stats['total_orders'],
+            'newOrders' => $stats['new_orders'],
+            'totalCustomers' => $stats['total_customers'],
+            'totalProducts' => $stats['total_products'],
+            'lowStockProducts' => $stats['low_stock_products'],
+            'recentOrders' => $recentOrders,
+            'revenueLabels' => $revenueChart['labels'],
+            'revenueValues' => $revenueChart['values'],
+            'statusLabels' => $orderStatus['labels'],
+            'statusValues' => $orderStatus['values'],
+            'topProducts' => $topProducts,
+            'totalProductsSold' => $totalProductsSold > 0 ? $totalProductsSold : 1, // Tránh chia cho 0
+            'startDate' => $startDate->format('Y-m-d'),
+            'endDate' => $endDate->format('Y-m-d'),
+            'funnelStats' => $funnelStats,
+        ]);
+    }
 
-        // Prepare data for ApexCharts (Labels and Series)
-        $revenueLabels = $revenueData->pluck('date')->map(function ($date) {
-            return \Carbon\Carbon::parse($date)->format('d/m');
-        })->toArray();
-        $revenueValues = $revenueData->pluck('total')->toArray();
+    /**
+     * API Thống kê doanh thu (Trình diễn dạng JSON cho filter Tuần/Tháng)
+     */
+    public function revenueApi(Request $request)
+    {
+        $filter = $request->get('filter', 'month');
 
-        // 9. Trạng thái đơn hàng (Pie/Donut Chart)
-        $orderStatusData = Order::select('status', DB::raw('count(*) as total'))
-            ->groupBy('status')
-            ->pluck('total', 'status')
-            ->toArray();
+        if ($filter === 'week') {
+            $startDate = now()->startOfWeek();
+            $endDate = now()->endOfWeek();
+        } else {
+            // Default is current month
+            $startDate = now()->startOfMonth();
+            $endDate = now()->endOfMonth();
+        }
 
-        // Ensure all statuses are present for consistent coloring if needed, or just send keys/values
-        $statusLabels = array_map(function ($status) {
-            $order = new Order(['status' => $status]);
-            return $order->status_text;
-        }, array_keys($orderStatusData));
-        $statusValues = array_values($orderStatusData);
+        // Nếu client muốn custom date
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
+        }
 
-        // 10. Top 5 Sản phẩm bán chạy
-        $topProducts = DB::table('order_items')
-            ->join('orders', 'orders.id', '=', 'order_items.order_id')
-            ->join('products', 'products.id', '=', 'order_items.product_id')
-            ->where('orders.status', Order::STATUS_COMPLETED)
-            ->select(
-                'products.name',
-                'products.price', // Or aggregate sum(order_items.price) if price changes
-                'products.image',
-                DB::raw('SUM(order_items.quantity) as total_sold')
-            )
-            ->groupBy('products.id', 'products.name', 'products.price', 'products.image')
-            ->orderByDesc('total_sold')
-            ->limit(5)
-            ->get();
+        $overviewStats = $this->reportService->getOverviewStats($startDate, $endDate);
+        $revenueChart = $this->reportService->getRevenueChartData($startDate, $endDate);
 
-        return view('admin.dashboard', compact(
-            'totalRevenue',
-            'totalOrders',
-            'newOrders',
-            'totalCustomers',
-            'totalProducts',
-            'lowStockProducts',
-            'recentOrders',
-            'revenueLabels',
-            'revenueValues',
-            'statusLabels',
-            'statusValues',
-            'topProducts'
-        ));
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'period' => [
+                    'start' => $startDate->format('Y-m-d'),
+                    'end' => $endDate->format('Y-m-d'),
+                    'filter' => $filter
+                ],
+                'summary' => [
+                    'total_revenue' => $overviewStats['total_revenue'],
+                    'total_orders' => $overviewStats['total_orders'],
+                    'successful_orders' => \App\Models\Order::where('status', \App\Models\Order::STATUS_COMPLETED)->whereBetween('created_at', [$startDate, $endDate])->count(),
+                ],
+                'chart' => [
+                    'labels' => $revenueChart['labels'],
+                    'values' => $revenueChart['values'],
+                ]
+            ]
+        ]);
     }
 }

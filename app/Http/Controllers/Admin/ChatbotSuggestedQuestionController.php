@@ -61,6 +61,7 @@ class ChatbotSuggestedQuestionController extends Controller
     {
         $question->delete();
         \Illuminate\Support\Facades\Cache::forget('chatbot_suggested_questions');
+
         return redirect()->route('admin.settings.chatbot', ['tab' => 'questions'])->with('success', 'Xóa câu hỏi gợi ý thành công!');
     }
 }

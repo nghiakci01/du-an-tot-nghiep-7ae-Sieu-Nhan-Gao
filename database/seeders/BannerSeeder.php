@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Banner;
+use Illuminate\Database\Seeder;
 
 class BannerSeeder extends Seeder
 {
@@ -40,8 +40,8 @@ class BannerSeeder extends Seeder
             'sort_order' => 1,
             'is_active' => true,
         ]);
-        
-         Banner::create([
+
+        Banner::create([
             'title' => 'Banner Bottom',
             'image' => 'banners/banner-bottom.jpg',
             'link' => '#',

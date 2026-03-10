@@ -35,7 +35,7 @@
                                     <div class="mb-3">
                                         <label for="image" class="form-label">Hình ảnh <span class="text-danger">*</span></label>
                                         <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" onchange="previewImage(this)">
-                                        <div class="form-text">Định dạng hỗ trợ: jpeg, png, jpg, gif. Tối đa 2MB.</div>
+                                        <div class="form-text">Định dạng hỗ trợ: jpeg, png, jpg, gif, webp. Tối đa 2MB. <br><strong>Khuyên dùng:</strong> Chiều rộng tối thiểu 1521px. Để sắc nét nhất trên mọi màn hình, hãy dùng 3042px.</div>
                                         @error('image')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -50,20 +50,15 @@
                                     <div class="mb-3">
                                         <label for="position" class="form-label">Vị trí hiển thị <span class="text-danger">*</span></label>
                                         <select class="form-select @error('position') is-invalid @enderror" id="position" name="position">
-                                            <option value="">-- Chọn vị trí --</option>
-                                            <option value="slider" {{ old('position') == 'slider' ? 'selected' : '' }}>Slider Chính (Trang chủ)</option>
-                                            <option value="banner_top" {{ old('position') == 'banner_top' ? 'selected' : '' }}>Banner Top (Bên phải Slider)</option>
-                                            <option value="banner_bottom" {{ old('position') == 'banner_bottom' ? 'selected' : '' }}>Banner Bottom (Cuối trang)</option>
+                                            <option value="slider" selected>Slider Chính Trang Chủ</option>
+                                            <option value="about_us">Banner Trang Về Chúng Tôi</option>
+                                            <option value="home_middle">Banner Giữa Trang Chủ (Thay Instagram)</option>
                                         </select>
                                         @error('position')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                         <div class="mt-2 small text-muted">
-                                            <ul class="ps-3 mb-0">
-                                                <li><strong>Slider:</strong> Chạy ngang ở đầu trang chủ.</li>
-                                                <li><strong>Top:</strong> 2 ảnh nhỏ bên phải slider.</li>
-                                                <li><strong>Bottom:</strong> Banner lớn ở giữa trang.</li>
-                                            </ul>
+                                            <p><strong>Lưu ý:</strong> Vị trí hiển thị sẽ quyết định banner được xuất hiện ở đâu trên trang.</p>
                                         </div>
                                     </div>
 

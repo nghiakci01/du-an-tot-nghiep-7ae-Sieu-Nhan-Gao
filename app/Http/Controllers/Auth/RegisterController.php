@@ -43,26 +43,28 @@ class RegisterController extends Controller
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'min:2', 'max:50', 'regex:/^[a-zA-ZÀ-ỹ\s]+$/u'],
-            'phone' => ['required', 'string', 'regex:/^0[0-9]{9}$/'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/'],
+            'phone' => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users'],
             'password' => [
-                'required', 
-                'string', 
-                'min:8', 
-                'confirmed', 
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
             ],
         ], [
             'name.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng.',
-            'phone.regex' => 'Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0.',
-            'email.regex' => 'Định dạng email không hợp lệ.',
+            'phone.required' => 'Vui lòng nhập số điện thoại.',
+            'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
+            'email.required' => 'Vui lòng nhập địa chỉ email.',
+            'email.email' => 'Địa chỉ email không hợp lệ.',
+            'email.unique' => 'Email này đã được đăng ký sử dụng.',
             'password.regex' => 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt.',
         ]);
     }
@@ -70,7 +72,6 @@ class RegisterController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
      * @return \App\Models\User
      */
     protected function create(array $data)
@@ -86,7 +87,6 @@ class RegisterController extends Controller
     /**
      * The user has been registered.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $user
      * @return mixed
      */
@@ -94,7 +94,7 @@ class RegisterController extends Controller
     {
         \App\Models\Coupon::create([
             'user_id' => $user->id,
-            'code' => 'WELCOME-' . strtoupper(\Illuminate\Support\Str::of(\Illuminate\Support\Str::random(8))->upper()),
+            'code' => 'WELCOME-'.strtoupper(\Illuminate\Support\Str::of(\Illuminate\Support\Str::random(8))->upper()),
             'type' => 'fixed',
             'value' => 100000,
             'min_order_amount' => 1000000,

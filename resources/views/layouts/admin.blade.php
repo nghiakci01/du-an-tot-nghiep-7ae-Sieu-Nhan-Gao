@@ -69,12 +69,12 @@
     </div>
   </div>
 
+  {{-- Include Sidebar --}}
+  @include('layouts.partials.admin.sidebar')
+
   {{-- Include Header --}}
   @include('layouts.partials.admin.header')
 
-  {{-- Include Sidebar --}}
-  @include('layouts.partials.admin.sidebar')
-  
   <!-- [ Main Content ] start -->
   <div class="pc-container">
     <div class="pc-content">
@@ -84,7 +84,7 @@
 
   {{-- Footer --}}
   @include('layouts.partials.admin.footer')
-  
+
   {{-- Theme setting --}}
   @include('layouts.partials.admin.theme_settings')
 
@@ -130,7 +130,105 @@
     integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
     data-cf-beacon='{"version":"2024.11.0","token":"db59679aec724f808b8e535e8076f80c","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
     crossorigin="anonymous"></script> --}}
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function confirmDelete(formId) {
+      Swal.fire({
+        title: 'Bạn có chắc chắn muốn xóa?',
+        text: "Hành động này không thể hoàn tác!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById(formId).submit();
+        }
+      })
+    }
+  </script>
+
   @yield('scripts')
+
+  {{-- Notification Sound System --}}
+  <script>
+    (function() {
+      const STORAGE_KEY = 'elite_notif_sound_enabled';
+      const soundToggleBtn = document.getElementById('notif-sound-toggle');
+      const soundIcon = document.getElementById('notif-sound-icon');
+      const badge = document.getElementById('notif-badge');
+
+      // Load saved preference (default: enabled)
+      let soundEnabled = localStorage.getItem(STORAGE_KEY) !== 'false';
+      let lastCount = parseInt(badge ? badge.textContent : '0') || 0;
+
+      function updateIcon() {
+        if (!soundIcon) return;
+        soundIcon.className = soundEnabled ? 'ti ti-volume fs-5' : 'ti ti-volume-off fs-5';
+        if(soundToggleBtn) soundToggleBtn.title = soundEnabled ? 'Tắt âm thanh thông báo' : 'Bật âm thanh thông báo';
+      }
+
+      function playChime() {
+        if (!soundEnabled) return;
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const freqs = [880, 1108, 1320];
+          freqs.forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            const t = ctx.currentTime + i * 0.18;
+            gain.gain.setValueAtTime(0, t);
+            gain.gain.linearRampToValueAtTime(0.4, t + 0.05);
+            gain.gain.linearRampToValueAtTime(0, t + 0.35);
+            osc.start(t);
+            osc.stop(t + 0.4);
+          });
+        } catch(e) { console.warn('Notification sound error:', e); }
+      }
+
+      // Toggle sound on button click
+      if (soundToggleBtn) {
+        soundToggleBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          soundEnabled = !soundEnabled;
+          localStorage.setItem(STORAGE_KEY, soundEnabled);
+          updateIcon();
+          // Demo chime when turning on
+          if (soundEnabled) playChime();
+        });
+      }
+
+      // Poll for new notifications every 30 seconds
+      setInterval(function() {
+        fetch('{{ route("admin.notifications.unread_count") }}', {
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(r => r.json())
+        .then(data => {
+          const count = data.count || 0;
+          if (badge) {
+            badge.textContent = count;
+            badge.classList.toggle('d-none', count === 0);
+          }
+          if (count > lastCount) {
+            playChime();
+          }
+          lastCount = count;
+        })
+        .catch(() => {});
+      }, 30000);
+
+      updateIcon();
+    })();
+  </script>
   <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
     @csrf
   </form>

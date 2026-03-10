@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Color;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
-use App\Models\Color;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,21 +16,23 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::where('is_active', true)->with(['category', 'variants', 'reviews']);
+        $query = Product::where('is_active', true)->with(['category', 'variants', 'reviews', 'images']);
 
         // Search by keyword
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('description', 'LIKE', "%{$search}%")
-                  ->orWhere('short_description', 'LIKE', "%{$search}%");
+                    ->orWhere('description', 'LIKE', "%{$search}%")
+                    ->orWhere('short_description', 'LIKE', "%{$search}%");
             });
         }
 
         // Filter by Category
+        $currentCategory = null;
         if ($request->has('category')) {
             $slug = $request->category;
+            $currentCategory = Category::where('slug', $slug)->first();
             $query->whereHas('category', function ($q) use ($slug) {
                 $q->where('slug', $slug);
             });
@@ -40,8 +42,8 @@ class ProductController extends Controller
         if ($request->has('search')) {
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
-                $q->where('name', 'like', '%' . $keyword . '%')
-                    ->orWhere('description', 'like', '%' . $keyword . '%');
+                $q->where('name', 'like', '%'.$keyword.'%')
+                    ->orWhere('description', 'like', '%'.$keyword.'%');
             });
         }
 
@@ -110,36 +112,45 @@ class ProductController extends Controller
         $products->appends($request->all());
 
         // Get sidebar data
-        $categories = Category::withCount(['products' => function($q) {
-            $q->where('products.is_active', true);
-        }])->get();
+        $categories = Category::withCount([
+            'products' => function ($q) {
+                $q->where('products.is_active', true);
+            },
+        ])->get();
 
-        $brands = Brand::where('is_active', true)->withCount(['products' => function($q) {
-            $q->where('products.is_active', true);
-        }])->get();
+        $brands = Brand::where('is_active', true)->withCount([
+            'products' => function ($q) {
+                $q->where('products.is_active', true);
+            },
+        ])->get();
 
         // Colors with product counts
-        $colors = Color::whereHas('productVariants.product', function($q) {
+        $colors = Color::whereHas('productVariants.product', function ($q) {
             $q->where('products.is_active', true);
-        })->withCount(['productVariants as products_count' => function($q) {
-            $q->whereHas('product', function($pq) {
-                $pq->where('products.is_active', true);
-            });
-        }])->limit(10)->get();
+        })->withCount([
+            'productVariants as products_count' => function ($q) {
+                $q->whereHas('product', function ($pq) {
+                    $pq->where('products.is_active', true);
+                });
+            },
+        ])->limit(10)->get();
 
-        $tags = Tag::withCount(['products' => function($q) {
-            $q->where('products.is_active', true);
-        }])->limit(15)->get();
+        $tags = Tag::withCount([
+            'products' => function ($q) {
+                $q->where('products.is_active', true);
+            },
+        ])->limit(15)->get();
 
         $totalActiveProducts = Product::where('is_active', true)->count();
 
         return view('frontend.products.index', compact(
-            'products', 
-            'categories', 
-            'brands', 
-            'colors', 
-            'tags', 
-            'totalActiveProducts'
+            'products',
+            'categories',
+            'brands',
+            'colors',
+            'tags',
+            'totalActiveProducts',
+            'currentCategory'
         ));
     }
 
@@ -155,7 +166,7 @@ class ProductController extends Controller
         if (Auth::check()) {
             $hasPurchased = Order::where('user_id', Auth::id())
                 ->where('status', Order::STATUS_COMPLETED)
-                ->whereHas('items', fn($q) => $q->where('product_id', $product->id))
+                ->whereHas('items', fn ($q) => $q->where('product_id', $product->id))
                 ->exists();
         }
 
@@ -163,6 +174,7 @@ class ProductController extends Controller
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
+            ->with(['images', 'variants', 'reviews'])
             ->take(4)
             ->get();
 

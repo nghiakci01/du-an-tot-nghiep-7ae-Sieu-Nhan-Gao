@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\Auditable;
+
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, Auditable;
 
     protected $fillable = [
         'user_id',
@@ -21,6 +23,8 @@ class Order extends Model
         'coupon_code',
         'discount_amount',
         'shipping_fee',
+        'shipping_provider',
+        'shipping_service_name',
         'final_total',
         'payment_method',
         'payment_status',
@@ -30,11 +34,17 @@ class Order extends Model
     ];
 
     const STATUS_PENDING = 'pending';
+
     const STATUS_CONFIRMED = 'confirmed';
+
     const STATUS_SHIPPED = 'shipped';
+
     const STATUS_COMPLETED = 'completed';
+
     const STATUS_CANCELLED = 'cancelled';
+
     const STATUS_FAILED = 'failed';
+
     const STATUS_RETURNED = 'returned';
 
     public function user()

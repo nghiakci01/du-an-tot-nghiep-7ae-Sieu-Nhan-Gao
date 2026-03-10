@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', __('messages.shopping_cart') . ' | FashionStore')
+@section('title', __('messages.shopping_cart') . ' | Elite')
 
 @section('content')
     <!--breadcrumbs area start-->
@@ -46,7 +46,8 @@
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th class="product_remove">{{ __('messages.remove') }}</th>
+                                                <th class="product_check" style="width: 50px;"><input type="checkbox" id="check-all" style="width: 18px; height: 18px; cursor: pointer;"></th>
+                                                <!-- <th class="product_remove">{{ __('messages.remove') }}</th> -->
                                                 <th class="product_thumb">{{ __('messages.image') }}</th>
                                                 <th class="product_name">{{ __('messages.product') }}</th>
                                                 <th class="product-price">{{ __('messages.price') }}</th>
@@ -57,11 +58,14 @@
                                         <tbody>
                                             @foreach(session('cart') as $id => $details)
                                                                                         <tr data-id="{{ $id }}">
-                                                    <td class="product_remove">
+                                                    <td class="product_check" style="vertical-align: middle;">
+                                                        <input type="checkbox" class="check-item" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;">
+                                                    </td>
+                                                    <!-- <td class="product_remove">
                                                         <a href="javascript:void(0)" class="remove-from-cart">
                                                             <i class="fa fa-trash-o"></i>
                                                         </a>
-                                                    </td>
+                                                    </td> -->
                                                     <td class="product_thumb">
                                                         <a href="{{ route('product.detail', $details['slug']) }}">
                                                             <img src="{{ $details['image'] ? asset('storage/' . $details['image']) : asset('frontend-assets/img/s-product/product.jpg') }}"
@@ -134,13 +138,13 @@
                                                             $stockQty = \App\Models\ProductVariant::find($id)?->stock_quantity ?? 100;
                                                         @endphp
                                                         <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
-                                                            class="quantity update-cart"
+                                                            class="quantity update-cart item-quantity"
                                                             data-stock="{{ $stockQty }}"
                                                             title="Còn {{ $stockQty }} sản phẩm trong kho">
                                                         <small class="d-block text-muted mt-1" style="font-size:11px;"
                                                             data-stock-label>Kho: {{ $stockQty }}</small>
                                                     </td>
-                                                    <td class="product_total">
+                                                    <td class="product_total item-total-price" data-price="{{ $details['price'] }}">
                                                         {{ number_format($details['price'] * $details['quantity']) }} VND</td>
                                                 </tr>
                                             @endforeach
@@ -151,6 +155,9 @@
                                     <a href="{{ route('shop') }}" class="btn btn-secondary">
                                         <i class="fa fa-arrow-left"></i> {{ __('messages.continue_shopping') }}
                                     </a>
+                                    <button type="button" class="btn btn-warning" id="delete-selected" style="display: none; margin-left: 10px; color: #fff;">
+                                        <i class="fa fa-trash"></i> Xóa mục đã chọn
+                                    </button>
                                     <button type="button" class="btn btn-danger" id="clear-cart">
                                         <i class="fa fa-trash"></i> {{ __('messages.clear_cart') }}
                                     </button>
@@ -162,7 +169,7 @@
                     <!--coupon code area start-->
                     <div class="coupon_area">
                         <div class="row">
-                            <div class="col-lg-6 col-md-6">
+                            <!-- <div class="col-lg-6 col-md-6">
                                 <div class="coupon_code left">
                                     <h3>{{ __('messages.coupon_code') }}</h3>
                                     <div class="coupon_inner">
@@ -178,8 +185,8 @@
                                         <div id="coupon-message"></div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6">
+                            </div> -->
+                            <div class="col-lg-6 col-md-6 offset-lg-6 offset-md-6">
                                 <div class="coupon_code right">
                                     <h3>{{ __('messages.cart_totals') }}</h3>
                                     <div class="coupon_inner">
@@ -187,7 +194,7 @@
                                             <p>{{ __('messages.subtotal') }}</p>
                                             <p class="cart_amount" id="cart-subtotal">{{ number_format($total) }} VND</p>
                                         </div>
-                                        <div class="cart_subtotal ">
+                                        <div class="cart_subtotal">
                                             <p>{{ __('messages.shipping') }}</p>
                                             @php
                                                 $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
@@ -207,14 +214,90 @@
                                             <p class="cart_amount" id="cart-grand-total">{{ number_format($total + $shippingFee) }} đ</p>
                                         </div>
                                         <div class="checkout_btn">
-                                            <a href="{{ route('checkout.index') }}">{{ __('messages.proceed_to_checkout') }}</a>
+                                            <a href="#" id="btn-proceed-checkout">{{ __('messages.proceed_to_checkout') }}</a>
                                         </div>
+
+                                        <script>
+                                        document.getElementById('btn-proceed-checkout').addEventListener('click', function(e) {
+                                            e.preventDefault();
+                                            var btn = this;
+                                            btn.style.opacity = '0.7';
+                                            btn.style.pointerEvents = 'none';
+
+                                            fetch('{{ route('cart.validate') }}', {
+                                                method: 'GET',
+                                                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                                            })
+                                            .then(r => r.json())
+                                            .then(data => {
+                                                btn.style.opacity = '';
+                                                btn.style.pointerEvents = '';
+
+                                                if (data.valid) {
+                                                    window.location.href = '{{ route('checkout.index') }}';
+                                                } else if (data.errors && data.errors.length > 0) {
+                                                    var list = data.errors.map(function(e) {
+                                                        var icon = e.type === 'out_of_stock' ? '🚫' :
+                                                                   e.type === 'not_found'    ? '❌' :
+                                                                   e.type === 'inactive'     ? '⛔' : '⚠️';
+                                                        return '<li style="text-align:left;margin-bottom:6px;">' + icon + ' <strong>' + e.name + '</strong>: ' + e.issue + '</li>';
+                                                    }).join('');
+
+                                                    Swal.fire({
+                                                        icon: 'warning',
+                                                        title: 'Giỏ hàng có vấn đề!',
+                                                        html: '<p style="margin-bottom:10px;">Vui lòng xử lý các mục sau trước khi thanh toán:</p><ul style="padding-left:10px;">' + list + '</ul>',
+                                                        confirmButtonColor: '#ef233c',
+                                                        confirmButtonText: 'Cập nhật giỏ hàng',
+                                                        showCancelButton: true,
+                                                        cancelButtonText: 'Đóng',
+                                                        cancelButtonColor: '#6c757d',
+                                                    });
+                                                } else {
+                                                    Swal.fire({ icon: 'error', title: 'Lỗi!', text: data.message || 'Không thể tiến hành thanh toán.', confirmButtonColor: '#ef233c' });
+                                                }
+                                            })
+                                            .catch(function() {
+                                                btn.style.opacity = '';
+                                                btn.style.pointerEvents = '';
+                                                window.location.href = '{{ route('checkout.index') }}';
+                                            });
+                                        });
+                                        </script>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!--coupon code area end-->
+
+                    <!--cross-sell section start-->
+                    @if(isset($crossSellProducts) && $crossSellProducts->count() > 0)
+                    <div class="mt-5">
+                        <div class="section_title" style="margin-bottom: 20px;">
+                            <h2>{{ __('messages.you_may_also_like') ?? 'Có thể bạn cũng thích' }}</h2>
+                        </div>
+                        <div class="row">
+                            @foreach($crossSellProducts->take(4) as $crossSell)
+                            <div class="col-lg-3 col-md-4 col-6 mb-3">
+                                <div class="single_product">
+                                    <div class="product_thumb">
+                                        <a class="primary_img" href="{{ route('product.detail', $crossSell->slug) }}">
+                                            <img src="{{ $crossSell->image ? asset('storage/' . $crossSell->image) : asset('frontend-assets/img/product/product21.jpg') }}"
+                                                alt="{{ $crossSell->name }}" style="height: 200px; object-fit: cover;">
+                                        </a>
+                                    </div>
+                                    <div class="product_content">
+                                        <h3><a href="{{ route('product.detail', $crossSell->slug) }}">{{ Str::limit($crossSell->name, 40) }}</a></h3>
+                                        @include('frontend.partials.product-price', ['product' => $crossSell])
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                    <!--cross-sell section end-->
 
                 </form>
             @else
@@ -308,7 +391,11 @@
                         $('#cart-subtotal').text(response.cart_total);
                         $('#shipping-fee span').text(response.shipping_fee);
                         $('#cart-grand-total').text(response.grand_total);
-                        $('#cart-count').text(response.cart_count);
+                        $('.cart-count').text(response.cart_count);
+
+                        // Cập nhật giá trị html cho item
+                        row.find('.product_total').text(response.item_total);
+                        calculateCartTotal(); // Tính toán lại theo các dòng được check
 
                         // Toast nhỏ xác nhận cập nhật
                         Swal.fire({
@@ -372,7 +459,7 @@
                                 $('#cart-subtotal').text(response.cart_total);
                                 $('#shipping-fee span').text(response.shipping_fee);
                                 $('#cart-grand-total').text(response.grand_total);
-                                $('#cart-count').text(response.cart_count);
+                                $('.cart-count').text(response.cart_count);
                                 if (response.cart_count == 0) {
                                     setTimeout(function() { window.location.reload(); }, 600);
                                 }
@@ -383,6 +470,119 @@
                         error: function() {
                             Swal.fire({ icon: 'error', title: 'Lỗi!', text: '{{ __("messages.error_occurred") }}' });
                         }
+                    });
+                }
+            });
+        });
+
+        // Tính toán lại tổng tiền dựa trên các sản phẩm được check
+        function calculateCartTotal() {
+            let subtotal = 0;
+            
+            $('.check-item:checked').each(function() {
+                var row = $(this).closest('tr');
+                var price = parseFloat(row.find('.item-total-price').attr('data-price'));
+                var quantity = parseInt(row.find('.item-quantity').val());
+                if (!isNaN(price) && !isNaN(quantity)) {
+                    subtotal += (price * quantity);
+                }
+            });
+
+            // Cập nhật Subtotal
+            $('#cart-subtotal').text(new Intl.NumberFormat('vi-VN').format(subtotal) + ' đ');
+
+            // Phí ship (Giả lập logic: > 500k free ship, dưới thì 30k)
+            let shippingFee = 0;
+            if (subtotal > 0 && subtotal < 500000) {
+                shippingFee = 30000;
+            }
+            
+            if (shippingFee > 0) {
+                $('#shipping-fee span').text(new Intl.NumberFormat('vi-VN').format(shippingFee) + ' đ');
+            } else {
+                $('#shipping-fee span').text('{{ __("messages.free") }}');
+            }
+
+            // Tính discount nếu có mã (logic cơ bản hiển thị lại session discount)
+            let discountDoc = $('#cart-discount').text().replace(/[^\d]/g, '');
+            let discount = discountDoc ? parseInt(discountDoc) : 0;
+            if (!$("#discount-row").is(":visible")) {
+                discount = 0; 
+            }
+            
+            // Grand Total
+            let grandTotal = subtotal + shippingFee - discount;
+            if (grandTotal < 0) grandTotal = 0;
+            
+            $('#cart-grand-total').text(new Intl.NumberFormat('vi-VN').format(grandTotal) + ' đ');
+        }
+
+        // Check All logic
+        $('#check-all').on('change', function() {
+            $('.check-item').prop('checked', $(this).prop('checked'));
+            toggleDeleteSelectedBtn();
+            calculateCartTotal();
+        });
+
+        // Check Item logic
+        $(document).on('change', '.check-item', function() {
+            var totalItems = $('.check-item').length;
+            var checkedItems = $('.check-item:checked').length;
+            $('#check-all').prop('checked', totalItems === checkedItems && totalItems > 0);
+            toggleDeleteSelectedBtn();
+            calculateCartTotal();
+        });
+
+        // Initialize total calculation on page load (nếu cần tự check sẵn hoặc không)
+        // Mặc định tick tất cả khi load file
+        $('#check-all').prop('checked', true).trigger('change');
+
+        function toggleDeleteSelectedBtn() {
+            if ($('.check-item:checked').length > 0) {
+                $('#delete-selected').fadeIn(200);
+            } else {
+                $('#delete-selected').fadeOut(200);
+            }
+        }
+
+        // Xóa các item đã chọn
+        $('#delete-selected').on('click', function() {
+            var selectedRows = $('.check-item:checked').closest('tr');
+            if (selectedRows.length === 0) return;
+
+            Swal.fire({
+                title: 'Xóa các sản phẩm đã chọn?',
+                text: `Bạn có chắc muốn xóa ${selectedRows.length} sản phẩm đã chọn khỏi giỏ hàng?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ef233c',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Đang xóa...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
+                    var promises = [];
+                    selectedRows.each(function() {
+                        var id = $(this).attr('data-id');
+                        promises.push(
+                            $.ajax({
+                                url: '{{ route("cart.remove") }}',
+                                method: 'POST',
+                                data: { _token: '{{ csrf_token() }}', _method: 'DELETE', id: id }
+                            })
+                        );
+                    });
+
+                    Promise.all(promises).then(function() {
+                        window.location.reload();
+                    }).catch(function() {
+                        window.location.reload();
                     });
                 }
             });

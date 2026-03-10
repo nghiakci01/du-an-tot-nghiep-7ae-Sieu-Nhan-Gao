@@ -43,19 +43,17 @@
                                                     </div>
                                                 @endif
                                             </td>
-                                            <td>
+                                             <td>
                                                 @switch($banner->position)
                                                     @case('slider')
-                                                        <span class="badge bg-light-info text-info">Slider</span>
+                                                        <span class="badge bg-light-info text-info">Wide Slider (1521x856px)</span>
                                                         @break
-                                                    @case('banner_top')
-                                                        <span class="badge bg-light-warning text-warning">Top Banner</span>
+                                                    @case('about_us')
+                                                        <span class="badge bg-light-primary text-primary">Banner Về Chúng Tôi</span>
                                                         @break
-                                                    @case('banner_bottom')
-                                                        <span class="badge bg-light-danger text-danger">Bottom Banner</span>
-                                                        @break
+
                                                     @default
-                                                        {{ $banner->position }}
+                                                        <span class="badge bg-light-secondary text-secondary">Khác: {{ $banner->position }}</span>
                                                 @endswitch
                                             </td>
                                             <td>

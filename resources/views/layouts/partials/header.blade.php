@@ -21,10 +21,12 @@
                 <ul>
                     <li class="top_links">
                         @guest
-                            <a href="#">{{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
+                            <a href="{{ route('account.index') }}">{{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
                             <ul class="dropdown_links">
+                                <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li>
+                                <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
+                                <li><a href="{{ route('order-tracking.index') }}">{{ __('messages.track_order') }}</a></li>
                                 <li><a href="{{ route('login') }}">{{ __('messages.login') }}</a></li>
-                                <li><a href="{{ route('register') }}">{{ __('messages.register') }}</a></li>
                             </ul>
                         @else
                             <a href="#" style="display: flex; align-items: center; gap: 8px;">
@@ -37,10 +39,12 @@
                                 <i class="ion-chevron-down"></i>
                             </a>
                             <ul class="dropdown_links">
+                                <!-- <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li> -->
                                 <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
                                 @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                                     <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? __('messages.admin') : __('messages.staff') }}</a></li>
                                 @endif
+                                <!-- <li><a href="{{ route('account.orders') }}">{{ __('messages.my_orders') }}</a></li> -->
                                 <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-offcanvas').submit();">{{ __('messages.logout') }}</a></li>
                                 <form id="logout-form-offcanvas" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                             </ul>
@@ -124,28 +128,106 @@
                                     <nav>
                                         <ul>
                                             <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
-                                            <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">{{ __('messages.shop') }} <i class="fa fa-angle-down"></i></a>
-                                                <ul class="mega_menu">
-                                                    <li><a href="#">{{ __('messages.product_categories') }}</a>
+                                            <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}">
+                                                <a href="{{ route('shop') }}">{{ __('messages.shop') }} <i class="fa fa-angle-down"></i></a>
+                                                <style>
+                                                    .custom-shop-mega {
+                                                        width: 800px !important;
+                                                        padding: 30px !important;
+                                                        background: #fff;
+                                                        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                                                        border-radius: 0 0 8px 8px;
+                                                        /* Override theme's display block on hover slightly to allow flex */
+                                                    }
+                                                    .mega_items:hover .custom-shop-mega {
+                                                        display: flex !important;
+                                                    }
+                                                    .custom-shop-mega-left {
+                                                        width: 25%;
+                                                        border-right: 1px solid #ebebeb;
+                                                        padding-right: 20px;
+                                                    }
+                                                    .custom-shop-mega-left ul {
+                                                        list-style: none;
+                                                        padding: 0;
+                                                        margin: 0;
+                                                    }
+                                                    .custom-shop-mega-left li {
+                                                        margin-bottom: 20px !important;
+                                                    }
+                                                    .custom-shop-mega-left a {
+                                                        color: #333 !important;
+                                                        font-size: 14px !important;
+                                                        font-weight: 600 !important;
+                                                        text-decoration: none;
+                                                        transition: color 0.3s;
+                                                        display: block;
+                                                        line-height: 1.4;
+                                                    }
+                                                    .custom-shop-mega-left a:hover {
+                                                        color: #ef233c !important;
+                                                    }
+                                                    .custom-shop-mega-right {
+                                                        width: 75%;
+                                                        padding-left: 30px;
+                                                        display: flex;
+                                                        gap: 20px;
+                                                    }
+                                                    .custom-shop-product {
+                                                        flex: 1;
+                                                        text-align: center;
+                                                    }
+                                                    .custom-shop-product-img {
+                                                        background-color: #f7f7f7;
+                                                        margin-bottom: 15px;
+                                                        overflow: hidden;
+                                                    }
+                                                    .custom-shop-product-img img {
+                                                        width: 100%;
+                                                        height: auto;
+                                                        mix-blend-mode: multiply;
+                                                        transition: transform 0.5s;
+                                                    }
+                                                    .custom-shop-product:hover .custom-shop-product-img img {
+                                                        transform: scale(1.05);
+                                                    }
+                                                    .custom-shop-product h5 {
+                                                        font-size: 14px !important;
+                                                        color: #666 !important;
+                                                        font-weight: 500 !important;
+                                                        margin: 0;
+                                                        line-height: 1.4;
+                                                    }
+                                                </style>
+                                                <ul class="mega_menu custom-shop-mega">
+                                                    <li class="custom-shop-mega-left">
                                                         <ul>
                                                             @foreach($categories as $category)
                                                                 <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
                                                             @endforeach
                                                         </ul>
                                                     </li>
-                                                    <li><a href="#">{{ __('messages.other_pages') }}</a>
-                                                        <ul>
-                                                            <li><a href="{{ route('cart.index') }}">{{ __('messages.cart') }}</a></li>
-                                                            <li><a href="{{ route('checkout.index') }}">{{ __('messages.checkout') }}</a></li>
-                                                            <li><a href="{{ route('account.index') }}">{{ __('messages.account') }}</a></li>
-                                                        </ul>
+                                                    <li class="custom-shop-mega-right">
+                                                        @php
+                                                            $megaMenuProducts = \App\Models\Product::where('is_active', true)->latest()->take(3)->get();
+                                                        @endphp
+                                                        @foreach($megaMenuProducts as $product)
+                                                        <div class="custom-shop-product">
+                                                            <a href="{{ route('product.detail', $product->slug) }}">
+                                                                <div class="custom-shop-product-img">
+                                                                    <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('frontend-assets/img/product/product1.jpg') }}" alt="{{ $product->name }}">
+                                                                </div>
+                                                                <h5>{{ Str::limit($product->name, 25) }}</h5>
+                                                            </a>
+                                                        </div>
+                                                        @endforeach
                                                     </li>
-                                                    <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
                                                 </ul>
                                             </li>
                                             <li><a href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
                                             <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
                                             <li><a href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
+                                            <!-- <li><a href="{{ route('order-tracking.index') }}">Tra cứu đơn hàng</a></li> -->
                                         </ul>
                                     </nav>
                                 </div>
@@ -166,10 +248,14 @@
                                     <ul>
                                         <li class="top_links">
                                             @guest
-                                                <a href="#"><i class="ion-android-person"></i> {{ __('messages.account') }} <i class="ion-chevron-down"></i></a>
+                                                <a href="{{ route('account.index') }}"><i class="ion-android-person"></i> {{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
                                                 <ul class="dropdown_links">
+                                                    <!-- <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li> -->
+                                                    <!-- <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li> -->
+                                                    <li><a href="{{ route('account.index') }}#dashboard">{{ __('messages.dashboard') }}</a></li>
+                                                    <!-- <li><a href="{{ route('order-tracking.index') }}">{{ __('messages.track_order') }}</a></li> -->
                                                     <li><a href="{{ route('login') }}">{{ __('messages.login') }}</a></li>
-                                                    <li><a href="{{ route('register') }}">{{ __('messages.register') }}</a></li>
+                                                    <li><a href="{{ route('logout') }}">{{ __('messages.logout') }}</a></li>
                                                 </ul>
                                             @else
                                                 <a href="#" style="display: flex; align-items: center; gap: 8px;">
@@ -182,10 +268,13 @@
                                                     <i class="ion-chevron-down"></i>
                                                 </a>
                                                 <ul class="dropdown_links">
-                                                    <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
+                                                    <!-- <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li> -->
+                                                    <!-- <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li> -->
+                                                    <li><a href="{{ route('account.index') }}#dashboard">{{ __('messages.dashboard') }}</a></li>
                                                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                                                         <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? __('messages.admin') : __('messages.staff') }}</a></li>
-                                                    @endif
+                                                    @endif  
+                                                    <!-- <li><a href="{{ route('account.orders') }}">{{ __('messages.my_orders') }}</a></li> -->
                                                     <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('messages.logout') }}</a></li>
                                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                                                 </ul>
@@ -250,23 +339,30 @@
                                 <ul>
                                     <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
                                     <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">{{ __('messages.shop') }} <i class="fa fa-angle-down"></i></a>
-                                        <ul class="mega_menu">
-                                            <li><a href="#">{{ __('messages.product_categories') }}</a>
-                                                <ul>
-                                                    @foreach($categories as $category)
-                                                        <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
-                                                    @endforeach
+                                                <ul class="mega_menu custom-shop-mega">
+                                                    <li class="custom-shop-mega-left">
+                                                        <ul>
+                                                            @foreach($categories as $category)
+                                                                <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </li>
+                                                    <li class="custom-shop-mega-right">
+                                                        @php
+                                                            $megaMenuProducts = \App\Models\Product::where('is_active', true)->latest()->take(3)->get();
+                                                        @endphp
+                                                        @foreach($megaMenuProducts as $product)
+                                                        <div class="custom-shop-product">
+                                                            <a href="{{ route('product.detail', $product->slug) }}">
+                                                                <div class="custom-shop-product-img">
+                                                                    <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('frontend-assets/img/product/product1.jpg') }}" alt="{{ $product->name }}">
+                                                                </div>
+                                                                <h5>{{ Str::limit($product->name, 25) }}</h5>
+                                                            </a>
+                                                        </div>
+                                                        @endforeach
+                                                    </li>
                                                 </ul>
-                                            </li>
-                                            <li><a href="#">{{ __('messages.other_pages') }}</a>
-                                                <ul>
-                                                    <li><a href="{{ route('cart.index') }}">{{ __('messages.cart') }}</a></li>
-                                                    <li><a href="{{ route('checkout.index') }}">{{ __('messages.checkout') }}</a></li>
-                                                    <li><a href="{{ route('account.index') }}">{{ __('messages.account') }}</a></li>
-                                                </ul>
-                                            </li>
-                                            <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
-                                        </ul>
                                     </li>
                                     <li><a href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
                                     <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>

@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -14,6 +13,7 @@ class ContactReply extends Mailable
     use Queueable, SerializesModels;
 
     public $contactMessage;
+
     public $replyMessage;
 
     /**
@@ -31,7 +31,7 @@ class ContactReply extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Phản hồi liên hệ: ' . $this->contactMessage->subject,
+            subject: 'Phản hồi liên hệ: '.$this->contactMessage->subject,
         );
     }
 

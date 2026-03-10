@@ -1,102 +1,171 @@
 @extends('layouts.public')
 
 @section('content')
-<style>
-    /* Normalize product image heights */
-    .single_product .product_thumb a img {
-        aspect-ratio: 3 / 4;
-        object-fit: cover;
-        width: 100%;
-        height: auto;
-        background-color: #f5f5f5; /* Fallback background */
-    }
-</style>
-
-        <!--slider area start-->
-    <div class="slider_section slider_section_six">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="slider_area home_six_slider owl-carousel">
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}">
-                           <div class="slider_content_inner">
-                                <div class="slider_content">
-                                   <h2>xu hướng hàng đầu</h2>
-                                    <h1>túui xách</h1>
-                                    <p>Khám phá bộ sưu tập mới nhất <br> với thiết kế tiên phong và hiện đại.</p>
-                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
-                                </div>  
-                            </div>     
-                        </div>
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider11.jpg') }}">
-                           <div class="slider_content_inner">
-                                <div class="slider_content">
-                                    <h2>hàng mới về</h2>
-                                    <h1>áo khoác</h1>
-                                    <p>Thiết kế trẻ trung, phù hợp mọi dịp <br> đi chơi hay đi làm đều đẹp.</p>
-                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
-                                </div> 
-                            </div>   
-                        </div>
-                        <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider12.jpg') }}">
-                           <div class="slider_content_inner">
-                                <div class="slider_content">
-                                    <h2>xu hướng hàng đầu</h2>
-                                    <h1>thời trang</h1>
-                                    <p>Bộ sưu tập thời trang đẳng cấp <br> dành riêng cho bạn.</p>
-                                    <a href="{{ route('shop') }}">Khám Phá Ngay</a>
-                                </div> 
-                            </div>         
-                        </div>
+    <!--slider area start-->
+    <div class="slider_section slider_section_six mb-30" style="background: #fff;">
+        <div style="padding: 0; width: 1521px; max-width: 100%; margin: 0 auto;">
+            <div class="row no-gutters">
+                <div class="col-12">
+                    <div class="slider_area home_six_slider owl-carousel banner-wide-slider">
+                        @if($sliders->count() > 0)
+                            @foreach($sliders as $slider)
+                                <div class="single_slider" data-bgimg="{{ asset('storage/' . $slider->image) }}">
+                                    @if($slider->link)
+                                        <a href="{{ $slider->link }}" style="display: block; width: 100%; height: 100%;"></a>
+                                    @endif
+                                    <div class="slider_content_inner">
+                                        <div class="slider_content">
+                                            <h2>{{ $slider->title }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}" style="height: 856px !important;">
+                                <div class="slider_content_inner">
+                                    <div class="slider_content">
+                                        <h2>Wide Banner Placeholder</h2>
+                                        <p>1521 x 856 px</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
-                </div>
-                <div class="col-lg-4">
-                    <!--banner area start-->
-                    <div class="banner_slider_section">
-                        <div class="row ">
-                           <div class="col-12">
-                                <div class="banner_area banner_top">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner18.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Giày Thể Thao <br> Nam Hè 2025</h1>
-                                           <h3>Giảm Giá Lớn Tuần Này</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="banner_area">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner19.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Thời Trang Nữ</h1>
-                                           <h3>Giảm 20% Toàn Bộ</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="banner_area">
-                                    <div class="banner_thumb">
-                                        <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner20.jpg') }}" alt="#"></a>
-                                        <div class="banner_content">
-                                           <h1>Túi Xách #1</h1>
-                                           <h3>Sale Khủng Không Giới Hạn</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--banner area end-->
                 </div>
             </div>
         </div>
     </div>
+    <style>
+        /* Responsive Banner Styles */
+        .banner-wide-slider .single_slider {
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            /* Default height for desktop */
+            height: 856px !important; 
+        }
+        .banner-wide-slider .slider_content_inner {
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        .banner-wide-slider .owl-nav {
+            display: none !important;
+        }
+        .slider_section_six.mb-30 { margin-bottom: 30px; }
+
+        /* Tablet (lg, md) */
+        @media only screen and (max-width: 1199px) {
+            .banner-wide-slider .single_slider {
+                height: 600px !important;
+            }
+        }
+        @media only screen and (max-width: 991px) {
+            .banner-wide-slider .single_slider {
+                height: 500px !important;
+            }
+        }
+        /* Mobile (sm, xs) */
+        @media only screen and (max-width: 767px) {
+            .banner-wide-slider .single_slider {
+                /* For aspect ratio close to 16:9 or similar to original width/height */
+                height: 350px !important; 
+                background-position: center top !important; /* Keep the top part in focus on mobile */
+            }
+        }
+        @media only screen and (max-width: 575px) {
+            .banner-wide-slider .single_slider {
+                height: 250px !important; 
+            }
+        }
+    </style>
     <!--slider area end-->
 
-    <!--product section area start-->
+    <!--flash sale section start-->
+    @if(isset($flashSaleProducts) && $flashSaleProducts->count() > 0)
+    <section class="flash-sale-section" style="padding: 30px 0; background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);">
+        <div class="container-fluid">
+            <div class="row align-items-center mb-3">
+                <div class="col-auto">
+                    <h2 style="color: white; font-weight: 900; margin: 0; font-size: 1.8rem;">
+                        <i class="fa fa-bolt"></i> FLASH SALE
+                    </h2>
+                </div>
+                <div class="col-auto">
+                    <div id="flash-sale-countdown" style="display: flex; gap: 8px;">
+                        <div style="background: rgba(0,0,0,0.3); color: white; padding: 6px 12px; border-radius: 6px; text-align: center; min-width: 50px;">
+                            <span id="fs-hours" style="font-size: 1.4rem; font-weight: 800;">00</span>
+                            <div style="font-size: 10px; opacity: 0.8;">GIỜ</div>
+                        </div>
+                        <div style="color: white; font-size: 1.4rem; font-weight: 800; line-height: 2.4;">:</div>
+                        <div style="background: rgba(0,0,0,0.3); color: white; padding: 6px 12px; border-radius: 6px; text-align: center; min-width: 50px;">
+                            <span id="fs-minutes" style="font-size: 1.4rem; font-weight: 800;">00</span>
+                            <div style="font-size: 10px; opacity: 0.8;">PHÚT</div>
+                        </div>
+                        <div style="color: white; font-size: 1.4rem; font-weight: 800; line-height: 2.4;">:</div>
+                        <div style="background: rgba(0,0,0,0.3); color: white; padding: 6px 12px; border-radius: 6px; text-align: center; min-width: 50px;">
+                            <span id="fs-seconds" style="font-size: 1.4rem; font-weight: 800;">00</span>
+                            <div style="font-size: 10px; opacity: 0.8;">GIÂY</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                @foreach($flashSaleProducts as $fsProduct)
+                <div class="col-lg-3 col-md-4 col-6 mb-3">
+                    <div class="single_product" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                        <div class="product_thumb" style="position: relative;">
+                            <a href="{{ route('product.detail', $fsProduct->slug) }}">
+                                <img src="{{ $fsProduct->image_url }}" alt="{{ $fsProduct->name }}" style="height: 220px; object-fit: cover; width: 100%;">
+                            </a>
+                            @php
+                                $discountPercent = $fsProduct->price > 0 ? round((1 - $fsProduct->sale_price / $fsProduct->price) * 100) : 0;
+                            @endphp
+                            <span style="position: absolute; top: 10px; left: 10px; background: #ff4b2b; color: white; padding: 4px 10px; border-radius: 4px; font-weight: 800; font-size: 13px;">
+                                -{{ $discountPercent }}%
+                            </span>
+                        </div>
+                        <div class="product_content" style="padding: 12px;">
+                            <h3 style="margin: 0 0 8px;"><a href="{{ route('product.detail', $fsProduct->slug) }}" style="font-size: 14px;">{{ Str::limit($fsProduct->name, 35) }}</a></h3>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-weight: 800; color: #ff4b2b; font-size: 16px;">{{ number_format($fsProduct->sale_price) }}đ</span>
+                                <span style="text-decoration: line-through; color: #999; font-size: 13px;">{{ number_format($fsProduct->price) }}đ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var endTimes = @json($flashSaleProducts->pluck('flash_sale_ends_at')->filter()->values());
+        if (endTimes.length === 0) return;
+        var earliest = new Date(Math.min(...endTimes.map(t => new Date(t).getTime())));
+        function updateCountdown() {
+            var now = new Date().getTime();
+            var diff = earliest.getTime() - now;
+            if (diff <= 0) { location.reload(); return; }
+            var h = Math.floor(diff / (1000 * 60 * 60));
+            var m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            var s = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById('fs-hours').textContent = String(h).padStart(2, '0');
+            document.getElementById('fs-minutes').textContent = String(m).padStart(2, '0');
+            document.getElementById('fs-seconds').textContent = String(s).padStart(2, '0');
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    });
+    </script>
+    @endif
+    <!--flash sale section end-->
+
+    <!--featured products section area start-->
     <section class="product_section womens_product product_section_six">
         <div class="container-fluid">
             <div class="row">
@@ -175,21 +244,7 @@
     </section>
     <!--product section area end-->
 
-    <!--banner area start-->
-    <div class="banner_slider_section section_fullwidth">
-       <div class="container-fluid">
-           <div class="row ">
-               <div class="col-12">
-                    <div class="banner_area">
-                        <div class="banner_thumb">
-                            <a href="{{ route('shop') }}"><img src="{{ asset('reid/assets/img/bg/banner21.jpg') }}" alt="#"></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-       </div>  
-    </div>
-    <!--banner area end-->
+
 
     <!--product section area start-->
     <section class="product_section womens_product product_section_six bottom">
@@ -269,7 +324,7 @@
     </section>
     <!--product section area end-->
 
-    <!--product section area end-->
+
 
     <!--product section area start (Top Wishlisted)-->
     <section class="product_section womens_product product_section_six bottom">
@@ -363,91 +418,43 @@
     </section>
     <!--product section area end (Top Wishlisted)-->
 
-    <!--Instagram area start-->
-    <section class="instagram_area instagram_six">
+    @if($midBanner)
+    <!--Middle Banner area start-->
+    <section class="middle_banner_section mb-30">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <div class="section_title">
-                        <h2>{{ __('messages.follow_instagram') }}</h2>
-                        <p>{{ __('messages.instagram_desc') }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="instagram_home_block">
-                <div class="row">
-                    <div class="instagram_wrapper instagram_column5 owl-carousel">
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram.png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram.png"><i
-                                            class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram1.png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram1.png"><i
-                                            class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram2.png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram2.png"><i
-                                            class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram3(1).png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram3(1).png"><i
-                                            class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram4(1).png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram4(1).png"><i
-                                            class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="single_instagram">
-                                <a href="#"><img src="{{ asset('frontend-assets') }}/img/about/intagram1.png" alt=""></a>
-                                <div class="instagram_icone">
-                                    <a class="instagram_pupop"
-                                        href="{{ asset('frontend-assets') }}/img/about/intagram1.png"><i
-                                            class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="text_follow">
-                            <a href="#">{{ __('messages.follow_us_hashtag') }}</a>
-                        </div>
+                    <div class="middle_banner_thumb">
+                        @if($midBanner->link)
+                            <a href="{{ $midBanner->link }}">
+                                <img src="{{ asset('storage/' . $midBanner->image) }}" alt="{{ $midBanner->title ?? 'Banner' }}">
+                            </a>
+                        @else
+                            <img src="{{ asset('storage/' . $midBanner->image) }}" alt="{{ $midBanner->title ?? 'Banner' }}">
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <!--Instagram area end-->
+    <style>
+        .middle_banner_thumb img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .middle_banner_thumb img:hover {
+            transform: translateY(-5px);
+        }
+        .middle_banner_section {
+            margin-bottom: 40px;
+            margin-top: 20px;
+        }
+    </style>
+    <!--Middle Banner area end-->
+    @endif
 
     <!-- modal area start-->
     <div class="modal fade" id="modal_box" tabindex="-1" role="dialog" aria-hidden="true">

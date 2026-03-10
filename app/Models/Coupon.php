@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class Coupon extends Model
 {
@@ -72,7 +71,7 @@ class Coupon extends Model
      */
     public function isValid(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -157,7 +156,7 @@ class Coupon extends Model
      */
     public function getStatusBadge(): string
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return '<span class="badge bg-warning">Không hoạt động</span>';
         }
 
@@ -182,9 +181,9 @@ class Coupon extends Model
     public function getFormattedValue(): string
     {
         if ($this->type === 'percentage') {
-            return $this->value . '%';
+            return $this->value.'%';
         }
 
-        return number_format($this->value, 0, ',', '.') . ' VNĐ';
+        return number_format($this->value, 0, ',', '.').' VNĐ';
     }
 }

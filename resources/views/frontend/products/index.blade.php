@@ -1,47 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Shop | Elite')
+@section('title', (isset($currentCategory) && $currentCategory ? $currentCategory->name . ' - ' : '') . __('messages.shop') . ' | Elite')
 
 @section('content')
-<style>
-    /* Fix image ratio and layout breaking on hover for Shop page */
-    .single_product .product_thumb {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 4 / 5;
-        overflow: hidden;
-        background: #f5f5f5;
-    }
-
-    .single_product .product_thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        position: absolute;
-        top: 0;
-        left: 0;
-    }
-
-    /* Ensure secondary image also fills correctly */
-    .single_product .product_thumb a.secondary_img {
-        width: 100%;
-        height: 100%;
-    }
-
-    /* Fix alignment for titles and prices in grid view */
-    .product_content.grid_content {
-        padding-top: 10px;
-        text-align: left;
-    }
-
-    .product_content.grid_content h3 {
-        margin-bottom: 5px;
-        font-size: 14px;
-        line-height: 1.2;
-        height: 2.4em; /* Max 2 lines height for alignment */
-        overflow: hidden;
-    }
-</style>
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area">
         <div class="container">   
@@ -49,9 +10,9 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('home') }}">home</a></li>
+                            <li><a href="{{ route('home') }}">{{ __('messages.home') }}</a></li>
                             <li>/</li>
-                            <li>shop</li>
+                            <li>{{ __('messages.shop') }}</li>
                         </ul>
                     </div>
                 </div>
