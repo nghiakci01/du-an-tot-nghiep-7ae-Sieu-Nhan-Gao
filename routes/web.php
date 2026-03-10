@@ -229,5 +229,10 @@ Route::get('lang/{locale}', function ($locale) {
         session(['locale' => $locale]);
     }
 
-    return redirect()->back();
 })->name('lang.switch');
+
+// Realtime testing route
+Route::get('/test-broadcast', function () {
+    \App\Events\TestEvent::dispatch('Gửi từ Web.php lúc ' . now()->format('H:i:s'));
+    return view('test-broadcast');
+});
