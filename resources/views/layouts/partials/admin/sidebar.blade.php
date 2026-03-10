@@ -26,21 +26,21 @@
                     <div class="collapse pc-user-links" id="pc_sidebar_userlink">
                         <div class="pt-3">
                             <a href="{{ route('admin.profile.index') }}"><i class="ti ti-user"></i>
-                                <span data-i18n="My Account">My Account</span> </a><a
+                                <span data-i18n="My Account">Tài khoản của tôi</span> </a><a
                                 href="{{ route('admin.settings.index') }}"><i class="ti ti-settings"></i>
-                                <span data-i18n="Settings">Settings</span> </a><a href="{{ route('admin.lock') }}"><i
+                                <span data-i18n="Settings">Cài đặt</span> </a><a href="{{ route('admin.lock') }}"><i
                                     class="ti ti-lock"></i>
-                                <span data-i18n="Lock Screen">Lock Screen</span> </a><a href="{{ route('logout') }}"
+                                <span data-i18n="Lock Screen">Khóa màn hình</span> </a><a href="{{ route('logout') }}"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
                                     class="ti ti-power"></i>
-                                <span data-i18n="Logout">Logout</span></a>
+                                <span data-i18n="Logout">Đăng xuất</span></a>
                         </div>
                     </div>
                 </div>
             </div>
             <ul class="pc-navbar">
                 <li class="pc-item pc-caption">
-                    <label>Navigation</label>
+                    <label>Điều hướng</label>
                 </li>
                 <li class="pc-item">
                     <a href="{{ route('admin.dashboard') }}" class="pc-link">
@@ -49,7 +49,7 @@
                                 <use xlink:href="#custom-status-up"></use>
                             </svg>
                         </span>
-                        <span class="pc-mtext">Dashboard</span>
+                        <span class="pc-mtext">Bảng điều khiển</span>
                     </a>
                 </li>
 
