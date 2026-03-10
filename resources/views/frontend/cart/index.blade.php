@@ -391,7 +391,7 @@
                         $('#cart-subtotal').text(response.cart_total);
                         $('#shipping-fee span').text(response.shipping_fee);
                         $('#cart-grand-total').text(response.grand_total);
-                        $('#cart-count').text(response.cart_count);
+                        $('.cart-count').text(response.cart_count);
 
                         // Cập nhật giá trị html cho item
                         row.find('.product_total').text(response.item_total);
@@ -459,7 +459,7 @@
                                 $('#cart-subtotal').text(response.cart_total);
                                 $('#shipping-fee span').text(response.shipping_fee);
                                 $('#cart-grand-total').text(response.grand_total);
-                                $('#cart-count').text(response.cart_count);
+                                $('.cart-count').text(response.cart_count);
                                 if (response.cart_count == 0) {
                                     setTimeout(function() { window.location.reload(); }, 600);
                                 }
