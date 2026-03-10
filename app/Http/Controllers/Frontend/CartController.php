@@ -19,12 +19,13 @@ class CartController extends Controller
         foreach ($cart as $id => &$details) {
             $total += $details['price'] * $details['quantity'];
 
-            $product = Product::with('variants.sizeRelationship', 'variants.colorRelationship')->find($details['product_id']);
+            $product = Product::with(['category', 'variants.sizeRelationship', 'variants.colorRelationship'])->find($details['product_id']);
             if ($product) {
                 // Determine stock
                 $currentVariant = ProductVariant::find($id);
                 $details['stock_quantity'] = $currentVariant ? $currentVariant->stock_quantity : 0;
                 $details['is_out_of_stock'] = $details['stock_quantity'] <= 0;
+                $details['category_slug'] = $product->category ? $product->category->slug : null;
 
 
                 // Get unique sizes and colors available for this product (supporting both legacy strings and IDs)
