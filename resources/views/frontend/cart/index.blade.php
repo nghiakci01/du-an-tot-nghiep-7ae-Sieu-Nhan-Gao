@@ -37,7 +37,7 @@
                 </div>
             @endif
 
-            @if(session('cart') && count(session('cart')) > 0)
+            @if(isset($cart) && count($cart) > 0)
                 <form action="#">
                     <div class="row">
                         <div class="col-12">
@@ -56,7 +56,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach(session('cart') as $id => $details)
+                                            @foreach($cart as $id => $details)
                                                                                         <tr data-id="{{ $id }}">
                                                     <td class="product_check" style="vertical-align: middle;">
                                                         <input type="checkbox" class="check-item" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;">
@@ -87,18 +87,7 @@
                                                         </div>
 
                                                         <div class="cart-variant-selectors mt-2" style="display: none;">
-                                                            @if(isset($details['category_products']) && $details['category_products']->count() > 1)
-                                                                <div class="mb-2">
-                                                                    <label class="small text-muted d-block">{{ __('messages.product') }}</label>
-                                                                    <select class="form-select form-select-sm variant-select product-select" data-type="product">
-                                                                        @foreach($details['category_products'] as $catProduct)
-                                                                            <option value="{{ $catProduct->id }}" {{ $details['product_id'] == $catProduct->id ? 'selected' : '' }}>
-                                                                                {{ $catProduct->name }}
-                                                                            </option>
-                                                                        @endforeach
-                                                                    </select>
-                                                                </div>
-                                                            @endif
+                                                            <!-- Product selection removed based on user request -->
                                                             
                                                             @if(isset($details['available_sizes_array']) && count($details['available_sizes_array']) > 0)
                                                                 <div class="d-inline-block me-2">
