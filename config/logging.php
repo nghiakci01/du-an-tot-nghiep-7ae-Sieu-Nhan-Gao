@@ -127,6 +127,12 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'vton' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/ai_errors.log'),
+            'level' => env('LOG_LEVEL', 'error'),
+        ],
+
     ],
 
 ];

@@ -149,7 +149,10 @@ class VtonController extends Controller
                 ]);
 
             if (!$response->successful()) {
-                Log::error('Replicate API Error: ' . $response->body());
+                Log::channel('vton')->error('Replicate API Error', [
+                    'body' => $response->body(),
+                    'status' => $response->status()
+                ]);
                 return response()->json([
                     'success' => false,
                     'message' => 'Lỗi kết nối với API AI. Vui lòng thử lại sau.',
@@ -179,7 +182,7 @@ class VtonController extends Controller
                         break;
                     } elseif ($pollStatus['status'] === 'failed') {
                         $errorMsg = $pollStatus['error'] ?? 'Unknown error';
-                        Log::error('Replicate Model Failed: ' . json_encode($errorMsg));
+                        Log::channel('vton')->error('Replicate Model Failed', ['error' => $errorMsg]);
                         
                         // Xử lý lỗi đặc biệt: AI không tìm thấy người
                         if (stripos(json_encode($errorMsg), 'No human detected') !== false || stripos(json_encode($errorMsg), 'human') !== false) {
@@ -219,7 +222,7 @@ class VtonController extends Controller
                 'message' => $firstError
             ], 422);
         } catch (ConnectionException $e) {
-            Log::error('VTON API Timeout/Connection Error: ' . $e->getMessage());
+            Log::channel('vton')->error('VTON API Timeout/Connection Error', ['message' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Hệ thống đang bận, vui lòng thử lại sau ít phút.'
