@@ -180,7 +180,7 @@ return [
     'variant' => 'Biến thể',
     'size' => 'Kích thước',
     'color' => 'Màu sắc',
-    'edit' => 'thêm sản phẩm tương tự',
+    'edit' => 'đổi biến thể',
 
     // Checkout - Reid Template
     'returning_customer' => 'Khách hàng cũ',
