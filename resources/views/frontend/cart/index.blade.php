@@ -75,8 +75,9 @@
                                                                 alt="{{ $details['name'] }}"
                                                                 style="width: 100px; height: 100px; object-fit: cover;">
                                                             @if($isOutOfStock)
-                                                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center;">
-                                                                    <span class="badge bg-danger" style="font-size: 0.8rem; padding: 5px 10px;">{{ __('messages.out_of_stock') ?? 'Hết hàng' }}</span>
+                                                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.6); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 5px;">
+                                                                    <span class="badge bg-danger mb-1" style="font-size: 0.8rem; padding: 5px 10px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">{{ __('messages.out_of_stock') ?? 'Hết hàng' }}</span>
+                                                                    <a href="{{ route('product.detail', $details['slug']) }}" class="btn btn-sm btn-dark" style="font-size: 0.65rem; padding: 2px 5px; white-space: nowrap; font-weight: normal;">Xem sản phẩm tương tự</a>
                                                                 </div>
                                                             @endif
                                                         </a>
