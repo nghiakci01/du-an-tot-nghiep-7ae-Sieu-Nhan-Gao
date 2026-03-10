@@ -45,6 +45,11 @@
             scroll-behavior: smooth;
         }
 
+        /* Remove default link underlines */
+        a {
+            text-decoration: none !important;
+        }
+
         /* Global Product Hover Effect & Consistent Sizing */
         .single_product .product_thumb {
             position: relative;
