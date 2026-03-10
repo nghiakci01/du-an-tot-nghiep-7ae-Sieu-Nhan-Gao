@@ -170,6 +170,9 @@ Hệ thống hoạt động trên trình duyệt web, hỗ trợ:
 #### FR-11: Quản lý giỏ hàng
 
 * Thêm, sửa, xóa sản phẩm
+* Thay đổi phân loại/biến thể sản phẩm (Kích thước, Màu sắc) trực tiếp tại giỏ hàng
+* Kiểm tra tình trạng tồn kho khi người dùng bấm "Thêm vào giỏ" hoặc "Mua ngay", sẽ thông báo lỗi nếu sản phẩm đã hết hàng.
+* Quản lý sản phẩm hết hàng (Đẩy xuống cuối danh sách, vô hiệu hóa thanh toán, làm mờ giao diện, gợi ý sản phẩm thay thế cùng danh mục)
 * Tính tổng tiền và phí vận chuyển
 
 ---
@@ -178,7 +181,8 @@ Hệ thống hoạt động trên trình duyệt web, hỗ trợ:
 
 #### FR-12: Thanh toán
 
-* COD
+* Kiểm tra và xác thực lại toàn bộ giỏ hàng khi người dùng bấm "Tiến hành thanh toán" (Đảm bảo sản phẩm vẫn tồn tại trên hệ thống và đối chiếu lại số lượng tồn kho thực tế).
+* Hình thức thanh toán: COD
 * Chuyển khoản (MoMo, ZaloPay, Ngân hàng)
 
 #### FR-13: Trả hàng & hoàn tiền
