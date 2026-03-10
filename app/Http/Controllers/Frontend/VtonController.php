@@ -175,10 +175,21 @@ class VtonController extends Controller
                         $resultUrl = is_array($pollStatus['output']) ? $pollStatus['output'][0] : $pollStatus['output'];
                         break;
                     } elseif ($pollStatus['status'] === 'failed') {
-                        Log::error('Replicate Model Failed: ' . json_encode($pollStatus['error']));
+                        $errorMsg = $pollStatus['error'] ?? 'Unknown error';
+                        Log::error('Replicate Model Failed: ' . json_encode($errorMsg));
+                        
+                        // Xử lý lỗi đặc biệt: AI không tìm thấy người
+                        if (stripos(json_encode($errorMsg), 'No human detected') !== false || stripos(json_encode($errorMsg), 'human') !== false) {
+                            return response()->json([
+                                'success' => false,
+                                'error_code' => 'NO_HUMAN_DETECTED',
+                                'message' => 'Hệ thống AI không nhận diện được người trong ảnh. Vui lòng xem hướng dẫn chụp ảnh mẫu bên dưới và thử lại.'
+                            ], 422);
+                        }
+
                         return response()->json([
                             'success' => false,
-                            'message' => 'AI xử lý thất bại: ' . ($pollStatus['error'] ?? 'Unknown error')
+                            'message' => 'AI xử lý thất bại: ' . $errorMsg
                         ], 500);
                     }
                 }

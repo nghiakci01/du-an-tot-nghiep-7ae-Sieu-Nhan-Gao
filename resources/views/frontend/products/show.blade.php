@@ -734,6 +734,19 @@
                                 <li>Đợi AI xử lý trang phục (<span style="color: #ef233c; font-weight: bold;">~15-30 giây</span>).</li>
                             </ol>
                             
+                            <!-- Sample Guide (Hidden by default, shown on error) -->
+                            <div id="vton-guide-sample" style="display: none; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                                <h6 style="color: #856404; margin-bottom: 10px; font-size: 14px; font-weight: bold;">
+                                    <i class="fa fa-info-circle"></i> Ảnh mẫu hợp lệ:
+                                </h6>
+                                <p style="font-size: 13px; color: #856404; margin-bottom: 10px;">Vui lòng nhìn thẳng, rõ khuôn mặt và dáng người (không bị che khuất). Tránh ảnh phong cảnh hoặc chỉ có mỗi khuôn mặt.</p>
+                                <div class="d-flex justify-content-center">
+                                    <div style="width: 100px; height: 130px; background: #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 2px dashed #856404;">
+                                        <i class="fa fa-user" style="font-size: 40px; color: #aaa;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <form id="vtonForm">
                                 @csrf
                                 <input type="hidden" name="product_id" value="{{ $product->id }}">
@@ -1187,6 +1200,7 @@
                     $('#vton-loading').hide();
                     
                     if(response.success && response.image_url) {
+                        $('#vton-guide-sample').slideUp();
                         $('#vton-result-image').attr('src', response.image_url);
                         $('#vton-download').attr('href', response.image_url);
                         $('#vton-result').fadeIn(400, function() {
@@ -1217,8 +1231,13 @@
                     $('#vton-initial').fadeIn();
                     
                     let msg = 'Máy chủ AI hiện không phản hồi hoặc đang quá tải. Hãy thử lại.';
+                    
                     if(xhr.responseJSON && xhr.responseJSON.message) {
                         msg = xhr.responseJSON.message;
+                        // Hiển thị khung hướng dẫn nếu lỗi do không tìm thấy người
+                        if(xhr.responseJSON.error_code === 'NO_HUMAN_DETECTED') {
+                            $('#vton-guide-sample').slideDown();
+                        }
                     }
                     
                     Swal.fire({
