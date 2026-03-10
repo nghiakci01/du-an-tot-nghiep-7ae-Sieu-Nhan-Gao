@@ -57,20 +57,28 @@
                                         </thead>
                                         <tbody>
                                             @foreach($cart as $id => $details)
-                                                                                        <tr data-id="{{ $id }}">
+                                                @php
+                                                    $isOutOfStock = isset($details['is_out_of_stock']) ? $details['is_out_of_stock'] : false;
+                                                @endphp
+                                                <tr data-id="{{ $id }}" class="{{ $isOutOfStock ? 'opacity-50' : '' }}">
                                                     <td class="product_check" style="vertical-align: middle;">
-                                                        <input type="checkbox" class="check-item" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;">
+                                                        <input type="checkbox" class="check-item" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;" {{ $isOutOfStock ? 'disabled' : '' }}>
                                                     </td>
                                                     <!-- <td class="product_remove">
                                                         <a href="javascript:void(0)" class="remove-from-cart">
                                                             <i class="fa fa-trash-o"></i>
                                                         </a>
                                                     </td> -->
-                                                    <td class="product_thumb">
+                                                    <td class="product_thumb" style="position: relative;">
                                                         <a href="{{ route('product.detail', $details['slug']) }}">
                                                             <img src="{{ $details['image'] ? asset('storage/' . $details['image']) : asset('frontend-assets/img/s-product/product.jpg') }}"
                                                                 alt="{{ $details['name'] }}"
                                                                 style="width: 100px; height: 100px; object-fit: cover;">
+                                                            @if($isOutOfStock)
+                                                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center;">
+                                                                    <span class="badge bg-danger" style="font-size: 0.8rem; padding: 5px 10px;">{{ __('messages.out_of_stock') ?? 'Hết hàng' }}</span>
+                                                                </div>
+                                                            @endif
                                                         </a>
                                                     </td>
                                                     <td class="product_name">
@@ -81,7 +89,8 @@
                                                                 {{ __('messages.color') }}: <strong>{{ $details['color'] }}</strong>
                                                             </div>
                                                             <button type="button" class="btn btn-sm edit-variant-btn mt-2" 
-                                                                    style="font-size: 0.85rem; color: #ff6a28; border: 1px solid #ff6a28; background: transparent; padding: 3px 10px; border-radius: 4px;">
+                                                                    style="font-size: 0.85rem; color: #ff6a28; border: 1px solid #ff6a28; background: transparent; padding: 3px 10px; border-radius: 4px;"
+                                                                    {{ $isOutOfStock ? 'disabled' : '' }}>
                                                                 <i class="fa fa-pencil-square-o"></i> {{ __('messages.edit') }}
                                                             </button>
                                                         </div>
@@ -125,14 +134,19 @@
                                                     <td class="product-price">{{ number_format($details['price']) }} VND</td>
                                                     <td class="product_quantity">
                                                         @php
-                                                            $stockQty = \App\Models\ProductVariant::find($id)?->stock_quantity ?? 100;
+                                                            $stockQty = isset($details['stock_quantity']) ? $details['stock_quantity'] : (\App\Models\ProductVariant::find($id)?->stock_quantity ?? 100);
                                                         @endphp
-                                                        <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
-                                                            class="quantity update-cart item-quantity"
-                                                            data-stock="{{ $stockQty }}"
-                                                            title="Còn {{ $stockQty }} sản phẩm trong kho">
-                                                        <small class="d-block text-muted mt-1" style="font-size:11px;"
-                                                            data-stock-label>Kho: {{ $stockQty }}</small>
+                                                        @if($isOutOfStock)
+                                                            <input type="text" value="0" class="quantity text-center text-muted" disabled style="background-color: #f8f9fa;">
+                                                            <small class="d-block text-danger mt-1" style="font-size:11px;">Hết hàng</small>
+                                                        @else
+                                                            <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
+                                                                class="quantity update-cart item-quantity"
+                                                                data-stock="{{ $stockQty }}"
+                                                                title="Còn {{ $stockQty }} sản phẩm trong kho">
+                                                            <small class="d-block text-muted mt-1" style="font-size:11px;"
+                                                                data-stock-label>Kho: {{ $stockQty }}</small>
+                                                        @endif
                                                     </td>
                                                     <td class="product_total item-total-price" data-price="{{ $details['price'] }}">
                                                         {{ number_format($details['price'] * $details['quantity']) }} VND</td>
@@ -509,15 +523,15 @@
 
         // Check All logic
         $('#check-all').on('change', function() {
-            $('.check-item').prop('checked', $(this).prop('checked'));
+            $('.check-item:not(:disabled)').prop('checked', $(this).prop('checked'));
             toggleDeleteSelectedBtn();
             calculateCartTotal();
         });
 
         // Check Item logic
         $(document).on('change', '.check-item', function() {
-            var totalItems = $('.check-item').length;
-            var checkedItems = $('.check-item:checked').length;
+            var totalItems = $('.check-item:not(:disabled)').length;
+            var checkedItems = $('.check-item:not(:disabled):checked').length;
             $('#check-all').prop('checked', totalItems === checkedItems && totalItems > 0);
             toggleDeleteSelectedBtn();
             calculateCartTotal();

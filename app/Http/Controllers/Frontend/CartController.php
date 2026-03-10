@@ -21,6 +21,12 @@ class CartController extends Controller
 
             $product = Product::with('variants.sizeRelationship', 'variants.colorRelationship')->find($details['product_id']);
             if ($product) {
+                // Determine stock
+                $currentVariant = ProductVariant::find($id);
+                $details['stock_quantity'] = $currentVariant ? $currentVariant->stock_quantity : 0;
+                $details['is_out_of_stock'] = $details['stock_quantity'] <= 0;
+
+
                 // Get unique sizes and colors available for this product (supporting both legacy strings and IDs)
                 $details['available_sizes_array'] = [];
                 $details['available_colors_array'] = [];
@@ -43,10 +49,9 @@ class CartController extends Controller
 
                 // Set current IDs if not present (for migration of existing carts)
                 if (! isset($details['size_id']) || ! isset($details['color_id'])) {
-                    $variant = ProductVariant::find($id);
-                    if ($variant) {
-                        $details['size_id'] = $variant->size_id;
-                        $details['color_id'] = $variant->color_id;
+                    if ($currentVariant) {
+                        $details['size_id'] = $currentVariant->size_id;
+                        $details['color_id'] = $currentVariant->color_id;
                     }
                 }
 
@@ -60,6 +65,13 @@ class CartController extends Controller
                 }
             }
         }
+
+        // Sort cart to put out of stock items at the bottom
+        uasort($cart, function ($a, $b) {
+            $aOut = isset($a['is_out_of_stock']) && $a['is_out_of_stock'] ? 1 : 0;
+            $bOut = isset($b['is_out_of_stock']) && $b['is_out_of_stock'] ? 1 : 0;
+            return $aOut <=> $bOut;
+        });
 
         // Get applied coupon from session
         $couponCode = session()->get('coupon_code');
