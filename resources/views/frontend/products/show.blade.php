@@ -1018,12 +1018,23 @@
                             timer: 1500
                         });
                         // Cập nhật số lượng giỏ hàng trên header
+                        let cartCountElements = document.querySelectorAll('.cart-count');
                         if (response.count !== undefined) {
-                            $('#cart-count').text(response.count);
+                            cartCountElements.forEach(el => {
+                                el.innerText = response.count;
+                                el.classList.remove('pulse-animation');
+                                void el.offsetWidth;
+                                el.classList.add('pulse-animation');
+                            });
                         } else {
                             $.get('{{ route('cart.count') }}', function(res) {
                                 if (res && res.count !== undefined) {
-                                    $('#cart-count').text(res.count);
+                                    cartCountElements.forEach(el => {
+                                        el.innerText = res.count;
+                                        el.classList.remove('pulse-animation');
+                                        void el.offsetWidth;
+                                        el.classList.add('pulse-animation');
+                                    });
                                 }
                             });
                         }

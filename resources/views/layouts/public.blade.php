@@ -161,15 +161,15 @@
 
             channel.listen('CartUpdatedEvent', (e) => {
                 // e.cartCount is from the CartUpdatedEvent constructor
-                let cartCountElement = document.getElementById('cart-count');
-                if (cartCountElement) {
-                    cartCountElement.innerText = e.cartCount;
+                let cartCountElements = document.querySelectorAll('.cart-count');
+                cartCountElements.forEach(el => {
+                    el.innerText = e.cartCount;
                     
                     // Thêm class nháy nhẹ (animation)
-                    cartCountElement.classList.remove('pulse-animation');
-                    void cartCountElement.offsetWidth; // trigger reflow
-                    cartCountElement.classList.add('pulse-animation');
-                }
+                    el.classList.remove('pulse-animation');
+                    void el.offsetWidth; // trigger reflow
+                    el.classList.add('pulse-animation');
+                });
             });
         }
     </script>
