@@ -11,6 +11,7 @@ return [
     'account' => 'Tài khoản',
     'logout' => 'Đăng xuất',
     'search_placeholder' => 'Tìm kiếm sản phẩm...',
+    'search_results' => 'Kết quả tìm kiếm',
     'cart' => 'Giỏ hàng',
     'checkout' => 'Thanh toán',
     'my_account' => 'Tài khoản của tôi',
