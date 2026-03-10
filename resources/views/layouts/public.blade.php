@@ -50,6 +50,24 @@
             text-decoration: none !important;
         }
 
+        /* Product Title Styling */
+        .product_content h3 a {
+            font-size: 14px !important;
+            font-weight: 300 !important;
+            color: #333 !important;
+            line-height: 1.4 !important;
+            transition: color 0.3s ease !important;
+        }
+
+        .product_content h3 a:hover {
+            color: #ef233c !important;
+        }
+
+        /* Product Price Styling */
+        .current_price {
+            font-weight: 700 !important;
+        }
+
         /* Global Product Hover Effect & Consistent Sizing */
         .single_product .product_thumb {
             position: relative;
