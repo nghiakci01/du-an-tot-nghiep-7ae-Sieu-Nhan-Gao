@@ -579,15 +579,30 @@
           <div class="row g-3">
             <div class="col-md-4">
               <label>Mật khẩu hiện tại</label>
-              <input type="password" name="current_password" class="form-control" placeholder="••••••••">
+              <div class="position-relative">
+                <input type="password" name="current_password" class="form-control pe-5" placeholder="••••••••">
+                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-muted toggle-password" style="z-index: 10; text-decoration: none;">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
             </div>
             <div class="col-md-4">
               <label>Mật khẩu mới</label>
-              <input type="password" name="new_password" class="form-control" placeholder="••••••••">
+              <div class="position-relative">
+                <input type="password" name="new_password" class="form-control pe-5" placeholder="••••••••">
+                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-muted toggle-password" style="z-index: 10; text-decoration: none;">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
             </div>
             <div class="col-md-4">
               <label>Xác nhận mật khẩu mới</label>
-              <input type="password" name="new_password_confirmation" class="form-control" placeholder="••••••••">
+              <div class="position-relative">
+                <input type="password" name="new_password_confirmation" class="form-control pe-5" placeholder="••••••••">
+                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-muted toggle-password" style="z-index: 10; text-decoration: none;">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -671,6 +686,22 @@ document.addEventListener('DOMContentLoaded', function() {
         document.execCommand('copy');
         document.body.removeChild(ta);
       });
+    });
+  });
+
+  // Toggle password visibility
+  document.querySelectorAll('.toggle-password').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const input = this.parentElement.querySelector('input');
+        const icon = this.querySelector('i');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
     });
   });
 });
