@@ -769,12 +769,20 @@
                             </div>
                             
                             <!-- Loading State -->
-                            <div id="vton-loading" class="text-center" style="display: none;">
-                                <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
+                            <div id="vton-loading" class="text-center w-100 px-4" style="display: none;">
+                                <div class="spinner-border text-danger mb-4" role="status" style="width: 3.5rem; height: 3.5rem; border-width: 4px;">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
-                                <h5 style="font-weight: 600; color: #333;">AI Đang Xử Lý...</h5>
-                                <p style="color: #666; font-size: 14px; max-width: 250px; margin: 0 auto;">Quá trình này có thể kéo dài từ 30 đến 120 giây (đặc biệt trong lần chạy đầu tiên), vui lòng không đóng cửa sổ này.</p>
+                                
+                                <h5 id="vton-progress-title" style="font-weight: 700; color: #111; margin-bottom: 15px; font-size: 18px;">Đang khởi tạo...</h5>
+                                
+                                <!-- Progress Bar -->
+                                <div class="progress mb-3" style="height: 10px; border-radius: 10px; background-color: #f0f0f0; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+                                    <div id="vton-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; background-color: #ef233c; transition: width 0.5s ease;"></div>
+                                </div>
+                                
+                                <p id="vton-progress-text" style="color: #666; font-size: 14px; margin-bottom: 8px;">Vui lòng đợi trong giây lát</p>
+                                <p style="font-size: 12px; color: #999; margin: 0; font-style: italic;">Quá trình này phụ thuộc vào tốc độ xử lý của AI (15-40s).</p>
                             </div>
                             
                             <!-- Result State -->
@@ -1178,16 +1186,43 @@
         });
 
         // VTON handling
+        let progressInterval;
+        
+        function updateVtonProgress(percentage, title, text) {
+            $('#vton-progress-bar').css('width', percentage + '%').attr('aria-valuenow', percentage);
+            $('#vton-progress-title').text(title);
+            if(text) $('#vton-progress-text').text(text);
+        }
+        
         $('#vtonForm').on('submit', function(e) {
             e.preventDefault();
             
             var formData = new FormData(this);
             var btn = $('#btn-vton-submit');
             
-            // UI Changes
-            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang tải lên...');
+            // Khởi tạo UI
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
             $('#vton-initial, #vton-result').hide();
             $('#vton-loading').fadeIn();
+            
+            // Reset Progress State
+            updateVtonProgress(10, 'Bước 1/4: Đang tải ảnh...', 'Đang gửi ảnh của bạn lên hệ thống an toàn.');
+            
+            // Giả lập Progress Bar (Client side simulated progress)
+            let currentProgress = 10;
+            clearInterval(progressInterval);
+            progressInterval = setInterval(() => {
+                if (currentProgress < 30) {
+                    currentProgress += 5;
+                    updateVtonProgress(currentProgress, 'Bước 2/4: Phân tích người mẫu...', 'AI đang quét cấu trúc cơ thể và trang phục cũ.');
+                } else if (currentProgress < 60) {
+                    currentProgress += 2;
+                    updateVtonProgress(currentProgress, 'Bước 3/4: Đang thử đồ (Renderer)...', 'Đang tính toán nếp gấp vải và ánh sáng.');
+                } else if (currentProgress < 95) {
+                    currentProgress += 1;
+                    updateVtonProgress(currentProgress, 'Bước 4/4: Hoàn thiện chi tiết...', 'Đang gộp hình ảnh mượt mà, sắp xong rồi...');
+                }
+            }, 1200);
             
             $.ajax({
                 url: '{{ route("api.vton.tryOn") }}',
@@ -1198,9 +1233,12 @@
                 success: function(response) {
                     btn.prop('disabled', false).text('Thử ảnh khác');
                     $('#vton-loading').hide();
+                    clearInterval(progressInterval);
                     
                     if(response.success && response.image_url) {
                         $('#vton-guide-sample').slideUp();
+                        updateVtonProgress(100, 'Hoàn thành!', 'Đã tạo xong ảnh thử đồ.');
+                        
                         $('#vton-result-image').attr('src', response.image_url);
                         $('#vton-download').attr('href', response.image_url);
                         $('#vton-result').fadeIn(400, function() {
@@ -1229,6 +1267,7 @@
                     btn.prop('disabled', false).text('Thử đồ lại');
                     $('#vton-loading').hide();
                     $('#vton-initial').fadeIn();
+                    clearInterval(progressInterval);
                     
                     let msg = 'Máy chủ AI hiện không phản hồi hoặc đang quá tải. Hãy thử lại.';
                     
