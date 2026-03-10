@@ -143,9 +143,10 @@
                                                         display: flex !important;
                                                     }
                                                     .custom-shop-mega-left {
-                                                        width: 25%;
+                                                        flex: 0 0 25% !important;
+                                                        max-width: 25% !important;
                                                         border-right: 1px solid #ebebeb;
-                                                        padding-right: 20px;
+                                                        padding-right: 15px;
                                                     }
                                                     .custom-shop-mega-left ul {
                                                         list-style: none;
@@ -157,7 +158,7 @@
                                                     }
                                                     .custom-shop-mega-left a {
                                                         color: #333 !important;
-                                                        font-size: 14px !important;
+                                                        font-size: 15px !important;
                                                         font-weight: 600 !important;
                                                         text-decoration: none;
                                                         transition: color 0.3s;
@@ -168,23 +169,27 @@
                                                         color: #ef233c !important;
                                                     }
                                                     .custom-shop-mega-right {
-                                                        width: 75%;
-                                                        padding-left: 30px;
-                                                        display: flex;
-                                                        gap: 20px;
+                                                        flex: 0 0 75% !important;
+                                                        max-width: 75% !important;
+                                                        padding-left: 15px;
+                                                        display: flex !important;
+                                                        gap: 15px;
                                                     }
                                                     .custom-shop-product {
                                                         flex: 1;
                                                         text-align: center;
                                                     }
                                                     .custom-shop-product-img {
-                                                        background-color: #f7f7f7;
+                                                        margin-left: 15px;
                                                         margin-bottom: 15px;
                                                         overflow: hidden;
+                                                        border-radius: 8px;
                                                     }
                                                     .custom-shop-product-img img {
-                                                        width: 100%;
-                                                        height: auto;
+                                                        width: 100% !important;
+                                                        height: auto !important;
+                                                        aspect-ratio: 1 / 1;
+                                                        object-fit: cover !important;
                                                         mix-blend-mode: multiply;
                                                         transition: transform 0.5s;
                                                     }
