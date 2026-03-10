@@ -1108,6 +1108,62 @@
 
         });
 
+        function showSmartError(message, type = 'error') {
+            Swal.fire({
+                icon: type === 'error' ? 'error' : 'warning',
+                title: type === 'error' ? 'Lỗi ảnh' : 'Lưu ý ảnh',
+                text: message,
+                confirmButtonColor: '#ef233c',
+            });
+        }
+
+        document.getElementById('user_image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // 1. Kiểm tra dung lượng (Max 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                showSmartError("File quá lớn. Vui lòng tải ảnh dung lượng dưới 5MB.");
+                e.target.value = ''; // Reset input
+                return;
+            }
+
+            // 2. Kiểm tra định dạng (.jpg, .png)
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                showSmartError("Định dạng không hợp lệ. Chỉ chấp nhận file .jpg, .png hoặc .webp.");
+                e.target.value = '';
+                return;
+            }
+
+            // 3. Kiểm tra độ phân giải & Cảnh báo chụp toàn thân
+            const fileURL = window.URL || window.webkitURL;
+            const img = new Image();
+            img.onload = function() {
+                fileURL.revokeObjectURL(this.src); // Xóa bộ nhớ đệm
+                
+                // Kiểm tra resolution tối thiểu (600x800 hoặc 800x600 nếu chụp ngang)
+                const isMinResValid = (this.width >= 600 && this.height >= 800) || (this.width >= 800 && this.height >= 600);
+                if (!isMinResValid) {
+                    showSmartError("Ảnh quá nhỏ hoặc mờ. Vui lòng chụp ảnh có độ phân giải tối thiểu 600x800px hoặc 800x600px.");
+                    e.target.value = '';
+                    return;
+                }
+
+                // Cảnh báo thêm UX: Gợi ý đứng thẳng nếu khung ảnh là ảnh vuông (Square) hoặc quá dị dạng
+                const ratio = this.height / this.width;
+                if (ratio < 1.0) {
+                    // Ảnh đang nằm ngang (landscape) -> Báo với User là server sẽ tự dựng đứng ảnh hoặc cảnh báo
+                    console.info("Hệ thống sẽ tự động xoay ảnh về chiều dọc.");
+                } else if (ratio < 1.2) {
+                    // Ảnh gần dạng vuông -> Khả năng cao không thấy toàn thân
+                    showSmartError("Vui lòng đứng thẳng và chụp rõ toàn thân từ đầu đến chân để thử đồ chính xác nhất.", 'warning');
+                }
+            };
+            img.src = fileURL.createObjectURL(file);
+        });
+
         // VTON handling
         $('#vtonForm').on('submit', function(e) {
             e.preventDefault();

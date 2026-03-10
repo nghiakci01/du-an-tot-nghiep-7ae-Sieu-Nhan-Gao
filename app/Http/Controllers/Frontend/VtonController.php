@@ -19,8 +19,12 @@ class VtonController extends Controller
         try {
             // Validate request
             $request->validate([
-                'user_image' => 'required|image|max:10240', // Max 10MB
+                'user_image' => 'required|mimes:jpeg,jpg,png,webp|max:5120|dimensions:min_width=600,min_height=600',
                 'product_id' => 'required|exists:products,id'
+            ], [
+                'user_image.mimes'      => 'Định dạng không hợp lệ. Chỉ cho phép file .jpg, .png, .webp.',
+                'user_image.max'        => 'File quá lớn. Vui lòng tải ảnh bé hơn 5MB.',
+                'user_image.dimensions' => 'Ảnh quá mờ hoặc có kích thước quá thấp. Vui lòng sử dụng ảnh sắc nét hơn (Tối thiểu 600x600px).',
             ]);
 
             $apiToken = env('REPLICATE_API_TOKEN');
@@ -65,8 +69,63 @@ class VtonController extends Controller
 
             // 2. Process User Image -> Base64 URI
             $userImageFile = $request->file('user_image');
+            $filePath = $userImageFile->getRealPath();
+            
+            // Pre-processing: Handle rotation based on EXIF or Ratio using GD
+            $imageData = file_get_contents($filePath);
+            $imageResource = @imagecreatefromstring($imageData);
+            
+            if ($imageResource !== false) {
+                $isRotated = false;
+                
+                // Rotation based on EXIF Orientation (JPEG only)
+                if (in_array(strtolower($userImageFile->getClientOriginalExtension()), ['jpg', 'jpeg']) && function_exists('exif_read_data')) {
+                    $exif = @exif_read_data($filePath);
+                    if (!empty($exif['Orientation'])) {
+                        switch ($exif['Orientation']) {
+                            case 3:
+                                $imageResource = imagerotate($imageResource, 180, 0);
+                                $isRotated = true;
+                                break;
+                            case 6:
+                                $imageResource = imagerotate($imageResource, -90, 0);
+                                $isRotated = true;
+                                break;
+                            case 8:
+                                $imageResource = imagerotate($imageResource, 90, 0);
+                                $isRotated = true;
+                                break;
+                        }
+                    }
+                }
+                
+                // Fallback rotation: If width > height and not rotated via EXIF, assume landscape photo meant to be portrait
+                $width = imagesx($imageResource);
+                $height = imagesy($imageResource);
+                
+                if (!$isRotated && $width > $height) {
+                    $imageResource = imagerotate($imageResource, -90, 0);
+                    $isRotated = true;
+                }
+
+                if ($isRotated) {
+                    ob_start();
+                    if (strtolower($userImageFile->getClientOriginalExtension()) === 'png') {
+                        imagepng($imageResource);
+                    } elseif (strtolower($userImageFile->getClientOriginalExtension()) === 'webp') {
+                        imagewebp($imageResource);
+                    } else {
+                        imagejpeg($imageResource, null, 90);
+                    }
+                    $imageData = ob_get_contents();
+                    ob_end_clean();
+                }
+                
+                imagedestroy($imageResource);
+            }
+
             $userImageMime = $userImageFile->getMimeType();
-            $userImageBase64 = base64_encode(file_get_contents($userImageFile->getRealPath()));
+            $userImageBase64 = base64_encode($imageData);
             $userDataUri = 'data:' . $userImageMime . ';base64,' . $userImageBase64;
 
             // 3. Call Replicate API to create prediction
@@ -137,6 +196,12 @@ class VtonController extends Controller
                 'message' => 'Hệ thống AI xử lý quá thời gian (Timeout). Hãy thử lại.'
             ], 408);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $firstError = collect($e->errors())->flatten()->first();
+            return response()->json([
+                'success' => false,
+                'message' => $firstError
+            ], 422);
         } catch (\Exception $e) {
             Log::error('VTON Controller Error: ' . $e->getMessage());
             return response()->json([
