@@ -34,7 +34,7 @@
     <!-- Search Autocomplete CSS -->
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/search-autocomplete.css') }}">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
