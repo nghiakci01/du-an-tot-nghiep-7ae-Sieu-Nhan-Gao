@@ -125,10 +125,11 @@
                                                                     </select>
                                                                 </div>
                                                             @endif
-                                                            <div class="mt-1">
-                                                                <button type="button" class="btn btn-sm btn-secondary cancel-variant-btn">Hủy</button>
-                                                            </div>
-                                                        </div>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm save-variant-btn" style="background-color: #ff6a28; color: #fff; border-color: #ff6a28;">Đổi biến thể</button>
+                            <button type="button" class="btn btn-sm btn-secondary cancel-variant-btn">Hủy</button>
+                        </div>
+                    </div>
                                                         <input type="hidden" class="product-id" value="{{ $details['product_id'] }}">
                                                         <input type="hidden" class="current-variant-id" value="{{ $id }}">
                                                     </td>
@@ -627,16 +628,17 @@
             row.find(".cart-variant-info").fadeIn();
         });
 
-        // Change variant (Product/Size/Color)
-        $(".variant-select").on('change', function() {
+        // Change variant (Product/Size/Color) via Submit Button
+        $(".save-variant-btn").on('click', function() {
             var ele = $(this);
-            var changedType = ele.data("type"); 
             var row = ele.parents("tr");
             var productId = row.find(".product-id").val();
             var newProductId = row.find(".product-select").val() || productId;
             var oldVariantId = row.find(".current-variant-id").val();
             var sizeId = row.find(".size-select").val();
             var colorId = row.find(".color-select").val();
+            
+            var changedType = (productId !== newProductId) ? 'product' : null;
 
             $.ajax({
                 url: '{{ route('cart.changeVariant') }}',
