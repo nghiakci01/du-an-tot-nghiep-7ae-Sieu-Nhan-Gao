@@ -66,6 +66,9 @@ Route::post('/wishlist/add', [App\Http\Controllers\Frontend\WishlistController::
 Route::post('/api/chat/send', [App\Http\Controllers\Api\ChatController::class, 'sendMessage'])->name('api.chat.send');
 Route::get('/api/chat/messages', [App\Http\Controllers\Api\ChatController::class, 'getMessages'])->name('api.chat.messages');
 
+// Virtual Try-On API
+Route::post('/api/vton', [App\Http\Controllers\Frontend\VtonController::class, 'tryOn'])->name('api.vton.tryOn');
+
 // Admin & Staff Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
 
