@@ -269,6 +269,61 @@
         ]
     });
     
+    // Test
+    // $('.product_column5').slick({
+    //     rows: 2,                  // 2 hàng
+    //     slidesPerRow: 5,          // 5 sản phẩm mỗi hàng → tổng 10 sp hiển thị cùng lúc
+    //     slidesToShow: 1,          // BẮT BUỘC là 1 để kích hoạt grid mode đầy đủ (đừng đổi!)
+    //     slidesToScroll: 1,        // Trượt từng khối nhỏ (có thể đổi thành 2 để trượt cả 1 hàng)
+    //     arrows: true,
+    //     prevArrow: '<button class="prev_arrow"><i class="fa fa-angle-left"></i></button>',
+    //     nextArrow: '<button class="next_arrow"><i class="fa fa-angle-right"></i></button>',
+    //     infinite: false,          // Không loop nếu số sp không nhiều
+    //     centerMode: false,
+    //     centerPadding: '0px',
+    //     adaptiveHeight: true,     // Tự điều chỉnh chiều cao grid nếu item cao khác nhau
+    //     mobileFirst: false,
+
+    //     responsive: [
+    //         {
+    //             breakpoint: 1200,  // Desktop lớn
+    //             settings: {
+    //                 rows: 2,
+    //                 slidesPerRow: 5,
+    //                 slidesToShow: 1,
+    //                 slidesToScroll: 1
+    //             }
+    //         },
+    //         {
+    //             breakpoint: 992,   // Tablet ~992px
+    //             settings: {
+    //                 rows: 2,
+    //                 slidesPerRow: 4,   // Giảm xuống 4 cột/hàng nếu màn hình nhỏ hơn
+    //                 slidesToShow: 1,
+    //                 slidesToScroll: 1
+    //             }
+    //         },
+    //         {
+    //             breakpoint: 768,   // Mobile
+    //             settings: {
+    //                 rows: 2,
+    //                 slidesPerRow: 2,   // 2 cột/hàng (tổng 4 sp) hoặc 1 nếu muốn
+    //                 slidesToShow: 1,
+    //                 slidesToScroll: 1
+    //             }
+    //         },
+    //         {
+    //             breakpoint: 480,
+    //             settings: {
+    //                 rows: 1,           // Mobile nhỏ: chỉ 1 hàng
+    //                 slidesPerRow: 2,
+    //                 slidesToShow: 1,
+    //                 slidesToScroll: 1
+    //             }
+    //         }
+    //     ]
+    // });
+
     /* blog column3 activation */
     $('.blog_column3').owlCarousel({
         autoplay: true,
