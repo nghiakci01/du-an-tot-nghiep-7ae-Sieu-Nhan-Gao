@@ -21,7 +21,7 @@
                 <ul>
                     <li class="top_links">
                         @guest
-                            <a href="{{ route('account.index') }}">{{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
+                            <a href="{{ route('account.index') }}" class="user-account-link">{{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
                             <ul class="dropdown_links">
                                 <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li>
                                 <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li>
@@ -29,7 +29,7 @@
                                 <li><a href="{{ route('login') }}">{{ __('messages.login') }}</a></li>
                             </ul>
                         @else
-                            <a href="#" style="display: flex; align-items: center; gap: 8px;">
+                            <a href="#" class="user-account-link" style="display: flex; align-items: center; gap: 8px;">
                                 @if(Auth::user()->avatar_url)
                                     <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" style="width: 25px; height: 25px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
                                 @else
@@ -253,7 +253,7 @@
                                     <ul>
                                         <li class="top_links">
                                             @guest
-                                                <a href="{{ route('account.index') }}"><i class="ion-android-person"></i> {{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
+                                                <a href="{{ route('account.index') }}" class="user-account-link"><i class="ion-android-person"></i> {{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
                                                 <ul class="dropdown_links">
                                                     <!-- <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li> -->
                                                     <!-- <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li> -->
@@ -263,7 +263,7 @@
                                                     <li><a href="{{ route('logout') }}">{{ __('messages.logout') }}</a></li>
                                                 </ul>
                                             @else
-                                                <a href="#" style="display: flex; align-items: center; gap: 8px;">
+                                                <a href="#" class="user-account-link" style="display: flex; align-items: center; gap: 8px;">
                                                     @if(Auth::user()->avatar_url)
                                                         <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" style="width: 25px; height: 25px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
                                                     @else

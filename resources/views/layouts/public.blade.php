@@ -15,8 +15,8 @@
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend-assets/img/favicon.ico') }}">
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts (Reid Theme: Libre Franklin + Playfair Display) -->
+    <link href="https://fonts.googleapis.com/css?family=Libre+Franklin:300,400,500,600,700|Playfair+Display:400,400i,700,700i,900,900i&display=swap" rel="stylesheet">
 
     <!-- CSS 
     ========================= -->
@@ -40,6 +40,21 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        /* Force Pure White Background & Remove Glow - OVERRIDE VITE/BOOTSTRAP */
+        :root, [data-bs-theme=light] {
+            --bs-body-bg: #ffffff !important;
+            --bs-body-bg-rgb: 255, 255, 255 !important;
+            --bs-tertiary-bg: #ffffff !important;
+            --bs-secondary-bg: #ffffff !important;
+        }
+
+        body, html, .main_wrapper, .main-wrapper, .header_area, .footer_section, .breadcrumbs_area, .atino-breadcrumb {
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+
         /* Smooth Scrolling */
         html {
             scroll-behavior: smooth;
