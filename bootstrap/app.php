@@ -18,9 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         );
         $middleware->trustProxies(at: '*');
 
-        // Bypass CSRF for cart routes (debug - remove after fix)
+        // Bypass CSRF for cart routes and API endpoints
         $middleware->validateCsrfTokens(except: [
             'cart/*',
+            'api/vton',
         ]);
 
         $middleware->web(append: [
