@@ -6,12 +6,20 @@ use App\Mail\OrderShippedMail;
 use App\Models\Order;
 use App\Models\OrderHistory;
 use App\Models\User;
+use App\Services\LoyaltyPointService;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class OrderService
 {
+    protected LoyaltyPointService $loyaltyPointService;
+
+    public function __construct(LoyaltyPointService $loyaltyPointService)
+    {
+        $this->loyaltyPointService = $loyaltyPointService;
+    }
+
     /**
      * Update order status with history tracking and stock management
      */
@@ -42,12 +50,15 @@ class OrderService
 
             // Handle stock logic
             $this->handleStockAdjustment($order, $oldStatus, $newStatus);
+
+            // Handle loyalty points
+            $this->handleLoyaltyPoints($order, $oldStatus, $newStatus);
         });
 
         // Send email if shipped
         if ($newStatus === Order::STATUS_SHIPPED) {
             try {
-                $email = $order->user_email ?? ($order->user->email ?? null);
+                $email = $order->email ?? ($order->user->email ?? null);
                 if ($email) {
                     Mail::to($email)->send(new OrderShippedMail($order));
                 }
@@ -76,15 +87,26 @@ class OrderService
         // 2. If transition FROM Cancelled/Returned/Failed TO Processing statuses -> Deduct Stock again
         // (Just in case specific admin flow allows un-cancelling, though usually hard. But good to handle)
         if (! $isCancelledState && $wasCancelledState) {
-            $this->deductStock($order);
+            foreach ($order->items as $item) {
+                if ($item->variant_id) {
+                    // Sử dụng lockForUpdate để tránh Race Condition khi trừ kho lại
+                    $variant = \App\Models\ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
+                    if ($variant && $variant->stock_quantity >= $item->quantity) {
+                        $variant->decrement('stock_quantity', $item->quantity);
+                    }
+                }
+            }
         }
     }
 
+    /**
+     * Khôi phục số lượng tồn kho cho các sản phẩm trong đơn hàng
+     */
     protected function restoreStock(Order $order)
     {
         foreach ($order->items as $item) {
             if ($item->variant_id) {
-                // Sử dụng lockForUpdate để tránh Race Condition khi cộng lại kho
+                // Sử dụng lockForUpdate để tránh Race Condition
                 $variant = \App\Models\ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
                 if ($variant) {
                     $variant->increment('stock_quantity', $item->quantity);
@@ -93,16 +115,18 @@ class OrderService
         }
     }
 
-    protected function deductStock(Order $order)
+    /**
+     * Xử lý tích/thu hồi loyalty points khi trạng thái đơn hàng thay đổi
+     */
+    protected function handleLoyaltyPoints(Order $order, string $oldStatus, string $newStatus): void
     {
-        foreach ($order->items as $item) {
-            if ($item->variant_id) {
-                // Sử dụng lockForUpdate để tránh Race Condition khi trừ kho lại
-                $variant = \App\Models\ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
-                if ($variant && $variant->stock_quantity >= $item->quantity) {
-                    $variant->decrement('stock_quantity', $item->quantity);
-                }
-            }
+        if ($newStatus === Order::STATUS_COMPLETED && $oldStatus !== Order::STATUS_COMPLETED) {
+            $this->loyaltyPointService->earnPoints($order);
+        }
+
+        $cancelledStates = [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_FAILED];
+        if (in_array($newStatus, $cancelledStates) && !in_array($oldStatus, $cancelledStates)) {
+            $this->loyaltyPointService->revokePoints($order);
         }
     }
 }

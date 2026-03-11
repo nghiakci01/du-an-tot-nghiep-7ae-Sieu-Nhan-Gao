@@ -17,7 +17,6 @@ class Category extends Model
         'name',
         'slug',
         'parent_id',
-        'image',
     ];
 
     public function products(): HasMany

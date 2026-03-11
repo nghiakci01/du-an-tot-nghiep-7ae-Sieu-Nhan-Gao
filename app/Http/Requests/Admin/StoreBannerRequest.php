@@ -35,18 +35,21 @@ class StoreBannerRequest extends BaseAdminFormRequest
                     }
 
                     // Check dimensions for sharp display
-                    if ($this->input('position') === 'slider') {
+                    if ($this->input('position') === 'slider' && in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
                         if ($value->isValid() && ($path = $value->getRealPath())) {
-                            [$width, $height] = getimagesize($path);
-                            if ($width < 1521) {
-                                $fail('Ảnh cho Slider phải có chiều rộng tối thiểu 1521px để đảm bảo độ sắc nét. Khuyên dùng 3042px cho màn hình Retina.');
+                            $dimensions = @getimagesize($path);
+                            if ($dimensions) {
+                                [$width, $height] = $dimensions;
+                                if ($width < 1521) {
+                                    $fail('Ảnh cho Slider phải có chiều rộng tối thiểu 1521px để đảm bảo độ sắc nét. Khuyên dùng 3042px cho màn hình Retina.');
+                                }
                             }
                         }
                     }
                 },
             ],
             'link' => 'nullable|string|max:255',
-            'position' => 'required|string|in:slider',
+            'position' => 'required|string|in:slider,about_us,home_middle',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ];

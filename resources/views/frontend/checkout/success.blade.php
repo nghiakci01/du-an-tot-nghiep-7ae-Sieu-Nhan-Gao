@@ -152,6 +152,7 @@
   $shippingFee = $order->shipping_fee ?? 0;
   $displayTotal = ($order->final_total > 0) ? $order->final_total : ($order->total_price + $shippingFee);
   $isBankTransfer = $order->payment_method == 'BANK_TRANSFER';
+  $isVnpay = $order->payment_method == 'VNPAY';
 @endphp
 
 <div class="success-page-wrapper">
@@ -160,11 +161,17 @@
   {{-- ===== SUCCESS HEADER ===== --}}
   <div class="text-center mb-5">
     <div class="success-icon-animate d-inline-block mb-3">
-      <div style="width:90px;height:90px;background:linear-gradient(135deg,#28a745,#20c997);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 8px 24px rgba(40,167,69,0.3);">
-        <i class="bi bi-check-lg text-white" style="font-size:2.8rem;"></i>
+      <div style="width:90px;height:90px;background:linear-gradient(135deg,@if($isBankTransfer && $order->payment_status == 'pending') #ffc107, #ff9800 @else #28a745,#20c997 @endif);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 8px 24px rgba(@if($isBankTransfer && $order->payment_status == 'pending') 255,193,7,0.3 @else 40,167,69,0.3 @endif);">
+        <i class="bi @if($isBankTransfer && $order->payment_status == 'pending') bi-clock-history @else bi-check-lg @endif text-white" style="font-size:2.8rem;"></i>
       </div>
     </div>
-    <h2 class="fw-bold mb-1" style="font-size:2rem;">Đặt hàng thành công!</h2>
+    <h2 class="fw-bold mb-1" style="font-size:2rem;">
+      @if($isBankTransfer && $order->payment_status == 'pending')
+        Chờ thanh toán
+      @else
+        Đặt hàng thành công!
+      @endif
+    </h2>
     <p class="text-muted mb-0">Cảm ơn bạn đã tin tưởng mua sắm tại <strong>{{ $settings['site_title'] ?? 'Elite' }}</strong></p>
     <p class="text-muted">Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
 
@@ -205,6 +212,7 @@
             <div class="order-badge">
               @if($order->payment_method == 'COD') 💵 Thanh toán khi nhận hàng
               @elseif($order->payment_method == 'BANK_TRANSFER') 🏦 Chuyển khoản ngân hàng
+              @elseif($order->payment_method == 'VNPAY') 💳 Thanh toán VNPAY
               @else {{ $order->payment_method }}
               @endif
             </div>
@@ -284,38 +292,95 @@
             {{-- BANK TRANSFER INFO --}}
             @if($isBankTransfer)
             <div class="col-12">
-              <p class="section-label">Thông tin chuyển khoản</p>
-              <div class="bank-info-box">
+              <div class="p-4 rounded-4 @if($order->payment_status == 'waiting_confirmation') bg-light-success @else bank-info-box @endif">
                 <div class="row align-items-center">
                   <div class="col-md-7">
-                    <p class="fw-bold mb-3" style="color:#d4860a;">⚠️ Vui lòng chuyển khoản trong vòng 24 giờ để đơn hàng được xử lý.</p>
-                    <div class="bank-info-row">
-                      <span class="text-muted">Ngân hàng</span>
-                      <span class="fw-semibold">{{ $bankName }}</span>
-                    </div>
-                    <div class="bank-info-row">
-                      <span class="text-muted">Số tài khoản</span>
-                      <span class="fw-bold text-dark">{{ $bankAccount }}</span>
-                    </div>
-                    <div class="bank-info-row">
-                      <span class="text-muted">Chủ tài khoản</span>
-                      <span class="fw-semibold">{{ $bankOwner }}</span>
-                    </div>
-                    <div class="bank-info-row">
-                      <span class="text-muted">Số tiền</span>
-                      <span class="fw-bold text-danger">{{ number_format($displayTotal) }}&thinsp;đ</span>
-                    </div>
-                    <div class="bank-info-row" style="border-bottom:none;">
-                      <span class="text-muted">Nội dung CK</span>
-                      <span class="fw-bold text-danger">THANHTOAN DH{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
-                    </div>
+                    @if($order->payment_status == 'pending')
+                      <p class="section-label mb-2">Thông tin chuyển khoản</p>
+                      <p class="fw-bold mb-3" style="color:#d4860a;">⚠️ Vui lòng chuyển khoản và nhấn nút xác nhận bên dưới.</p>
+                      <div class="bank-info-row">
+                        <span class="text-muted">Ngân hàng</span>
+                        <span class="fw-semibold">{{ $bankName }}</span>
+                      </div>
+                      <div class="bank-info-row">
+                        <span class="text-muted">Số tài khoản</span>
+                        <span class="fw-bold text-dark">{{ $bankAccount }}</span>
+                      </div>
+                      <div class="bank-info-row">
+                        <span class="text-muted">Chủ tài khoản</span>
+                        <span class="fw-semibold">{{ $bankOwner }}</span>
+                      </div>
+                      <div class="bank-info-row">
+                        <span class="text-muted">Số tiền</span>
+                        <span class="fw-bold text-danger">{{ number_format($displayTotal) }}&thinsp;đ</span>
+                      </div>
+                      <div class="bank-info-row" style="border-bottom:none;">
+                        <span class="text-muted">Nội dung CK</span>
+                        <span class="fw-bold text-danger">THANHTOAN DH{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
+                      </div>
+
+                      <div class="mt-4 d-flex gap-2">
+                        <form action="{{ route('checkout.confirm_transfer', $order->id) }}" method="POST" class="flex-grow-1">
+                          @csrf
+                          <button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow-sm">
+                            <i class="bi bi-send-check-fill me-2"></i> Xác nhận đã chuyển khoản
+                          </button>
+                        </form>
+                        <form action="{{ route('checkout.cancel_order', $order->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')">
+                          @csrf
+                          <button type="submit" class="btn btn-outline-danger py-3 px-4 rounded-pill fw-bold">
+                            Hủy đơn
+                          </button>
+                        </form>
+                      </div>
+                    @elseif($order->payment_status == 'waiting_confirmation')
+                      <div class="text-center py-4">
+                        <div class="mb-3">
+                          <i class="bi bi-clock-history text-warning" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="fw-bold">Đang chờ xác nhận thanh toán</h5>
+                        <p class="text-muted">Hệ thống đã ghi nhận thông báo chuyển khoản của bạn. Admin sẽ kiểm tra và xác nhận đơn hàng sớm nhất có thể.</p>
+                      </div>
+                    @elseif($order->payment_status == 'paid')
+                      <div class="text-center py-4">
+                        <div class="mb-3">
+                          <i class="bi bi-patch-check-fill text-success" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="fw-bold">Thanh toán đã được xác nhận</h5>
+                        <p class="text-muted">Cảm ơn bạn, chúng tôi đã nhận được thanh toán và đang chuẩn bị hàng.</p>
+                      </div>
+                    @endif
                   </div>
                   <div class="col-md-5 text-center mt-4 mt-md-0">
                     <div class="qr-holder">
-                      <img src="https://img.vietqr.io/image/{{ $bankId }}-{{ $bankAccount }}-compact2.png?amount={{ $displayTotal }}&addInfo=THANHTOAN%20DH{{ $order->id }}&accountName={{ urlencode($bankOwner) }}"
-                           alt="VietQR" class="img-fluid" style="max-width: 190px;">
+                      @php
+                        $qrUrl = "https://img.vietqr.io/image/{$bankId}-{$bankAccount}-compact2.png?amount={$displayTotal}&addInfo=THANHTOAN%20DH{$order->id}&accountName=" . urlencode($bankOwner);
+                      @endphp
+                      <img src="{{ $qrUrl }}" alt="VietQR" class="img-fluid" style="max-width: 190px;">
                     </div>
                     <p class="small text-muted mt-2 mb-0">📷 Quét mã QR để thanh toán nhanh</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            @endif
+
+            {{-- VNPAY PAYMENT SUCCESS INFO --}}
+            @if($isVnpay)
+            <div class="col-12">
+              <div class="p-4 rounded-3" style="background: linear-gradient(135deg,#e8f5e9,#f1f8e9); border: 1.5px solid #a5d6a7;">
+                <div class="d-flex align-items-center gap-3">
+                  <div style="width:52px;height:52px;background:#28a745;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="bi bi-shield-check text-white" style="font-size:1.4rem;"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold" style="color:#1b5e20;font-size:1.05rem;">Thanh toán VNPAY thành công! 🎉</div>
+                    <div class="text-muted small">Số tiền: <strong class="text-danger">{{ number_format($displayTotal) }}&thinsp;đ</strong>
+                      @if($order->transaction_id)
+                        &nbsp;&bull;&nbsp; Mã giao dịch: <code>{{ $order->transaction_id }}</code>
+                      @endif
+                    </div>
+                    <div class="text-muted small mt-1">Trạng thái đơn hàng đã được cập nhật. Chúng tôi sẽ xử lý ngay!</div>
                   </div>
                 </div>
               </div>
@@ -327,9 +392,15 @@
 
         {{-- ACTION BUTTONS --}}
         <div class="px-4 pb-4 pt-2 d-flex flex-wrap gap-2 justify-content-center border-top mt-2" style="background:#f9fafb;">
-          <a href="{{ route('account.index') }}?tab=orders" class="btn btn-outline-dark px-4 py-2 rounded-pill">
-            <i class="bi bi-list-ul me-1"></i> Xem đơn hàng của tôi
-          </a>
+          @if(Auth::check())
+            <a href="{{ route('account.index') }}?tab=orders" class="btn btn-outline-dark px-4 py-2 rounded-pill">
+              <i class="bi bi-list-ul me-1"></i> Xem đơn hàng của tôi
+            </a>
+          @else
+            <a href="{{ route('order-tracking.index') }}" class="btn btn-outline-dark px-4 py-2 rounded-pill">
+              <i class="bi bi-search me-1"></i> Tra cứu đơn hàng
+            </a>
+          @endif
           <a href="{{ route('shop') }}" class="btn btn-dark px-4 py-2 rounded-pill">
             <i class="bi bi-bag me-1"></i> Tiếp tục mua sắm
           </a>

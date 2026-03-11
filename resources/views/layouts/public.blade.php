@@ -15,6 +15,9 @@
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend-assets/img/favicon.ico') }}">
 
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- CSS 
     ========================= -->
 
@@ -31,6 +34,8 @@
     <!-- Search Autocomplete CSS -->
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/search-autocomplete.css') }}">
 
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -38,6 +43,29 @@
         /* Smooth Scrolling */
         html {
             scroll-behavior: smooth;
+        }
+
+        /* Remove default link underlines */
+        a {
+            text-decoration: none !important;
+        }
+
+        /* Product Title Styling */
+        .product_content h3 a {
+            font-size: 14px !important;
+            font-weight: 300 !important;
+            color: #333 !important;
+            line-height: 1.4 !important;
+            transition: color 0.3s ease !important;
+        }
+
+        .product_content h3 a:hover {
+            color: #ef233c !important;
+        }
+
+        /* Product Price Styling */
+        .current_price {
+            font-weight: 700 !important;
         }
 
         /* Global Product Hover Effect & Consistent Sizing */
@@ -58,6 +86,21 @@
 
         .single_product:hover .product_thumb img {
             transform: scale(1.08) !important;
+        }
+
+        /* Remove underlines from header and breadcrumb links */
+        .header_area a, 
+        .breadcrumbs_area a, 
+        .main_menu a, 
+        .offcanvas_menu a {
+            text-decoration: none !important;
+        }
+
+        .header_area a:hover, 
+        .breadcrumbs_area a:hover, 
+        .main_menu a:hover, 
+        .offcanvas_menu a:hover {
+            text-decoration: none !important;
         }
     </style>
 </head>
@@ -144,6 +187,42 @@
         });
         @endif
     </script>
+
+    <script type="module">
+        if (window.Echo) {
+            let channel;
+            @if(auth()->check())
+                channel = window.Echo.private('App.Models.User.{{ auth()->id() }}');
+            @else
+                channel = window.Echo.channel('cart.{{ session()->getId() }}');
+            @endif
+
+            channel.listen('CartUpdatedEvent', (e) => {
+                // e.cartCount is from the CartUpdatedEvent constructor
+                let cartCountElements = document.querySelectorAll('.cart-count');
+                cartCountElements.forEach(el => {
+                    el.innerText = e.cartCount;
+                    
+                    // Thêm class nháy nhẹ (animation)
+                    el.classList.remove('pulse-animation');
+                    void el.offsetWidth; // trigger reflow
+                    el.classList.add('pulse-animation');
+                });
+            });
+        }
+    </script>
+
+    <style>
+        @keyframes cartPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); color: #ef233c; }
+            100% { transform: scale(1); }
+        }
+        .pulse-animation {
+            animation: cartPulse 0.5s ease-in-out;
+            display: inline-block;
+        }
+    </style>
 </body>
 
 

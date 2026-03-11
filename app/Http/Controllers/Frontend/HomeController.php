@@ -24,6 +24,11 @@ class HomeController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        $midBanner = Banner::where('position', 'home_middle')
+            ->where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->first();
+
 
 
         // Sản phẩm nổi bật cho section "New Arrivals"
@@ -48,12 +53,23 @@ class HomeController extends Controller
             ->take(10)
             ->get();
 
-        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders'));
+        // Flash Sale products
+        $flashSaleProducts = Product::flashSale()
+            ->with(['variants', 'reviews', 'images'])
+            ->take(8)
+            ->get();
+
+        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders', 'midBanner', 'flashSaleProducts'));
     }
 
     public function about()
     {
-        return view('frontend.about');
+        $aboutBanner = \App\Models\Banner::where('position', 'about_us')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->first();
+
+        return view('frontend.about', compact('aboutBanner'));
     }
 
     public function news()

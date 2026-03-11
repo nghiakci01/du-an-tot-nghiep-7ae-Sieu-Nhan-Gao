@@ -11,6 +11,7 @@ return [
     'account' => 'Tài khoản',
     'logout' => 'Đăng xuất',
     'search_placeholder' => 'Tìm kiếm sản phẩm...',
+    'search_results' => 'Kết quả tìm kiếm',
     'cart' => 'Giỏ hàng',
     'checkout' => 'Thanh toán',
     'my_account' => 'Tài khoản của tôi',
@@ -179,7 +180,7 @@ return [
     'variant' => 'Biến thể',
     'size' => 'Kích thước',
     'color' => 'Màu sắc',
-    'edit' => 'thêm sản phẩm tương tự',
+    'edit' => 'đổi biến thể',
 
     // Checkout - Reid Template
     'returning_customer' => 'Khách hàng cũ',
@@ -281,6 +282,14 @@ return [
     'reset_password' => 'Đặt lại mật khẩu',
     'send_verification_code' => "Gửi mã xác nhận",
 
-    
-
+    // Theme Setting Admin
+    'settings' => 'Cài đặt',
+    'theme_mode_title' => 'Chế độ giao diện',
+    'theme_mode_desc' => 'Chọn chế độ Sáng, Tối hoặc Tự động',
+    'theme_mode_light' => 'Sáng',
+    'theme_mode_dark' => 'Tối',
+    'theme_mode_auto' => 'Tự động thiết lập chế độ giao diện dựa trên chủ đề của trình duyệt người dùng.',
+    'theme_layout_title' => 'Bố cục giao diện',
+    'theme_layout_desc' => 'Chọn bố cục của bạn',
+    'reset_layout' => 'Đặt lại mặc định'
 ];

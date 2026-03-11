@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -11,7 +12,7 @@ use App\Traits\Auditable;
 
 class Product extends Model
 {
-    use HasFactory, Auditable;
+    use HasFactory, SoftDeletes, Auditable;
 
     protected $fillable = [
         'category_id',
@@ -22,6 +23,8 @@ class Product extends Model
         'description',
         'price',
         'sale_price',
+        'sale_start',
+        'sale_end',
         'is_active',
         'is_featured',
         'image',
@@ -32,6 +35,8 @@ class Product extends Model
         'is_featured' => 'boolean',
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
+        'sale_start' => 'datetime',
+        'sale_end' => 'datetime',
     ];
 
     public function category(): BelongsTo
@@ -89,5 +94,37 @@ class Product extends Model
         }
 
         return asset('frontend-assets/img/product/product21.jpg');
+    }
+
+    public function isOnFlashSale(): bool
+    {
+        if (!$this->sale_price || !$this->sale_start || !$this->sale_end) {
+            return false;
+        }
+        $now = now();
+        return $now->gte($this->sale_start) && $now->lte($this->sale_end);
+    }
+
+    public function getFlashSaleEndsAtAttribute(): ?string
+    {
+        return $this->isOnFlashSale() ? $this->sale_end->toIso8601String() : null;
+    }
+
+    public function scopeFlashSale($query)
+    {
+        return $query->whereNotNull('sale_price')
+            ->where('sale_price', '>', 0)
+            ->whereNotNull('sale_start')
+            ->whereNotNull('sale_end')
+            ->where('sale_start', '<=', now())
+            ->where('sale_end', '>=', now())
+            ->where('is_active', true);
+    }
+
+    public function getTotalSoldAttribute(): int
+    {
+        return (int) \App\Models\OrderItem::where('product_id', $this->id)
+            ->whereHas('order', fn($q) => $q->whereNotIn('status', ['cancelled', 'failed', 'returned']))
+            ->sum('quantity');
     }
 }

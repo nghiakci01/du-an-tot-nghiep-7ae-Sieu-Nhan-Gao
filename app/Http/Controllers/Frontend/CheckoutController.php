@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Notifications\NewOrderNotification;
@@ -21,7 +22,29 @@ class CheckoutController extends Controller
     {
         $cart = session()->get('cart', []);
         if (count($cart) == 0) {
-            return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
+            return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
+        }
+
+        // Validate tồn kho trước khi vào trang checkout
+        $invalidItems = [];
+        foreach ($cart as $variantId => $item) {
+            $variant = ProductVariant::find($variantId);
+            if (!$variant || !$variant->product) {
+                $invalidItems[] = '“' . ($item['name'] ?? 'Sản phẩm') . '” đã không còn tồn tại.';
+                continue;
+            }
+            if ($variant->stock_quantity <= 0) {
+                $invalidItems[] = '“' . $item['name'] . '” (đã hết hàng).';
+                continue;
+            }
+            if ($item['quantity'] > $variant->stock_quantity) {
+                $invalidItems[] = '“' . $item['name'] . '” - chỉ còn ' . $variant->stock_quantity . ' sản phẩm.';
+            }
+        }
+
+        if (!empty($invalidItems)) {
+            $msg = 'Giỏ hàng có sản phẩm không hợp lệ: ' . implode(' ', $invalidItems) . ' Vui lòng cập nhật giỏ hàng trước khi thanh toán.';
+            return redirect()->route('cart.index')->with('error', $msg);
         }
 
         $total = 0;
@@ -47,6 +70,65 @@ class CheckoutController extends Controller
         return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces'));
     }
 
+    /**
+     * AJAX: Kiểm tra giỏ hàng trước khi chuyển sang checkout
+     */
+    public function validateCart()
+    {
+        $cart = session()->get('cart', []);
+
+        if (empty($cart)) {
+            return response()->json(['valid' => false, 'message' => 'Giỏ hàng trống!']);
+        }
+
+        $errors = [];
+        foreach ($cart as $variantId => $item) {
+            $variant = ProductVariant::with('product')->find($variantId);
+
+            if (!$variant || !$variant->product) {
+                $errors[] = [
+                    'name' => $item['name'] ?? 'Sản phẩm',
+                    'issue' => 'không còn tồn tại trong hệ thống',
+                    'type' => 'not_found',
+                ];
+                continue;
+            }
+
+            if (!$variant->product->is_active) {
+                $errors[] = [
+                    'name' => $item['name'],
+                    'issue' => 'đã ngưng kinh doanh',
+                    'type' => 'inactive',
+                ];
+                continue;
+            }
+
+            if ($variant->stock_quantity <= 0) {
+                $errors[] = [
+                    'name' => $item['name'],
+                    'issue' => 'đã hết hàng',
+                    'type' => 'out_of_stock',
+                ];
+                continue;
+            }
+
+            if ($item['quantity'] > $variant->stock_quantity) {
+                $errors[] = [
+                    'name' => $item['name'],
+                    'issue' => 'chỉ còn ' . $variant->stock_quantity . ' sản phẩm (bạn chọn ' . $item['quantity'] . ')',
+                    'type' => 'insufficient_stock',
+                    'available' => $variant->stock_quantity,
+                ];
+            }
+        }
+
+        if (!empty($errors)) {
+            return response()->json(['valid' => false, 'errors' => $errors]);
+        }
+
+        return response()->json(['valid' => true]);
+    }
+
     public function store(Request $request)
     {
         $provinces = config('vietnam_provinces');
@@ -57,7 +139,7 @@ class CheckoutController extends Controller
             'province' => 'required|string|in:'.implode(',', $provinces),
             'address' => 'required|string|max:500',
             'note' => 'nullable|string|max:1000',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
             'shipping_provider' => 'nullable|string',
             'shipping_service_name' => 'nullable|string',
             'shipping_fee' => 'nullable|numeric',
@@ -127,14 +209,12 @@ class CheckoutController extends Controller
             }
 
             foreach ($cart as $id => $details) {
-                // Verify stock again with a lock to prevent race condition
-                $variant = clone ProductVariant::where('id', $details['variant_id'])->lockForUpdate()->first();
-                if (! $variant || $variant->stock_quantity < $details['quantity']) {
-                    throw new \Exception('Product '.$details['name'].' ('.$details['size'].'/'.$details['color'].') is out of stock.');
+                // Trừ kho với lockForUpdate để tránh race condition
+                $variant = ProductVariant::where('id', $details['variant_id'])->lockForUpdate()->first();
+                if (!$variant || $variant->stock_quantity < $details['quantity']) {
+                    throw new \Exception('Sản phẩm "' . $details['name'] . '" không đủ số lượng tồn kho.');
                 }
-
-                // Deduct stock
-                ProductVariant::where('id', $details['variant_id'])->decrement('stock_quantity', $details['quantity']);
+                $variant->decrement('stock_quantity', $details['quantity']);
 
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -142,7 +222,7 @@ class CheckoutController extends Controller
                     'variant_id' => $details['variant_id'],
                     'quantity' => $details['quantity'],
                     'price' => $details['price'],
-                    'cost_price' => $variant->cost_price ?? 0,
+                    'cost_price' => $details['price'],
                 ]);
             }
 
@@ -155,8 +235,22 @@ class CheckoutController extends Controller
             // Clear cart and coupon session
             Session::forget(['cart', 'coupon_code', 'discount_amount']);
 
+            // Nếu chọn VNPAY -> redirect sang trang thanh toán VNPAY
+            if ($request->payment_method === 'VNPAY') {
+                return redirect()->route('vnpay.payment', $order->id);
+            }
 
-            // Send confirmation email for COD and BANK_TRANSFER
+            // Mark any abandoned carts as recovered for this user/session
+            try {
+                app(\App\Services\ConversionTrackingService::class)->markRecovered(
+                    Auth::id(),
+                    session()->getId()
+                );
+            } catch (\Exception $e) {
+                \Log::warning('Cart abandonment recovery tracking failed: ' . $e->getMessage());
+            }
+
+            // COD & BANK_TRANSFER: gửi email xác nhận và chuyển đến trang thành công
             try {
                 \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
             } catch (\Exception $e) {
@@ -176,13 +270,72 @@ class CheckoutController extends Controller
     {
         $order = Order::with(['items.product', 'items.variant'])->findOrFail($id);
 
-        // Security check: Only allow viewing if Auth user matches Or if just created (session check could be added here for strictness)
-        $bankName = \App\Models\Setting::get('bank_name', 'Vietcombank');
-        $bankAccount = \App\Models\Setting::get('bank_account_number', '0071001234567');
-        $bankOwner = \App\Models\Setting::get('bank_account_name', 'CÔNG TY TNHH SIÊU NHÂN GAO');
-        $bankId = \App\Models\Setting::get('bank_id', 'vcb');
+        // Lấy thông tin tài khoản ngân hàng mặc định
+        $bank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first();
+        
+        // Nếu không có mặc định, lấy cái đầu tiên đang hoạt động
+        if (!$bank) {
+            $bank = \App\Models\BankSetting::where('is_active', true)->first();
+        }
+
+        $bankName = $bank->bank_name ?? 'Vietcombank';
+        $bankAccount = $bank->account_number ?? '0071001234567';
+        $bankOwner = $bank->account_name ?? 'CÔNG TY TNHH SIÊU NHÂN GAO';
+        $bankId = $bank->bank_id ?? 'vcb';
 
         return view('frontend.checkout.success', compact('order', 'bankName', 'bankAccount', 'bankOwner', 'bankId'));
+    }
+
+    /**
+     * Xác nhận đã chuyển khoản
+     */
+    public function confirmTransfer($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->payment_method !== 'BANK_TRANSFER') {
+            return redirect()->back()->with('error', 'Phương thức thanh toán không hợp lệ.');
+        }
+
+        if ($order->payment_status !== 'pending') {
+            return redirect()->back()->with('error', 'Trạng thái thanh toán không hợp lệ.');
+        }
+
+        $order->update([
+            'payment_status' => 'waiting_confirmation'
+        ]);
+
+        // Ghi lại lịch sử (nếu có hệ thống lịch sử đơn hàng)
+        if (class_exists(\App\Models\OrderHistory::class)) {
+            \App\Models\OrderHistory::create([
+                'order_id' => $order->id,
+                'status' => $order->status,
+                'note' => 'Khách hàng xác nhận đã chuyển khoản. Chờ Admin kiểm tra.',
+                'user_id' => Auth::id()
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Thông báo đã được gửi. Vui lòng chờ chúng tôi xác nhận giao dịch.');
+    }
+
+    /**
+     * Hủy đơn hàng khi đang chờ thanh toán
+     */
+    public function cancelOrder($id, \App\Services\OrderService $orderService)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->status !== 'pending') {
+            return redirect()->back()->with('error', 'Không thể hủy đơn hàng ở trạng thái hiện tại.');
+        }
+
+        try {
+            $orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, Auth::user(), 'Khách hàng tự hủy đơn hàng từ trang thanh toán.');
+
+            return redirect()->route('shop')->with('success', 'Đơn hàng đã được hủy thành công.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi hủy đơn hàng: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -55,7 +55,7 @@ class PostController extends Controller
 
         Post::create($data);
 
-        return redirect()->route('admin.posts.index')->with('success', 'Bài viết đã được tạo thành công.');
+        return redirect()->route('admin.posts.index')->with('success', 'Tin tức đã được tạo thành công.');
     }
 
     /**
@@ -94,7 +94,7 @@ class PostController extends Controller
 
         $post->update($data);
 
-        return redirect()->route('admin.posts.index')->with('success', 'Bài viết đã được cập nhật thành công.');
+        return redirect()->route('admin.posts.index')->with('success', 'Tin tức đã được cập nhật thành công.');
     }
 
     /**
@@ -108,6 +108,6 @@ class PostController extends Controller
         }
         $post->delete();
 
-        return redirect()->route('admin.posts.index')->with('success', 'Bài viết đã được xóa thành công.');
+        return redirect()->route('admin.posts.index')->with('success', 'Tin tức đã được xóa thành công.');
     }
 }

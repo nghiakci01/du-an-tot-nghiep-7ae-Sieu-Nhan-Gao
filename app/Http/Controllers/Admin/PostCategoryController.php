@@ -42,7 +42,7 @@ class PostCategoryController extends Controller
 
         \App\Models\PostCategory::create($validated);
 
-        return redirect()->route('admin.post-categories.index')->with('success', 'Danh mục tin đã được tạo thành công.');
+        return redirect()->route('admin.post-categories.index')->with('success', 'Danh mục tin tức đã được tạo thành công.');
     }
 
     /**
@@ -72,7 +72,7 @@ class PostCategoryController extends Controller
 
         $category->update($validated);
 
-        return redirect()->route('admin.post-categories.index')->with('success', 'Danh mục tin đã được cập nhật thành công.');
+        return redirect()->route('admin.post-categories.index')->with('success', 'Danh mục tin tức đã được cập nhật thành công.');
     }
 
     /**
@@ -88,6 +88,6 @@ class PostCategoryController extends Controller
 
         $category->delete();
 
-        return redirect()->route('admin.post-categories.index')->with('success', 'Danh mục tin đã được xóa thành công.');
+        return redirect()->route('admin.post-categories.index')->with('success', 'Danh mục tin tức đã được xóa thành công.');
     }
 }

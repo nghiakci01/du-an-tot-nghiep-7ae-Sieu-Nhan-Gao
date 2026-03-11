@@ -239,13 +239,39 @@
                 </div>
                 <div class="mb-3">
                     <p class="mb-1 text-muted small">TRẠNG THÁI THANH TOÁN</p>
-                    <p class="mb-0">
-                        @if($order->payment_status == 'PAID')
+                    <p class="mb-2">
+                        @if($order->payment_status == 'paid')
                             <span class="badge bg-success"><i class="feather icon-check"></i> Đã thanh toán</span>
+                        @elseif($order->payment_status == 'refunded')
+                            <span class="badge bg-danger"><i class="feather icon-rotate-ccw"></i> Đã hoàn tiền</span>
+                        @elseif($order->payment_status == 'waiting_confirmation')
+                            <span class="badge bg-info text-white"><i class="feather icon-clock"></i> Chờ xác nhận</span>
                         @else
                             <span class="badge bg-warning text-dark"><i class="feather icon-clock"></i> Chưa thanh toán</span>
                         @endif
                     </p>
+
+                    @if($order->payment_method === 'VNPAY')
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btn-query-vnpay">
+                                <i class="feather icon-search"></i> Truy vấn trạng thái VNPAY
+                            </button>
+                            @if($order->payment_status === 'paid')
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#refundVnpayModal">
+                                    <i class="feather icon-rotate-ccw"></i> Yêu cầu hoàn tiền
+                                </button>
+                            @endif
+                        </div>
+                    @endif
+
+                    @if($order->payment_method == 'BANK_TRANSFER' && $order->payment_status == 'waiting_confirmation')
+                        <form action="{{ route('admin.orders.confirm-payment', $order->id) }}" method="POST" onsubmit="return confirm('Bạn đã chắc chắn nhận được tiền cho đơn hàng này?')">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-success w-100">
+                                <i class="feather icon-check-circle"></i> Xác nhận ĐÃ NHẬN TIỀN
+                            </button>
+                        </form>
+                    @endif
                 </div>
                 @if($order->shipping_service_name)
                 <div class="mb-0">
@@ -270,4 +296,84 @@
 
     </div>
 </div>
+@endsection
+
+@if($order->payment_method === 'VNPAY' && $order->payment_status === 'paid')
+<!-- Refund Modal -->
+<div class="modal fade" id="refundVnpayModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('admin.orders.refund-payment', $order->id) }}" method="POST" class="modal-content">
+            @csrf
+            <div class="modal-header">
+                <h5 class="modal-title">Hoàn tiền VNPAY</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info py-2">
+                    <p class="mb-0 small"><i class="feather icon-info me-1"></i> Số tiền tối đa có thể hoàn: <strong>{{ number_format($order->final_total) }}đ</strong></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Số tiền hoàn (VNĐ):</label>
+                    <input type="number" name="refund_amount" class="form-control" value="{{ (int)$order->final_total }}" min="1000" max="{{ (int)$order->final_total }}" required>
+                    <div class="form-text">Mặc định là hoàn toàn bộ đơn hàng.</div>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">Lý do hoàn tiền:</label>
+                    <textarea name="reason" class="form-control" rows="2" placeholder="VD: Khách hàng đổi trả sản phẩm..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Xác nhận gửi yêu cầu hoàn tiền sang VNPAY?')">Xác nhận hoàn tiền</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endif
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnQuery = document.getElementById('btn-query-vnpay');
+    if (btnQuery) {
+        btnQuery.addEventListener('click', function() {
+            const originalText = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang kiểm tra...';
+
+            fetch("{{ route('admin.orders.query-payment', $order->id) }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+                
+                if (data.success) {
+                    let logMsg = `Kết quả từ VNPAY:\n- Trạng thái: ${data.message}\n- Mã phản hồi: ${data.data.vnp_ResponseCode}`;
+                    if (data.data.vnp_TransactionStatus) {
+                        logMsg += `\n- Tình trạng GD: ${data.data.vnp_TransactionStatus}`;
+                    }
+                    alert(logMsg);
+                    if (data.data.vnp_ResponseCode === '00' && "{{ $order->payment_status }}" !== 'paid') {
+                        location.reload();
+                    }
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+                alert('Có lỗi xảy ra khi gọi API: ' + error.message);
+            });
+        });
+    }
+});
+</script>
 @endsection

@@ -58,6 +58,11 @@
   </script>
   <script defer="defer" src="https://phpstack-207002-5085356.cloudwaysapps.com/pixel/"></script> --}}
   <link rel="stylesheet" href="{{ asset('admin-assets') }}/css/style-preset.css" />
+  <style>
+    a {
+      text-decoration: none !important;
+    }
+  </style>
 </head><!-- [Head] end --><!-- [Body] Start -->
 
 <body data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr"

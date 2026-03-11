@@ -197,7 +197,7 @@
                     <li class="separator">/</li>
                     <li><a href="{{ route('news') }}">Tin tức</a></li>
                     <li class="separator">/</li>
-                    <li>{{ Str::limit($post->title, 50) }}</li>
+                    <li>{{ $post->title }}</li>
                 </ul>
             </div>
         </div>

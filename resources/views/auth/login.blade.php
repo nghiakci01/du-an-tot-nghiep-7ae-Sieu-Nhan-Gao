@@ -250,6 +250,13 @@
                                 @enderror
                             </div>
 
+                            <div class="input-group" style="display: flex; align-items: center; margin-bottom: 5px; margin-top: 10px;">
+                                <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }} style="margin-right: 8px; cursor: pointer; width: auto; height: 16px;">
+                                <label for="remember" style="font-size: 14px; color: #666; cursor: pointer; margin-bottom: 0; user-select: none;">
+                                    {{ __('messages.remember_me') }}
+                                </label>
+                            </div>
+
                             <button type="submit" class="auth-btn auth-btn-login">{{ __('messages.login') }}</button>
 
                             <a href="{{ route('password.request') }}" class="forgot-link">{{ __('messages.lost_password') }}</a>

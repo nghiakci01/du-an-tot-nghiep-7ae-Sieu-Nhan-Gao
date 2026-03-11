@@ -26,21 +26,21 @@
                     <div class="collapse pc-user-links" id="pc_sidebar_userlink">
                         <div class="pt-3">
                             <a href="{{ route('admin.profile.index') }}"><i class="ti ti-user"></i>
-                                <span data-i18n="My Account">My Account</span> </a><a
+                                <span data-i18n="My Account">Tài khoản của tôi</span> </a><a
                                 href="{{ route('admin.settings.index') }}"><i class="ti ti-settings"></i>
-                                <span data-i18n="Settings">Settings</span> </a><a href="{{ route('admin.lock') }}"><i
+                                <span data-i18n="Settings">Cài đặt</span> </a><a href="{{ route('admin.lock') }}"><i
                                     class="ti ti-lock"></i>
-                                <span data-i18n="Lock Screen">Lock Screen</span> </a><a href="{{ route('logout') }}"
+                                <span data-i18n="Lock Screen">Khóa màn hình</span> </a><a href="{{ route('logout') }}"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
                                     class="ti ti-power"></i>
-                                <span data-i18n="Logout">Logout</span></a>
+                                <span data-i18n="Logout">Đăng xuất</span></a>
                         </div>
                     </div>
                 </div>
             </div>
             <ul class="pc-navbar">
                 <li class="pc-item pc-caption">
-                    <label>Navigation</label>
+                    <label>Điều hướng</label>
                 </li>
                 <li class="pc-item">
                     <a href="{{ route('admin.dashboard') }}" class="pc-link">
@@ -49,7 +49,7 @@
                                 <use xlink:href="#custom-status-up"></use>
                             </svg>
                         </span>
-                        <span class="pc-mtext">Dashboard</span>
+                        <span class="pc-mtext">Bảng điều khiển</span>
                     </a>
                 </li>
 
@@ -143,39 +143,7 @@
                         </a>
                     </li>
                 @endif
-                <li class="pc-item pc-hasmenu">
-                    <a href="#!" class="pc-link">
-                        <span class="pc-micon">
-                            <i class="ti ti-archive"></i>
-                        </span>
-                        <span class="pc-mtext">Quản lý Kho</span>
-                        <span class="pc-arrow">
-                            <i data-feather="chevron-right"></i>
-                        </span>
-                    </a>
-                    <ul class="pc-submenu">
-                        <li class="pc-item">
-                            <a href="{{ route('admin.vouchers.index') }}" class="pc-link">
-                                <span class="pc-mtext">Phiếu Nhập/Xuất</span>
-                            </a>
-                        </li>
-                        <li class="pc-item">
-                            <a href="{{ route('admin.warehouses.index') }}" class="pc-link">
-                                <span class="pc-mtext">Danh sách Kho</span>
-                            </a>
-                        </li>
-                        <li class="pc-item">
-                            <a href="{{ route('admin.suppliers.index') }}" class="pc-link">
-                                <span class="pc-mtext">Nhà cung cấp</span>
-                            </a>
-                        </li>
-                        <li class="pc-item">
-                            <a href="{{ route('admin.stock.index') }}" class="pc-link">
-                                <span class="pc-mtext">Báo cáo tồn kho</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                {{-- Removed corrupted stock report item --}}
                 <li class="pc-item">
                     <a href="{{ route('admin.chat.index') }}" class="pc-link">
                         <span class="pc-micon">
@@ -200,13 +168,13 @@
                         <span class="pc-mtext">Đánh giá sản phẩm</span>
                     </a>
                 </li>
-                @if (auth()->user()->isAdmin())
+                @if (auth()->user()->isAdmin() || auth()->user()->isStaff())
                     <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link">
                             <span class="pc-micon">
                                 <i class="ti ti-news"></i>
                             </span>
-                            <span class="pc-mtext">Quản lý Blog</span>
+                            <span class="pc-mtext">Quản lý Tin tức</span>
                             <span class="pc-arrow">
                                 <i data-feather="chevron-right"></i>
                             </span>
@@ -214,16 +182,18 @@
                         <ul class="pc-submenu">
                             <li class="pc-item">
                                 <a href="{{ route('admin.post-categories.index') }}" class="pc-link">
-                                    <span class="pc-mtext">Danh mục tin</span>
+                                    <span class="pc-mtext">Danh mục tin tức</span>
                                 </a>
                             </li>
                             <li class="pc-item">
                                 <a href="{{ route('admin.posts.index') }}" class="pc-link">
-                                    <span class="pc-mtext">Bài viết</span>
+                                    <span class="pc-mtext">Danh sách tin tức</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
+                @endif
+                @if (auth()->user()->isAdmin())
                     <li class="pc-item">
                         <a href="{{ route('admin.loyalty-points.index') }}" class="pc-link">
                             <span class="pc-micon">
@@ -232,8 +202,6 @@
                             <span class="pc-mtext">Cấu hình Tích điểm</span>
                         </a>
                     </li>
-                @endif
-                @if (auth()->user()->isAdmin())
                     <li class="pc-item">
                         <a href="{{ route('admin.users.index') }}" class="pc-link">
                             <span class="pc-micon">

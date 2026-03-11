@@ -27,14 +27,24 @@ class VtonController extends Controller
                 'user_image.max'        => 'File quá lớn. Vui lòng tải ảnh bé hơn 5MB.',
                 'user_image.dimensions' => 'Ảnh quá mờ hoặc có kích thước quá thấp. Vui lòng sử dụng ảnh sắc nét hơn (Tối thiểu 600x600px).',
             ]);
-
             $apiToken = env('REPLICATE_API_TOKEN', env('FASHN_API_TOKEN'));
 
-            if (empty($apiToken)) {
+            // --- CHẾ ĐỘ GIẢ LẬP (MOCK) CHO ĐỒ ÁN (TRÁNH MẤT PHÍ API) ---
+            if (empty($apiToken) || $apiToken === 'demo' || str_starts_with($apiToken, 'nhap_api')) {
+                // Lấy ảnh người dùng tải lên để trả về (giả lập kết quả VTON thành công)
+                $userImageFile = $request->file('user_image');
+                $userImageMime = $userImageFile->getMimeType();
+                $userImageBase64 = base64_encode(file_get_contents($userImageFile->getRealPath()));
+                $userDataUri = 'data:' . $userImageMime . ';base64,' . $userImageBase64;
+
+                // Giả lập thời gian AI đang xử lý (5 giây)
+                sleep(5);
+
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Lỗi máy chủ: Chưa cấu hình REPLICATE_API_TOKEN trong file .env.'
-                ], 500);
+                    'success' => true,
+                    'image_url' => $userDataUri, // Trả về ảnh giả lập để báo cáo
+                    'message' => 'Thử đồ thành công! (Chạy ở chế độ Demo)'
+                ]);
             }
 
             $product = Product::findOrFail($request->product_id);

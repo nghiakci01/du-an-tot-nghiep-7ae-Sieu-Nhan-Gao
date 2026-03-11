@@ -149,15 +149,14 @@
                                 @endforeach
                             </ul>
                         </div>
-
-                        <!-- AI Try On Button Indicator -->
-                        <div class="ai-try-on-section mt-4 mb-3 text-center">
-                            <button type="button" class="btn btn-outline-dark w-100 py-3"
-                                style="border: 1px dashed #333; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s;"
-                                data-bs-toggle="modal" data-bs-target="#aiTryOnModal"
-                                onmouseover="this.style.background='#333'; this.style.color='#fff';"
-                                onmouseout="this.style.background='transparent'; this.style.color='#333';">
-                                <i class="fa fa-magic mr-2"></i> {{ __('messages.ai_try_on') === 'messages.ai_try_on' ? 'Thử Đồ AI' : __('messages.ai_try_on') }}
+                        <!-- AI Try On Button -->
+                        <div class="mt-4 mb-3 text-center">
+                            <button type="button" class="btn w-100 py-3 d-flex align-items-center justify-content-center" 
+                                style="background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); color: white; font-weight: bold; border-radius: 8px; border: none; box-shadow: 0 4px 15px rgba(253, 29, 29, 0.4); transition: transform 0.2s; font-size: 16px;" 
+                                data-bs-toggle="modal" data-bs-target="#aiTryOnModal" data-toggle="modal" data-target="#aiTryOnModal"
+                                onmouseover="this.style.transform='scale(1.02)'" 
+                                onmouseout="this.style.transform='scale(1)'">
+                                <i class="fa fa-magic mr-2" style="font-size: 20px;"></i> ✨ {{ __('messages.ai_try_on') === 'messages.ai_try_on' ? 'Thử Đồ AI' : __('messages.ai_try_on') }}
                             </button>
                         </div>
 
@@ -188,6 +187,32 @@
                                     </li>
                                 </ul>
                             </div>
+
+                            {{-- Social Proof badges --}}
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0;">
+                                @php $totalSold = $product->total_sold; @endphp
+                                @if($totalSold > 0)
+                                <span style="display: inline-flex; align-items: center; gap: 4px; background: #f0f0f0; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #555;">
+                                    <i class="fa fa-shopping-bag" style="color: #ef233c;"></i> Đã bán {{ $totalSold }}
+                                </span>
+                                @endif
+                                @if($totalSold >= 10)
+                                <span style="display: inline-flex; align-items: center; gap: 4px; background: #fff3e0; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #e65100; font-weight: 600;">
+                                    <i class="fa fa-fire"></i> Best Seller
+                                </span>
+                                @endif
+                                @if($product->isOnFlashSale())
+                                <span style="display: inline-flex; align-items: center; gap: 4px; background: #ff4b2b; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: white; font-weight: 600;">
+                                    <i class="fa fa-bolt"></i> Flash Sale
+                                </span>
+                                @endif
+                                @if($ratingAvg >= 4.5 && $product->reviews->count() >= 3)
+                                <span style="display: inline-flex; align-items: center; gap: 4px; background: #e8f5e9; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #2e7d32; font-weight: 600;">
+                                    <i class="fa fa-star"></i> Đánh giá cao
+                                </span>
+                                @endif
+                            </div>
+
                             <div class="product_desc">
                                 <p>{{ $product->short_description }}</p>
                             </div>
@@ -231,7 +256,7 @@
                                     style="font-weight: bold; display: none;"></div>
 
                                 <script>
-                                    document.addEventListener('DOMContentLoad                                           ed', fun ction() {
+                                    document.addEventListener('DOMContentLoaded', function() {
                                         const variants = @json($product->variants);
                                         const niceSize = document.getElementById('select_size_nice');
                                         const niceColor = document.getElementById('select_color_nice');
@@ -430,16 +455,12 @@
                                                 priceContainer.innerHTML = originalPriceHtml;
                                             }
                                         }
-                                    });
                                 </script>
                             @endif
 
                             <div class="product_variant quantity">
                                 <label>{{ __('messages.quantity') }}</label>
-                                <input min="1" max="100" value="1" type="number" name="quantity"
-                                    id="quantity_input">
-                                <span id="stock-info"
-                                    style="display:none; font-size:13px; color:#666; margin-left:8px;"></span>
+                                <input min="1" value="1" type="number" name="quantity" id="quantity_input">
                                 <div style="margin-top:10px;">
                                     <input type="hidden" name="action" id="action_input" value="add_to_cart">
                                     <button class="button" type="button"
@@ -695,6 +716,93 @@
     </section>
     <!--product section area end-->
 
+    <!-- AI Try On Modal -->
+    <div class="modal fade" id="aiTryOnModal" tabindex="-1" aria-labelledby="aiTryOnModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px; overflow: hidden; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                <div class="modal-header" style="background: linear-gradient(45deg, #111, #333); color: white; border-bottom: none; padding: 20px 25px;">
+                    <h5 class="modal-title" id="aiTryOnModalLabel" style="font-weight: 700; letter-spacing: 1px; margin: 0; color: white;">
+                        <i class="fa fa-magic text-warning" style="margin-right: 8px;"></i> {{ __('messages.ai_try_on_modal_title') ?? 'Trải nghiệm Phòng Thử Đồ AI' }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="row g-0">
+                        <!-- Left side: Instructions & Upload -->
+                        <div class="col-md-5 p-4" style="background: #f8f9fa; border-right: 1px solid #eee;">
+                            <h6 style="font-weight: 600; color: #ef233c; margin-bottom: 15px;">Hướng dẫn:</h6>
+                            <ol style="padding-left: 15px; font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 25px;">
+                                <li>Tải lên một bức ảnh rõ nét của bạn.</li>
+                                <li>Nên chọn ảnh chụp toàn thân hoặc bán thân thẳng đứng.</li>
+                                <li>Đợi AI xử lý trang phục (<span style="color: #ef233c; font-weight: bold;">~15-30 giây</span>).</li>
+                            </ol>
+                            
+                            <!-- Sample Guide (Hidden by default, shown on error) -->
+                            <div id="vton-guide-sample" style="display: none; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                                <h6 style="color: #856404; margin-bottom: 10px; font-size: 14px; font-weight: bold;">
+                                    <i class="fa fa-info-circle"></i> Ảnh mẫu hợp lệ:
+                                </h6>
+                                <p style="font-size: 13px; color: #856404; margin-bottom: 10px;">Vui lòng nhìn thẳng, rõ khuôn mặt và dáng người (không bị che khuất). Tránh ảnh phong cảnh hoặc chỉ có mỗi khuôn mặt.</p>
+                                <div class="d-flex justify-content-center">
+                                    <div style="width: 100px; height: 130px; background: #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 2px dashed #856404;">
+                                        <i class="fa fa-user" style="font-size: 40px; color: #aaa;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <form id="vtonForm">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <div class="mb-4">
+                                    <label for="user_image" class="form-label fw-bold" style="font-size: 14px;">Tải ảnh của bạn lên:</label>
+                                    <input class="form-control" type="file" id="user_image" name="user_image" accept="image/jpeg, image/png, image/webp" required style="font-size: 14px; padding: 10px;">
+                                </div>
+                                <button type="submit" class="btn w-100 py-3" id="btn-vton-submit" style="background: #111; color: white; font-weight: bold; border-radius: 6px; border: none; transition: 0.3s;">
+                                    Bắt đầu thử đồ
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Right side: Preview area -->
+                        <div class="col-md-7 p-4 d-flex flex-column align-items-center justify-content-center" style="min-height: 400px; background: #fff; position: relative;">
+                            <!-- Initial State -->
+                            <div id="vton-initial" class="text-center text-muted">
+                                <i class="fa fa-picture-o" style="font-size: 50px; color: #ddd; margin-bottom: 15px;"></i>
+                                <p style="font-size: 15px; margin: 0;">Kết quả thử đồ sẽ hiển thị tại đây</p>
+                            </div>
+                            
+                            <!-- Loading State -->
+                            <div id="vton-loading" class="text-center" style="display: none;">
+                                <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <h5 style="font-weight: 600; color: #333;">AI Đang Xử Lý...</h5>
+                                <p style="color: #666; font-size: 14px; max-width: 250px; margin: 0 auto;">Quá trình này có thể kéo dài từ 30 đến 120 giây (đặc biệt trong lần chạy đầu tiên), vui lòng không đóng cửa sổ này.</p>
+                            </div>
+                            
+                            <!-- Result State -->
+                            <div id="vton-result" class="text-center" style="display: none; width: 100%; perspective: 1000px;">
+                                <div id="vton-3d-card" style="display: inline-block; padding: 12px; background: linear-gradient(135deg, rgba(239, 35, 60, 0.05), rgba(255, 255, 255, 0.5)); backdrop-filter: blur(10px); border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.8); transform-style: preserve-3d; cursor: pointer; transition: all 0.3s ease;">
+                                    <img id="vton-result-image" src="" alt="Virtual Try On Result" style="max-height: 480px; max-width: 100%; border-radius: 10px; transform: translateZ(40px); filter: drop-shadow(0 15px 25px rgba(0,0,0,0.25)); transition: transform 0.3s ease;">
+                                    
+                                    <!-- Hiệu ứng đổ bóng dưới cùng cho cảm giác đứng trong không gian -->
+                                    <div style="position: absolute; bottom: -15px; left: 10%; right: 10%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 70%); filter: blur(5px); transform: translateZ(-20px); z-index: -1;"></div>
+                                </div>
+                                <div class="mt-4 d-flex justify-content-center gap-2">
+                                    <button type="button" id="vton-add-to-cart" class="btn text-white rounded-pill px-4 shadow-sm" style="background: linear-gradient(45deg, #ef233c, #d90429); border: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                        <i class="fa fa-shopping-cart"></i> Giữ ản phẩm & Thêm vào giỏ
+                                    </button>
+                                    <a id="vton-download" href="#" download="ai-try-on.jpg" class="btn btn-dark rounded-pill px-4 shadow-sm" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                        <i class="fa fa-download"></i> Tải ảnh 3D về
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- AI Try On Modal -->
     <div class="modal fade" id="aiTryOnModal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="false" data-backdrop="false" style="z-index: 105050; background: rgba(0,0,0,0.6);">
@@ -792,9 +900,12 @@
         </div>
     </div>
 
+    @include('frontend.partials.recently-viewed')
+
 @endsection
 
 @section('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
     <script>
         // Likert scale labels
         var likertLabels = {
@@ -1136,9 +1247,24 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Hết hàng!',
-                            text: 'Sản phẩm này đã hết hàng với lựa chọn của bạn.',
+                            html: 'Sản phẩm với lựa chọn này hiện đã <strong>hết hàng</strong>.<br>Vui lòng chọn thuộc tính khác.',
                             confirmButtonColor: '#ef233c',
+                            confirmButtonText: 'Chọn lại',
                         });
+                        return;
+                    }
+
+                    // Kiểm tra số lượng yêu cầu vượt tồn kho
+                    var requestedQty = parseInt($('#quantity_input').val()) || 1;
+                    if (requestedQty > matchedVariant.stock_quantity) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Vượt quá tồn kho!',
+                            html: `Chỉ còn <strong>${matchedVariant.stock_quantity}</strong> sản phẩm trong kho.<br>Số lượng đã được điều chỉnh về mức tối đa.`,
+                            confirmButtonColor: '#ef233c',
+                            confirmButtonText: 'Đồng ý',
+                        });
+                        $('#quantity_input').val(matchedVariant.stock_quantity);
                         return;
                     }
 
@@ -1184,12 +1310,23 @@
                             timer: 1500
                         });
                         // Cập nhật số lượng giỏ hàng trên header
+                        let cartCountElements = document.querySelectorAll('.cart-count');
                         if (response.count !== undefined) {
-                            $('#cart-count').text(response.count);
+                            cartCountElements.forEach(el => {
+                                el.innerText = response.count;
+                                el.classList.remove('pulse-animation');
+                                void el.offsetWidth;
+                                el.classList.add('pulse-animation');
+                            });
                         } else {
                             $.get('{{ route('cart.count') }}', function(res) {
                                 if (res && res.count !== undefined) {
-                                    $('#cart-count').text(res.count);
+                                    cartCountElements.forEach(el => {
+                                        el.innerText = res.count;
+                                        el.classList.remove('pulse-animation');
+                                        void el.offsetWidth;
+                                        el.classList.add('pulse-animation');
+                                    });
                                 }
                             });
                         }
@@ -1214,7 +1351,195 @@
                     }
                 });
             }
+
+            // VTON Modal Open Handling
+            $('#btn-open-vton-modal').on('click', function(e) {
+                e.preventDefault();
+
+                var hasVariants = @json($product->variants->count() > 0 && $product->variants->min('price') > 0);
+
+                if (hasVariants) {
+                    var selectedSize = $('#select_size_nice').val();
+                    var selectedColor = $('#select_color_nice').val();
+
+                    if (!selectedSize || !selectedColor) {
+                        var missingFields = [];
+                        if (!selectedSize) {
+                            missingFields.push('{{ __('messages.size') }}');
+                            $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');
+                        }
+                        if (!selectedColor) {
+                            missingFields.push('{{ __('messages.color') }}');
+                            $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');
+                        }
+                        setTimeout(function() {
+                            $('.niceselect_option').next('.nice-select').css('border-color', '');
+                        }, 3000);
+
+                        var message = missingFields.length > 0 ?
+                            'Vui lòng chọn: <strong>' + missingFields.join(', ') + '</strong> trước khi thử đồ!' :
+                            'Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thử đồ!';
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Chưa chọn thuộc tính!',
+                            html: message,
+                            confirmButtonColor: '#ef233c',
+                            confirmButtonText: 'Chọn ngay',
+                            timer: 4000,
+                            timerProgressBar: true,
+                        });
+                        return;
+                    }
+                }
+
+                // If validation passes or no variants, open the modal
+                var myModal = new bootstrap.Modal(document.getElementById('aiTryOnModal'));
+                myModal.show();
+            });
+
         });
+
+        function showSmartError(message, type = 'error') {
+            Swal.fire({
+                icon: type === 'error' ? 'error' : 'warning',
+                title: type === 'error' ? 'Lỗi ảnh' : 'Lưu ý ảnh',
+                text: message,
+                confirmButtonColor: '#ef233c',
+            });
+        }
+
+        document.getElementById('user_image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // 1. Kiểm tra dung lượng (Max 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                showSmartError("File quá lớn. Vui lòng tải ảnh dung lượng dưới 5MB.");
+                e.target.value = ''; // Reset input
+                return;
+            }
+
+            // 2. Kiểm tra định dạng (.jpg, .png)
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                showSmartError("Định dạng không hợp lệ. Chỉ chấp nhận file .jpg, .png hoặc .webp.");
+                e.target.value = '';
+                return;
+            }
+
+            // 3. Kiểm tra độ phân giải & Cảnh báo chụp toàn thân
+            const fileURL = window.URL || window.webkitURL;
+            const img = new Image();
+            img.onload = function() {
+                fileURL.revokeObjectURL(this.src); // Xóa bộ nhớ đệm
+                
+                // Kiểm tra resolution tối thiểu (600x800 hoặc 800x600 nếu chụp ngang)
+                const isMinResValid = (this.width >= 600 && this.height >= 800) || (this.width >= 800 && this.height >= 600);
+                if (!isMinResValid) {
+                    showSmartError("Ảnh quá nhỏ hoặc mờ. Vui lòng chụp ảnh có độ phân giải tối thiểu 600x800px hoặc 800x600px.");
+                    e.target.value = '';
+                    return;
+                }
+
+                // Cảnh báo thêm UX: Gợi ý đứng thẳng nếu khung ảnh là ảnh vuông (Square) hoặc quá dị dạng
+                const ratio = this.height / this.width;
+                if (ratio < 1.0) {
+                    // Ảnh đang nằm ngang (landscape) -> Báo với User là server sẽ tự dựng đứng ảnh hoặc cảnh báo
+                    console.info("Hệ thống sẽ tự động xoay ảnh về chiều dọc.");
+                } else if (ratio < 1.2) {
+                    // Ảnh gần dạng vuông -> Khả năng cao không thấy toàn thân
+                    showSmartError("Vui lòng đứng thẳng và chụp rõ toàn thân từ đầu đến chân để thử đồ chính xác nhất.", 'warning');
+                }
+            };
+            img.src = fileURL.createObjectURL(file);
+        });
+
+        // VTON handling
+        $('#vtonForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = new FormData(this);
+            var btn = $('#btn-vton-submit');
+            
+            // UI Changes
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang tải lên...');
+            $('#vton-initial, #vton-result').hide();
+            $('#vton-loading').fadeIn();
+            
+            $.ajax({
+                url: '{{ route("api.vton.tryOn") }}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    btn.prop('disabled', false).text('Thử ảnh khác');
+                    $('#vton-loading').hide();
+                    
+                    if(response.success && response.image_url) {
+                        $('#vton-guide-sample').slideUp();
+                        $('#vton-result-image').attr('src', response.image_url);
+                        $('#vton-download').attr('href', response.image_url);
+                        $('#vton-result').fadeIn(400, function() {
+                            // Init 3D Tilt Effect
+                            if (typeof VanillaTilt !== 'undefined') {
+                                VanillaTilt.init(document.querySelector("#vton-3d-card"), {
+                                    max: 12,
+                                    speed: 400,
+                                    glare: true,
+                                    "max-glare": 0.4,
+                                    perspective: 1000,
+                                    scale: 1.03
+                                });
+                            }
+                        });
+                    } else {
+                        $('#vton-initial').fadeIn();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Thử đồ thất bại',
+                            text: response.message || 'Đã có lỗi xảy ra',
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).text('Thử đồ lại');
+                    $('#vton-loading').hide();
+                    $('#vton-initial').fadeIn();
+                    
+                    let msg = 'Máy chủ AI hiện không phản hồi hoặc đang quá tải. Hãy thử lại.';
+                    
+                    if(xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                        // Hiển thị khung hướng dẫn nếu lỗi do không tìm thấy người
+                        if(xhr.responseJSON.error_code === 'NO_HUMAN_DETECTED') {
+                            $('#vton-guide-sample').slideDown();
+                        }
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi hệ thống',
+                        text: msg,
+                    });
+                }
+            });
+        });
+
+        // Add to cart from VTON modal
+        $('#vton-add-to-cart').on('click', function(e) {
+            e.preventDefault();
+            
+            // Close the modal
+            $('#aiTryOnModal').modal('hide');
+            
+            // Trigger the main add to cart button
+            // If variants exist, it will show the alert if not selected
+            $('#btn-add-to-cart').trigger('click');
+        });
+
     </script>
     <!-- AI Try On Modal -->
     <div class="modal fade" id="aiTryOnModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1050;">

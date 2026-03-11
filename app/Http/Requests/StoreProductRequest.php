@@ -141,7 +141,6 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'sale_price.lt' => 'Giá khuyến mãi phải nhỏ hơn giá gốc.',
-            'gallery_images.max' => 'Bạn chỉ có thể tải lên tối đa :max ảnh bộ sưu tập.',
             'variants.*.sku.distinct' => 'Mã SKU của các biến thể không được trùng nhau.',
         ];
     }

@@ -10,9 +10,9 @@
                 <div class="col-12">
                     <div class="breadcrumb_content">
                         <ul>
-                            <li><a href="{{ route('welcome') }}">home</a></li>
+                            <li><a href="{{ route('welcome') }}">{{ __('messages.home')}}</a></li>
                             <li>/</li>
-                            <li>search results</li>
+                            <li>{{ __('messages.search_results')}}</li>
                         </ul>
                     </div>
                 </div>
@@ -36,10 +36,10 @@
                         <div class="search_info mb-4">
                             <p>
                                 @if($products->total() > 0)
-                                    Showing {{ $products->firstItem() }} - {{ $products->lastItem() }} of {{ $products->total() }} results for 
+                                    Hiển thị {{ $products->firstItem() }} - {{ $products->lastItem() }} trong tổng số {{ $products->total() }} kết quả cho 
                                     <strong>"{{ $query }}"</strong>
                                 @else
-                                    No results found for <strong>"{{ $query }}"</strong>
+                                    Không tìm thấy kết quả nào cho <strong>"{{ $query }}"</strong>
                                 @endif
                             </p>
                         </div>
@@ -47,7 +47,7 @@
 
                         <div class="shop_toolbar_wrapper mb-4">
                             <div class="page_amount">
-                                <p>Showing {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p>
+                                <p>Hiển thị {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} trong tổng số {{ $products->total() }} kết quả</p>
                             </div>
                         </div>
                         <!--shop toolbar end-->
@@ -66,16 +66,16 @@
                                         <div class="mb-4">
                                             <i class="fa fa-search" style="font-size: 80px; color: #ccc;"></i>
                                         </div>
-                                        <h3>No Products Found</h3>
+                                        <h3>{{ __('messages.no_products_found')}}</h3>
                                         <p class="text-muted mb-4">
                                             @if($query)
-                                                We couldn't find any products matching "{{ $query }}"
+                                                Chúng tôi không tìm thấy sản phẩm nào phù hợp "{{ $query }}"
                                             @else
-                                                Please enter a search term
+                                                Vui lòng nhập từ khóa tìm kiếm
                                             @endif
                                         </p>
                                         <a href="{{ route('shop') }}" class="btn btn-primary">
-                                            <i class="fa fa-shopping-bag"></i> Continue Shopping
+                                            <i class="fa fa-shopping-bag"></i> {{ __('messages.continue_shopping')}}
                                         </a>
                                     </div>
                                 </div>

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -101,7 +102,7 @@ class ProductController extends Controller
                         'color' => $colorName,
                         'price' => $variantData['price'] ?? null,
                         'sale_price' => $variantData['sale_price'] ?? null,
-                        'stock_quantity' => $variantData['stock_quantity'],
+                        'stock_quantity' => $variantData['stock_quantity'] ?? 100, // Default value since it's removed from UI
                         'sku' => $sku,
                     ]);
                 }
@@ -233,7 +234,7 @@ class ProductController extends Controller
                     'color' => $colorName,
                     'price' => $variantData['price'] ?? null,
                     'sale_price' => $variantData['sale_price'] ?? null,
-                    'stock_quantity' => $variantData['stock_quantity'],
+                    'stock_quantity' => $variantData['stock_quantity'] ?? 100, // Default value since it's removed from UI
                     'sku' => $sku,
                 ];
 
@@ -303,20 +304,17 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
 
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            // Variants deleted via cascade if set in DB, but manually here to be safe if not
+            // Variants will be soft deleted if manually called or via cascade (if setup)
+            // Since we added SoftDeletes trait, this will now only set deleted_at
             $product->variants()->delete();
             $product->delete();
 
             DB::commit();
-
-            return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
+            return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được xóa thành công.');
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return redirect()->route('admin.products.index')->with('error', 'Error deleting product.');
+            \Log::error('Lỗi khi xóa sản phẩm ID ' . $product->id . ': ' . $e->getMessage());
+            return redirect()->route('admin.products.index')->with('error', 'Có lỗi xảy ra khi xóa sản phẩm. Vui lòng kiểm tra lại.');
         }
     }
 
@@ -337,5 +335,42 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Search product variants for autocomplete (e.g., in Order Creation)
+     */
+    public function variantsSearch(Request $request)
+    {
+        $q = $request->get('q');
+        if (empty($q)) {
+            return response()->json([]);
+        }
+
+        $variants = ProductVariant::with(['product', 'sizeRelationship', 'colorRelationship'])
+            ->where('sku', 'like', "%{$q}%")
+            ->orWhereHas('product', function($query) use ($q) {
+                $query->where('name', 'like', "%{$q}%");
+            })
+            ->latest()
+            ->get();
+
+        $results = $variants->map(function($variant) {
+            return [
+                'id' => $variant->id,
+                'name' => $variant->product->name,
+                'sku' => $variant->sku,
+                'price' => (float)$variant->price,
+                'size' => $variant->size ?: ($variant->sizeRelationship ? $variant->sizeRelationship->name : ''),
+                'color' => $variant->color ?: ($variant->colorRelationship ? $variant->colorRelationship->name : ''),
+                'stock' => $variant->stock_quantity,
+                'product' => [
+                    'name' => $variant->product->name,
+                    'image' => $variant->product->image_url,
+                ]
+            ];
+        });
+
+        return response()->json($results);
     }
 }

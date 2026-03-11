@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Sửa Bài viết')
+@section('title', 'Sửa Tin tức')
 
 @section('content')
     <div class="page-header">
@@ -8,12 +8,12 @@
             <div class="row align-items-center">
                 <div class="col-md-12">
                     <div class="page-header-title">
-                        <h5 class="m-b-10">Sửa Bài viết</h5>
+                        <h5 class="m-b-10">Sửa Tin tức</h5>
                     </div>
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i
                                      class="feather icon-home"></i></a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.posts.index') }}">Bài viết</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.posts.index') }}">Tin tức</a></li>
                         <li class="breadcrumb-item"><a href="#!">Sửa</a></li>
                     </ul>
                 </div>
@@ -30,10 +30,10 @@
                     <div class="row">
                         <div class="col-md-8">
                             <div class="card">
-                                <div class="card-header"><h5>Nội dung bài viết</h5></div>
+                                <div class="card-header"><h5>Nội dung tin tức</h5></div>
                                 <div class="card-body">
                                     <div class="form-group mb-3">
-                                        <label class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                        <label class="form-label">Tiêu đề tin tức <span class="text-danger">*</span></label>
                                         <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title', $post->title) }}" required>
                                         @error('title') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </div>
@@ -42,7 +42,7 @@
                                         <textarea name="summary" class="form-control" rows="3">{{ old('summary', $post->summary) }}</textarea>
                                     </div>
                                     <div class="form-group mb-0">
-                                        <label class="form-label">Nội dung bài viết <span class="text-danger">*</span></label>
+                                        <label class="form-label">Nội dung tin tức <span class="text-danger">*</span></label>
                                         <textarea name="content" id="editor" class="form-control @error('content') is-invalid @enderror">{{ old('content', $post->content) }}</textarea>
                                         @error('content') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </div>
@@ -87,7 +87,7 @@
                                     </div>
 
                                     <div class="mt-4 d-grid">
-                                        <button type="submit" class="btn btn-primary">Cập nhật bài viết</button>
+                                        <button type="submit" class="btn btn-primary">Cập nhật tin tức</button>
                                         <a href="{{ route('admin.posts.index') }}" class="btn btn-link-secondary mt-2">Hủy</a>
                                     </div>
                                 </div>

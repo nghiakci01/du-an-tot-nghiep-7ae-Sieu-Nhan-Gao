@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Events\CartUpdatedEvent;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -18,21 +19,40 @@ class CartController extends Controller
         foreach ($cart as $id => &$details) {
             $total += $details['price'] * $details['quantity'];
 
-            $product = Product::with('variants.sizeRelationship', 'variants.colorRelationship')->find($details['product_id']);
+            $product = Product::with(['category', 'variants.sizeRelationship', 'variants.colorRelationship'])->find($details['product_id']);
             if ($product) {
-                // Get unique sizes and colors available for this product
-                $details['available_sizes'] = $product->variants->pluck('sizeRelationship')->unique('id')->whereNotNull();
-                $details['available_colors'] = $product->variants->pluck('colorRelationship')->unique('id')->whereNotNull();
+                // Determine stock
+                $currentVariant = ProductVariant::find($id);
+                $details['stock_quantity'] = $currentVariant ? $currentVariant->stock_quantity : 0;
+                $details['is_out_of_stock'] = $details['stock_quantity'] <= 0;
+                $details['category_slug'] = $product->category ? $product->category->slug : null;
+
+
+                // Get unique sizes and colors available for this product (supporting both legacy strings and IDs)
+                $details['available_sizes_array'] = [];
+                $details['available_colors_array'] = [];
+                foreach ($product->variants as $variant) {
+                    if ($variant->size_id && $variant->sizeRelationship) {
+                        $details['available_sizes_array'][$variant->size_id] = $variant->sizeRelationship->name;
+                    } elseif ($variant->size) {
+                        $details['available_sizes_array'][$variant->size] = $variant->size;
+                    }
+                    
+                    if ($variant->color_id && $variant->colorRelationship) {
+                        $details['available_colors_array'][$variant->color_id] = $variant->colorRelationship->name;
+                    } elseif ($variant->color) {
+                        $details['available_colors_array'][$variant->color] = $variant->color;
+                    }
+                }
 
                 // Also get all valid variant combinations for this product to help client-side selection
                 $details['product_variants'] = $product->variants;
 
                 // Set current IDs if not present (for migration of existing carts)
                 if (! isset($details['size_id']) || ! isset($details['color_id'])) {
-                    $variant = ProductVariant::find($id);
-                    if ($variant) {
-                        $details['size_id'] = $variant->size_id;
-                        $details['color_id'] = $variant->color_id;
+                    if ($currentVariant) {
+                        $details['size_id'] = $currentVariant->size_id;
+                        $details['color_id'] = $currentVariant->color_id;
                     }
                 }
 
@@ -46,6 +66,13 @@ class CartController extends Controller
                 }
             }
         }
+
+        // Sort cart to put out of stock items at the bottom
+        uasort($cart, function ($a, $b) {
+            $aOut = isset($a['is_out_of_stock']) && $a['is_out_of_stock'] ? 1 : 0;
+            $bOut = isset($b['is_out_of_stock']) && $b['is_out_of_stock'] ? 1 : 0;
+            return $aOut <=> $bOut;
+        });
 
         // Get applied coupon from session
         $couponCode = session()->get('coupon_code');
@@ -69,7 +96,18 @@ class CartController extends Controller
             }
         }
 
-        return view('frontend.cart.index', compact('cart', 'total', 'coupon', 'discount'));
+        // Cross-sell: products from same categories, excluding items already in cart
+    $cartProductIds = collect($cart)->pluck('product_id')->unique()->toArray();
+    $cartCategoryIds = Product::whereIn('id', $cartProductIds)->pluck('category_id')->unique()->toArray();
+    $crossSellProducts = Product::where('is_active', true)
+        ->whereIn('category_id', $cartCategoryIds)
+        ->whereNotIn('id', $cartProductIds)
+        ->with(['variants', 'reviews', 'images'])
+        ->inRandomOrder()
+        ->take(8)
+        ->get();
+
+        return view('frontend.cart.index', compact('cart', 'total', 'coupon', 'discount', 'crossSellProducts'));
     }
 
     public function changeVariant(Request $request)
@@ -100,10 +138,14 @@ class CartController extends Controller
         // Try to find the exact combination first
         $query = ProductVariant::where('product_id', $productId);
         if ($sizeId) {
-            $query->where('size_id', $sizeId);
+            $query->where(function ($q) use ($sizeId) {
+                $q->where('size_id', $sizeId)->orWhere('size', $sizeId);
+            });
         }
         if ($colorId) {
-            $query->where('color_id', $colorId);
+            $query->where(function ($q) use ($colorId) {
+                $q->where('color_id', $colorId)->orWhere('color', $colorId);
+            });
         }
         $newVariant = $query->first();
 
@@ -111,9 +153,13 @@ class CartController extends Controller
         if (! $newVariant && $changedType) {
             $query = ProductVariant::where('product_id', $productId);
             if ($changedType === 'size' && $sizeId) {
-                $query->where('size_id', $sizeId);
+                $query->where(function ($q) use ($sizeId) {
+                    $q->where('size_id', $sizeId)->orWhere('size', $sizeId);
+                });
             } elseif ($changedType === 'color' && $colorId) {
-                $query->where('color_id', $colorId);
+                $query->where(function ($q) use ($colorId) {
+                    $q->where('color_id', $colorId)->orWhere('color', $colorId);
+                });
             } elseif ($changedType === 'product') {
                 // If product changed, just pick the first available variant
             }
@@ -164,6 +210,10 @@ class CartController extends Controller
         }
 
         session()->put('cart', $cart);
+
+        // Fire event
+        $cartCount = array_sum(array_column($cart, 'quantity'));
+        CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
 
         return response()->json([
             'success' => true,
@@ -263,6 +313,10 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
+        // Fire Event
+        $cartCount = array_sum(array_column($cart, 'quantity'));
+        CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+
         if ($request->input('action') === 'buy_now') {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -323,6 +377,8 @@ class CartController extends Controller
 
                 $grandTotal = $subtotal - $discount + $shippingFee;
 
+                CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Giỏ hàng đã được cập nhật',
@@ -336,13 +392,9 @@ class CartController extends Controller
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid quantity or exceeds stock',
+                    'message' => 'Số lượng không hợp lệ hoặc vượt quá tồn kho.',
                 ], 400);
             }
-
-            session()->flash('error', 'Invalid quantity or exceeds stock');
-
-            return response()->json(['success' => false], 400);
         }
 
         return response()->json(['success' => false, 'message' => 'Invalid request'], 400);
@@ -404,6 +456,8 @@ class CartController extends Controller
 
                 $grandTotal = $subtotal - $discount + $shippingFee;
 
+                CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Sản phẩm đã được xóa khỏi giỏ hàng',
@@ -422,11 +476,24 @@ class CartController extends Controller
     public function clearCart(Request $request)
     {
         session()->forget('cart');
+        session()->forget(['coupon_code', 'discount_amount']); // Also clear coupon info
+
+        // Recalculate totals for an empty cart
+        $subtotal = 0;
+        $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
+        $grandTotal = $subtotal + $shippingFee;
+
+        CartUpdatedEvent::dispatch(0, session()->getId(), auth()->id());
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Cart has been cleared',
+                'message' => 'Giỏ hàng đã được xóa!',
+                'cart_total' => number_format($subtotal).' đ',
+                'discount' => number_format(0).' đ',
+                'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee).' đ') : 'Miễn phí',
+                'grand_total' => number_format($grandTotal).' đ',
+                'cart_count' => 0,
             ]);
         }
 

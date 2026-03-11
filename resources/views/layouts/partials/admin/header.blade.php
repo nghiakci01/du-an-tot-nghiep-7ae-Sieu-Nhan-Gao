@@ -36,22 +36,8 @@
                 <span>Mặc định</span></a>
             </div>
           </li>
-          {{-- Language Switcher (Removed)
-          <li class="dropdown pc-h-item">
-            <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
-              aria-haspopup="false" aria-expanded="false"><svg class="pc-icon">
-                <use xlink:href="#custom-language"></use>
-              </svg></a>
-            <div class="dropdown-menu dropdown-menu-end pc-h-dropdown lng-dropdown">
-              <a href="#!" class="dropdown-item" data-lng="en"><span>English <small>(UK)</small> </span></a><a href="#!"
-                class="dropdown-item" data-lng="fr"><span>français <small>(French)</small> </span></a><a href="#!"
-                class="dropdown-item" data-lng="ro"><span>Română <small>(Romanian)</small> </span></a><a href="#!"
-                class="dropdown-item" data-lng="cn"><span>中国人 <small>(Chinese)</small></span></a>
-            </div>
-          </li>
-          --}}
 
-          {{-- Setting --}}
+          <!-- {{-- Setting --}}
           {{-- <li class="dropdown pc-h-item">
             <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
               aria-haspopup="false" aria-expanded="false"><svg class="pc-icon">
@@ -64,7 +50,7 @@
                 class="dropdown-item"><i class="ti ti-lock"></i> <span>Lock Screen</span> </a><a href="#!"
                 class="dropdown-item"><i class="ti ti-power"></i> <span>Logout</span></a>
             </div>
-          </li> --}}
+          </li> --}} -->
 
           {{-- Notification Sound Toggle --}}
           <li class="pc-h-item">
@@ -144,23 +130,30 @@
           </li>
           <li class="dropdown pc-h-item header-user-profile">
             <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
-              aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false"><img
-                src="{{ asset('admin-assets') }}/images/user/avatar-2.jpg" alt="user-image" class="user-avtar" /></a>
+              aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
+                @if(Auth::check() && Auth::user()->avatar)
+                    <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="user-image" class="user-avtar" />
+                @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::check() ? Auth::user()->name : 'Admin') }}&background=random" alt="user-image" class="user-avtar" />
+                @endif
+            </a>
             <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
               <div class="dropdown-header d-flex align-items-center justify-content-between">
-                <h5 class="m-0">Profile</h5>
+                <h5 class="m-0">Hồ sơ</h5>
               </div>
               <div class="dropdown-body">
                 <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
                   <div class="d-flex mb-1">
                     <div class="flex-shrink-0">
-                      <img src="{{ asset('admin-assets') }}/images/user/avatar-2.jpg" alt="user-image"
-                        class="user-avtar wid-35" />
+                      @if(Auth::check() && Auth::user()->avatar)
+                          <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="user-image" class="user-avtar wid-35" />
+                      @else
+                          <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::check() ? Auth::user()->name : 'Admin') }}&background=random" alt="user-image" class="user-avtar wid-35" />
+                      @endif
                     </div>
                     <div class="flex-grow-1 ms-3">
-                      <h6 class="mb-1">Carson Darrin 🖖</h6>
-                      <span><a href="../cdn-cgi/l/email-protection.html" class="__cf_email__"
-                          data-cfemail="b9dad8cbcad6d797ddd8cbcbd0d7f9dad6d4c9d8d7c097d0d6">[email&#160;protected]</a></span>
+                      <h6 class="mb-1">{{ Auth::check() ? Auth::user()->name : 'Admin' }} 🖖</h6>
+                      <span><a href="mailto:{{ Auth::check() ? Auth::user()->email : '#' }}" class="__cf_email__">{{ Auth::check() ? Auth::user()->email : 'admin@example.com' }}</a></span>
                     </div>
                   </div>
                   <hr class="border-secondary border-opacity-50" />
@@ -170,7 +163,7 @@
                         <h5 class="mb-0 d-inline-flex align-items-center">
                           <svg class="pc-icon text-muted me-2">
                             <use xlink:href="#custom-notification-outline"></use>
-                          </svg>Notification
+                          </svg>Thông báo
                         </h5>
                         <div class="form-check form-switch form-check-reverse m-0">
                           <input class="form-check-input f-18" type="checkbox" role="switch" />
@@ -178,89 +171,26 @@
                       </div>
                     </div>
                   </div>
-                  <p class="text-span">Manage</p>
-                  <a href="#" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
+                  <hr class="border-secondary border-opacity-50" />
+                  <p class="text-span">Quản lý</p>
+                  <a href="{{ route('admin.profile.index') }}" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
                         <use xlink:href="#custom-setting-outline"></use>
                       </svg>
-                      <span>Settings</span>
-                    </span></a><a href="#" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
-                        <use xlink:href="#custom-share-bold"></use>
-                      </svg>
-                      <span>Share</span>
-                    </span></a><a href="#" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
+                      <span>Cài đặt</span>
+                    </span></a><a href="{{ route('admin.profile.index') }}" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
                         <use xlink:href="#custom-lock-outline"></use>
                       </svg>
-                      <span>Change Password</span></span></a>
+                      <span>Đổi mật khẩu</span></span></a>
                   <hr class="border-secondary border-opacity-50" />
-                  <p class="text-span">Team</p>
-                  <a href="#" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
-                        <use xlink:href="#custom-profile-2user-outline"></use>
-                      </svg>
-                      <span>UI Design team</span></span>
-                    <div class="user-group">
-                      <img src="{{ asset('admin-assets') }}/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
-                      <span class="avtar bg-danger text-white">K</span>
-                      <span class="avtar bg-success text-white"><svg class="pc-icon m-0">
-                          <use xlink:href="#custom-user"></use>
-                        </svg> </span><span class="avtar bg-light-primary text-primary">+2</span>
-                    </div>
-                  </a><a href="#" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
-                        <use xlink:href="#custom-profile-2user-outline"></use>
-                      </svg>
-                      <span>Friends Groups</span></span>
-                    <div class="user-group">
-                      <img src="{{ asset('admin-assets') }}/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
-                      <span class="avtar bg-danger text-white">K</span>
-                      <span class="avtar bg-success text-white"><svg class="pc-icon m-0">
-                          <use xlink:href="#custom-user"></use>
-                        </svg></span>
-                    </div>
-                  </a><a href="#" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
-                        <use xlink:href="#custom-add-outline"></use>
-                      </svg>
-                      <span>Add new</span></span>
-                    <div class="user-group">
-                      <span class="avtar bg-primary text-white"><svg class="pc-icon m-0">
-                          <use xlink:href="#custom-add-outline"></use>
-                        </svg></span>
-                    </div>
-                  </a>
-                  <hr class="border-secondary border-opacity-50" />
-                  <div class="d-grid mb-3">
+                  <div class="d-grid mb-3 mt-3">
                     <form method="POST" action="{{ route('logout') }}">
                       @csrf
                       <button class="btn btn-primary w-100" type="submit">
                         <svg class="pc-icon me-2">
                           <use xlink:href="#custom-logout-1-outline"></use>
-                        </svg>Logout
+                        </svg>Đăng xuất
                       </button>
                     </form>
-                  </div>
-                  <div class="card border-0 shadow-none drp-upgrade-card mb-0" style="
-                        background-image: url({{ asset('admin-assets') }}/images/layout/img-profile-card.jpg);
-                      ">
-                    <div class="card-body">
-                      <div class="user-group">
-                        <img src="{{ asset('admin-assets') }}/images/user/avatar-1.jpg" alt="user-image"
-                          class="avtar" />
-                        <img src="{{ asset('admin-assets') }}/images/user/avatar-2.jpg" alt="user-image"
-                          class="avtar" />
-                        <img src="{{ asset('admin-assets') }}/images/user/avatar-3.jpg" alt="user-image"
-                          class="avtar" />
-                        <img src="{{ asset('admin-assets') }}/images/user/avatar-4.jpg" alt="user-image"
-                          class="avtar" />
-                        <img src="{{ asset('admin-assets') }}/images/user/avatar-5.jpg" alt="user-image"
-                          class="avtar" />
-                        <span class="avtar bg-light-primary text-primary">+20</span>
-                      </div>
-                      <h3 class="my-3 text-dark">
-                        245.3k <small class="text-muted">Followers</small>
-                      </h3>
-                      <a href="#" class="btn btn btn-warning buynowlinks"><svg class="pc-icon me-2">
-                          <use xlink:href="#custom-logout-1-outline"></use>
-                        </svg>
-                        Upgrade to Business</a>
-                    </div>
                   </div>
                 </div>
               </div>

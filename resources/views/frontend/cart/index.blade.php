@@ -37,7 +37,7 @@
                 </div>
             @endif
 
-            @if(session('cart') && count(session('cart')) > 0)
+            @if(isset($cart) && count($cart) > 0)
                 <form action="#">
                     <div class="row">
                         <div class="col-12">
@@ -47,7 +47,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="product_check" style="width: 50px;"><input type="checkbox" id="check-all" style="width: 18px; height: 18px; cursor: pointer;"></th>
-                                                <th class="product_remove">{{ __('messages.remove') }}</th>
+                                                <!-- <th class="product_remove">{{ __('messages.remove') }}</th> -->
                                                 <th class="product_thumb">{{ __('messages.image') }}</th>
                                                 <th class="product_name">{{ __('messages.product') }}</th>
                                                 <th class="product-price">{{ __('messages.price') }}</th>
@@ -56,93 +56,98 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach(session('cart') as $id => $details)
-                                                                                        <tr data-id="{{ $id }}">
+                                            @foreach($cart as $id => $details)
+                                                @php
+                                                    $isOutOfStock = isset($details['is_out_of_stock']) ? $details['is_out_of_stock'] : false;
+                                                @endphp
+                                                <tr data-id="{{ $id }}" class="{{ $isOutOfStock ? 'opacity-50' : '' }}">
                                                     <td class="product_check" style="vertical-align: middle;">
-                                                        <input type="checkbox" class="check-item" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;">
+                                                        <input type="checkbox" class="check-item" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;" {{ $isOutOfStock ? 'disabled' : '' }}>
                                                     </td>
                                                     <!-- <td class="product_remove">
                                                         <a href="javascript:void(0)" class="remove-from-cart">
                                                             <i class="fa fa-trash-o"></i>
                                                         </a>
                                                     </td> -->
-                                                    <td class="product_thumb">
+                                                    <td class="product_thumb" style="position: relative;">
                                                         <a href="{{ route('product.detail', $details['slug']) }}">
                                                             <img src="{{ $details['image'] ? asset('storage/' . $details['image']) : asset('frontend-assets/img/s-product/product.jpg') }}"
                                                                 alt="{{ $details['name'] }}"
                                                                 style="width: 100px; height: 100px; object-fit: cover;">
+                                                            @if($isOutOfStock)
+                                                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.6); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 5px;">
+                                                                    <span class="badge bg-danger mb-1" style="font-size: 0.8rem; padding: 5px 10px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">{{ __('messages.out_of_stock') ?? 'Hết hàng' }}</span>
+                                                                    <a href="{{ isset($details['category_slug']) && $details['category_slug'] ? route('shop', ['category' => $details['category_slug']]) : route('shop') }}" class="btn btn-sm btn-dark" style="font-size: 0.65rem; padding: 2px 5px; white-space: nowrap; font-weight: normal;">Xem sản phẩm tương tự</a>
+                                                                </div>
+                                                            @endif
                                                         </a>
                                                     </td>
                                                     <td class="product_name">
-                                                        <a href="{{ route('product.detail', $details['slug']) }}" class="cart-product-link">{{ $details['name'] }}</a>
-                                                        <div class="cart-variant-info mt-2">
-                                                            <div class="text-muted small mb-1">
+                                                        <a href="{{ route('product.detail', $details['slug']) }}" class="cart-product-link font-weight-bold" style="font-size: 16px;">{{ $details['name'] }}</a>
+                                                        <div class="cart-variant-info mt-2 text-center" style="display: flex; flex-direction: column; align-items: center;">
+                                                            <div class="text-muted small mb-1" style="font-size: 15px;">
                                                                 {{ __('messages.size') }}: <strong>{{ $details['size'] }}</strong> | 
                                                                 {{ __('messages.color') }}: <strong>{{ $details['color'] }}</strong>
                                                             </div>
-                                                            <button type="button" class="btn btn-sm edit-variant-btn p-0" 
-                                                                    style="font-size: 0.75rem; color: #ff6a28; text-decoration: none; border: none; background: transparent;">
+                                                            <button type="button" class="btn btn-sm edit-variant-btn mt-2" 
+                                                                    style="font-size: 0.85rem; color: #ff6a28; border: 1px solid #ff6a28; background: transparent; padding: 3px 10px; border-radius: 4px;"
+                                                                    {{ $isOutOfStock ? 'disabled' : '' }}>
                                                                 <i class="fa fa-pencil-square-o"></i> {{ __('messages.edit') }}
                                                             </button>
                                                         </div>
 
                                                         <div class="cart-variant-selectors mt-2" style="display: none;">
-                                                            @if(isset($details['category_products']) && $details['category_products']->count() > 1)
-                                                                <div class="mb-2">
-                                                                    <label class="small text-muted d-block">{{ __('messages.product') }}</label>
-                                                                    <select class="form-select form-select-sm variant-select product-select" data-type="product">
-                                                                        @foreach($details['category_products'] as $catProduct)
-                                                                            <option value="{{ $catProduct->id }}" {{ $details['product_id'] == $catProduct->id ? 'selected' : '' }}>
-                                                                                {{ $catProduct->name }}
-                                                                            </option>
-                                                                        @endforeach
-                                                                    </select>
-                                                                </div>
-                                                            @endif
+                                                            <!-- Product selection removed based on user request -->
                                                             
-                                                            @if(isset($details['available_sizes']) && count($details['available_sizes']) > 0)
+                                                            @if(isset($details['available_sizes_array']) && count($details['available_sizes_array']) > 0)
                                                                 <div class="d-inline-block me-2">
                                                                     <label class="small text-muted d-block">{{ __('messages.size') }}</label>
                                                                     <select class="form-select form-select-sm variant-select size-select" data-type="size">
-                                                                        @foreach($details['available_sizes'] as $size)
-                                                                            <option value="{{ $size->id }}" {{ (isset($details['size_id']) && $details['size_id'] == $size->id) ? 'selected' : '' }}>
-                                                                                {{ $size->name }}
+                                                                        @foreach($details['available_sizes_array'] as $key => $name)
+                                                                            <option value="{{ $key }}" {{ (isset($details['size_id']) && $details['size_id'] == $key) || (empty($details['size_id']) && isset($details['size']) && $details['size'] == $key) ? 'selected' : '' }}>
+                                                                                {{ $name }}
                                                                             </option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
                                                             @endif
 
-                                                            @if(isset($details['available_colors']) && count($details['available_colors']) > 0)
+                                                            @if(isset($details['available_colors_array']) && count($details['available_colors_array']) > 0)
                                                                 <div class="d-inline-block">
                                                                     <label class="small text-muted d-block">{{ __('messages.color') }}</label>
                                                                     <select class="form-select form-select-sm variant-select color-select" data-type="color">
-                                                                        @foreach($details['available_colors'] as $color)
-                                                                            <option value="{{ $color->id }}" {{ (isset($details['color_id']) && $details['color_id'] == $color->id) ? 'selected' : '' }}>
-                                                                                {{ $color->name }}
+                                                                        @foreach($details['available_colors_array'] as $key => $name)
+                                                                            <option value="{{ $key }}" {{ (isset($details['color_id']) && $details['color_id'] == $key) || (empty($details['color_id']) && isset($details['color']) && $details['color'] == $key) ? 'selected' : '' }}>
+                                                                                {{ $name }}
                                                                             </option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
                                                             @endif
-                                                            <div class="mt-1">
-                                                                <button type="button" class="btn btn-sm btn-secondary cancel-variant-btn">Hủy</button>
-                                                            </div>
-                                                        </div>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm save-variant-btn" style="background-color: #ff6a28; color: #fff; border-color: #ff6a28;">Đổi biến thể</button>
+                            <button type="button" class="btn btn-sm btn-secondary cancel-variant-btn">Hủy</button>
+                        </div>
+                    </div>
                                                         <input type="hidden" class="product-id" value="{{ $details['product_id'] }}">
                                                         <input type="hidden" class="current-variant-id" value="{{ $id }}">
                                                     </td>
                                                     <td class="product-price">{{ number_format($details['price']) }} VND</td>
                                                     <td class="product_quantity">
                                                         @php
-                                                            $stockQty = \App\Models\ProductVariant::find($id)?->stock_quantity ?? 100;
+                                                            $stockQty = isset($details['stock_quantity']) ? $details['stock_quantity'] : (\App\Models\ProductVariant::find($id)?->stock_quantity ?? 100);
                                                         @endphp
-                                                        <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
-                                                            class="quantity update-cart item-quantity"
-                                                            data-stock="{{ $stockQty }}"
-                                                            title="Còn {{ $stockQty }} sản phẩm trong kho">
-                                                        <small class="d-block text-muted mt-1" style="font-size:11px;"
-                                                            data-stock-label>Kho: {{ $stockQty }}</small>
+                                                        @if($isOutOfStock)
+                                                            <input type="text" value="0" class="quantity text-center text-muted" disabled style="background-color: #f8f9fa;">
+                                                            <small class="d-block text-danger mt-1" style="font-size:11px;">Hết hàng</small>
+                                                        @else
+                                                            <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
+                                                                class="quantity update-cart item-quantity"
+                                                                data-stock="{{ $stockQty }}"
+                                                                title="Còn {{ $stockQty }} sản phẩm trong kho">
+                                                            <small class="d-block text-muted mt-1" style="font-size:11px;"
+                                                                data-stock-label>Kho: {{ $stockQty }}</small>
+                                                        @endif
                                                     </td>
                                                     <td class="product_total item-total-price" data-price="{{ $details['price'] }}">
                                                         {{ number_format($details['price'] * $details['quantity']) }} VND</td>
@@ -214,14 +219,90 @@
                                             <p class="cart_amount" id="cart-grand-total">{{ number_format($total + $shippingFee) }} đ</p>
                                         </div>
                                         <div class="checkout_btn">
-                                            <a href="{{ route('checkout.index') }}">{{ __('messages.proceed_to_checkout') }}</a>
+                                            <a href="#" id="btn-proceed-checkout">{{ __('messages.proceed_to_checkout') }}</a>
                                         </div>
+
+                                        <script>
+                                        document.getElementById('btn-proceed-checkout').addEventListener('click', function(e) {
+                                            e.preventDefault();
+                                            var btn = this;
+                                            btn.style.opacity = '0.7';
+                                            btn.style.pointerEvents = 'none';
+
+                                            fetch('{{ route('cart.validate') }}', {
+                                                method: 'GET',
+                                                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                                            })
+                                            .then(r => r.json())
+                                            .then(data => {
+                                                btn.style.opacity = '';
+                                                btn.style.pointerEvents = '';
+
+                                                if (data.valid) {
+                                                    window.location.href = '{{ route('checkout.index') }}';
+                                                } else if (data.errors && data.errors.length > 0) {
+                                                    var list = data.errors.map(function(e) {
+                                                        var icon = e.type === 'out_of_stock' ? '🚫' :
+                                                                   e.type === 'not_found'    ? '❌' :
+                                                                   e.type === 'inactive'     ? '⛔' : '⚠️';
+                                                        return '<li style="text-align:left;margin-bottom:6px;">' + icon + ' <strong>' + e.name + '</strong>: ' + e.issue + '</li>';
+                                                    }).join('');
+
+                                                    Swal.fire({
+                                                        icon: 'warning',
+                                                        title: 'Giỏ hàng có vấn đề!',
+                                                        html: '<p style="margin-bottom:10px;">Vui lòng xử lý các mục sau trước khi thanh toán:</p><ul style="padding-left:10px;">' + list + '</ul>',
+                                                        confirmButtonColor: '#ef233c',
+                                                        confirmButtonText: 'Cập nhật giỏ hàng',
+                                                        showCancelButton: true,
+                                                        cancelButtonText: 'Đóng',
+                                                        cancelButtonColor: '#6c757d',
+                                                    });
+                                                } else {
+                                                    Swal.fire({ icon: 'error', title: 'Lỗi!', text: data.message || 'Không thể tiến hành thanh toán.', confirmButtonColor: '#ef233c' });
+                                                }
+                                            })
+                                            .catch(function() {
+                                                btn.style.opacity = '';
+                                                btn.style.pointerEvents = '';
+                                                window.location.href = '{{ route('checkout.index') }}';
+                                            });
+                                        });
+                                        </script>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!--coupon code area end-->
+
+                    <!--cross-sell section start-->
+                    @if(isset($crossSellProducts) && $crossSellProducts->count() > 0)
+                    <div class="mt-5">
+                        <div class="section_title" style="margin-bottom: 20px;">
+                            <h2>{{ __('messages.you_may_also_like') ?? 'Có thể bạn cũng thích' }}</h2>
+                        </div>
+                        <div class="row">
+                            @foreach($crossSellProducts->take(4) as $crossSell)
+                            <div class="col-lg-3 col-md-4 col-6 mb-3">
+                                <div class="single_product">
+                                    <div class="product_thumb">
+                                        <a class="primary_img" href="{{ route('product.detail', $crossSell->slug) }}">
+                                            <img src="{{ $crossSell->image ? asset('storage/' . $crossSell->image) : asset('frontend-assets/img/product/product21.jpg') }}"
+                                                alt="{{ $crossSell->name }}" style="height: 200px; object-fit: cover;">
+                                        </a>
+                                    </div>
+                                    <div class="product_content">
+                                        <h3><a href="{{ route('product.detail', $crossSell->slug) }}">{{ Str::limit($crossSell->name, 40) }}</a></h3>
+                                        @include('frontend.partials.product-price', ['product' => $crossSell])
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                    <!--cross-sell section end-->
 
                 </form>
             @else
@@ -315,7 +396,7 @@
                         $('#cart-subtotal').text(response.cart_total);
                         $('#shipping-fee span').text(response.shipping_fee);
                         $('#cart-grand-total').text(response.grand_total);
-                        $('#cart-count').text(response.cart_count);
+                        $('.cart-count').text(response.cart_count);
 
                         // Cập nhật giá trị html cho item
                         row.find('.product_total').text(response.item_total);
@@ -383,7 +464,7 @@
                                 $('#cart-subtotal').text(response.cart_total);
                                 $('#shipping-fee span').text(response.shipping_fee);
                                 $('#cart-grand-total').text(response.grand_total);
-                                $('#cart-count').text(response.cart_count);
+                                $('.cart-count').text(response.cart_count);
                                 if (response.cart_count == 0) {
                                     setTimeout(function() { window.location.reload(); }, 600);
                                 }
@@ -443,15 +524,15 @@
 
         // Check All logic
         $('#check-all').on('change', function() {
-            $('.check-item').prop('checked', $(this).prop('checked'));
+            $('.check-item:not(:disabled)').prop('checked', $(this).prop('checked'));
             toggleDeleteSelectedBtn();
             calculateCartTotal();
         });
 
         // Check Item logic
         $(document).on('change', '.check-item', function() {
-            var totalItems = $('.check-item').length;
-            var checkedItems = $('.check-item:checked').length;
+            var totalItems = $('.check-item:not(:disabled)').length;
+            var checkedItems = $('.check-item:not(:disabled):checked').length;
             $('#check-all').prop('checked', totalItems === checkedItems && totalItems > 0);
             toggleDeleteSelectedBtn();
             calculateCartTotal();
@@ -551,16 +632,17 @@
             row.find(".cart-variant-info").fadeIn();
         });
 
-        // Change variant (Product/Size/Color)
-        $(".variant-select").on('change', function() {
+        // Change variant (Product/Size/Color) via Submit Button
+        $(".save-variant-btn").on('click', function() {
             var ele = $(this);
-            var changedType = ele.data("type"); 
             var row = ele.parents("tr");
             var productId = row.find(".product-id").val();
             var newProductId = row.find(".product-select").val() || productId;
             var oldVariantId = row.find(".current-variant-id").val();
             var sizeId = row.find(".size-select").val();
             var colorId = row.find(".color-select").val();
+            
+            var changedType = (productId !== newProductId) ? 'product' : null;
 
             $.ajax({
                 url: '{{ route('cart.changeVariant') }}',

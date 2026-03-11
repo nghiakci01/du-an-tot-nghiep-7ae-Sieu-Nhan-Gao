@@ -19,6 +19,18 @@ class SettingController extends Controller
     {
         $data = $request->except('_token');
 
+        // Handle file uploads for settings
+        foreach ($request->allFiles() as $key => $file) {
+            $path = $file->store('settings', 'public');
+            $data[$key] = $path;
+            
+            // Delete old file if exists
+            $oldSetting = Setting::where('key', $key)->first();
+            if ($oldSetting && $oldSetting->value) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldSetting->value);
+            }
+        }
+
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(
                 ['key' => $key],

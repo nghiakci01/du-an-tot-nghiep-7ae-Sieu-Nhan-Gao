@@ -47,7 +47,7 @@ class ReportService
             'new_orders' => $newOrders,
             'total_customers' => $totalCustomers,
             'total_products' => Product::where('is_active', true)->count(),
-            'low_stock_products' => ProductVariant::where('stock_quantity', '<', 10)->count(),
+            'low_stock_products' => 0, // Stock tracking is removed
         ];
     }
 

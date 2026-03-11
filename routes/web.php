@@ -26,6 +26,8 @@ Route::post('/cart/apply-coupon', [App\Http\Controllers\Frontend\CartController:
 Route::post('/cart/remove-coupon', [App\Http\Controllers\Frontend\CartController::class, 'removeCoupon'])->name('cart.remove_coupon');
 Route::post('/cart/change-variant', [App\Http\Controllers\Frontend\CartController::class, 'changeVariant'])->name('cart.changeVariant');
 Route::get('/cart/count', [App\Http\Controllers\Frontend\CartController::class, 'getCartCount'])->name('cart.count');
+Route::get('/cart/validate', [App\Http\Controllers\Frontend\CheckoutController::class, 'validateCart'])->name('cart.validate');
+Route::post('/api/checkout/check-inventory', [App\Http\Controllers\Api\InventoryCheckController::class, 'checkInventory'])->name('api.checkout.checkInventory');
 
 Route::get('/home', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
 Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('checkout.index');
@@ -33,6 +35,14 @@ Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::clas
 Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
 Route::post('/checkout/remove-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeCoupon'])->name('checkout.removeCoupon');
 Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
+Route::post('/checkout/order/{id}/confirm-transfer', [App\Http\Controllers\Frontend\CheckoutController::class, 'confirmTransfer'])->name('checkout.confirm_transfer');
+Route::post('/checkout/order/{id}/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancelOrder'])->name('checkout.cancel_order');
+
+// VNPAY Routes
+Route::get('/vnpay/payment/{order_id}', [App\Http\Controllers\Frontend\PaymentController::class, 'createPayment'])->name('vnpay.payment');
+Route::get('/vnpay/callback', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('vnpay.callback');
+Route::get('/vnpay/return', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('vnpay.return');
+Route::get('/vnpay/ipn', [App\Http\Controllers\Frontend\PaymentController::class, 'ipn'])->name('vnpay.ipn');
 
 // Guest Order Tracking Routes
 Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'index'])->name('order-tracking.index');
@@ -97,6 +107,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
         Route::get('orders/customers/search', [App\Http\Controllers\Admin\OrderController::class, 'customersSearch'])->name('orders.customers.search');
         Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
+        Route::post('orders/{order}/confirm-payment', [App\Http\Controllers\Admin\OrderController::class, 'confirmPayment'])->name('orders.confirm-payment');
+        Route::post('orders/{order}/query-payment', [App\Http\Controllers\Admin\OrderController::class, 'queryPayment'])->name('orders.query-payment');
+        Route::post('orders/{order}/refund-payment', [App\Http\Controllers\Admin\OrderController::class, 'refundPayment'])->name('orders.refund-payment');
+        Route::post('orders-trigger-auto-cancel', [App\Http\Controllers\Admin\OrderController::class, 'triggerAutoCancel'])->name('orders.trigger-auto-cancel');
         Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
         Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
 
@@ -105,7 +119,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
         
         // General APIs for Admin Panel
-        Route::get('api/variants/search', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'variantsSearch'])->name('api.variants.search');
+        Route::get('api/variants/search', [App\Http\Controllers\Admin\ProductController::class, 'variantsSearch'])->name('api.variants.search');
 
         // Admin Only Routes
         Route::middleware(['admin.only'])->group(function () {
@@ -124,20 +138,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
 
-            // Blog Management
-            Route::resource('post-categories', App\Http\Controllers\Admin\PostCategoryController::class);
-            Route::resource('posts', App\Http\Controllers\Admin\PostController::class);
-
             // Loyalty Points
             Route::get('loyalty-points', [App\Http\Controllers\Admin\LoyaltyPointController::class, 'index'])->name('loyalty-points.index');
             
             // Cài đặt ngân hàng thanh toán (QR Bank Settings)
-            Route::resource('bank-settings', App\Http\Controllers\Backend\BankSettingController::class);
+            Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
         });
 
-        // Admin & Staff Routes (Stock only)
-        Route::get('stock', [App\Http\Controllers\Admin\StockController::class, 'index'])->name('stock.index');
-        Route::post('stock/update', [App\Http\Controllers\Admin\StockController::class, 'update'])->name('stock.update');
+        // Blog Management (Admin & Staff)
+        Route::resource('post-categories', App\Http\Controllers\Admin\PostCategoryController::class);
+        Route::resource('posts', App\Http\Controllers\Admin\PostController::class);
+
 
         // Chatbot Management (Admin & Staff)
         Route::prefix('chat')->name('chat.')->group(function () {
@@ -219,5 +230,10 @@ Route::get('lang/{locale}', function ($locale) {
         session(['locale' => $locale]);
     }
 
-    return redirect()->back();
 })->name('lang.switch');
+
+// Realtime testing route
+Route::get('/test-broadcast', function () {
+    \App\Events\TestEvent::dispatch('Gửi từ Web.php lúc ' . now()->format('H:i:s'));
+    return view('test-broadcast');
+});

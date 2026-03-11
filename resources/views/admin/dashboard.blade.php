@@ -169,7 +169,7 @@
               <div class="col-12">
                 <h3 class="mb-1">{{ number_format($totalProducts) }}</h3>
                 <p class="text-danger mb-0">
-                  <i class="ti ti-alert-circle"></i> {{ $lowStockProducts }} Mẫu sắp hết hàng
+                  <i class="ti ti-alert-circle"></i> Sản phẩm đang kinh doanh
                 </p>
               </div>
             </div>
@@ -318,6 +318,57 @@
       </div>
       
       <!-- You could add another card here for Balance/Quick Actions or leave it half-width -->
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-header bg-transparent border-bottom-0 pb-0">
+            <h5 class="mb-0 fw-bold"><i class="ti ti-chart-funnel me-2 text-warning"></i>Phễu Chuyển Đổi (30 ngày)</h5>
+          </div>
+          <div class="card-body">
+            @if(isset($funnelStats))
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <div class="p-3 rounded bg-light-danger text-center">
+                  <h3 class="mb-1 text-danger">{{ $funnelStats['abandoned_carts'] }}</h3>
+                  <small class="text-muted">Giỏ bị bỏ rơi</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 rounded bg-light-success text-center">
+                  <h3 class="mb-1 text-success">{{ $funnelStats['recovered_carts'] }}</h3>
+                  <small class="text-muted">Giỏ phục hồi</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 rounded bg-light-primary text-center">
+                  <h3 class="mb-1 text-primary">{{ $funnelStats['cart_to_order_rate'] }}%</h3>
+                  <small class="text-muted">Tỷ lệ chuyển đổi</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 rounded bg-light-warning text-center">
+                  <h3 class="mb-1 text-warning">{{ number_format($funnelStats['avg_order_value']) }}đ</h3>
+                  <small class="text-muted">Giá trị TB / đơn</small>
+                </div>
+              </div>
+            </div>
+            <div class="p-3 rounded" style="background: #fff3e0;">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <small class="text-muted">Doanh thu tiềm năng bị mất</small>
+                  <h5 class="mb-0 text-danger fw-bold">{{ number_format($funnelStats['abandoned_value']) }}đ</h5>
+                </div>
+                <i class="ti ti-alert-triangle f-28 text-warning"></i>
+              </div>
+            </div>
+            @else
+            <div class="text-center py-4 text-muted">
+              <i class="ti ti-chart-funnel f-40 opacity-50"></i>
+              <p class="mt-2 mb-0">Chưa có dữ liệu chuyển đổi.</p>
+            </div>
+            @endif
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Recent Orders Table -->
