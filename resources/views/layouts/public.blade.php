@@ -40,6 +40,21 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        /* Force Pure White Background & Remove Glow - OVERRIDE VITE/BOOTSTRAP */
+        :root, [data-bs-theme=light] {
+            --bs-body-bg: #ffffff !important;
+            --bs-body-bg-rgb: 255, 255, 255 !important;
+            --bs-tertiary-bg: #ffffff !important;
+            --bs-secondary-bg: #ffffff !important;
+        }
+
+        body, html, .main_wrapper, .main-wrapper, .header_area, .footer_section, .breadcrumbs_area, .atino-breadcrumb {
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+
         /* Smooth Scrolling */
         html {
             scroll-behavior: smooth;
