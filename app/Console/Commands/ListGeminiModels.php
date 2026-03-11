@@ -18,7 +18,6 @@ class ListGeminiModels extends Command
         $this->info('Listing available Gemini models...');
         $this->info('API Key: '.substr($apiKey, 0, 15).'...');
         $this->newLine();
-
         try {
             // Try to list models
             $response = Http::timeout(10)

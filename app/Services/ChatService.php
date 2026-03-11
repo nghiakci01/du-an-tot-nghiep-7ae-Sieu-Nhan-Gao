@@ -33,13 +33,7 @@ class ChatService
             }
 
             // Handle AI modes
-            $provider = $this->getSetting('ai_provider', 'gemini');
-
-            if ($provider === 'openai') {
-                return $this->generateOpenAIResponse($message);
-            }
-
-            return $this->generateGeminiResponse($message);
+            return $this->generateAIResponse($message);
         } catch (\Exception $e) {
             Log::error('ChatService Exception: '.$e->getMessage());
             $mode = $this->getSetting('chatbot_mode', 'rules');
@@ -150,116 +144,59 @@ class ChatService
     }
 
     /**
-     * Gemini AI response based on settings
+     * AI response with fallback logic
      */
-    private function generateGeminiResponse(string $message): array
+    private function generateAIResponse(string $message): array
     {
-        // Prioritize finding a key explicitly for Gemini, or fallback to generic AI key
-        $apiKey = $this->getSetting('gemini_api_key');
+        $providerType = $this->getSetting('ai_provider', 'gemini');
+        $contextData = $this->getAiContext($message);
+        $fullPrompt = $contextData['instruction']."\n\nUser Question: ".$message;
+        $products = $contextData['products'];
 
-        if (! $apiKey) {
-            return $this->textResponse('Chưa cấu hình Gemini API Key. Vui lòng liên hệ Admin! 🤖');
-        }
+        // Define fallback chains
+        $fallbacks = [
+            'gemini' => [
+                ['model' => 'gemini-1.5-flash-latest', 'key' => $this->getSetting('gemini_api_key')],
+                ['model' => 'gemini-1.5-pro-latest', 'key' => $this->getSetting('gemini_api_key')],
+                ['model' => 'gemini-pro', 'key' => $this->getSetting('gemini_api_key')],
+            ],
+            'openai' => [
+                ['model' => 'gpt-3.5-turbo', 'key' => $this->getSetting('openai_api_key')],
+                ['model' => 'gpt-4o-mini', 'key' => $this->getSetting('openai_api_key')],
+            ]
+        ];
 
-        try {
-            $contextData = $this->getAiContext($message);
-            $fullPrompt = $contextData['instruction']."\n\nUser Question: ".$message;
-            $products = $contextData['products'];
+        $modelsToTry = $fallbacks[$providerType] ?? [];
 
-            // Updated to use 'gemini-flash-latest' and 'v1beta' based on successful diagnostics
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={$apiKey}";
+        foreach ($modelsToTry as $config) {
+            if (empty($config['key'])) continue;
 
-            $response = \Illuminate\Support\Facades\Http::withOptions([
-                'curl' => [
-                    CURLOPT_SSL_VERIFYPEER => true,
-                    CURLOPT_SSL_VERIFYHOST => 2,
-                ],
-                'timeout' => 30,
-            ])->withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post($url, [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $fullPrompt],
-                        ],
-                    ],
-                ],
-            ]);
+            try {
+                $provider = \App\Services\AI\AIFactory::make($providerType, $config['key'], $config['model']);
+                
+                $responseText = $provider->generateResponse($fullPrompt, [
+                    'instruction' => $contextData['instruction'],
+                    'timeout' => 30
+                ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $responseText = $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Tôi không nhận được phản hồi từ AI. 😅';
-
-                if ($products->isNotEmpty()) {
-                    return $this->productResponse($responseText, $products);
+                if ($responseText) {
+                    if ($products->isNotEmpty()) {
+                        return $this->productResponse($responseText, $products);
+                    }
+                    return $this->textResponse($responseText);
                 }
 
-                return $this->textResponse($responseText);
+                Log::warning("AI Fallback: Model {$config['model']} failed, trying next...");
+            } catch (\Exception $e) {
+                Log::error("AI Fallback Exception ({$config['model']}): ".$e->getMessage());
             }
-
-            Log::error('Gemini API Error: '.$response->body());
-
-            return $this->textResponse('Có lỗi khi kết nối với AI (Gemini). Vui lòng thử lại sau! 🤖');
-
-        } catch (\Exception $e) {
-            Log::error('Gemini Service Exception: '.$e->getMessage());
-
-            return $this->textResponse('Hệ thống AI đang gặp sự cố nhỏ. 😅');
         }
+
+        // Final fallback to Rules if AI fails completely
+        Log::error("AI System completely failed for provider {$providerType}. Falling back to Rule-based response.");
+        return $this->generateRuleResponse($message);
     }
 
-    private function generateOpenAIResponse(string $message): array
-    {
-        $apiKey = $this->getSetting('openai_api_key');
-
-        if (! $apiKey) {
-            return $this->textResponse('Chưa cấu hình OpenAI API Key. Vui lòng liên hệ Admin! 🤖');
-        }
-
-        try {
-            $contextData = $this->getAiContext($message);
-            $products = $contextData['products'];
-
-            $response = \Illuminate\Support\Facades\Http::withOptions([
-                'curl' => [
-                    CURLOPT_SSL_VERIFYPEER => true,
-                    CURLOPT_SSL_VERIFYHOST => 2,
-                ],
-                'timeout' => 30,
-            ])->withHeaders([
-                'Authorization' => "Bearer {$apiKey}",
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/responses', [
-                'model' => 'gpt-3.5-turbo',
-                'instructions' => $contextData['instruction'],
-                'input' => $message,
-                'temperature' => 0.7,
-                'max_output_tokens' => 800,
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                // v1/responses structure: output[0].content[0].text
-                $responseText = $data['output'][0]['content'][0]['text'] ?? 'Tôi không nhận được phản hồi từ OpenAI. 😅';
-
-                if ($products->isNotEmpty()) {
-                    return $this->productResponse($responseText, $products);
-                }
-
-                return $this->textResponse($responseText);
-            }
-
-            Log::error('OpenAI API Error: '.$response->body());
-
-            return $this->textResponse('Có lỗi khi kết nối với AI (OpenAI). Vui lòng thử lại sau! 🤖');
-
-        } catch (\Exception $e) {
-            Log::error('OpenAI Service Exception: '.$e->getMessage());
-
-            return $this->textResponse('Hệ thống AI OpenAI đang gặp sự cố nhỏ. 😅');
-        }
-    }
 
     /**
      * Get context for AI (Product list, Shop info, etc.)
