@@ -149,11 +149,14 @@
                                 @endforeach
                             </ul>
                         </div>
-                        
                         <!-- AI Try On Button -->
-                        <div class="mt-4 text-center">
-                            <button type="button" id="btn-open-vton-modal" class="btn w-100 py-3 d-flex align-items-center justify-content-center" style="background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); color: white; font-weight: bold; border-radius: 8px; border: none; box-shadow: 0 4px 15px rgba(253, 29, 29, 0.4); transition: transform 0.2s; font-size: 16px;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                                <i class="fa fa-magic" style="margin-right: 8px; font-size: 20px;"></i> ✨ {{ __('messages.ai_try_on') ?? 'Thử Đồ Thực Tế Ảo (AI)' }}
+                        <div class="mt-4 mb-3 text-center">
+                            <button type="button" class="btn w-100 py-3 d-flex align-items-center justify-content-center" 
+                                style="background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); color: white; font-weight: bold; border-radius: 8px; border: none; box-shadow: 0 4px 15px rgba(253, 29, 29, 0.4); transition: transform 0.2s; font-size: 16px;" 
+                                data-bs-toggle="modal" data-bs-target="#aiTryOnModal" data-toggle="modal" data-target="#aiTryOnModal"
+                                onmouseover="this.style.transform='scale(1.02)'" 
+                                onmouseout="this.style.transform='scale(1)'">
+                                <i class="fa fa-magic mr-2" style="font-size: 20px;"></i> ✨ {{ __('messages.ai_try_on') === 'messages.ai_try_on' ? 'Thử Đồ AI' : __('messages.ai_try_on') }}
                             </button>
                         </div>
 
@@ -801,6 +804,101 @@
         </div>
     </div>
 
+    <!-- AI Try On Modal -->
+    <div class="modal fade" id="aiTryOnModal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="false" data-backdrop="false" style="z-index: 105050; background: rgba(0,0,0,0.6);">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow" style="border-radius: 12px; overflow: hidden;">
+                <div class="modal-header border-0 pb-0 pt-4 px-4 text-center d-block position-relative">
+                    <h5 class="modal-title" style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px;"><i
+                            class="fa fa-magic text-primary"></i> {{ __('messages.ai_try_on_modal_title') === 'messages.ai_try_on_modal_title' ? 'Thử Đồ Thông Minh (AI)' : __('messages.ai_try_on_modal_title') }}</h5>
+                    <button type="button" class="close position-absolute" data-bs-dismiss="modal" data-dismiss="modal"
+                        aria-label="Close"
+                        style="top: 15px; right: 20px; font-size: 28px; background:transparent; border:none;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <p class="text-muted mt-2" style="font-size: 14px;">{{ __('messages.ai_try_on_desc') === 'messages.ai_try_on_desc' ? 'Tải ảnh toàn thân của bạn lên để AI tự động ghép thử bộ áo/quần này.' : __('messages.ai_try_on_desc') }}</p>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-5 text-center mb-4 mb-md-0">
+                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">
+                                {{ __('messages.user_photo_sample') === 'messages.user_photo_sample' ? 'Ảnh Của Bạn' : __('messages.user_photo_sample') }}</p>
+                            <div class="upload-area p-4 d-flex flex-column align-items-center justify-content-center"
+                                style="border: 2px dashed #ccc; border-radius: 8px; background: #fafafa; cursor: pointer; position: relative; min-height: 250px;"
+                                id="uploadBtn">
+                                <div id="uploadPlaceholder" style="pointer-events: none;">
+                                    <i class="fa fa-cloud-upload fa-3x text-muted mb-3"></i>
+                                    <p class="m-0" style="font-size: 14px; font-weight: 600;">
+                                        {{ __('messages.upload_photo') === 'messages.upload_photo' ? 'Nhấn để Tải ảnh lên' : __('messages.upload_photo') }}</p>
+                                    <p class="text-muted mt-1" style="font-size: 11px;">{!! __('messages.upload_photo_support') === 'messages.upload_photo_support' ? 'Hỗ trợ JPG, PNG (Max 5MB).' : __('messages.upload_photo_support') !!}</p>
+                                </div>
+                                <input type="file" id="userImageUpload" accept="image/jpeg, image/png, image/jpg"
+                                    style="opacity: 0; position: absolute; top:0; left:0; width: 100%; height: 100%; cursor: pointer; z-index: 100;">
+                                <img id="userImagePreview" src=""
+                                    style="max-width: 100%; max-height: 230px; border-radius: 6px; display: none; position: relative; z-index: 2;"
+                                    alt="User Image">
+                                <button type="button" class="btn btn-sm btn-light position-absolute shadow-sm"
+                                    id="btnChangeImage"
+                                    style="display:none; bottom: 10px; right: 10px; z-index: 105; font-size: 11px; font-weight: bold;"><i
+                                        class="fa fa-refresh"></i> {{ __('messages.change_photo') === 'messages.change_photo' ? 'Đổi ảnh khác' : __('messages.change_photo') }}</button>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-center d-none d-md-block">
+                            <i class="fa fa-long-arrow-right fa-2x text-muted"></i>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">
+                                {{ __('messages.ai_result') === 'messages.ai_result' ? 'Kết Quả (AI)' : __('messages.ai_result') }}</p>
+                            <div class="result-area p-4 d-flex align-items-center justify-content-center"
+                                style="border: 1px solid #eee; border-radius: 8px; background: #f8f9fa; min-height: 250px; position: relative; overflow: hidden;"
+                                id="aiResultArea">
+                                <div class="text-muted text-center" id="aiWaitingText">
+                                    <i class="fa fa-user-circle-o fa-3x mb-3" style="color: #ddd;"></i><br>
+                                    <span style="font-size: 13px;">{!! __('messages.please_upload_photo') === 'messages.please_upload_photo' ? 'Vui lòng tải ảnh của bạn lên trước' : __('messages.please_upload_photo') !!}</span>
+                                </div>
+                                <div id="aiLoading" class="text-center"
+                                    style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%;">
+                                    
+                                    <div class="progress mb-2" style="height: 10px; margin: 0 auto; width: 80%; border-radius: 10px;">
+                                        <div id="aiProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;"></div>
+                                    </div>
+                                    
+                                    <p id="aiProgressText" style="font-size: 13px; font-weight: 600; color: #111;" class="m-0 mt-2">Đang thiết lập...</p>
+                                    <p style="font-size: 11px; color: #666;" class="m-0 mt-1">Quá trình này có thể mất 10-20 giây</p>
+                                </div>
+                                
+                                <div id="aiNoHumanGuide" style="display: none; text-align: center; width: 100%;">
+                                    <i class="fa fa-exclamation-triangle text-warning fa-3x mb-2"></i>
+                                    <p style="font-weight: bold; font-size: 14px; color: #ef233c;">Video/Ảnh mẫu không đạt yêu cầu</p>
+                                    <p style="font-size: 12px; color: #555;">AI không tìm thấy người hoặc tư thế không hợp lệ.</p>
+                                    <p style="font-size: 11px; color: #888;">Hãy đảm bảo ảnh chụp toàn thân thẳng góc, không bị cắt xén tay chân, và có đủ ánh sáng.</p>
+                                </div>
+
+                                <div id="aiSuccessResult" style="display: none; width: 100%; height: 100%;">
+                                    <div
+                                        style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                        <img id="resultBaseImage" src=""
+                                            style="max-height: 230px; max-width: 100%; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 justify-content-center">
+                    <button type="button" class="btn btn-dark px-5 py-3" id="btnRunAI"
+                        style="border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-width: 250px; transition: all 0.3s;"
+                        disabled>
+                        <i class="fa fa-gears mr-2"></i> Bắt đầu thử đồ
+                    </button>
+                    <a href="#" class="btn btn-success px-5 py-3" id="btnDownloadResult" target="_blank" download="AI_ThuDo_SNG.jpg"
+                        style="border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-width: 250px; display: none;">
+                        <i class="fa fa-download mr-2"></i> Tải ảnh về
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     @include('frontend.partials.recently-viewed')
 
@@ -819,7 +917,188 @@
         };
 
         $(document).ready(function() {
+            
+            
+            // --- AI Try On Logic ---
+            const uploadBtn = document.getElementById('uploadBtn');
+            const fileInput = document.getElementById('userImageUpload');
+            const imgPreview = document.getElementById('userImagePreview');
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const btnChange = document.getElementById('btnChangeImage');
+            const btnRunAI = document.getElementById('btnRunAI');
 
+            const aiWaitingText = document.getElementById('aiWaitingText');
+            const aiLoading = document.getElementById('aiLoading');
+            const aiSuccessResult = document.getElementById('aiSuccessResult');
+            const resultBaseImage = document.getElementById('resultBaseImage');
+            const btnDownloadResult = document.getElementById('btnDownloadResult');
+            const aiNoHumanGuide = document.getElementById('aiNoHumanGuide');
+            
+            const aiProgressBar = document.getElementById('aiProgressBar');
+            const aiProgressText = document.getElementById('aiProgressText');
+            let progressInterval;
+
+            if (uploadBtn) {
+                // Trigger file input when clicking the upload area
+                uploadBtn.addEventListener('click', function(e) {
+                    if (e.target !== fileInput && e.target !== btnChange && e.target.parentElement !==
+                        btnChange) {
+                        fileInput.click();
+                    }
+                });
+
+                btnChange.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    fileInput.click();
+                });
+
+                // Handle file selection
+                fileInput.addEventListener('change', function() {
+                    const file = this.files[0];
+                    if (file) {
+                        // Validate file size and type
+                        if (file.size > 5 * 1024 * 1024) {
+                            Swal.fire({ icon: 'error', title: 'Ảnh quá lớn', text: 'Vui lòng chọn ảnh < 5MB' });
+                            return;
+                        }
+                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                        if (!allowedTypes.includes(file.type)) {
+                            Swal.fire({ icon: 'error', title: 'Định dạng sai', text: 'Chỉ chấp nhận file JPG, PNG' });
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = new Image();
+                            img.src = e.target.result;
+                            img.onload = function() {
+                                // Validate resolution directly
+                                if (img.width < 300 || img.height < 400) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Kích thước ảnh nhỏ',
+                                        text: 'Chất lượng ảnh thấp có thể khiến hình ảnh AI tạo ra bị mờ hoặc bị lỗi khuôn mặt.'
+                                    });
+                                }
+
+                                imgPreview.src = e.target.result;
+                                placeholder.style.display = 'none';
+                                imgPreview.style.display = 'block';
+                                btnChange.style.display = 'block';
+
+                                // Enable run button
+                                btnRunAI.disabled = false;
+                                btnRunAI.classList.remove('btn-dark');
+                                btnRunAI.classList.add('btn-primary');
+
+                                // Reset AI area
+                                aiWaitingText.style.display = 'block';
+                                aiLoading.style.display = 'none';
+                                aiSuccessResult.style.display = 'none';
+                                aiNoHumanGuide.style.display = 'none';
+                                btnDownloadResult.style.display = 'none';
+                                btnRunAI.style.display = 'inline-block';
+                            }
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                function resetProgress() {
+                    clearInterval(progressInterval);
+                    if(aiProgressBar) aiProgressBar.style.width = '0%';
+                }
+
+                function simulateProgress() {
+                    let progress = 0;
+                    if(aiProgressBar) aiProgressBar.style.width = '0%';
+                    aiProgressText.innerText = "Đang tải ảnh của bạn lên server (10%)...";
+                    
+                    progressInterval = setInterval(() => {
+                        progress += Math.random() * 5;
+                        if (progress > 95) progress = 95; // Capping at 95% until complete
+                        
+                        if(aiProgressBar) aiProgressBar.style.width = progress + '%';
+                        
+                        if (progress > 30 && progress < 60) {
+                            aiProgressText.innerText = "Đang gửi ảnh sang máy chủ HuggingFace mô hình Kolors...";
+                        } else if (progress >= 60 && progress < 85) {
+                            aiProgressText.innerText = "AI đang phần tích kết cấu trang phục và tư thế người...";
+                        } else if (progress >= 85) {
+                            aiProgressText.innerText = "Đang áp dụng chất liệu lên da và dựng ảnh (sắp xong)...";
+                        }
+                    }, 800);
+                }
+
+                // Handle Run AI
+                btnRunAI.addEventListener('click', function() {
+                    if (!fileInput.files[0]) return;
+
+                    // Start loading UI
+                    aiWaitingText.style.display = 'none';
+                    aiSuccessResult.style.display = 'none';
+                    aiNoHumanGuide.style.display = 'none';
+                    aiLoading.style.display = 'block';
+                    btnRunAI.disabled = true;
+                    btnRunAI.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> Đang xử lý...';
+
+                    simulateProgress();
+
+                    const formData = new FormData();
+                    formData.append('user_image', fileInput.files[0]);
+                    formData.append('product_id', {{ $product->id }});
+
+                    $.ajax({
+                        url: '/api/vton',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            resetProgress();
+                            
+                            if (response.success && response.image_url) {
+                                aiLoading.style.display = 'none';
+                                resultBaseImage.src = response.image_url;
+                                aiSuccessResult.style.display = 'block';
+                                
+                                btnRunAI.style.display = 'none';
+                                btnDownloadResult.href = response.image_url;
+                                btnDownloadResult.style.display = 'inline-block';
+                            } else {
+                                handleVtonError(response);
+                            }
+                        },
+                        error: function(xhr) {
+                            resetProgress();
+                            const response = xhr.responseJSON || {};
+                            handleVtonError(response);
+                        }
+                    });
+                });
+
+                function handleVtonError(response) {
+                    aiLoading.style.display = 'none';
+                    aiSuccessResult.style.display = 'none';
+                    btnRunAI.disabled = false;
+                    btnRunAI.innerHTML = '<i class="fa fa-gears mr-2"></i> Bắt đầu thử đồ';
+                    btnRunAI.style.display = 'inline-block';
+
+                    if (response.error_code === 'NO_HUMAN_DETECTED') {
+                        aiNoHumanGuide.style.display = 'block';
+                    } else {
+                        aiWaitingText.style.display = 'block';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Thử đồ thất bại',
+                            text: response.message || 'Đã xảy ra lỗi kết nối. Vui lòng thử lại sau.'
+                        });
+                    }
+                }
+            }
 
             // Star hover - show likert label
             $('.star-rating label').on('mouseenter', function() {
@@ -1262,4 +1541,100 @@
         });
 
     </script>
+    <!-- AI Try On Modal -->
+    <div class="modal fade" id="aiTryOnModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1050;">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow" style="border-radius: 12px; overflow: hidden;">
+                <div class="modal-header border-0 pb-0 pt-4 px-4 text-center d-block position-relative">
+                    <h5 class="modal-title" style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px;"><i
+                            class="fa fa-magic text-primary"></i> {{ __('messages.ai_try_on_modal_title') === 'messages.ai_try_on_modal_title' ? 'Thử Đồ Thông Minh (AI)' : __('messages.ai_try_on_modal_title') }}</h5>
+                    <button type="button" class="close position-absolute" data-bs-dismiss="modal" data-dismiss="modal"
+                        aria-label="Close"
+                        style="top: 15px; right: 20px; font-size: 28px; background:transparent; border:none;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <p class="text-muted mt-2" style="font-size: 14px;">{{ __('messages.ai_try_on_desc') === 'messages.ai_try_on_desc' ? 'Tải ảnh toàn thân của bạn lên để AI tự động ghép thử bộ áo/quần này.' : __('messages.ai_try_on_desc') }}</p>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-5 text-center mb-4 mb-md-0">
+                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">
+                                {{ __('messages.user_photo_sample') === 'messages.user_photo_sample' ? 'Ảnh Của Bạn' : __('messages.user_photo_sample') }}</p>
+                            <div class="upload-area p-4 d-flex flex-column align-items-center justify-content-center"
+                                style="border: 2px dashed #ccc; border-radius: 8px; background: #fafafa; cursor: pointer; position: relative; min-height: 250px;"
+                                id="uploadBtn">
+                                <div id="uploadPlaceholder" style="pointer-events: none;">
+                                    <i class="fa fa-cloud-upload fa-3x text-muted mb-3"></i>
+                                    <p class="m-0" style="font-size: 14px; font-weight: 600;">
+                                        {{ __('messages.upload_photo') === 'messages.upload_photo' ? 'Nhấn để Tải ảnh lên' : __('messages.upload_photo') }}</p>
+                                    <p class="text-muted mt-1" style="font-size: 11px;">{!! __('messages.upload_photo_support') === 'messages.upload_photo_support' ? 'Hỗ trợ JPG, PNG (Max 5MB).' : __('messages.upload_photo_support') !!}</p>
+                                </div>
+                                <input type="file" id="userImageUpload" accept="image/jpeg, image/png, image/jpg"
+                                    style="opacity: 0; position: absolute; top:0; left:0; width: 100%; height: 100%; cursor: pointer; z-index: 100;">
+                                <img id="userImagePreview" src=""
+                                    style="max-width: 100%; max-height: 230px; border-radius: 6px; display: none; position: relative; z-index: 2;"
+                                    alt="User Image">
+                                <button type="button" class="btn btn-sm btn-light position-absolute shadow-sm"
+                                    id="btnChangeImage"
+                                    style="display:none; bottom: 10px; right: 10px; z-index: 105; font-size: 11px; font-weight: bold;"><i
+                                        class="fa fa-refresh"></i> {{ __('messages.change_photo') === 'messages.change_photo' ? 'Đổi ảnh khác' : __('messages.change_photo') }}</button>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-center d-none d-md-block">
+                            <i class="fa fa-long-arrow-right fa-2x text-muted"></i>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">
+                                {{ __('messages.ai_result') === 'messages.ai_result' ? 'Kết Quả (AI)' : __('messages.ai_result') }}</p>
+                            <div class="result-area p-4 d-flex align-items-center justify-content-center"
+                                style="border: 1px solid #eee; border-radius: 8px; background: #f8f9fa; min-height: 250px; position: relative; overflow: hidden;"
+                                id="aiResultArea">
+                                <div class="text-muted text-center" id="aiWaitingText">
+                                    <i class="fa fa-user-circle-o fa-3x mb-3" style="color: #ddd;"></i><br>
+                                    <span style="font-size: 13px;">{!! __('messages.please_upload_photo') === 'messages.please_upload_photo' ? 'Vui lòng tải ảnh của bạn lên trước' : __('messages.please_upload_photo') !!}</span>
+                                </div>
+                                <div id="aiLoading" class="text-center"
+                                    style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%;">
+                                    
+                                    <div class="progress mb-2" style="height: 10px; margin: 0 auto; width: 80%; border-radius: 10px;">
+                                        <div id="aiProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;"></div>
+                                    </div>
+                                    
+                                    <p id="aiProgressText" style="font-size: 13px; font-weight: 600; color: #111;" class="m-0 mt-2">Đang thiết lập...</p>
+                                    <p style="font-size: 11px; color: #666;" class="m-0 mt-1">Quá trình này có thể mất 10-20 giây</p>
+                                </div>
+                                
+                                <div id="aiNoHumanGuide" style="display: none; text-align: center; width: 100%;">
+                                    <i class="fa fa-exclamation-triangle text-warning fa-3x mb-2"></i>
+                                    <p style="font-weight: bold; font-size: 14px; color: #ef233c;">Video/Ảnh mẫu không đạt yêu cầu</p>
+                                    <p style="font-size: 12px; color: #555;">AI không tìm thấy người hoặc tư thế không hợp lệ.</p>
+                                    <p style="font-size: 11px; color: #888;">Hãy đảm bảo ảnh chụp toàn thân thẳng góc, không bị cắt xén tay chân, và có đủ ánh sáng.</p>
+                                </div>
+
+                                <div id="aiSuccessResult" style="display: none; width: 100%; height: 100%;">
+                                    <div
+                                        style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                        <img id="resultBaseImage" src=""
+                                            style="max-height: 230px; max-width: 100%; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 justify-content-center">
+                    <button type="button" class="btn btn-dark px-5 py-3" id="btnRunAI"
+                        style="border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-width: 250px; transition: all 0.3s;"
+                        disabled>
+                        <i class="fa fa-gears mr-2"></i> Bắt đầu thử đồ
+                    </button>
+                    <a href="#" class="btn btn-success px-5 py-3" id="btnDownloadResult" target="_blank" download="AI_ThuDo_SNG.jpg"
+                        style="border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-width: 250px; display: none;">
+                        <i class="fa fa-download mr-2"></i> Tải ảnh về
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
