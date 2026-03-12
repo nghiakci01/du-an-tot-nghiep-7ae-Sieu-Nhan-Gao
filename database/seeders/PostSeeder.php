@@ -29,7 +29,6 @@ class PostSeeder extends Seeder
                 'content' => 'Nội dung mẫu cho bài viết số ' . $i . '. Tổng hợp các xu hướng thời trang mới nhất năm 2026. Đội ngũ Elite cam kết mang lại sản phẩm chất lượng cao nhất.',
                 'image' => 'posts/sample-' . $i . '.jpg',
                 'is_active' => true,
-                'views' => rand(100, 1000),
             ]);
         }
     }
