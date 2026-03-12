@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ChatbotSetting;
 use Illuminate\Database\Seeder;
 
 class ChatbotSettingSeeder extends Seeder
