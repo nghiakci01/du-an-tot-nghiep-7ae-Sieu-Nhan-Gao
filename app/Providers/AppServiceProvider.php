@@ -33,9 +33,8 @@ class AppServiceProvider extends ServiceProvider
             // Share categories globally for header menu
             // Using View::composer to avoid query on console commands if DB not ready,
             // but for simplicity in this context View::share or composer with closure is fine.
-            // Using composer is safer for performance if not all views need it, but header is on almost all.
+        if (! app()->runningInConsole()) {
             View::composer('*', function ($view) {
-                if (app()->runningInConsole()) return;
                 try {
                 // Check if categories is already set to avoid double query or overriding
                 if (! isset($view->getData()['categories'])) {
