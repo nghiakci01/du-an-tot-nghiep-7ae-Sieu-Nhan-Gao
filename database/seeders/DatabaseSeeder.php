@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             ChatbotSettingSeeder::class,
             
             // Core Entities (Lookups first)
-            UserSeeder::class,
+            // UserSeeder::class,
             CategorySeeder::class,
             BrandSeeder::class,
             ColorSeeder::class,
