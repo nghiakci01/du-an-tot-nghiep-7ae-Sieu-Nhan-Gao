@@ -367,6 +367,7 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
         margin-bottom: 6px;
         display: -webkit-box;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
