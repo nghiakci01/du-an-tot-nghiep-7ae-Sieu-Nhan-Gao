@@ -257,7 +257,7 @@
 
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function() {
-                                        const variants = @json($product->variants);
+                                        const variants = {!! json_encode($product->variants) !!};
                                         const niceSize = document.getElementById('select_size_nice');
                                         const niceColor = document.getElementById('select_color_nice');
                                         const sizeInput = document.getElementById('select_size');
@@ -265,7 +265,7 @@
                                         const variantInput = document.getElementById('variant_select');
                                         const msg = document.getElementById('variant-message');
                                         const priceContainer = document.querySelector('.product_price');
-                                        const form = document.querySelector('form[action="{{ route('cart.add') }}"]');
+                                        const form = document.querySelector("form[action='{{ route('cart.add') }}']");
 
                                         const originalPriceHtml = priceContainer.innerHTML;
 
@@ -287,19 +287,19 @@
                                             form.addEventListener('submit', function(e) {
                                                 const selectedSize = sizeInput ? sizeInput.value : '1';
                                                 const selectedColor = colorInput ? colorInput.value : '1';
-                                                const hasVariants = @json($product->variants->count() > 0 && $product->variants->min('price') > 0);
+                                                const hasVariants = {!! json_encode($product->variants->count() > 0 && $product->variants->min('price') > 0) !!};
 
                                                 if (hasVariants && (!selectedSize || !selectedColor || !variantInput.value)) {
                                                     e.preventDefault();
 
                                                     let missingFields = [];
                                                     if (!selectedSize) {
-                                                        missingFields.push('{{ __('messages.size') }}');
+                                                        missingFields.push("{{ __('messages.size') }}");
                                                         // Highlight size select
                                                         $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');
                                                     }
                                                     if (!selectedColor) {
-                                                        missingFields.push('{{ __('messages.color') }}');
+                                                        missingFields.push("{{ __('messages.color') }}");
                                                         // Highlight color select
                                                         $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');
                                                     }
@@ -1142,10 +1142,10 @@
                 var icon = $(this).find('i');
 
                 $.ajax({
-                    url: '{{ route('wishlist.add') }}',
+                    url: "{{ route('wishlist.add') }}",
                     method: 'POST',
                     data: {
-                        _token: '{{ csrf_token() }}',
+                        _token: "{{ csrf_token() }}",
                         product_id: productId
                     },
                     success: function(response) {
@@ -1182,10 +1182,10 @@
             function submitAddToCartForm(isBuyNow) {
                 var form = $('#add-to-cart-form');
                 var url = form.attr('action');
-                var allVariants = @json($product->variants);
+                var allVariants = {!! json_encode($product->variants) !!};
 
                 // Kiểm tra thuộc tính bắt buộc
-                var hasVariants = @json($product->variants->count() > 0 && $product->variants->min('price') > 0);
+                var hasVariants = {!! json_encode($product->variants->count() > 0 && $product->variants->min('price') > 0) !!};
 
                 if (hasVariants) {
                     // Đọc giá trị size & color từ select gốc
@@ -1196,11 +1196,11 @@
                     if (!selectedSize || !selectedColor) {
                         var missingFields = [];
                         if (!selectedSize) {
-                            missingFields.push('{{ __('messages.size') }}');
+                            missingFields.push("{{ __('messages.size') }}");
                             $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');
                         }
                         if (!selectedColor) {
-                            missingFields.push('{{ __('messages.color') }}');
+                            missingFields.push("{{ __('messages.color') }}");
                             $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');
                         }
                         setTimeout(function() {
@@ -1320,7 +1320,7 @@
                                 el.classList.add('pulse-animation');
                             });
                         } else {
-                            $.get('{{ route('cart.count') }}', function(res) {
+                            $.get("{{ route('cart.count') }}", function(res) {
                                 if (res && res.count !== undefined) {
                                     cartCountElements.forEach(el => {
                                         el.innerText = res.count;
@@ -1357,7 +1357,7 @@
             $('#btn-open-vton-modal').on('click', function(e) {
                 e.preventDefault();
 
-                var hasVariants = @json($product->variants->count() > 0 && $product->variants->min('price') > 0);
+                var hasVariants = {!! json_encode($product->variants->count() > 0 && $product->variants->min('price') > 0) !!};
 
                 if (hasVariants) {
                     var selectedSize = $('#select_size_nice').val();
@@ -1366,11 +1366,11 @@
                     if (!selectedSize || !selectedColor) {
                         var missingFields = [];
                         if (!selectedSize) {
-                            missingFields.push('{{ __('messages.size') }}');
+                            missingFields.push("{{ __('messages.size') }}");
                             $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');
                         }
                         if (!selectedColor) {
-                            missingFields.push('{{ __('messages.color') }}');
+                            missingFields.push("{{ __('messages.color') }}");
                             $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');
                         }
                         setTimeout(function() {
