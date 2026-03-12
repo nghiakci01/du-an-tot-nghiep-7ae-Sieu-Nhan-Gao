@@ -92,6 +92,7 @@ class AppServiceProvider extends ServiceProvider
                     // Ignore errors during view composition
                 }
             });
+        }
         } catch (\Throwable $e) {
             // Log or ignore if DB connection fails during boot (e.g. composer install)
         }
