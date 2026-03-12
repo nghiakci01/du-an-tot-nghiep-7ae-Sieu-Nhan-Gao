@@ -140,9 +140,9 @@
                                 @foreach ($product->images as $image)
                                     <li>
                                         <a href="#" class="elevatezoom-gallery" data-update=""
-                                            data-image="{{ asset('storage/' . $image->image_path) }}"
-                                            data-zoom-image="{{ asset('storage/' . $image->image_path) }}">
-                                            <img src="{{ asset('storage/' . $image->image_path) }}"
+                                            data-image="{{ $image->image_url }}"
+                                            data-zoom-image="{{ $image->image_url }}">
+                                            <img src="{{ $image->image_url }}"
                                                 alt="zo-th-{{ $loop->iteration }}" />
                                         </a>
                                     </li>
@@ -455,6 +455,7 @@
                                                 priceContainer.innerHTML = originalPriceHtml;
                                             }
                                         }
+                                    });
                                 </script>
                             @endif
 
@@ -998,8 +999,8 @@
                                 aiNoHumanGuide.style.display = 'none';
                                 btnDownloadResult.style.display = 'none';
                                 btnRunAI.style.display = 'inline-block';
-                            }
-                        }
+                            };
+                        };
                         reader.readAsDataURL(file);
                     }
                 });
@@ -1046,7 +1047,7 @@
 
                     const formData = new FormData();
                     formData.append('user_image', fileInput.files[0]);
-                    formData.append('product_id', {{ $product->id }});
+                    formData.append('product_id', '{{ $product->id }}');
 
                     $.ajax({
                         url: '/api/vton',

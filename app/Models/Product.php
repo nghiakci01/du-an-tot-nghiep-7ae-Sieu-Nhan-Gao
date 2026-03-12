@@ -89,7 +89,7 @@ class Product extends Model
      */
     public function getImageUrlAttribute()
     {
-        if ($this->image && \Storage::disk('public')->exists($this->image)) {
+        if (!empty($this->image)) {
             return asset('storage/'.$this->image);
         }
 
