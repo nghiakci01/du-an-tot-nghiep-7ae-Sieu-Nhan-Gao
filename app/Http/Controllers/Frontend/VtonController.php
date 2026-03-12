@@ -27,8 +27,7 @@ class VtonController extends Controller
                 'user_image.max'        => 'File quá lớn. Vui lòng tải ảnh bé hơn 5MB.',
                 'user_image.dimensions' => 'Ảnh quá mờ hoặc có kích thước quá thấp. Vui lòng sử dụng ảnh sắc nét hơn (Tối thiểu 600x600px).',
             ]);
-
-            $apiToken = env('REPLICATE_API_TOKEN');
+            $apiToken = env('REPLICATE_API_TOKEN', env('FASHN_API_TOKEN'));
 
             // --- CHẾ ĐỘ GIẢ LẬP (MOCK) CHO ĐỒ ÁN (TRÁNH MẤT PHÍ API) ---
             if (empty($apiToken) || $apiToken === 'demo' || str_starts_with($apiToken, 'nhap_api')) {
@@ -149,16 +148,34 @@ class VtonController extends Controller
                 ]);
 
             if (!$response->successful()) {
-                Log::error('Replicate API Error: ' . $response->body());
+                Log::channel('vton')->error('Replicate API Error', [
+                    'body' => $response->body(),
+                    'status' => $response->status()
+                ]);
+                
+                // Nếu lỗi từ Replicate, parse message để trả về cho FE
+                $errorMsg = 'Lỗi kết nối với API AI. Vui lòng thử lại sau.';
+                $errorData = $response->json();
+                if (isset($errorData['detail'])) {
+                    $errorMsg = 'Replicate AI: ' . $errorData['detail'];
+                }
+                
                 return response()->json([
                     'success' => false,
-                    'message' => 'Lỗi kết nối với API AI. Vui lòng thử lại sau.',
-                    'details' => $response->json()
+                    'message' => $errorMsg,
+                    'details' => $errorData
                 ], 500);
             }
 
             $prediction = $response->json();
-            $pollUrl = $prediction['urls']['get'];
+            $pollUrl = $prediction['urls']['get'] ?? null;
+            
+            if (!$pollUrl) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Lỗi kết nối API: Không nhận được URL chờ kết quả.',
+                ], 500);
+            }
 
             // 4. Poll the result
             // AI Try-on usually takes 10-30 seconds, but cold boots can take longer. We'll poll up to 75 times (150s).
@@ -179,7 +196,7 @@ class VtonController extends Controller
                         break;
                     } elseif ($pollStatus['status'] === 'failed') {
                         $errorMsg = $pollStatus['error'] ?? 'Unknown error';
-                        Log::error('Replicate Model Failed: ' . json_encode($errorMsg));
+                        Log::channel('vton')->error('Replicate Model Failed', ['error' => $errorMsg]);
                         
                         // Xử lý lỗi đặc biệt: AI không tìm thấy người
                         if (stripos(json_encode($errorMsg), 'No human detected') !== false || stripos(json_encode($errorMsg), 'human') !== false) {
@@ -219,7 +236,7 @@ class VtonController extends Controller
                 'message' => $firstError
             ], 422);
         } catch (ConnectionException $e) {
-            Log::error('VTON API Timeout/Connection Error: ' . $e->getMessage());
+            Log::channel('vton')->error('VTON API Timeout/Connection Error', ['message' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Hệ thống đang bận, vui lòng thử lại sau ít phút.'

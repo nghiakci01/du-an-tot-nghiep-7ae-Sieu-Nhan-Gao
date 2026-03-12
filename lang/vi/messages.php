@@ -147,6 +147,7 @@ return [
     'cash_on_delivery' => 'Thanh toán khi nhận hàng (COD)',
     'bank_transfer' => 'Chuyển khoản ngân hàng',
     'place_order' => 'Đặt hàng',
+    'continue' => 'Tiếp tục',
 
     // Account
     'dashboard' => 'Bảng điều khiển',

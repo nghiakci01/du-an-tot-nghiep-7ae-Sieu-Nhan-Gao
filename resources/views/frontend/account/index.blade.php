@@ -512,9 +512,13 @@
         <h6 class="fw-bold mb-3">Lịch sử điểm thưởng</h6>
         @if($loyaltyHistory->isNotEmpty())
           @foreach($loyaltyHistory as $point)
+          @php
+            $pointStyleStr = 'width:40px; height:40px; ' . ($point->points > 0 ? 'background-color:#d1e7dd; color:#0a3622;' : 'background-color:#f8d7da; color:#842029;');
+            $iconClass = $point->points > 0 ? 'bi-plus-lg' : 'bi-dash-lg';
+          @endphp
           <div class="d-flex align-items-center gap-3 p-3 mb-2 rounded-3" style="background:#f9fafb; border:1px solid #eee;">
-            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:40px; height:40px; {{ $point->points > 0 ? 'background:#d1e7dd; color:#0a3622;' : 'background:#f8d7da; color:#842029;' }}">
-              <i class="bi {{ $point->points > 0 ? 'bi-plus-lg' : 'bi-dash-lg' }}"></i>
+            <div class="rounded-circle d-flex align-items-center justify-content-center" {!! 'style="' . $pointStyleStr . '"' !!}>
+              <i class="bi {{ $iconClass }}"></i>
             </div>
             <div class="flex-grow-1">
               <div class="fw-semibold">{{ $point->description }}</div>
