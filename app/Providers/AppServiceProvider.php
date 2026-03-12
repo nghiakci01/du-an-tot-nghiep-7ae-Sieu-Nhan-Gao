@@ -45,10 +45,10 @@ class AppServiceProvider extends ServiceProvider
                 // Share chatbot settings
                 if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_settings')) {
                     $chatbotEnabled = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_enabled', 3600, function () {
-                        return \App\Models\ChatbotSetting::where('key', 'chatbot_enabled')->first()?->value ?? '0';
+                        return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_enabled')->first()?->value ?? '0';
                     });
                     $chatbotMode = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_mode', 3600, function () {
-                        return \App\Models\ChatbotSetting::where('key', 'chatbot_mode')->first()?->value ?? 'rules';
+                        return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_mode')->first()?->value ?? 'rules';
                     });
 
                     $view->with('chatbot_enabled', $chatbotEnabled == '1');
@@ -74,7 +74,7 @@ class AppServiceProvider extends ServiceProvider
                 // Share Global Settings
                 if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
                     $settings = \Illuminate\Support\Facades\Cache::remember('global_settings', 3600, function () {
-                        return \App\Models\Setting::all()->pluck('value', 'key')->toArray();
+                        return \Illuminate\Support\Facades\DB::table('settings')->get()->pluck('value', 'key')->toArray();
                     });
                     $view->with('settings', $settings);
                 } else {

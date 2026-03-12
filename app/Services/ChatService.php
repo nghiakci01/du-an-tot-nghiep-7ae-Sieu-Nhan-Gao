@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\Category;
-use App\Models\ChatbotSetting;
 use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -16,7 +16,7 @@ class ChatService
     private function getSetting(string $key, $default = null)
     {
         return Cache::remember("chatbot_setting_{$key}", 3600, function () use ($key, $default) {
-            $setting = ChatbotSetting::where('key', $key)->first();
+            $setting = DB::table('chatbot_settings')->where('key', $key)->first();
 
             return $setting ? $setting->value : $default;
         });
