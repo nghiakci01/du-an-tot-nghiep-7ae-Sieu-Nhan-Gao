@@ -149,68 +149,83 @@
     @if($chatbot_enabled)
         @include('frontend.partials.chatbot-widget')
     @endif
+    <div id="layout-config" style="display: none;"
+        data-session-error="{{ session('error') }}"
+        data-session-success="{{ session('success') }}"
+        data-session-warning="{{ session('warning') }}"
+        data-session-info="{{ session('info') }}"
+        data-auth-check="{{ auth()->check() ? 'true' : 'false' }}"
+        data-auth-id="{{ auth()->id() }}"
+        data-session-id="{{ session()->getId() }}"
+    ></div>
+
     <script type="text/javascript">
-        if (window.location.hash && window.location.hash == '#_=_') {
-            if (window.history && history.pushState) {
-                window.history.pushState("", document.title, window.location.pathname + window.location.search);
-            } else {
-                var scroll = { top: document.body.scrollTop, left: document.body.scrollLeft };
-                window.location.hash = '';
-                document.body.scrollTop = scroll.top;
-                document.body.scrollLeft = scroll.left;
+        $(document).ready(function () {
+            const config = document.getElementById('layout-config').dataset;
+
+            if (window.location.hash && window.location.hash == '#_=_') {
+                if (window.history && history.pushState) {
+                    window.history.pushState("", document.title, window.location.pathname + window.location.search);
+                } else {
+                    var scroll = { top: document.body.scrollTop, left: document.body.scrollLeft };
+                    window.location.hash = '';
+                    document.body.scrollTop = scroll.top;
+                    document.body.scrollLeft = scroll.left;
+                }
             }
-        }
 
-        // Flash session messages → SweetAlert2
-        @if(session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Lỗi!',
-            html: '{!! session('error') !!}',
-            confirmButtonColor: '#ef233c',
-            confirmButtonText: 'Đóng',
-        });
-        @endif
+            // Flash session messages → SweetAlert2
+            if (config.sessionError) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    html: config.sessionError,
+                    confirmButtonColor: '#ef233c',
+                    confirmButtonText: 'Đóng',
+                });
+            }
 
-        @if(session('success'))
-        Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'success',
-            title: '{{ session('success') }}',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-        });
-        @endif
+            if (config.sessionSuccess) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: config.sessionSuccess,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+            }
 
-        @if(session('warning'))
-        Swal.fire({
-            icon: 'warning',
-            title: 'Cảnh báo',
-            html: '{{ session('warning') }}',
-            confirmButtonColor: '#ef233c',
-        });
-        @endif
+            if (config.sessionWarning) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cảnh báo',
+                    html: config.sessionWarning,
+                    confirmButtonColor: '#ef233c',
+                });
+            }
 
-        @if(session('info'))
-        Swal.fire({
-            icon: 'info',
-            title: 'Thông báo',
-            html: '{{ session('info') }}',
-            confirmButtonColor: '#333',
+            if (config.sessionInfo) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Thông báo',
+                    html: config.sessionInfo,
+                    confirmButtonColor: '#333',
+                });
+            }
         });
-        @endif
     </script>
 
     <script type="module">
+        const config = document.getElementById('layout-config').dataset;
         if (window.Echo) {
             let channel;
-            @if(auth()->check())
-                channel = window.Echo.private('App.Models.User.{{ auth()->id() }}');
-            @else
-                channel = window.Echo.channel('cart.{{ session()->getId() }}');
-            @endif
+            if (config.authCheck === 'true') {
+                channel = window.Echo.private('App.Models.User.' + config.authId);
+            } else {
+                channel = window.Echo.channel('cart.' + config.sessionId);
+            }
 
             channel.listen('CartUpdatedEvent', (e) => {
                 // e.cartCount is from the CartUpdatedEvent constructor

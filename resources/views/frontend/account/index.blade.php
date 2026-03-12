@@ -164,6 +164,24 @@
   .account-avatar-box { display: flex; align-items: center; gap: 14px; padding: 20px; text-align: left; }
   .account-avatar-box img { width: 60px; height: 60px; }
 }
+
+/* Loyalty Points */
+.loyalty-point-icon {
+  width: 40px;
+  height: 40px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+}
+.loyalty-point-positive {
+  background-color: #d1e7dd !important;
+  color: #0a3622 !important;
+}
+.loyalty-point-negative {
+  background-color: #f8d7da !important;
+  color: #842029 !important;
+}
 </style>
 @endpush
 
@@ -513,11 +531,12 @@
         @if($loyaltyHistory->isNotEmpty())
           @foreach($loyaltyHistory as $point)
           @php
-            $pointStyleStr = 'width:40px; height:40px; ' . ($point->points > 0 ? 'background-color:#d1e7dd; color:#0a3622;' : 'background-color:#f8d7da; color:#842029;');
-            $iconClass = $point->points > 0 ? 'bi-plus-lg' : 'bi-dash-lg';
+            $isPositive = $point->points > 0;
+            $iconClass = $isPositive ? 'bi-plus-lg' : 'bi-dash-lg';
+            $loyaltyClass = $isPositive ? 'loyalty-point-positive' : 'loyalty-point-negative';
           @endphp
           <div class="d-flex align-items-center gap-3 p-3 mb-2 rounded-3" style="background:#f9fafb; border:1px solid #eee;">
-            <div class="rounded-circle d-flex align-items-center justify-content-center" style="{{ $pointStyleStr }}">
+            <div class="loyalty-point-icon {{ $loyaltyClass }}">
               <i class="bi {{ $iconClass }}"></i>
             </div>
             <div class="flex-grow-1">

@@ -212,7 +212,7 @@
     {{-- Progress --}}
     @if(!$isCancelled)
     <div class="status-track mt-4 pb-1">
-      <div class="track-fill" style="width:{{ $progressW }}%;"></div>
+      <div class="track-fill" style="--track-width: {{ $progressW }}%; width: var(--track-width);"></div>
       @foreach(['pending'=>['Chờ xác nhận','bi-clipboard-check'],'confirmed'=>['Đã xác nhận','bi-shield-check'],'shipped'=>['Đang giao','bi-truck'],'completed'=>['Hoàn thành','bi-house-check']] as $s=>[$lbl,$icn])
         @php $idx = array_search($s, $statusSteps); $cls = $idx < $curIdx ? 'done' : ($idx == $curIdx ? 'active' : 'idle'); @endphp
         <div class="track-step">

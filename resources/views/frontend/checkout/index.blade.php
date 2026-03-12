@@ -1,4 +1,4 @@
-﻿@extends('layouts.public')
+@extends('layouts.public')
 
 @section('title', __('messages.checkout') . ' | Elite')
 
@@ -704,8 +704,22 @@
 
 
 @section('scripts')
+    <div id="checkout-config" style="display: none;"
+        data-csrf="{{ csrf_token() }}"
+        data-route-inventory="{{ route('api.checkout.checkInventory') }}"
+        data-route-coupon-apply="{{ route('checkout.applyCoupon') }}"
+        data-route-coupon-remove="{{ route('checkout.removeCoupon') }}"
+        data-route-cart="{{ route('cart.index') }}"
+        data-route-shipping="{{ url('/api/checkout/shipping-fees') }}"
+        data-base-total="{{ $total - $discount }}"
+        data-bank-account="{{ isset($defaultBank) ? $defaultBank->account_number : '0' }}"
+        data-bank-id="{{ isset($defaultBank) ? $defaultBank->bank_id : 'X' }}"
+        data-bank-name="{{ isset($defaultBank) ? urlencode($defaultBank->account_name) : 'X' }}"
+        data-msg-continue="{{ __('messages.continue') }}"
+    ></div>
     <script>
         $(document).ready(function () {
+            const config = document.getElementById('checkout-config').dataset;
             // ============ MULTI-STEP LOGIC ============
             let currentStep = 1;
 
@@ -738,9 +752,9 @@
 
             function checkInventoryAsync() {
                 return $.ajax({
-                    url: '{{ route("api.checkout.checkInventory") }}',
+                    url: config.routeInventory,
                     method: 'POST',
-                    data: { _token: '{{ csrf_token() }}' }
+                    data: { _token: config.csrf }
                 });
             }
 
@@ -761,7 +775,7 @@
                     confirmButtonColor: '#dc3545'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = '{{ route("cart.index") }}';
+                        window.location.href = config.routeCart;
                     }
                 });
             }
@@ -803,7 +817,7 @@
                         Swal.fire('Lỗi!', 'Không thể kiểm tra tồn kho lúc này.', 'error');
                     }
                 } finally {
-                    $btn.prop('disabled', false).html('{{ __("messages.continue") }} <i class="fa fa-arrow-right ms-2"></i>');
+                    $btn.prop('disabled', false).html(config.msgContinue + ' <i class="fa fa-arrow-right ms-2"></i>');
                 }
             });
 
@@ -877,10 +891,10 @@
                 btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...');
 
                 $.ajax({
-                    url: '{{ route("checkout.applyCoupon") }}',
+                    url: config.routeCouponApply,
                     method: 'POST',
                     data: {
-                        _token: '{{ csrf_token() }}',
+                        _token: config.csrf,
                         coupon_code: couponCode
                     },
                     success: function (response) {
@@ -918,9 +932,9 @@
                 }).then(function (result) {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: '{{ route("checkout.removeCoupon") }}',
+                            url: config.routeCouponRemove,
                             method: 'POST',
-                            data: { _token: '{{ csrf_token() }}' },
+                            data: { _token: config.csrf },
                             success: function (response) {
                                 if (response.success) location.reload();
                             },
@@ -987,7 +1001,7 @@
             $('input[name="address"]').on('blur', function () { showValidation(this, validateAddress($(this).val())); });
             
             // ============ SHIPPING FEES CALCULATION ============
-            let baseTotal = {{ $total - $discount }}; 
+            let baseTotal = parseInt(config.baseTotal); 
 
             function calculateShippingFees(province) {
                 if (!province) {
@@ -1000,10 +1014,10 @@
                 $('#shipping_options').html('<div class="text-center p-3"><span class="spinner-border spinner-border-sm text-primary"></span> Đang tính phí vận chuyển...</div>');
 
                 $.ajax({
-                    url: '/api/checkout/shipping-fees',
+                    url: config.routeShipping,
                     method: 'POST',
                     data: {
-                        _token: '{{ csrf_token() }}',
+                        _token: config.csrf,
                         province: province,
                         district: 'Quận/Huyện',
                         ward: 'Phường/Xã',
@@ -1063,9 +1077,9 @@
                 $('#final_total_display').html('<strong>' + new Intl.NumberFormat('vi-VN').format(finalTotal) + ' VND</strong>');
                 
                 // Update QR code amount if banking selected
-                let bankAccount = "{{ isset($defaultBank) ? $defaultBank->account_number : '0' }}";
-                let bankId = "{{ isset($defaultBank) ? $defaultBank->bank_id : 'X' }}";
-                let bankName = "{{ isset($defaultBank) ? urlencode($defaultBank->account_name) : 'X' }}";
+                let bankAccount = config.bankAccount;
+                let bankId = config.bankId;
+                let bankName = config.bankName;
                 let qrUrl = `https://img.vietqr.io/image/${bankId}-${bankAccount}-compact.png?amount=${finalTotal}&addInfo=THANHTOAN%20DH&accountName=${bankName}`;
                 
                 if (bankAccount !== '0') {

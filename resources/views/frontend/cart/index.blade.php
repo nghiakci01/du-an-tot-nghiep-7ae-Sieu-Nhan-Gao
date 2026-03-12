@@ -37,6 +37,23 @@
                 </div>
             @endif
 
+            <!-- Cart Configuration -->
+            <div id="cart-config" style="display: none;"
+                 data-route-validate="{{ route('cart.validate') }}"
+                 data-route-checkout="{{ route('checkout.index') }}"
+                 data-route-update="{{ route('cart.update') }}"
+                 data-route-remove="{{ route('cart.remove') }}"
+                 data-route-clear="{{ route('cart.clear') }}"
+                 data-route-change-variant="{{ route('cart.changeVariant') }}"
+                 data-route-apply-coupon="{{ route('cart.apply_coupon') }}"
+                 data-route-remove-coupon="{{ route('cart.remove_coupon') }}"
+                 data-csrf="{{ csrf_token() }}"
+                 data-editing="{{ request('editing') }}"
+                 data-msg-error="{{ __('messages.error_occurred') }}"
+                 data-msg-update-error="{{ __('messages.cart_update_error') }}"
+                 data-msg-apply="{{ __('messages.apply') }}">
+            </div>
+
             @if(isset($cart) && count($cart) > 0)
                 <form action="#">
                     <div class="row">
@@ -209,7 +226,7 @@
                                             </p>
                                         </div>
                                         
-                                        <div class="cart_subtotal" id="discount-row" style="{{ $discount > 0 ? '' : 'display: none;' }}">
+                                        <div class="cart_subtotal {{ $discount > 0 ? '' : 'd-none' }}" id="discount-row">
                                             <p>Giảm giá</p>
                                             <p class="cart_amount text-danger" id="cart-discount">- {{ number_format($discount) }} đ</p>
                                         </div>
@@ -229,9 +246,10 @@
                                             btn.style.opacity = '0.7';
                                             btn.style.pointerEvents = 'none';
 
-                                            fetch('{{ route('cart.validate') }}', {
+                                            var config = document.getElementById('cart-config').dataset;
+                                            fetch(config.routeValidate, {
                                                 method: 'GET',
-                                                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                                                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': config.csrf }
                                             })
                                             .then(r => r.json())
                                             .then(data => {
@@ -239,7 +257,7 @@
                                                 btn.style.pointerEvents = '';
 
                                                 if (data.valid) {
-                                                    window.location.href = '{{ route('checkout.index') }}';
+                                                    window.location.href = config.routeCheckout;
                                                 } else if (data.errors && data.errors.length > 0) {
                                                     var list = data.errors.map(function(e) {
                                                         var icon = e.type === 'out_of_stock' ? '🚫' :
@@ -265,7 +283,7 @@
                                             .catch(function() {
                                                 btn.style.opacity = '';
                                                 btn.style.pointerEvents = '';
-                                                window.location.href = '{{ route('checkout.index') }}';
+                                                window.location.href = config.routeCheckout;
                                             });
                                         });
                                         </script>
@@ -335,8 +353,9 @@
 @section('scripts')
 <script type="text/javascript">
     $(document).ready(function() {
+        var config = document.getElementById('cart-config').dataset;
         $.ajaxSetup({
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+            headers: { 'X-CSRF-TOKEN': config.csrf }
         });
 
         // Realtime stock check khi nhập số lượng
@@ -387,9 +406,9 @@
             }
 
             $.ajax({
-                url: '{{ route("cart.update") }}',
+                url: config.routeUpdate,
                 method: "PATCH",
-                data: { _token: '{{ csrf_token() }}', id: id, quantity: quantity },
+                data: { _token: config.csrf, id: id, quantity: quantity },
                 success: function (response) {
                     if (response.success) {
                         row.find('.product_total').text(response.item_total);
@@ -415,14 +434,14 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Lỗi!',
-                            html: response.message || '{{ __("messages.error_occurred") }}',
+                            html: response.message || config.msgError,
                             confirmButtonColor: '#ef233c',
                         });
                         window.location.reload();
                     }
                 },
                 error: function(xhr) {
-                    const msg = xhr.responseJSON ? xhr.responseJSON.message : '{{ __("messages.cart_update_error") }}';
+                    const msg = xhr.responseJSON ? xhr.responseJSON.message : config.msgUpdateError;
                     Swal.fire({
                         icon: 'error',
                         title: 'Không thể cập nhật!',
@@ -455,9 +474,9 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '{{ route("cart.remove") }}',
+                        url: config.routeRemove,
                         method: "POST",
-                        data: { _token: '{{ csrf_token() }}', _method: 'DELETE', id: id },
+                        data: { _token: config.csrf, _method: 'DELETE', id: id },
                         success: function (response) {
                             if (response.success) {
                                 row.fadeOut(300, function() { $(this).remove(); });
@@ -469,11 +488,11 @@
                                     setTimeout(function() { window.location.reload(); }, 600);
                                 }
                             } else {
-                                Swal.fire({ icon: 'error', title: 'Lỗi!', text: response.message || '{{ __("messages.error_occurred") }}' });
+                                Swal.fire({ icon: 'error', title: 'Lỗi!', text: response.message || config.msgError });
                             }
                         },
                         error: function() {
-                            Swal.fire({ icon: 'error', title: 'Lỗi!', text: '{{ __("messages.error_occurred") }}' });
+                            Swal.fire({ icon: 'error', title: 'Lỗi!', text: config.msgError });
                         }
                     });
                 }
@@ -505,7 +524,7 @@
             if (shippingFee > 0) {
                 $('#shipping-fee span').text(new Intl.NumberFormat('vi-VN').format(shippingFee) + ' đ');
             } else {
-                $('#shipping-fee span').text('{{ __("messages.free") }}');
+                $('#shipping-fee span').text('Miễn phí');
             }
 
             // Tính discount nếu có mã (logic cơ bản hiển thị lại session discount)
@@ -577,9 +596,9 @@
                         var id = $(this).attr('data-id');
                         promises.push(
                             $.ajax({
-                                url: '{{ route("cart.remove") }}',
+                                url: config.routeRemove,
                                 method: 'POST',
-                                data: { _token: '{{ csrf_token() }}', _method: 'DELETE', id: id }
+                                data: { _token: config.csrf, _method: 'DELETE', id: id }
                             })
                         );
                     });
@@ -608,12 +627,12 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '{{ route("cart.clear") }}',
+                        url: config.routeClear,
                         method: "POST",
-                        data: { _token: '{{ csrf_token() }}' },
+                        data: { _token: config.csrf },
                         success: function() { window.location.reload(); },
                         error: function() {
-                            Swal.fire({ icon: 'error', title: 'Lỗi!', text: '{{ __("messages.error_occurred") }}' });
+                            Swal.fire({ icon: 'error', title: 'Lỗi!', text: config.msgError });
                         }
                     });
                 }
@@ -645,10 +664,10 @@
             var changedType = (productId !== newProductId) ? 'product' : null;
 
             $.ajax({
-                url: '{{ route('cart.changeVariant') }}',
+                url: config.routeChangeVariant,
                 method: "POST",
                 data: {
-                    _token: '{{ csrf_token() }}',
+                    _token: config.csrf,
                     old_variant_id: oldVariantId,
                     product_id: productId,
                     new_product_id: newProductId,
@@ -665,12 +684,12 @@
                             window.location.href = response.redirect;
                         }
                     } else {
-                        alert(response.message || "{{ __('messages.error_occurred') }}");
+                        alert(response.message || config.msgError);
                         window.location.reload();
                     }
                 },
                 error: function(xhr) {
-                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : "{{ __('messages.error_occurred') }}";
+                    var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : config.msgError;
                     alert(errorMsg);
                     window.location.reload();
                 }
@@ -686,7 +705,7 @@
             }
 
             $.ajax({
-                url: '{{ route('cart.apply_coupon') }}',
+                url: config.routeApplyCoupon,
                 method: 'POST',
                 data: { coupon_code: couponCode },
                 success: function(response) {
@@ -712,12 +731,12 @@
         // Remove coupon
         $(document).on('click', '#remove-coupon', function() {
             $.ajax({
-                url: '{{ route('cart.remove_coupon') }}',
+                url: config.routeRemoveCoupon,
                 method: 'POST',
                 success: function(response) {
                     if (response.success) {
                         $('#coupon_code').val('').prop('readonly', false);
-                        $('#remove-coupon').replaceWith('<button type="button" class="btn btn-dark" id="apply-coupon">{{ __("messages.apply") }}</button>');
+                        $('#remove-coupon').replaceWith('<button type="button" class="btn btn-dark" id="apply-coupon">' + config.msgApply + '</button>');
                         
                         $('#discount-row').hide();
                         $('#shipping-fee span').text(response.data.shipping_fee);
@@ -730,14 +749,14 @@
         });
 
         // Keep edit mode open after refresh if 'editing' param exists
-        @if(request('editing'))
-            var editingId = "{{ request('editing') }}";
+        if (config.editing) {
+            var editingId = config.editing;
             var editRow = $("tr[data-id='" + editingId + "']");
             if (editRow.length) {
                 editRow.find(".cart-variant-info").hide();
                 editRow.find(".cart-variant-selectors").show();
             }
-        @endif
+        }
     });
 </script>
 @endsection
