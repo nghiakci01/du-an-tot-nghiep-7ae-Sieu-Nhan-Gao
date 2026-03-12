@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Category;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -82,9 +83,11 @@ class AppServiceProvider extends ServiceProvider
                 }
 
                 // Share notifications for Admin
-                if (auth()->check() && auth()->user()->role === \App\Models\User::ROLE_ADMIN) {
-                    $notifications = auth()->user()->unreadNotifications()->latest()->limit(5)->get();
-                    $unreadCount = auth()->user()->unreadNotifications()->count();
+                /** @var \App\Models\User|null $user */
+                $user = Auth::user();
+                if ($user && $user->role === \App\Models\User::ROLE_ADMIN) {
+                    $notifications = $user->unreadNotifications()->latest()->limit(5)->get();
+                    $unreadCount = $user->unreadNotifications()->count();
                     $view->with('admin_notifications', $notifications);
                     $view->with('admin_unread_count', $unreadCount);
                 }
