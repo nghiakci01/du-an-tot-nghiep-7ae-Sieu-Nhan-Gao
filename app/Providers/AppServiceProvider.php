@@ -61,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
                 // Share chatbot suggested questions
                 if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_suggested_questions')) {
                     $suggestedQuestions = \Illuminate\Support\Facades\Cache::remember('chatbot_suggested_questions', 3600, function () {
-                        return \App\Models\ChatbotSuggestedQuestion::where('is_active', true)
+                        return \Illuminate\Support\Facades\DB::table('chatbot_suggested_questions')->where('is_active', true)
                             ->orderBy('order')
                             ->pluck('question')
                             ->toArray();

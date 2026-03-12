@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
             ColorSeeder::class,
             SizeSeeder::class,
             SupplierSeeder::class,
-            WarehouseSeeder::class,
+            // WarehouseSeeder::class,
             
             // Content & Products (Depends on above)
             PostCategorySeeder::class,
