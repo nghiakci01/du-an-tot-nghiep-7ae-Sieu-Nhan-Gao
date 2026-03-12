@@ -35,6 +35,8 @@ class AppServiceProvider extends ServiceProvider
             // but for simplicity in this context View::share or composer with closure is fine.
             // Using composer is safer for performance if not all views need it, but header is on almost all.
             View::composer('*', function ($view) {
+                if (app()->runningInConsole()) return;
+                try {
                 // Check if categories is already set to avoid double query or overriding
                 if (! isset($view->getData()['categories'])) {
                     $categories = Category::whereNull('parent_id')->get();
@@ -87,8 +89,11 @@ class AppServiceProvider extends ServiceProvider
                     $view->with('admin_notifications', $notifications);
                     $view->with('admin_unread_count', $unreadCount);
                 }
+                } catch (\Throwable $e) {
+                    // Ignore errors during view composition
+                }
             });
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Log or ignore if DB connection fails during boot (e.g. composer install)
         }
     }
