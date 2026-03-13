@@ -49,6 +49,17 @@ Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingContro
 Route::post('/order-tracking/search', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'search'])->name('order-tracking.search');
 Auth::routes();
 
+// Fallback GET /logout → redirect về trang chủ (tránh lỗi 405)
+Route::get('/logout', function () {
+    if (Auth::check()) {
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+    }
+    return redirect()->route('welcome');
+});
+
+
 // Social Login
 Route::get('auth/{provider}', [App\Http\Controllers\Auth\SocialLoginController::class, 'redirectToProvider'])->name('social.login');
 Route::get('auth/{provider}/callback', [App\Http\Controllers\Auth\SocialLoginController::class, 'handleProviderCallback'])->name('social.callback');
