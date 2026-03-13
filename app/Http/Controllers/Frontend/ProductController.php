@@ -158,7 +158,7 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['category', 'variants.sizeRelationship', 'variants.colorRelationship', 'images', 'reviews.user', 'vtonModel'])
+            ->with(['category.vtonModel', 'variants.sizeRelationship', 'variants.colorRelationship', 'images', 'reviews.user', 'vtonModel'])
             ->firstOrFail();
 
         // Kiểm tra user đã mua và nhận hàng thành công chưa

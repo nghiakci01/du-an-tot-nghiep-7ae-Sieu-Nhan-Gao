@@ -207,6 +207,69 @@
             0% { transform: scale(0); }
             100% { transform: scale(1); }
         }
+        /* VTON Smart Mockup */
+        .smart-mockup-wrapper {
+            position: relative;
+            width: 260px;
+            height: 350px;
+            margin: 0 auto 25px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+        }
+        .mockup-base {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+        .mockup-item {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            width: 55%;
+            transform: translate(-50%, -50%) scale(0.9);
+            mix-blend-mode: multiply;
+            opacity: 0;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
+            transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .mockup-item.active {
+            opacity: 0.9;
+            transform: translate(-50%, -50%) scale(1);
+            top: 48%;
+        }
+        .mockup-scan-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(239, 35, 60, 0.5);
+            box-shadow: 0 0 10px #ef233c;
+            z-index: 10;
+            animation: scan-move 2.5s infinite ease-in-out;
+        }
+        @keyframes scan-move {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .mockup-label {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #ef233c;
+            letter-spacing: 2px;
+            background: rgba(255,255,255,0.8);
+            padding: 2px 0;
+        }
     </style>
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area product_bread">
@@ -243,12 +306,13 @@
             <div class="row">
                 <div class="col-lg-5 col-md-5">
                     <div class="product-details-tab" style="position: relative;">
-                        @if($product->vton_model_id)
+                        @php $effectiveVtonModel = $product->getEffectiveVtonModel(); @endphp
+                        @if($effectiveVtonModel)
                         {{-- Smart AI Mirror Widget --}}
                         <div id="smart-ai-mirror" onclick="$('#aiTryOnModal').modal('show')">
                             <div class="mirror-header">AI Smart Mirror</div>
                             <div class="mirror-body">
-                                <img src="" id="mirror-placeholder" class="mirror-img" style="filter: blur(2px) grayscale(100%); opacity: 0.6;">
+                                <img src="{{ asset('storage/' . $effectiveVtonModel->image) }}" id="mirror-placeholder" class="mirror-img" style="filter: blur(2px) grayscale(100%); opacity: 0.6;">
                                 <div id="mirror-status-loading" class="mirror-loading">
                                     <div class="mirror-pulse"></div>
                                     <div class="mirror-text">Đang thử đồ...</div>
@@ -291,7 +355,7 @@
                                 @endforeach
                             </ul>
                         </div>
-                        @if($product->vton_model_id)
+                        @if($effectiveVtonModel)
                         <!-- AI Try On Button -->
                         <div class="mt-4 mb-3 text-center">
                             <button type="button" class="btn w-100 py-3 d-flex align-items-center justify-content-center" 
@@ -894,7 +958,9 @@
                                     <select class="form-select form-control" name="vton_model_id" id="vton_model_id" style="font-size: 14px;">
                                         <option value="">-- Dùng ảnh của bạn --</option>
                                         @foreach($vtonModels as $model)
-                                            <option value="{{ $model->id }}" {{ $product->vton_model_id == $model->id ? 'selected' : '' }}>
+                                            <option value="{{ $model->id }}" 
+                                                    data-image="{{ asset('storage/' . $model->image) }}"
+                                                    {{ ($effectiveVtonModel && $effectiveVtonModel->id == $model->id) ? 'selected' : '' }}>
                                                 {{ $model->name }} ({{ $model->gender == 'male' ? 'Nam' : 'Nữ' }})
                                             </option>
                                         @endforeach
@@ -936,14 +1002,22 @@
                             
                             <!-- Loading State -->
                             <div id="vton-loading" class="text-center" style="display: none; width: 100%;">
-                                <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
+                                <!-- Smart Mockup Fallback -->
+                                <div class="smart-mockup-wrapper">
+                                    <div class="mockup-scan-line"></div>
+                                    <img id="mockup-base-img" src="" class="mockup-base" alt="Model">
+                                    <img id="mockup-clothes-img" src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}" class="mockup-item" alt="Garment">
+                                    <div class="mockup-label">AI MOCKUP PREVIEW</div>
+                                </div>
+
+                                <div class="spinner-border text-danger mb-3" role="status" style="width: 2rem; height: 2rem; border-width: 0.2em;">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
-                                <h5 style="font-weight: 600; color: #333;">AI Đang Xử Lý...</h5>
-                                <div class="progress mt-3 mx-auto" style="height: 10px; width: 80%; border-radius: 5px;">
+                                <h5 style="font-weight: 600; color: #333; font-size: 18px;">AI Đang Xử Lý...</h5>
+                                <div class="progress mt-3 mx-auto" style="height: 6px; width: 80%; border-radius: 3px; background-color: #eee;">
                                     <div id="vton-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: 0%"></div>
                                 </div>
-                                <p id="vton-status-text" class="mt-2" style="color: #666; font-size: 13px;">Đang chuẩn bị dữ liệu...</p>
+                                <p id="vton-status-text" class="mt-2" style="color: #666; font-size: 12px; font-weight: 500;">Đang chuẩn bị dữ liệu...</p>
                             </div>
                             
                             <!-- Result State -->
@@ -1422,6 +1496,27 @@
                 loadingArea.fadeIn();
                 btnSubmit.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
                 
+                // --- Smart Mockup Logic ---
+                const mockupBase = $('#mockup-base-img');
+                const mockupClothes = $('#mockup-clothes-img');
+                mockupClothes.removeClass('active');
+                
+                // Determine Person Source
+                if (fileInput[0].files && fileInput[0].files[0]) {
+                    mockupBase.attr('src', previewImg.attr('src'));
+                } else {
+                    const selectedModelImg = mannequinSelect.find(':selected').data('image');
+                    if (selectedModelImg) {
+                        mockupBase.attr('src', selectedModelImg);
+                    }
+                }
+
+                // Show clothes overlay simulation
+                setTimeout(() => {
+                    mockupClothes.addClass('active');
+                }, 600);
+                // ---------------------------
+
                 progress = 0;
                 messageIndex = 0;
                 progressBar.css('width', '0%');

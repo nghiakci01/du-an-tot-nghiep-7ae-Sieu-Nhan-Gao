@@ -142,6 +142,9 @@
     <!-- Search Autocomplete JS -->
     <script src="{{ asset('frontend-assets/js/search-autocomplete.js') }}"></script>
 
+    <!-- Global UX Fixes -->
+    <script src="{{ asset('frontend-assets/js/ux-fixes.js') }}"></script>
+
     @stack('styles')
     @stack('scripts')
     @yield('scripts')

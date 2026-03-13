@@ -78,7 +78,7 @@
                     suggestions = data;
                     
                     if (data.length === 0) {
-                        $dropdown.html('<div class="search-suggestions-empty">No products found</div>');
+                        $dropdown.html('<div class="search-suggestions-empty"><i class="fa fa-search-plus"></i> No products found / Không tìm thấy sản phẩm</div>');
                     } else {
                         let html = '';
                         data.forEach(product => {
