@@ -30,7 +30,6 @@ class ReviewSeeder extends Seeder
                     'user_id' => $users->random()->id,
                     'rating' => rand(3, 5),
                     'comment' => 'Sản phẩm chất lượng thực tế giống hình. Shop phục vụ nhiệt tình.',
-                    'is_active' => true,
                 ]);
             }
         }

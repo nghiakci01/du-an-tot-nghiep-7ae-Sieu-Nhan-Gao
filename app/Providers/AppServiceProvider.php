@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Category;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -33,8 +34,9 @@ class AppServiceProvider extends ServiceProvider
             // Share categories globally for header menu
             // Using View::composer to avoid query on console commands if DB not ready,
             // but for simplicity in this context View::share or composer with closure is fine.
-            // Using composer is safer for performance if not all views need it, but header is on almost all.
+        if (! app()->runningInConsole()) {
             View::composer('*', function ($view) {
+                try {
                 // Check if categories is already set to avoid double query or overriding
                 if (! isset($view->getData()['categories'])) {
                     $categories = Category::whereNull('parent_id')->get();
@@ -44,10 +46,10 @@ class AppServiceProvider extends ServiceProvider
                 // Share chatbot settings
                 if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_settings')) {
                     $chatbotEnabled = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_enabled', 3600, function () {
-                        return \App\Models\ChatbotSetting::where('key', 'chatbot_enabled')->first()?->value ?? '0';
+                        return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_enabled')->first()?->value ?? '0';
                     });
                     $chatbotMode = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_mode', 3600, function () {
-                        return \App\Models\ChatbotSetting::where('key', 'chatbot_mode')->first()?->value ?? 'rules';
+                        return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_mode')->first()?->value ?? 'rules';
                     });
 
                     $view->with('chatbot_enabled', $chatbotEnabled == '1');
@@ -60,7 +62,7 @@ class AppServiceProvider extends ServiceProvider
                 // Share chatbot suggested questions
                 if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_suggested_questions')) {
                     $suggestedQuestions = \Illuminate\Support\Facades\Cache::remember('chatbot_suggested_questions', 3600, function () {
-                        return \App\Models\ChatbotSuggestedQuestion::where('is_active', true)
+                        return \Illuminate\Support\Facades\DB::table('chatbot_suggested_questions')->where('is_active', true)
                             ->orderBy('order')
                             ->pluck('question')
                             ->toArray();
@@ -73,7 +75,7 @@ class AppServiceProvider extends ServiceProvider
                 // Share Global Settings
                 if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
                     $settings = \Illuminate\Support\Facades\Cache::remember('global_settings', 3600, function () {
-                        return \App\Models\Setting::all()->pluck('value', 'key')->toArray();
+                        return \Illuminate\Support\Facades\DB::table('settings')->get()->pluck('value', 'key')->toArray();
                     });
                     $view->with('settings', $settings);
                 } else {
@@ -81,14 +83,20 @@ class AppServiceProvider extends ServiceProvider
                 }
 
                 // Share notifications for Admin
-                if (auth()->check() && auth()->user()->role === \App\Models\User::ROLE_ADMIN) {
-                    $notifications = auth()->user()->unreadNotifications()->latest()->limit(5)->get();
-                    $unreadCount = auth()->user()->unreadNotifications()->count();
+                /** @var \App\Models\User|null $user */
+                $user = Auth::user();
+                if ($user && $user->role === \App\Models\User::ROLE_ADMIN) {
+                    $notifications = $user->unreadNotifications()->latest()->limit(5)->get();
+                    $unreadCount = $user->unreadNotifications()->count();
                     $view->with('admin_notifications', $notifications);
                     $view->with('admin_unread_count', $unreadCount);
                 }
+                } catch (\Throwable $e) {
+                    // Ignore errors during view composition
+                }
             });
-        } catch (\Exception $e) {
+        }
+        } catch (\Throwable $e) {
             // Log or ignore if DB connection fails during boot (e.g. composer install)
         }
     }

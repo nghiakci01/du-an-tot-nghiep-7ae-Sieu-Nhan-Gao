@@ -9,7 +9,9 @@
     }
 @endphp
 
-<div class="cart_link">
+<div class="cart_link" id="mini-cart-container"
+     data-route-remove="{{ route('cart.remove') }}"
+     data-csrf="{{ csrf_token() }}">
     <a href="{{ route('cart.index') }}">
         <i class="fa fa-shopping-basket"></i>
         <span class="cart-count">{{ $cartCount }}</span> {{ __('messages.product') }}
@@ -101,13 +103,15 @@ $(document).ready(function() {
     $('.mini-cart-remove').click(function(e) {
         e.preventDefault();
         var itemId = $(this).data('id');
+        var container = document.getElementById('mini-cart-container');
+        var config = container ? container.dataset : {};
         
             if(confirm('Remove this product from cart?')) {
                 $.ajax({
-                    url: '{{ route('cart.remove') }}',
+                    url: config.routeRemove,
                     method: 'POST',
                     data: {
-                        _token: '{{ csrf_token() }}',
+                        _token: config.csrf,
                         _method: 'DELETE',
                         id: itemId
                     },

@@ -24,7 +24,7 @@ class ChatbotSettingSeeder extends Seeder
         ];
 
         foreach ($settings as $key => $value) {
-            \App\Models\ChatbotSetting::updateOrCreate(['key' => $key], ['value' => $value]);
+            \Illuminate\Support\Facades\DB::table('chatbot_settings')->updateOrInsert(['key' => $key], ['value' => $value]);
         }
     }
 }

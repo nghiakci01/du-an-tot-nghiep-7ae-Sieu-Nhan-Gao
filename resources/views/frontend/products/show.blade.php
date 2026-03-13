@@ -114,7 +114,16 @@
     <!--breadcrumbs area end-->
 
     <!--product details start-->
-    <div class="product_details">
+    <div class="product_details" id="product-details-container"
+        data-variants="{{ json_encode($product->variants) }}"
+        data-has-variants="{{ $product->variants->count() > 0 && $product->variants->min('price') > 0 ? 'true' : 'false' }}"
+        data-route-wishlist-add="{{ route('wishlist.add') }}"
+        data-route-cart-count="{{ route('cart.count') }}"
+        data-route-login="{{ route('login') }}"
+        data-msg-size="{{ __('messages.size') }}"
+        data-msg-color="{{ __('messages.color') }}"
+        data-msg-variant-out-of-stock="{{ __('messages.variant_out_of_stock') }}"
+        data-msg-combination-not-available="{{ __('messages.combination_not_available') }}">
         <div class="container">
             <div class="row">
                 <div class="col-lg-5 col-md-5">
@@ -257,7 +266,10 @@
 
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function() {
-                                        const variants = @json($product->variants);
+                                        const config = document.getElementById('product-details-container').dataset;
+                                        const variants = JSON.parse(config.variants);
+                                        const hasVariants = config.hasVariants === 'true';
+
                                         const niceSize = document.getElementById('select_size_nice');
                                         const niceColor = document.getElementById('select_color_nice');
                                         const sizeInput = document.getElementById('select_size');
@@ -265,7 +277,7 @@
                                         const variantInput = document.getElementById('variant_select');
                                         const msg = document.getElementById('variant-message');
                                         const priceContainer = document.querySelector('.product_price');
-                                        const form = document.querySelector('form[action="{{ route('cart.add') }}"]');
+                                        const form = document.getElementById('add-to-cart-form');
 
                                         const originalPriceHtml = priceContainer.innerHTML;
 
@@ -287,19 +299,18 @@
                                             form.addEventListener('submit', function(e) {
                                                 const selectedSize = sizeInput ? sizeInput.value : '1';
                                                 const selectedColor = colorInput ? colorInput.value : '1';
-                                                const hasVariants = @json($product->variants->count() > 0 && $product->variants->min('price') > 0);
 
                                                 if (hasVariants && (!selectedSize || !selectedColor || !variantInput.value)) {
                                                     e.preventDefault();
 
                                                     let missingFields = [];
                                                     if (!selectedSize) {
-                                                        missingFields.push('{{ __('messages.size') }}');
+                                                        missingFields.push(config.msgSize);
                                                         // Highlight size select
                                                         $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');
                                                     }
                                                     if (!selectedColor) {
-                                                        missingFields.push('{{ __('messages.color') }}');
+                                                        missingFields.push(config.msgColor);
                                                         // Highlight color select
                                                         $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');
                                                     }
@@ -425,7 +436,7 @@
                                                         }
                                                     } else {
                                                         variantInput.value = '';
-                                                        msg.textContent = "{{ __('messages.variant_out_of_stock') }}";
+                                                        msg.textContent = config.msgVariantOutOfStock;
                                                         msg.style.display = 'block';
                                                         const stockInfo = document.getElementById('stock-info');
                                                         if (stockInfo) stockInfo.style.display = 'none';
@@ -1138,14 +1149,16 @@
 
             $('.add-to-wishlist').click(function(e) {
                 e.preventDefault();
+                const config = document.getElementById('product-details-container').dataset;
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
                 var productId = $(this).data('id');
                 var icon = $(this).find('i');
 
                 $.ajax({
-                    url: '{{ route('wishlist.add') }}',
+                    url: config.routeWishlistAdd,
                     method: 'POST',
                     data: {
-                        _token: '{{ csrf_token() }}',
+                        _token: csrfToken,
                         product_id: productId
                     },
                     success: function(response) {
@@ -1160,7 +1173,7 @@
                     },
                     error: function(xhr) {
                         if (xhr.status === 401) {
-                            window.location.href = "{{ route('login') }}";
+                            window.location.href = config.routeLogin;
                         } else {
                             alert('An error occurred, please try again!');
                         }
@@ -1180,12 +1193,13 @@
             });
 
             function submitAddToCartForm(isBuyNow) {
+                const config = document.getElementById('product-details-container').dataset;
                 var form = $('#add-to-cart-form');
                 var url = form.attr('action');
-                var allVariants = @json($product->variants);
+                var allVariants = JSON.parse(config.variants);
 
                 // Kiểm tra thuộc tính bắt buộc
-                var hasVariants = @json($product->variants->count() > 0 && $product->variants->min('price') > 0);
+                var hasVariants = config.hasVariants === 'true';
 
                 if (hasVariants) {
                     // Đọc giá trị size & color từ select gốc
@@ -1196,11 +1210,11 @@
                     if (!selectedSize || !selectedColor) {
                         var missingFields = [];
                         if (!selectedSize) {
-                            missingFields.push('{{ __('messages.size') }}');
+                            missingFields.push(config.msgSize);
                             $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');
                         }
                         if (!selectedColor) {
-                            missingFields.push('{{ __('messages.color') }}');
+                            missingFields.push(config.msgColor);
                             $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');
                         }
                         setTimeout(function() {
@@ -1320,7 +1334,8 @@
                                 el.classList.add('pulse-animation');
                             });
                         } else {
-                            $.get('{{ route('cart.count') }}', function(res) {
+                            const config = document.getElementById('product-details-container').dataset;
+                            $.get(config.routeCartCount, function(res) {
                                 if (res && res.count !== undefined) {
                                     cartCountElements.forEach(el => {
                                         el.innerText = res.count;
@@ -1356,8 +1371,9 @@
             // VTON Modal Open Handling
             $('#btn-open-vton-modal').on('click', function(e) {
                 e.preventDefault();
+                const config = document.getElementById('product-details-container').dataset;
 
-                var hasVariants = @json($product->variants->count() > 0 && $product->variants->min('price') > 0);
+                var hasVariants = config.hasVariants === 'true';
 
                 if (hasVariants) {
                     var selectedSize = $('#select_size_nice').val();
@@ -1366,11 +1382,11 @@
                     if (!selectedSize || !selectedColor) {
                         var missingFields = [];
                         if (!selectedSize) {
-                            missingFields.push('{{ __('messages.size') }}');
+                            missingFields.push(config.msgSize);
                             $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');
                         }
                         if (!selectedColor) {
-                            missingFields.push('{{ __('messages.color') }}');
+                            missingFields.push(config.msgColor);
                             $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');
                         }
                         setTimeout(function() {

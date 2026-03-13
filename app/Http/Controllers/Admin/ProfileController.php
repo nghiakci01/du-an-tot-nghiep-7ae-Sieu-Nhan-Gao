@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
     public function index()
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         return view('admin.profile.index', compact('user'));
@@ -18,6 +20,7 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         $request->validate([
@@ -33,22 +36,13 @@ class ProfileController extends Controller
         $user->phone = $request->phone;
         $user->address = $request->address;
 
-        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+        if ($request->hasFile('avatar')) {
             // Delete old avatar if exists
-            if ($user->avatar && file_exists(storage_path('app/public/'.$user->avatar))) {
-                unlink(storage_path('app/public/'.$user->avatar));
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
             }
 
-            $file = $request->file('avatar');
-            $filename = 'avatar_'.$user->id.'_'.time().'.'.$file->getClientOriginalExtension();
-            $destinationPath = storage_path('app/public/avatars');
-
-            if (! is_dir($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-            }
-
-            $file->move($destinationPath, $filename);
-            $user->avatar = 'avatars/'.$filename;
+            $user->avatar = $request->file('avatar')->store('avatars', 'public');
         }
 
         if ($request->filled('new_password')) {
