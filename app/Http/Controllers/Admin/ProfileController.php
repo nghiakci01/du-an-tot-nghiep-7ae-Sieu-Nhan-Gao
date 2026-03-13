@@ -37,12 +37,27 @@ class ProfileController extends Controller
         $user->address = $request->address;
 
         if ($request->hasFile('avatar')) {
-            // Delete old avatar if exists
-            if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
-            }
+            $file = $request->file('avatar');
+            $path = $file->getRealPath() ?: $file->getPathname();
 
-            $user->avatar = $request->file('avatar')->store('avatars', 'public');
+            if ($file->isValid() && ! empty($path)) {
+                // Delete old avatar if exists
+                if ($user->avatar) {
+                    Storage::disk('public')->delete($user->avatar);
+                }
+
+                $filename = $file->hashName();
+                $stream = fopen($path, 'r');
+                $storedPath = Storage::disk('public')->put('avatars/'.$filename, $stream);
+
+                if (is_resource($stream)) {
+                    fclose($stream);
+                }
+
+                if ($storedPath) {
+                    $user->avatar = 'avatars/'.$filename;
+                }
+            }
         }
 
         if ($request->filled('new_password')) {

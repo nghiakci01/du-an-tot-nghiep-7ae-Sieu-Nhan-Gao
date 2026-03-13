@@ -129,9 +129,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
             // Inventory Management
             Route::resource('suppliers', App\Http\Controllers\Admin\SupplierController::class);
-            Route::resource('warehouses', App\Http\Controllers\Admin\WarehouseController::class);
-            Route::resource('vouchers', App\Http\Controllers\Admin\InventoryVoucherController::class);
-            Route::post('vouchers/{voucher}/complete', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'complete'])->name('vouchers.complete');
+            // Route::resource('warehouses', App\Http\Controllers\Admin\WarehouseController::class);
+            // Route::resource('vouchers', App\Http\Controllers\Admin\InventoryVoucherController::class);
+            // Route::post('vouchers/{voucher}/complete', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'complete'])->name('vouchers.complete');
             Route::get('stock', function () {
                 return 'Stock Report Page (Coming Soon)';
             })->name('stock.index');

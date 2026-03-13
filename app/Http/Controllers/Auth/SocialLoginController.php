@@ -18,8 +18,10 @@ class SocialLoginController extends Controller
         // Facebook in development mode may not have email permission approved
         // Use setScopes to completely override default scopes (scopes() only adds to defaults)
         if ($provider === 'facebook') {
-            return Socialite::driver($provider)
-                ->setScopes(['public_profile']) // Only request public_profile, no email
+            /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
+            $driver = Socialite::driver($provider);
+
+            return $driver->setScopes(['public_profile']) // Only request public_profile, no email
                 ->redirect();
         }
 
