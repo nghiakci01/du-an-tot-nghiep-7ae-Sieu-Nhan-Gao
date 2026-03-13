@@ -105,7 +105,7 @@
   <script src="{{ asset('admin-assets') }}/js/plugins/i18nextHttpBackend.min.js"></script> --}}
   <script src="{{ asset('admin-assets') }}/js/icon/custom-font.js"></script>
   <script src="{{ asset('admin-assets') }}/js/script.js"></script>
-  <script src="{{ asset('admin-assets') }}/js/theme.js"></script>
+  <script src="{{ asset('admin-assets') }}/js/theme.js?v=1.0.1"></script>
   {{--
   <script src="{{ asset('admin-assets') }}/js/multi-lang.js"></script> --}}
   <script src="{{ asset('admin-assets') }}/js/plugins/feather.min.js"></script>

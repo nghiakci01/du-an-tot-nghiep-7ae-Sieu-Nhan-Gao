@@ -51,7 +51,7 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $data = $request->except(['variants', 'image', 'vton_model_id']);
-            $data['vton_model_id'] = $request->vton_model_id;
+            $data['vton_model_id'] = $request->vton_model_id ?: null;
             if (empty($data['price'])) {
                 $data['price'] = 0;
             }
@@ -77,10 +77,10 @@ class ProductController extends Controller
                             $data['image'] = 'products/'.$filename;
                         }
                     } catch (\Exception $e) {
-                        \Log::error('Image upload failed: '.$e->getMessage());
+                        Log::error('Image upload failed: '.$e->getMessage());
                     }
                 } else {
-                    \Log::warning('Main image upload attempted but file is invalid or path is empty: '.$file->getClientOriginalName());
+                    Log::warning('Main image upload attempted but file is invalid or path is empty: '.$file->getClientOriginalName());
                 }
             }
 
@@ -132,10 +132,10 @@ class ProductController extends Controller
                                 ]);
                             }
                         } catch (\Exception $e) {
-                            \Log::error('Gallery image upload failed: '.$e->getMessage());
+                            Log::error('Gallery image upload failed: '.$e->getMessage());
                         }
                     } else {
-                        \Log::warning('Gallery image upload attempted but file is invalid or path is empty: '.$image->getClientOriginalName());
+                        Log::warning('Gallery image upload attempted but file is invalid or path is empty: '.$image->getClientOriginalName());
                     }
                 }
             }
@@ -175,7 +175,7 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $data = $request->except(['variants', 'image', 'vton_model_id']);
-            $data['vton_model_id'] = $request->vton_model_id;
+            $data['vton_model_id'] = $request->vton_model_id ?: null;
             if (empty($data['price'])) {
                 $data['price'] = 0;
             }
@@ -205,10 +205,10 @@ class ProductController extends Controller
                             $data['image'] = 'products/'.$filename;
                         }
                     } catch (\Exception $e) {
-                        \Log::error('Image update failed: '.$e->getMessage());
+                        Log::error('Image update failed: '.$e->getMessage());
                     }
                 } else {
-                    \Log::warning('Main image update attempted but file is invalid or path is empty: '.$file->getClientOriginalName());
+                    Log::warning('Main image update attempted but file is invalid or path is empty: '.$file->getClientOriginalName());
                 }
             }
 
@@ -278,10 +278,10 @@ class ProductController extends Controller
                                     ]);
                                 }
                             } catch (\Exception $e) {
-                                \Log::error('Gallery image update failed: '.$e->getMessage());
+                                Log::error('Gallery image update failed: '.$e->getMessage());
                             }
                         } else {
-                            \Log::warning('Gallery image update attempted but file is invalid or path is empty: '.$image->getClientOriginalName());
+                            Log::warning('Gallery image update attempted but file is invalid or path is empty: '.$image->getClientOriginalName());
                         }
                     }
                 }
@@ -319,7 +319,7 @@ class ProductController extends Controller
             return redirect()->route('admin.products.index')->with('success', 'Sản phẩm đã được xóa thành công.');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Lỗi khi xóa sản phẩm ID ' . $product->id . ': ' . $e->getMessage());
+            Log::error('Lỗi khi xóa sản phẩm ID ' . $product->id . ': ' . $e->getMessage());
             return redirect()->route('admin.products.index')->with('error', 'Có lỗi xảy ra khi xóa sản phẩm. Vui lòng kiểm tra lại.');
         }
     }
@@ -348,7 +348,7 @@ class ProductController extends Controller
      */
     public function variantsSearch(Request $request)
     {
-        $q = $request->get('q');
+        $q = $request->input('q');
         if (empty($q)) {
             return response()->json([]);
         }
