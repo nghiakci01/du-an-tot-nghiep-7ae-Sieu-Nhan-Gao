@@ -13,6 +13,7 @@ class AccountController extends Controller
 {
     public function index()
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         
         if ($user) {
@@ -47,6 +48,7 @@ class AccountController extends Controller
 
     public function showOrder($id)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         
         if ($user) {
@@ -76,6 +78,7 @@ class AccountController extends Controller
 
     public function update(Request $request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         $request->validate([
@@ -112,6 +115,7 @@ class AccountController extends Controller
 
     public function cancelOrder($id, \App\Services\OrderService $orderService)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         $order = $user->orders()->findOrFail($id);
 
