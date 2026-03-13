@@ -152,8 +152,8 @@
                         <!-- AI Try On Button -->
                         <div class="mt-4 mb-3 text-center">
                             <button type="button" class="btn w-100 py-3 d-flex align-items-center justify-content-center" 
+                                id="btn-open-vton-modal"
                                 style="background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); color: white; font-weight: bold; border-radius: 8px; border: none; box-shadow: 0 4px 15px rgba(253, 29, 29, 0.4); transition: transform 0.2s; font-size: 16px;" 
-                                data-bs-toggle="modal" data-bs-target="#aiTryOnModal" data-toggle="modal" data-target="#aiTryOnModal"
                                 onmouseover="this.style.transform='scale(1.02)'" 
                                 onmouseout="this.style.transform='scale(1)'">
                                 <i class="fa fa-magic mr-2" style="font-size: 20px;"></i> ✨ {{ __('messages.ai_try_on') === 'messages.ai_try_on' ? 'Thử Đồ AI' : __('messages.ai_try_on') }}
@@ -1359,15 +1359,10 @@
                 var hasVariants = @json($product->variants->count() > 0 && $product->variants->min('price') > 0);
 
                 if (hasVariants) {
-                    var selectedSize = $('#select_size_nice').val();
                     var selectedColor = $('#select_color_nice').val();
 
-                    if (!selectedSize || !selectedColor) {
+                    if (!selectedColor) {
                         var missingFields = [];
-                        if (!selectedSize) {
-                            missingFields.push('{{ __('messages.size') }}');
-                            $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');
-                        }
                         if (!selectedColor) {
                             missingFields.push('{{ __('messages.color') }}');
                             $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');
@@ -1378,14 +1373,14 @@
 
                         var message = missingFields.length > 0 ?
                             'Vui lòng chọn: <strong>' + missingFields.join(', ') + '</strong> trước khi thử đồ!' :
-                            'Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thử đồ!';
+                            'Vui lòng chọn màu sắc sản phẩm trước khi thử đồ!';
 
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Chưa chọn thuộc tính!',
+                            title: 'Chưa chọn màu sắc!',
                             html: message,
                             confirmButtonColor: '#ef233c',
-                            confirmButtonText: 'Chọn ngay',
+                            confirmButtonText: 'Chọn màu',
                             timer: 4000,
                             timerProgressBar: true,
                         });

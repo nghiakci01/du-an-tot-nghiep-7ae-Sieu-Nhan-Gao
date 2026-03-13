@@ -135,7 +135,7 @@ class VtonController extends Controller
             $response = Http::withToken($apiToken)
                 ->retry(3, 1000, function ($exception, $request) {
                     return $exception instanceof ConnectionException;
-                })
+                }, throw: false)
                 ->timeout(30)
                 ->post('https://api.replicate.com/v1/models/cuiapp/kolors-virtual-try-on/predictions', [
                     'input' => [
