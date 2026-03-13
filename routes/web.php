@@ -143,6 +143,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             
             // Cài đặt ngân hàng thanh toán (QR Bank Settings)
             Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
+
+            // Virtual Try-On Models management
+            Route::resource('vton-models', App\Http\Controllers\Admin\VtonModelController::class);
         });
 
         // Blog Management (Admin & Staff)

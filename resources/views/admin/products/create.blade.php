@@ -51,6 +51,20 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="vton_model_id" class="form-label">Người mẫu AI (VTON)</label>
+                        <select class="form-select @error('vton_model_id') is-invalid @enderror" id="vton_model_id" name="vton_model_id">
+                            <option value="">-- Mặc định theo giới tính --</option>
+                            @foreach($vtonModels as $model)
+                                <option value="{{ $model->id }}" {{ old('vton_model_id') == $model->id ? 'selected' : '' }}>
+                                    {{ $model->name }} ({{ $model->gender == 'female' ? 'Nữ' : ($model->gender == 'male' ? 'Nam' : 'Trẻ em') }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('vton_model_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="image" class="form-label">Hình ảnh</label>
@@ -252,7 +266,7 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        let variantIndex = {{ old('variants') ? count(old('variants')) : 1 }};
+        let variantIndex = Number("{{ old('variants') ? count(old('variants')) : 1 }}");
         const tableBody = document.querySelector('#variants-table tbody');
         const addBtn = document.getElementById('add-variant-btn');
 

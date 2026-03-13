@@ -28,6 +28,7 @@ class Product extends Model
         'is_active',
         'is_featured',
         'image',
+        'vton_model_id',
     ];
 
     protected $casts = [
@@ -62,6 +63,11 @@ class Product extends Model
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    public function vtonModel(): BelongsTo
+    {
+        return $this->belongsTo(VtonModel::class, 'vton_model_id');
     }
 
     public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany

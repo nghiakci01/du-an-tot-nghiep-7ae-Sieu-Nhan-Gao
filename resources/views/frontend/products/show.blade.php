@@ -92,6 +92,121 @@
         .star-rating label i {
             pointer-events: none;
         }
+
+        /* Smart AI Mirror Styles */
+        #smart-ai-mirror {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 100;
+            width: 100px;
+            height: 140px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: none;
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        #smart-ai-mirror.active {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        #smart-ai-mirror:hover {
+            width: 120px;
+            height: 165px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        }
+
+        .mirror-header {
+            font-size: 9px;
+            font-weight: 800;
+            text-align: center;
+            background: #ef233c;
+            color: white;
+            padding: 3px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mirror-body {
+            height: 100%;
+            position: relative;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mirror-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.3s;
+        }
+
+        .mirror-loading {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .mirror-pulse {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #ef233c;
+            box-shadow: 0 0 0 0 rgba(239, 35, 60, 0.7);
+            animation: pulse-mirror 1.5s infinite;
+        }
+
+        @keyframes pulse-mirror {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 35, 60, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(239, 35, 60, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 35, 60, 0); }
+        }
+
+        .mirror-text {
+            font-size: 8px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .mirror-success-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: #2ecc71;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
     </style>
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area product_bread">
@@ -127,7 +242,23 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-5 col-md-5">
-                    <div class="product-details-tab">
+                    <div class="product-details-tab" style="position: relative;">
+                        {{-- Smart AI Mirror Widget --}}
+                        <div id="smart-ai-mirror" onclick="$('#aiTryOnModal').modal('show')">
+                            <div class="mirror-header">AI Smart Mirror</div>
+                            <div class="mirror-body">
+                                <img src="" id="mirror-placeholder" class="mirror-img" style="filter: blur(2px) grayscale(100%); opacity: 0.6;">
+                                <div id="mirror-status-loading" class="mirror-loading">
+                                    <div class="mirror-pulse"></div>
+                                    <div class="mirror-text">Đang thử đồ...</div>
+                                </div>
+                                <img src="" id="mirror-result-img" class="mirror-img" style="display: none;">
+                                <div id="mirror-success" class="mirror-success-badge" style="display: none;">
+                                    <i class="fa fa-check"></i>
+                                </div>
+                            </div>
+                        </div>
+
                         <div id="img-1" class="zoomWrapper single-zoom">
                             <a href="#">
                                 <img id="zoom1"
@@ -729,12 +860,13 @@
     <!--product section area end-->
 
     <!-- AI Try On Modal -->
-    <div class="modal fade" id="aiTryOnModal" tabindex="-1" aria-labelledby="aiTryOnModalLabel" aria-hidden="true">
+    <!-- AI Try On Modal -->
+    <div class="modal fade" id="aiTryOnModal" tabindex="-1" aria-labelledby="aiTryOnModalLabel" aria-hidden="true" style="z-index: 10000;">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content" style="border-radius: 12px; overflow: hidden; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                 <div class="modal-header" style="background: linear-gradient(45deg, #111, #333); color: white; border-bottom: none; padding: 20px 25px;">
                     <h5 class="modal-title" id="aiTryOnModalLabel" style="font-weight: 700; letter-spacing: 1px; margin: 0; color: white;">
-                        <i class="fa fa-magic text-warning" style="margin-right: 8px;"></i> {{ __('messages.ai_try_on_modal_title') ?? 'Trải nghiệm Phòng Thử Đồ AI' }}
+                        <i class="fa fa-magic text-warning" style="margin-right: 8px;"></i> {{ __('messages.ai_try_on_modal_title') ?? 'Phòng Thử Đồ AI' }}
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
                 </div>
@@ -743,40 +875,55 @@
                         <!-- Left side: Instructions & Upload -->
                         <div class="col-md-5 p-4" style="background: #f8f9fa; border-right: 1px solid #eee;">
                             <h6 style="font-weight: 600; color: #ef233c; margin-bottom: 15px;">Hướng dẫn:</h6>
-                            <ol style="padding-left: 15px; font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 25px;">
-                                <li>Tải lên một bức ảnh rõ nét của bạn.</li>
-                                <li>Nên chọn ảnh chụp toàn thân hoặc bán thân thẳng đứng.</li>
-                                <li>Đợi AI xử lý trang phục (<span style="color: #ef233c; font-weight: bold;">~15-30 giây</span>).</li>
+                            <ol style="padding-left: 15px; font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 20px;">
+                                <li>Chọn người mẫu hoặc tải ảnh của bạn.</li>
+                                <li>Nên chọn ảnh rõ nét, chụp thẳng.</li>
+                                <li>AI sẽ xử lý trong khoảng <span style="color: #ef233c; font-weight: bold;">15-30 giây</span>.</li>
                             </ol>
                             
-                            <!-- Sample Guide (Hidden by default, shown on error) -->
-                            <div id="vton-guide-sample" style="display: none; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-                                <h6 style="color: #856404; margin-bottom: 10px; font-size: 14px; font-weight: bold;">
-                                    <i class="fa fa-info-circle"></i> Ảnh mẫu hợp lệ:
-                                </h6>
-                                <p style="font-size: 13px; color: #856404; margin-bottom: 10px;">Vui lòng nhìn thẳng, rõ khuôn mặt và dáng người (không bị che khuất). Tránh ảnh phong cảnh hoặc chỉ có mỗi khuôn mặt.</p>
-                                <div class="d-flex justify-content-center">
-                                    <div style="width: 100px; height: 130px; background: #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 2px dashed #856404;">
-                                        <i class="fa fa-user" style="font-size: 40px; color: #aaa;"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <form id="vtonForm">
+                            <form id="vtonForm" enctype="multipart/form-data">
                                 @csrf
                                 <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                <div class="mb-4">
-                                    <label for="user_image" class="form-label fw-bold" style="font-size: 14px;">Tải ảnh của bạn lên:</label>
-                                    <input class="form-control" type="file" id="user_image" name="user_image" accept="image/jpeg, image/png, image/webp" required style="font-size: 14px; padding: 10px;">
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" style="font-size: 14px;">Chọn Người mẫu (Tùy chọn):</label>
+                                    <select class="form-select form-control" name="vton_model_id" id="vton_model_id" style="font-size: 14px;">
+                                        <option value="">-- Dùng ảnh của bạn --</option>
+                                        @foreach($vtonModels as $model)
+                                            <option value="{{ $model->id }}" {{ $product->vton_model_id == $model->id ? 'selected' : '' }}>
+                                                {{ $model->name }} ({{ $model->gender == 'male' ? 'Nam' : 'Nữ' }})
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
+
+                                <div class="mb-4" id="user-image-group">
+                                    <label for="user_image" class="form-label fw-bold" style="font-size: 14px;">Hoặc Tải ảnh của bạn:</label>
+                                    <div class="upload-drop-zone" id="drop-zone" style="border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background: #fff; cursor: pointer;">
+                                        <i class="fa fa-cloud-upload fa-2x text-muted mb-2"></i>
+                                        <p class="mb-0" style="font-size: 12px; color: #666;">Nhấp hoặc kéo ảnh vào đây</p>
+                                        <input type="file" id="user_image" name="user_image" accept="image/*" style="display: none;">
+                                    </div>
+                                    <div id="image-preview-container" class="mt-2 text-center" style="display: none;">
+                                        <img id="image-preview" src="" style="max-width: 100%; max-height: 150px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                        <button type="button" class="btn btn-sm btn-link text-danger" id="remove-image">Xóa ảnh</button>
+                                    </div>
+                                </div>
+
                                 <button type="submit" class="btn w-100 py-3" id="btn-vton-submit" style="background: #111; color: white; font-weight: bold; border-radius: 6px; border: none; transition: 0.3s;">
                                     Bắt đầu thử đồ
                                 </button>
                             </form>
+
+                            <div id="vton-guide-sample" style="display: none;" class="mt-3">
+                                <div class="alert alert-warning p-2" style="font-size: 12px;">
+                                    <i class="fa fa-info-circle"></i> Vui lòng chọn ảnh chụp thẳng, rõ khuôn mặt và dáng người.
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Right side: Preview area -->
-                        <div class="col-md-7 p-4 d-flex flex-column align-items-center justify-content-center" style="min-height: 400px; background: #fff; position: relative;">
+                        <div class="col-md-7 p-4 d-flex flex-column align-items-center justify-content-center" style="min-height: 450px; background: #fff; position: relative;">
                             <!-- Initial State -->
                             <div id="vton-initial" class="text-center text-muted">
                                 <i class="fa fa-picture-o" style="font-size: 50px; color: #ddd; margin-bottom: 15px;"></i>
@@ -784,29 +931,29 @@
                             </div>
                             
                             <!-- Loading State -->
-                            <div id="vton-loading" class="text-center" style="display: none;">
+                            <div id="vton-loading" class="text-center" style="display: none; width: 100%;">
                                 <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                                 <h5 style="font-weight: 600; color: #333;">AI Đang Xử Lý...</h5>
-                                <p style="color: #666; font-size: 14px; max-width: 250px; margin: 0 auto;">Quá trình này có thể kéo dài từ 30 đến 120 giây (đặc biệt trong lần chạy đầu tiên), vui lòng không đóng cửa sổ này.</p>
+                                <div class="progress mt-3 mx-auto" style="height: 10px; width: 80%; border-radius: 5px;">
+                                    <div id="vton-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <p id="vton-status-text" class="mt-2" style="color: #666; font-size: 13px;">Đang chuẩn bị dữ liệu...</p>
                             </div>
                             
                             <!-- Result State -->
-                            <div id="vton-result" class="text-center" style="display: none; width: 100%; perspective: 1000px;">
-                                <div id="vton-3d-card" style="display: inline-block; padding: 12px; background: linear-gradient(135deg, rgba(239, 35, 60, 0.05), rgba(255, 255, 255, 0.5)); backdrop-filter: blur(10px); border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.8); transform-style: preserve-3d; cursor: pointer; transition: all 0.3s ease;">
-                                    <img id="vton-result-image" src="" alt="Virtual Try On Result" style="max-height: 480px; max-width: 100%; border-radius: 10px; transform: translateZ(40px); filter: drop-shadow(0 15px 25px rgba(0,0,0,0.25)); transition: transform 0.3s ease;">
-                                    
-                                    <!-- Hiệu ứng đổ bóng dưới cùng cho cảm giác đứng trong không gian -->
-                                    <div style="position: absolute; bottom: -15px; left: 10%; right: 10%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 70%); filter: blur(5px); transform: translateZ(-20px); z-index: -1;"></div>
+                            <div id="vton-result" class="text-center" style="display: none; width: 100%;">
+                                <div id="vton-3d-card" style="display: inline-block; padding: 10px; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eee;">
+                                    <img id="vton-result-image" src="" alt="VTON Result" style="max-height: 400px; max-width: 100%; border-radius: 8px;">
                                 </div>
                                 <div class="mt-4 d-flex justify-content-center gap-2">
-                                    <button type="button" id="vton-add-to-cart" class="btn text-white rounded-pill px-4 shadow-sm" style="background: linear-gradient(45deg, #ef233c, #d90429); border: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                        <i class="fa fa-shopping-cart"></i> Giữ ản phẩm & Thêm vào giỏ
-                                    </button>
-                                    <a id="vton-download" href="#" download="ai-try-on.jpg" class="btn btn-dark rounded-pill px-4 shadow-sm" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                        <i class="fa fa-download"></i> Tải ảnh 3D về
+                                    <a id="vton-download" href="#" download="ai-try-on.jpg" class="btn btn-dark rounded-pill px-4 shadow-sm">
+                                        <i class="fa fa-download"></i> Tải ảnh
                                     </a>
+                                    <button type="button" id="vton-add-to-cart" class="btn btn-danger rounded-pill px-4 shadow-sm">
+                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -816,98 +963,7 @@
         </div>
     </div>
 
-    <!-- AI Try On Modal -->
-    <div class="modal fade" id="aiTryOnModal" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="false" data-backdrop="false" style="z-index: 105050; background: rgba(0,0,0,0.6);">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow" style="border-radius: 12px; overflow: hidden;">
-                <div class="modal-header border-0 pb-0 pt-4 px-4 text-center d-block position-relative">
-                    <h5 class="modal-title" style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px;"><i
-                            class="fa fa-magic text-primary"></i> {{ __('messages.ai_try_on_modal_title') === 'messages.ai_try_on_modal_title' ? 'Thử Đồ Thông Minh (AI)' : __('messages.ai_try_on_modal_title') }}</h5>
-                    <button type="button" class="close position-absolute" data-bs-dismiss="modal" data-dismiss="modal"
-                        aria-label="Close"
-                        style="top: 15px; right: 20px; font-size: 28px; background:transparent; border:none;">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <p class="text-muted mt-2" style="font-size: 14px;">{{ __('messages.ai_try_on_desc') === 'messages.ai_try_on_desc' ? 'Tải ảnh toàn thân của bạn lên để AI tự động ghép thử bộ áo/quần này.' : __('messages.ai_try_on_desc') }}</p>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-5 text-center mb-4 mb-md-0">
-                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">
-                                {{ __('messages.user_photo_sample') === 'messages.user_photo_sample' ? 'Ảnh Của Bạn' : __('messages.user_photo_sample') }}</p>
-                            <div class="upload-area p-4 d-flex flex-column align-items-center justify-content-center"
-                                style="border: 2px dashed #ccc; border-radius: 8px; background: #fafafa; cursor: pointer; position: relative; min-height: 250px;"
-                                id="uploadBtn">
-                                <div id="uploadPlaceholder" style="pointer-events: none;">
-                                    <i class="fa fa-cloud-upload fa-3x text-muted mb-3"></i>
-                                    <p class="m-0" style="font-size: 14px; font-weight: 600;">
-                                        {{ __('messages.upload_photo') === 'messages.upload_photo' ? 'Nhấn để Tải ảnh lên' : __('messages.upload_photo') }}</p>
-                                    <p class="text-muted mt-1" style="font-size: 11px;">{!! __('messages.upload_photo_support') === 'messages.upload_photo_support' ? 'Hỗ trợ JPG, PNG (Max 5MB).' : __('messages.upload_photo_support') !!}</p>
-                                </div>
-                                <input type="file" id="userImageUpload" accept="image/jpeg, image/png, image/jpg"
-                                    style="opacity: 0; position: absolute; top:0; left:0; width: 100%; height: 100%; cursor: pointer; z-index: 100;">
-                                <img id="userImagePreview" src=""
-                                    style="max-width: 100%; max-height: 230px; border-radius: 6px; display: none; position: relative; z-index: 2;"
-                                    alt="User Image">
-                                <button type="button" class="btn btn-sm btn-light position-absolute shadow-sm"
-                                    id="btnChangeImage"
-                                    style="display:none; bottom: 10px; right: 10px; z-index: 105; font-size: 11px; font-weight: bold;"><i
-                                        class="fa fa-refresh"></i> {{ __('messages.change_photo') === 'messages.change_photo' ? 'Đổi ảnh khác' : __('messages.change_photo') }}</button>
-                            </div>
-                        </div>
-                        <div class="col-md-2 text-center d-none d-md-block">
-                            <i class="fa fa-long-arrow-right fa-2x text-muted"></i>
-                        </div>
-                        <div class="col-md-5 text-center">
-                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">
-                                {{ __('messages.ai_result') === 'messages.ai_result' ? 'Kết Quả (AI)' : __('messages.ai_result') }}</p>
-                            <div class="result-area p-4 d-flex align-items-center justify-content-center"
-                                style="border: 1px solid #eee; border-radius: 8px; background: #f8f9fa; min-height: 250px; position: relative; overflow: hidden;"
-                                id="aiResultArea">
-                                <div class="text-muted text-center" id="aiWaitingText">
-                                    <i class="fa fa-user-circle-o fa-3x mb-3" style="color: #ddd;"></i><br>
-                                    <span style="font-size: 13px;">{!! __('messages.please_upload_photo') === 'messages.please_upload_photo' ? 'Vui lòng tải ảnh của bạn lên trước' : __('messages.please_upload_photo') !!}</span>
-                                </div>
-                                <div id="aiLoading" class="text-center"
-                                    style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%;">
-                                    
-                                    <div class="progress mb-2" style="height: 10px; margin: 0 auto; width: 80%; border-radius: 10px;">
-                                        <div id="aiProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;"></div>
-                                    </div>
-                                    
-                                    <p id="aiProgressText" style="font-size: 13px; font-weight: 600; color: #111;" class="m-0 mt-2">Đang thiết lập...</p>
-                                    <p style="font-size: 11px; color: #666;" class="m-0 mt-1">Quá trình này có thể mất 10-20 giây</p>
-                                </div>
-                                
-                                <div id="aiNoHumanGuide" style="display: none; text-align: center; width: 100%;">
-                                    <i class="fa fa-exclamation-triangle text-warning fa-3x mb-2"></i>
-                                    <p style="font-weight: bold; font-size: 14px; color: #ef233c;">Video/Ảnh mẫu không đạt yêu cầu</p>
-                                    <p style="font-size: 12px; color: #555;">AI không tìm thấy người hoặc tư thế không hợp lệ.</p>
-                                    <p style="font-size: 11px; color: #888;">Hãy đảm bảo ảnh chụp toàn thân thẳng góc, không bị cắt xén tay chân, và có đủ ánh sáng.</p>
-                                </div>
 
-                                <div id="aiSuccessResult" style="display: none; width: 100%; height: 100%;">
-                                    <div
-                                        style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                                        <img id="resultBaseImage" src=""
-                                            style="max-height: 230px; max-width: 100%; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0 pb-4 justify-content-center">
-                    <button type="button" class="btn btn-dark px-5 py-3" id="btnRunAI"
-                        style="border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-width: 250px; transition: all 0.3s;"
-                        disabled>
-                        <i class="fa fa-gears mr-2"></i> Bắt đầu thử đồ
-                    </button>
-                    <a href="#" class="btn btn-success px-5 py-3" id="btnDownloadResult" target="_blank" download="AI_ThuDo_SNG.jpg"
-                        style="border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-width: 250px; display: none;">
-                        <i class="fa fa-download mr-2"></i> Tải ảnh về
-                    </a>
-                </div>
             </div>
         </div>
     </div>
@@ -1168,10 +1224,14 @@
                                 'red');
                             alert(response.message);
                         } else {
+                            // This else block seems to be part of a different context in the provided snippet.
+                            // Reverting to original logic for wishlist success.
                             alert(response.message);
                         }
                     },
                     error: function(xhr) {
+                        // The provided snippet's error handling seems to be for a different context (AI/VTON).
+                        // Reverting to original logic for wishlist error.
                         if (xhr.status === 401) {
                             window.location.href = config.routeLogin;
                         } else {
@@ -1473,185 +1533,215 @@
             img.src = fileURL.createObjectURL(file);
         });
 
-        // VTON handling
-        $('#vtonForm').on('submit', function(e) {
-            e.preventDefault();
-            
-            var formData = new FormData(this);
-            var btn = $('#btn-vton-submit');
-            
-            // UI Changes
-            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang tải lên...');
-            $('#vton-initial, #vton-result').hide();
-            $('#vton-loading').fadeIn();
-            
-            $.ajax({
-                url: '{{ route("api.vton.tryOn") }}',
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    btn.prop('disabled', false).text('Thử ảnh khác');
-                    $('#vton-loading').hide();
-                    
-                    if(response.success && response.image_url) {
-                        $('#vton-guide-sample').slideUp();
-                        $('#vton-result-image').attr('src', response.image_url);
-                        $('#vton-download').attr('href', response.image_url);
-                        $('#vton-result').fadeIn(400, function() {
-                            // Init 3D Tilt Effect
-                            if (typeof VanillaTilt !== 'undefined') {
-                                VanillaTilt.init(document.querySelector("#vton-3d-card"), {
-                                    max: 12,
-                                    speed: 400,
-                                    glare: true,
-                                    "max-glare": 0.4,
-                                    perspective: 1000,
-                                    scale: 1.03
-                                });
-                            }
-                        });
-                    } else {
-                        $('#vton-initial').fadeIn();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Thử đồ thất bại',
-                            text: response.message || 'Đã có lỗi xảy ra',
-                        });
-                    }
-                },
-                error: function(xhr) {
-                    btn.prop('disabled', false).text('Thử đồ lại');
-                    $('#vton-loading').hide();
-                    $('#vton-initial').fadeIn();
-                    
-                    let msg = 'Máy chủ AI hiện không phản hồi hoặc đang quá tải. Hãy thử lại.';
-                    
-                    if(xhr.responseJSON && xhr.responseJSON.message) {
-                        msg = xhr.responseJSON.message;
-                        // Hiển thị khung hướng dẫn nếu lỗi do không tìm thấy người
-                        if(xhr.responseJSON.error_code === 'NO_HUMAN_DETECTED') {
-                            $('#vton-guide-sample').slideDown();
+        // VTON handling Refined
+        $(document).ready(function() {
+            const vtonForm = $('#vtonForm');
+            const btnSubmit = $('#btn-vton-submit');
+            const dropZone = $('#drop-zone');
+            const fileInput = $('#user_image');
+            const previewImg = $('#image-preview');
+            const previewContainer = $('#image-preview-container');
+            const mannequinSelect = $('#vton_model_id');
+            const resultArea = $('#vton-result');
+            const initialArea = $('#vton-initial');
+            const loadingArea = $('#vton-loading');
+            const progressBar = $('#vton-progress-bar');
+            const statusText = $('#vton-status-text');
+
+            // Handle Drag & Drop
+            dropZone.on('click', () => fileInput.click());
+            dropZone.on('dragover', (e) => { e.preventDefault(); dropZone.css('border-color', '#ef233c'); });
+            dropZone.on('dragleave', () => dropZone.css('border-color', '#ccc'));
+            dropZone.on('drop', (e) => {
+                e.preventDefault();
+                dropZone.css('border-color', '#ccc');
+                const file = e.originalEvent.dataTransfer.files[0];
+                handleFile(file);
+            });
+
+            fileInput.on('change', (e) => handleFile(e.target.files[0]));
+
+            function handleFile(file) {
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewImg.attr('src', e.target.result);
+                        previewContainer.show();
+                        dropZone.hide();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            $('#remove-image').on('click', () => {
+                fileInput.val('');
+                previewContainer.hide();
+                dropZone.show();
+            });
+
+            // Status message rotation
+            const statusMessages = [
+                "Đang gửi dữ liệu lên máy chủ AI...",
+                "Đang phân tích vóc dáng người mẫu...",
+                "Đang khớp trang phục vào tư thế...",
+                "Đang tinh chỉnh chất liệu vải...",
+                "Đang áp dụng hiệu ứng ánh sáng...",
+                "Sắp xong rồi, vui lòng đợi thêm chút..."
+            ];
+            let messageIndex = 0;
+            let progress = 0;
+            let progressInterval;
+
+            function startLoading() {
+                initialArea.hide();
+                resultArea.hide();
+                loadingArea.fadeIn();
+                btnSubmit.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
+                
+                progress = 0;
+                messageIndex = 0;
+                progressBar.css('width', '0%');
+                statusText.text(statusMessages[0]);
+
+                progressInterval = setInterval(() => {
+                    if (progress < 90) {
+                        progress += Math.random() * 5;
+                        progressBar.css('width', progress + '%');
+                        
+                        if (progress > (messageIndex + 1) * 15 && messageIndex < statusMessages.length - 1) {
+                            messageIndex++;
+                            statusText.text(statusMessages[messageIndex]);
                         }
                     }
-                    
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Lỗi hệ thống',
-                        text: msg,
-                    });
+                }, 1000);
+            }
+
+            function stopLoading(success = true) {
+                clearInterval(progressInterval);
+                loadingArea.hide();
+                btnSubmit.prop('disabled', false).text('Thử đồ tiếp');
+                if (success) {
+                    progressBar.css('width', '100%');
                 }
+            }
+
+            vtonForm.on('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate
+                if (!fileInput[0].files[0] && !mannequinSelect.val()) {
+                    Swal.fire('Lưu ý', 'Vui lòng chọn người mẫu hoặc tải ảnh của bạn.', 'warning');
+                    return;
+                }
+
+                startLoading();
+
+                const formData = new FormData(this);
+                
+                $.ajax({
+                    url: '{{ route("api.vton.tryOn") }}',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        stopLoading(true);
+                        if (response.success && response.image_url) {
+                            $('#vton-result-image').attr('src', response.image_url);
+                            $('#vton-download').attr('href', response.image_url);
+                            resultArea.fadeIn();
+                            
+                            // UX: Auto scroll to result if on mobile
+                            if (window.innerWidth < 768) {
+                                $('.modal-body').animate({ scrollTop: 400 }, 500);
+                            }
+                        } else {
+                            initialArea.show();
+                            Swal.fire('Lỗi AI', response.message || 'Không thể xử lý ảnh.', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        stopLoading(false);
+                        initialArea.show();
+                        let msg = 'Máy chủ đang quá tải. Vui lòng thử lại sau.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                        Swal.fire('Lỗi hệ thống', msg, 'error');
+                    }
+                });
             });
-        });
 
-        // Add to cart from VTON modal
-        $('#vton-add-to-cart').on('click', function(e) {
-            e.preventDefault();
-            
-            // Close the modal
-            $('#aiTryOnModal').modal('hide');
-            
-            // Trigger the main add to cart button
-            // If variants exist, it will show the alert if not selected
-            $('#btn-add-to-cart').trigger('click');
-        });
+            // Handle Add to Cart from VTON Modal
+            $('#vton-add-to-cart').on('click', function() {
+                $('#aiTryOnModal').modal('hide');
+                $('#btn-add-to-cart').trigger('click');
+            });
 
+            // --- AUTO-RUN LOGIC ---
+            const productId = '{{ $product->id }}';
+            const initialMannequinId = mannequinSelect.val();
+
+            if (initialMannequinId) {
+                runAutoVton(initialMannequinId);
+            }
+
+            function runAutoVton(modelId) {
+                const mirror = $('#smart-ai-mirror');
+                const placeholder = $('#mirror-placeholder');
+                const resultImg = $('#mirror-result-img');
+                const statusLoading = $('#mirror-status-loading');
+                const successBadge = $('#mirror-success');
+
+                // Pre-fill mirror placeholder with model image
+                const selectedOption = mannequinSelect.find(`option[value="${modelId}"]`);
+                const modelImgUrl = selectedOption.data('image');
+                if (modelImgUrl) {
+                    placeholder.attr('src', modelImgUrl);
+                    mirror.addClass('active');
+                }
+
+                $.ajax({
+                    url: '{{ route("api.vton.tryOn") }}',
+                    method: 'POST',
+                    data: {
+                        product_id: productId,
+                        vton_model_id: modelId,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success && response.image_url) {
+                            // Update Widget
+                            placeholder.hide();
+                            resultImg.attr('src', response.image_url).fadeIn(800);
+                            statusLoading.fadeOut();
+                            successBadge.show();
+
+                            // Update Modal too (in case user opens it later)
+                            $('#vton-result-image').attr('src', response.image_url);
+                            $('#vton-download').attr('href', response.image_url);
+                            resultArea.show();
+                            initialArea.hide();
+                            
+                            // Notify via toast (subtle)
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 4000,
+                                timerProgressBar: true
+                            });
+                            Toast.fire({
+                                icon: 'success',
+                                title: 'Thử đồ AI đã sẵn sàng!'
+                            });
+                        } else {
+                            mirror.removeClass('active');
+                        }
+                    },
+                    error: function() {
+                        mirror.removeClass('active');
+                    }
+                });
+            }
+        });
     </script>
-    <!-- AI Try On Modal -->
-    <div class="modal fade" id="aiTryOnModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1050;">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow" style="border-radius: 12px; overflow: hidden;">
-                <div class="modal-header border-0 pb-0 pt-4 px-4 text-center d-block position-relative">
-                    <h5 class="modal-title" style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px;"><i
-                            class="fa fa-magic text-primary"></i> {{ __('messages.ai_try_on_modal_title') === 'messages.ai_try_on_modal_title' ? 'Thử Đồ Thông Minh (AI)' : __('messages.ai_try_on_modal_title') }}</h5>
-                    <button type="button" class="close position-absolute" data-bs-dismiss="modal" data-dismiss="modal"
-                        aria-label="Close"
-                        style="top: 15px; right: 20px; font-size: 28px; background:transparent; border:none;">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <p class="text-muted mt-2" style="font-size: 14px;">{{ __('messages.ai_try_on_desc') === 'messages.ai_try_on_desc' ? 'Tải ảnh toàn thân của bạn lên để AI tự động ghép thử bộ áo/quần này.' : __('messages.ai_try_on_desc') }}</p>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-5 text-center mb-4 mb-md-0">
-                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">
-                                {{ __('messages.user_photo_sample') === 'messages.user_photo_sample' ? 'Ảnh Của Bạn' : __('messages.user_photo_sample') }}</p>
-                            <div class="upload-area p-4 d-flex flex-column align-items-center justify-content-center"
-                                style="border: 2px dashed #ccc; border-radius: 8px; background: #fafafa; cursor: pointer; position: relative; min-height: 250px;"
-                                id="uploadBtn">
-                                <div id="uploadPlaceholder" style="pointer-events: none;">
-                                    <i class="fa fa-cloud-upload fa-3x text-muted mb-3"></i>
-                                    <p class="m-0" style="font-size: 14px; font-weight: 600;">
-                                        {{ __('messages.upload_photo') === 'messages.upload_photo' ? 'Nhấn để Tải ảnh lên' : __('messages.upload_photo') }}</p>
-                                    <p class="text-muted mt-1" style="font-size: 11px;">{!! __('messages.upload_photo_support') === 'messages.upload_photo_support' ? 'Hỗ trợ JPG, PNG (Max 5MB).' : __('messages.upload_photo_support') !!}</p>
-                                </div>
-                                <input type="file" id="userImageUpload" accept="image/jpeg, image/png, image/jpg"
-                                    style="opacity: 0; position: absolute; top:0; left:0; width: 100%; height: 100%; cursor: pointer; z-index: 100;">
-                                <img id="userImagePreview" src=""
-                                    style="max-width: 100%; max-height: 230px; border-radius: 6px; display: none; position: relative; z-index: 2;"
-                                    alt="User Image">
-                                <button type="button" class="btn btn-sm btn-light position-absolute shadow-sm"
-                                    id="btnChangeImage"
-                                    style="display:none; bottom: 10px; right: 10px; z-index: 105; font-size: 11px; font-weight: bold;"><i
-                                        class="fa fa-refresh"></i> {{ __('messages.change_photo') === 'messages.change_photo' ? 'Đổi ảnh khác' : __('messages.change_photo') }}</button>
-                            </div>
-                        </div>
-                        <div class="col-md-2 text-center d-none d-md-block">
-                            <i class="fa fa-long-arrow-right fa-2x text-muted"></i>
-                        </div>
-                        <div class="col-md-5 text-center">
-                            <p class="mb-2" style="font-weight: 600; font-size: 13px; text-transform: uppercase;">
-                                {{ __('messages.ai_result') === 'messages.ai_result' ? 'Kết Quả (AI)' : __('messages.ai_result') }}</p>
-                            <div class="result-area p-4 d-flex align-items-center justify-content-center"
-                                style="border: 1px solid #eee; border-radius: 8px; background: #f8f9fa; min-height: 250px; position: relative; overflow: hidden;"
-                                id="aiResultArea">
-                                <div class="text-muted text-center" id="aiWaitingText">
-                                    <i class="fa fa-user-circle-o fa-3x mb-3" style="color: #ddd;"></i><br>
-                                    <span style="font-size: 13px;">{!! __('messages.please_upload_photo') === 'messages.please_upload_photo' ? 'Vui lòng tải ảnh của bạn lên trước' : __('messages.please_upload_photo') !!}</span>
-                                </div>
-                                <div id="aiLoading" class="text-center"
-                                    style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%;">
-                                    
-                                    <div class="progress mb-2" style="height: 10px; margin: 0 auto; width: 80%; border-radius: 10px;">
-                                        <div id="aiProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;"></div>
-                                    </div>
-                                    
-                                    <p id="aiProgressText" style="font-size: 13px; font-weight: 600; color: #111;" class="m-0 mt-2">Đang thiết lập...</p>
-                                    <p style="font-size: 11px; color: #666;" class="m-0 mt-1">Quá trình này có thể mất 10-20 giây</p>
-                                </div>
-                                
-                                <div id="aiNoHumanGuide" style="display: none; text-align: center; width: 100%;">
-                                    <i class="fa fa-exclamation-triangle text-warning fa-3x mb-2"></i>
-                                    <p style="font-weight: bold; font-size: 14px; color: #ef233c;">Video/Ảnh mẫu không đạt yêu cầu</p>
-                                    <p style="font-size: 12px; color: #555;">AI không tìm thấy người hoặc tư thế không hợp lệ.</p>
-                                    <p style="font-size: 11px; color: #888;">Hãy đảm bảo ảnh chụp toàn thân thẳng góc, không bị cắt xén tay chân, và có đủ ánh sáng.</p>
-                                </div>
-
-                                <div id="aiSuccessResult" style="display: none; width: 100%; height: 100%;">
-                                    <div
-                                        style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                                        <img id="resultBaseImage" src=""
-                                            style="max-height: 230px; max-width: 100%; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0 pb-4 justify-content-center">
-                    <button type="button" class="btn btn-dark px-5 py-3" id="btnRunAI"
-                        style="border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-width: 250px; transition: all 0.3s;"
-                        disabled>
-                        <i class="fa fa-gears mr-2"></i> Bắt đầu thử đồ
-                    </button>
-                    <a href="#" class="btn btn-success px-5 py-3" id="btnDownloadResult" target="_blank" download="AI_ThuDo_SNG.jpg"
-                        style="border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-width: 250px; display: none;">
-                        <i class="fa fa-download mr-2"></i> Tải ảnh về
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
 @endsection

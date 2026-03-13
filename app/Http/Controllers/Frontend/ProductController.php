@@ -158,7 +158,7 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['category', 'variants.sizeRelationship', 'variants.colorRelationship', 'images', 'reviews.user'])
+            ->with(['category', 'variants.sizeRelationship', 'variants.colorRelationship', 'images', 'reviews.user', 'vtonModel'])
             ->firstOrFail();
 
         // Kiểm tra user đã mua và nhận hàng thành công chưa
@@ -178,6 +178,9 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
-        return view('frontend.products.show', compact('product', 'relatedProducts', 'hasPurchased'));
+        // Get Available AI Models for selection
+        $vtonModels = \App\Models\VtonModel::latest()->get();
+
+        return view('frontend.products.show', compact('product', 'relatedProducts', 'hasPurchased', 'vtonModels'));
     }
 }

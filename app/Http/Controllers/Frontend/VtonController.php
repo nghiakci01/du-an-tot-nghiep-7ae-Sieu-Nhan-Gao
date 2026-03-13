@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\VtonModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Product;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Str;
 
 class VtonController extends Controller
 {
@@ -20,203 +23,112 @@ class VtonController extends Controller
         try {
             // Validate request
             $request->validate([
-                'user_image' => 'required|mimes:jpeg,jpg,png,webp|max:5120|dimensions:min_width=600,min_height=600',
-                'product_id' => 'required|exists:products,id'
-            ], [
-                'user_image.mimes'      => 'Định dạng không hợp lệ. Chỉ cho phép file .jpg, .png, .webp.',
-                'user_image.max'        => 'File quá lớn. Vui lòng tải ảnh bé hơn 5MB.',
-                'user_image.dimensions' => 'Ảnh quá mờ hoặc có kích thước quá thấp. Vui lòng sử dụng ảnh sắc nét hơn (Tối thiểu 600x600px).',
+                'user_image' => 'nullable|mimes:jpeg,jpg,png,webp|max:5120|dimensions:min_width=400,min_height=400',
+                'product_id' => 'required|exists:products,id',
+                'vton_model_id' => 'nullable|exists:vton_models,id'
             ]);
-            $apiToken = env('REPLICATE_API_TOKEN', env('FASHN_API_TOKEN'));
-
-            // --- CHẾ ĐỘ GIẢ LẬP (MOCK) CHO ĐỒ ÁN (TRÁNH MẤT PHÍ API) ---
-            if (empty($apiToken) || $apiToken === 'demo' || str_starts_with($apiToken, 'nhap_api')) {
-                // Lấy ảnh người dùng tải lên để trả về (giả lập kết quả VTON thành công)
-                $userImageFile = $request->file('user_image');
-                $userImageMime = $userImageFile->getMimeType();
-                $userImageBase64 = base64_encode(file_get_contents($userImageFile->getRealPath()));
-                $userDataUri = 'data:' . $userImageMime . ';base64,' . $userImageBase64;
-
-                // Giả lập thời gian AI đang xử lý (5 giây)
-                sleep(5);
-
-                return response()->json([
-                    'success' => true,
-                    'image_url' => $userDataUri, // Trả về ảnh giả lập để báo cáo
-                    'message' => 'Thử đồ thành công! (Chạy ở chế độ Demo)'
-                ]);
-            }
 
             $product = Product::findOrFail($request->product_id);
             if (!$product->image) {
+                return response()->json(['success' => false, 'message' => 'Sản phẩm này chưa có ảnh.'], 400);
+            }
+
+            // 1. Get Human Image (User Upload vs Pre-defined Model)
+            $humanData = $this->getHumanData($request, $product);
+            if (!$humanData['success']) {
+                return response()->json(['success' => false, 'message' => $humanData['message']], 400);
+            }
+
+            $humanImageBase64 = $humanData['base64'];
+            $humanCacheKey = $humanData['cache_key'];
+
+            // 2. Get Product Image Base64
+            $productPath = storage_path('app/public/' . $product->image);
+            if (!file_exists($productPath)) {
+                return response()->json(['success' => false, 'message' => 'Không tìm thấy ảnh sản phẩm.'], 404);
+            }
+            $productImageBase64 = 'data:' . mime_content_type($productPath) . ';base64,' . base64_encode(file_get_contents($productPath));
+
+            // 3. Check Cache
+            $cacheKey = 'vton_' . md5($humanCacheKey . '_' . $product->id);
+            if (Cache::has($cacheKey)) {
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Sản phẩm này chưa có ảnh đại diện để thử đồ.'
-                ], 400);
-            }
-
-            // 1. Process Product Image -> Base64 URI
-            $productImagePath = storage_path('app/public/' . $product->image);
-            if (!file_exists($productImagePath)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Không tìm thấy ảnh sản phẩm trong kho lưu trữ.'
-                ], 404);
-            }
-            $productImageMime = mime_content_type($productImagePath);
-            $productImageBase64 = base64_encode(file_get_contents($productImagePath));
-            $productDataUri = 'data:' . $productImageMime . ';base64,' . $productImageBase64;
-
-            // 2. Process User Image -> Base64 URI
-            $userImageFile = $request->file('user_image');
-            $filePath = $userImageFile->getRealPath();
-            
-            // Pre-processing: Handle rotation based on EXIF or Ratio using GD
-            $imageData = file_get_contents($filePath);
-            $imageResource = @imagecreatefromstring($imageData);
-            
-            if ($imageResource !== false) {
-                $isRotated = false;
-                
-                // Rotation based on EXIF Orientation (JPEG only)
-                if (in_array(strtolower($userImageFile->getClientOriginalExtension()), ['jpg', 'jpeg']) && function_exists('exif_read_data')) {
-                    $exif = @exif_read_data($filePath);
-                    if (!empty($exif['Orientation'])) {
-                        switch ($exif['Orientation']) {
-                            case 3:
-                                $imageResource = imagerotate($imageResource, 180, 0);
-                                $isRotated = true;
-                                break;
-                            case 6:
-                                $imageResource = imagerotate($imageResource, -90, 0);
-                                $isRotated = true;
-                                break;
-                            case 8:
-                                $imageResource = imagerotate($imageResource, 90, 0);
-                                $isRotated = true;
-                                break;
-                        }
-                    }
-                }
-                
-                // Fallback rotation: If width > height and not rotated via EXIF, assume landscape photo meant to be portrait
-                $width = imagesx($imageResource);
-                $height = imagesy($imageResource);
-                
-                if (!$isRotated && $width > $height) {
-                    $imageResource = imagerotate($imageResource, -90, 0);
-                    $isRotated = true;
-                }
-
-                if ($isRotated) {
-                    ob_start();
-                    if (strtolower($userImageFile->getClientOriginalExtension()) === 'png') {
-                        imagepng($imageResource);
-                    } elseif (strtolower($userImageFile->getClientOriginalExtension()) === 'webp') {
-                        imagewebp($imageResource);
-                    } else {
-                        imagejpeg($imageResource, null, 90);
-                    }
-                    $imageData = ob_get_contents();
-                    ob_end_clean();
-                }
-                
-                imagedestroy($imageResource);
-            }
-
-            $userImageMime = $userImageFile->getMimeType();
-            $userImageBase64 = base64_encode($imageData);
-            $userDataUri = 'data:' . $userImageMime . ';base64,' . $userImageBase64;
-
-            // 3. Call Replicate API to create prediction
-            // Using Kolors Virtual Try-On model via official models prediction endpoint
-            // Endpoint: POST https://api.replicate.com/v1/models/cuiapp/kolors-virtual-try-on/predictions
-            
-            $response = Http::withToken($apiToken)
-                ->retry(3, 1000, function ($exception, $request) {
-                    return $exception instanceof ConnectionException;
-                })
-                ->timeout(30)
-                ->post('https://api.replicate.com/v1/models/cuiapp/kolors-virtual-try-on/predictions', [
-                    'input' => [
-                        'human_image' => $userDataUri,
-                        'garment_image' => $productDataUri,
-                        'garment_des' => 'clothing',
-                        'seed' => rand(1, 4294967295),
-                        'steps' => 30
-                    ]
+                    'success' => true,
+                    'image_url' => Cache::get($cacheKey),
+                    'message' => 'Thử đồ thành công! (Cached)'
                 ]);
-
-            if (!$response->successful()) {
-                Log::channel('vton')->error('Replicate API Error', [
-                    'body' => $response->body(),
-                    'status' => $response->status()
-                ]);
-                
-                // Nếu lỗi từ Replicate, parse message để trả về cho FE
-                $errorMsg = 'Lỗi kết nối với API AI. Vui lòng thử lại sau.';
-                $errorData = $response->json();
-                if (isset($errorData['detail'])) {
-                    $errorMsg = 'Replicate AI: ' . $errorData['detail'];
-                }
-                
-                return response()->json([
-                    'success' => false,
-                    'message' => $errorMsg,
-                    'details' => $errorData
-                ], 500);
             }
 
-            $prediction = $response->json();
-            $pollUrl = $prediction['urls']['get'] ?? null;
+            // 4. Select VTON Category
+            $category = $this->mapCategory($product);
+
+            // 5. Call Hugging Face API (OOTDiffusion)
+            // URL: https://levihsu-ootdiffusion.hf.space/call/process_hd
+            $hfUrl = 'https://levihsu-ootdiffusion.hf.space/call/process_hd';
             
-            if (!$pollUrl) {
+            Log::info('VTON HF Request', ['product_id' => $product->id, 'category' => $category]);
+
+            $payload = [
+                'data' => [
+                    ['url' => $humanImageBase64, 'meta' => ['_type' => 'gradio.FileData']],
+                    ['url' => $productImageBase64, 'meta' => ['_type' => 'gradio.FileData']],
+                    $category,
+                    1,   // Model select
+                    20,  // Steps
+                    2.0, // Guidance scale
+                    -1   // Seed
+                ]
+            ];
+
+            $response = Http::timeout(60)->post($hfUrl, $payload);
+            $eventId = $response->json('event_id');
+
+            if (!$eventId) {
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Lỗi kết nối API: Không nhận được URL chờ kết quả.',
-                ], 500);
+                    'success' => false, 
+                    'message' => 'Hệ thống AI đang bận (Queue Full). Vui lòng đợi 30 giây và thử lại.',
+                    'debug' => $response->body()
+                ], 503);
             }
 
-            // 4. Poll the result
-            // AI Try-on usually takes 10-30 seconds, but cold boots can take longer. We'll poll up to 75 times (150s).
-            $maxAttempts = 75;
-            $attempt = 0;
+            // 6. Polling for result via stream endpoint
+            // HF Spaces use Server-Sent Events or long-polling on the event ID
+            $startTime = time();
+            $maxWait = 120; // 2 minutes max
             $resultUrl = null;
 
-            while ($attempt < $maxAttempts) {
-                sleep(2); // Wait 2s between polls
-                $pollResponse = Http::withToken($apiToken)->get($pollUrl);
+            while ((time() - $startTime) < $maxWait) {
+                $statusRes = Http::timeout(120)->get($hfUrl . '/' . $eventId);
                 
-                if ($pollResponse->successful()) {
-                    $pollStatus = $pollResponse->json();
+                if ($statusRes->successful()) {
+                    $body = $statusRes->body();
                     
-                    if ($pollStatus['status'] === 'succeeded') {
-                        // The output is an array of image URLs (or a single URL depending on model)
-                        $resultUrl = is_array($pollStatus['output']) ? $pollStatus['output'][0] : $pollStatus['output'];
-                        break;
-                    } elseif ($pollStatus['status'] === 'failed') {
-                        $errorMsg = $pollStatus['error'] ?? 'Unknown error';
-                        Log::channel('vton')->error('Replicate Model Failed', ['error' => $errorMsg]);
-                        
-                        // Xử lý lỗi đặc biệt: AI không tìm thấy người
-                        if (stripos(json_encode($errorMsg), 'No human detected') !== false || stripos(json_encode($errorMsg), 'human') !== false) {
-                            return response()->json([
-                                'success' => false,
-                                'error_code' => 'NO_HUMAN_DETECTED',
-                                'message' => 'Hệ thống AI không nhận diện được người trong ảnh. Vui lòng xem hướng dẫn chụp ảnh mẫu bên dưới và thử lại.'
-                            ], 422);
+                    // Gradio response format for finished event:
+                    // data: [{"url": "...", ...}]
+                    // event: complete
+                    if (Str::contains($body, 'event: complete') || Str::contains($body, '"url"')) {
+                        // Extract URL using regex for simplicity in this stream format
+                        if (preg_match('/"url":\s*"([^"]+)"/', $body, $matches)) {
+                            $resultUrl = $matches[1];
+                            // If it's a relative URL from HF, prepend the space URL
+                            if (Str::startsWith($resultUrl, '/')) {
+                                $resultUrl = 'https://levihsu-ootdiffusion.hf.space' . $resultUrl;
+                            }
+                            break;
                         }
-
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'AI xử lý thất bại: ' . $errorMsg
-                        ], 500);
+                    }
+                    
+                    if (Str::contains($body, 'event: error') || Str::contains($body, '"error"')) {
+                        break;
                     }
                 }
-                $attempt++;
+                sleep(2);
             }
 
             if ($resultUrl) {
+                // Cache the result for 7 days
+                Cache::put($cacheKey, $resultUrl, now()->addDays(7));
+
                 return response()->json([
                     'success' => true,
                     'image_url' => $resultUrl,
@@ -226,27 +138,109 @@ class VtonController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Hệ thống AI xử lý quá thời gian (Timeout). Hãy thử lại.'
-            ], 408);
+                'message' => 'Hệ thống AI xử lý quá lâu hoặc gặp lỗi. Hãy thử lại sau.'
+            ], 504);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            $firstError = collect($e->errors())->flatten()->first();
-            return response()->json([
-                'success' => false,
-                'message' => $firstError
-            ], 422);
-        } catch (ConnectionException $e) {
-            Log::channel('vton')->error('VTON API Timeout/Connection Error', ['message' => $e->getMessage()]);
-            return response()->json([
-                'success' => false,
-                'message' => 'Hệ thống đang bận, vui lòng thử lại sau ít phút.'
-            ], 504); // 504 Gateway Timeout
         } catch (\Exception $e) {
-            Log::error('VTON Controller Error: ' . $e->getMessage());
+            Log::error('VTON HF Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Đã xảy ra lỗi hệ thống: ' . $e->getMessage()
+                'message' => 'Lỗi hệ thống: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    private function getHumanData(Request $request, Product $product)
+    {
+        // Case 1: User uploaded image
+        if ($request->hasFile('user_image')) {
+            $userImageFile = $request->file('user_image');
+            $imageData = file_get_contents($userImageFile->getRealPath());
+            
+            // Basic rotation correction (same as original logic)
+            $imageResource = @imagecreatefromstring($imageData);
+            if ($imageResource !== false) {
+                $isRotated = false;
+                if (in_array(strtolower($userImageFile->getClientOriginalExtension()), ['jpg', 'jpeg']) && function_exists('exif_read_data')) {
+                    $exif = @exif_read_data($userImageFile->getRealPath());
+                    if (!empty($exif['Orientation'])) {
+                        switch ($exif['Orientation']) {
+                            case 3: $imageResource = imagerotate($imageResource, 180, 0); $isRotated = true; break;
+                            case 6: $imageResource = imagerotate($imageResource, -90, 0); $isRotated = true; break;
+                            case 8: $imageResource = imagerotate($imageResource, 90, 0); $isRotated = true; break;
+                        }
+                    }
+                }
+                
+                if ($isRotated) {
+                    ob_start();
+                    imagejpeg($imageResource, null, 90);
+                    $imageData = ob_get_contents();
+                    ob_end_clean();
+                }
+                imagedestroy($imageResource);
+            }
+
+            return [
+                'success' => true,
+                'base64' => 'data:' . $userImageFile->getMimeType() . ';base64,' . base64_encode($imageData),
+                'cache_key' => 'user_upload_' . md5($imageData)
+            ];
+        }
+
+        // Case 2: Specific Model requested
+        $modelId = $request->vton_model_id ?: $product->vton_model_id;
+        $model = null;
+
+        if ($modelId) {
+            $model = VtonModel::find($modelId);
+        }
+
+        // Case 3: Fallback to Default Model based on product/category
+        if (!$model) {
+            // Very basic gender detection based on category name or parent category
+            $gender = 'female'; // Default to female as it's most common for VTON
+            $categoryName = strtolower($product->category->name ?? '');
+            if (Str::contains($categoryName, ['nam', 'man', 'men'])) $gender = 'male';
+            elseif (Str::contains($categoryName, ['bé', 'kid', 'child'])) $gender = 'kid';
+
+            $model = VtonModel::where('gender', $gender)->where('is_default', true)->first();
+            
+            // Absoulte fallback to any default or any model
+            if (!$model) $model = VtonModel::where('is_default', true)->first();
+            if (!$model) $model = VtonModel::first();
+        }
+
+        if ($model && $model->image) {
+            $path = storage_path('app/public/' . $model->image);
+            if (file_exists($path)) {
+                return [
+                    'success' => true,
+                    'base64' => 'data:' . mime_content_type($path) . ';base64,' . base64_encode(file_get_contents($path)),
+                    'cache_key' => 'model_' . $model->id
+                ];
+            }
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Vui lòng tải ảnh của bạn lên hoặc chọn người mẫu để thử đồ.'
+        ];
+    }
+
+    private function mapCategory(Product $product)
+    {
+        $catName = strtolower($product->category->name ?? '');
+        
+        if (Str::contains($catName, ['quần', 'pant', 'trouser', 'jean', 'short', 'skirt', 'chân váy'])) {
+            return 'Lower-body';
+        }
+        
+        if (Str::contains($catName, ['váy', 'đầm', 'dress', 'jumpsuit'])) {
+            return 'Dress';
+        }
+        
+        // Default to Upper-body
+        return 'Upper-body';
     }
 }
