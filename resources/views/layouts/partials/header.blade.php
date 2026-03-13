@@ -260,7 +260,6 @@
                                                     <li><a href="{{ route('account.index') }}#dashboard">{{ __('messages.dashboard') }}</a></li>
                                                     <!-- <li><a href="{{ route('order-tracking.index') }}">{{ __('messages.track_order') }}</a></li> -->
                                                     <li><a href="{{ route('login') }}">{{ __('messages.login') }}</a></li>
-                                                    <!-- <li><a href="{{ route('logout') }}">{{ __('messages.logout') }}</a></li> -->
                                                 </ul>
                                             @else
                                                 <a href="#" class="user-account-link" style="display: flex; align-items: center; gap: 8px;">
