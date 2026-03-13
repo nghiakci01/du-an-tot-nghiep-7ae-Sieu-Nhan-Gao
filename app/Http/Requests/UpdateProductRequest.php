@@ -129,6 +129,7 @@ class UpdateProductRequest extends FormRequest
             'description' => 'Mô tả',
             'image' => 'Hình ảnh chính',
             'gallery_images' => 'Ảnh bộ sưu tập',
+            'vton_model_id' => 'Người mẫu AI (VTON)',
             'variants' => 'Biến thể',
             'variants.*.size_id' => 'Kích thước',
             'variants.*.color_id' => 'Màu sắc',
@@ -142,7 +143,7 @@ class UpdateProductRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'sale_price.lt' => 'Giá khuyến mãi phải nhỏ hơn giá gốc.',
+            'sale_price.lt' => 'Giá khuyến mãi không được lớn hơn giá gốc.',
         ];
     }
 }

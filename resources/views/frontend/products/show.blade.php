@@ -243,6 +243,7 @@
             <div class="row">
                 <div class="col-lg-5 col-md-5">
                     <div class="product-details-tab" style="position: relative;">
+                        @if($product->vton_model_id)
                         {{-- Smart AI Mirror Widget --}}
                         <div id="smart-ai-mirror" onclick="$('#aiTryOnModal').modal('show')">
                             <div class="mirror-header">AI Smart Mirror</div>
@@ -258,6 +259,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         <div id="img-1" class="zoomWrapper single-zoom">
                             <a href="#">
@@ -289,6 +291,7 @@
                                 @endforeach
                             </ul>
                         </div>
+                        @if($product->vton_model_id)
                         <!-- AI Try On Button -->
                         <div class="mt-4 mb-3 text-center">
                             <button type="button" class="btn w-100 py-3 d-flex align-items-center justify-content-center" 
@@ -299,6 +302,7 @@
                                 <i class="fa fa-magic mr-2" style="font-size: 20px;"></i> ✨ {{ __('messages.ai_try_on') === 'messages.ai_try_on' ? 'Thử Đồ AI' : __('messages.ai_try_on') }}
                             </button>
                         </div>
+                        @endif
 
                     </div>
                 </div>
@@ -987,186 +991,6 @@
         $(document).ready(function() {
             
             
-            // --- AI Try On Logic ---
-            const uploadBtn = document.getElementById('uploadBtn');
-            const fileInput = document.getElementById('userImageUpload');
-            const imgPreview = document.getElementById('userImagePreview');
-            const placeholder = document.getElementById('uploadPlaceholder');
-            const btnChange = document.getElementById('btnChangeImage');
-            const btnRunAI = document.getElementById('btnRunAI');
-
-            const aiWaitingText = document.getElementById('aiWaitingText');
-            const aiLoading = document.getElementById('aiLoading');
-            const aiSuccessResult = document.getElementById('aiSuccessResult');
-            const resultBaseImage = document.getElementById('resultBaseImage');
-            const btnDownloadResult = document.getElementById('btnDownloadResult');
-            const aiNoHumanGuide = document.getElementById('aiNoHumanGuide');
-            
-            const aiProgressBar = document.getElementById('aiProgressBar');
-            const aiProgressText = document.getElementById('aiProgressText');
-            let progressInterval;
-
-            if (uploadBtn) {
-                // Trigger file input when clicking the upload area
-                uploadBtn.addEventListener('click', function(e) {
-                    if (e.target !== fileInput && e.target !== btnChange && e.target.parentElement !==
-                        btnChange) {
-                        fileInput.click();
-                    }
-                });
-
-                btnChange.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    fileInput.click();
-                });
-
-                // Handle file selection
-                fileInput.addEventListener('change', function() {
-                    const file = this.files[0];
-                    if (file) {
-                        // Validate file size and type
-                        if (file.size > 5 * 1024 * 1024) {
-                            Swal.fire({ icon: 'error', title: 'Ảnh quá lớn', text: 'Vui lòng chọn ảnh < 5MB' });
-                            return;
-                        }
-                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                        if (!allowedTypes.includes(file.type)) {
-                            Swal.fire({ icon: 'error', title: 'Định dạng sai', text: 'Chỉ chấp nhận file JPG, PNG' });
-                            return;
-                        }
-
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const img = new Image();
-                            img.src = e.target.result;
-                            img.onload = function() {
-                                // Validate resolution directly
-                                if (img.width < 300 || img.height < 400) {
-                                    Swal.fire({
-                                        icon: 'warning',
-                                        title: 'Kích thước ảnh nhỏ',
-                                        text: 'Chất lượng ảnh thấp có thể khiến hình ảnh AI tạo ra bị mờ hoặc bị lỗi khuôn mặt.'
-                                    });
-                                }
-
-                                imgPreview.src = e.target.result;
-                                placeholder.style.display = 'none';
-                                imgPreview.style.display = 'block';
-                                btnChange.style.display = 'block';
-
-                                // Enable run button
-                                btnRunAI.disabled = false;
-                                btnRunAI.classList.remove('btn-dark');
-                                btnRunAI.classList.add('btn-primary');
-
-                                // Reset AI area
-                                aiWaitingText.style.display = 'block';
-                                aiLoading.style.display = 'none';
-                                aiSuccessResult.style.display = 'none';
-                                aiNoHumanGuide.style.display = 'none';
-                                btnDownloadResult.style.display = 'none';
-                                btnRunAI.style.display = 'inline-block';
-                            };
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-
-                function resetProgress() {
-                    clearInterval(progressInterval);
-                    if(aiProgressBar) aiProgressBar.style.width = '0%';
-                }
-
-                function simulateProgress() {
-                    let progress = 0;
-                    if(aiProgressBar) aiProgressBar.style.width = '0%';
-                    aiProgressText.innerText = "Đang tải ảnh của bạn lên server (10%)...";
-                    
-                    progressInterval = setInterval(() => {
-                        progress += Math.random() * 5;
-                        if (progress > 95) progress = 95; // Capping at 95% until complete
-                        
-                        if(aiProgressBar) aiProgressBar.style.width = progress + '%';
-                        
-                        if (progress > 30 && progress < 60) {
-                            aiProgressText.innerText = "Đang gửi ảnh sang máy chủ HuggingFace mô hình Kolors...";
-                        } else if (progress >= 60 && progress < 85) {
-                            aiProgressText.innerText = "AI đang phần tích kết cấu trang phục và tư thế người...";
-                        } else if (progress >= 85) {
-                            aiProgressText.innerText = "Đang áp dụng chất liệu lên da và dựng ảnh (sắp xong)...";
-                        }
-                    }, 800);
-                }
-
-                // Handle Run AI
-                btnRunAI.addEventListener('click', function() {
-                    if (!fileInput.files[0]) return;
-
-                    // Start loading UI
-                    aiWaitingText.style.display = 'none';
-                    aiSuccessResult.style.display = 'none';
-                    aiNoHumanGuide.style.display = 'none';
-                    aiLoading.style.display = 'block';
-                    btnRunAI.disabled = true;
-                    btnRunAI.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> Đang xử lý...';
-
-                    simulateProgress();
-
-                    const formData = new FormData();
-                    formData.append('user_image', fileInput.files[0]);
-                    formData.append('product_id', '{{ $product->id }}');
-
-                    $.ajax({
-                        url: '/api/vton',
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            resetProgress();
-                            
-                            if (response.success && response.image_url) {
-                                aiLoading.style.display = 'none';
-                                resultBaseImage.src = response.image_url;
-                                aiSuccessResult.style.display = 'block';
-                                
-                                btnRunAI.style.display = 'none';
-                                btnDownloadResult.href = response.image_url;
-                                btnDownloadResult.style.display = 'inline-block';
-                            } else {
-                                handleVtonError(response);
-                            }
-                        },
-                        error: function(xhr) {
-                            resetProgress();
-                            const response = xhr.responseJSON || {};
-                            handleVtonError(response);
-                        }
-                    });
-                });
-
-                function handleVtonError(response) {
-                    aiLoading.style.display = 'none';
-                    aiSuccessResult.style.display = 'none';
-                    btnRunAI.disabled = false;
-                    btnRunAI.innerHTML = '<i class="fa fa-gears mr-2"></i> Bắt đầu thử đồ';
-                    btnRunAI.style.display = 'inline-block';
-
-                    if (response.error_code === 'NO_HUMAN_DETECTED') {
-                        aiNoHumanGuide.style.display = 'block';
-                    } else {
-                        aiWaitingText.style.display = 'block';
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Thử đồ thất bại',
-                            text: response.message || 'Đã xảy ra lỗi kết nối. Vui lòng thử lại sau.'
-                        });
-                    }
-                }
-            }
 
             // Star hover - show likert label
             $('.star-rating label').on('mouseenter', function() {

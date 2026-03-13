@@ -22,6 +22,17 @@
 
 <div class="row">
     <div class="col-sm-12">
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <strong>Lỗi nhập liệu:</strong>
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
@@ -135,15 +146,6 @@
                 <button type="button" class="btn btn-success btn-sm" id="add-variant-btn"><i class="feather icon-plus"></i> Thêm Biến thể</button>
             </div>
             <div class="card-body">
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
 
                 <div class="table-responsive">
                     <table class="table table-bordered" id="variants-table">
