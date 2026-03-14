@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Str;
 
+use App\Models\VtonHistory;
+use Illuminate\Support\Facades\File;
+
 class VtonController extends Controller
 {
     /**
@@ -126,12 +129,40 @@ class VtonController extends Controller
             }
 
             if ($resultUrl) {
+                // 7. Save Result Locally for History/Gallery
+                $resultFilename = 'vton_res_' . Str::random(10) . '_' . time() . '.jpg';
+                $resultFolder = 'vton/results';
+                $resultPath = $resultFolder . '/' . $resultFilename;
+                
+                try {
+                    $imageContent = file_get_contents($resultUrl);
+                    if ($imageContent) {
+                        Storage::disk('public')->put($resultPath, $imageContent);
+                        $finalImageUrl = asset('storage/' . $resultPath);
+                        
+                        // Save to History
+                        VtonHistory::create([
+                            'user_id' => auth()->id(),
+                            'product_id' => $product->id,
+                            'vton_model_id' => $request->vton_model_id ?: $product->vton_model_id,
+                            'user_image' => $humanData['saved_path'] ?? null,
+                            'result_image' => $resultPath,
+                            'session_id' => session()->getId(),
+                        ]);
+                    } else {
+                        $finalImageUrl = $resultUrl; // Fallback to HF URL if download fails
+                    }
+                } catch (\Exception $saveEx) {
+                    Log::error('VTON Save Result Error: ' . $saveEx->getMessage());
+                    $finalImageUrl = $resultUrl;
+                }
+
                 // Cache the result for 7 days
-                Cache::put($cacheKey, $resultUrl, now()->addDays(7));
+                Cache::put($cacheKey, $finalImageUrl, now()->addDays(7));
 
                 return response()->json([
                     'success' => true,
-                    'image_url' => $resultUrl,
+                    'image_url' => $finalImageUrl,
                     'message' => 'Thử đồ thành công!'
                 ]);
             }
@@ -181,10 +212,17 @@ class VtonController extends Controller
                 imagedestroy($imageResource);
             }
 
+            // Save user image locally if it's new
+            $userImageFilename = 'vton_user_' . Str::random(10) . '_' . time() . '.jpg';
+            $userImageFolder = 'vton/uploads';
+            $userImagePath = $userImageFolder . '/' . $userImageFilename;
+            Storage::disk('public')->put($userImagePath, $imageData);
+
             return [
                 'success' => true,
                 'base64' => 'data:' . $userImageFile->getMimeType() . ';base64,' . base64_encode($imageData),
-                'cache_key' => 'user_upload_' . md5($imageData)
+                'cache_key' => 'user_upload_' . md5($imageData),
+                'saved_path' => $userImagePath
             ];
         }
 

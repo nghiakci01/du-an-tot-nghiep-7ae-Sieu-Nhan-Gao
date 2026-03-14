@@ -78,6 +78,8 @@ Route::get('/api/chat/messages', [App\Http\Controllers\Api\ChatController::class
 
 // Virtual Try-On API
 Route::post('/api/vton', [App\Http\Controllers\Frontend\VtonController::class, 'tryOn'])->name('api.vton.tryOn');
+Route::get('/vton-history', [App\Http\Controllers\Frontend\VtonHistoryController::class, 'index'])->name('vton.history');
+Route::delete('/vton-history/{id}', [App\Http\Controllers\Frontend\VtonHistoryController::class, 'destroy'])->name('vton.history.destroy');
 
 // Admin & Staff Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {

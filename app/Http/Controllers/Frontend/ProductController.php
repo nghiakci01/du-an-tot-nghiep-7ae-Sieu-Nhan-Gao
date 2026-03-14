@@ -82,6 +82,16 @@ class ProductController extends Controller
             });
         }
 
+        // Filter by VTON Capability
+        if ($request->has('vton')) {
+            $query->where(function ($q) {
+                $q->whereNotNull('vton_model_id')
+                    ->orWhereHas('category', function ($catQ) {
+                        $catQ->whereNotNull('vton_model_id');
+                    });
+            });
+        }
+
         // Sorting
         if ($request->has('sort')) {
             switch ($request->sort) {

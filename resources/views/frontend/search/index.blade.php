@@ -45,9 +45,23 @@
                         </div>
                         @endif
 
-                        <div class="shop_toolbar_wrapper mb-4">
+                        <div class="shop_toolbar_wrapper mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <div class="page_amount">
                                 <p>Hiển thị {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} trong tổng số {{ $products->total() }} kết quả</p>
+                            </div>
+                            
+                            <div class="search_filter_vton">
+                                @php
+                                    $vtonSearchParams = request()->all();
+                                    if (request('vton')) {
+                                        unset($vtonSearchParams['vton']);
+                                    } else {
+                                        $vtonSearchParams['vton'] = 1;
+                                    }
+                                @endphp
+                                <a href="{{ route('product.search', $vtonSearchParams) }}" class="btn btn-outline-primary {{ request('vton') ? 'active' : '' }}" style="border-radius: 30px; padding: 6px 20px; font-size: 14px; {{ request('vton') ? 'background-color: #ef233c; border-color: #ef233c; color: #fff;' : 'color: #ef233c; border-color: #ef233c;' }}">
+                                    <i class="fa fa-magic mr-1"></i> {{ __('messages.vton_products_only') }}
+                                </a>
                             </div>
                         </div>
                         <!--shop toolbar end-->
