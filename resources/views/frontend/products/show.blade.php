@@ -369,7 +369,7 @@
                         @if($effectiveVtonModel)
                         <!-- AI Try On Button -->
                         <div class="mt-4 mb-3 text-center">
-                            <button type="button" class="btn w-100 py-3 d-flex align-items-center justify-content-center" 
+                            <button type="button" id="btn-open-vton-modal" class="btn w-100 py-3 d-flex align-items-center justify-content-center" 
                                 style="background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); color: white; font-weight: bold; border-radius: 8px; border: none; box-shadow: 0 4px 15px rgba(253, 29, 29, 0.4); transition: transform 0.2s; font-size: 16px;" 
                                 data-bs-toggle="modal" data-bs-target="#aiTryOnModal" data-toggle="modal" data-target="#aiTryOnModal"
                                 onmouseover="this.style.transform='scale(1.02)'" 
@@ -774,7 +774,8 @@
                                 <div class="product_info_content">
                                     <p>{{ __('messages.customer_reviews_for') }} {{ $product->name }}</p>
                                 </div>
-                                @forelse($product->reviews as $review)
+                                @if(count($product->reviews) > 0)
+                                    @foreach($product->reviews as $review)
                                     <div class="product_info_inner">
                                         <div class="product_ratting mb-10">
                                             <ul>
@@ -792,14 +793,15 @@
                                         </div>
                                     </div>
                                     <hr>
-                                @empty
+                                    @endforeach
+                                @else
                                     <div class="alert alert-light text-center py-4"
                                         style="border: 1px dashed #ddd; border-radius: 8px;">
                                         <i class="fa fa-commenting-o mb-2"
                                             style="font-size: 24px; color: #ccc; display: block;"></i>
                                         <span class="text-muted">{{ __('messages.no_reviews_yet') }}</span>
                                     </div>
-                                @endforelse
+                                @endif
                                 <div class="product_review_form">
                                     @if (session('success'))
                                         <div class="alert alert-success">{{ session('success') }}</div>

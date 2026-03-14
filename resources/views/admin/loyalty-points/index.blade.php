@@ -41,7 +41,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($points as $item)
+                                @if(count($points) > 0)
+                                    @foreach($points as $item)
                                     <tr>
                                         <td>{{ $item->id }}</td>
                                         <td>
@@ -65,11 +66,12 @@
                                         </td>
                                         <td>{{ $item->created_at->format('d/m/Y H:i') }}</td>
                                     </tr>
-                                @empty
+                                    @endforeach
+                                @else
                                     <tr>
                                         <td colspan="6" class="text-center">Chưa có dữ liệu tích điểm.</td>
                                     </tr>
-                                @endforelse
+                                @endif
                             </tbody>
                         </table>
                     </div>

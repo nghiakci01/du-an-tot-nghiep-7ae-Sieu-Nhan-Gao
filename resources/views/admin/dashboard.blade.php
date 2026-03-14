@@ -277,7 +277,8 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @forelse($vtonStats['top_vton_products'] as $product)
+                  @if(count($vtonStats['top_vton_products']) > 0)
+                    @foreach($vtonStats['top_vton_products'] as $product)
                     <tr>
                       <td>
                         <div class="d-flex align-items-center">
@@ -292,11 +293,12 @@
                         <span class="badge bg-light-info text-info fw-bold px-3 py-2">{{ number_format($product->try_on_count) }}</span>
                       </td>
                     </tr>
-                  @empty
+                    @endforeach
+                  @else
                     <tr>
                       <td colspan="2" class="text-center py-4 text-muted">Chưa có dữ liệu thử đồ</td>
                     </tr>
-                  @endforelse
+                  @endif
                 </tbody>
               </table>
             </div>
@@ -377,7 +379,8 @@
                 </tr>
               </thead>
               <tbody>
-                @forelse($recentOrders as $order)
+                @if(count($recentOrders) > 0)
+                  @foreach($recentOrders as $order)
                   <tr>
                     <td>#{{ $order->id }}</td>
                     <td>
@@ -401,11 +404,12 @@
                       </a>
                     </td>
                   </tr>
-                @empty
+                  @endforeach
+                @else
                   <tr>
                     <td colspan="6" class="text-center">Chưa có đơn hàng nào</td>
                   </tr>
-                @endforelse
+                @endif
               </tbody>
             </table>
           </div>

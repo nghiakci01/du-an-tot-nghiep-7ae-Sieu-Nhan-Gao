@@ -87,7 +87,7 @@
                                             $newValues = $auditLog->new_values ?? [];
                                             $allKeys = array_unique(array_merge(array_keys($oldValues), array_keys($newValues)));
                                         @endphp
-                                        @foreach($allKeys as $key)
+                                        @foreach($allKeys as $key) @php /** @var string $key */ @endphp
                                             <tr>
                                                 <td><strong>{{ $key }}</strong></td>
                                                 <td class="text-danger">{{ is_array($oldValues[$key] ?? '') ? json_encode($oldValues[$key]) : ($oldValues[$key] ?? 'N/A') }}</td>

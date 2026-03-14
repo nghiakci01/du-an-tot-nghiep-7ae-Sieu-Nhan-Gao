@@ -373,7 +373,8 @@
             </tr>
           </thead>
           <tbody>
-            @forelse($orders as $order)
+            @if(count($orders) > 0)
+              @foreach($orders as $order)
             <tr>
               <td style="padding-left:28px;" class="order-id">
                 <a href="{{ route('account.orders.show', $order->id) }}" class="text-decoration-none text-dark">
@@ -397,14 +398,15 @@
                 </div>
               </td>
             </tr>
-            @empty
+            @endforeach
+            @else
             <tr>
               <td colspan="5" class="text-center py-5 text-muted">
                 <i class="bi bi-bag-x" style="font-size:2rem;"></i>
                 <p class="mt-2 mb-0">Bạn chưa có đơn hàng nào.</p>
               </td>
             </tr>
-            @endforelse
+            @endif
           </tbody>
         </table>
         @if(method_exists($orders, 'links'))

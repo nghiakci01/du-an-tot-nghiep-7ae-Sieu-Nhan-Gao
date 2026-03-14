@@ -30,7 +30,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($banks as $index => $bank)
+                                @if(count($banks) > 0)
+                                    @foreach($banks as $index => $bank)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
                                         <td>{{ $bank->bank_name }}</td>
@@ -58,11 +59,12 @@
                                             </form>
                                         </td>
                                     </tr>
-                                @empty
+                                    @endforeach
+                                @else
                                     <tr>
                                         <td colspan="8">Chưa có ngân hàng nào.</td>
                                     </tr>
-                                @endforelse
+                                @endif
                             </tbody>
                         </table>
                     </div>

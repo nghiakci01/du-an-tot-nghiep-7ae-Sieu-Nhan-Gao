@@ -64,7 +64,7 @@ class VtonController extends Controller
             
             // 4. Create History Record (Pending)
             $history = VtonHistory::create([
-                'user_id' => Auth::id(),
+                'user_id' => auth()->user()->id,
                 'product_id' => $product->id,
                 'vton_model_id' => $request->vton_model_id,
                 'user_image' => $humanData['relative_path'],

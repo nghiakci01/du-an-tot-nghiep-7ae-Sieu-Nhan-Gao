@@ -38,7 +38,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($sizes as $size)
+                            @if(count($sizes) > 0)
+                                @foreach($sizes as $size) @php /** @var \App\Models\Size $size */ @endphp
                             <tr>
                                 <td>{{ $size->id }}</td>
                                 <td>{{ $size->name }}</td>
@@ -61,11 +62,12 @@
                                     </form>
                                 </td>
                             </tr>
-                            @empty
+                            @endforeach
+                            @else
                             <tr>
                                 <td colspan="5" class="text-center">No sizes found.</td>
                             </tr>
-                            @endforelse
+                            @endif
                         </tbody>
                     </table>
 

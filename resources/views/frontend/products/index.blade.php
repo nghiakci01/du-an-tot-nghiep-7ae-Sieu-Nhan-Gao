@@ -182,18 +182,20 @@
                         <!--shop toolbar end-->
                         
                         <div class="row shop_wrapper">
-                            @forelse($products as $product)
+                            @if(count($products) > 0)
+                                @foreach($products as $product)
                                 @include('frontend.partials.product-grid-item', [
                                     'product' => $product,
                                     'columnClass' => 'col-lg-4 col-md-4 col-12',
                                     'contentClass' => 'grid_content',
                                     'showListContent' => true
                                 ])
-                            @empty
+                                @endforeach
+                            @else
                                 <div class="col-12 text-center">
                                     <p>No products found.</p>
                                 </div>
-                            @endforelse
+                            @endif
                         </div>
 
                         <div class="shop_toolbar t_bottom">

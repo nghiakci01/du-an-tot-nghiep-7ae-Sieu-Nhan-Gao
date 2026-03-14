@@ -72,14 +72,16 @@
                         <!--shop toolbar end-->
                         
                         <div class="row shop_wrapper">
-                            @forelse($products as $product)
+                            @if(count($products) > 0)
+                                @foreach($products as $product)
                                 @include('frontend.partials.product-grid-item', [
                                     'product' => $product,
                                     'columnClass' => 'col-lg-3 col-md-4 col-sm-6 col-12',
                                     'contentClass' => 'grid_content',
                                     'showListContent' => false
                                 ])
-                            @empty
+                                @endforeach
+                            @else
                                 <div class="col-12">
                                     <div class="text-center py-5">
                                         <div class="mb-4">
@@ -98,7 +100,7 @@
                                         </a>
                                     </div>
                                 </div>
-                            @endforelse
+                            @endif
                         </div>
 
                         @if($products->hasPages())

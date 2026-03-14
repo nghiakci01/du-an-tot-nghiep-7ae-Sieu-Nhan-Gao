@@ -28,7 +28,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($banners as $banner)
+                                    @if(count($banners) > 0)
+                                        @foreach($banners as $banner)
                                         <tr>
                                             <td><span class="badge bg-light-primary text-primary">{{ $banner->sort_order }}</span></td>
                                             <td>
@@ -80,14 +81,15 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    @empty
+                                        @endforeach
+                                    @else
                                         <tr>
                                             <td colspan="6" class="text-center py-4 text-muted">
                                                 <i class="ti ti-info-circle fs-2"></i><br>
                                                 Chưa có banner nào được tạo.
                                             </td>
                                         </tr>
-                                    @endforelse
+                                    @endif
                                 </tbody>
                             </table>
                         </div>

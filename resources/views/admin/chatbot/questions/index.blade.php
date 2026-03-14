@@ -44,7 +44,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($questions as $question)
+                            @if(count($questions) > 0)
+                                @foreach($questions as $question)
                             <tr>
                                 <td>{{ $question->order }}</td>
                                 <td>{{ $question->question }}</td>
@@ -71,11 +72,12 @@
                                     </form>
                                 </td>
                             </tr>
-                            @empty
+                            @endforeach
+                            @else
                             <tr>
                                 <td colspan="5" class="text-center">Chưa có câu hỏi gợi ý nào.</td>
                             </tr>
-                            @endforelse
+                            @endif
                         </tbody>
                     </table>
                 </div>

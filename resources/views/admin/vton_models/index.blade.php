@@ -47,7 +47,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($models as $model)
+                            @if(count($models) > 0)
+                                @foreach($models as $model) @php /** @var \App\Models\VtonModel $model */ @endphp
                             <tr>
                                 <td>
                                     <img src="{{ asset('storage/' . $model->image) }}" alt="{{ $model->name }}" style="width: 60px; height: 80px; object-fit: cover; border-radius: 4px;">
@@ -79,11 +80,12 @@
                                     </form>
                                 </td>
                             </tr>
-                            @empty
+                            @endforeach
+                            @else
                             <tr>
                                 <td colspan="6" class="text-center">Chưa có người mẫu nào được thêm.</td>
                             </tr>
-                            @endforelse
+                            @endif
                         </tbody>
                     </table>
                 </div>

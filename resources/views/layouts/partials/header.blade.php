@@ -77,7 +77,7 @@
                 <form action="{{ route('search.index') }}" method="GET">
                     <select class="select_option" name="category">
                         <option selected value="">{{ __('messages.all_products') }}</option>
-                        @foreach($categories as $category)
+                        @foreach($categories as $category) @php /** @var \App\Models\Category $category */ @endphp
                             <option value="{{ $category->slug }}">{{ $category->name }}</option>
                         @endforeach
                     </select>
@@ -209,7 +209,7 @@
                                                 <ul class="mega_menu custom-shop-mega">
                                                     <li class="custom-shop-mega-left">
                                                         <ul>
-                                                            @foreach($categories as $category)
+                                                            @foreach($categories as $category) @php /** @var \App\Models\Category $category */ @endphp
                                                                 <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
                                                             @endforeach
                                                         </ul>
@@ -218,7 +218,7 @@
                                                         @php
                                                             $megaMenuProducts = \App\Models\Product::where('is_active', true)->latest()->take(3)->get();
                                                         @endphp
-                                                        @foreach($megaMenuProducts as $product)
+                                                        @foreach($megaMenuProducts as $product) @php /** @var \App\Models\Product $product */ @endphp
                                                         <div class="custom-shop-product">
                                                             <a href="{{ route('product.detail', $product->slug) }}">
                                                                 <div class="custom-shop-product-img">
@@ -351,7 +351,7 @@
                                                 <ul class="mega_menu custom-shop-mega">
                                                     <li class="custom-shop-mega-left">
                                                         <ul>
-                                                            @foreach($categories as $category)
+                                                            @foreach($categories as $category) @php /** @var \App\Models\Category $category */ @endphp
                                                                 <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
                                                             @endforeach
                                                         </ul>
@@ -360,7 +360,7 @@
                                                         @php
                                                             $megaMenuProducts = \App\Models\Product::where('is_active', true)->latest()->take(3)->get();
                                                         @endphp
-                                                        @foreach($megaMenuProducts as $product)
+                                                        @foreach($megaMenuProducts as $product) @php /** @var \App\Models\Product $product */ @endphp
                                                         <div class="custom-shop-product">
                                                             <a href="{{ route('product.detail', $product->slug) }}">
                                                                 <div class="custom-shop-product-img">

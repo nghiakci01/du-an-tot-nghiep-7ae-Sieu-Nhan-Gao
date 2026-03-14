@@ -53,7 +53,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($reviews as $review)
+                            @if(count($reviews) > 0)
+                                @foreach($reviews as $review) @php /** @var \App\Models\Review $review */ @endphp
                             <tr>
                                 <td>{{ $review->id }}</td>
                                 <td>
@@ -78,7 +79,7 @@
                                     <small>({{ $review->rating }} sao)</small>
                                 </td>
                                 <td class="text-start" style="max-width: 300px;">
-                                    {{ Str::limit($review->comment, 100) }}
+                                    {{ \Illuminate\Support\Str::limit($review->comment, 100) }}
                                 </td>
                                 <td>{{ $review->created_at->format('d/m/Y H:i') }}</td>
                                 <td>
@@ -91,11 +92,12 @@
                                     </form>
                                 </td>
                             </tr>
-                            @empty
+                            @endforeach
+                            @else
                             <tr>
                                 <td colspan="7" class="text-center">Chưa có đánh giá nào.</td>
                             </tr>
-                            @endforelse
+                            @endif
                         </tbody>
                     </table>
                 </div>
