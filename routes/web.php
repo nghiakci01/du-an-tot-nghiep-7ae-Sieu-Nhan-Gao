@@ -89,6 +89,9 @@ Route::get('/api/chat/messages', [App\Http\Controllers\Api\ChatController::class
 
 // Virtual Try-On API
 Route::post('/api/vton', [App\Http\Controllers\Frontend\VtonController::class, 'tryOn'])->name('api.vton.tryOn');
+Route::get('/api/vton/status/{id}', [App\Http\Controllers\Frontend\VtonController::class, 'checkStatus'])->name('api.vton.status');
+Route::get('/vton-history', [App\Http\Controllers\Frontend\VtonHistoryController::class, 'index'])->name('vton.history');
+Route::delete('/vton-history/{id}', [App\Http\Controllers\Frontend\VtonHistoryController::class, 'destroy'])->name('vton.history.destroy');
 
 // Admin & Staff Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
@@ -124,6 +127,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('orders-trigger-auto-cancel', [App\Http\Controllers\Admin\OrderController::class, 'triggerAutoCancel'])->name('orders.trigger-auto-cancel');
         Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
         Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
+        Route::post('vton/generate', [App\Http\Controllers\Admin\VtonAdminController::class, 'generate'])->name('vton.generate');
+        Route::get('vton/status/{id}', [App\Http\Controllers\Admin\VtonAdminController::class, 'status'])->name('vton.status');
 
         // Product Attributes
         Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
@@ -154,6 +159,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             
             // Cài đặt ngân hàng thanh toán (QR Bank Settings)
             Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
+
+            // Virtual Try-On Models management
+            Route::resource('vton-models', App\Http\Controllers\Admin\VtonModelController::class);
         });
 
         // Blog Management (Admin & Staff)

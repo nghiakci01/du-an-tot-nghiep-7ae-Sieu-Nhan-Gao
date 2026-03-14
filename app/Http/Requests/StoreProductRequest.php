@@ -17,14 +17,15 @@ class StoreProductRequest extends FormRequest
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'price' => 'nullable|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0|lt:price',
-            'short_description' => 'nullable|string|max:1000',
-            'description' => 'nullable|string|max:500',
+            'sale_price' => 'nullable|numeric|min:0',
+            'vton_model_id' => 'nullable|exists:vton_models,id',
+            'short_description' => 'nullable|string|max:2000',
+            'description' => 'nullable|string|max:10000',
             'image' => [
                 'nullable',
                 'image',
                 'mimes:jpeg,png,jpg,webp',
-                'max:2048',
+                'max:10240',
                 function ($attribute, $value, $fail) {
                     if ($value instanceof \Illuminate\Http\UploadedFile && $value->isValid()) {
                         $path = $value->getRealPath();
@@ -50,7 +51,7 @@ class StoreProductRequest extends FormRequest
             'gallery_images.*' => [
                 'image',
                 'mimes:jpeg,png,jpg,webp',
-                'max:2048',
+                'max:10240',
                 function ($attribute, $value, $fail) {
                     if ($value instanceof \Illuminate\Http\UploadedFile && $value->isValid()) {
                         $path = $value->getRealPath();
@@ -106,8 +107,8 @@ class StoreProductRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $index = explode('.', $attribute)[1];
                     $price = request()->input("variants.{$index}.price");
-                    if ($price && $value >= $price) {
-                        $fail('Giá khuyến mãi phải nhỏ hơn giá gốc.');
+                    if ($price && $value > $price) {
+                        $fail('Giá khuyến mãi không được lớn hơn giá gốc.');
                     }
                 },
             ],
@@ -127,6 +128,7 @@ class StoreProductRequest extends FormRequest
             'description' => 'Mô tả',
             'image' => 'Hình ảnh chính',
             'gallery_images' => 'Ảnh bộ sưu tập',
+            'vton_model_id' => 'Người mẫu AI (VTON)',
             'variants' => 'Biến thể',
             'variants.*.size_id' => 'Kích thước',
             'variants.*.color_id' => 'Màu sắc',
@@ -140,7 +142,7 @@ class StoreProductRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'sale_price.lt' => 'Giá khuyến mãi phải nhỏ hơn giá gốc.',
+            'sale_price.lt' => 'Giá khuyến mãi không được lớn hơn giá gốc.',
             'variants.*.sku.distinct' => 'Mã SKU của các biến thể không được trùng nhau.',
         ];
     }

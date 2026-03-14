@@ -56,6 +56,10 @@
             <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
                 <form action="{{ route('admin.settings.chatbot.update') }}" method="POST">
                     @csrf
+                    <div id="js-data" 
+                         data-old-rules="{{ json_encode(old('keyword_rules')) }}" 
+                         data-db-rules="{{ json_encode($chatbotSettings['keyword_rules'] ?? '[]') }}"
+                         style="display: none;"></div>
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Cấu hình chung</h5>
@@ -74,7 +78,10 @@
                                 @error('chatbot_mode') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
-                            <div id="ai_provider_section" style="display: {{ old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai' ? 'block' : 'none' }};">
+                            <div id="ai_provider_section" @style([
+                                'display: block' => old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai',
+                                'display: none' => old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') != 'ai'
+                            ])>
                                 <div class="mb-3">
                                     <label class="form-label">Nhà cung cấp AI</label>
                                     <select name="ai_provider" id="ai_provider" class="form-select @error('ai_provider') is-invalid @enderror">
@@ -99,7 +106,10 @@
                                 <small class="text-muted">Sử dụng {hotline} để tự động chèn số điện thoại hỗ trợ.</small>
                             </div>
 
-                            <div id="system_instruction_section" style="display: {{ old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai' ? 'block' : 'none' }};">
+                            <div id="system_instruction_section" @style([
+                                'display: block' => old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai',
+                                'display: none' => old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') != 'ai'
+                            ])>
                                 <div class="mb-3">
                                     <label class="form-label">System Instruction (Chỉ dẫn cho AI)</label>
                                     <textarea name="system_instruction" class="form-control @error('system_instruction') is-invalid @enderror" rows="10">{{ old('system_instruction', $chatbotSettings['system_instruction'] ?? '') }}</textarea>
@@ -167,7 +177,7 @@
                                 </div>
                             </div>
 
-                            <div id="gemini_key_section" class="provider-key-section" style="display: {{ old('ai_provider', $chatbotSettings['ai_provider'] ?? 'gemini') == 'gemini' ? 'block' : 'none' }};">
+                            <div id="gemini_key_section" class="provider-key-section" {!! old('ai_provider', $chatbotSettings['ai_provider'] ?? 'gemini') != 'gemini' ? 'style="display: none;"' : 'style="display: block;"' !!}>
                                 <div class="mb-3">
                                     <label class="form-label">Gemini API Key</label>
                                     <div class="input-group">
@@ -180,7 +190,7 @@
                                 </div>
                             </div>
 
-                            <div id="openai_key_section" class="provider-key-section" style="display: {{ old('ai_provider', $chatbotSettings['ai_provider'] ?? '') == 'openai' ? 'block' : 'none' }};">
+                            <div id="openai_key_section" class="provider-key-section" {!! old('ai_provider', $chatbotSettings['ai_provider'] ?? '') != 'openai' ? 'style="display: none;"' : 'style="display: block;"' !!}>
                                 <div class="mb-3">
                                     <label class="form-label">OpenAI API Key</label>
                                     <div class="input-group">
@@ -225,7 +235,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($questions as $question)
+                                    @if(count($questions) > 0)
+                                        @foreach($questions as $question) @php /** @var \App\Models\ChatbotQuestion $question */ @endphp
                                     <tr>
                                         <td><span class="badge bg-light text-dark border">{{ $question->order }}</span></td>
                                         <td class="fw-bold">{{ $question->question }}</td>
@@ -258,14 +269,15 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    @empty
+                                        @endforeach
+                                    @else
                                     <tr>
                                         <td colspan="5" class="text-center py-4 text-muted">
                                             <i class="ti ti-help-circle fs-2 d-block mb-2"></i>
                                             Chưa có câu hỏi gợi ý nào.
                                         </td>
                                     </tr>
-                                    @endforelse
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -368,12 +380,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const addBtn = document.getElementById('add-keyword-rule');
     const rulesInput = document.getElementById('keyword_rules_input');
     
-    // Load existing rules - Safely pass from PHP to JS
+    // Load existing rules - Safely pass from PHP to JS via data attributes
     let rules = [];
     try {
-        // Ưu tiên lấy từ old() nếu có (khi validation lỗi), sau đó mới lấy từ database
-        const oldRules = @json(old('keyword_rules'));
-        const dbRules = @json($chatbotSettings['keyword_rules'] ?? '[]');
+        const jsData = document.getElementById('js-data');
+        const oldRules = jsData.dataset.oldRules ? JSON.parse(jsData.dataset.oldRules) : null;
+        let dbRulesRaw = jsData.dataset.dbRules;
+        const dbRules = dbRulesRaw ? JSON.parse(dbRulesRaw) : [];
         
         const rawJson = (oldRules !== null && typeof oldRules !== 'undefined') ? oldRules : dbRules;
         rules = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;

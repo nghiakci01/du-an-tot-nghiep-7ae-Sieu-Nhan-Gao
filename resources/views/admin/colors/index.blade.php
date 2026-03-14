@@ -38,7 +38,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($colors as $color)
+                            @if(count($colors) > 0)
+                                @foreach($colors as $color)
                             <tr>
                                 <td>{{ $color->id }}</td>
                                 <td>{{ $color->name }}</td>
@@ -61,11 +62,12 @@
                                     </form>
                                 </td>
                             </tr>
-                            @empty
+                            @endforeach
+                            @else
                             <tr>
                                 <td colspan="7" class="text-center">No colors found.</td>
                             </tr>
-                            @endforelse
+                            @endif
                         </tbody>
                     </table>
 

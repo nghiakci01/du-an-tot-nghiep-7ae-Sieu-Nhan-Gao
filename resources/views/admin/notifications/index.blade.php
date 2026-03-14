@@ -31,7 +31,8 @@
                     </div>
                     <div class="card-body">
                         <div class="list-group list-group-flush">
-                            @forelse($notifications as $notification)
+                            @if(count($notifications) > 0)
+                                @foreach($notifications as $notification)
                                 <a href="{{ route('admin.notifications.markAsRead', $notification->id) }}" 
                                    class="list-group-item list-group-item-action d-flex align-items-center {{ $notification->read_at ? '' : 'bg-light-primary border-start border-primary border-4' }}">
                                     <div class="flex-shrink-0">
@@ -63,12 +64,13 @@
                                         <span class="badge bg-primary rounded-pill">Mới</span>
                                     @endif
                                 </a>
-                            @empty
+                                @endforeach
+                            @else
                                 <div class="text-center py-5">
                                     <i class="ti ti-bell-off f-50 text-muted"></i>
                                     <p class="mt-2 text-muted">Không có thông báo nào</p>
                                 </div>
-                            @endforelse
+                            @endif
                         </div>
                         <div class="mt-3">
                             {{ $notifications->links() }}

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreCategoryRequest;
 use App\Http\Requests\Admin\UpdateCategoryRequest;
 use App\Models\Category;
+use App\Models\VtonModel;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -27,8 +28,8 @@ class CategoryController extends Controller
     public function create()
     {
         $categories = Category::whereNull('parent_id')->get(); // Only allowing 2 levels for simplicity initially, or list all for parent selection
-
-        return view('admin.categories.create', compact('categories'));
+        $vtonModels = VtonModel::all();
+        return view('admin.categories.create', compact('categories', 'vtonModels'));
     }
 
     /**
@@ -51,8 +52,8 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         $categories = Category::where('id', '!=', $category->id)->whereNull('parent_id')->get();
-
-        return view('admin.categories.edit', compact('category', 'categories'));
+        $vtonModels = VtonModel::all();
+        return view('admin.categories.edit', compact('category', 'categories', 'vtonModels'));
     }
 
     /**

@@ -45,22 +45,43 @@
                         </div>
                         @endif
 
-                        <div class="shop_toolbar_wrapper mb-4">
+                        <div class="shop_toolbar_wrapper mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <div class="page_amount">
                                 <p>Hiển thị {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} trong tổng số {{ $products->total() }} kết quả</p>
+                            </div>
+                            
+                            <div class="search_filter_vton">
+                                @php
+                                    $vtonSearchParams = request()->all();
+                                    if (request('vton')) {
+                                        unset($vtonSearchParams['vton']);
+                                    } else {
+                                        $vtonSearchParams['vton'] = 1;
+                                    }
+                                @endphp
+                                <a href="{{ route('product.search', $vtonSearchParams) }}" class="btn btn-outline-primary {{ request('vton') ? 'active' : '' }}" 
+                                   @style([
+                                       'border-radius: 30px; padding: 6px 20px; font-size: 14px;',
+                                       'background-color: #ef233c; border-color: #ef233c; color: #fff;' => request('vton'),
+                                       'color: #ef233c; border-color: #ef233c;' => !request('vton')
+                                   ])>
+                                    <i class="fa fa-magic mr-1"></i> {{ __('messages.vton_products_only') }}
+                                </a>
                             </div>
                         </div>
                         <!--shop toolbar end-->
                         
                         <div class="row shop_wrapper">
-                            @forelse($products as $product)
+                            @if(count($products) > 0)
+                                @foreach($products as $product)
                                 @include('frontend.partials.product-grid-item', [
                                     'product' => $product,
                                     'columnClass' => 'col-lg-3 col-md-4 col-sm-6 col-12',
                                     'contentClass' => 'grid_content',
                                     'showListContent' => false
                                 ])
-                            @empty
+                                @endforeach
+                            @else
                                 <div class="col-12">
                                     <div class="text-center py-5">
                                         <div class="mb-4">
@@ -79,7 +100,7 @@
                                         </a>
                                     </div>
                                 </div>
-                            @endforelse
+                            @endif
                         </div>
 
                         @if($products->hasPages())

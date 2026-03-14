@@ -40,7 +40,8 @@
                 </div>
             </div>
             <div class="row">
-                @forelse($posts as $post)
+                @if(count($posts) > 0)
+                    @foreach($posts as $post)
                 <div class="col-lg-4 col-md-6 mb-4">
                     <article class="single_blog">
                         <figure>
@@ -52,7 +53,7 @@
                                 <div class="articles_date">
                                     <p>{{ $post->created_at->format('M d, Y') }} | <a href="#">{{ $post->category ? $post->category->name : 'Tin tức' }}</a> </p>
                                 </div>
-                                <p class="post_desc">{{ Str::limit(strip_tags(html_entity_decode($post->content)), 120) }}</p>
+                                <p class="post_desc">{{ \Illuminate\Support\Str::limit(strip_tags(html_entity_decode($post->content)), 120) }}</p>
                                 <footer class="btn_more">
                                     <a href="{{ route('news.detail', $post->slug) }}"> {{ __('messages.read_more') }}</a>
                                 </footer>
@@ -60,12 +61,13 @@
                         </figure>
                     </article>
                 </div>
-                @empty
+                @endforeach
+                @else
                     <div class="col-12 text-center py-5">
                         <i class="bi bi-file-earmark-text text-muted" style="font-size: 3rem;"></i>
                         <p class="mt-3 text-muted">Chưa có bài viết nào.</p>
                     </div>
-                @endforelse
+                @endif
             </div>
             
             <div class="row">

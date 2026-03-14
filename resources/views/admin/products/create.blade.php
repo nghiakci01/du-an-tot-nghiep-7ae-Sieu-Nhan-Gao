@@ -22,6 +22,17 @@
 
 <div class="row">
     <div class="col-sm-12">
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <strong>Lỗi nhập liệu:</strong>
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
@@ -51,6 +62,20 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="vton_model_id" class="form-label">Người mẫu AI (VTON)</label>
+                        <select class="form-select @error('vton_model_id') is-invalid @enderror" id="vton_model_id" name="vton_model_id">
+                            <option value="">-- Mặc định theo giới tính --</option>
+                            @foreach($vtonModels as $model)
+                                <option value="{{ $model->id }}" {{ old('vton_model_id') == $model->id ? 'selected' : '' }}>
+                                    {{ $model->name }} ({{ $model->gender == 'female' ? 'Nữ' : ($model->gender == 'male' ? 'Nam' : 'Trẻ em') }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('vton_model_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="image" class="form-label">Hình ảnh</label>
@@ -73,7 +98,7 @@
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="short_description" class="form-label">Mô tả ngắn <small class="text-muted">(Tối đa 1000 ký tự)</small></label>
-                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="short_description" name="short_description" rows="4" maxlength="1000">{{ old('short_description') }}</textarea>
+                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="short_description" name="short_description" rows="4" maxlength="2000">{{ old('short_description') }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('short_description')
@@ -81,13 +106,12 @@
                                 @enderror
                             </div>
                             <small class="text-muted">
-                                <span id="short-char-count">0</span> / 1000 ký tự
+                                <span id="short-char-count">0</span> / 2000 ký tự
                             </small>
                         </div>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="description" class="form-label">Mô tả <small class="text-muted">(Tối đa 500 ký tự)</small></label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="500">{{ old('description') }}</textarea>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="10000">{{ old('description') }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('description')
@@ -95,7 +119,7 @@
                                 @enderror
                             </div>
                             <small class="text-muted">
-                                <span id="char-count">0</span> / 500 ký tự
+                                <span id="char-count">0</span> / 10000 ký tự
                             </small>
                         </div>
                     </div>
@@ -122,15 +146,6 @@
                 <button type="button" class="btn btn-success btn-sm" id="add-variant-btn"><i class="feather icon-plus"></i> Thêm Biến thể</button>
             </div>
             <div class="card-body">
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
 
                 <div class="table-responsive">
                     <table class="table table-bordered" id="variants-table">
@@ -252,7 +267,7 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        let variantIndex = {{ old('variants') ? count(old('variants')) : 1 }};
+        let variantIndex = Number("{{ old('variants') ? count(old('variants')) : 1 }}");
         const tableBody = document.querySelector('#variants-table tbody');
         const addBtn = document.getElementById('add-variant-btn');
 

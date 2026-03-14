@@ -50,7 +50,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($coupons as $coupon)
+                            @if(count($coupons) > 0)
+                                @foreach($coupons as $coupon)
                             <tr>
                                 <td>{{ $coupon->id }}</td>
                                 <td><strong>{{ $coupon->code }}</strong></td>
@@ -107,11 +108,12 @@
                                     </form>
                                 </td>
                             </tr>
-                            @empty
+                            @endforeach
+                            @else
                             <tr>
                                 <td colspan="9" class="text-center">Chưa có mã giảm giá nào.</td>
                             </tr>
-                            @endforelse
+                            @endif
                         </tbody>
                     </table>
                 </div>

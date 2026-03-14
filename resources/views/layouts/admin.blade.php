@@ -83,6 +83,20 @@
   <!-- [ Main Content ] start -->
   <div class="pc-container">
     <div class="pc-content">
+      @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
+          {{ session('success') }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      @endif
+
+      @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
+          {{ session('error') }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      @endif
+
       @yield('content')
     </div>
   </div>
@@ -105,7 +119,7 @@
   <script src="{{ asset('admin-assets') }}/js/plugins/i18nextHttpBackend.min.js"></script> --}}
   <script src="{{ asset('admin-assets') }}/js/icon/custom-font.js"></script>
   <script src="{{ asset('admin-assets') }}/js/script.js"></script>
-  <script src="{{ asset('admin-assets') }}/js/theme.js"></script>
+  <script src="{{ asset('admin-assets') }}/js/theme.js?v=1.0.1"></script>
   {{--
   <script src="{{ asset('admin-assets') }}/js/multi-lang.js"></script> --}}
   <script src="{{ asset('admin-assets') }}/js/plugins/feather.min.js"></script>

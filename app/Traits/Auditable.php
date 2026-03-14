@@ -38,7 +38,7 @@ trait Auditable
         }
 
         AuditLog::create([
-            'user_id' => Auth::id(),
+            'user_id' => auth()->id(),
             'event' => $event,
             'auditable_type' => get_class($this),
             'auditable_id' => $this->id,

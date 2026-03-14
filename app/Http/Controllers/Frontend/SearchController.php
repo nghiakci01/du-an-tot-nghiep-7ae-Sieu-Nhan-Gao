@@ -25,6 +25,14 @@ class SearchController extends Controller
                         $categoryQuery->where('name', 'LIKE', "%{$query}%");
                     });
             })
+            ->when($request->has('vton'), function ($q) {
+                $q->where(function ($vq) {
+                    $vq->whereNotNull('vton_model_id')
+                        ->orWhereHas('category', function ($catQ) {
+                            $catQ->whereNotNull('vton_model_id');
+                        });
+                });
+            })
             ->with(['category', 'images', 'reviews', 'variants'])
             ->orderByRaw('CASE 
                 WHEN name LIKE ? THEN 1 

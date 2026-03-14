@@ -100,7 +100,8 @@
                     </a>
                 </div>
                 <div class="card-body p-0">
-                    @forelse($conversations as $chat)
+                    @if(count($conversations) > 0)
+                        @foreach($conversations as $chat)
                         <div class="chat-item-wrapper border-bottom position-relative">
                             <div class="d-flex align-items-center">
                                 <a href="{{ route('admin.chat.show', $chat->session_id) }}"
@@ -157,14 +158,15 @@
                                 </div>
                             </div>
                         </div>
-                    @empty
+                        @endforeach
+                    @else
                         <div class="p-5 text-center">
                             <div class="mb-3">
                                 <i class="ti ti-message-x text-muted" style="font-size: 3rem;"></i>
                             </div>
                             <h6 class="text-muted">Chưa có hội thoại nào.</h6>
                         </div>
-                    @endforelse
+                    @endif
 
                     <div class="p-4 border-top">
                         {{ $conversations->links() }}

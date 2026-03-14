@@ -221,6 +221,8 @@ return [
     'confirm_remove_cart_item' => 'Are you sure you want to remove this product from the cart?',
     'confirm_clear_cart' => 'Are you sure you want to clear the cart?',
     'ai_try_on' => 'AI Try On',
+    'vton_filter' => 'AI Virtual Try-On',
+    'vton_products_only' => 'AI Try-On Only',
     'ai_try_on_modal_title' => 'AI Try On Experience',
     'ai_try_on_desc' => 'See how this outfit looks on you',
     'upload_photo' => 'Click to upload photo',

@@ -72,7 +72,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($payments as $payment)
+                                @if(count($payments) > 0)
+                                    @foreach($payments as $payment) @php /** @var \App\Models\PaymentHistory $payment */ @endphp
                                     <tr>
                                         <td><a href="{{ route('admin.orders.show', $payment) }}" class="fw-bold text-dark">#{{ $payment->id }}</a></td>
                                         <td>
@@ -113,14 +114,15 @@
                                             </a>
                                         </td>
                                     </tr>
-                                @empty
+                                    @endforeach
+                                @else
                                     <tr>
                                         <td colspan="8" class="text-center py-4">
                                             <i class="ti ti-receipt text-muted" style="font-size: 3rem;"></i>
                                             <p class="mt-2 mb-0">Không có dữ liệu giao dịch nào.</p>
                                         </td>
                                     </tr>
-                                @endforelse
+                                @endif
                             </tbody>
                         </table>
                     </div>

@@ -1,37 +1,45 @@
-/* Search Autocomplete Dropdown Styles */
+/* Search Autocomplete Dropdown Styles - Premium Zara Inspired */
 .search-suggestions-dropdown {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 10px);
     left: 0;
     right: 0;
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-top: none;
-    max-height: 400px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    max-height: 450px;
     overflow-y: auto;
-    z-index: 9999;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10000;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .search-suggestions-dropdown.active {
     display: block;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .search-suggestion-item {
     display: flex;
     align-items: center;
-    padding: 12px 15px;
-    border-bottom: 1px solid #f5f5f5;
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
     text-decoration: none;
-    color: #333;
+    color: #111;
 }
 
 .search-suggestion-item:hover,
 .search-suggestion-item.highlighted {
-    background: #f8f8f8;
+    background: rgba(0, 0, 0, 0.02);
+    padding-left: 25px; /* Subtle slide effect */
 }
 
 .search-suggestion-item:last-child {
@@ -39,11 +47,17 @@
 }
 
 .search-suggestion-image {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 75px; /* Fashion aspect ratio */
     object-fit: cover;
-    margin-right: 12px;
+    margin-right: 18px;
     flex-shrink: 0;
+    border-radius: 2px;
+    transition: transform 0.3s ease;
+}
+
+.search-suggestion-item:hover .search-suggestion-image {
+    transform: scale(1.05);
 }
 
 .search-suggestion-info {
@@ -53,36 +67,58 @@
 
 .search-suggestion-name {
     font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 4px;
+    font-weight: 600;
+    margin-bottom: 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #111;
 }
 
 .search-suggestion-price {
     font-size: 13px;
-    color: #f6931d;
-    font-weight: 600;
+    color: #ef233c;
+    font-weight: 700;
 }
 
 .search-suggestion-price .old-price {
     text-decoration: line-through;
     color: #999;
-    margin-right: 8px;
-    font-weight: normal;
+    margin-right: 10px;
+    font-weight: 400;
 }
 
 .search-suggestions-loading {
-    padding: 20px;
+    padding: 30px;
     text-align: center;
-    color: #999;
+    color: #666;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 1px;
 }
 
 .search-suggestions-empty {
-    padding: 20px;
+    padding: 40px 20px;
     text-align: center;
-    color: #999;
+    color: #888;
+}
+
+.search-suggestions-empty i {
+    display: block;
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #ddd;
+}
+
+/* Scrollbar styling */
+.search-suggestions-dropdown::-webkit-scrollbar {
+    width: 4px;
+}
+.search-suggestions-dropdown::-webkit-scrollbar-thumb {
+    background: #eee;
+    border-radius: 10px;
 }
 
 /* Offcanvas specific adjustments */
@@ -91,25 +127,23 @@
 }
 
 #search-suggestions-offcanvas {
-    margin-top: 0;
+    margin-top: 5px;
+    background: #fff; /* Solid background for offcanvas */
 }
 
 /* Mobile responsive */
 @media (max-width: 767px) {
+    .search-suggestions-dropdown {
+        max-height: 350px;
+    }
     .search-suggestion-item {
-        padding: 10px;
+        padding: 12px 15px;
     }
-
     .search-suggestion-image {
-        width: 40px;
-        height: 40px;
+        width: 50px;
+        height: 62px;
     }
-
     .search-suggestion-name {
-        font-size: 13px;
-    }
-
-    .search-suggestion-price {
         font-size: 12px;
     }
 }

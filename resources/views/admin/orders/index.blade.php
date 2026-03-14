@@ -83,7 +83,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($orders as $order)
+                                @if(count($orders) > 0)
+                                    @foreach($orders as $order) @php /** @var \App\Models\Order $order */ @endphp
                                     <tr>
                                         <td>#{{ $order->id }}</td>
                                         <td>
@@ -120,11 +121,12 @@
                                             @endif -->
                                         </td>
                                     </tr>
-                                @empty
+                                    @endforeach
+                                @else
                                     <tr>
                                         <td colspan="7">Chưa có đơn hàng nào.</td>
                                     </tr>
-                                @endforelse
+                                @endif
                             </tbody>
                         </table>
                     </div>

@@ -67,7 +67,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($logs as $log)
+                                    @if(count($logs) > 0)
+                                        @foreach($logs as $log) @php /** @var \OwenIt\Auditing\Models\Audit $log */ @endphp
                                         <tr>
                                             <td>{{ $log->created_at->format('d/m/Y H:i:s') }}</td>
                                             <td>{{ $log->user ? $log->user->name : 'Hệ thống' }}</td>
@@ -88,11 +89,12 @@
                                                 <a href="{{ route('admin.audit-logs.show', $log->id) }}" class="btn btn-sm btn-light-primary">Chi tiết</a>
                                             </td>
                                         </tr>
-                                    @empty
+                                        @endforeach
+                                    @else
                                         <tr>
                                             <td colspan="6" class="text-center">Không có dữ liệu</td>
                                         </tr>
-                                    @endforelse
+                                    @endif
                                 </tbody>
                             </table>
                         </div>

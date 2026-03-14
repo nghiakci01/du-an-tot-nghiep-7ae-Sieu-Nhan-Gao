@@ -230,6 +230,8 @@ return [
     'confirm_remove_cart_item' => 'Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?',
     'confirm_clear_cart' => 'Bạn có chắc chắn muốn xóa toàn bộ giỏ hàng?',
     'ai_try_on' => 'Thử đồ với AI (Phòng thử đồ ảo)',
+    'vton_filter' => 'Phòng thử đồ ảo AI',
+    'vton_products_only' => 'Chỉ hiện sản phẩm AI Trial',
     'ai_try_on_modal_title' => 'Trải nghiệm Thử Đồ AI',
     'ai_try_on_desc' => 'Xem thử trang phục này trên người bạn sẽ trông như thế nào',
     'upload_photo' => 'Nhấn để tải ảnh lên',
