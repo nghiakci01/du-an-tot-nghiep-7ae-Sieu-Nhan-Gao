@@ -28,6 +28,7 @@ class Product extends Model
         'is_active',
         'is_featured',
         'image',
+        'vton_image',
         'vton_model_id',
     ];
 

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class VtonController extends Controller
@@ -63,7 +64,7 @@ class VtonController extends Controller
             
             // 4. Create History Record (Pending)
             $history = VtonHistory::create([
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 'product_id' => $product->id,
                 'vton_model_id' => $request->vton_model_id,
                 'user_image' => $humanData['relative_path'],

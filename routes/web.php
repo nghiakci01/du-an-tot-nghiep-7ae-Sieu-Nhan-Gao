@@ -116,6 +116,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('orders-trigger-auto-cancel', [App\Http\Controllers\Admin\OrderController::class, 'triggerAutoCancel'])->name('orders.trigger-auto-cancel');
         Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
         Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
+        Route::post('vton/generate', [App\Http\Controllers\Admin\VtonAdminController::class, 'generate'])->name('vton.generate');
+        Route::get('vton/status/{id}', [App\Http\Controllers\Admin\VtonAdminController::class, 'status'])->name('vton.status');
 
         // Product Attributes
         Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);

@@ -16,6 +16,7 @@ class VtonHistory extends Model
         'user_image',
         'result_image',
         'session_id',
+        'status',
     ];
 
     public function user()
