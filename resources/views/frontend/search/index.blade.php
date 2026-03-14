@@ -59,7 +59,12 @@
                                         $vtonSearchParams['vton'] = 1;
                                     }
                                 @endphp
-                                <a href="{{ route('product.search', $vtonSearchParams) }}" class="btn btn-outline-primary {{ request('vton') ? 'active' : '' }}" style="border-radius: 30px; padding: 6px 20px; font-size: 14px; {{ request('vton') ? 'background-color: #ef233c; border-color: #ef233c; color: #fff;' : 'color: #ef233c; border-color: #ef233c;' }}">
+                                <a href="{{ route('product.search', $vtonSearchParams) }}" class="btn btn-outline-primary {{ request('vton') ? 'active' : '' }}" 
+                                   @style([
+                                       'border-radius: 30px; padding: 6px 20px; font-size: 14px;',
+                                       'background-color: #ef233c; border-color: #ef233c; color: #fff;' => request('vton'),
+                                       'color: #ef233c; border-color: #ef233c;' => !request('vton')
+                                   ])>
                                     <i class="fa fa-magic mr-1"></i> {{ __('messages.vton_products_only') }}
                                 </a>
                             </div>

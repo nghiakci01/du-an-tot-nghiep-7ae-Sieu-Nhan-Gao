@@ -169,13 +169,68 @@
               <div class="col-12">
                 <h3 class="mb-1">{{ number_format($totalProducts) }}</h3>
                 <p class="text-danger mb-0">
-                  <i class="ti ti-alert-circle"></i> Sản phẩm đang kinh doanh
+                   Sản phẩm đang kinh doanh
                 </p>
               </div>
             </div>
           </div>
         </div>
       </a>
+    </div>
+
+    <!-- VTON Summary Row -->
+    <div class="col-md-6 col-xxl-3">
+      <div class="card dashboard-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="avtar avtar-s bg-light-info">
+                <i class="ti ti-magic f-24"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="mb-0">Lượt Thử Đồ AI</h6>
+            </div>
+          </div>
+          <div class="bg-body p-3 mt-3 rounded">
+            <div class="mt-3 row align-items-center">
+              <div class="col-12">
+                <h3 class="mb-1">{{ number_format($totalVtonHistories) }}</h3>
+                <p class="text-info mb-0">
+                  <i class="ti ti-history"></i> Tổng cộng mọi thời đại
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-xxl-3">
+      <div class="card dashboard-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="avtar avtar-s bg-light-primary">
+                <i class="ti ti-user-check f-24"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="mb-0">Sản phẩm có AI</h6>
+            </div>
+          </div>
+          <div class="bg-body p-3 mt-3 rounded">
+            <div class="mt-3 row align-items-center">
+              <div class="col-12">
+                <h3 class="mb-1">{{ number_format($vtonEnabledProducts) }}</h3>
+                <p class="text-primary mb-0">
+                  <i class="ti ti-check"></i> Hỗ trợ Thử Đồ AI
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Charts Row -->
@@ -205,72 +260,41 @@
       </div>
     </div>
 
-    <!-- Đoạn HTML của bảng Top Selling Products giữ nguyên -->
+    <!-- Recent Notifications & VTON Trends Row -->
     <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header">
-            <h5>Top 5 Sản Phẩm Bán Chạy</h5>
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+           <div class="card-header d-flex justify-content-between align-items-center bg-transparent border-bottom-0 pb-0">
+            <h5 class="mb-0 fw-bold"><i class="ti ti-award me-2 text-info"></i>Top 5 Sản phẩm Thử đồ AI nhiều nhất</h5>
           </div>
           <div class="card-body p-0">
             <div class="table-responsive">
               <table class="table table-hover mb-0 align-middle">
                 <thead class="table-light">
                   <tr>
-                    <th style="width: 50px;">#</th>
                     <th>Sản Phẩm</th>
-                    <th class="text-end">Giá Bán</th>
-                    <th class="text-center">Đã Bán</th>
-                    <th class="text-end">Doanh Thu (Ước tính)</th>
-                    <th>Tỷ Trọng Doanh Số</th>
+                    <th class="text-center">Số lượt thử</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @forelse($topProducts as $index => $product)
-                    @php
-                        $percentage = min(100, round(($product->total_sold / $totalProductsSold) * 100, 1));
-                        
-                        // Pick color based on rank
-                        $bgClass = 'bg-primary';
-                        if($index == 0) $bgClass = 'bg-success';
-                        else if($index == 1) $bgClass = 'bg-info';
-                        else if($index == 2) $bgClass = 'bg-warning';
-                    @endphp
+                  @forelse($vtonStats['top_vton_products'] as $product)
                     <tr>
-                      <td>
-                        <span class="badge {{ $bgClass }} rounded-pill">{{ $index + 1 }}</span>
-                      </td>
                       <td>
                         <div class="d-flex align-items-center">
                           <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-fluid wid-40 rounded me-3 shadow-sm"
                             style="height: 48px; width: 48px; object-fit: cover;">
                           <div>
-                            <h6 class="mb-0 text-truncate" style="max-width: 250px;" title="{{ $product->name }}">{{ $product->name }}</h6>
+                            <h6 class="mb-0 text-truncate" style="max-width: 250px;">{{ $product->name }}</h6>
                           </div>
                         </div>
                       </td>
-                      <td class="text-end fw-medium">{{ number_format($product->price) }} ₫</td>
                       <td class="text-center">
-                        <span class="badge bg-light-secondary text-secondary fw-bold px-3 py-2">{{ $product->total_sold }}</span>
-                      </td>
-                      <td class="text-end fw-bold text-success">{{ number_format($product->price * $product->total_sold) }} ₫</td>
-                      <td style="width: 200px;">
-                        <div class="d-flex align-items-center">
-                          <div class="progress flex-grow-1 me-2" style="height: 6px;">
-                            <div class="progress-bar {{ $bgClass }}" role="progressbar" style="width: {{ $percentage }}%" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                          <span class="text-muted small fw-medium">{{ $percentage }}%</span>
-                        </div>
+                        <span class="badge bg-light-info text-info fw-bold px-3 py-2">{{ number_format($product->try_on_count) }}</span>
                       </td>
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="6" class="text-center py-4">
-                        <div class="text-muted">
-                           <i class="ti ti-chart-bar f-24 d-block mb-2"></i>
-                           Chưa có dữ liệu bán hàng trong thời gian này
-                        </div>
-                      </td>
+                      <td colspan="2" class="text-center py-4 text-muted">Chưa có dữ liệu thử đồ</td>
                     </tr>
                   @endforelse
                 </tbody>
@@ -279,45 +303,7 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Recent Notifications Row -->
-    <div class="row">
-      <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-header d-flex justify-content-between align-items-center bg-transparent border-bottom-0 pb-0">
-            <h5 class="mb-0 fw-bold"><i class="ti ti-bell me-2 text-primary"></i>Thông báo mới nhất</h5>
-            <a href="{{ route('admin.notifications.index') }}" class="btn btn-sm btn-link-primary">Xem tất cả</a>
-          </div>
-          <div class="card-body">
-            <div class="list-group list-group-flush">
-              @forelse($admin_notifications ?? [] as $notification)
-                <a href="{{ route('admin.notifications.markAsRead', $notification->id) }}" 
-                   class="list-group-item list-group-item-action border-0 mb-2 rounded p-3 {{ $notification->read_at ? 'bg-light' : 'bg-light-primary border-start border-primary border-4' }}">
-                  <div class="d-flex w-100 justify-content-between align-items-start">
-                    <div>
-                      <h6 class="mb-1 fw-semibold text-dark">{{ $notification->data['message'] ?? 'Thông báo' }}</h6>
-                      <small class="text-muted d-block mt-1">
-                        <i class="ti ti-clock me-1"></i>{{ $notification->created_at->diffForHumans() }}
-                      </small>
-                    </div>
-                    @if(!$notification->read_at)
-                      <span class="badge bg-primary rounded-pill px-2 py-1">Mới</span>
-                    @endif
-                  </div>
-                </a>
-              @empty
-                <div class="text-center py-5">
-                  <i class="ti ti-bell-off f-40 text-muted opacity-50"></i>
-                  <p class="text-muted mb-0 mt-2">Tuyệt vời! Không có thông báo mới.</p>
-                </div>
-              @endforelse
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- You could add another card here for Balance/Quick Actions or leave it half-width -->
       <div class="col-lg-6 mb-4">
         <div class="card h-100 shadow-sm border-0">
           <div class="card-header bg-transparent border-bottom-0 pb-0">
@@ -446,13 +432,19 @@
   </style>
   <!-- ApexChart -->
   <script src="{{ asset('admin-assets/js/plugins/apexcharts.min.js') }}"></script>
+  
+  <script id="revenue-values-data" type="application/json">@json($revenueValues)</script>
+  <script id="revenue-labels-data" type="application/json">@json($revenueLabels)</script>
+  <script id="status-values-data" type="application/json">@json($statusValues)</script>
+  <script id="status-labels-data" type="application/json">@json($statusLabels)</script>
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       // Revenue Chart
       var revenueOptions = {
         series: [{
           name: 'Doanh Thu',
-          data: @json($revenueValues)
+          data: JSON.parse(document.getElementById('revenue-values-data').textContent)
         }],
         chart: {
           type: 'area', // or line, bar
@@ -468,7 +460,7 @@
           curve: 'smooth'
         },
         xaxis: {
-          categories: @json($revenueLabels),
+          categories: JSON.parse(document.getElementById('revenue-labels-data').textContent),
         },
         yaxis: {
           labels: {
@@ -492,12 +484,12 @@
 
       // 2. Order Status Chart (Dùng Data từ Backend truyền thẳng vào view qua $statusValues)
       var statusOptions = {
-        series: @json($statusValues),
+        series: JSON.parse(document.getElementById('status-values-data').textContent),
         chart: {
           type: 'donut',
           height: 350,
         },
-        labels: @json($statusLabels),
+        labels: JSON.parse(document.getElementById('status-labels-data').textContent),
         responsive: [{
           breakpoint: 480,
           options: {

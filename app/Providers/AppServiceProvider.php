@@ -92,12 +92,12 @@ class AppServiceProvider extends ServiceProvider
                     $view->with('admin_unread_count', $unreadCount);
                 }
                 } catch (\Throwable $e) {
-                    // Ignore errors during view composition
+                    \Illuminate\Support\Facades\Log::error('AppServiceProvider View Composer Error: ' . $e->getMessage());
                 }
             });
         }
         } catch (\Throwable $e) {
-            // Log or ignore if DB connection fails during boot (e.g. composer install)
+            \Illuminate\Support\Facades\Log::error('AppServiceProvider Boot Error: ' . $e->getMessage());
         }
     }
 }

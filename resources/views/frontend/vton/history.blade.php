@@ -91,7 +91,7 @@
             <div class="row">
                 <div class="col-12 text-center py-5">
                     <div style="font-size: 80px; color: #f0f0f0; margin-bottom: 25px; animation: float 3s ease-in-out infinite;">
-                        <i class="fa fa-magic" style="background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                        <i class="fa fa-magic vton-magic-icon"></i>
                     </div>
                     <h3 style="font-weight: 700; color: #333;">Lịch sử trống</h3>
                     <p style="color: #888; max-width: 400px; margin: 0 auto 30px;">Bạn chưa thực hiện thử đồ AI nào. Hãy chọn một sản phẩm yêu thích và bắt đầu trải nghiệm ngay!</p>
@@ -133,6 +133,12 @@
         0% { transform: translateY(0px); }
         50% { transform: translateY(-15px); }
         100% { transform: translateY(0px); }
+    }
+    .vton-magic-icon {
+        background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
     .pagination {
         display: flex;

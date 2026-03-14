@@ -59,13 +59,20 @@
                                                     $vtonParams['vton'] = 1;
                                                 }
                                             @endphp
-                                            <a href="{{ route('shop', $vtonParams) }}" style="display: flex; align-items: center; gap: 10px;">
-                                                <div style="width: 20px; height: 20px; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: {{ request('vton') ? '#ef233c' : '#fff' }}; border-color: {{ request('vton') ? '#ef233c' : '#ddd' }};">
+                                            <a href="{{ route('shop', $vtonParams) }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                                                <div @style([
+                                                    'width: 20px; height: 20px; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center;',
+                                                    'background-color: #ef233c; border-color: #ef233c;' => request('vton'),
+                                                    'background-color: #fff;' => !request('vton')
+                                                ])>
                                                     @if(request('vton'))
                                                         <i class="fa fa-check" style="color: #fff; font-size: 10px;"></i>
                                                     @endif
                                                 </div>
-                                                <span style="color: {{ request('vton') ? '#ef233c' : '#333' }}; font-weight: {{ request('vton') ? '700' : '400' }};">
+                                                <span @style([
+                                                    'color: #ef233c; font-weight: 700;' => request('vton'),
+                                                    'color: #333; font-weight: 400;' => !request('vton')
+                                                ])>
                                                     {{ __('messages.vton_products_only') }}
                                                 </span>
                                             </a>

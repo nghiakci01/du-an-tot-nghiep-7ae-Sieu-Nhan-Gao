@@ -4,17 +4,14 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\VtonHistory;
 use App\Models\VtonModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Str;
-
-use App\Models\VtonHistory;
-use Illuminate\Support\Facades\File;
 
 class VtonController extends Controller
 {
@@ -26,154 +23,70 @@ class VtonController extends Controller
         try {
             // Validate request
             $request->validate([
-                'user_image' => 'nullable|mimes:jpeg,jpg,png,webp|max:5120|dimensions:min_width=400,min_height=400',
+                'user_image' => 'nullable|mimes:jpeg,jpg,png,webp|max:5120',
                 'product_id' => 'required|exists:products,id',
                 'vton_model_id' => 'nullable|exists:vton_models,id'
             ]);
 
             $product = Product::findOrFail($request->product_id);
-            if (!$product->image) {
-                return response()->json(['success' => false, 'message' => 'Sản phẩm này chưa có ảnh.'], 400);
-            }
 
-            // 1. Get Human Image (User Upload vs Pre-defined Model)
-            $humanData = $this->getHumanData($request, $product);
-            if (!$humanData['success']) {
-                return response()->json(['success' => false, 'message' => $humanData['message']], 400);
-            }
-
-            $humanImageBase64 = $humanData['base64'];
-            $humanCacheKey = $humanData['cache_key'];
-
-            // 2. Get Product Image Base64
-            $productPath = storage_path('app/public/' . $product->image);
-            if (!file_exists($productPath)) {
-                return response()->json(['success' => false, 'message' => 'Không tìm thấy ảnh sản phẩm.'], 404);
-            }
-            $productImageBase64 = 'data:' . mime_content_type($productPath) . ';base64,' . base64_encode(file_get_contents($productPath));
-
-            // 3. Check Cache
-            $cacheKey = 'vton_' . md5($humanCacheKey . '_' . $product->id);
-            if (Cache::has($cacheKey)) {
-                return response()->json([
-                    'success' => true,
-                    'image_url' => Cache::get($cacheKey),
-                    'message' => 'Thử đồ thành công! (Cached)'
-                ]);
-            }
-
-            // 4. Select VTON Category
-            $category = $this->mapCategory($product);
-
-            // 5. Call Hugging Face API (OOTDiffusion)
-            // URL: https://levihsu-ootdiffusion.hf.space/call/process_hd
-            $hfUrl = 'https://levihsu-ootdiffusion.hf.space/call/process_hd';
+            // 1. Get Human Data (Upload or Model)
+            $humanData = $this->getHumanData($request->file('user_image'), $request->vton_model_id, $product);
             
-            Log::info('VTON HF Request', ['product_id' => $product->id, 'category' => $category]);
-
-            $payload = [
-                'data' => [
-                    ['url' => $humanImageBase64, 'meta' => ['_type' => 'gradio.FileData']],
-                    ['url' => $productImageBase64, 'meta' => ['_type' => 'gradio.FileData']],
-                    $category,
-                    1,   // Model select
-                    20,  // Steps
-                    2.0, // Guidance scale
-                    -1   // Seed
-                ]
-            ];
-
-            $response = Http::timeout(60)->post($hfUrl, $payload);
-            $eventId = $response->json('event_id');
-
-            if (!$eventId) {
+            if (!$humanData) {
                 return response()->json([
-                    'success' => false, 
-                    'message' => 'Hệ thống AI đang bận (Queue Full). Vui lòng đợi 30 giây và thử lại.',
-                    'debug' => $response->body()
-                ], 503);
-            }
-
-            // 6. Polling for result via stream endpoint
-            // HF Spaces use Server-Sent Events or long-polling on the event ID
-            $startTime = time();
-            $maxWait = 120; // 2 minutes max
-            $resultUrl = null;
-
-            while ((time() - $startTime) < $maxWait) {
-                $statusRes = Http::timeout(120)->get($hfUrl . '/' . $eventId);
-                
-                if ($statusRes->successful()) {
-                    $body = $statusRes->body();
-                    
-                    // Gradio response format for finished event:
-                    // data: [{"url": "...", ...}]
-                    // event: complete
-                    if (Str::contains($body, 'event: complete') || Str::contains($body, '"url"')) {
-                        // Extract URL using regex for simplicity in this stream format
-                        if (preg_match('/"url":\s*"([^"]+)"/', $body, $matches)) {
-                            $resultUrl = $matches[1];
-                            // If it's a relative URL from HF, prepend the space URL
-                            if (Str::startsWith($resultUrl, '/')) {
-                                $resultUrl = 'https://levihsu-ootdiffusion.hf.space' . $resultUrl;
-                            }
-                            break;
-                        }
-                    }
-                    
-                    if (Str::contains($body, 'event: error') || Str::contains($body, '"error"')) {
-                        break;
-                    }
-                }
-                sleep(2);
-            }
-
-            if ($resultUrl) {
-                // 7. Save Result Locally for History/Gallery
-                $resultFilename = 'vton_res_' . Str::random(10) . '_' . time() . '.jpg';
-                $resultFolder = 'vton/results';
-                $resultPath = $resultFolder . '/' . $resultFilename;
-                
-                try {
-                    $imageContent = file_get_contents($resultUrl);
-                    if ($imageContent) {
-                        Storage::disk('public')->put($resultPath, $imageContent);
-                        $finalImageUrl = asset('storage/' . $resultPath);
-                        
-                        // Save to History
-                        VtonHistory::create([
-                            'user_id' => auth()->id(),
-                            'product_id' => $product->id,
-                            'vton_model_id' => $request->vton_model_id ?: $product->vton_model_id,
-                            'user_image' => $humanData['saved_path'] ?? null,
-                            'result_image' => $resultPath,
-                            'session_id' => session()->getId(),
-                        ]);
-                    } else {
-                        $finalImageUrl = $resultUrl; // Fallback to HF URL if download fails
-                    }
-                } catch (\Exception $saveEx) {
-                    Log::error('VTON Save Result Error: ' . $saveEx->getMessage());
-                    $finalImageUrl = $resultUrl;
-                }
-
-                // Cache the result for 7 days
-                Cache::put($cacheKey, $finalImageUrl, now()->addDays(7));
-
-                return response()->json([
-                    'success' => true,
-                    'image_url' => $finalImageUrl,
-                    'message' => 'Thử đồ thành công!'
+                    'success' => false,
+                    'message' => 'Lỗi không tìm được hoặc không thể lưu ảnh người mẫu.'
                 ]);
             }
+
+            // 2. Prepare Product Image Base64
+            if (empty($product->image)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sản phẩm không có ảnh để thử.'
+                ]);
+            }
+
+            $productPath = storage_path('app/public/' . $product->image);
+            if (!file_exists($productPath) || is_dir($productPath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ảnh sản phẩm không tồn tại.'
+                ]);
+            }
+
+            $productImageBase64 = 'data:' . mime_content_type($productPath) . ';base64,' . base64_encode(file_get_contents($productPath));
+            
+            // 3. Map Category
+            $category = $this->mapCategory($product);
+            
+            // 4. Create History Record (Pending)
+            $history = VtonHistory::create([
+                'user_id' => auth()->id(),
+                'product_id' => $product->id,
+                'vton_model_id' => $request->vton_model_id,
+                'user_image' => $humanData['relative_path'],
+                'status' => 'pending'
+            ]);
+
+            // 5. Dispatch Background Job
+            \App\Jobs\ProcessVtonJob::dispatch(
+                $history->id,
+                $humanData['base64'],
+                $productImageBase64,
+                $category
+            );
 
             return response()->json([
-                'success' => false,
-                'message' => 'Hệ thống AI xử lý quá lâu hoặc gặp lỗi. Hãy thử lại sau.'
-            ], 504);
+                'success' => true,
+                'history_id' => $history->id,
+                'status' => 'pending',
+                'message' => 'Đang xử lý thử đồ AI. Vui lòng đợi trong giây lát...'
+            ]);
 
         } catch (\Exception $e) {
-            Log::error('VTON HF Error: ' . $e->getMessage());
+            Log::channel('vton')->error('VTON Controller Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Lỗi hệ thống: ' . $e->getMessage()
@@ -181,92 +94,138 @@ class VtonController extends Controller
         }
     }
 
-    private function getHumanData(Request $request, Product $product)
+    /**
+     * Check status of VTON process
+     */
+    public function checkStatus($id)
     {
-        // Case 1: User uploaded image
-        if ($request->hasFile('user_image')) {
-            $userImageFile = $request->file('user_image');
-            $imageData = file_get_contents($userImageFile->getRealPath());
-            
-            // Basic rotation correction (same as original logic)
-            $imageResource = @imagecreatefromstring($imageData);
-            if ($imageResource !== false) {
-                $isRotated = false;
-                if (in_array(strtolower($userImageFile->getClientOriginalExtension()), ['jpg', 'jpeg']) && function_exists('exif_read_data')) {
-                    $exif = @exif_read_data($userImageFile->getRealPath());
-                    if (!empty($exif['Orientation'])) {
-                        switch ($exif['Orientation']) {
-                            case 3: $imageResource = imagerotate($imageResource, 180, 0); $isRotated = true; break;
-                            case 6: $imageResource = imagerotate($imageResource, -90, 0); $isRotated = true; break;
-                            case 8: $imageResource = imagerotate($imageResource, 90, 0); $isRotated = true; break;
+        $history = VtonHistory::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'status' => $history->status,
+            'image_url' => $history->result_image ? asset('storage/' . $history->result_image) : null,
+            'message' => match($history->status) {
+                'completed' => 'Thử đồ thành công!',
+                'failed' => 'Hệ thống AI đang bận hoặc quá tải. Vui lòng thử lại sau.',
+                'processing' => 'AI đang xử lý ảnh của bạn...',
+                default => 'Đang chờ xử lý...'
+            }
+        ]);
+    }
+
+    private function attemptTryOn($humanBase64, $productBase64, $category)
+    {
+        $spaces = [
+            // Official OOTDiffusion - High Quality
+            [
+                'url' => 'https://levihsu-ootdiffusion.hf.space/call/process_dc',
+                'payload' => [
+                    'data' => [
+                        ['url' => $humanBase64, 'meta' => ['_type' => 'gradio.FileData']],
+                        ['url' => $productBase64, 'meta' => ['_type' => 'gradio.FileData']],
+                        $category, 1, 20, 2.0, -1
+                    ]
+                ]
+            ],
+            // Alternative IDM-VTON
+            [
+                'url' => 'https://yisol-idm-vton.hf.space/call/tryon',
+                'payload' => [
+                    'data' => [
+                        ['url' => $humanBase64, 'meta' => ['_type' => 'gradio.FileData']],
+                        ['url' => $productBase64, 'meta' => ['_type' => 'gradio.FileData']],
+                        "Fashion garment", true, true, 30, 42
+                    ]
+                ]
+            ]
+        ];
+
+        foreach ($spaces as $space) {
+            try {
+                $response = Http::timeout(30)->post($space['url'], $space['payload']);
+                $eventId = $response->json('event_id');
+
+                if ($eventId) {
+                    Log::info('VTON Polling Start: ' . $space['url'] . ' ID: ' . $eventId);
+                    $startTime = time();
+                    while ((time() - $startTime) < 90) { // Max 90 seconds
+                        $statusRes = Http::timeout(60)->get($space['url'] . '/' . $eventId);
+                        $body = $statusRes->body();
+                        
+                        if (Str::contains($body, 'event: complete')) {
+                            if (preg_match('/"url":\s*"([^"]+)"/', $body, $matches)) {
+                                $resUrl = $matches[1];
+                                // Handle relative URLs
+                                if (Str::startsWith($resUrl, '/')) {
+                                    $resUrl = rtrim(dirname(dirname($space['url'])), '/') . $resUrl;
+                                }
+                                return $resUrl;
+                            }
                         }
+                        
+                        if (Str::contains($body, 'event: error') || Str::contains($body, '"error"')) break;
+                        
+                        sleep(3);
                     }
                 }
-                
-                if ($isRotated) {
-                    ob_start();
-                    imagejpeg($imageResource, null, 90);
-                    $imageData = ob_get_contents();
-                    ob_end_clean();
-                }
-                imagedestroy($imageResource);
+            } catch (\Exception $e) {
+                Log::warning('VTON Space Failed: ' . $space['url'] . ' - ' . $e->getMessage());
             }
-
-            // Save user image locally if it's new
-            $userImageFilename = 'vton_user_' . Str::random(10) . '_' . time() . '.jpg';
-            $userImageFolder = 'vton/uploads';
-            $userImagePath = $userImageFolder . '/' . $userImageFilename;
-            Storage::disk('public')->put($userImagePath, $imageData);
-
-            return [
-                'success' => true,
-                'base64' => 'data:' . $userImageFile->getMimeType() . ';base64,' . base64_encode($imageData),
-                'cache_key' => 'user_upload_' . md5($imageData),
-                'saved_path' => $userImagePath
-            ];
         }
 
-        // Case 2: Specific Model requested
-        $modelId = $request->vton_model_id ?: $product->vton_model_id;
-        $model = null;
+        return null;
+    }
 
+    private function getHumanData($userImageFile = null, $modelId = null, $product = null)
+    {
+        if ($userImageFile) {
+            try {
+                $imageData = file_get_contents($userImageFile->getRealPath());
+                $filename = 'user_' . time() . '_' . Str::random(10) . '.jpg';
+                $relativePath = 'vton/user_uploads/' . $filename;
+                
+                Storage::disk('public')->put($relativePath, $imageData);
+                
+                return [
+                    'path' => storage_path('app/public/' . $relativePath),
+                    'relative_path' => $relativePath,
+                    'base64' => 'data:' . $userImageFile->getMimeType() . ';base64,' . base64_encode($imageData),
+                ];
+            } catch (\Exception $e) {
+                Log::error('VTON Human Upload Error: ' . $e->getMessage());
+            }
+        }
+
+        $model = null;
         if ($modelId) {
             $model = VtonModel::find($modelId);
         }
 
-        // Case 3: Fallback to Default Model based on product/category
         if (!$model) {
-            // Very basic gender detection based on category name or parent category
-            $gender = 'female'; // Default to female as it's most common for VTON
-            $categoryName = strtolower($product->category->name ?? '');
-            if (Str::contains($categoryName, ['nam', 'man', 'men'])) $gender = 'male';
-            elseif (Str::contains($categoryName, ['bé', 'kid', 'child'])) $gender = 'kid';
-
-            $model = VtonModel::where('gender', $gender)->where('is_default', true)->first();
+            $gender = 'female';
+            $catName = strtolower($product->category->name ?? '');
+            if (Str::contains($catName, ['nam', 'man', 'men'])) $gender = 'male';
             
-            // Absoulte fallback to any default or any model
-            if (!$model) $model = VtonModel::where('is_default', true)->first();
-            if (!$model) $model = VtonModel::first();
+            $model = VtonModel::where('gender', $gender)->where('status', 'active')->first() 
+                  ?: VtonModel::where('status', 'active')->first();
         }
 
-        if ($model && $model->image) {
+        if ($model && !empty($model->image)) {
             $path = storage_path('app/public/' . $model->image);
-            if (file_exists($path)) {
+            if (file_exists($path) && !is_dir($path)) {
                 return [
-                    'success' => true,
+                    'path' => $path,
+                    'relative_path' => $model->image,
                     'base64' => 'data:' . mime_content_type($path) . ';base64,' . base64_encode(file_get_contents($path)),
-                    'cache_key' => 'model_' . $model->id
                 ];
             }
         }
 
-        return [
-            'success' => false,
-            'message' => 'Vui lòng tải ảnh của bạn lên hoặc chọn người mẫu để thử đồ.'
-        ];
+        return null;
     }
 
-    private function mapCategory(Product $product)
+    private function mapCategory($product)
     {
         $catName = strtolower($product->category->name ?? '');
         
@@ -278,7 +237,6 @@ class VtonController extends Controller
             return 'Dress';
         }
         
-        // Default to Upper-body
         return 'Upper-body';
     }
 }

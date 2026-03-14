@@ -1511,37 +1511,35 @@
                     }
                 }
 
-                // Show clothes overlay simulation
-                setTimeout(() => {
-                    mockupClothes.addClass('active');
-                }, 600);
-                // ---------------------------
-
-                progress = 0;
-                messageIndex = 0;
-                progressBar.css('width', '0%');
-                statusText.text(statusMessages[0]);
-
-                progressInterval = setInterval(() => {
-                    if (progress < 90) {
-                        progress += Math.random() * 5;
-                        progressBar.css('width', progress + '%');
-                        
-                        if (progress > (messageIndex + 1) * 15 && messageIndex < statusMessages.length - 1) {
-                            messageIndex++;
-                            statusText.text(statusMessages[messageIndex]);
-                        }
-                    }
-                }, 1000);
-            }
-
-            function stopLoading(success = true) {
+                // Show clothes             function stopLoading(success = true) {
                 clearInterval(progressInterval);
                 loadingArea.hide();
                 btnSubmit.prop('disabled', false).text('Thử đồ tiếp');
                 if (success) {
                     progressBar.css('width', '100%');
                 }
+            }
+
+            function pollVtonStatus(historyId, onComplete, onFail, onProgress) {
+                const basePollUrl = '{{ route("api.vton.status", ["id" => ":id"]) }}';
+                const pollUrl = basePollUrl.replace(':id', historyId);
+
+                const pollInterval = setInterval(() => {
+                    $.get(pollUrl, function(res) {
+                        if (res.status === 'completed') {
+                            clearInterval(pollInterval);
+                            onComplete(res);
+                        } else if (res.status === 'failed') {
+                            clearInterval(pollInterval);
+                            onFail(res);
+                        } else if (onProgress) {
+                            onProgress(res);
+                        }
+                    }).fail(function() {
+                        clearInterval(pollInterval);
+                        onFail({ message: 'Lỗi kết nối hệ thống.' });
+                    });
+                }, 3000);
             }
 
             vtonForm.on('submit', function(e) {
@@ -1564,19 +1562,32 @@
                     processData: false,
                     contentType: false,
                     success: function(response) {
-                        stopLoading(true);
-                        if (response.success && response.image_url) {
-                            $('#vton-result-image').attr('src', response.image_url);
-                            $('#vton-download').attr('href', response.image_url);
-                            resultArea.fadeIn();
-                            
-                            // UX: Auto scroll to result if on mobile
-                            if (window.innerWidth < 768) {
-                                $('.modal-body').animate({ scrollTop: 400 }, 500);
-                            }
+                        if (response.success && response.history_id) {
+                            // Start polling
+                            pollVtonStatus(
+                                response.history_id,
+                                function(finalRes) { // Complete
+                                    stopLoading(true);
+                                    $('#vton-result-image').attr('src', finalRes.image_url);
+                                    $('#vton-download').attr('href', finalRes.image_url);
+                                    resultArea.fadeIn();
+                                    if (window.innerWidth < 768) {
+                                        $('.modal-body').animate({ scrollTop: 400 }, 500);
+                                    }
+                                },
+                                function(errRes) { // Failed
+                                    stopLoading(false);
+                                    initialArea.show();
+                                    Swal.fire('Lỗi AI', errRes.message || 'Không thể xử lý ảnh.', 'error');
+                                },
+                                function(progRes) { // Progress
+                                    statusText.text(progRes.message);
+                                }
+                            );
                         } else {
+                            stopLoading(false);
                             initialArea.show();
-                            Swal.fire('Lỗi AI', response.message || 'Không thể xử lý ảnh.', 'error');
+                            Swal.fire('Lỗi', response.message || 'Không thể khởi tạo tiến trình.', 'error');
                         }
                     },
                     error: function(xhr) {
@@ -1627,17 +1638,48 @@
                         _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
-                        if (response.success && response.image_url) {
-                            // Update Widget
-                            placeholder.hide();
-                            resultImg.attr('src', response.image_url).fadeIn(800);
-                            statusLoading.fadeOut();
-                            successBadge.show();
+                        if (response.success && response.history_id) {
+                            pollVtonStatus(
+                                response.history_id,
+                                function(finalRes) { // Complete
+                                    // Update Widget
+                                    placeholder.hide();
+                                    resultImg.attr('src', finalRes.image_url).fadeIn(800);
+                                    statusLoading.fadeOut();
+                                    successBadge.show();
 
-                            // Update Modal too (in case user opens it later)
-                            $('#vton-result-image').attr('src', response.image_url);
-                            $('#vton-download').attr('href', response.image_url);
-                            resultArea.show();
+                                    // Update Modal too (in case user opens it later)
+                                    $('#vton-result-image').attr('src', finalRes.image_url);
+                                    $('#vton-download').attr('href', finalRes.image_url);
+                                    resultArea.show();
+                                    initialArea.hide();
+                                    
+                                    const Toast = Swal.mixin({
+                                        toast: true,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 4000,
+                                        timerProgressBar: true
+                                    });
+                                    Toast.fire({
+                                        icon: 'success',
+                                        title: 'Thử đồ AI đã sẵn sàng!'
+                                    });
+                                },
+                                function() { // Failed
+                                    mirror.removeClass('active');
+                                }
+                            );
+                        } else {
+                            mirror.removeClass('active');
+                        }
+                    },
+                    error: function() {
+                        mirror.removeClass('active');
+                    }
+                });
+            }
+show();
                             initialArea.hide();
                             
                             // Notify via toast (subtle)
