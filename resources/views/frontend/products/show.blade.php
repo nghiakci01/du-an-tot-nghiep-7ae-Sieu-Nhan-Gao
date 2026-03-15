@@ -41,7 +41,7 @@
             cursor: not-allowed;
         }
 
-        /* Highlight chÆ°a chá»n thuộc tính */
+        /* Highlight chưa chọn thuộc tính */
         .nice-select[style*="border-color: rgb(239, 35, 60)"],
         .nice-select[style*="border-color: #ef233c"] {
             border: 2px solid #ef233c !important;
@@ -372,7 +372,7 @@
                                 @php $totalSold = $product->total_sold; @endphp
                                 @if($totalSold > 0)
                                 <span style="display: inline-flex; align-items: center; gap: 4px; background: #f0f0f0; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #555;">
-                                    <i class="fa fa-shopping-bag" style="color: #ef233c;"></i> ÄÃ£ bán {{ $totalSold }}
+                                    <i class="fa fa-shopping-bag" style="color: #ef233c;"></i> Đã bán {{ $totalSold }}
                                 </span>
                                 @endif
                                 @if($totalSold >= 10)
@@ -387,7 +387,7 @@
                                 @endif
                                 @if($ratingAvg >= 4.5 && $product->reviews->count() >= 3)
                                 <span style="display: inline-flex; align-items: center; gap: 4px; background: #e8f5e9; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #2e7d32; font-weight: 600;">
-                                    <i class="fa fa-star"></i> ÄÃ¡nh giá cao
+                                    <i class="fa fa-star"></i> Đánh giá cao
                                 </span>
                                 @endif
                             </div>
@@ -486,15 +486,15 @@
                                                     }
 
                                                     let message = missingFields.length > 0 ?
-                                                        `Vui lòng chá»n: <strong>${missingFields.join(', ')}</strong> trước khi thêm vÃ o giá» hÃ ng!` :
-                                                        'Vui lòng chá»n đầy đủ thuộc tính sản phẩm!';
+                                                        `Vui lòng chọn: <strong>${missingFields.join(', ')}</strong> trước khi thêm vào giỏ hàng!` :
+                                                        'Vui lòng chọn đầy đủ thuộc tính sản phẩm!';
 
                                                     Swal.fire({
                                                         icon: 'warning',
-                                                        title: 'Chưa chá»n thuộc tính!',
+                                                        title: 'Chưa chọn thuộc tính!',
                                                         html: message,
                                                         confirmButtonColor: '#ef233c',
-                                                        confirmButtonText: 'Chá»n ngay',
+                                                        confirmButtonText: 'Chọn ngay',
                                                         timer: 4000,
                                                         timerProgressBar: true,
                                                         showClass: {
@@ -515,9 +515,9 @@
                                                     Swal.fire({
                                                         icon: 'error',
                                                         title: 'Vượt quá số lượng tồn kho!',
-                                                        html: `Sản phẩm này chỉ còn <strong>${maxQty}</strong> trong kho.<br>Sá»‘ lÆ°á»£ng đã Ä‘Æ°á»£c Ä‘iá»u chá»‰nh vá» mức tối đa.`,
+                                                        html: `Sản phẩm này chỉ còn <strong>${maxQty}</strong> trong kho.<br>Số lượng đã được điều chỉnh về mức tối đa.`,
                                                         confirmButtonColor: '#ef233c',
-                                                        confirmButtonText: 'Äá»“ng Ã½',
+                                                        confirmButtonText: 'Đồng ý',
                                                         timer: 5000,
                                                         timerProgressBar: true,
                                                     });
@@ -590,7 +590,7 @@
                                                     if (matchedVariant.stock_quantity > 0) {
                                                         variantInput.value = matchedVariant.id;
                                                         msg.style.display = 'none';
-                                                        // Cập nhật stock info vÃ  max quantity
+                                                        // Cập nhật stock info và max quantity
                                                         const qtyInput = document.getElementById('quantity_input');
                                                         const stockInfo = document.getElementById('stock-info');
                                                         if (qtyInput) {
@@ -600,7 +600,7 @@
                                                             }
                                                         }
                                                         if (stockInfo) {
-                                                            stockInfo.textContent = `(CÃ²n ${matchedVariant.stock_quantity} sản phẩm)`;
+                                                            stockInfo.textContent = `(Còn ${matchedVariant.stock_quantity} sản phẩm)`;
                                                             stockInfo.style.display = 'inline';
                                                             stockInfo.style.color = matchedVariant.stock_quantity <= 5 ? '#ef233c' : '#666';
                                                         }
@@ -679,7 +679,7 @@
                                 <h4
                                     style="font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 10px; color: #333;">
                                     <i class="fa fa-tags" style="color: #ef233c; margin-right: 5px;"></i>
-                                    {{ __('messages.tags') === 'messages.tags' ? 'Tháº»' : __('messages.tags') }}
+                                    {{ __('messages.tags') === 'messages.tags' ? 'Thẻ' : __('messages.tags') }}
                                 </h4>
                                 <ul
                                     style="list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px;">
@@ -921,11 +921,11 @@
     <script>
         // Likert scale labels
         var likertLabels = {
-            1: 'Ráº¥t khÃ´ng hÃ i lÃ²ng',
-            2: 'KhÃ´ng hÃ i lÃ²ng',
-            3: 'BÃ¬nh thÆ°á»ng',
-            4: 'HÃ i lÃ²ng',
-            5: 'Ráº¥t hÃ i lÃ²ng'
+            1: 'Rất không hài lòng',
+            2: 'Không hài lòng',
+            3: 'Bình thường',
+            4: 'Hài lòng',
+            5: 'Rất hài lòng'
         };
 
         $(document).ready(function() {
@@ -1022,15 +1022,15 @@
                 var url = form.attr('action');
                 var allVariants = JSON.parse(config.variants);
 
-                // Kiểm tra thuộc tính báº¯t buá»™c
+                // Kiểm tra thuộc tính bắt buộc
                 var hasVariants = config.hasVariants === 'true';
 
                 if (hasVariants) {
-                    // Äá»c giá trá»‹ size & color tá»« select gá»‘c
+                    // Đọc giá trị size & color từ select gốc
                     var selectedSize = $('#select_size_nice').val();
                     var selectedColor = $('#select_color_nice').val();
 
-                    // Validate: pháº£i chá»n đủ size vÃ  color
+                    // Validate: phải chọn đủ size và color
                     if (!selectedSize || !selectedColor) {
                         var missingFields = [];
                         if (!selectedSize) {
@@ -1046,22 +1046,22 @@
                         }, 3000);
 
                         var message = missingFields.length > 0 ?
-                            'Vui lòng chá»n: <strong>' + missingFields.join(', ') + '</strong> trước khi tiáº¿p tá»¥c!' :
-                            'Vui lòng chá»n đầy đủ thuộc tính sản phẩm!';
+                            'Vui lòng chọn: <strong>' + missingFields.join(', ') + '</strong> trước khi tiếp tục!' :
+                            'Vui lòng chọn đầy đủ thuộc tính sản phẩm!';
 
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Chưa chá»n thuộc tính!',
+                            title: 'Chưa chọn thuộc tính!',
                             html: message,
                             confirmButtonColor: '#ef233c',
-                            confirmButtonText: 'Chá»n ngay',
+                            confirmButtonText: 'Chọn ngay',
                             timer: 4000,
                             timerProgressBar: true,
                         });
                         return;
                     }
 
-                    // Tự tìm variant khớp với size + color đã chá»n
+                    // Tự tìm variant khớp với size + color đã chọn
                     var matchedVariant = null;
                     for (var i = 0; i < allVariants.length; i++) {
                         var v = allVariants[i];
@@ -1075,8 +1075,8 @@
                     if (!matchedVariant) {
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Tá»• há»£p khÃ´ng cÃ³!',
-                            text: 'KhÃ´ng tÃ¬m tháº¥y sản phẩm vá»›i size vÃ  mÃ u sáº¯c nÃ y.',
+                            title: 'Tổ hợp không có!',
+                            text: 'Không tìm thấy sản phẩm với size và màu sắc này.',
                             confirmButtonColor: '#ef233c',
                         });
                         return;
@@ -1085,29 +1085,29 @@
                     if (matchedVariant.stock_quantity <= 0) {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Háº¿t hÃ ng!',
-                            html: 'Sản phẩm vá»›i lá»±a chá»n nÃ y hiá»‡n đã <strong>háº¿t hÃ ng</strong>.<br>Vui lòng chá»n thuộc tính khÃ¡c.',
+                            title: 'Hết hàng!',
+                            html: 'Sản phẩm với lựa chọn này hiện đã <strong>hết hàng</strong>.<br>Vui lòng chọn thuộc tính khác.',
                             confirmButtonColor: '#ef233c',
-                            confirmButtonText: 'Chá»n láº¡i',
+                            confirmButtonText: 'Chọn lại',
                         });
                         return;
                     }
 
-                    // Kiểm tra số lượng yÃªu cáº§u vÆ°á»£t tồn kho
+                    // Kiểm tra số lượng yêu cầu vượt tồn kho
                     var requestedQty = parseInt($('#quantity_input').val()) || 1;
                     if (requestedQty > matchedVariant.stock_quantity) {
                         Swal.fire({
                             icon: 'warning',
-                            title: 'VÆ°á»£t quÃ¡ tồn kho!',
-                            html: `Chỉ còn <strong>${matchedVariant.stock_quantity}</strong> sản phẩm trong kho.<br>Sá»‘ lÆ°á»£ng đã Ä‘Æ°á»£c Ä‘iá»u chá»‰nh vá» mức tối đa.`,
+                            title: 'Vượt quá tồn kho!',
+                            html: `Chỉ còn <strong>${matchedVariant.stock_quantity}</strong> sản phẩm trong kho.<br>Số lượng đã được điều chỉnh về mức tối đa.`,
                             confirmButtonColor: '#ef233c',
-                            confirmButtonText: 'Äá»“ng Ã½',
+                            confirmButtonText: 'Đồng ý',
                         });
                         $('#quantity_input').val(matchedVariant.stock_quantity);
                         return;
                     }
 
-                    // GÃ¡n variant_id vÃ o form trước khi serialize
+                    // Gán variant_id vào form trước khi serialize
                     $('#variant_select').val(matchedVariant.id);
                 }
 
@@ -1120,7 +1120,7 @@
 
                 if (!isBuyNow) {
                     Swal.fire({
-                        title: 'Äang thêm vÃ o giá» hÃ ng...',
+                        title: 'Đang thêm vào giỏ hàng...',
                         allowOutsideClick: false,
                         didOpen: () => {
                             Swal.showLoading();
@@ -1137,18 +1137,18 @@
                     },
                     success: function(response) {
                         if (response.redirect) {
-                            // buy_now â†’ chuyển đến checkout
+                            // buy_now → chuyển đến checkout
                             window.location.href = response.redirect;
                             return;
                         }
                         Swal.fire({
-                            title: 'ThÃ nh cÃ´ng!',
-                            text: 'Sản phẩm đã Ä‘Æ°á»£c thêm vÃ o giá» hÃ ng.',
+                            title: 'Thành công!',
+                            text: 'Sản phẩm đã được thêm vào giỏ hàng.',
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        // Cập nhật số lượng giá» hÃ ng trÃªn header
+                        // Cập nhật số lượng giá» hàng trên header
                         let cartCountElements = document.querySelectorAll('.cart-count');
                         if (response.count !== undefined) {
                             cartCountElements.forEach(el => {
