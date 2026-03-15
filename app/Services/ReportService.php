@@ -6,8 +6,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
-use App\Models\VtonHistory;
-use App\Models\VtonModel;
+
 use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -50,43 +49,9 @@ class ReportService
             'new_orders' => $newOrders,
             'total_customers' => $totalCustomers,
             'total_products' => Product::where('is_active', true)->count(),
-            'low_stock_products' => 0, // Stock tracking is removed
-            'total_vton_histories' => VtonHistory::count(),
-            'vton_enabled_products_count' => Product::whereNotNull('vton_model_id')->count(),
         ];
     }
 
-    /**
-     * Get VTON specific statistics
-     */
-    public function getVtonStats($startDate = null, $endDate = null)
-    {
-        $startDate = $startDate ?: now()->subDays(30)->startOfDay();
-        $endDate = $endDate ?: now()->endOfDay();
-
-        $totalTryOns = VtonHistory::whereBetween('created_at', [$startDate, $endDate])->count();
-        
-        $topVtonProducts = DB::table('vton_histories')
-            ->join('products', 'products.id', '=', 'vton_histories.product_id')
-            ->whereBetween('vton_histories.created_at', [$startDate, $endDate])
-            ->select(
-                'products.name',
-                'products.image',
-                DB::raw('count(*) as try_on_count')
-            )
-            ->groupBy('products.id', 'products.name', 'products.image')
-            ->orderByDesc('try_on_count')
-            ->limit(5)
-            ->get();
-
-        $vtonEnabledCategories = Category::whereNotNull('vton_model_id')->count();
-
-        return [
-            'total_try_ons' => $totalTryOns,
-            'top_vton_products' => $topVtonProducts,
-            'vton_enabled_categories' => $vtonEnabledCategories,
-        ];
-    }
 
     /**
      * Get revenue data for chart

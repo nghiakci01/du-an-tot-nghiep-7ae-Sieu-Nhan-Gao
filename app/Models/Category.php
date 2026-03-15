@@ -17,13 +17,7 @@ class Category extends Model
         'name',
         'slug',
         'parent_id',
-        'vton_model_id',
     ];
-
-    public function vtonModel(): BelongsTo
-    {
-        return $this->belongsTo(VtonModel::class);
-    }
 
     public function products(): HasMany
     {

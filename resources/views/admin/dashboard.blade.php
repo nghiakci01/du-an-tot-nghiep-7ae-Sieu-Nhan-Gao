@@ -178,60 +178,7 @@
       </a>
     </div>
 
-    <!-- VTON Summary Row -->
-    <div class="col-md-6 col-xxl-3">
-      <div class="card dashboard-card">
-        <div class="card-body">
-          <div class="d-flex align-items-center">
-            <div class="flex-shrink-0">
-              <div class="avtar avtar-s bg-light-info">
-                <i class="ti ti-magic f-24"></i>
-              </div>
-            </div>
-            <div class="flex-grow-1 ms-3">
-              <h6 class="mb-0">Lượt Thử Đồ AI</h6>
-            </div>
-          </div>
-          <div class="bg-body p-3 mt-3 rounded">
-            <div class="mt-3 row align-items-center">
-              <div class="col-12">
-                <h3 class="mb-1">{{ number_format($totalVtonHistories) }}</h3>
-                <p class="text-info mb-0">
-                  <i class="ti ti-history"></i> Tổng cộng mọi thời đại
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="col-md-6 col-xxl-3">
-      <div class="card dashboard-card">
-        <div class="card-body">
-          <div class="d-flex align-items-center">
-            <div class="flex-shrink-0">
-              <div class="avtar avtar-s bg-light-primary">
-                <i class="ti ti-user-check f-24"></i>
-              </div>
-            </div>
-            <div class="flex-grow-1 ms-3">
-              <h6 class="mb-0">Sản phẩm có AI</h6>
-            </div>
-          </div>
-          <div class="bg-body p-3 mt-3 rounded">
-            <div class="mt-3 row align-items-center">
-              <div class="col-12">
-                <h3 class="mb-1">{{ number_format($vtonEnabledProducts) }}</h3>
-                <p class="text-primary mb-0">
-                  <i class="ti ti-check"></i> Hỗ trợ Thử Đồ AI
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Charts Row -->
     <div class="row">
@@ -260,53 +207,9 @@
       </div>
     </div>
 
-    <!-- Recent Notifications & VTON Trends Row -->
+    <!-- Recent Notifications & Funnel Trends Row -->
     <div class="row">
-      <div class="col-lg-6 mb-4">
-        <div class="card h-100 shadow-sm border-0">
-           <div class="card-header d-flex justify-content-between align-items-center bg-transparent border-bottom-0 pb-0">
-            <h5 class="mb-0 fw-bold"><i class="ti ti-award me-2 text-info"></i>Top 5 Sản phẩm Thử đồ AI nhiều nhất</h5>
-          </div>
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-hover mb-0 align-middle">
-                <thead class="table-light">
-                  <tr>
-                    <th>Sản Phẩm</th>
-                    <th class="text-center">Số lượt thử</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @if(count($vtonStats['top_vton_products']) > 0)
-                    @foreach($vtonStats['top_vton_products'] as $product)
-                    <tr>
-                      <td>
-                        <div class="d-flex align-items-center">
-                          <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-fluid wid-40 rounded me-3 shadow-sm"
-                            style="height: 48px; width: 48px; object-fit: cover;">
-                          <div>
-                            <h6 class="mb-0 text-truncate" style="max-width: 250px;">{{ $product->name }}</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="text-center">
-                        <span class="badge bg-light-info text-info fw-bold px-3 py-2">{{ number_format($product->try_on_count) }}</span>
-                      </td>
-                    </tr>
-                    @endforeach
-                  @else
-                    <tr>
-                      <td colspan="2" class="text-center py-4 text-muted">Chưa có dữ liệu thử đồ</td>
-                    </tr>
-                  @endif
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-6 mb-4">
+      <div class="col-lg-12 mb-4">
         <div class="card h-100 shadow-sm border-0">
           <div class="card-header bg-transparent border-bottom-0 pb-0">
             <h5 class="mb-0 fw-bold"><i class="ti ti-chart-funnel me-2 text-warning"></i>Phễu Chuyển Đổi (30 ngày)</h5>
@@ -314,25 +217,25 @@
           <div class="card-body">
             @if(isset($funnelStats))
             <div class="row g-3 mb-3">
-              <div class="col-6">
+              <div class="col-md-3 col-6">
                 <div class="p-3 rounded bg-light-danger text-center">
                   <h3 class="mb-1 text-danger">{{ $funnelStats['abandoned_carts'] }}</h3>
                   <small class="text-muted">Giỏ bị bỏ rơi</small>
                 </div>
               </div>
-              <div class="col-6">
+              <div class="col-md-3 col-6">
                 <div class="p-3 rounded bg-light-success text-center">
                   <h3 class="mb-1 text-success">{{ $funnelStats['recovered_carts'] }}</h3>
                   <small class="text-muted">Giỏ phục hồi</small>
                 </div>
               </div>
-              <div class="col-6">
+              <div class="col-md-3 col-6">
                 <div class="p-3 rounded bg-light-primary text-center">
                   <h3 class="mb-1 text-primary">{{ $funnelStats['cart_to_order_rate'] }}%</h3>
                   <small class="text-muted">Tỷ lệ chuyển đổi</small>
                 </div>
               </div>
-              <div class="col-6">
+              <div class="col-md-3 col-6">
                 <div class="p-3 rounded bg-light-warning text-center">
                   <h3 class="mb-1 text-warning">{{ number_format($funnelStats['avg_order_value']) }}đ</h3>
                   <small class="text-muted">Giá trị TB / đơn</small>

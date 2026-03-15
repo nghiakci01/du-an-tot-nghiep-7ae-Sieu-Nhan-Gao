@@ -18,7 +18,7 @@ class StoreProductRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'price' => 'nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
-            'vton_model_id' => 'nullable|exists:vton_models,id',
+
             'short_description' => 'nullable|string|max:2000',
             'description' => 'nullable|string|max:10000',
             'image' => [
@@ -128,7 +128,7 @@ class StoreProductRequest extends FormRequest
             'description' => 'Mô tả',
             'image' => 'Hình ảnh chính',
             'gallery_images' => 'Ảnh bộ sưu tập',
-            'vton_model_id' => 'Người mẫu AI (VTON)',
+
             'variants' => 'Biến thể',
             'variants.*.size_id' => 'Kích thước',
             'variants.*.color_id' => 'Màu sắc',
