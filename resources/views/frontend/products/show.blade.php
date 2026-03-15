@@ -41,7 +41,7 @@
             cursor: not-allowed;
         }
 
-        /* Highlight chÆ°a chá»n thuá»™c tÃ­nh */
+        /* Highlight chÆ°a chá»n thuộc tính */
         .nice-select[style*="border-color: rgb(239, 35, 60)"],
         .nice-select[style*="border-color: #ef233c"] {
             border: 2px solid #ef233c !important;
@@ -372,7 +372,7 @@
                                 @php $totalSold = $product->total_sold; @endphp
                                 @if($totalSold > 0)
                                 <span style="display: inline-flex; align-items: center; gap: 4px; background: #f0f0f0; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #555;">
-                                    <i class="fa fa-shopping-bag" style="color: #ef233c;"></i> ÄÃ£ bÃ¡n {{ $totalSold }}
+                                    <i class="fa fa-shopping-bag" style="color: #ef233c;"></i> ÄÃ£ bán {{ $totalSold }}
                                 </span>
                                 @endif
                                 @if($totalSold >= 10)
@@ -387,7 +387,7 @@
                                 @endif
                                 @if($ratingAvg >= 4.5 && $product->reviews->count() >= 3)
                                 <span style="display: inline-flex; align-items: center; gap: 4px; background: #e8f5e9; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #2e7d32; font-weight: 600;">
-                                    <i class="fa fa-star"></i> ÄÃ¡nh giÃ¡ cao
+                                    <i class="fa fa-star"></i> ÄÃ¡nh giá cao
                                 </span>
                                 @endif
                             </div>
@@ -486,12 +486,12 @@
                                                     }
 
                                                     let message = missingFields.length > 0 ?
-                                                        `Vui lÃ²ng chá»n: <strong>${missingFields.join(', ')}</strong> trÆ°á»›c khi thÃªm vÃ o giá» hÃ ng!` :
-                                                        'Vui lÃ²ng chá»n Ä‘áº§y Ä‘á»§ thuá»™c tÃ­nh sáº£n pháº©m!';
+                                                        `Vui lòng chá»n: <strong>${missingFields.join(', ')}</strong> trước khi thêm vÃ o giá» hÃ ng!` :
+                                                        'Vui lòng chá»n đầy đủ thuộc tính sản phẩm!';
 
                                                     Swal.fire({
                                                         icon: 'warning',
-                                                        title: 'ChÆ°a chá»n thuá»™c tÃ­nh!',
+                                                        title: 'Chưa chá»n thuộc tính!',
                                                         html: message,
                                                         confirmButtonColor: '#ef233c',
                                                         confirmButtonText: 'Chá»n ngay',
@@ -504,7 +504,7 @@
                                                     return false;
                                                 }
 
-                                                // Kiá»ƒm tra sá»‘ lÆ°á»£ng vÆ°á»£t tá»“n kho
+                                                // Kiểm tra số lượng vượt tồn kho
                                                 const qtyInput = document.getElementById('quantity_input');
                                                 const requestedQty = parseInt(qtyInput ? qtyInput.value : 1);
                                                 const maxQty = parseInt(qtyInput ? qtyInput.max : 100);
@@ -514,8 +514,8 @@
                                                     qtyInput.value = maxQty;
                                                     Swal.fire({
                                                         icon: 'error',
-                                                        title: 'VÆ°á»£t quÃ¡ sá»‘ lÆ°á»£ng tá»“n kho!',
-                                                        html: `Sáº£n pháº©m nÃ y chá»‰ cÃ²n <strong>${maxQty}</strong> trong kho.<br>Sá»‘ lÆ°á»£ng Ä‘Ã£ Ä‘Æ°á»£c Ä‘iá»u chá»‰nh vá» má»©c tá»‘i Ä‘a.`,
+                                                        title: 'Vượt quá số lượng tồn kho!',
+                                                        html: `Sản phẩm này chỉ còn <strong>${maxQty}</strong> trong kho.<br>Sá»‘ lÆ°á»£ng đã Ä‘Æ°á»£c Ä‘iá»u chá»‰nh vá» mức tối đa.`,
                                                         confirmButtonColor: '#ef233c',
                                                         confirmButtonText: 'Äá»“ng Ã½',
                                                         timer: 5000,
@@ -525,7 +525,7 @@
                                                 }
                                             });
 
-                                            // Realtime check khi nháº­p sá»‘ lÆ°á»£ng
+                                            // Realtime check khi nhập số lượng
                                             const qtyInputEl = document.getElementById('quantity_input');
                                             if (qtyInputEl) {
                                                 qtyInputEl.addEventListener('input', function() {
@@ -536,7 +536,7 @@
                                                             toast: true,
                                                             position: 'top-end',
                                                             icon: 'warning',
-                                                            title: `Chá»‰ cÃ²n ${max} sáº£n pháº©m trong kho!`,
+                                                            title: `Chỉ còn ${max} sản phẩm trong kho!`,
                                                             showConfirmButton: false,
                                                             timer: 2500,
                                                             timerProgressBar: true,
@@ -590,7 +590,7 @@
                                                     if (matchedVariant.stock_quantity > 0) {
                                                         variantInput.value = matchedVariant.id;
                                                         msg.style.display = 'none';
-                                                        // Cáº­p nháº­t stock info vÃ  max quantity
+                                                        // Cập nhật stock info vÃ  max quantity
                                                         const qtyInput = document.getElementById('quantity_input');
                                                         const stockInfo = document.getElementById('stock-info');
                                                         if (qtyInput) {
@@ -600,7 +600,7 @@
                                                             }
                                                         }
                                                         if (stockInfo) {
-                                                            stockInfo.textContent = `(CÃ²n ${matchedVariant.stock_quantity} sáº£n pháº©m)`;
+                                                            stockInfo.textContent = `(CÃ²n ${matchedVariant.stock_quantity} sản phẩm)`;
                                                             stockInfo.style.display = 'inline';
                                                             stockInfo.style.color = matchedVariant.stock_quantity <= 5 ? '#ef233c' : '#666';
                                                         }
@@ -1022,15 +1022,15 @@
                 var url = form.attr('action');
                 var allVariants = JSON.parse(config.variants);
 
-                // Kiá»ƒm tra thuá»™c tÃ­nh báº¯t buá»™c
+                // Kiểm tra thuộc tính báº¯t buá»™c
                 var hasVariants = config.hasVariants === 'true';
 
                 if (hasVariants) {
-                    // Äá»c giÃ¡ trá»‹ size & color tá»« select gá»‘c
+                    // Äá»c giá trá»‹ size & color tá»« select gá»‘c
                     var selectedSize = $('#select_size_nice').val();
                     var selectedColor = $('#select_color_nice').val();
 
-                    // Validate: pháº£i chá»n Ä‘á»§ size vÃ  color
+                    // Validate: pháº£i chá»n đủ size vÃ  color
                     if (!selectedSize || !selectedColor) {
                         var missingFields = [];
                         if (!selectedSize) {
@@ -1046,12 +1046,12 @@
                         }, 3000);
 
                         var message = missingFields.length > 0 ?
-                            'Vui lÃ²ng chá»n: <strong>' + missingFields.join(', ') + '</strong> trÆ°á»›c khi tiáº¿p tá»¥c!' :
-                            'Vui lÃ²ng chá»n Ä‘áº§y Ä‘á»§ thuá»™c tÃ­nh sáº£n pháº©m!';
+                            'Vui lòng chá»n: <strong>' + missingFields.join(', ') + '</strong> trước khi tiáº¿p tá»¥c!' :
+                            'Vui lòng chá»n đầy đủ thuộc tính sản phẩm!';
 
                         Swal.fire({
                             icon: 'warning',
-                            title: 'ChÆ°a chá»n thuá»™c tÃ­nh!',
+                            title: 'Chưa chá»n thuộc tính!',
                             html: message,
                             confirmButtonColor: '#ef233c',
                             confirmButtonText: 'Chá»n ngay',
@@ -1061,7 +1061,7 @@
                         return;
                     }
 
-                    // Tá»± tÃ¬m variant khá»›p vá»›i size + color Ä‘Ã£ chá»n
+                    // Tự tìm variant khớp với size + color đã chá»n
                     var matchedVariant = null;
                     for (var i = 0; i < allVariants.length; i++) {
                         var v = allVariants[i];
@@ -1076,7 +1076,7 @@
                         Swal.fire({
                             icon: 'warning',
                             title: 'Tá»• há»£p khÃ´ng cÃ³!',
-                            text: 'KhÃ´ng tÃ¬m tháº¥y sáº£n pháº©m vá»›i size vÃ  mÃ u sáº¯c nÃ y.',
+                            text: 'KhÃ´ng tÃ¬m tháº¥y sản phẩm vá»›i size vÃ  mÃ u sáº¯c nÃ y.',
                             confirmButtonColor: '#ef233c',
                         });
                         return;
@@ -1086,20 +1086,20 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Háº¿t hÃ ng!',
-                            html: 'Sáº£n pháº©m vá»›i lá»±a chá»n nÃ y hiá»‡n Ä‘Ã£ <strong>háº¿t hÃ ng</strong>.<br>Vui lÃ²ng chá»n thuá»™c tÃ­nh khÃ¡c.',
+                            html: 'Sản phẩm vá»›i lá»±a chá»n nÃ y hiá»‡n đã <strong>háº¿t hÃ ng</strong>.<br>Vui lòng chá»n thuộc tính khÃ¡c.',
                             confirmButtonColor: '#ef233c',
                             confirmButtonText: 'Chá»n láº¡i',
                         });
                         return;
                     }
 
-                    // Kiá»ƒm tra sá»‘ lÆ°á»£ng yÃªu cáº§u vÆ°á»£t tá»“n kho
+                    // Kiểm tra số lượng yÃªu cáº§u vÆ°á»£t tồn kho
                     var requestedQty = parseInt($('#quantity_input').val()) || 1;
                     if (requestedQty > matchedVariant.stock_quantity) {
                         Swal.fire({
                             icon: 'warning',
-                            title: 'VÆ°á»£t quÃ¡ tá»“n kho!',
-                            html: `Chá»‰ cÃ²n <strong>${matchedVariant.stock_quantity}</strong> sáº£n pháº©m trong kho.<br>Sá»‘ lÆ°á»£ng Ä‘Ã£ Ä‘Æ°á»£c Ä‘iá»u chá»‰nh vá» má»©c tá»‘i Ä‘a.`,
+                            title: 'VÆ°á»£t quÃ¡ tồn kho!',
+                            html: `Chỉ còn <strong>${matchedVariant.stock_quantity}</strong> sản phẩm trong kho.<br>Sá»‘ lÆ°á»£ng đã Ä‘Æ°á»£c Ä‘iá»u chá»‰nh vá» mức tối đa.`,
                             confirmButtonColor: '#ef233c',
                             confirmButtonText: 'Äá»“ng Ã½',
                         });
@@ -1107,7 +1107,7 @@
                         return;
                     }
 
-                    // GÃ¡n variant_id vÃ o form trÆ°á»›c khi serialize
+                    // GÃ¡n variant_id vÃ o form trước khi serialize
                     $('#variant_select').val(matchedVariant.id);
                 }
 
@@ -1120,7 +1120,7 @@
 
                 if (!isBuyNow) {
                     Swal.fire({
-                        title: 'Äang thÃªm vÃ o giá» hÃ ng...',
+                        title: 'Äang thêm vÃ o giá» hÃ ng...',
                         allowOutsideClick: false,
                         didOpen: () => {
                             Swal.showLoading();
@@ -1137,18 +1137,18 @@
                     },
                     success: function(response) {
                         if (response.redirect) {
-                            // buy_now â†’ chuyá»ƒn Ä‘áº¿n checkout
+                            // buy_now â†’ chuyển đến checkout
                             window.location.href = response.redirect;
                             return;
                         }
                         Swal.fire({
                             title: 'ThÃ nh cÃ´ng!',
-                            text: 'Sáº£n pháº©m Ä‘Ã£ Ä‘Æ°á»£c thÃªm vÃ o giá» hÃ ng.',
+                            text: 'Sản phẩm đã Ä‘Æ°á»£c thêm vÃ o giá» hÃ ng.',
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        // Cáº­p nháº­t sá»‘ lÆ°á»£ng giá» hÃ ng trÃªn header
+                        // Cập nhật số lượng giá» hÃ ng trÃªn header
                         let cartCountElements = document.querySelectorAll('.cart-count');
                         if (response.count !== undefined) {
                             cartCountElements.forEach(el => {
