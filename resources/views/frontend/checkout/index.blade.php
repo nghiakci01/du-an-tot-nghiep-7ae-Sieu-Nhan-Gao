@@ -881,6 +881,17 @@
             });
 
             // ============ COUPON ============
+            // Fix collapse toggle behavior for coupon
+            $('[data-bs-target="#checkout_coupon"]').click(function(e) {
+                e.preventDefault();
+                $('#checkout_coupon').collapse('toggle');
+            });
+            // Fix collapse toggle behavior for login
+            $('[data-bs-target="#checkout_login"]').click(function(e) {
+                e.preventDefault();
+                $('#checkout_login').collapse('toggle');
+            });
+
             $('#applyCouponBtn').click(function () {
                 const couponCode = $('#couponCode').val().trim();
                 if (!couponCode) {
