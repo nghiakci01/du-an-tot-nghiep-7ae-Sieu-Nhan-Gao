@@ -55,21 +55,7 @@
                         @enderror
                     </div>
 
-                    <div class="mb-3">
-                        <label for="vton_model_id" class="form-label">Người mẫu AI mặc định (VTON)</label>
-                        <select class="form-select @error('vton_model_id') is-invalid @enderror" id="vton_model_id" name="vton_model_id">
-                            <option value="">-- Không dùng --</option>
-                            @foreach($vtonModels as $model)
-                                <option value="{{ $model->id }}" {{ old('vton_model_id', $category->vton_model_id) == $model->id ? 'selected' : '' }}>
-                                    {{ $model->name }} ({{ $model->gender == 'male' ? 'Nam' : 'Nữ' }})
-                                </option>
-                            @endforeach
-                        </select>
-                        <small class="text-muted">Nếu chọn, tất cả sản phẩm trong danh mục này chưa có người mẫu riêng sẽ dùng người mẫu này.</small>
-                        @error('vton_model_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+
 
                     <div class="mt-3">
                         <button type="submit" class="btn btn-primary">Cập nhật</button>

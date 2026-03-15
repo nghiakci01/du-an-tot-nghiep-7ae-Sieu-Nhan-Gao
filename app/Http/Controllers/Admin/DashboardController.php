@@ -43,9 +43,6 @@ class DashboardController extends Controller
         // Conversion funnel stats
         $funnelStats = $this->conversionService->getFunnelStats('30d');
 
-        // VTON Stats
-        $vtonStats = $this->reportService->getVtonStats($startDate, $endDate);
-
         return view('admin.dashboard', [
             'totalRevenue' => $stats['total_revenue'],
             'totalProfit' => $stats['total_profit'],
@@ -54,9 +51,7 @@ class DashboardController extends Controller
             'totalCustomers' => $stats['total_customers'],
             'totalProducts' => $stats['total_products'],
             'lowStockProducts' => $stats['low_stock_products'],
-            'totalVtonHistories' => $stats['total_vton_histories'],
-            'vtonEnabledProducts' => $stats['vton_enabled_products_count'],
-            'vtonStats' => $vtonStats,
+
             'recentOrders' => $recentOrders,
             'revenueLabels' => $revenueChart['labels'],
             'revenueValues' => $revenueChart['values'],

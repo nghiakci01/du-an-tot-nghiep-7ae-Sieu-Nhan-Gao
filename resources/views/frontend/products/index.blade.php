@@ -35,9 +35,7 @@
                                     @if(request('sort'))
                                         <input type="hidden" name="sort" value="{{ request('sort') }}">
                                     @endif
-                                    @if(request('vton'))
-                                        <input type="hidden" name="vton" value="{{ request('vton') }}">
-                                    @endif
+
                                     <input type="hidden" name="min_price" id="min_price" value="{{ request('min_price', 0) }}">
                                     <input type="hidden" name="max_price" id="max_price" value="{{ request('max_price', 5000000) }}">
 
@@ -46,40 +44,7 @@
                                     <input type="text" name="text" id="amount" readonly style="border:0; color:#f6931d; font-weight:bold; width: 100%; margin-top: 10px;" />   
                                 </form> 
                             </div>
-                            <div class="widget_list widget_categories">
-                                <h2>{{ __('messages.vton_filter') }}</h2>
-                                <ul>
-                                    <li>
-                                        <div class="form-check p-0">
-                                            @php
-                                                $vtonParams = request()->all();
-                                                if (request('vton')) {
-                                                    unset($vtonParams['vton']);
-                                                } else {
-                                                    $vtonParams['vton'] = 1;
-                                                }
-                                            @endphp
-                                            <a href="{{ route('shop', $vtonParams) }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-                                                <div @style([
-                                                    'width: 20px; height: 20px; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center;',
-                                                    'background-color: #ef233c; border-color: #ef233c;' => request('vton'),
-                                                    'background-color: #fff;' => !request('vton')
-                                                ])>
-                                                    @if(request('vton'))
-                                                        <i class="fa fa-check" style="color: #fff; font-size: 10px;"></i>
-                                                    @endif
-                                                </div>
-                                                <span @style([
-                                                    'color: #ef233c; font-weight: 700;' => request('vton'),
-                                                    'color: #333; font-weight: 400;' => !request('vton')
-                                                ])>
-                                                    {{ __('messages.vton_products_only') }}
-                                                </span>
-                                            </a>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
+
                             <div class="widget_list widget_categories">
                                 <h2>{{ __('messages.product_categories') }}</h2>
                                 <ul>
@@ -192,8 +157,21 @@
                                 ])
                                 @endforeach
                             @else
-                                <div class="col-12 text-center">
-                                    <p>No products found.</p>
+                                <div class="col-12">
+                                    <div class="text-center py-5" style="margin-top: 40px; margin-bottom: 40px;">
+                                        <div class="mb-4">
+                                            <i class="fa fa-box-open" style="font-size: 80px; color: #e0e0e0;"></i>
+                                        </div>
+                                        <h3 style="font-size: 22px; color: #333; margin-bottom: 15px; font-weight: 500;">
+                                            {{ __('Rất tiếc, không tìm thấy sản phẩm nào') }}
+                                        </h3>
+                                        <p class="text-muted mb-4" style="font-size: 15px; max-width: 500px; margin: 0 auto 25px auto;">
+                                            Vui lòng thử điều chỉnh lại bộ lọc, tìm kiếm với từ khóa khác hoặc xóa các tùy chọn hiện tại để xem thêm nhiều sản phẩm.
+                                        </p>
+                                        <a href="{{ route('shop') }}" class="btn" style="background: #000; color: #fff; padding: 12px 30px; border-radius: 0; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 1px; transition: all 0.3s ease;">
+                                            HỦY TẤT CẢ BỘ LỌC
+                                        </a>
+                                    </div>
                                 </div>
                             @endif
                         </div>

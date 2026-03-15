@@ -41,7 +41,7 @@
             cursor: not-allowed;
         }
 
-        /* Highlight chÆ°a chá»n thuá»™c tÃ­nh */
+        /* Highlight chÆ°a chá»n thuộc tính */
         .nice-select[style*="border-color: rgb(239, 35, 60)"],
         .nice-select[style*="border-color: #ef233c"] {
             border: 2px solid #ef233c !important;
@@ -306,24 +306,6 @@
             <div class="row">
                 <div class="col-lg-5 col-md-5">
                     <div class="product-details-tab" style="position: relative;">
-                        @php $effectiveVtonModel = $product->getEffectiveVtonModel(); @endphp
-                        @if($effectiveVtonModel)
-                        {{-- Smart AI Mirror Widget --}}
-                        <div id="smart-ai-mirror" onclick="$('#aiTryOnModal').modal('show')">
-                            <div class="mirror-header">AI Smart Mirror</div>
-                            <div class="mirror-body">
-                                <img src="{{ asset('storage/' . $effectiveVtonModel->image) }}" id="mirror-placeholder" class="mirror-img" style="filter: blur(2px) grayscale(100%); opacity: 0.6;">
-                                <div id="mirror-status-loading" class="mirror-loading">
-                                    <div class="mirror-pulse"></div>
-                                    <div class="mirror-text">Äang thá»­ Ä‘á»“...</div>
-                                </div>
-                                <img src="" id="mirror-result-img" class="mirror-img" style="display: none;">
-                                <div id="mirror-success" class="mirror-success-badge" style="display: none;">
-                                    <i class="fa fa-check"></i>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
 
                         <div id="img-1" class="zoomWrapper single-zoom">
                             <a href="#">
@@ -343,17 +325,7 @@
                                             alt="{{ $product->name }}" />
                                     </a>
                                 </li>
-                                @if($product->vton_image)
-                                <li>
-                                    <a href="#" class="elevatezoom-gallery" data-update=""
-                                        data-image="{{ asset('storage/' . $product->vton_image) }}"
-                                        data-zoom-image="{{ asset('storage/' . $product->vton_image) }}"
-                                        style="position: relative; display: block;">
-                                        <img src="{{ asset('storage/' . $product->vton_image) }}" alt="AI Model View" />
-                                        <span class="badge" style="position: absolute; top: 0; left: 0; background: #ef233c; color: white; font-size: 8px; padding: 2px 4px; border-radius: 0 0 4px 0;">AI MODEL</span>
-                                    </a>
-                                </li>
-                                @endif
+
                                 @foreach ($product->images as $image)
                                     <li>
                                         <a href="#" class="elevatezoom-gallery" data-update=""
@@ -366,18 +338,6 @@
                                 @endforeach
                             </ul>
                         </div>
-                        @if($effectiveVtonModel)
-                        <!-- AI Try On Button -->
-                        <div class="mt-4 mb-3 text-center">
-                            <button type="button" id="btn-open-vton-modal" class="btn w-100 py-3 d-flex align-items-center justify-content-center" 
-                                style="background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045); color: white; font-weight: bold; border-radius: 8px; border: none; box-shadow: 0 4px 15px rgba(253, 29, 29, 0.4); transition: transform 0.2s; font-size: 16px;" 
-                                data-bs-toggle="modal" data-bs-target="#aiTryOnModal" data-toggle="modal" data-target="#aiTryOnModal"
-                                onmouseover="this.style.transform='scale(1.02)'" 
-                                onmouseout="this.style.transform='scale(1)'">
-                                <i class="fa fa-magic mr-2" style="font-size: 20px;"></i> âœ¨ {{ __('messages.ai_try_on') === 'messages.ai_try_on' ? 'Thá»­ Äá»“ AI' : __('messages.ai_try_on') }}
-                            </button>
-                        </div>
-                        @endif
 
                     </div>
                 </div>
@@ -412,7 +372,7 @@
                                 @php $totalSold = $product->total_sold; @endphp
                                 @if($totalSold > 0)
                                 <span style="display: inline-flex; align-items: center; gap: 4px; background: #f0f0f0; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #555;">
-                                    <i class="fa fa-shopping-bag" style="color: #ef233c;"></i> ÄÃ£ bÃ¡n {{ $totalSold }}
+                                    <i class="fa fa-shopping-bag" style="color: #ef233c;"></i> ÄÃ£ bán {{ $totalSold }}
                                 </span>
                                 @endif
                                 @if($totalSold >= 10)
@@ -427,7 +387,7 @@
                                 @endif
                                 @if($ratingAvg >= 4.5 && $product->reviews->count() >= 3)
                                 <span style="display: inline-flex; align-items: center; gap: 4px; background: #e8f5e9; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #2e7d32; font-weight: 600;">
-                                    <i class="fa fa-star"></i> ÄÃ¡nh giÃ¡ cao
+                                    <i class="fa fa-star"></i> ÄÃ¡nh giá cao
                                 </span>
                                 @endif
                             </div>
@@ -526,12 +486,12 @@
                                                     }
 
                                                     let message = missingFields.length > 0 ?
-                                                        `Vui lÃ²ng chá»n: <strong>${missingFields.join(', ')}</strong> trÆ°á»›c khi thÃªm vÃ o giá» hÃ ng!` :
-                                                        'Vui lÃ²ng chá»n Ä‘áº§y Ä‘á»§ thuá»™c tÃ­nh sáº£n pháº©m!';
+                                                        `Vui lòng chá»n: <strong>${missingFields.join(', ')}</strong> trước khi thêm vÃ o giá» hÃ ng!` :
+                                                        'Vui lòng chá»n đầy đủ thuộc tính sản phẩm!';
 
                                                     Swal.fire({
                                                         icon: 'warning',
-                                                        title: 'ChÆ°a chá»n thuá»™c tÃ­nh!',
+                                                        title: 'Chưa chá»n thuộc tính!',
                                                         html: message,
                                                         confirmButtonColor: '#ef233c',
                                                         confirmButtonText: 'Chá»n ngay',
@@ -544,7 +504,7 @@
                                                     return false;
                                                 }
 
-                                                // Kiá»ƒm tra sá»‘ lÆ°á»£ng vÆ°á»£t tá»“n kho
+                                                // Kiểm tra số lượng vượt tồn kho
                                                 const qtyInput = document.getElementById('quantity_input');
                                                 const requestedQty = parseInt(qtyInput ? qtyInput.value : 1);
                                                 const maxQty = parseInt(qtyInput ? qtyInput.max : 100);
@@ -554,8 +514,8 @@
                                                     qtyInput.value = maxQty;
                                                     Swal.fire({
                                                         icon: 'error',
-                                                        title: 'VÆ°á»£t quÃ¡ sá»‘ lÆ°á»£ng tá»“n kho!',
-                                                        html: `Sáº£n pháº©m nÃ y chá»‰ cÃ²n <strong>${maxQty}</strong> trong kho.<br>Sá»‘ lÆ°á»£ng Ä‘Ã£ Ä‘Æ°á»£c Ä‘iá»u chá»‰nh vá» má»©c tá»‘i Ä‘a.`,
+                                                        title: 'Vượt quá số lượng tồn kho!',
+                                                        html: `Sản phẩm này chỉ còn <strong>${maxQty}</strong> trong kho.<br>Sá»‘ lÆ°á»£ng đã Ä‘Æ°á»£c Ä‘iá»u chá»‰nh vá» mức tối đa.`,
                                                         confirmButtonColor: '#ef233c',
                                                         confirmButtonText: 'Äá»“ng Ã½',
                                                         timer: 5000,
@@ -565,7 +525,7 @@
                                                 }
                                             });
 
-                                            // Realtime check khi nháº­p sá»‘ lÆ°á»£ng
+                                            // Realtime check khi nhập số lượng
                                             const qtyInputEl = document.getElementById('quantity_input');
                                             if (qtyInputEl) {
                                                 qtyInputEl.addEventListener('input', function() {
@@ -576,7 +536,7 @@
                                                             toast: true,
                                                             position: 'top-end',
                                                             icon: 'warning',
-                                                            title: `Chá»‰ cÃ²n ${max} sáº£n pháº©m trong kho!`,
+                                                            title: `Chỉ còn ${max} sản phẩm trong kho!`,
                                                             showConfirmButton: false,
                                                             timer: 2500,
                                                             timerProgressBar: true,
@@ -630,7 +590,7 @@
                                                     if (matchedVariant.stock_quantity > 0) {
                                                         variantInput.value = matchedVariant.id;
                                                         msg.style.display = 'none';
-                                                        // Cáº­p nháº­t stock info vÃ  max quantity
+                                                        // Cập nhật stock info vÃ  max quantity
                                                         const qtyInput = document.getElementById('quantity_input');
                                                         const stockInfo = document.getElementById('stock-info');
                                                         if (qtyInput) {
@@ -640,7 +600,7 @@
                                                             }
                                                         }
                                                         if (stockInfo) {
-                                                            stockInfo.textContent = `(CÃ²n ${matchedVariant.stock_quantity} sáº£n pháº©m)`;
+                                                            stockInfo.textContent = `(CÃ²n ${matchedVariant.stock_quantity} sản phẩm)`;
                                                             stockInfo.style.display = 'inline';
                                                             stockInfo.style.color = matchedVariant.stock_quantity <= 5 ? '#ef233c' : '#666';
                                                         }
@@ -940,113 +900,6 @@
     </section>
     <!--product section area end-->
 
-    <!-- AI Try On Modal -->
-    <!-- AI Try On Modal -->
-    <div class="modal fade" id="aiTryOnModal" tabindex="-1" aria-labelledby="aiTryOnModalLabel" style="z-index: 10000;">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px; overflow: hidden; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                <div class="modal-header" style="background: linear-gradient(45deg, #111, #333); color: white; border-bottom: none; padding: 20px 25px;">
-                    <h5 class="modal-title" id="aiTryOnModalLabel" style="font-weight: 700; letter-spacing: 1px; margin: 0; color: white;">
-                        <i class="fa fa-magic text-warning" style="margin-right: 8px;"></i> {{ __('messages.ai_try_on_modal_title') ?? 'PhÃ²ng Thá»­ Äá»“ AI' }}
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
-                </div>
-                <div class="modal-body p-0">
-                    <div class="row g-0">
-                        <!-- Left side: Instructions & Upload -->
-                        <div class="col-md-5 p-4" style="background: #f8f9fa; border-right: 1px solid #eee;">
-                            <h6 style="font-weight: 600; color: #ef233c; margin-bottom: 15px;">HÆ°á»›ng dáº«n:</h6>
-                            <ol style="padding-left: 15px; font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 20px;">
-                                <li>Chá»n ngÆ°á»i máº«u hoáº·c táº£i áº£nh cá»§a báº¡n.</li>
-                                <li>NÃªn chá»n áº£nh rÃµ nÃ©t, chá»¥p tháº³ng.</li>
-                                <li>AI sáº½ xá»­ lÃ½ trong khoáº£ng <span style="color: #ef233c; font-weight: bold;">15-30 giÃ¢y</span>.</li>
-                            </ol>
-                            
-                            <form id="vtonForm" enctype="multipart/form-data">
-                                @csrf
-                                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold" style="font-size: 14px;">Chá»n NgÆ°á»i máº«u (TÃ¹y chá»n):</label>
-                                    <select class="form-select form-control" name="vton_model_id" id="vton_model_id" style="font-size: 14px;">
-                                        <option value="">-- DÃ¹ng áº£nh cá»§a báº¡n --</option>
-                                        @foreach($vtonModels as $model)
-                                            <option value="{{ $model->id }}" 
-                                                    data-image="{{ asset('storage/' . $model->image) }}"
-                                                    {{ ($effectiveVtonModel && $effectiveVtonModel->id == $model->id) ? 'selected' : '' }}>
-                                                {{ $model->name }} ({{ $model->gender == 'male' ? 'Nam' : 'Ná»¯' }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="mb-4" id="user-image-group">
-                                    <label for="user_image" class="form-label fw-bold" style="font-size: 14px;">Hoáº·c Táº£i áº£nh cá»§a báº¡n:</label>
-                                    <div class="upload-drop-zone" id="drop-zone" style="border: 2px dashed #ccc; border-radius: 8px; padding: 20px; text-align: center; background: #fff; cursor: pointer;">
-                                        <i class="fa fa-cloud-upload fa-2x text-muted mb-2"></i>
-                                        <p class="mb-0" style="font-size: 12px; color: #666;">Nháº¥p hoáº·c kÃ©o áº£nh vÃ o Ä‘Ã¢y</p>
-                                        <input type="file" id="user_image" name="user_image" accept="image/*" style="display: none;">
-                                    </div>
-                                    <div id="image-preview-container" class="mt-2 text-center" style="display: none;">
-                                        <img id="image-preview" src="" style="max-width: 100%; max-height: 150px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                                        <button type="button" class="btn btn-sm btn-link text-danger" id="remove-image">XÃ³a áº£nh</button>
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="btn w-100 py-3" id="btn-vton-submit" style="background: #111; color: white; font-weight: bold; border-radius: 6px; border: none; transition: 0.3s;">
-                                    Báº¯t Ä‘áº§u thá»­ Ä‘á»“
-                                </button>
-                            </form>
-
-                            <div id="vton-guide-sample" style="display: none;" class="mt-3">
-                                <div class="alert alert-warning p-2" style="font-size: 12px;">
-                                    <i class="fa fa-info-circle"></i> Vui lÃ²ng chá»n áº£nh chá»¥p tháº³ng, rÃµ khuÃ´n máº·t vÃ  dÃ¡ng ngÆ°á»i.
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Right side: Preview area -->
-                        <div class="col-md-7 p-4 d-flex flex-column align-items-center justify-content-center" style="min-height: 450px; background: #fff; position: relative;">
-                            <!-- Initial State -->
-                            <div id="vton-initial" class="text-center text-muted">
-                                <i class="fa fa-picture-o" style="font-size: 50px; color: #ddd; margin-bottom: 15px;"></i>
-                                <p style="font-size: 15px; margin: 0;">Káº¿t quáº£ thá»­ Ä‘á»“ sáº½ hiá»ƒn thá»‹ táº¡i Ä‘Ã¢y</p>
-                            </div>
-                            
-                            <!-- Loading State -->
-                            <div id="vton-loading" class="text-center" style="display: none; width: 100%;">
-                                <!-- Smart Mockup Fallback -->
-                                <div class="smart-mockup-wrapper">
-                                    <div class="mockup-scan-line"></div>
-                                    <img id="mockup-base-img" src="" class="mockup-base" alt="Model">
-                                    <img id="mockup-clothes-img" src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}" class="mockup-item" alt="Garment">
-                                    <div class="mockup-label">AI MOCKUP PREVIEW</div>
-                                </div>
-
-                                <div class="spinner-border text-danger mb-3" role="status" style="width: 2rem; height: 2rem; border-width: 0.2em;">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <h5 style="font-weight: 600; color: #333; font-size: 18px;">AI Äang Xá»­ LÃ½...</h5>
-                                <div class="progress mt-3 mx-auto" style="height: 6px; width: 80%; border-radius: 3px; background-color: #eee;">
-                                    <div id="vton-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: 0%"></div>
-                                </div>
-                                <p id="vton-status-text" class="mt-2" style="color: #666; font-size: 12px; font-weight: 500;">Äang chuáº©n bá»‹ dá»¯ liá»‡u...</p>
-                            </div>
-                            
-                            <!-- Result State -->
-                            <div id="vton-result" class="text-center" style="display: none; width: 100%;">
-                                <div id="vton-3d-card" style="display: inline-block; padding: 10px; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eee;">
-                                    <img id="vton-result-image" src="" alt="VTON Result" style="max-height: 400px; max-width: 100%; border-radius: 8px;">
-                                </div>
-                                <div class="mt-4 d-flex justify-content-center gap-2">
-                                    <a id="vton-download" href="#" download="ai-try-on.jpg" class="btn btn-dark rounded-pill px-4 shadow-sm">
-                                        <i class="fa fa-download"></i> Táº£i áº£nh
-                                    </a>
-                                    <button type="button" id="vton-add-to-cart" class="btn btn-danger rounded-pill px-4 shadow-sm">
-                                        <i class="fa fa-shopping-cart"></i> ThÃªm vÃ o giá»
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1169,15 +1022,15 @@
                 var url = form.attr('action');
                 var allVariants = JSON.parse(config.variants);
 
-                // Kiá»ƒm tra thuá»™c tÃ­nh báº¯t buá»™c
+                // Kiểm tra thuộc tính báº¯t buá»™c
                 var hasVariants = config.hasVariants === 'true';
 
                 if (hasVariants) {
-                    // Äá»c giÃ¡ trá»‹ size & color tá»« select gá»‘c
+                    // Äá»c giá trá»‹ size & color tá»« select gá»‘c
                     var selectedSize = $('#select_size_nice').val();
                     var selectedColor = $('#select_color_nice').val();
 
-                    // Validate: pháº£i chá»n Ä‘á»§ size vÃ  color
+                    // Validate: pháº£i chá»n đủ size vÃ  color
                     if (!selectedSize || !selectedColor) {
                         var missingFields = [];
                         if (!selectedSize) {
@@ -1193,12 +1046,12 @@
                         }, 3000);
 
                         var message = missingFields.length > 0 ?
-                            'Vui lÃ²ng chá»n: <strong>' + missingFields.join(', ') + '</strong> trÆ°á»›c khi tiáº¿p tá»¥c!' :
-                            'Vui lÃ²ng chá»n Ä‘áº§y Ä‘á»§ thuá»™c tÃ­nh sáº£n pháº©m!';
+                            'Vui lòng chá»n: <strong>' + missingFields.join(', ') + '</strong> trước khi tiáº¿p tá»¥c!' :
+                            'Vui lòng chá»n đầy đủ thuộc tính sản phẩm!';
 
                         Swal.fire({
                             icon: 'warning',
-                            title: 'ChÆ°a chá»n thuá»™c tÃ­nh!',
+                            title: 'Chưa chá»n thuộc tính!',
                             html: message,
                             confirmButtonColor: '#ef233c',
                             confirmButtonText: 'Chá»n ngay',
@@ -1208,7 +1061,7 @@
                         return;
                     }
 
-                    // Tá»± tÃ¬m variant khá»›p vá»›i size + color Ä‘Ã£ chá»n
+                    // Tự tìm variant khớp với size + color đã chá»n
                     var matchedVariant = null;
                     for (var i = 0; i < allVariants.length; i++) {
                         var v = allVariants[i];
@@ -1223,7 +1076,7 @@
                         Swal.fire({
                             icon: 'warning',
                             title: 'Tá»• há»£p khÃ´ng cÃ³!',
-                            text: 'KhÃ´ng tÃ¬m tháº¥y sáº£n pháº©m vá»›i size vÃ  mÃ u sáº¯c nÃ y.',
+                            text: 'KhÃ´ng tÃ¬m tháº¥y sản phẩm vá»›i size vÃ  mÃ u sáº¯c nÃ y.',
                             confirmButtonColor: '#ef233c',
                         });
                         return;
@@ -1233,20 +1086,20 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Háº¿t hÃ ng!',
-                            html: 'Sáº£n pháº©m vá»›i lá»±a chá»n nÃ y hiá»‡n Ä‘Ã£ <strong>háº¿t hÃ ng</strong>.<br>Vui lÃ²ng chá»n thuá»™c tÃ­nh khÃ¡c.',
+                            html: 'Sản phẩm vá»›i lá»±a chá»n nÃ y hiá»‡n đã <strong>háº¿t hÃ ng</strong>.<br>Vui lòng chá»n thuộc tính khÃ¡c.',
                             confirmButtonColor: '#ef233c',
                             confirmButtonText: 'Chá»n láº¡i',
                         });
                         return;
                     }
 
-                    // Kiá»ƒm tra sá»‘ lÆ°á»£ng yÃªu cáº§u vÆ°á»£t tá»“n kho
+                    // Kiểm tra số lượng yÃªu cáº§u vÆ°á»£t tồn kho
                     var requestedQty = parseInt($('#quantity_input').val()) || 1;
                     if (requestedQty > matchedVariant.stock_quantity) {
                         Swal.fire({
                             icon: 'warning',
-                            title: 'VÆ°á»£t quÃ¡ tá»“n kho!',
-                            html: `Chá»‰ cÃ²n <strong>${matchedVariant.stock_quantity}</strong> sáº£n pháº©m trong kho.<br>Sá»‘ lÆ°á»£ng Ä‘Ã£ Ä‘Æ°á»£c Ä‘iá»u chá»‰nh vá» má»©c tá»‘i Ä‘a.`,
+                            title: 'VÆ°á»£t quÃ¡ tồn kho!',
+                            html: `Chỉ còn <strong>${matchedVariant.stock_quantity}</strong> sản phẩm trong kho.<br>Sá»‘ lÆ°á»£ng đã Ä‘Æ°á»£c Ä‘iá»u chá»‰nh vá» mức tối đa.`,
                             confirmButtonColor: '#ef233c',
                             confirmButtonText: 'Äá»“ng Ã½',
                         });
@@ -1254,7 +1107,7 @@
                         return;
                     }
 
-                    // GÃ¡n variant_id vÃ o form trÆ°á»›c khi serialize
+                    // GÃ¡n variant_id vÃ o form trước khi serialize
                     $('#variant_select').val(matchedVariant.id);
                 }
 
@@ -1267,7 +1120,7 @@
 
                 if (!isBuyNow) {
                     Swal.fire({
-                        title: 'Äang thÃªm vÃ o giá» hÃ ng...',
+                        title: 'Äang thêm vÃ o giá» hÃ ng...',
                         allowOutsideClick: false,
                         didOpen: () => {
                             Swal.showLoading();
@@ -1284,18 +1137,18 @@
                     },
                     success: function(response) {
                         if (response.redirect) {
-                            // buy_now â†’ chuyá»ƒn Ä‘áº¿n checkout
+                            // buy_now â†’ chuyển đến checkout
                             window.location.href = response.redirect;
                             return;
                         }
                         Swal.fire({
                             title: 'ThÃ nh cÃ´ng!',
-                            text: 'Sáº£n pháº©m Ä‘Ã£ Ä‘Æ°á»£c thÃªm vÃ o giá» hÃ ng.',
+                            text: 'Sản phẩm đã Ä‘Æ°á»£c thêm vÃ o giá» hÃ ng.',
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        // Cáº­p nháº­t sá»‘ lÆ°á»£ng giá» hÃ ng trÃªn header
+                        // Cập nhật số lượng giá» hÃ ng trÃªn header
                         let cartCountElements = document.querySelectorAll('.cart-count');
                         if (response.count !== undefined) {
                             cartCountElements.forEach(el => {
@@ -1321,7 +1174,7 @@
                     error: function(xhr) {
                         var msg = (xhr.responseJSON && xhr.responseJSON.message) ?
                             xhr.responseJSON.message :
-                            'Vui lÃ²ng chá»n Ä‘áº§y Ä‘á»§ thuá»™c tÃ­nh sáº£n pháº©m.';
+                            'Vui lòng chọn đầy đủ thuộc tính sản phẩm.';
                         if (xhr.status === 422) {
                             $('.niceselect_option').next('.nice-select').css('border-color', '#ef233c');
                             setTimeout(function() {
@@ -1330,341 +1183,12 @@
                             }, 3000);
                         }
                         Swal.fire({
-                            title: 'KhÃ´ng thá»ƒ thÃªm',
+                            title: 'Không thể thêm',
                             text: msg,
                             icon: 'warning',
                             confirmButtonColor: '#ef233c'
                         });
                     }
-                });
-            }
-
-            // VTON Modal Open Handling
-            $('#btn-open-vton-modal').on('click', function(e) {
-                e.preventDefault();
-                const config = document.getElementById('product-details-container').dataset;
-
-                var hasVariants = config.hasVariants === 'true';
-
-                if (hasVariants) {
-                    var selectedSize = $('#select_size_nice').val();
-                    var selectedColor = $('#select_color_nice').val();
-
-                    if (!selectedSize || !selectedColor) {
-                        var missingFields = [];
-                        if (!selectedSize) {
-                            missingFields.push(config.msgSize);
-                            $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');
-                        }
-                        if (!selectedColor) {
-                            missingFields.push(config.msgColor);
-                            $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');
-                        }
-                        setTimeout(function() {
-                            $('.niceselect_option').next('.nice-select').css('border-color', '');
-                        }, 3000);
-
-                        var message = missingFields.length > 0 ?
-                            'Vui lÃ²ng chá»n: <strong>' + missingFields.join(', ') + '</strong> trÆ°á»›c khi thá»­ Ä‘á»“!' :
-                            'Vui lÃ²ng chá»n Ä‘áº§y Ä‘á»§ thuá»™c tÃ­nh sáº£n pháº©m trÆ°á»›c khi thá»­ Ä‘á»“!';
-
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'ChÆ°a chá»n thuá»™c tÃ­nh!',
-                            html: message,
-                            confirmButtonColor: '#ef233c',
-                            confirmButtonText: 'Chá»n ngay',
-                            timer: 4000,
-                            timerProgressBar: true,
-                        });
-                        return;
-                    }
-                }
-
-                // If validation passes or no variants, open the modal
-                var myModal = new bootstrap.Modal(document.getElementById('aiTryOnModal'));
-                myModal.show();
-            });
-
-        });
-
-        function showSmartError(message, type = 'error') {
-            Swal.fire({
-                icon: type === 'error' ? 'error' : 'warning',
-                title: type === 'error' ? 'Lá»—i áº£nh' : 'LÆ°u Ã½ áº£nh',
-                text: message,
-                confirmButtonColor: '#ef233c',
-            });
-        }
-
-        document.getElementById('user_image').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // 1. Kiá»ƒm tra dung lÆ°á»£ng (Max 5MB)
-            const maxSize = 5 * 1024 * 1024; // 5MB
-            if (file.size > maxSize) {
-                showSmartError("File quÃ¡ lá»›n. Vui lÃ²ng táº£i áº£nh dung lÆ°á»£ng dÆ°á»›i 5MB.");
-                e.target.value = ''; // Reset input
-                return;
-            }
-
-            // 2. Kiá»ƒm tra Ä‘á»‹nh dáº¡ng (.jpg, .png)
-            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                showSmartError("Äá»‹nh dáº¡ng khÃ´ng há»£p lá»‡. Chá»‰ cháº¥p nháº­n file .jpg, .png hoáº·c .webp.");
-                e.target.value = '';
-                return;
-            }
-
-            // 3. Kiá»ƒm tra Ä‘á»™ phÃ¢n giáº£i & Cáº£nh bÃ¡o chá»¥p toÃ n thÃ¢n
-            const fileURL = window.URL || window.webkitURL;
-            const img = new Image();
-            img.onload = function() {
-                fileURL.revokeObjectURL(this.src); // XÃ³a bá»™ nhá»› Ä‘á»‡m
-                
-                // Kiá»ƒm tra resolution tá»‘i thiá»ƒu (600x800 hoáº·c 800x600 náº¿u chá»¥p ngang)
-                const isMinResValid = (this.width >= 600 && this.height >= 800) || (this.width >= 800 && this.height >= 600);
-                if (!isMinResValid) {
-                    showSmartError("áº¢nh quÃ¡ nhá» hoáº·c má». Vui lÃ²ng chá»¥p áº£nh cÃ³ Ä‘á»™ phÃ¢n giáº£i tá»‘i thiá»ƒu 600x800px hoáº·c 800x600px.");
-                    e.target.value = '';
-                    return;
-                }
-
-                // Cáº£nh bÃ¡o thÃªm UX: Gá»£i Ã½ Ä‘á»©ng tháº³ng náº¿u khung áº£nh lÃ  áº£nh vuÃ´ng (Square) hoáº·c quÃ¡ dá»‹ dáº¡ng
-                const ratio = this.height / this.width;
-                if (ratio < 1.0) {
-                    // áº¢nh Ä‘ang náº±m ngang (landscape) -> BÃ¡o vá»›i User lÃ  server sáº½ tá»± dá»±ng Ä‘á»©ng áº£nh hoáº·c cáº£nh bÃ¡o
-                    console.info("Há»‡ thá»‘ng sáº½ tá»± Ä‘á»™ng xoay áº£nh vá» chiá»u dá»c.");
-                } else if (ratio < 1.2) {
-                    // áº¢nh gáº§n dáº¡ng vuÃ´ng -> Kháº£ nÄƒng cao khÃ´ng tháº¥y toÃ n thÃ¢n
-                    showSmartError("Vui lÃ²ng Ä‘á»©ng tháº³ng vÃ  chá»¥p rÃµ toÃ n thÃ¢n tá»« Ä‘áº§u Ä‘áº¿n chÃ¢n Ä‘á»ƒ thá»­ Ä‘á»“ chÃ­nh xÃ¡c nháº¥t.", 'warning');
-                }
-            };
-            img.src = fileURL.createObjectURL(file);
-        });
-
-        // VTON handling Refined
-        $(document).ready(function() {
-            const vtonForm = $('#vtonForm');
-            const btnSubmit = $('#btn-vton-submit');
-            const dropZone = $('#drop-zone');
-            const fileInput = $('#user_image');
-            const previewImg = $('#image-preview');
-            const previewContainer = $('#image-preview-container');
-            const mannequinSelect = $('#vton_model_id');
-            const resultArea = $('#vton-result');
-            const initialArea = $('#vton-initial');
-            const loadingArea = $('#vton-loading');
-            const progressBar = $('#vton-progress-bar');
-            const statusText = $('#vton-status-text');
-
-            // Handle Drag & Drop
-            dropZone.on('click', () => fileInput.click());
-            dropZone.on('dragover', (e) => { e.preventDefault(); dropZone.css('border-color', '#ef233c'); });
-            dropZone.on('dragleave', () => dropZone.css('border-color', '#ccc'));
-            dropZone.on('drop', (e) => {
-                e.preventDefault();
-                dropZone.css('border-color', '#ccc');
-                const file = e.originalEvent.dataTransfer.files[0];
-                handleFile(file);
-            });
-
-            fileInput.on('change', (e) => handleFile(e.target.files[0]));
-
-            function handleFile(file) {
-                if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        previewImg.attr('src', e.target.result);
-                        previewContainer.show();
-                        dropZone.hide();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            }
-
-            $('#remove-image').on('click', () => {
-                fileInput.val('');
-                previewContainer.hide();
-                dropZone.show();
-            });
-
-            // Status message rotation
-            const statusMessages = [
-                "Đang gửi dữ liệu lên máy chủ AI...",
-                "Đang phân tích vóc dáng người mẫu...",
-                "Đang khớp trang phục vào tư thế...",
-                "Đang tinh chỉnh chất liệu vải...",
-                "Đang áp dụng hiệu ứng ánh sáng...",
-                "Sắp xong rồi, vui lòng đợi thêm chút..."
-            ];
-            let messageIndex = 0;
-            let progress = 0;
-            let progressInterval;
-
-            function startLoading() {
-                initialArea.hide();
-                resultArea.hide();
-                loadingArea.fadeIn();
-                btnSubmit.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
-                
-                const mockupBase = $('#mockup-base-img');
-                const mockupClothes = $('#mockup-clothes-img');
-                mockupClothes.removeClass('active');
-                
-                if (fileInput[0].files && fileInput[0].files[0]) {
-                    mockupBase.attr('src', previewImg.attr('src'));
-                } else {
-                    const selectedModelImg = mannequinSelect.find(':selected').data('image');
-                    if (selectedModelImg) mockupBase.attr('src', selectedModelImg);
-                }
-
-                setTimeout(() => { mockupClothes.addClass('active'); }, 600);
-
-                progress = 0;
-                messageIndex = 0;
-                progressBar.css('width', '0%');
-                statusText.text(statusMessages[0]);
-
-                progressInterval = setInterval(() => {
-                    if (progress < 90) {
-                        progress += Math.random() * 5;
-                        progressBar.css('width', progress + '%');
-                        if (progress > (messageIndex + 1) * 15 && messageIndex < statusMessages.length - 1) {
-                            messageIndex++;
-                            statusText.text(statusMessages[messageIndex]);
-                        }
-                    }
-                }, 1000);
-            }
-
-            function stopLoading(success = true) {
-                if (progressInterval) clearInterval(progressInterval);
-                loadingArea.hide();
-                btnSubmit.prop('disabled', false).text('Thử đồ tiếp');
-                if (success) progressBar.css('width', '100%');
-            }
-
-            function pollVtonStatus(historyId, onComplete, onFail, onProgress) {
-                const basePollUrl = '{{ route("api.vton.status", ["id" => ":id"]) }}';
-                const pollUrl = basePollUrl.replace(':id', historyId);
-
-                const pollInterval = setInterval(() => {
-                    $.get(pollUrl, function(res) {
-                        if (res.status === 'completed') {
-                            clearInterval(pollInterval);
-                            onComplete(res);
-                        } else if (res.status === 'failed') {
-                            clearInterval(pollInterval);
-                            onFail(res);
-                        } else if (onProgress) {
-                            onProgress(res);
-                        }
-                    }).fail(function() {
-                        clearInterval(pollInterval);
-                        onFail({ message: 'Lỗi kết nối hệ thống.' });
-                    });
-                }, 3000);
-            }
-
-            vtonForm.on('submit', function(e) {
-                e.preventDefault();
-                if (!fileInput[0].files[0] && !mannequinSelect.val()) {
-                    Swal.fire('Lưu ý', 'Vui lòng chọn người mẫu hoặc tải ảnh của bạn.', 'warning');
-                    return;
-                }
-                startLoading();
-                const formData = new FormData(this);
-                $.ajax({
-                    url: '{{ route("api.vton.tryOn") }}',
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.success && response.history_id) {
-                            pollVtonStatus(
-                                response.history_id,
-                                function(finalRes) { // Complete
-                                    stopLoading(true);
-                                    $('#vton-result-image').attr('src', finalRes.image_url);
-                                    $('#vton-download').attr('href', finalRes.image_url);
-                                    resultArea.fadeIn();
-                                },
-                                function(errRes) { // Failed
-                                    stopLoading(false);
-                                    initialArea.show();
-                                    Swal.fire('Lỗi AI', errRes.message || 'Không thể xử lý ảnh.', 'error');
-                                },
-                                function(progRes) { // Progress
-                                    statusText.text(progRes.message);
-                                }
-                            );
-                        } else {
-                            stopLoading(false);
-                            initialArea.show();
-                            Swal.fire('Lỗi', response.message || 'Không thể khởi tạo tiến trình.', 'error');
-                        }
-                    },
-                    error: function(xhr) {
-                        stopLoading(false);
-                        initialArea.show();
-                        let msg = 'Máy chủ đang quá tải. Vui lòng thử lại sau.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
-                        Swal.fire('Lỗi hệ thống', msg, 'error');
-                    }
-                });
-            });
-
-            $('#vton-add-to-cart').on('click', function() {
-                $('#aiTryOnModal').modal('hide');
-                $('#btn-add-to-cart').trigger('click');
-            });
-
-            // --- AUTO-RUN LOGIC ---
-            const initialMannequinId = mannequinSelect.val();
-            if (initialMannequinId) runAutoVton(initialMannequinId);
-
-            function runAutoVton(modelId) {
-                const mirror = $('#smart-ai-mirror');
-                const placeholder = $('#mirror-placeholder');
-                const resultImg = $('#mirror-result-img');
-                const statusLoading = $('#mirror-status-loading');
-                const successBadge = $('#mirror-success');
-                const selectedOption = mannequinSelect.find(`option[value="${modelId}"]`);
-                const modelImgUrl = selectedOption.data('image');
-
-                if (modelImgUrl) {
-                    placeholder.attr('src', modelImgUrl);
-                    mirror.addClass('active');
-                }
-
-                $.ajax({
-                    url: '{{ route("api.vton.tryOn") }}',
-                    method: 'POST',
-                    data: { product_id: '{{ $product->id }}', vton_model_id: modelId, _token: '{{ csrf_token() }}' },
-                    success: function(response) {
-                        if (response.success && response.history_id) {
-                            pollVtonStatus(
-                                response.history_id,
-                                function(finalRes) { // Complete
-                                    placeholder.hide();
-                                    resultImg.attr('src', finalRes.image_url).fadeIn(800);
-                                    statusLoading.fadeOut();
-                                    successBadge.show();
-                                    $('#vton-result-image').attr('src', finalRes.image_url);
-                                    $('#vton-download').attr('href', finalRes.image_url);
-                                    resultArea.show();
-                                    initialArea.hide();
-                                },
-                                function() { mirror.removeClass('active'); }
-                            );
-                        } else {
-                            mirror.removeClass('active');
-                        }
-                    },
-                    error: function() { mirror.removeClass('active'); }
                 });
             }
         });

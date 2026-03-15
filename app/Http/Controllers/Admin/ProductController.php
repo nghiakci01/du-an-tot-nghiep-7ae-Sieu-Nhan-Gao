@@ -8,7 +8,7 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\VtonModel;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -40,9 +40,7 @@ class ProductController extends Controller
         $categories = Category::all();
         $sizes = \App\Models\Size::active()->orderBy('display_order')->get();
         $colors = \App\Models\Color::active()->orderBy('display_order')->get();
-        $vtonModels = VtonModel::all();
-
-        return view('admin.products.create', compact('categories', 'sizes', 'colors', 'vtonModels'));
+        return view('admin.products.create', compact('categories', 'sizes', 'colors'));
     }
 
     public function store(StoreProductRequest $request)
@@ -50,8 +48,7 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->except(['variants', 'image', 'vton_model_id']);
-            $data['vton_model_id'] = $request->vton_model_id ?: null;
+            $data = $request->except(['variants', 'image']);
             if (empty($data['price'])) {
                 $data['price'] = 0;
             }
@@ -164,9 +161,7 @@ class ProductController extends Controller
         $categories = Category::all();
         $sizes = \App\Models\Size::active()->orderBy('display_order')->get();
         $colors = \App\Models\Color::active()->orderBy('display_order')->get();
-        $vtonModels = VtonModel::all();
-
-        return view('admin.products.edit', compact('product', 'categories', 'sizes', 'colors', 'vtonModels'));
+        return view('admin.products.edit', compact('product', 'categories', 'sizes', 'colors'));
     }
 
     public function update(UpdateProductRequest $request, Product $product)
@@ -174,8 +169,7 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->except(['variants', 'image', 'vton_model_id']);
-            $data['vton_model_id'] = $request->vton_model_id ?: null;
+            $data = $request->except(['variants', 'image']);
             if (empty($data['price'])) {
                 $data['price'] = 0;
             }

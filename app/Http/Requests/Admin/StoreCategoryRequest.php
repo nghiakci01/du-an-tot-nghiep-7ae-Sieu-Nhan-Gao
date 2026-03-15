@@ -51,7 +51,6 @@ class StoreCategoryRequest extends BaseAdminFormRequest
                 },
             ],
             'is_active' => 'boolean',
-            'vton_model_id' => 'nullable|exists:vton_models,id',
         ];
     }
 

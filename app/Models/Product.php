@@ -28,8 +28,6 @@ class Product extends Model
         'is_active',
         'is_featured',
         'image',
-        'vton_image',
-        'vton_model_id',
     ];
 
     protected $casts = [
@@ -66,26 +64,7 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    public function vtonModel(): BelongsTo
-    {
-        return $this->belongsTo(VtonModel::class, 'vton_model_id');
-    }
 
-    /**
-     * Get the effective VTON model (product-specific or category-default)
-     */
-    public function getEffectiveVtonModel()
-    {
-        if ($this->vton_model_id) {
-            return $this->vtonModel;
-        }
-
-        if ($this->category && $this->category->vton_model_id) {
-            return $this->category->vtonModel;
-        }
-
-        return null;
-    }
 
     public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {

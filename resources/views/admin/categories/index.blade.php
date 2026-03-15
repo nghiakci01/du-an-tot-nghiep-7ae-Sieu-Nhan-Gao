@@ -42,7 +42,7 @@
                                 <th>Tên danh mục</th>
                                 <th>Slug</th>
                                 <th>Danh mục cha</th>
-                                <th>Người mẫu VTON</th>
+
                                 <th>Hành động</th>
                             </tr>
                         </thead>
@@ -59,13 +59,7 @@
                                         <span class="badge bg-secondary">Gốc</span>
                                     @endif
                                 </td>
-                                <td>
-                                    @if($category->vtonModel)
-                                        <span class="badge bg-primary">{{ $category->vtonModel->name }}</span>
-                                    @else
-                                        <span class="text-muted">N/A</span>
-                                    @endif
-                                </td>
+
                                 <td>
                                     <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-warning btn-sm">Sửa</a>
                                     <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">

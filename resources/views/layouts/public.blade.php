@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/plugins.css') }}">
 
     <!-- Main Style CSS -->
-    <link rel="stylesheet" href="{{ asset('frontend-assets/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('frontend-assets/css/style.css') }}?v={{ filemtime(public_path('frontend-assets/css/style.css')) }}">
 
     <!-- Custom Header CSS -->
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/custom-header.css') }}">
@@ -96,12 +96,152 @@
             width: 100% !important;
             height: 100% !important;
             object-fit: cover !important;
-            transition: transform 0.4s ease-in-out !important;
+            transition: transform 0.6s ease !important;
         }
 
         .single_product:hover .product_thumb img {
-            transform: scale(1.08) !important;
+            transform: scale(1.05) !important;
         }
+
+        /* ----- ZARA STYLE OVERRIDES START ----- */
+        .single_product {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0; 
+            box-shadow: none !important;
+            border: 1px solid transparent;
+            transition: border 0.3s ease;
+        }
+
+        .single_product:hover .product_thumb a.secondary_img {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* Clean up action buttons (Hide default cluttered view) */
+        .single_product .hover_action > a {
+            display: none !important;
+        }
+
+        .single_product .product_action {
+            top: 10px;
+            right: 10px;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none;
+        }
+
+        .single_product .action_button {
+            opacity: 1 !important;
+            visibility: hidden;
+            transform: translateX(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            max-height: none;
+        }
+
+        .single_product:hover .action_button {
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .single_product .action_button ul {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .single_product .action_button ul li a {
+            width: 38px;
+            height: 38px;
+            line-height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .single_product .action_button ul li a:hover {
+            background: #000;
+            color: #fff;
+        }
+
+        .single_product .action_button ul li a::before {
+            display: none;
+        }
+
+        /* Redesign Quick view / Add to cart button to slide from bottom like Zara */
+        .single_product .quick_button {
+            bottom: -60px;
+            left: 0;
+            right: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 5;
+            padding: 0;
+            margin: 0;
+            border-radius: 0;
+        }
+
+        .single_product:hover .quick_button {
+            bottom: 0;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .single_product .quick_button a {
+            line-height: 48px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #000;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 0;
+            transition: background 0.3s, color 0.3s;
+            border-top: 1px solid #ebebeb;
+        }
+
+        .single_product .quick_button a:hover {
+            background: #000;
+            color: #fff;
+            border-top: 1px solid #000;
+        }
+
+        /* Content styling - align left, clean font */
+        .single_product .product_content {
+            text-align: left;
+            padding: 0 5px 15px 5px !important;
+        }
+
+        .single_product .product_content h3 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .single_product .product_content h3 a {
+            color: #333;
+        }
+        .single_product .product_content h3 a:hover {
+            color: #000;
+            text-decoration: underline;
+        }
+
+        .single_product .product_content .price_box {
+            margin-top: 5px;
+        }
+
+        /* Hide rating on grid for Zara minimal look */
+        .single_product .product_ratting {
+            display: none !important;
+        }
+        /* ----- ZARA STYLE OVERRIDES END ----- */
 
         /* Remove underlines from header and breadcrumb links */
         .header_area a, 

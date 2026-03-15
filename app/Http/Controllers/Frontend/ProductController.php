@@ -82,15 +82,6 @@ class ProductController extends Controller
             });
         }
 
-        // Filter by VTON Capability
-        if ($request->has('vton')) {
-            $query->where(function ($q) {
-                $q->whereNotNull('vton_model_id')
-                    ->orWhereHas('category', function ($catQ) {
-                        $catQ->whereNotNull('vton_model_id');
-                    });
-            });
-        }
 
         // Sorting
         if ($request->has('sort')) {
@@ -168,7 +159,7 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['category.vtonModel', 'variants.sizeRelationship', 'variants.colorRelationship', 'images', 'reviews.user', 'vtonModel'])
+            ->with(['category', 'variants.sizeRelationship', 'variants.colorRelationship', 'images', 'reviews.user'])
             ->firstOrFail();
 
         // Kiểm tra user đã mua và nhận hàng thành công chưa
@@ -188,9 +179,6 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
-        // Get Available AI Models for selection
-        $vtonModels = \App\Models\VtonModel::latest()->get();
-
-        return view('frontend.products.show', compact('product', 'relatedProducts', 'hasPurchased', 'vtonModels'));
+        return view('frontend.products.show', compact('product', 'relatedProducts', 'hasPurchased'));
     }
 }
