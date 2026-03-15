@@ -192,8 +192,21 @@
                                 ])
                                 @endforeach
                             @else
-                                <div class="col-12 text-center">
-                                    <p>No products found.</p>
+                                <div class="col-12">
+                                    <div class="text-center py-5" style="margin-top: 40px; margin-bottom: 40px;">
+                                        <div class="mb-4">
+                                            <i class="fa fa-box-open" style="font-size: 80px; color: #e0e0e0;"></i>
+                                        </div>
+                                        <h3 style="font-size: 22px; color: #333; margin-bottom: 15px; font-weight: 500;">
+                                            {{ __('Rất tiếc, không tìm thấy sản phẩm nào') }}
+                                        </h3>
+                                        <p class="text-muted mb-4" style="font-size: 15px; max-width: 500px; margin: 0 auto 25px auto;">
+                                            Vui lòng thử điều chỉnh lại bộ lọc, tìm kiếm với từ khóa khác hoặc xóa các tùy chọn hiện tại để xem thêm nhiều sản phẩm.
+                                        </p>
+                                        <a href="{{ route('shop') }}" class="btn" style="background: #000; color: #fff; padding: 12px 30px; border-radius: 0; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 1px; transition: all 0.3s ease;">
+                                            HỦY TẤT CẢ BỘ LỌC
+                                        </a>
+                                    </div>
                                 </div>
                             @endif
                         </div>
