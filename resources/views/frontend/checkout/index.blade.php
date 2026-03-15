@@ -397,7 +397,7 @@
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
                                         <a href="{{ route('password.request') }}">{{ __('messages.lost_password') }}?</a>
-                                        <a href="javascript:void(0)" data-bs-toggle="collapse" data-bs-target="#checkout_login" class="text-secondary" style="text-decoration: none;"><i class="fa fa-angle-up"></i> Thu gọn</a>
+                                        <a href="javascript:void(0)" onclick="$('#checkout_login').collapse('hide')" class="text-secondary" style="text-decoration: none;"><i class="fa fa-angle-up"></i> Thu gọn</a>
                                     </div>
                                 </div>
                             </div>
@@ -429,7 +429,7 @@
                                         <button type="button" id="applyCouponBtn">{{ __('messages.apply_coupon') }}</button>
                                     </div>
                                     <div class="text-end mt-2">
-                                        <a href="javascript:void(0)" data-bs-toggle="collapse" data-bs-target="#checkout_coupon" class="text-secondary" style="text-decoration: none;"><i class="fa fa-angle-up"></i> Thu gọn</a>
+                                        <a href="javascript:void(0)" onclick="$('#checkout_coupon').collapse('hide')" class="text-secondary" style="text-decoration: none;"><i class="fa fa-angle-up"></i> Thu gọn</a>
                                     </div>
                                 @endif
                             </div>
@@ -886,16 +886,6 @@
             });
 
             // ============ COUPON ============
-            // Fix collapse toggle behavior for coupon
-            $('[data-bs-target="#checkout_coupon"]').click(function(e) {
-                e.preventDefault();
-                $('#checkout_coupon').collapse('toggle');
-            });
-            // Fix collapse toggle behavior for login
-            $('[data-bs-target="#checkout_login"]').click(function(e) {
-                e.preventDefault();
-                $('#checkout_login').collapse('toggle');
-            });
 
             $('#applyCouponBtn').click(function () {
                 const couponCode = $('#couponCode').val().trim();
