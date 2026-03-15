@@ -35,9 +35,7 @@
                                     @if(request('sort'))
                                         <input type="hidden" name="sort" value="{{ request('sort') }}">
                                     @endif
-                                    @if(request('vton'))
-                                        <input type="hidden" name="vton" value="{{ request('vton') }}">
-                                    @endif
+
                                     <input type="hidden" name="min_price" id="min_price" value="{{ request('min_price', 0) }}">
                                     <input type="hidden" name="max_price" id="max_price" value="{{ request('max_price', 5000000) }}">
 
@@ -46,40 +44,7 @@
                                     <input type="text" name="text" id="amount" readonly style="border:0; color:#f6931d; font-weight:bold; width: 100%; margin-top: 10px;" />   
                                 </form> 
                             </div>
-                            <div class="widget_list widget_categories">
-                                <h2>{{ __('messages.vton_filter') }}</h2>
-                                <ul>
-                                    <li>
-                                        <div class="form-check p-0">
-                                            @php
-                                                $vtonParams = request()->all();
-                                                if (request('vton')) {
-                                                    unset($vtonParams['vton']);
-                                                } else {
-                                                    $vtonParams['vton'] = 1;
-                                                }
-                                            @endphp
-                                            <a href="{{ route('shop', $vtonParams) }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-                                                <div @style([
-                                                    'width: 20px; height: 20px; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center;',
-                                                    'background-color: #ef233c; border-color: #ef233c;' => request('vton'),
-                                                    'background-color: #fff;' => !request('vton')
-                                                ])>
-                                                    @if(request('vton'))
-                                                        <i class="fa fa-check" style="color: #fff; font-size: 10px;"></i>
-                                                    @endif
-                                                </div>
-                                                <span @style([
-                                                    'color: #ef233c; font-weight: 700;' => request('vton'),
-                                                    'color: #333; font-weight: 400;' => !request('vton')
-                                                ])>
-                                                    {{ __('messages.vton_products_only') }}
-                                                </span>
-                                            </a>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
+
                             <div class="widget_list widget_categories">
                                 <h2>{{ __('messages.product_categories') }}</h2>
                                 <ul>
