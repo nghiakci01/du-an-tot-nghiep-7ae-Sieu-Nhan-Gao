@@ -1026,7 +1026,7 @@
                 var hasVariants = config.hasVariants === 'true';
 
                 if (hasVariants) {
-                    // Äá»c giá trá»‹ size & color tá»« select gá»‘c
+                    // Äá»c giá trá»‹ size & color từ select gốc
                     var selectedSize = $('#select_size_nice').val();
                     var selectedColor = $('#select_color_nice').val();
 
