@@ -305,7 +305,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-5 col-md-5">
-                    <div class="product-details-tab" style="position: r                @endif
+                    <div class="product-details-tab" style="position: relative;">
 
                         <div id="img-1" class="zoomWrapper single-zoom">
                             <a href="#">
@@ -337,8 +337,7 @@
                                     </li>
                                 @endforeach
                             </ul>
-        div>
-                        @endif
+                        </div>
 
                     </div>
                 </div>
