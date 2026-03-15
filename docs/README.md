@@ -21,7 +21,7 @@ docs/
 │   ├── 07-wishlist.md
 │   ├── 08-chatbot-ai.md
 │   ├── 09-theo-doi-don-hang.md
-│   ├── 10-vton.md
+
 │   ├── 11-lien-he.md
 │   └── 12-kiem-tra-ton-kho-thanh-toan.md  ← MỚI
 └── admin/                  ← Đặc tả chức năng Admin Panel
@@ -54,7 +54,7 @@ docs/
 | [07-wishlist.md](frontend/07-wishlist.md) | Danh sách yêu thích |
 | [08-chatbot-ai.md](frontend/08-chatbot-ai.md) | Chatbot AI Gemini tư vấn sản phẩm (RAG) |
 | [09-theo-doi-don-hang.md](frontend/09-theo-doi-don-hang.md) | Tra cứu đơn hàng cho khách vãng lai |
-| [10-vton.md](frontend/10-vton.md) | Thử đồ ảo bằng AI (Virtual Try-On — Replicate Kolors) |
+
 | [11-lien-he.md](frontend/11-lien-he.md) | Form liên hệ với email reply |
 | [12-kiem-tra-ton-kho-thanh-toan.md](frontend/12-kiem-tra-ton-kho-thanh-toan.md) | Đặc tả kiểm tra tồn kho thời gian thực khi thanh toán — **MỚI** |
 
