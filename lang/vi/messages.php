@@ -229,6 +229,7 @@ return [
     'feature_in_development' => 'Tính năng đang phát triển',
     'confirm_remove_cart_item' => 'Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?',
     'confirm_clear_cart' => 'Bạn có chắc chắn muốn xóa toàn bộ giỏ hàng?',
+    'you_may_also_like' => 'Có thể bạn cũng thích',
     'ai_try_on' => 'Thử đồ với AI (Phòng thử đồ ảo)',
 
     'ai_try_on_modal_title' => 'Trải nghiệm Thử Đồ AI',
