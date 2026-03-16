@@ -49,6 +49,7 @@ class ReportService
             'new_orders' => $newOrders,
             'total_customers' => $totalCustomers,
             'total_products' => Product::where('is_active', true)->count(),
+            'low_stock_products' => ProductVariant::whereColumn('stock_quantity', '<=', 'alert_threshold')->count(),
         ];
     }
 
