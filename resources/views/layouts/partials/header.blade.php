@@ -80,7 +80,7 @@
             <div class="offcanvas_footer">
                 <span><a href="mailto:{{ $settings['site_email'] ?? 'Elite@gmail.com' }}"><i class="fa fa-envelope-o"></i> {{ $settings['site_email'] ?? 'Elite@gmail.com' }}</a></span>
                 <ul>
-                    <li class="facebook"><a href="{{ $settings['social_facebook'] ?? '#' }}"><i class="fa fa-facebook"></i></a></li>
+                    <li class="facebook"><a href="{{ $settings['social_facebook'] ?? 'https://www.facebook.com/profile.php?id=61577211110743' }}"><i class="fa fa-facebook"></i></a></li>
                     <li class="instagram"><a href="{{ $settings['social_instagram'] ?? '#' }}"><i class="fa fa-instagram"></i></a></li>
                     <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
                     <li class="youtube"><a href="#"><i class="fa fa-youtube"></i></a></li>

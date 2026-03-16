@@ -42,7 +42,7 @@
                             <ul>
                                 <li><a href="#" title="Twitter"><i class="fa fa-twitter"></i></a></li>
                                 <li><a href="#" title="google-plus"><i class="fa fa-google-plus"></i></a></li>
-                                <li><a href="{{ $settings['social_facebook'] ?? '#' }}" title="facebook"><i class="fa fa-facebook"></i></a></li>
+                                <li><a href="{{ $settings['social_facebook'] ?? 'https://www.facebook.com/profile.php?id=61577211110743' }}" title="facebook"><i class="fa fa-facebook"></i></a></li>
                                 <li><a href="{{ $settings['social_instagram'] ?? '#' }}" title="Instagram"><i class="fa fa-instagram"></i></a></li>
                                 <li><a href="#" title="youtube"><i class="fa fa-youtube"></i></a></li>
                             </ul>
