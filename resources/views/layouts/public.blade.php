@@ -289,7 +289,7 @@
     @stack('scripts')
     @yield('scripts')
 
-    @if($chatbot_enabled)
+    @if($chatbot_enabled ?? false)
         @include('frontend.partials.chatbot-widget')
     @endif
     <div id="layout-config" style="display: none;"
