@@ -22,18 +22,22 @@
                 <use xlink:href="#custom-sun-1"></use>
               </svg></a>
             <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
-              <a href="#!" class="dropdown-item" onclick="layout_change('dark')"><svg class="pc-icon">
+              <a href="#!" class="dropdown-item" onclick="layout_change('dark'); localStorage.setItem('theme','dark')">
+                <svg class="pc-icon">
                   <use xlink:href="#custom-moon"></use>
                 </svg>
-                <span>Tối</span> </a><a href="#!" class="dropdown-item" onclick="layout_change('light')"><svg
-                  class="pc-icon">
+                <span>Tối</span>
+              </a>
+              <a href="#!" class="dropdown-item" onclick="layout_change('light'); localStorage.setItem('theme','light')">
+                <svg class="pc-icon">
                   <use xlink:href="#custom-sun-1"></use>
                 </svg>
-                <span>Sáng</span> </a><a href="#!" class="dropdown-item" onclick="layout_change_default()"><svg
-                  class="pc-icon">
-                  <use xlink:href="#custom-setting-2"></use>
-                </svg>
-                <span>Mặc định</span></a>
+                <span>Sáng</span>
+              </a>
+              <a href="#!" class="dropdown-item" onclick="layout_change_default()">
+                <i class="ph-duotone ph-cpu pc-icon"></i>
+                <span>Tự động</span>
+              </a>
             </div>
           </li>
 
