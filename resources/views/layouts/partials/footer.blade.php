@@ -77,4 +77,43 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mcForm = document.getElementById('mc-form');
+            if (mcForm) {
+                // Prevent default submission to avoid navigating away or showing default errors built-in somewhere
+                $(mcForm).on('submit', function(e) {
+                    e.preventDefault();
+                    const mcEmail = document.getElementById('mc-email');
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    
+                    if(mcEmail && mcEmail.value && emailRegex.test(mcEmail.value)) {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: 'Cảm ơn bạn đã đăng ký nhận bản tin!',
+                                confirmButtonColor: '#ef233c',
+                            });
+                        } else {
+                            alert('Cảm ơn bạn đã đăng ký nhận bản tin!');
+                        }
+                        mcForm.reset();
+                    } else {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: 'Vui lòng nhập địa chỉ email hợp lệ.',
+                                confirmButtonColor: '#ef233c',
+                            });
+                        } else {
+                            alert('Vui lòng nhập địa chỉ email hợp lệ.');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 </footer>
