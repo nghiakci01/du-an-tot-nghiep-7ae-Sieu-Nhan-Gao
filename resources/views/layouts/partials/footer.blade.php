@@ -40,11 +40,11 @@
                             <p>{{ __('messages.phone') }}: <a href="tel:{{ str_replace(' ', '', $settings['site_phone'] ?? '0354869999') }}">{{ $settings['site_phone'] ?? '0354869999' }}</a> </p>
                             <p>{{ __('messages.email') }}: {{ $settings['site_email'] ?? 'Elite@gmail.com' }}</p>
                             <ul>
-                                <li><a href="#" title="Twitter"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="#" title="google-plus"><i class="fa fa-google-plus"></i></a></li>
-                                <li><a href="{{ $settings['social_facebook'] ?? 'https://www.facebook.com/profile.php?id=61577211110743' }}" title="facebook"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="{{ $settings['social_instagram'] ?? '#' }}" title="Instagram"><i class="fa fa-instagram"></i></a></li>
-                                <li><a href="#" title="youtube"><i class="fa fa-youtube"></i></a></li>
+                                <li><a href="https://twitter.com/" title="Twitter" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a></li>
+                                <li><a href="https://plus.google.com/" title="google-plus" target="_blank" rel="noopener noreferrer"><i class="fa fa-google-plus"></i></a></li>
+                                <li><a href="{{ $settings['social_facebook'] ?? 'https://www.facebook.com/profile.php?id=61577211110743' }}" title="facebook" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook"></i></a></li>
+                                <li><a href="{{ $settings['social_instagram'] ?? 'https://www.instagram.com/' }}" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a></li>
+                                <li><a href="https://www.youtube.com/" title="youtube" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube"></i></a></li>
                             </ul>
                         </div>
                     </div>
