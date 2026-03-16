@@ -8,11 +8,11 @@
                         <div class="footer_menu">
                             <ul>
                                 <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
-                                <li><a href="#">{{ __('messages.delivery_information') }}</a></li>
-                                <li><a href="#">{{ __('messages.privacy_policy') }}</a></li>
-                                <li><a href="#">{{ __('messages.terms_conditions') }}</a></li>
+                                <li><a href="http://127.0.0.1:8000/news">{{ __('messages.delivery_information') }}</a></li>
+                                <li><a href="http://127.0.0.1:8000/news">    {{ __('messages.privacy_policy') }}</a></li>
+                                <li><a href="http://127.0.0.1:8000/news">{{ __('messages.terms_conditions') }}</a></li>
                                 <li><a href="{{ route('contact.index') }}">{{ __('messages.contact_us') }}</a></li>
-                                <li><a href="#">{{ __('messages.returns') }}</a></li>
+                                <li><a href="http://127.0.0.1:8000/news">{{ __('messages.returns') }}</a></li>
                             </ul>
                         </div>
                     </div>
@@ -46,6 +46,11 @@
                                 <li><a href="{{ $settings['social_instagram'] ?? 'https://www.instagram.com/' }}" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a></li>
                                 <li><a href="https://www.youtube.com/" title="youtube" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube"></i></a></li>
                             </ul>
+                            <div class="bocongthuong_logo" style="margin-top: 15px;">
+                                <a href="http://online.gov.vn/" target="_blank" rel="noopener noreferrer">
+                                    <img src="https://tenten.vn/tin-tuc/wp-content/uploads/2024/09/Dinh-nghia-Da-thong-bao-voi-Bo-Cong-Thuong-la-gi.png" alt="Đã thông báo Bộ Công Thương" style="max-width: 360px;">
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
