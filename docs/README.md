@@ -2,7 +2,7 @@
 
 > **Dự án:** Elite — Hệ thống thương mại điện tử thời trang nam  
 > **Công nghệ:** Laravel 10+, MySQL, Bootstrap, Blade Templates, Gemini AI  
-> **Cập nhật:** 09/03/2026
+> **Cập nhật:** 14/03/2026
 
 ---
 
@@ -94,16 +94,16 @@ docs/
 
 ```
 Elite E-Commerce (Laravel 10+)
-├── Frontend (Khách hàng)     → routes/web.php + Controllers/Frontend/ (13 controllers)
-├── Admin Panel               → /admin prefix + Controllers/Admin/ (26 controllers)
+├── Frontend (Khách hàng)     → routes/web.php + Controllers/Frontend/ (14 controllers)
+├── Admin Panel               → /admin prefix + Controllers/Admin/ (28 controllers)
 ├── API Layer                 → Controllers/Api/ (Chatbot)
 ├── Services/                 → ChatService, VnpayService, LoyaltyPointService,
 │                                ConversionTrackingService, OrderService, ReportService,
 │                                ShippingService
-└── Database                  → 34 Models, MySQL (70+ migrations)
+└── Database                  → 36 Models, MySQL (70+ migrations)
 ```
 
-## 📦 Danh Sách Models (34 Models)
+## 📦 Danh Sách Models (36 Models)
 
 | Nhóm | Models |
 |------|--------|
@@ -116,4 +116,5 @@ Elite E-Commerce (Laravel 10+)
 | **Thanh toán** | `BankSetting` |
 | **Chatbot** | `ChatSession`, `ChatMessage`, `ChatbotSetting`, `ChatbotSuggestedQuestion` |
 | **Blog** | `Post`, `PostCategory` |
+| **VTON (Thử đồ)** | `VtonModel`, `VtonHistory` |
 | **Hệ thống** | `Setting`, `Banner`, `AuditLog`, `ContactMessage`, `Review`, `Wishlist` |
