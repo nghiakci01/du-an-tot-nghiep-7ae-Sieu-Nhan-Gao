@@ -34,7 +34,14 @@ class OrderService
 
         DB::transaction(function () use ($order, $newStatus, $oldStatus, $user, $note) {
             // update status
-            $order->update(['status' => $newStatus]);
+            $updateData = ['status' => $newStatus];
+
+            // Auto-mark as paid if order is completed
+            if ($newStatus === Order::STATUS_COMPLETED && $order->payment_status !== 'paid') {
+                $updateData['payment_status'] = 'paid';
+            }
+
+            $order->update($updateData);
 
             // create history
             OrderHistory::create([
