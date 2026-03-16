@@ -138,24 +138,8 @@
   {{--
   <script defer="defer" src="https://fomo.codedthemes.com/pixel/CDkpF1sQ8Tt5wpMZgqRvKpQiUhpWE3bc"></script> --}}
 
-  <script>
-    layout_change("light");
-  </script>
-  <script>
-    change_box_container("false");
-  </script>
-  <script>
-    layout_caption_change("true");
-  </script>
-  <script>
-    layout_rtl_change("false");
-  </script>
-  <script>
-    preset_change("preset-1");
-  </script>
-  <script>
-    main_layout_change("vertical");
-  </script>
+  <script src="{{ asset('admin-assets') }}/js/plugins/feather.min.js"></script>
+
   {{--
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
     integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="
