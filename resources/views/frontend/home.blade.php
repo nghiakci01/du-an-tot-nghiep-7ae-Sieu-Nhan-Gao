@@ -585,11 +585,11 @@
                                     <div class="modal_social">
                                         <h2>Chia sẻ sản phẩm</h2>
                                         <ul>
-                                            <li class="facebook"><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                            <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                            <li class="pinterest"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-                                            <li class="google-plus"><a href="#"><i class="fa fa-google-plus"></i></a></li>
-                                            <li class="linkedin"><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                                            <li class="facebook"><a href="{{ $settings['social_facebook'] ?? 'https://www.facebook.com/profile.php?id=61577211110743' }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook"></i></a></li>
+                                            <li class="twitter"><a href="https://twitter.com/" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a></li>
+                                            <li class="pinterest"><a href="https://www.pinterest.com/" target="_blank" rel="noopener noreferrer"><i class="fa fa-pinterest"></i></a></li>
+                                            <li class="google-plus"><a href="https://plus.google.com/" target="_blank" rel="noopener noreferrer"><i class="fa fa-google-plus"></i></a></li>
+                                            <li class="linkedin"><a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer"><i class="fa fa-linkedin"></i></a></li>
                                         </ul>
                                     </div>
                                 </div>

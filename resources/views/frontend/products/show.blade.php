@@ -668,9 +668,9 @@
                             <h3>{{ __('messages.share_on') }}</h3>
                             <ul>
                                 <li><a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
-                                        target="_blank" title="Share on Facebook"><i class="fa fa-facebook"></i></a></li>
+                                        target="_blank" rel="noopener noreferrer" title="Share on Facebook"><i class="fa fa-facebook"></i></a></li>
                                 <li><a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($product->name) }}"
-                                        target="_blank" title="Share on Twitter"><i class="fa fa-twitter"></i></a></li>
+                                        target="_blank" rel="noopener noreferrer" title="Share on Twitter"><i class="fa fa-twitter"></i></a></li>
                             </ul>
                         </div>
 
