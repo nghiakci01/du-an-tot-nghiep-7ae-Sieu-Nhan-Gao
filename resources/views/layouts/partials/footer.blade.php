@@ -1,4 +1,45 @@
 <footer class="footer_widgets footer_six">
+    <div class="footer_support" style="border-top: 1px solid #ebebeb; padding: 40px 0; background: #fff;">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-md-auto mb-4 mb-md-0" style="margin-right: 50px;">
+                    <div class="support_block" style="text-align: left;">
+                        <p style="text-transform: uppercase; font-size: 14px; color: #333; margin-bottom: 15px; font-weight: 500;">GỌI MUA HÀNG ( 8:30 - 22:20 )</p>
+                        <div class="support_phone" style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                            <i class="fa fa-phone" style="background: #df2d2d; color: #fff; width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 50%; font-size: 20px;"></i>
+                            <span style="font-size: 24px; font-weight: 300; color: #333; letter-spacing: 1px;">096728.4444</span>
+                        </div>
+                        <p style="color: #666; font-size: 13px; margin-bottom: 0;">Tất cả các ngày trong tuần</p>
+                    </div>
+                </div>
+                <div class="col-md-auto mb-4 mb-md-0" style="margin-right: 50px;">
+                    <div class="support_block" style="text-align: left; ">
+                        <p style="text-transform: uppercase; font-size: 14px; color: #333; margin-bottom: 15px; font-weight: 500;">GÓP Ý, KHIẾU NẠI ( 8:00 - 17:00 )</p>
+                        <div class="support_phone" style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                            <i class="fa fa-phone" style="background: #df2d2d; color: #fff; width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 50%; font-size: 20px;"></i>
+                            <span style="font-size: 24px; font-weight: 300; color: #333; letter-spacing: 1px;">096.895.90.50</span>
+                        </div>
+                        <p style="color: #666; font-size: 13px; margin-bottom: 0;">Các ngày trong tuần ( trừ ngày lễ )</p>
+                    </div>
+                </div>
+                <div class="col-md-auto">
+                    <div class="support_block" style="text-align: left;">
+                        <p style="text-transform: uppercase; font-size: 16px; color: #333; margin-bottom: 15px; font-weight: 500;">THEO DÕI CHÚNG TÔI</p>
+                        <div class="social_follow" style="display: flex; gap: 10px; align-items: center;">
+                            <a href="{{ $settings['social_facebook'] ?? 'https://www.facebook.com/profile.php?id=61577211110743' }}" target="_blank" rel="noopener noreferrer" style="color: #333; font-size: 32px; transition: color 0.3s;"><i class="fa fa-facebook-square"></i></a>
+                            <a href="{{ $settings['social_instagram'] ?? 'https://www.instagram.com/' }}" target="_blank" rel="noopener noreferrer" style="color: #333; font-size: 32px; transition: color 0.3s;"><i class="fa fa-instagram"></i></a>
+                            <a href="#" target="_blank" rel="noopener noreferrer" style="transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">
+                                <img src="https://icon-icons.com/download-file?file=https%3A%2F%2Fimages.icon-icons.com%2F3915%2FPNG%2F512%2Fshopee_logo_icon_249631.png&id=249631&pack_or_individual=pack  " alt="Shopee" style="width: 32px; height: 32px; object-fit: contain; margin-bottom: 8px;">
+                            </a>
+                            <a href="#" target="_blank" rel="noopener noreferrer" style="transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">
+                                <img src="https://www.citypng.com/public/uploads/preview/lazada-laz-square-white-icon-701751694968344ipp4hnbd4h.png?v=2026031223" alt="Lazada" style="width: 32px; height: 32px; object-fit: contain;">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="footer_top">
         <div class="container-fluid">
             <div class="row">
