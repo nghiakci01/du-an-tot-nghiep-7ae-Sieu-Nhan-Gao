@@ -62,6 +62,18 @@
     a {
       text-decoration: none !important;
     }
+
+    /* Layout-Aware User Profile */
+    /* Ẩn Header Profile khi ở Vertical (mặc định) */
+    body:not([data-pc-layout="compact"]):not([data-pc-layout="tab"]) .pc-user-profile-header {
+        display: none !important;
+    }
+    
+    /* Ẩn Sidebar Profile khi ở Compact hoặc Tab */
+    body[data-pc-layout="compact"] .pc-user-profile-sidebar,
+    body[data-pc-layout="tab"] .pc-user-profile-sidebar {
+        display: none !important;
+    }
   </style>
 </head><!-- [Head] end --><!-- [Body] Start -->
 

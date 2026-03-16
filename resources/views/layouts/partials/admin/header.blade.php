@@ -132,7 +132,9 @@
               </div>
             </div>
           </li>
-          <li class="dropdown pc-h-item header-user-profile">
+          
+          <!-- User Profile Admin-->
+          <li class="dropdown pc-h-item header-user-profile pc-user-profile-header">
             <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
               aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
                 @if(Auth::check() && Auth::user()->avatar)
@@ -147,60 +149,113 @@
               </div>
               <div class="dropdown-body">
                 <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
-                  <div class="d-flex mb-1">
+
+                  {{-- Avatar + info --}}
+                  <div class="d-flex align-items-center mb-2">
                     <div class="flex-shrink-0">
                       @if(Auth::check() && Auth::user()->avatar)
-                          <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="user-image" class="user-avtar wid-35" />
+                          <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="user-image" class="user-avtar wid-45 rounded-circle" style="object-fit:cover" />
                       @else
-                          <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::check() ? Auth::user()->name : 'Admin') }}&background=random" alt="user-image" class="user-avtar wid-35" />
+                          <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::check() ? Auth::user()->name : 'Admin') }}&background=random" alt="user-image" class="user-avtar wid-45 rounded-circle" />
                       @endif
                     </div>
                     <div class="flex-grow-1 ms-3">
-                      <h6 class="mb-1">{{ Auth::check() ? Auth::user()->name : 'Admin' }} 🖖</h6>
-                      <span><a href="mailto:{{ Auth::check() ? Auth::user()->email : '#' }}" class="__cf_email__">{{ Auth::check() ? Auth::user()->email : 'admin@example.com' }}</a></span>
+                      <h6 class="mb-0">{{ Auth::check() ? Auth::user()->name : 'Admin' }}</h6>
+                      <small class="text-muted">{{ ucfirst(Auth::check() ? Auth::user()->role : 'admin') }}</small><br>
+                      <small><a href="mailto:{{ Auth::check() ? Auth::user()->email : '#' }}" class="text-muted">{{ Auth::check() ? Auth::user()->email : 'admin@example.com' }}</a></small>
                     </div>
                   </div>
-                  <hr class="border-secondary border-opacity-50" />
-                  <div class="card">
-                    <div class="card-body py-3">
-                      <div class="d-flex align-items-center justify-content-between">
-                        <h5 class="mb-0 d-inline-flex align-items-center">
-                          <svg class="pc-icon text-muted me-2">
-                            <use xlink:href="#custom-notification-outline"></use>
-                          </svg>Thông báo
-                        </h5>
-                        <div class="form-check form-switch form-check-reverse m-0">
-                          <input class="form-check-input f-18" type="checkbox" role="switch" />
-                        </div>
-                      </div>
+
+                  <hr class="border-secondary border-opacity-50 mt-1" />
+
+                  {{-- Sound toggle --}}
+                  <div class="d-flex align-items-center justify-content-between px-1 py-2">
+                    <h6 class="mb-0 d-inline-flex align-items-center">
+                      <i class="ph-duotone ph-speaker-high text-muted me-2 f-18" id="header-sound-icon"></i>
+                      Âm thanh thông báo
+                    </h6>
+                    <div class="form-check form-switch form-check-reverse m-0">
+                      <input class="form-check-input f-18" type="checkbox" role="switch"
+                             id="header-sound-toggle" title="Bật/Tắt âm thanh thông báo">
                     </div>
                   </div>
+
                   <hr class="border-secondary border-opacity-50" />
                   <p class="text-span">Quản lý</p>
-                  <a href="{{ route('admin.profile.index') }}" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
-                        <use xlink:href="#custom-setting-outline"></use>
-                      </svg>
+
+                  <a href="{{ route('admin.profile.index') }}" class="dropdown-item">
+                    <span>
+                      <svg class="pc-icon text-muted me-2"><use xlink:href="#custom-setting-outline"></use></svg>
                       <span>Cài đặt</span>
-                    </span></a><a href="{{ route('admin.profile.index') }}" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
-                        <use xlink:href="#custom-lock-outline"></use>
-                      </svg>
-                      <span>Đổi mật khẩu</span></span></a>
+                    </span>
+                  </a>
+                  <a href="{{ route('admin.profile.index') }}" class="dropdown-item">
+                    <span>
+                      <svg class="pc-icon text-muted me-2"><use xlink:href="#custom-lock-outline"></use></svg>
+                      <span>Đổi mật khẩu</span>
+                    </span>
+                  </a>
+                  <a href="{{ route('admin.lock') ?? '#' }}" class="dropdown-item">
+                    <span>
+                      <i class="ti ti-lock text-muted me-2 f-18"></i>
+                      <span>Khóa màn hình</span>
+                    </span>
+                  </a>
+
                   <hr class="border-secondary border-opacity-50" />
-                  <div class="d-grid mb-3 mt-3">
+
+                  <div class="d-grid mb-2 mt-2">
                     <form method="POST" action="{{ route('logout') }}">
                       @csrf
                       <button class="btn btn-primary w-100" type="submit">
-                        <svg class="pc-icon me-2">
-                          <use xlink:href="#custom-logout-1-outline"></use>
-                        </svg>Đăng xuất
+                        <svg class="pc-icon me-2"><use xlink:href="#custom-logout-1-outline"></use></svg>
+                        Đăng xuất
                       </button>
                     </form>
                   </div>
+
                 </div>
               </div>
             </div>
           </li>
+          
         </ul>
       </div>
     </div>
   </header>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const headerToggle = document.getElementById('header-sound-toggle');
+    const headerIcon = document.getElementById('header-sound-icon');
+    const sidebarToggle = document.getElementById('sidebar-sound-toggle');
+    const sidebarIcon = document.getElementById('sidebar-sound-icon');
+
+    const updateSoundIcons = (isMuted) => {
+        const targetClass = isMuted ? 'ph-duotone ph-speaker-slash text-muted me-2 f-18' : 'ph-duotone ph-speaker-high text-muted me-2 f-18';
+        const sidebarTargetClass = isMuted ? 'ph-duotone ph-speaker-slash f-18' : 'ph-duotone ph-speaker-high f-18';
+        
+        if (headerIcon) headerIcon.className = targetClass;
+        if (sidebarIcon) sidebarIcon.className = sidebarTargetClass;
+    };
+
+    // Đọc trạng thái từ localStorage (mặc định là bật - false)
+    const isSoundMuted = localStorage.getItem('sound_muted') === 'true';
+    if (headerToggle) headerToggle.checked = !isSoundMuted;
+    if (sidebarToggle) sidebarToggle.checked = !isSoundMuted;
+    updateSoundIcons(isSoundMuted);
+
+    const onToggle = (e) => {
+        const isMuted = !e.target.checked;
+        localStorage.setItem('sound_muted', isMuted);
+        
+        if (headerToggle) headerToggle.checked = !isMuted;
+        if (sidebarToggle) sidebarToggle.checked = !isMuted;
+        
+        updateSoundIcons(isMuted);
+    };
+
+    if (headerToggle) headerToggle.addEventListener('change', onToggle);
+    if (sidebarToggle) sidebarToggle.addEventListener('change', onToggle);
+});
+</script>

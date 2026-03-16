@@ -128,11 +128,16 @@ function layout_change_default() {
 // so this always runs last and correctly overrides the server-side default.
 document.addEventListener("DOMContentLoaded", function () {
     if ("undefined" !== typeof Storage) {
-        var saved = localStorage.getItem("theme");
-        if (saved === "default") {
+        var savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "default") {
             layout_change_default();
-        } else if (saved === "dark" || saved === "light") {
-            layout_change(saved);
+        } else if (savedTheme === "dark" || savedTheme === "light") {
+            layout_change(savedTheme);
+        }
+        
+        var savedLayout = localStorage.getItem("layout");
+        if (savedLayout) {
+            main_layout_change(savedLayout);
         }
         // If nothing is saved, keep the server-side default (already applied by inline script)
     } else {
@@ -245,6 +250,9 @@ function change_box_container(e) {
 function main_layout_change(e) {
     var body = document.getElementsByTagName("body")[0];
     if (body) body.setAttribute("data-pc-layout", e);
+    if ("undefined" !== typeof Storage) {
+        localStorage.setItem("layout", e);
+    }
 }
 
 // ── DOMContentLoaded: preset colors, SimpleBar, layout reset ─────────────────
