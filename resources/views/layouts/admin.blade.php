@@ -13,10 +13,16 @@
   <script>
     (function() {
       const savedTheme = localStorage.getItem('theme') || 'light';
-      document.documentElement.setAttribute('data-pc-theme', savedTheme);
+      const html = document.documentElement;
+      html.setAttribute('data-pc-theme', savedTheme);
       if (savedTheme === 'dark') {
-          document.documentElement.classList.add('dark-mode');
+          html.classList.add('dark-mode');
       }
+      
+      // Đồng bộ luôn cho body nếu nó đã có sẵn (dù script này thường chạy ở head)
+      document.addEventListener('DOMContentLoaded', () => {
+          document.body.setAttribute('data-pc-theme', savedTheme);
+      });
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />

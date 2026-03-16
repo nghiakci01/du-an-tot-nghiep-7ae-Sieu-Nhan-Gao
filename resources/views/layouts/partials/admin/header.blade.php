@@ -169,14 +169,14 @@
                   <hr class="border-secondary border-opacity-50 mt-1" />
 
                   {{-- Sound toggle --}}
-                  <div class="d-flex align-items-center justify-content-between px-1 py-2">
-                    <h6 class="mb-0 d-inline-flex align-items-center">
-                      <i class="ph-duotone ph-speaker-high text-muted me-2 f-18" id="header-sound-icon"></i>
+                  <div class="d-flex align-items-center justify-content-between px-3 py-2">
+                    <h6 class="mb-0 d-inline-flex align-items-center text-muted">
+                      <i class="ph-duotone ph-speaker-high me-2 f-18" id="header-sound-icon"></i>
                       Âm thanh thông báo
                     </h6>
-                    <div class="form-check form-switch form-check-reverse m-0">
+                    <div class="form-check form-switch m-0">
                       <input class="form-check-input f-18" type="checkbox" role="switch"
-                             id="header-sound-toggle" title="Bật/Tắt âm thanh thông báo">
+                             id="header-sound-toggle" title="Bật/Tắt âm thanh thông báo" style="cursor: pointer;">
                     </div>
                   </div>
 

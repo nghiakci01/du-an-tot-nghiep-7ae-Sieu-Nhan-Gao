@@ -39,7 +39,10 @@ function layout_change(mode) {
     _removeAutoListener();
 
     var body = document.getElementsByTagName("body")[0];
+    var html = document.documentElement;
+
     if (body) body.setAttribute("data-pc-theme", mode);
+    if (html) html.setAttribute("data-pc-theme", mode);
 
     // Ensure the auto button is not marked active
     var autoBtn = document.querySelector('.theme-layout .btn[data-value="default"]');
@@ -47,6 +50,7 @@ function layout_change(mode) {
 
     if ("dark" === mode) {
         dark_flag = !0;
+        if (html) html.classList.add('dark-mode');
         updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-white.svg");
         updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-white.svg");
         updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-white.svg");
@@ -54,6 +58,7 @@ function layout_change(mode) {
         updateActiveButton('.theme-layout .btn[data-value="false"]');
     } else {
         dark_flag = !1;
+        if (html) html.classList.remove('dark-mode');
         updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-dark.svg");
         updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-dark.svg");
         updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-dark.svg");
@@ -85,16 +90,21 @@ function layout_change_default() {
     var mq = window.matchMedia("(prefers-color-scheme: dark)");
     var isDark = mq.matches;
     var body = document.getElementsByTagName("body")[0];
+    var html = document.documentElement;
+
     if (body) body.setAttribute("data-pc-theme", isDark ? "dark" : "light");
+    if (html) html.setAttribute("data-pc-theme", isDark ? "dark" : "light");
 
     if (isDark) {
         dark_flag = !0;
+        if (html) html.classList.add('dark-mode');
         updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-white.svg");
         updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-white.svg");
         updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-white.svg");
         updateLogo(".footer-top .footer-logo", "/admin-assets/images/logo-white.svg");
     } else {
         dark_flag = !1;
+        if (html) html.classList.remove('dark-mode');
         updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-dark.svg");
         updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-dark.svg");
         updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-dark.svg");
@@ -105,15 +115,19 @@ function layout_change_default() {
     _autoThemeMediaQuery = mq;
     _autoThemeListener = function (e) {
         var body = document.getElementsByTagName("body")[0];
+        var html = document.documentElement;
         if (body) body.setAttribute("data-pc-theme", e.matches ? "dark" : "light");
+        if (html) html.setAttribute("data-pc-theme", e.matches ? "dark" : "light");
         if (e.matches) {
             dark_flag = !0;
+            if (html) html.classList.add('dark-mode');
             updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-white.svg");
             updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-white.svg");
             updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-white.svg");
             updateLogo(".footer-top .footer-logo", "/admin-assets/images/logo-white.svg");
         } else {
             dark_flag = !1;
+            if (html) html.classList.remove('dark-mode');
             updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-dark.svg");
             updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-dark.svg");
             updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-dark.svg");
