@@ -149,8 +149,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
 
-            // Loyalty Points
-            Route::get('loyalty-points', [App\Http\Controllers\Admin\LoyaltyPointController::class, 'index'])->name('loyalty-points.index');
             
             // Cài đặt ngân hàng thanh toán (QR Bank Settings)
             Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
@@ -204,7 +202,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
         // Audit Logs (Admin only)
         Route::middleware(['admin.only'])->group(function () {
-            Route::resource('audit-logs', App\Http\Controllers\Admin\AuditLogController::class)->only(['index', 'show']);
             
             // Notifications
             Route::get('notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');

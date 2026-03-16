@@ -6,18 +6,15 @@ use App\Mail\OrderShippedMail;
 use App\Models\Order;
 use App\Models\OrderHistory;
 use App\Models\User;
-use App\Services\LoyaltyPointService;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class OrderService
 {
-    protected LoyaltyPointService $loyaltyPointService;
 
-    public function __construct(LoyaltyPointService $loyaltyPointService)
+    public function __construct()
     {
-        $this->loyaltyPointService = $loyaltyPointService;
     }
 
     /**
@@ -51,8 +48,6 @@ class OrderService
             // Handle stock logic
             $this->handleStockAdjustment($order, $oldStatus, $newStatus);
 
-            // Handle loyalty points
-            $this->handleLoyaltyPoints($order, $oldStatus, $newStatus);
         });
 
         // Send email if shipped
@@ -115,18 +110,4 @@ class OrderService
         }
     }
 
-    /**
-     * Xử lý tích/thu hồi loyalty points khi trạng thái đơn hàng thay đổi
-     */
-    protected function handleLoyaltyPoints(Order $order, string $oldStatus, string $newStatus): void
-    {
-        if ($newStatus === Order::STATUS_COMPLETED && $oldStatus !== Order::STATUS_COMPLETED) {
-            $this->loyaltyPointService->earnPoints($order);
-        }
-
-        $cancelledStates = [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_FAILED];
-        if (in_array($newStatus, $cancelledStates) && !in_array($oldStatus, $cancelledStates)) {
-            $this->loyaltyPointService->revokePoints($order);
-        }
-    }
 }

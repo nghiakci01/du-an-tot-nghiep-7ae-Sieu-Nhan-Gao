@@ -86,15 +86,6 @@ class User extends Authenticatable
         return $this->hasMany(Wishlist::class);
     }
 
-    public function loyaltyPoints()
-    {
-        return $this->hasMany(LoyaltyPoint::class);
-    }
-
-    public function getTotalLoyaltyPointsAttribute(): int
-    {
-        return (int) $this->loyaltyPoints()->sum('points');
-    }
 
     public function getAvatarUrlAttribute()
     {

@@ -30,20 +30,13 @@ class AccountController extends Controller
                 ->get();
             $wishlists = $user->wishlists()->with('product')->get();
 
-            // Loyalty Points
-            $loyaltyPoints = $user->total_loyalty_points;
-            $loyaltyHistory = $user->loyaltyPoints()->with('order')->latest()->take(10)->get();
-            $loyaltyPointsValue = (new \App\Services\LoyaltyPointService)->pointsToDiscount($loyaltyPoints);
         } else {
             $orders = collect();
             $coupons = collect();
             $wishlists = collect();
-            $loyaltyPoints = 0;
-            $loyaltyHistory = collect();
-            $loyaltyPointsValue = 0;
         }
 
-        return view('frontend.account.index', compact('user', 'orders', 'coupons', 'wishlists', 'loyaltyPoints', 'loyaltyHistory', 'loyaltyPointsValue'));
+        return view('frontend.account.index', compact('user', 'orders', 'coupons', 'wishlists'));
     }
 
     public function showOrder($id)

@@ -203,27 +203,11 @@
                 @endif
                 @if (auth()->user()->isAdmin())
                     <li class="pc-item">
-                        <a href="{{ route('admin.loyalty-points.index') }}" class="pc-link">
-                            <span class="pc-micon">
-                                <i class="ti ti-coin"></i>
-                            </span>
-                            <span class="pc-mtext">Cấu hình Tích điểm</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
                         <a href="{{ route('admin.users.index') }}" class="pc-link">
                             <span class="pc-micon">
                                 <i class="ti ti-users"></i>
                             </span>
                             <span class="pc-mtext">Người dùng</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('admin.audit-logs.index') }}" class="pc-link">
-                            <span class="pc-micon">
-                                <i class="ti ti-history"></i>
-                            </span>
-                            <span class="pc-mtext">Nhật ký hệ thống</span>
                         </a>
                     </li>
                     <li class="pc-item">
