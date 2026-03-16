@@ -149,8 +149,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
 
-            // Loyalty Points
-            Route::get('loyalty-points', [App\Http\Controllers\Admin\LoyaltyPointController::class, 'index'])->name('loyalty-points.index');
             
             // Cài đặt ngân hàng thanh toán (QR Bank Settings)
             Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
