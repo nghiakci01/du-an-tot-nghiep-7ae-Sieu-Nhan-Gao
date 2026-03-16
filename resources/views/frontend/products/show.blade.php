@@ -270,6 +270,16 @@
             background: rgba(255,255,255,0.8);
             padding: 2px 0;
         }
+
+        /* Album thumbnails styling */
+        .single-zoom-thumb ul li img {
+            width: 64px !important;
+            height: 64px !important;
+            object-fit: cover;
+            padding: 3px;
+            border: 0.5px solid #ddd;
+            margin-right: 3px;
+        }
     </style>
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area product_bread">
