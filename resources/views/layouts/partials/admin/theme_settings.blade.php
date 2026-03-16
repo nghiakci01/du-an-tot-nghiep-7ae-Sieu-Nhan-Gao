@@ -55,13 +55,13 @@
             <h6 class="mb-1">{{ __('messages.theme_layout_title') }}</h6>
             <p class="text-muted text-sm">{{ __('messages.theme_layout_desc') }}</p>
             <div class="theme-main-layout d-flex align-center gap-1 w-100">
-              <a href="#!" data-bs-toggle="tooltip" title="Vertical" class="active" data-value="vertical"><img
+              <a href="#!" onclick="main_layout_change('vertical', this); return false;" data-bs-toggle="tooltip" title="Vertical" class="active" data-value="vertical"><img
                   src="{{ asset('admin-assets') }}/images/customizer/caption-on.svg" alt="img" class="img-fluid" />
               </a>
-              <a href="#!" data-bs-toggle="tooltip" title="Compact" data-value="compact"><img
+              <a href="#!" onclick="main_layout_change('compact', this); return false;" data-bs-toggle="tooltip" title="Compact" data-value="compact"><img
                   src="{{ asset('admin-assets') }}/images/customizer/compact.svg" alt="img" class="img-fluid" />
                 </a>
-              <a href="#!" data-bs-toggle="tooltip" title="Tab" data-value="tab"><img
+              <a href="#!" onclick="main_layout_change('tab', this); return false;" data-bs-toggle="tooltip" title="Tab" data-value="tab"><img
                   src="{{ asset('admin-assets') }}/images/customizer/tab.svg" alt="img" class="img-fluid" />
               </a>
             </div>
