@@ -52,25 +52,6 @@
                             </ul>
                         @endguest
                     </li> 
-                    <!-- <li class="language">
-                         <a href="#">
-                            @if(App::getLocale() == 'vi')
-                                <img src="{{ asset('frontend-assets/img/logo/language.png') }}" alt=""> Tiếng Việt
-                            @else
-                                <img src="{{ asset('frontend-assets/img/logo/en-gb.png') }}" alt=""> English
-                            @endif
-                            <i class="ion-chevron-down"></i>
-                        </a>
-                        <ul class="dropdown_language">
-                            <li><a href="{{ route('lang.switch', 'vi') }}">Tiếng Việt</a></li>
-                            <li><a href="{{ route('lang.switch', 'en') }}">English</a></li>
-                        </ul>
-                    </li>
-                    <li class="currency"><a href="#">VND <i class="ion-chevron-down"></i></a>
-                        <ul class="dropdown_currency">
-                            <li><a href="#">USD</a></li>
-                        </ul>
-                    </li> -->
                 </ul>
             </div> 
             <div class="search_bar">
@@ -297,41 +278,6 @@
                     </div>
                 </div>
                 
-                <!-- Horizontal Menu -->
-                <!-- <div class="horizontal_menu horizontal_menu_six">
-                    <div class="main_menu"> 
-                        <nav>  
-                            <ul>
-                                <li class="{{ request()->is('/') ? 'active' : '' }}"><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
-                                <li class="mega_items {{ request()->is('shop*') ? 'active' : '' }}"><a href="{{ route('shop') }}">{{ __('messages.shop') }}<i class="fa fa-angle-down"></i></a>
-                                    <ul class="mega_menu">
-                                        <li><a href="#">{{ __('messages.product_categories') }}</a>
-                                            <ul>
-                                                @foreach($categories as $category)
-                                                    <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
-                                                @endforeach
-                                            </ul>
-                                        </li>
-                                        <li><a href="#">{{ __('messages.other_pages') }}</a>
-                                            <ul>
-                                                <li><a href="{{ route('cart.index') }}">{{ __('messages.cart') }}</a></li>
-                                                <li><a href="{{ route('checkout.index') }}">{{ __('messages.checkout') }}</a></li>
-                                                <li><a href="{{ route('account.index') }}">{{ __('messages.account') }}</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="banner_menu"><a href="#"><img src="{{ asset('frontend-assets/img/bg/banner1.jpg') }}" alt=""></a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="{{ route('news') }}">{{ __('messages.news') }}</a></li>
-                                <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
-                                <li><a href="{{ route('contact.index') }}">{{ __('messages.contact') }}</a></li>
-                            </ul>   
-                        </nav> 
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        <!--header middel end-->
 
     </header>
     <!--header area end-->
