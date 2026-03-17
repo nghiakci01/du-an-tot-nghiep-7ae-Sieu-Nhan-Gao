@@ -9,6 +9,22 @@
   <meta charset="utf-8" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,minimal-ui" />
+  <meta name="color-scheme" content="light dark">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const html = document.documentElement;
+      html.setAttribute('data-pc-theme', savedTheme);
+      if (savedTheme === 'dark') {
+          html.classList.add('dark-mode');
+      }
+      
+      // Đồng bộ luôn cho body nếu nó đã có sẵn (dù script này thường chạy ở head)
+      document.addEventListener('DOMContentLoaded', () => {
+          document.body.setAttribute('data-pc-theme', savedTheme);
+      });
+    })();
+  </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="description"
     content="Able Pro is trending dashboard template made using Bootstrap 5 design framework. Able Pro is available in Bootstrap, React, CodeIgniter, Angular,  and .net Technologies." />
@@ -73,6 +89,59 @@
     body[data-pc-layout="compact"] .pc-user-profile-sidebar,
     body[data-pc-layout="tab"] .pc-user-profile-sidebar {
         display: none !important;
+    }
+
+    /* Dark Mode Improvements */
+    [data-pc-theme="dark"] .bg-light-primary {
+        background-color: rgba(70, 128, 255, 0.15) !important;
+        color: #72a1ff !important;
+    }
+    [data-pc-theme="dark"] .bg-light-success {
+        background-color: rgba(44, 168, 127, 0.15) !important;
+        color: #48d6a8 !important;
+    }
+    [data-pc-theme="dark"] .bg-light-warning {
+        background-color: rgba(255, 193, 7, 0.15) !important;
+        color: #ffd666 !important;
+    }
+    [data-pc-theme="dark"] .bg-light-danger {
+        background-color: rgba(220, 53, 69, 0.15) !important;
+        color: #ff8e99 !important;
+    }
+    [data-pc-theme="dark"] .bg-light-info {
+        background-color: rgba(61, 197, 255, 0.15) !important;
+        color: #7cd9ff !important;
+    }
+    [data-pc-theme="dark"] .bg-light-secondary {
+        background-color: rgba(108, 117, 125, 0.15) !important;
+        color: #aeb5bc !important;
+    }
+    [data-pc-theme="dark"] .text-dark {
+        color: var(--bs-body-color) !important;
+    }
+    /* Status Update Form Dark Mode Fix */
+    [data-pc-theme="dark"] .status-update-form {
+        background-color: rgba(0, 0, 0, 0.2) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    [data-pc-theme="dark"] .status-update-form .form-label {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    [data-pc-theme="dark"] .status-update-form .form-control,
+    [data-pc-theme="dark"] .status-update-form .form-select {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+    }
+    [data-pc-theme="dark"] .status-update-form .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.4) !important;
+    }
+    [data-pc-theme="dark"] .status-update-form .form-select option {
+        background-color: #1a1a1a !important;
+        color: #fff !important;
+    }
+    [data-pc-theme="dark"] {
+        --barcode-brightness: 0.85;
     }
   </style>
 </head><!-- [Head] end --><!-- [Body] Start -->

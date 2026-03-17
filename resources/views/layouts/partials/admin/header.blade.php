@@ -58,8 +58,8 @@
 
           {{-- Notification Sound Toggle --}}
           <li class="pc-h-item">
-            <a href="#" class="pc-head-link me-0" id="notif-sound-toggle" title="Bật/Tắt âm thanh thông báo">
-              <i class="ti ti-volume fs-5" id="notif-sound-icon"></i>
+            <a href="#" class="pc-head-link me-0" id="notif-sound-toggle-main" title="Bật/Tắt âm thanh thông báo">
+              <i class="ph-duotone ph-speaker-high fs-4" id="notif-sound-icon-main"></i>
             </a>
           </li>
 
@@ -88,7 +88,7 @@
                 style="max-height: calc(100vh - 215px)">
                 @if(isset($admin_notifications) && $admin_notifications->count() > 0)
                   @foreach($admin_notifications as $notification)
-                    <div class="card mb-2 notification-item {{ $notification->read_at ? '' : 'bg-light-primary' }}">
+                    <div class="card mb-2 notification-item {{ $notification->read_at ? '' : 'bg-primary-subtle border-primary border-opacity-25' }}">
                       <div class="card-body">
                         <div class="d-flex">
                           <div class="flex-shrink-0">
@@ -169,14 +169,14 @@
                   <hr class="border-secondary border-opacity-50 mt-1" />
 
                   {{-- Sound toggle --}}
-                  <div class="d-flex align-items-center justify-content-between px-1 py-2">
-                    <h6 class="mb-0 d-inline-flex align-items-center">
-                      <i class="ph-duotone ph-speaker-high text-muted me-2 f-18" id="header-sound-icon"></i>
+                  <div class="d-flex align-items-center justify-content-between px-3 py-2">
+                    <h6 class="mb-0 d-inline-flex align-items-center text-muted">
+                      <i class="ph-duotone ph-speaker-high me-2 f-18" id="header-sound-icon"></i>
                       Âm thanh thông báo
                     </h6>
-                    <div class="form-check form-switch form-check-reverse m-0">
+                    <div class="form-check form-switch m-0">
                       <input class="form-check-input f-18" type="checkbox" role="switch"
-                             id="header-sound-toggle" title="Bật/Tắt âm thanh thông báo">
+                             id="header-sound-toggle" title="Bật/Tắt âm thanh thông báo" style="cursor: pointer;">
                     </div>
                   </div>
 
@@ -226,27 +226,33 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    const mainToggle = document.getElementById('notif-sound-toggle-main');
+    const mainIcon = document.getElementById('notif-sound-icon-main');
     const headerToggle = document.getElementById('header-sound-toggle');
     const headerIcon = document.getElementById('header-sound-icon');
     const sidebarToggle = document.getElementById('sidebar-sound-toggle');
     const sidebarIcon = document.getElementById('sidebar-sound-icon');
 
     const updateSoundIcons = (isMuted) => {
-        const targetClass = isMuted ? 'ph-duotone ph-speaker-slash text-muted me-2 f-18' : 'ph-duotone ph-speaker-high text-muted me-2 f-18';
-        const sidebarTargetClass = isMuted ? 'ph-duotone ph-speaker-slash f-18' : 'ph-duotone ph-speaker-high f-18';
+        const iconClass = isMuted ? 'ph-duotone ph-speaker-slash' : 'ph-duotone ph-speaker-high';
+        const colorClass = isMuted ? 'text-muted' : 'text-primary';
         
-        if (headerIcon) headerIcon.className = targetClass;
-        if (sidebarIcon) sidebarIcon.className = sidebarTargetClass;
+        if (mainIcon) mainIcon.className = `${iconClass} fs-4 ${isMuted ? '' : 'text-primary'}`;
+        if (headerIcon) headerIcon.className = `${iconClass} text-muted me-2 f-18`;
+        if (sidebarIcon) sidebarIcon.className = `${iconClass} f-18`;
     };
 
-    // Đọc trạng thái từ localStorage (mặc định là bật - false)
+    // Sync state
     const isSoundMuted = localStorage.getItem('sound_muted') === 'true';
     if (headerToggle) headerToggle.checked = !isSoundMuted;
     if (sidebarToggle) sidebarToggle.checked = !isSoundMuted;
     updateSoundIcons(isSoundMuted);
 
     const onToggle = (e) => {
-        const isMuted = !e.target.checked;
+        const isMuted = e.target.id === 'notif-sound-toggle-main' ? 
+                       (localStorage.getItem('sound_muted') !== 'true') : 
+                       !e.target.checked;
+                       
         localStorage.setItem('sound_muted', isMuted);
         
         if (headerToggle) headerToggle.checked = !isMuted;
@@ -255,6 +261,10 @@ document.addEventListener("DOMContentLoaded", function() {
         updateSoundIcons(isMuted);
     };
 
+    if (mainToggle) mainToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        onToggle({target: {id: 'notif-sound-toggle-main'}});
+    });
     if (headerToggle) headerToggle.addEventListener('change', onToggle);
     if (sidebarToggle) sidebarToggle.addEventListener('change', onToggle);
 });

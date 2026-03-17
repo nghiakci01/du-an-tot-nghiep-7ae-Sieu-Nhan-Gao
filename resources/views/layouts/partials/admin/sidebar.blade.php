@@ -28,14 +28,14 @@
                     <div class="collapse pc-user-links" id="pc_sidebar_userlink">
                         <div class="pt-3">
                             {{-- Âm thanh thông báo --}}
-                            <div class="d-flex align-items-center justify-content-between px-2 py-2 mb-2" style="border-radius:8px;background:var(--bs-secondary-bg,rgba(0,0,0,.04))">
-                                <span class="d-flex align-items-center gap-2 text-muted" style="font-size:.85rem">
-                                    <i class="ph-duotone ph-speaker-high f-18" id="sidebar-sound-icon"></i>
-                                    Âm thanh
+                            <div class="d-flex align-items-center justify-content-between px-3 py-2 mb-2" 
+                                 style="border-radius:8px; background: rgba(var(--bs-primary-rgb), 0.05); border: 1px solid rgba(var(--bs-primary-rgb), 0.1); transition: all 0.2s ease;">
+                                <span class="d-flex align-items-center gap-2 text-muted fw-medium" style="font-size:0.82rem">
+                                    Âm thanh thông báo
                                 </span>
                                 <div class="form-check form-switch m-0">
                                     <input class="form-check-input f-16" type="checkbox" role="switch"
-                                           id="sidebar-sound-toggle" title="Bật/Tắt âm thanh thông báo">
+                                           id="sidebar-sound-toggle" title="Bật/Tắt âm thanh thông báo" style="cursor: pointer;">
                                 </div>
                             </div>
                             
