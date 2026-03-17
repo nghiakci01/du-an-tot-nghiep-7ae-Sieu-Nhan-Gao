@@ -324,6 +324,18 @@
             display: none !important;
         }
 
+        /* Ensure variants stack vertically */
+        .product_variant.size, 
+        .product_variant.color {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            margin-bottom: 20px;
+        }
+        .product_variant h3 {
+            margin-bottom: 5px !important;
+        }
+
         /* Quantity Selector Styles */
         .quantity-selector {
             display: flex !important;
