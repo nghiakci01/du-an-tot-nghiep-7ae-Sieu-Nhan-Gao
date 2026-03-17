@@ -21,43 +21,6 @@
                                     </div>
                                 </div>
                             @endforeach
-                        @else
-                            <div class="single_slider no-image-banner" style="height: 856px !important; background: #e8e8e8 !important;">
-                                <style>
-                                    .no-image-banner {
-                                        display: flex !important;
-                                        align-items: center;
-                                        justify-content: center;
-                                        position: relative;
-                                    }
-                                    .no-image-banner::before,
-                                    .no-image-banner::after {
-                                        content: '';
-                                        position: absolute;
-                                        border: 1px solid #bbb;
-                                    }
-                                    .no-image-banner::before {
-                                        top: 0; left: 0; right: 0; bottom: 0;
-                                    }
-                                    .no-image-banner .banner-placeholder-inner {
-                                        text-align: center;
-                                        color: #888;
-                                        user-select: none;
-                                    }
-                                    .no-image-banner .banner-placeholder-inner .placeholder-x {
-                                        position: absolute;
-                                        top: 0; left: 0; right: 0; bottom: 0;
-                                        background-image:
-                                            linear-gradient(to bottom right, transparent calc(50% - 0.5px), #bbb calc(50% - 0.5px), #bbb calc(50% + 0.5px), transparent calc(50% + 0.5px)),
-                                            linear-gradient(to bottom left, transparent calc(50% - 0.5px), #bbb calc(50% - 0.5px), #bbb calc(50% + 0.5px), transparent calc(50% + 0.5px));
-                                        pointer-events: none;
-                                    }
-                                </style>
-                                <div class="banner-placeholder-inner">
-                                    <div class="placeholder-x"></div>
-                                    <span style="font-size: 2rem; font-weight: 700; position: relative; z-index: 1;">Banner</span>
-                                </div>
-                            </div>
                         @endif
                     </div>
                 </div>
@@ -458,7 +421,7 @@
     </section>
     <!--product section area end (Top Wishlisted)-->
 
-    @if($midBanner)
+    @if($midBanner && $midBanner->image)
     <!--Middle Banner area start-->
     <section class="middle_banner_section mb-30">
         <div class="container-fluid">

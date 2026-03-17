@@ -22,6 +22,13 @@ class OrderService
      */
     public function updateOrderStatus(Order $order, string $newStatus, ?User $user = null, ?string $note = null)
     {
+        // Prevent transitioning an unpaid online order to progressive statuses
+        if ($order->payment_method !== 'COD' && $order->payment_status !== 'paid') {
+            if (!in_array($newStatus, [Order::STATUS_CANCELLED, Order::STATUS_FAILED])) {
+                throw new Exception("Không thể chuyển trạng thái (sang {$newStatus}) do khách chưa hoàn tất thanh toán Online.");
+            }
+        }
+
         if (! $order->canTransitionTo($newStatus)) {
             throw new Exception("Không thể chuyển đổi trạng thái từ {$order->status} sang {$newStatus}");
         }
