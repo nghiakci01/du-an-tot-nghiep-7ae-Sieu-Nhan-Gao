@@ -3113,8 +3113,11 @@ textarea:-ms-input-placeholder {
 }
 
 .middel_right_info .search_bar form input {
-  height: 35px;
-  line-height: 35px;
+  height: 38px;
+  line-height: 38px;
+  border: 0.5px solid #ccc !important;
+  border-radius: 25px !important;
+  padding: 0 45px 0 20px !important;
 }
 
 @media only screen and (min-width: 768px) and (max-width: 991px) {
@@ -14787,7 +14790,7 @@ textarea:-ms-input-placeholder {
 .single_product {
   position: relative;
   overflow: hidden;
-  border-radius: 0; 
+  border-radius: 0;
   box-shadow: none !important;
   border: 1px solid transparent;
   transition: border 0.3s ease;
@@ -14796,41 +14799,49 @@ textarea:-ms-input-placeholder {
 .product_thumb {
   position: relative;
   overflow: hidden;
-  margin-bottom: 15px; /* Increase spacing */
+  margin-bottom: 15px;
+  /* Increase spacing */
 }
 
 /* Smooth Image Swap and subtle zoom */
 .product_thumb a.primary_img img {
   transition: transform 0.6s ease;
 }
+
 .single_product:hover .product_thumb a.primary_img img {
-  transform: scale(1.03); /* Subtle Zara zoom */
+  transform: scale(1.03);
+  /* Subtle Zara zoom */
 }
+
 .product_thumb a.secondary_img {
   transition: opacity 0.5s ease;
   z-index: 2;
 }
+
 .single_product:hover .product_thumb a.secondary_img {
   opacity: 1 !important;
   visibility: visible !important;
 }
 
 /* Clean up action buttons (Hide default cluttered view) */
-.single_product .hover_action > a {
-  display: none !important; /* Hide the plus icon */
+.single_product .hover_action>a {
+  display: none !important;
+  /* Hide the plus icon */
 }
 
 .single_product .product_action {
   top: 10px;
   right: 10px;
-  opacity: 1 !important; /* We want the heart to be visible or at least structured cleanly */
+  opacity: 1 !important;
+  /* We want the heart to be visible or at least structured cleanly */
   visibility: visible !important;
   transform: none;
 }
 
 .single_product .action_button {
   opacity: 1 !important;
-  visibility: hidden; /* Hide until hover */
+  visibility: hidden;
+  /* Hide until hover */
   transform: translateX(10px);
   transition: all 0.3s ease;
   position: relative;
@@ -14855,7 +14866,7 @@ textarea:-ms-input-placeholder {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
   color: #000;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   border: none;
   font-size: 14px;
   transition: all 0.2s;
@@ -14867,12 +14878,14 @@ textarea:-ms-input-placeholder {
 }
 
 .single_product .action_button ul li a::before {
-  display: none; /* Remove weird border lines */
+  display: none;
+  /* Remove weird border lines */
 }
 
 /* Redesign Quick view / Add to cart button to slide from bottom like Zara */
 .single_product .quick_button {
-  bottom: -60px; /* Start hidden below */
+  bottom: -60px;
+  /* Start hidden below */
   left: 0;
   right: 0;
   opacity: 0;
@@ -14925,6 +14938,7 @@ textarea:-ms-input-placeholder {
 .single_product .product_content h3 a {
   color: #333;
 }
+
 .single_product .product_content h3 a:hover {
   color: #000;
   text-decoration: underline;
@@ -14953,6 +14967,7 @@ textarea:-ms-input-placeholder {
   font-weight: 600;
   letter-spacing: 1px;
 }
+
 .single_product .double_base .product_sale span,
 .single_product .label_product span {
   color: #000;

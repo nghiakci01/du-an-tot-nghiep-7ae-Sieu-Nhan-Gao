@@ -424,6 +424,17 @@
         .product_variant.quantity .button:hover {
             background: #333 !important;
         }
+
+        /* Align rating to left */
+        .product_ratting ul {
+            justify-content: flex-start !important;
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            display: flex !important;
+        }
+        .product_ratting ul li {
+            margin-right: 5px !important;
+        }
         
     </style>
     <!--breadcrumbs area start-->
