@@ -148,7 +148,7 @@
                             <span class="pc-micon">
                                 <i class="ti ti-photo"></i>
                             </span>
-                            <span class="pc-mtext">Quản lý Banner</span>
+                            <span class="pc-mtext">Banner</span>
                         </a>
                     </li>
                     <li class="pc-item">
@@ -159,14 +159,14 @@
                             <span class="pc-mtext">Mã Giảm Giá</span>
                         </a>
                     </li>
-                    <li class="pc-item">
+                    {{-- <li class="pc-item">
                         <a href="{{ route('admin.vton-models.index') }}" class="pc-link">
                             <span class="pc-micon">
                                 <i class="ti ti-user-plus"></i>
                             </span>
                             <span class="pc-mtext">Người mẫu AI (VTON)</span>
                         </a>
-                    </li>
+                    </li> --}}
                 @endif
                 {{-- Removed corrupted stock report item --}}
                 <li class="pc-item">

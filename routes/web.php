@@ -154,7 +154,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
 
             // Virtual Try-On Models management
-            Route::resource('vton-models', App\Http\Controllers\Admin\VtonModelController::class);
+            // Route::resource('vton-models', App\Http\Controllers\Admin\VtonModelController::class);
         });
 
         // Blog Management (Admin & Staff)
