@@ -32,9 +32,7 @@ class AppServiceProvider extends ServiceProvider
 
         try {
             // Share categories globally for header menu
-            // Using View::composer to avoid query on console commands if DB not ready,
-            // but for simplicity in this context View::share or composer with closure is fine.
-        if (! app()->runningInConsole()) {
+            // Register view composer even in console so tests and queues can render views
             View::composer('*', function ($view) {
                 try {
                 // Check if categories is already set to avoid double query or overriding
@@ -95,7 +93,6 @@ class AppServiceProvider extends ServiceProvider
                     \Illuminate\Support\Facades\Log::error('AppServiceProvider View Composer Error: ' . $e->getMessage());
                 }
             });
-        }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('AppServiceProvider Boot Error: ' . $e->getMessage());
         }

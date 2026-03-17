@@ -91,7 +91,7 @@ class Order extends Model
 
     public function getAllowedTransitions()
     {
-        return match ($this->status) {
+        $transitions = match ($this->status) {
             self::STATUS_PENDING => [self::STATUS_CONFIRMED, self::STATUS_CANCELLED],
             self::STATUS_CONFIRMED => [self::STATUS_SHIPPED, self::STATUS_CANCELLED],
             self::STATUS_SHIPPED => [self::STATUS_COMPLETED, self::STATUS_RETURNED, self::STATUS_FAILED],
@@ -101,6 +101,12 @@ class Order extends Model
             self::STATUS_RETURNED => [],
             default => [],
         };
+
+        if ($this->payment_method !== 'COD' && $this->payment_method !== 'CASH' && $this->payment_status !== 'paid') {
+            $transitions = array_values(array_intersect($transitions, [self::STATUS_CANCELLED, self::STATUS_FAILED]));
+        }
+
+        return $transitions;
     }
 
     public function canTransitionTo($newStatus)

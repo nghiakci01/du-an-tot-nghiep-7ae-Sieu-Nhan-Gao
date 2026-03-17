@@ -149,6 +149,31 @@ class OrderTest extends TestCase
     }
 
     /** @test */
+    public function admin_cannot_update_status_of_unpaid_online_order()
+    {
+        $order = Order::create([
+            'user_id' => $this->customer->id,
+            'total_price' => 500000,
+            'final_total' => 500000,
+            'status' => 'pending',
+            'payment_method' => 'VNPAY',
+            'payment_status' => 'pending',
+            'shipping_address' => '123 Đường Test, TP.HCM',
+            'name' => 'Nguyen Van A',
+            'phone' => '0901234567',
+            'province' => 'TP.HCM',
+            'address' => '123 Đường Test',
+        ]);
+
+        $response = $this->actingAs($this->admin)->put(route('admin.orders.update', $order), [
+            'status' => 'confirmed',
+        ]);
+
+        $response->assertSessionHas('error');
+        $this->assertEquals('pending', $order->fresh()->status);
+    }
+
+    /** @test */
     public function guest_cannot_access_orders()
     {
         $response = $this->get(route('admin.orders.index'));
