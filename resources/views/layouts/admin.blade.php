@@ -85,6 +85,15 @@
       <div class="loader-fill"></div>
     </div>
   </div>
+  <script>
+      // Automatically hide loader on normal page load
+      document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(() => {
+              const loader = document.querySelector('.loader-bg');
+              if(loader) loader.style.display = 'none';
+          }, 200);
+      });
+  </script>
 
   {{-- Include Sidebar --}}
   @include('layouts.partials.admin.sidebar')
@@ -139,6 +148,52 @@
   <script defer="defer" src="https://fomo.codedthemes.com/pixel/CDkpF1sQ8Tt5wpMZgqRvKpQiUhpWE3bc"></script> --}}
 
   <script src="{{ asset('admin-assets') }}/js/plugins/feather.min.js"></script>
+
+  <!-- jQuery (Cần có cho Pjax) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <!-- Pjax -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.pjax/2.0.1/jquery.pjax.min.js"></script>
+  <script>
+      $(document).ready(function() {
+          // Khởi tạo pjax cho các link menu
+          $(document).pjax('a.pc-link, a.nav-link:not([data-bs-toggle])', '.pc-content', {
+              timeout: 10000,
+              scrollTo: false
+          });
+
+          // Hiển thị loading
+          $(document).on('pjax:send', function() {
+              $('.loader-bg').show(); 
+          });
+
+          // Tắt loading
+          $(document).on('pjax:complete', function() {
+              $('.loader-bg').fadeOut('slow');
+
+              // Khởi tạo lại Feather icons và tooltip/popover nêú cần
+              if(window.feather) feather.replace();
+              
+              const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+              tooltipTriggerList.map(function (tooltipTriggerEl) {
+                  return new bootstrap.Tooltip(tooltipTriggerEl);
+              });
+
+              // Chạy lại các đoạn script inline nằm trong pc-content (nếu cần)
+              $('.pc-content script').each(function() {
+                  if (this.src) {
+                      $.getScript(this.src);
+                  } else {
+                      eval($(this).text());
+                  }
+              });
+              
+              // Nếu có sử dụng DataTables, cần re-init lại bảng
+              if ($.fn.DataTable) {
+                  $('.table:not(.initialized)').addClass('initialized').DataTable();
+              }
+          });
+      });
+  </script>
 
   {{--
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
