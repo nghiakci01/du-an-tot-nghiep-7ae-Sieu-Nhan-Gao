@@ -155,10 +155,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.pjax/2.0.1/jquery.pjax.min.js"></script>
   <script>
       $(document).ready(function() {
-          // Khởi tạo pjax cho các link menu
-          $(document).pjax('a.pc-link, a.nav-link:not([data-bs-toggle])', '.pc-content', {
+          // Khởi tạo pjax cho các link menu và nút bấm chuyển trang
+          $(document).pjax('a.pc-link, a.nav-link:not([data-bs-toggle]), .pagination a, a.btn', '.pc-content', {
+              fragment: '.pc-content', // Bắt buộc phải có để báo Pjax chỉ rút trích phần .pc-content
               timeout: 10000,
-              scrollTo: false
+              scrollTo: 0 // Cuộn lên đầu
+          });
+
+          // Khởi tạo pjax form submit (loại trừ form logout và form upload file)
+          $(document).on('submit', 'form:not(#logout-form):not([enctype="multipart/form-data"]):not(.no-pjax)', function(event) {
+              $.pjax.submit(event, '.pc-content', {
+                  fragment: '.pc-content',
+                  timeout: 10000,
+                  scrollTo: 0
+              });
           });
 
           // Hiển thị loading
