@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -16,18 +17,24 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $categories = Category::whereNull('parent_id')->take(6)->get();
+        $categories = Cache::remember('home_categories', 3600, function() {
+            return Category::whereNull('parent_id')->take(6)->get();
+        });
 
         // Banners
-        $sliders = Banner::where('position', 'slider')
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->get();
+        $sliders = Cache::remember('home_sliders', 3600, function() {
+            return Banner::where('position', 'slider')
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->get();
+        });
 
-        $midBanner = Banner::where('position', 'home_middle')
-            ->where('is_active', true)
-            ->orderBy('sort_order', 'asc')
-            ->first();
+        $midBanner = Cache::remember('home_midBanner', 3600, function() {
+            return Banner::where('position', 'home_middle')
+                ->where('is_active', true)
+                ->orderBy('sort_order', 'asc')
+                ->first();
+        });
 
 
 
