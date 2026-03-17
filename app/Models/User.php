@@ -31,6 +31,7 @@ class User extends Authenticatable
         'address',
         'role',
         'avatar',
+        'cart_data',
     ];
 
     /**
@@ -53,6 +54,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'cart_data' => 'array',
         ];
     }
 
