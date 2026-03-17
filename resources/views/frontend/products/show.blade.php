@@ -342,7 +342,7 @@
             align-items: center;
             border: 0.5px solid #ccc;
             width: 140px !important;
-            height: 40px !important;
+            height: 40px !important; /* Reverted to 40px */
             margin-top: 10px;
             overflow: hidden !important;
             border-radius: 4px;
@@ -355,8 +355,8 @@
         .qty-btn {
             flex: 0 0 40px !important;
             width: 40px !important;
-            height: 40px !important;
-            border: 0 !important; /* Force border 0 as requested */
+            height: 40px !important; /* Reverted to 40px */
+            border: 0 !important;
             background: #fff !important;
             color: #333 !important;
             font-size: 20px !important;
@@ -377,9 +377,9 @@
             background: #d1d1d1 !important;
         }
         .quantity-selector input {
-            flex: 0 0 59px !important; /* 40 + 59 + 40 = 139. 139 + 0.5*2 borders = 140 totals. */
+            flex: 0 0 59px !important;
             width: 59px !important;
-            height: 40px !important;
+            height: 40px !important; /* Reverted to 40px */
             border: 0 !important;
             border-left: 0.5px solid #ccc !important;
             border-right: 0.5px solid #ccc !important;
@@ -402,14 +402,27 @@
 
         /* Responsive adjustments for buttons */
         .product_variant.quantity .button {
-            height: 40px !important;
-            line-height: 40px !important;
-            padding: 0 15px !important;
-            font-weight: 300 !important;
-            font-size: 13px !important;
+            width: 175px !important; /* Fixed width as requested */
+            height: 50px !important; /* Fixed height as requested */
+            line-height: 50px !important;
+            padding: 0 !important; /* Padding removed due to fixed width */
+            font-weight: 600 !important;
+            font-size: 14px !important;
             margin-top: 5px;
-            border-radius: 0;
-            border: 0.5px solid #ccc;
+            border-radius: 4px;
+            border: 0 !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #1a1a1a !important; /* Solid black */
+            color: #fff !important;
+            display: inline-block;
+            text-align: center;
+        }
+        .product_variant.quantity .button.buy_now {
+            background: #1a1a1a !important; /* Change to black as requested */
+        }
+        .product_variant.quantity .button:hover {
+            background: #333 !important;
         }
         
     </style>
@@ -819,17 +832,17 @@
                                 </script>
                             @endif
 
-                            <div class="product_variant quantity" style="display: flex; align-items: center; flex-wrap: wrap; gap: 20px;">
-                                <div style="display: flex; align-items: center; gap: 15px;">
+                            <div class="product_variant quantity" style="display: flex; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
+                                <div style="display: flex; flex-direction: column; gap: 5px;">
                                     <label style="margin-bottom: 0; font-weight: 700;">{{ __('messages.quantity') }}</label>
-                                    <div class="quantity-selector">
+                                    <div class="quantity-selector" style="margin-top: 0;">
                                         <button type="button" class="qty-btn minus">-</button>
                                         <input min="1" value="1" type="number" name="quantity" id="quantity_input">
                                         <button type="button" class="qty-btn plus">+</button>
                                     </div>
                                 </div>
-                                <span id="stock-info" style="display: none; font-size: 13px;"></span>
-                                <div style="display: flex; gap: 10px;">
+                                <span id="stock-info" style="display: none; font-size: 13px; margin-bottom: 10px;"></span>
+                                <div style="display: flex; gap: 10px; align-items: center;">
                                     <input type="hidden" name="action" id="action_input" value="add_to_cart">
                                     <button class="button" type="button" style="margin: 0;"
                                         id="btn-add-to-cart">{{ __('messages.add_to_cart') }}</button>
