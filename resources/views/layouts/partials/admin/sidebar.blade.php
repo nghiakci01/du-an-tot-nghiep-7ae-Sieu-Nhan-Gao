@@ -3,7 +3,7 @@
         <div class="m-header d-flex align-items-center justify-content-center">
             <a href="{{ route('admin.dashboard') }}"
                 class="b-brand text-primary d-flex align-items-center" style="text-decoration: none;">
-                <h3 class="mb-0 fw-bolder text-dark ls-1">Elite Admin</h3>
+                <h3 class="mb-0 fw-bolder text-body ls-1">Elite Admin</h3>
             </a>
         </div>
         <div class="navbar-content">

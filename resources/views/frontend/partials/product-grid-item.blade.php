@@ -4,7 +4,7 @@
     <div class="single_product">
         <div class="product_thumb">
             <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
+                <img loading="lazy" src="{{ $product->image_url }}" alt="{{ $product->name }}">
             </a>
             <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
                 @php
@@ -14,7 +14,7 @@
                         ? $product->images->skip(1)->first()?->image_url 
                         : $product->image_url;
                 @endphp
-                <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
+                <img loading="lazy" src="{{ $secondaryImage }}" alt="{{ $product->name }}">
             </a>
             <div class="product_action">
                 <div class="hover_action">

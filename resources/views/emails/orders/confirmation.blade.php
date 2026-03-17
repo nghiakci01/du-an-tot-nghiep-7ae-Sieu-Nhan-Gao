@@ -15,7 +15,7 @@
 
     ## Địa chỉ giao hàng
     **{{ $order->name }}**<br>
-    Số điện thoại: {{ $order->phone }}<br>
+    Số điện thoại: **{{ $order->phone }}**<br>
     Email: {{ $order->email }}<br>
     Địa chỉ: {{ $order->address }}, {{ $order->province }}<br>
     @if($order->note)
@@ -55,7 +55,7 @@
         Xem Chi Tiết Đơn Hàng
     </x-mail::button>
 
-    Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email này hoặc gọi hotline.
+    Nếu bạn có bất kỳ câu hỏi nào về trạng thái đơn hàng, vui lòng liên hệ với chúng tôi qua email này hoặc gọi **HOTLINE: 0123.456.789**.
 
     Trân trọng,<br>
     Đội ngũ {{ config('app.name') }}
