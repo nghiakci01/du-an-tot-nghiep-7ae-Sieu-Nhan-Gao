@@ -47,14 +47,46 @@ class ProductController extends Controller
             });
         }
 
-        // Filter by Price (using variants)
+        // Filter by Price (including promotional prices)
         if ($request->has('min_price') && $request->has('max_price')) {
-            $min = $request->min_price;
-            $max = $request->max_price;
+            $min = (float) $request->min_price;
+            $max = (float) $request->max_price;
 
-            // Check if product has ANY variant within the price range
-            $query->whereHas('variants', function ($q) use ($min, $max) {
-                $q->whereBetween('price', [$min, $max]);
+            $query->where(function ($q) use ($min, $max) {
+                // 1. Check if product has ANY variant with an active price in range
+                $q->whereHas('variants', function ($v_q) use ($min, $max) {
+                    $v_q->where(function ($sub) use ($min, $max) {
+                        // If sale price exists and > 0, check it
+                        $sub->where(function ($q1) use ($min, $max) {
+                            $q1->whereNotNull('sale_price')
+                                ->where('sale_price', '>', 0)
+                                ->whereBetween('sale_price', [$min, $max]);
+                        })
+                        // Otherwise check regular price
+                        ->orWhere(function ($q2) use ($min, $max) {
+                            $q2->where(function ($q_null) {
+                                $q_null->whereNull('sale_price')
+                                      ->orWhere('sale_price', '<=', 0);
+                            })->whereBetween('price', [$min, $max]);
+                        });
+                    });
+                })
+                // 2. OR if it has NO variants (or they are invalid), check the product's own price
+                ->orWhere(function ($p_q) use ($min, $max) {
+                    $p_q->doesntHave('variants')
+                        ->where(function ($sub) use ($min, $max) {
+                            $sub->where(function ($q1) use ($min, $max) {
+                                $q1->whereNotNull('sale_price')
+                                    ->where('sale_price', '>', 0)
+                                    ->whereBetween('sale_price', [$min, $max]);
+                            })->orWhere(function ($q2) use ($min, $max) {
+                                $q2->where(function ($q_null) {
+                                    $q_null->whereNull('sale_price')
+                                          ->orWhere('sale_price', '<=', 0);
+                                })->whereBetween('price', [$min, $max]);
+                            });
+                        });
+                });
             });
         }
 
