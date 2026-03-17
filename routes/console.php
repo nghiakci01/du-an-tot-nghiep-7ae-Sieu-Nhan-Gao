@@ -11,3 +11,6 @@ use Illuminate\Support\Facades\Schedule;
 
 // Tự động kiểm tra và hủy đơn hàng online chưa thanh toán (chạy mỗi giờ 1 lần)
 Schedule::command('orders:cancel-unpaid')->hourly();
+
+// Quét giỏ hàng bị bỏ quên và gửi email nhắc nhở (chạy mỗi giờ 1 lần)
+Schedule::command('cart:check-abandoned')->hourly();

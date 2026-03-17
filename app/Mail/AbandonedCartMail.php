@@ -8,17 +8,20 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use App\Models\CartAbandonment;
 
 class AbandonedCartMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $cartAbandonment;
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(CartAbandonment $cartAbandonment)
     {
-        //
+        $this->cartAbandonment = $cartAbandonment;
     }
 
     /**
@@ -27,7 +30,7 @@ class AbandonedCartMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Abandoned Cart Mail',
+            subject: 'Giỏ hàng của bạn tại Elite Shop đang chờ bạn!',
         );
     }
 
@@ -37,7 +40,7 @@ class AbandonedCartMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.abandoned_cart',
         );
     }
 
