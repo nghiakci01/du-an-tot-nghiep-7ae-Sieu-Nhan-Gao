@@ -775,9 +775,13 @@
                                                             }
                                                         }
                                                         if (stockInfo) {
-                                                            stockInfo.textContent = `(Còn ${matchedVariant.stock_quantity} sản phẩm)`;
-                                                            stockInfo.style.display = 'inline';
-                                                            stockInfo.style.color = matchedVariant.stock_quantity <= 5 ? '#ef233c' : '#666';
+                                                            if (matchedVariant.stock_quantity <= 5) {
+                                                                stockInfo.textContent = `(Còn ${matchedVariant.stock_quantity} sản phẩm)`;
+                                                                stockInfo.style.display = 'inline';
+                                                                stockInfo.style.color = '#ef233c';
+                                                            } else {
+                                                                stockInfo.style.display = 'none';
+                                                            }
                                                         }
                                                     } else {
                                                         variantInput.value = '';
