@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
@@ -113,36 +114,46 @@ class ProductController extends Controller
         $products->appends($request->all());
 
         // Get sidebar data
-        $categories = Category::withCount([
-            'products' => function ($q) {
-                $q->where('products.is_active', true);
-            },
-        ])->get();
+        $categories = Cache::remember('shop_sidebar_categories', 3600, function () {
+            return Category::withCount([
+                'products' => function ($q) {
+                    $q->where('products.is_active', true);
+                },
+            ])->get();
+        });
 
-        $brands = Brand::where('is_active', true)->withCount([
-            'products' => function ($q) {
-                $q->where('products.is_active', true);
-            },
-        ])->get();
+        $brands = Cache::remember('shop_sidebar_brands', 3600, function () {
+            return Brand::where('is_active', true)->withCount([
+                'products' => function ($q) {
+                    $q->where('products.is_active', true);
+                },
+            ])->get();
+        });
 
         // Colors with product counts
-        $colors = Color::whereHas('productVariants.product', function ($q) {
-            $q->where('products.is_active', true);
-        })->withCount([
-            'productVariants as products_count' => function ($q) {
-                $q->whereHas('product', function ($pq) {
-                    $pq->where('products.is_active', true);
-                });
-            },
-        ])->limit(10)->get();
-
-        $tags = Tag::withCount([
-            'products' => function ($q) {
+        $colors = Cache::remember('shop_sidebar_colors', 3600, function () {
+            return Color::whereHas('productVariants.product', function ($q) {
                 $q->where('products.is_active', true);
-            },
-        ])->limit(15)->get();
+            })->withCount([
+                'productVariants as products_count' => function ($q) {
+                    $q->whereHas('product', function ($pq) {
+                        $pq->where('products.is_active', true);
+                    });
+                },
+            ])->limit(10)->get();
+        });
 
-        $totalActiveProducts = Product::where('is_active', true)->count();
+        $tags = Cache::remember('shop_sidebar_tags', 3600, function () {
+            return Tag::withCount([
+                'products' => function ($q) {
+                    $q->where('products.is_active', true);
+                },
+            ])->limit(15)->get();
+        });
+
+        $totalActiveProducts = Cache::remember('shop_total_active', 3600, function () {
+            return Product::where('is_active', true)->count();
+        });
 
         return view('frontend.products.index', compact(
             'products',
