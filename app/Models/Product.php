@@ -95,7 +95,7 @@ class Product extends Model
             return asset('storage/'.$this->image);
         }
 
-        return asset('frontend-assets/img/product/product21.jpg');
+        return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     }
 
     public function isOnFlashSale(): bool

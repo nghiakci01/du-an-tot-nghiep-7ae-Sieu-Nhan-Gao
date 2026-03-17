@@ -21,15 +21,6 @@
                                     </div>
                                 </div>
                             @endforeach
-                        @else
-                            <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}" style="height: 856px !important;">
-                                <div class="slider_content_inner">
-                                    <div class="slider_content">
-                                        <h2>Wide Banner Placeholder</h2>
-                                        <p>1521 x 856 px</p>
-                                    </div>
-                                </div>
-                            </div>
                         @endif
                     </div>
                 </div>
@@ -430,7 +421,7 @@
     </section>
     <!--product section area end (Top Wishlisted)-->
 
-    @if($midBanner)
+    @if($midBanner && $midBanner->image)
     <!--Middle Banner area start-->
     <section class="middle_banner_section mb-30">
         <div class="container-fluid">
