@@ -21,13 +21,18 @@ class SettingController extends Controller
 
         // Handle file uploads for settings
         foreach ($request->allFiles() as $key => $file) {
-            $path = $file->store('settings', 'public');
-            $data[$key] = $path;
-            
-            // Delete old file if exists
-            $oldSetting = Setting::where('key', $key)->first();
-            if ($oldSetting && $oldSetting->value) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldSetting->value);
+            if ($file && $file->isValid()) {
+                $path = $file->store('settings', 'public');
+                $data[$key] = $path;
+                
+                // Delete old file if exists
+                $oldSetting = Setting::where('key', $key)->first();
+                if ($oldSetting && $oldSetting->value && \Illuminate\Support\Facades\Storage::disk('public')->exists($oldSetting->value)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldSetting->value);
+                }
+            } else {
+                // Remove invalid file from data array so it doesn't overwrite existing setting with empty
+                unset($data[$key]);
             }
         }
 

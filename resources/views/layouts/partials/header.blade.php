@@ -54,14 +54,14 @@
             </div> 
             <div class="search_bar">
                 <form action="{{ route('search.index') }}" method="GET">
-                    <select class="select_option" name="category">
+                    <select class="select_option" name="category" aria-label="Select Category">
                         <option selected value="">{{ __('messages.all_products') }}</option>
                         @foreach($categories as $category) @php /** @var \App\Models\Category $category */ @endphp
                             <option value="{{ $category->slug }}">{{ $category->name }}</option>
                         @endforeach
                     </select>
-                    <input id="search-input-offcanvas" placeholder="{{ __('messages.search_placeholder') }}" type="text" name="q" autocomplete="off">
-                    <button type="submit"><i class="ion-ios-search-strong"></i></button>
+                    <input id="search-input-offcanvas" placeholder="{{ __('messages.search_placeholder') }}" type="text" name="q" autocomplete="off" aria-label="Search">
+                    <button type="submit" aria-label="Submit Search"><i class="ion-ios-search-strong"></i></button>
                 </form>
                 <div id="search-suggestions-offcanvas" class="search-suggestions-dropdown"></div>
             </div>
@@ -225,8 +225,8 @@
                             <div class="middel_right_info">
                                 <div class="search_bar" style="position: relative;">
                                     <form action="{{ route('search.index') }}" method="GET">                          
-                                        <input id="search-input-desktop" placeholder="{{ __('messages.search_placeholder') }}" type="text" name="q" autocomplete="off">
-                                        <button type="submit"><i class="ion-ios-search-strong"></i></button>
+                                        <input id="search-input-desktop" placeholder="{{ __('messages.search_placeholder') }}" type="text" name="q" autocomplete="off" aria-label="Search">
+                                        <button type="submit" aria-label="Submit Search"><i class="ion-ios-search-strong"></i></button>
                                     </form>
                                     <div id="search-suggestions-desktop" class="search-suggestions-dropdown"></div>
                                 </div>

@@ -102,9 +102,9 @@
                             <p>{{ __('messages.newsletter_desc') }}</p>
                             <div class="subscribe_form">
                                 <form id="mc-form" class="mc-form footer-newsletter">
-                                    <input id="mc-email" type="email" autocomplete="off"
-                                        placeholder="{{ __('messages.enter_email') }}" />
-                                    <button id="mc-submit">{{ __('messages.subscribe') }}</button>
+                                    <input id="mc-email" name="mc-email" type="email" autocomplete="off"
+                                        placeholder="{{ __('messages.enter_email') }}" aria-label="Email Address for newsletter" />
+                                    <button id="mc-submit" aria-label="Subscribe to newsletter">{{ __('messages.subscribe') }}</button>
                                 </form>
                                 <div class="mailchimp-alerts text-centre">
                                     <div class="mailchimp-submitting"></div>

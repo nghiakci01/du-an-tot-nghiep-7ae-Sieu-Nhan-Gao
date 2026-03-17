@@ -21,7 +21,7 @@ Module cấu hình toàn bộ hệ thống, bao gồm thông tin shop, banner qu
 
 ---
 
-### A11.2 Quản Lý Banner
+### A11.2 Banner
 - **Route:** `GET /admin/banners` (resource)
 - **Controller:** `Admin\BannerController`
 - **Thông tin:**
@@ -88,7 +88,7 @@ Module cấu hình toàn bộ hệ thống, bao gồm thông tin shop, banner qu
 | Hành động | Staff | Admin |
 |-----------|-------|-------|
 | Cài đặt hệ thống | ❌ | ✅ |
-| Quản lý Banner | ❌ | ✅ |
+| Banner | ❌ | ✅ |
 | Cài đặt ngân hàng | ❌ | ✅ |
 | Xem Audit Logs | ❌ | ✅ |
 | Xem Thông báo | ✅ | ✅ |

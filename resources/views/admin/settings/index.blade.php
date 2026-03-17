@@ -29,7 +29,7 @@
                                 <input type="number" class="form-control" name="shipping_fee"
                                     value="{{ $settings['shipping_fee'] ?? '30000' }}">
                             </div>
-                            <div class="col-md-12 mb-3">
+                            <!-- <div class="col-md-12 mb-3">
                                 <label class="form-label">Ảnh Banner Trang Liên Hệ</label>
                                 @if(isset($settings['contact_banner']) && $settings['contact_banner'])
                                     <div class="mb-2">
@@ -38,7 +38,7 @@
                                 @endif
                                 <input type="file" class="form-control" name="contact_banner" accept="image/*">
                                 <small class="text-muted">Định dạng hỗ trợ: JPG, PNG, GIF. Kích thước khuyến nghị: 1920x400px.</small>
-                            </div>
+                            </div> -->
                         </div>
 
                         <h6 class="mb-3 mt-3 text-primary"><i class="ti ti-phone"></i> Thông tin Liên hệ</h6>
