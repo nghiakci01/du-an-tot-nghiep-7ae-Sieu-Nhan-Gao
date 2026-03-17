@@ -36,12 +36,26 @@
                                         <input type="hidden" name="sort" value="{{ request('sort') }}">
                                     @endif
 
-                                    <input type="hidden" name="min_price" id="min_price" value="{{ request('min_price', 0) }}">
-                                    <input type="hidden" name="max_price" id="max_price" value="{{ request('max_price', 5000000) }}">
-
-                                    <div id="slider-range"></div>   
-                                    <button type="submit">{{ __('messages.filter') }}</button>
-                                    <input type="text" name="text" id="amount" readonly style="border:0; color:#f6931d; font-weight:bold; width: 100%; margin-top: 10px;" />   
+                                    <div class="price_slider_amount">
+                                        <div id="slider-range"></div>
+                                        <div class="price_summary text-center mb-3">
+                                            <span id="price_min_text">0đ</span> - <span id="price_max_text">5,000,000đ</span>
+                                        </div>
+                                        <div class="price_inputs d-flex align-items-center justify-content-between">
+                                            <div class="price_input_box">
+                                                <input type="text" id="min_price_input" placeholder="Min">
+                                                <span class="currency_symbol">đ</span>
+                                                <input type="hidden" name="min_price" id="min_price" value="{{ request('min_price', 0) }}">
+                                            </div>
+                                            <span class="separator">—</span>
+                                            <div class="price_input_box">
+                                                <input type="text" id="max_price_input" placeholder="Max">
+                                                <span class="currency_symbol">đ</span>
+                                                <input type="hidden" name="max_price" id="max_price" value="{{ request('max_price', 5000000) }}">
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="mt-3 w-100">{{ __('messages.filter') }}</button>
+                                    </div>
                                 </form> 
                             </div>
 
