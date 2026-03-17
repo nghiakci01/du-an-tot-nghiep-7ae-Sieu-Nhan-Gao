@@ -96,6 +96,23 @@
                                     @endforeach
                                 </ul>
                             </div>
+
+                            <div class="widget_list widget_categories mt-4">
+                                <h2>{{ __('messages.select_by_size') }}</h2>
+                                <ul>
+                                    @foreach($sizes as $size)
+                                        <li>
+                                            @php
+                                                $params = request()->all();
+                                                $params['size'] = $size->name;
+                                            @endphp
+                                            <a href="{{ route('shop', $params) }}" class="{{ request('size') == $size->name ? 'active' : '' }}">
+                                                {{ $size->name }} <span>{{ $size->products_count }}</span>
+                                            </a> 
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         </div>
                         <!--sidebar widget end-->
                     </div>

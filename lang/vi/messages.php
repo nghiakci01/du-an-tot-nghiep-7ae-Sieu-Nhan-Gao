@@ -217,6 +217,7 @@ return [
     'already_reviewed' => 'Bạn đã gửi đánh giá cho sản phẩm này.',
     'manufacturer' => 'Thương hiệu',
     'select_by_color' => 'Chọn theo màu sắc',
+    'select_by_size' => 'Chọn theo kích thước',
     'popular_tags' => 'Thẻ phổ biến',
     'review_purchase_required' => 'Bạn cần mua và nhận sản phẩm này trước khi có thể đánh giá.',
     'buy_to_review' => 'Mua ngay để đánh giá',

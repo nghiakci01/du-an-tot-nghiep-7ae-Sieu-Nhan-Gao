@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Size;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -106,6 +107,14 @@ class ProductController extends Controller
             });
         }
 
+        // Filter by Size
+        if ($request->has('size')) {
+            $sizeName = $request->size;
+            $query->whereHas('variants.sizeRelationship', function ($q) use ($sizeName) {
+                $q->where('name', $sizeName);
+            });
+        }
+
         // Filter by Tag
         if ($request->has('tag')) {
             $tagSlug = $request->tag;
@@ -168,6 +177,17 @@ class ProductController extends Controller
             },
         ])->limit(10)->get();
 
+        // Sizes with product counts
+        $sizes = Size::where('is_active', true)->whereHas('productVariants.product', function ($q) {
+            $q->where('products.is_active', true);
+        })->withCount([
+            'productVariants as products_count' => function ($q) {
+                $q->whereHas('product', function ($pq) {
+                    $pq->where('products.is_active', true);
+                });
+            },
+        ])->orderBy('display_order', 'asc')->get();
+
         $tags = Tag::withCount([
             'products' => function ($q) {
                 $q->where('products.is_active', true);
@@ -181,6 +201,7 @@ class ProductController extends Controller
             'categories',
             'brands',
             'colors',
+            'sizes',
             'tags',
             'totalActiveProducts',
             'currentCategory'
