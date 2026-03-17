@@ -9,5 +9,5 @@ Artisan::command('inspire', function () {
 
 use Illuminate\Support\Facades\Schedule;
 
-// Tự động kiểm tra và hủy đơn hàng online chưa thanh toán (chạy mỗi giờ 1 lần)
-Schedule::command('orders:cancel-unpaid')->hourly();
+// Tự động kiểm tra nhắc nhở và hủy đơn hàng online chưa thanh toán (chạy mỗi phút)
+Schedule::command('app:check-payment-reminders')->everyMinute();
