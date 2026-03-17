@@ -11,7 +11,7 @@ class AuthSecurityAuditTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function registration_fails_if_email_already_exists()
     {
         User::factory()->create([
@@ -30,7 +30,7 @@ class AuthSecurityAuditTest extends TestCase
         $this->assertDatabaseCount('users', 1);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function login_is_immune_to_basic_sql_injection()
     {
         $admin = User::factory()->create([
@@ -51,7 +51,7 @@ class AuthSecurityAuditTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_input_is_escaped_in_views_to_prevent_xss()
     {
         $maliciousName = '<script>alert("XSS")</script>';
@@ -74,7 +74,7 @@ class AuthSecurityAuditTest extends TestCase
         }
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function passwords_are_hashed()
     {
         $user = User::factory()->create([

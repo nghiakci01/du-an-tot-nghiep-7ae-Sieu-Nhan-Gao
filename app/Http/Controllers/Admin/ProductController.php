@@ -348,9 +348,11 @@ class ProductController extends Controller
         }
 
         $variants = ProductVariant::with(['product', 'sizeRelationship', 'colorRelationship'])
-            ->where('sku', 'like', "%{$q}%")
-            ->orWhereHas('product', function($query) use ($q) {
-                $query->where('name', 'like', "%{$q}%");
+            ->where(function ($query) use ($q) {
+                $query->where('sku', 'like', "%{$q}%")
+                      ->orWhereHas('product', function ($q2) use ($q) {
+                          $q2->where('name', 'like', "%{$q}%");
+                      });
             })
             ->latest()
             ->get();

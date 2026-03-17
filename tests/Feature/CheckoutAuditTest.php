@@ -59,7 +59,7 @@ class CheckoutAuditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function checkout_page_redirects_to_cart_if_cart_is_empty()
     {
         $response = $this->get('/checkout');
@@ -68,7 +68,7 @@ class CheckoutAuditTest extends TestCase
                  ->assertSessionHas('error', 'Giỏ hàng của bạn đang trống.');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function checkout_page_redirects_to_cart_if_item_is_out_of_stock()
     {
         $product = $this->createProduct();
@@ -92,7 +92,7 @@ class CheckoutAuditTest extends TestCase
                  ->assertSessionHas('error');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_successfully_places_cod_order_deducts_stock_and_clears_cart()
     {
         $product = $this->createProduct();
@@ -138,7 +138,7 @@ class CheckoutAuditTest extends TestCase
         $this->assertEmpty(Session::get('cart'));
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_calculates_total_correctly_when_valid_coupon_is_applied()
     {
         $product = $this->createProduct();

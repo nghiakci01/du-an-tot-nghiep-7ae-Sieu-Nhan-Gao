@@ -20,7 +20,7 @@ class ReportTest extends TestCase
         $this->admin = User::factory()->create(['role' => 'admin']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_view_dashboard_with_date_filters()
     {
         $this->actingAs($this->admin);
@@ -42,7 +42,7 @@ class ReportTest extends TestCase
         $response->assertDontSee('100,000 VND'); // Should not see the order from 40 days ago
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_export_orders_to_excel()
     {
         Excel::fake();
@@ -54,7 +54,7 @@ class ReportTest extends TestCase
         Excel::assertDownloaded('orders-report-'.now()->subDays(30)->format('Ymd').'-'.now()->format('Ymd').'.xlsx');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_export_revenue_to_pdf()
     {
         $this->actingAs($this->admin);

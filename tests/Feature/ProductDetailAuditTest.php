@@ -24,7 +24,7 @@ class ProductDetailAuditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_404_when_product_does_not_exist()
     {
         $response = $this->get('/product/invalid-slug-12345');
@@ -32,7 +32,7 @@ class ProductDetailAuditTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_renders_product_page_even_if_image_is_null_or_empty()
     {
         $this->withoutExceptionHandling();
@@ -52,7 +52,7 @@ class ProductDetailAuditTest extends TestCase
         // It shouldn't crash because we recently fixed the fallback image logic in the view
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_renders_product_page_gracefully_when_price_is_zero()
     {
         $product = Product::create([
@@ -70,7 +70,7 @@ class ProductDetailAuditTest extends TestCase
         $response->assertSee('0 VND'); 
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_handles_invalid_pagination_or_filter_queries_gracefully()
     {
         // Go to product list page with garbage inputs
@@ -79,7 +79,7 @@ class ProductDetailAuditTest extends TestCase
         $response->assertStatus(200); // Should just ignore invalid filters and load default list
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_shows_out_of_stock_message_if_no_stock_available()
     {
         $product = Product::create([

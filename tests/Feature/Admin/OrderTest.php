@@ -51,7 +51,7 @@ class OrderTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_view_orders_list()
     {
         $this->makeOrder();
@@ -62,7 +62,7 @@ class OrderTest extends TestCase
         $response->assertViewIs('admin.orders.index');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_view_single_order()
     {
         $order = $this->makeOrder();
@@ -73,7 +73,7 @@ class OrderTest extends TestCase
         $response->assertViewIs('admin.orders.show');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_filter_orders_by_status()
     {
         $this->makeOrder('pending');
@@ -84,7 +84,7 @@ class OrderTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_update_order_status()
     {
         $order = $this->makeOrder('pending');
@@ -104,7 +104,7 @@ class OrderTest extends TestCase
         $response->assertRedirect(route('admin.orders.show', $order));
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function order_status_is_required_on_update()
     {
         $order = $this->makeOrder('pending');
@@ -116,7 +116,7 @@ class OrderTest extends TestCase
         $response->assertSessionHasErrors(['status']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_delete_cancelled_order()
     {
         $order = $this->makeOrder('cancelled');
@@ -127,7 +127,7 @@ class OrderTest extends TestCase
         $this->assertDatabaseMissing('orders', ['id' => $order->id]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_cannot_delete_pending_order()
     {
         $order = $this->makeOrder('pending');
@@ -138,7 +138,7 @@ class OrderTest extends TestCase
         $this->assertDatabaseHas('orders', ['id' => $order->id]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_print_order()
     {
         $order = $this->makeOrder();
@@ -148,7 +148,7 @@ class OrderTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_cannot_update_status_of_unpaid_online_order()
     {
         $order = Order::create([
@@ -173,7 +173,7 @@ class OrderTest extends TestCase
         $this->assertEquals('pending', $order->fresh()->status);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_access_orders()
     {
         $response = $this->get(route('admin.orders.index'));

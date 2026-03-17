@@ -50,7 +50,7 @@ class CartAuditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_requires_variant_selection_if_product_has_multiple_variants()
     {
         $product = $this->createProduct();
@@ -68,7 +68,7 @@ class CartAuditTest extends TestCase
                  ->assertJsonPath('message', 'Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_auto_selects_variant_if_product_has_only_one_variant()
     {
         $product = $this->createProduct();
@@ -89,7 +89,7 @@ class CartAuditTest extends TestCase
         $this->assertEquals(2, $cart[$variant->id]['quantity']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_prevents_adding_more_than_stock_quantity()
     {
         $product = $this->createProduct();
@@ -105,7 +105,7 @@ class CartAuditTest extends TestCase
                  ->assertJsonPath('success', false);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_prevents_adding_if_existing_cart_quantity_plus_new_quantity_exceeds_stock()
     {
         $product = $this->createProduct();
@@ -132,7 +132,7 @@ class CartAuditTest extends TestCase
         $this->assertEquals(3, $cart[$variant->id]['quantity']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_accumulates_quantity_when_added_multiple_times()
     {
         $product = $this->createProduct();
@@ -156,7 +156,7 @@ class CartAuditTest extends TestCase
         $this->assertEquals(5, $cart[$variant->id]['quantity']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_update_cart_quantity()
     {
         $product = $this->createProduct();
@@ -180,7 +180,7 @@ class CartAuditTest extends TestCase
         $this->assertEquals(5, $cart[$variant->id]['quantity']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_remove_item_from_cart()
     {
         $product = $this->createProduct();
