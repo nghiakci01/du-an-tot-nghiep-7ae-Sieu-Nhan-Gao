@@ -280,6 +280,126 @@
             border: 0.5px solid #ddd;
             margin-right: 3px;
         }
+
+        /* Swatch Styles */
+        .swatch-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .swatch-item {
+            min-width: 45px;
+            height: 45px;
+            padding: 0 10px;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: #fff;
+            user-select: none;
+        }
+        .swatch-item:hover {
+            border-color: #ef233c;
+            color: #ef233c;
+        }
+        .swatch-item.active {
+            border-color: #ef233c;
+            background: #fff;
+            color: #ef233c;
+            box-shadow: inset 0 0 0 1px #ef233c;
+        }
+        .swatch-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f5f5f5;
+        }
+
+        /* Hide legacy dropdowns and nice-select wrappers */
+        .product_variant select,
+        .product_variant .nice-select {
+            display: none !important;
+        }
+
+        /* Quantity Selector Styles */
+        .quantity-selector {
+            display: flex !important;
+            align-items: center;
+            border: 0.5px solid #ccc;
+            width: 140px !important;
+            height: 40px !important;
+            margin-top: 10px;
+            overflow: hidden !important;
+            border-radius: 4px;
+            box-sizing: border-box !important;
+            background: #fff;
+        }
+        .quantity-selector * {
+            box-sizing: border-box !important;
+        }
+        .qty-btn {
+            flex: 0 0 40px !important;
+            width: 40px !important;
+            height: 40px !important;
+            border: 0 !important; /* Force border 0 as requested */
+            background: #fff !important;
+            color: #333 !important;
+            font-size: 20px !important;
+            font-weight: bold !important;
+            cursor: pointer;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .qty-btn:hover {
+            background: #f8f8f8 !important;
+            color: #ef233c !important;
+        }
+        .qty-btn:active {
+            background: #d1d1d1 !important;
+        }
+        .quantity-selector input {
+            flex: 0 0 59px !important; /* 40 + 59 + 40 = 139. 139 + 0.5*2 borders = 140 totals. */
+            width: 59px !important;
+            height: 40px !important;
+            border: 0 !important;
+            border-left: 0.5px solid #ccc !important;
+            border-right: 0.5px solid #ccc !important;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+            -moz-appearance: textfield;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff;
+            color: #333;
+            outline: none !important;
+            font-family: 'Quicksand', sans-serif;
+        }
+        .quantity-selector input::-webkit-outer-spin-button,
+        .quantity-selector input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Responsive adjustments for buttons */
+        .product_variant.quantity .button {
+            height: 40px !important;
+            line-height: 40px !important;
+            padding: 0 15px !important;
+            font-weight: 300 !important;
+            font-size: 13px !important;
+            margin-top: 5px;
+            border-radius: 0;
+            border: 0.5px solid #ccc;
+        }
+        
     </style>
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area product_bread">
@@ -419,8 +539,16 @@
                                 @endphp
 
                                 <div class="product_variant size">
-                                    <h3>{{ __('messages.size') }}</h3>
-                                    <select class="niceselect_option" id="select_size_nice" name="size_id">
+                                    <h3 style="display: flex; align-items: center; gap: 10px;">
+                                        {{ __('messages.size') }}
+                                        <a href="#" style="font-size: 12px; text-decoration: underline; color: #666; font-weight: normal;">Hướng Dẫn Chọn Size</a>
+                                    </h3>
+                                    <div class="swatch-container size-swatches">
+                                        @foreach ($uniqueSizes as $size)
+                                            <div class="swatch-item" data-value="{{ $size->id }}">{{ $size->name }}</div>
+                                        @endforeach
+                                    </div>
+                                    <select class="niceselect_option" id="select_size_nice" name="size_id" style="display: none;">
                                         <option selected value="">{{ __('messages.size') }}</option>
                                         @foreach ($uniqueSizes as $size)
                                             <option value="{{ $size->id }}">{{ $size->name }}</option>
@@ -431,7 +559,12 @@
 
                                 <div class="product_variant color">
                                     <h3>{{ __('messages.color') }}</h3>
-                                    <select class="niceselect_option" id="select_color_nice" name="color_id">
+                                    <div class="swatch-container color-swatches">
+                                        @foreach ($uniqueColors as $color)
+                                            <div class="swatch-item" data-value="{{ $color->id }}">{{ $color->name }}</div>
+                                        @endforeach
+                                    </div>
+                                    <select class="niceselect_option" id="select_color_nice" name="color_id" style="display: none;">
                                         <option selected value="">{{ __('messages.color') }}</option>
                                         @foreach ($uniqueColors as $color)
                                             <option value="{{ $color->id }}">{{ $color->name }}</option>
@@ -461,16 +594,36 @@
 
                                         const originalPriceHtml = priceContainer.innerHTML;
 
-                                        // Handle Nice Select changes
+                                        // Handle Swatch changes
+                                        $('.size-swatches .swatch-item').on('click', function() {
+                                            if ($(this).hasClass('disabled')) return;
+                                            $('.size-swatches .swatch-item').removeClass('active');
+                                            $(this).addClass('active');
+                                            const val = $(this).data('value');
+                                            sizeInput.value = val;
+                                            $(niceSize).val(val).trigger('change');
+                                            checkSelection();
+                                        });
+
+                                        $('.color-swatches .swatch-item').on('click', function() {
+                                            if ($(this).hasClass('disabled')) return;
+                                            $('.color-swatches .swatch-item').removeClass('active');
+                                            $(this).addClass('active');
+                                            const val = $(this).data('value');
+                                            colorInput.value = val;
+                                            $(niceColor).val(val).trigger('change');
+                                            checkSelection();
+                                        });
+
+                                        // Keep Nice Select and swatches in sync if needed (though we hidden Nice Select)
                                         $(niceSize).on('change', function() {
                                             sizeInput.value = this.value;
-                                            // Remove error highlight when user selects
-                                            $(this).closest('.product_variant').find('.nice-select').css('border-color', '');
+                                            $(`.size-swatches .swatch-item[data-value="${this.value}"]`).addClass('active').siblings().removeClass('active');
                                             checkSelection();
                                         });
                                         $(niceColor).on('change', function() {
                                             colorInput.value = this.value;
-                                            $(this).closest('.product_variant').find('.nice-select').css('border-color', '');
+                                            $(`.color-swatches .swatch-item[data-value="${this.value}"]`).addClass('active').siblings().removeClass('active');
                                             checkSelection();
                                         });
 
@@ -650,14 +803,21 @@
                                 </script>
                             @endif
 
-                            <div class="product_variant quantity">
-                                <label>{{ __('messages.quantity') }}</label>
-                                <input min="1" value="1" type="number" name="quantity" id="quantity_input">
-                                <div style="margin-top:10px;">
+                            <div class="product_variant quantity" style="display: flex; align-items: center; flex-wrap: wrap; gap: 20px;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <label style="margin-bottom: 0; font-weight: 700;">{{ __('messages.quantity') }}</label>
+                                    <div class="quantity-selector">
+                                        <button type="button" class="qty-btn minus">-</button>
+                                        <input min="1" value="1" type="number" name="quantity" id="quantity_input">
+                                        <button type="button" class="qty-btn plus">+</button>
+                                    </div>
+                                </div>
+                                <span id="stock-info" style="display: none; font-size: 13px;"></span>
+                                <div style="display: flex; gap: 10px;">
                                     <input type="hidden" name="action" id="action_input" value="add_to_cart">
-                                    <button class="button" type="button"
+                                    <button class="button" type="button" style="margin: 0;"
                                         id="btn-add-to-cart">{{ __('messages.add_to_cart') }}</button>
-                                    <button class="button buy_now" type="button"
+                                    <button class="button buy_now" type="button" style="margin: 0;"
                                         id="btn-buy-now">{{ __('messages.buy_now') }}</button>
                                 </div>
                             </div>
@@ -1158,7 +1318,7 @@
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        // Cập nhật số lượng giá» hàng trên header
+                        // Cập nhật số lượng giỏ hàng trên header
                         let cartCountElements = document.querySelectorAll('.cart-count');
                         if (response.count !== undefined) {
                             cartCountElements.forEach(el => {
@@ -1201,6 +1361,33 @@
                     }
                 });
             }
+
+            // Quantity increment/decrement buttons
+            $('.qty-btn.plus').on('click', function() {
+                var input = $('#quantity_input');
+                var val = parseInt(input.val()) || 1;
+                var max = parseInt(input.attr('max'));
+                if (!max || val < max) {
+                    input.val(val + 1).trigger('input');
+                } else {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: `Chỉ còn ${max} sản phẩm trong kho!`,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            });
+
+            $('.qty-btn.minus').on('click', function() {
+                var input = $('#quantity_input');
+                var val = parseInt(input.val()) || 1;
+                if (val > 1) {
+                    input.val(val - 1).trigger('input');
+                }
+            });
         });
     </script>
 @endsection
