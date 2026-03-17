@@ -54,7 +54,7 @@
                                                 <input type="hidden" name="max_price" id="max_price" value="{{ request('max_price', 5000000) }}">
                                             </div>
                                         </div>
-                                        <button type="submit" class="mt-3 w-100">{{ __('messages.filter') }}</button>
+                                        <button type="submit" class="mt-3 w-100 product_filter_button">{{ __('messages.filter') }}</button>
                                     </div>
                                 </form> 
                             </div>
@@ -81,22 +81,6 @@
                                 </ul>
                             </div>
                             <div class="widget_list widget_categories">
-                                <h2>{{ __('messages.manufacturer') }}</h2>
-                                <ul>
-                                    @foreach($brands as $brand)
-                                        <li>
-                                            @php
-                                                $params = request()->all();
-                                                $params['brand'] = $brand->slug;
-                                            @endphp
-                                            <a href="{{ route('shop', $params) }}" class="{{ request('brand') == $brand->slug ? 'active' : '' }}">
-                                                {{ $brand->name }} <span>{{ $brand->products_count }}</span>
-                                            </a> 
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                            <div class="widget_list widget_categories">
                                 <h2>{{ __('messages.select_by_color') }}</h2>
                                 <ul>
                                     @foreach($colors as $color)
@@ -111,20 +95,6 @@
                                         </li>
                                     @endforeach
                                 </ul>
-                            </div>
-                            <div class="widget_list tag-cloud">
-                                <h2>{{ __('messages.popular_tags') }}</h2>
-                                <div class="tag_widget">
-                                    <ul>
-                                        @foreach($tags as $tag)
-                                            @php
-                                                $params = request()->all();
-                                                $params['tag'] = $tag->slug;
-                                            @endphp
-                                            <li><a href="{{ route('shop', $params) }}" class="{{ request('tag') == $tag->slug ? 'active' : '' }}">{{ $tag->name }}</a></li>
-                                        @endforeach
-                                    </ul>
-                                </div>
                             </div>
                         </div>
                         <!--sidebar widget end-->

@@ -11368,6 +11368,7 @@ textarea:-ms-input-placeholder {
   background: #242424;
 }
 
+
 @media only screen and (max-width: 767px) {
   .contact_message.content {
     margin-bottom: 52px;
@@ -15014,5 +15015,24 @@ textarea:-ms-input-placeholder {
 /* ========================================= */
 /* ZARA STYLE PRODUCT HOVER OVERRIDES END   */
 /* ========================================= */
+
+.widget_filter .product_filter_button {
+  background: #ffffff !important;
+  color: #242424 !important;
+  border: 1px solid #e1e1e1 !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+  text-transform: uppercase !important;
+  height: 45px !important;
+  line-height: normal !important;
+  border-radius: 0px !important;
+}
+
+.widget_filter .product_filter_button:hover {
+  border-color: #242424 !important;
+  background: #f9f9f9 !important;
+}
 
 /*# sourceMappingURL=style.css.map */
