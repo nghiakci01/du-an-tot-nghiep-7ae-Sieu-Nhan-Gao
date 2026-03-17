@@ -185,13 +185,19 @@
 
                   <a href="{{ route('admin.profile.index') }}" class="dropdown-item">
                     <span>
-                      <svg class="pc-icon text-muted me-2"><use xlink:href="#custom-setting-outline"></use></svg>
+                      <i class="ti ti-user text-muted me-2 f-18"></i>
+                      <span>Tài khoản của tôi</span>
+                    </span>
+                  </a>
+                  <a href="{{ route('admin.settings.index') }}" class="dropdown-item">
+                    <span>
+                      <i class="ti ti-settings text-muted me-2 f-18"></i>
                       <span>Cài đặt</span>
                     </span>
                   </a>
                   <a href="{{ route('admin.profile.index') }}" class="dropdown-item">
                     <span>
-                      <svg class="pc-icon text-muted me-2"><use xlink:href="#custom-lock-outline"></use></svg>
+                      <i class="ti ti-key text-muted me-2 f-18"></i>
                       <span>Đổi mật khẩu</span>
                     </span>
                   </a>
