@@ -78,14 +78,14 @@ class Order extends Model
     public function getStatusBadgeAttribute()
     {
         return match ($this->status) {
-            self::STATUS_PENDING => 'bg-warning',
-            self::STATUS_CONFIRMED => 'bg-info',
-            self::STATUS_SHIPPED => 'bg-primary',
-            self::STATUS_COMPLETED => 'bg-success',
-            self::STATUS_CANCELLED => 'bg-danger',
-            self::STATUS_FAILED => 'bg-danger',
-            self::STATUS_RETURNED => 'bg-warning',
-            default => 'bg-secondary',
+            self::STATUS_PENDING => 'bg-light-warning',
+            self::STATUS_CONFIRMED => 'bg-light-info',
+            self::STATUS_SHIPPED => 'bg-light-primary',
+            self::STATUS_COMPLETED => 'bg-light-success',
+            self::STATUS_CANCELLED => 'bg-light-danger',
+            self::STATUS_FAILED => 'bg-light-danger',
+            self::STATUS_RETURNED => 'bg-light-warning',
+            default => 'bg-light-secondary',
         };
     }
 

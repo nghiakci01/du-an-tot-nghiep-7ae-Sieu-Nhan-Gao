@@ -28,8 +28,6 @@ class ProfileController extends Controller
             'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:255',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'current_password' => 'nullable|required_with:new_password',
-            'new_password' => 'nullable|min:8|confirmed',
         ]);
 
         $user->name = $request->name;
@@ -60,15 +58,47 @@ class ProfileController extends Controller
             }
         }
 
-        if ($request->filled('new_password')) {
-            if (! Hash::check($request->current_password, $user->password)) {
-                return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng']);
-            }
-            $user->password = Hash::make($request->new_password);
-        }
-
         $user->save();
 
-        return back()->with('success', 'Profile updated successfully.');
+        return back()->with('success', 'Cập nhật hồ sơ thành công.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ], [
+            'current_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
+            'new_password.required' => 'Vui lòng nhập mật khẩu mới.',
+            'new_password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+            'new_password.confirmed' => 'Xác nhận mật khẩu mới không khớp.',
+        ]);
+
+        if (! Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng']);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return back()->with('success', 'Đổi mật khẩu thành công.');
+    }
+
+    public function checkCurrentPassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required'
+        ]);
+
+        $isValid = Hash::check($request->current_password, Auth::user()->password);
+
+        return response()->json([
+            'valid' => $isValid,
+            'message' => $isValid ? '' : 'Mật khẩu hiện tại không chính xác.'
+        ]);
     }
 }
