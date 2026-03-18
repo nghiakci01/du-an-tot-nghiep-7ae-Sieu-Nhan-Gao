@@ -1,6 +1,7 @@
 {{-- Mini Cart Widget --}}
 @php
-    $cart = session()->get('cart', []);
+    $cartService = app(\App\Services\CartService::class);
+    $cart = $cartService->getCart();
     $cartCount = 0;
     $cartTotal = 0;
     foreach($cart as $item) {
