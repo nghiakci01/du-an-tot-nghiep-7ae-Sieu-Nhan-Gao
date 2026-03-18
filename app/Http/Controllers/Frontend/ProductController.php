@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Size;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,14 +49,46 @@ class ProductController extends Controller
             });
         }
 
-        // Filter by Price (using variants)
+        // Filter by Price (including promotional prices)
         if ($request->has('min_price') && $request->has('max_price')) {
-            $min = $request->min_price;
-            $max = $request->max_price;
+            $min = (float) $request->min_price;
+            $max = (float) $request->max_price;
 
-            // Check if product has ANY variant within the price range
-            $query->whereHas('variants', function ($q) use ($min, $max) {
-                $q->whereBetween('price', [$min, $max]);
+            $query->where(function ($q) use ($min, $max) {
+                // 1. Check if product has ANY variant with an active price in range
+                $q->whereHas('variants', function ($v_q) use ($min, $max) {
+                    $v_q->where(function ($sub) use ($min, $max) {
+                        // If sale price exists and > 0, check it
+                        $sub->where(function ($q1) use ($min, $max) {
+                            $q1->whereNotNull('sale_price')
+                                ->where('sale_price', '>', 0)
+                                ->whereBetween('sale_price', [$min, $max]);
+                        })
+                        // Otherwise check regular price
+                        ->orWhere(function ($q2) use ($min, $max) {
+                            $q2->where(function ($q_null) {
+                                $q_null->whereNull('sale_price')
+                                      ->orWhere('sale_price', '<=', 0);
+                            })->whereBetween('price', [$min, $max]);
+                        });
+                    });
+                })
+                // 2. OR if it has NO variants (or they are invalid), check the product's own price
+                ->orWhere(function ($p_q) use ($min, $max) {
+                    $p_q->doesntHave('variants')
+                        ->where(function ($sub) use ($min, $max) {
+                            $sub->where(function ($q1) use ($min, $max) {
+                                $q1->whereNotNull('sale_price')
+                                    ->where('sale_price', '>', 0)
+                                    ->whereBetween('sale_price', [$min, $max]);
+                            })->orWhere(function ($q2) use ($min, $max) {
+                                $q2->where(function ($q_null) {
+                                    $q_null->whereNull('sale_price')
+                                          ->orWhere('sale_price', '<=', 0);
+                                })->whereBetween('price', [$min, $max]);
+                            });
+                        });
+                });
             });
         }
 
@@ -72,6 +105,14 @@ class ProductController extends Controller
             $colorSlug = $request->color;
             $query->whereHas('variants.colorRelationship', function ($q) use ($colorSlug) {
                 $q->where('slug', $colorSlug);
+            });
+        }
+
+        // Filter by Size
+        if ($request->has('size')) {
+            $sizeName = $request->size;
+            $query->whereHas('variants.sizeRelationship', function ($q) use ($sizeName) {
+                $q->where('name', $sizeName);
             });
         }
 
@@ -131,8 +172,29 @@ class ProductController extends Controller
         });
 
         // Colors with product counts
-        $colors = Cache::remember('shop_sidebar_colors', 3600, function () {
-            return Color::whereHas('productVariants.product', function ($q) {
+        $colors = Color::whereHas('productVariants.product', function ($q) {
+            $q->where('products.is_active', true);
+        })->withCount([
+            'productVariants as products_count' => function ($q) {
+                $q->whereHas('product', function ($pq) {
+                    $pq->where('products.is_active', true);
+                });
+            },
+        ])->limit(10)->get();
+
+        // Sizes with product counts
+        $sizes = Size::where('is_active', true)->whereHas('productVariants.product', function ($q) {
+            $q->where('products.is_active', true);
+        })->withCount([
+            'productVariants as products_count' => function ($q) {
+                $q->whereHas('product', function ($pq) {
+                    $pq->where('products.is_active', true);
+                });
+            },
+        ])->orderBy('display_order', 'asc')->get();
+
+        $tags = Tag::withCount([
+            'products' => function ($q) {
                 $q->where('products.is_active', true);
             })->withCount([
                 'productVariants as products_count' => function ($q) {
@@ -160,6 +222,7 @@ class ProductController extends Controller
             'categories',
             'brands',
             'colors',
+            'sizes',
             'tags',
             'totalActiveProducts',
             'currentCategory'

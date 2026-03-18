@@ -3113,8 +3113,11 @@ textarea:-ms-input-placeholder {
 }
 
 .middel_right_info .search_bar form input {
-  height: 35px;
-  line-height: 35px;
+  height: 38px;
+  line-height: 38px;
+  border: 0.5px solid #ccc !important;
+  border-radius: 25px !important;
+  padding: 0 45px 0 20px !important;
 }
 
 @media only screen and (min-width: 768px) and (max-width: 991px) {
@@ -9089,63 +9092,100 @@ textarea:-ms-input-placeholder {
 }
 
 .ui-slider-horizontal .ui-slider-range {
-  background: #ff6a28;
+  background: #242424;
   height: 5px;
 }
 
 .ui-slider-horizontal {
-  height: 3px;
+  height: 2px;
   background: #dbdbdb;
   border: none;
-  width: 92%;
+  width: 100%;
   margin: 0 auto;
-  margin-bottom: 22px;
+  margin-bottom: 25px;
+  margin-top: 10px;
 }
 
 .ui-state-default,
 .ui-widget-content .ui-state-default,
 .ui-widget-header .ui-state-default {
   background: #fff;
-  border: 0;
-  border-radius: 0;
-  width: 13px;
-  height: 13px;
-  top: -5px;
-  cursor: e-resize;
+  border: 1px solid #242424;
+  width: 20px;
+  height: 20px;
+  top: -10px;
+  cursor: pointer;
   border-radius: 50%;
-  -webkit-box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+  z-index: 2;
+  outline: none;
 }
 
-.widget_list.widget_filter form {
-  padding-top: 10px;
+.ui-state-default:hover,
+.ui-state-active,
+.ui-widget-content .ui-state-active {
+  transform: scale(1.1);
+  background: #fff;
 }
 
-.widget_list.widget_filter form input {
-  background: none;
-  border: none;
-  font-size: 12px;
-  float: right;
-  text-align: right;
-  line-height: 31px;
+.price_summary {
+  font-size: 16px;
+  font-weight: 500;
+  color: #242424;
+  margin-bottom: 20px !important;
 }
 
-@media only screen and (min-width: 992px) and (max-width: 1199px) {
-  .widget_list.widget_filter form input {
-    width: 65px;
-  }
+.price_inputs {
+  gap: 10px;
+}
+
+.price_input_box {
+  position: relative;
+  flex: 1;
+}
+
+.price_input_box input {
+  width: 100%;
+  height: 40px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 5px !important;
+  padding: 0 25px 0 10px !important;
+  font-size: 16px !important;
+  color: #242424 !important;
+  background: #fff !important;
+  text-align: left !important;
+  float: none !important;
+  margin: 0 !important;
+  line-height: normal !important;
+}
+
+.price_input_box .currency_symbol {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #242424;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.separator {
+  color: #242424;
+  font-weight: 300;
 }
 
 .widget_list.widget_filter form button {
-  height: 30px;
-  line-height: 30px;
+  height: 40px;
+  line-height: 40px;
   padding: 0 16px;
   text-transform: uppercase;
   color: #ffffff;
   background: #242424;
   border: 0;
-  border-radius: 30px;
-  -webkit-transition: 0.3s;
+  border-radius: 5px;
   transition: 0.3s;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .widget_list.widget_filter form button:hover {
@@ -11327,6 +11367,7 @@ textarea:-ms-input-placeholder {
 .contact_message button:hover {
   background: #242424;
 }
+
 
 @media only screen and (max-width: 767px) {
   .contact_message.content {
@@ -14787,7 +14828,7 @@ textarea:-ms-input-placeholder {
 .single_product {
   position: relative;
   overflow: hidden;
-  border-radius: 0; 
+  border-radius: 0;
   box-shadow: none !important;
   border: 1px solid transparent;
   transition: border 0.3s ease;
@@ -14796,41 +14837,49 @@ textarea:-ms-input-placeholder {
 .product_thumb {
   position: relative;
   overflow: hidden;
-  margin-bottom: 15px; /* Increase spacing */
+  margin-bottom: 15px;
+  /* Increase spacing */
 }
 
 /* Smooth Image Swap and subtle zoom */
 .product_thumb a.primary_img img {
   transition: transform 0.6s ease;
 }
+
 .single_product:hover .product_thumb a.primary_img img {
-  transform: scale(1.03); /* Subtle Zara zoom */
+  transform: scale(1.03);
+  /* Subtle Zara zoom */
 }
+
 .product_thumb a.secondary_img {
   transition: opacity 0.5s ease;
   z-index: 2;
 }
+
 .single_product:hover .product_thumb a.secondary_img {
   opacity: 1 !important;
   visibility: visible !important;
 }
 
 /* Clean up action buttons (Hide default cluttered view) */
-.single_product .hover_action > a {
-  display: none !important; /* Hide the plus icon */
+.single_product .hover_action>a {
+  display: none !important;
+  /* Hide the plus icon */
 }
 
 .single_product .product_action {
   top: 10px;
   right: 10px;
-  opacity: 1 !important; /* We want the heart to be visible or at least structured cleanly */
+  opacity: 1 !important;
+  /* We want the heart to be visible or at least structured cleanly */
   visibility: visible !important;
   transform: none;
 }
 
 .single_product .action_button {
   opacity: 1 !important;
-  visibility: hidden; /* Hide until hover */
+  visibility: hidden;
+  /* Hide until hover */
   transform: translateX(10px);
   transition: all 0.3s ease;
   position: relative;
@@ -14855,7 +14904,7 @@ textarea:-ms-input-placeholder {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
   color: #000;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   border: none;
   font-size: 14px;
   transition: all 0.2s;
@@ -14867,12 +14916,14 @@ textarea:-ms-input-placeholder {
 }
 
 .single_product .action_button ul li a::before {
-  display: none; /* Remove weird border lines */
+  display: none;
+  /* Remove weird border lines */
 }
 
 /* Redesign Quick view / Add to cart button to slide from bottom like Zara */
 .single_product .quick_button {
-  bottom: -60px; /* Start hidden below */
+  bottom: -60px;
+  /* Start hidden below */
   left: 0;
   right: 0;
   opacity: 0;
@@ -14925,6 +14976,7 @@ textarea:-ms-input-placeholder {
 .single_product .product_content h3 a {
   color: #333;
 }
+
 .single_product .product_content h3 a:hover {
   color: #000;
   text-decoration: underline;
@@ -14953,6 +15005,7 @@ textarea:-ms-input-placeholder {
   font-weight: 600;
   letter-spacing: 1px;
 }
+
 .single_product .double_base .product_sale span,
 .single_product .label_product span {
   color: #000;
@@ -14962,5 +15015,24 @@ textarea:-ms-input-placeholder {
 /* ========================================= */
 /* ZARA STYLE PRODUCT HOVER OVERRIDES END   */
 /* ========================================= */
+
+.widget_filter .product_filter_button {
+  background: #ffffff !important;
+  color: #242424 !important;
+  border: 1px solid #e1e1e1 !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+  text-transform: uppercase !important;
+  height: 45px !important;
+  line-height: normal !important;
+  border-radius: 0px !important;
+}
+
+.widget_filter .product_filter_button:hover {
+  border-color: #242424 !important;
+  background: #f9f9f9 !important;
+}
 
 /*# sourceMappingURL=style.css.map */

@@ -71,7 +71,7 @@
                 </li>
 
                 <li class="pc-item">
-                    <a href="{{ route('welcome') }}" class="pc-link" target="_blank">
+                    <a href="{{ route('welcome') }}" class="pc-link" target="_blank" data-pjax="false">
                         <span class="pc-micon">
                             <i class="ti ti-world"></i>
                         </span>

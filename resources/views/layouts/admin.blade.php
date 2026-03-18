@@ -225,7 +225,7 @@
   <script>
       $(document).ready(function() {
           // Khởi tạo pjax cho các link menu và nút bấm chuyển trang
-          $(document).pjax('a.pc-link, a.nav-link:not([data-bs-toggle]), .pagination a, a.btn', '.pc-content', {
+          $(document).pjax('a.pc-link:not([target="_blank"]):not([data-pjax="false"]), a.nav-link:not([data-bs-toggle]):not([target="_blank"]):not([data-pjax="false"]), .pagination a, a.btn:not([target="_blank"]):not([data-pjax="false"])', '.pc-content', {
               fragment: '.pc-content', // Bắt buộc phải có để báo Pjax chỉ rút trích phần .pc-content
               timeout: 10000,
               scrollTo: 0 // Cuộn lên đầu
