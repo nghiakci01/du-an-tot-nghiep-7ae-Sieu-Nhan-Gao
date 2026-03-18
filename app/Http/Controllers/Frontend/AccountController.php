@@ -16,7 +16,7 @@ class AccountController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        
+
         if ($user) {
             $orders = $user->orders()->orderBy('created_at', 'desc')->paginate(10);
             $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
@@ -28,17 +28,24 @@ class AccountController extends Controller
                 })
                 ->whereRaw('used_count < usage_limit')
                 ->get();
-            $wishlists        = $user->wishlists()->with('product')->get();
-            $userBankAccounts = $user->bankAccounts()->get();
-
+            $wishlists            = $user->wishlists()->with('product')->get();
+            $userBankAccounts     = $user->bankAccounts()->get();
+            $walletTransactions   = $user->walletTransactions()->take(20)->get();
+            $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();
         } else {
-            $orders = collect();
-            $coupons = collect();
+            $orders   = collect();
+            $coupons  = collect();
             $wishlists = collect();
-            $userBankAccounts = collect();
+            $userBankAccounts    = collect();
+            $walletTransactions  = collect();
+            $walletTopupRequests = collect();
         }
 
-        return view('frontend.account.index', compact('user', 'orders', 'coupons', 'wishlists', 'userBankAccounts'));
+        return view('frontend.account.index', compact(
+            'user', 'orders', 'coupons', 'wishlists',
+            'userBankAccounts', 'walletTransactions', 'walletTopupRequests'
+        ));
+
     }
 
     public function showOrder($id)

@@ -6,6 +6,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\WalletTransaction;
+use App\Models\WalletTopupRequest;
 
 class User extends Authenticatable
 {
@@ -32,6 +34,7 @@ class User extends Authenticatable
         'role',
         'avatar',
         'cart_data',
+        'wallet_balance',
     ];
 
     /**
@@ -52,9 +55,10 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'cart_data' => 'array',
+            'email_verified_at'  => 'datetime',
+            'password'           => 'hashed',
+            'cart_data'          => 'array',
+            'wallet_balance'     => 'decimal:2',
         ];
     }
 
@@ -93,6 +97,15 @@ class User extends Authenticatable
         return $this->hasMany(UserBankAccount::class)->orderByDesc('is_default');
     }
 
+    public function walletTransactions()
+    {
+        return $this->hasMany(WalletTransaction::class)->latest();
+    }
+
+    public function walletTopupRequests()
+    {
+        return $this->hasMany(WalletTopupRequest::class)->latest();
+    }
 
     public function getAvatarUrlAttribute()
     {
