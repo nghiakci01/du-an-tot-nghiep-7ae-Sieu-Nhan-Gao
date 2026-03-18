@@ -208,7 +208,7 @@
   <script src="{{ asset('admin-assets') }}/js/plugins/i18next.min.js"></script>
   <script src="{{ asset('admin-assets') }}/js/plugins/i18nextHttpBackend.min.js"></script> --}}
   <script src="{{ asset('admin-assets') }}/js/icon/custom-font.js"></script>
-  <script src="{{ asset('admin-assets') }}/js/script.js"></script>
+  <script src="{{ asset('admin-assets') }}/js/script.js?v=1.0.3"></script>
   <script src="{{ asset('admin-assets') }}/js/theme.js?v=1.0.1"></script>
   {{--
   <script src="{{ asset('admin-assets') }}/js/multi-lang.js"></script> --}}
@@ -247,7 +247,16 @@
 
           // Tắt loading
           $(document).on('pjax:complete', function() {
+              console.log("Pjax complete triggered.");
               $('.loader-bg').fadeOut('slow');
+
+              // Update sidebar active menu
+              if (window.update_active_menu) {
+                  console.log("Calling update_active_menu()...");
+                  window.update_active_menu();
+              } else {
+                  console.warn("window.update_active_menu is not defined!");
+              }
 
               // Khởi tạo lại Feather icons và tooltip/popover nêú cần
               if(window.feather) feather.replace();
