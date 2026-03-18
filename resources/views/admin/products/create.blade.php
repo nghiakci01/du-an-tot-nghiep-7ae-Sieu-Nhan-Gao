@@ -256,6 +256,14 @@
         const addBtn = document.getElementById('add-variant-btn');
 
         addBtn.addEventListener('click', function() {
+            // Find highest index to avoid collision
+            let maxIndex = -1;
+            document.querySelectorAll('.variant-row').forEach(row => {
+                const index = parseInt(row.getAttribute('data-index'));
+                if (index > maxIndex) maxIndex = index;
+            });
+            variantIndex = maxIndex + 1;
+
             const row = `
                 <tr class="variant-row" data-index="${variantIndex}">
                     <td>
@@ -292,7 +300,6 @@
                 </tr>
             `;
             tableBody.insertAdjacentHTML('beforeend', row);
-            variantIndex++;
         });
 
         tableBody.addEventListener('click', function(e) {
