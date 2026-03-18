@@ -427,6 +427,14 @@
             </button>
           </form>
         @endif
+        @if($user && in_array($order->status, [\App\Models\Order::STATUS_COMPLETED, \App\Models\Order::STATUS_SHIPPED]))
+          <form action="{{ route('account.orders.return', $order->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn hoàn đơn hàng này?');">
+            @csrf
+            <button type="submit" class="btn btn-outline-warning rounded-pill py-2 w-100 mt-2">
+              <i class="bi bi-arrow-return-left me-1"></i> Hoàn đơn hàng
+            </button>
+          </form>
+        @endif
       </div>
 
     </div>

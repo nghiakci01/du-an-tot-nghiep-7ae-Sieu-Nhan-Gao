@@ -217,7 +217,8 @@ class OrderController extends Controller
             \App\Models\OrderHistory::create([
                 'order_id' => $order->id,
                 'user_id' => auth()->id(),
-                'status' => Order::STATUS_CONFIRMED,
+                'previous_status' => 'waiting_confirmation',
+                'new_status' => Order::STATUS_CONFIRMED,
                 'note' => 'Admin xác nhận đã nhận tiền chuyển khoản. Đơn hàng chuyển sang trạng thái Đã xác nhận.',
             ]);
 
@@ -329,6 +330,7 @@ class OrderController extends Controller
             \App\Models\OrderHistory::create([
                 'order_id' => $order->id,
                 'user_id' => auth()->id(),
+                'previous_status' => 'paid',
                 'new_status' => $order->status,
                 'note' => 'Hoàn tiền VNPAY thành công: ' . number_format($amount) . 'đ',
             ]);
