@@ -724,5 +724,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+function copyBankAccount(number, btn) {
+  if (!navigator.clipboard) return;
+  navigator.clipboard.writeText(number).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check2 me-1"></i>Đã sao chép!';
+    btn.classList.replace('btn-outline-dark', 'btn-dark');
+    setTimeout(() => {
+      btn.innerHTML = orig;
+      btn.classList.replace('btn-dark', 'btn-outline-dark');
+    }, 2000);
+  });
+}
 </script>
 @endpush
