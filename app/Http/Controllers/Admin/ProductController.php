@@ -318,6 +318,53 @@ class ProductController extends Controller
         }
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:products,id'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $ids = $request->ids;
+            
+            // Delete variants first
+            ProductVariant::whereIn('product_id', $ids)->delete();
+            
+            // Delete products
+            Product::whereIn('id', $ids)->delete();
+
+            DB::commit();
+            return redirect()->route('admin.products.index')->with('success', 'Đã xóa thành công ' . count($ids) . ' sản phẩm.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Lỗi khi xóa nhiều sản phẩm: ' . $e->getMessage());
+            return redirect()->route('admin.products.index')->with('error', 'Có lỗi xảy ra khi xóa danh sách sản phẩm. Vui lòng kiểm tra lại.');
+        }
+    }
+
+    public function deleteAll()
+    {
+        try {
+            DB::beginTransaction();
+
+            // Delete all variants first
+            ProductVariant::query()->delete();
+            
+            // Delete all products
+            Product::query()->delete();
+
+            DB::commit();
+            return redirect()->route('admin.products.index')->with('success', 'Đã xóa TOÀN BỘ sản phẩm trong hệ thống thành công.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Lỗi khi xóa tất cả sản phẩm: ' . $e->getMessage());
+            return redirect()->route('admin.products.index')->with('error', 'Có lỗi xảy ra khi xóa toàn bộ. Vui lòng kiểm tra lại.');
+        }
+    }
+
     public function deleteGalleryImage($imageId)
     {
         try {
