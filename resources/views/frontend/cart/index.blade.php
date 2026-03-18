@@ -275,6 +275,10 @@
                                                         showCancelButton: true,
                                                         cancelButtonText: 'Đóng',
                                                         cancelButtonColor: '#6c757d',
+                                                    }).then((result) => {
+                                                        if (result.isConfirmed) {
+                                                            location.reload();
+                                                        }
                                                     });
                                                 } else {
                                                     Swal.fire({ icon: 'error', title: 'Lỗi!', text: data.message || 'Không thể tiến hành thanh toán.', confirmButtonColor: '#ef233c' });
