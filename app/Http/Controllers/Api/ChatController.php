@@ -27,12 +27,14 @@ class ChatController extends Controller
             $userId = auth()->id();
 
             // 1. Save user message
-            \App\Models\ChatMessage::create([
+            $userMessage = \App\Models\ChatMessage::create([
                 'session_id' => $sessionId,
                 'user_id' => $userId,
                 'message' => $message,
                 'sender_type' => 'user',
             ]);
+            
+            event(new \App\Events\ChatMessageSent($userMessage));
 
             // 2. Check if Bot is enabled for this session
             $chatSession = \App\Models\ChatSession::where('session_id', $sessionId)->first();
@@ -50,7 +52,7 @@ class ChatController extends Controller
             $result = $this->chatService->generateResponse($message);
 
             // 4. Save bot reply
-            \App\Models\ChatMessage::create([
+            $botMessage = \App\Models\ChatMessage::create([
                 'session_id' => $sessionId,
                 'user_id' => $userId,
                 'message' => $result['message'],
@@ -59,6 +61,8 @@ class ChatController extends Controller
                     'products' => $result['products'] ?? [],
                 ],
             ]);
+            
+            event(new \App\Events\ChatMessageSent($botMessage));
 
             return response()->json([
                 'status' => 'success',
