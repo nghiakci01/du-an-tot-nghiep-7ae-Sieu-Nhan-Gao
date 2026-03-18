@@ -257,7 +257,9 @@
                   return new bootstrap.Tooltip(tooltipTriggerEl);
               });
 
-              // Chạy lại các đoạn script inline nằm trong pc-content (nếu cần)
+              // the following block is commented out because jquery-pjax already executes scripts 
+              // within the fragment, and manual eval causes double execution (e.g., double event binding)
+              /*
               $('.pc-content script').each(function() {
                   if (this.src) {
                       $.getScript(this.src);
@@ -265,6 +267,7 @@
                       eval($(this).text());
                   }
               });
+              */
               
               // Nếu có sử dụng DataTables, cần re-init lại bảng
               if ($.fn.DataTable) {
