@@ -29,7 +29,6 @@ Route::get('/cart/count', [App\Http\Controllers\Frontend\CartController::class, 
 Route::get('/cart/validate', [App\Http\Controllers\Frontend\CheckoutController::class, 'validateCart'])->name('cart.validate');
 Route::post('/api/checkout/check-inventory', [App\Http\Controllers\Api\InventoryCheckController::class, 'checkInventory'])->name('api.checkout.checkInventory');
 
-Route::get('/home', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
 Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'store'])->name('checkout.store');
 Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
@@ -143,9 +142,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
             // Inventory Management
             Route::resource('suppliers', App\Http\Controllers\Admin\SupplierController::class);
-            // Route::resource('warehouses', App\Http\Controllers\Admin\WarehouseController::class);
-            // Route::resource('vouchers', App\Http\Controllers\Admin\InventoryVoucherController::class);
-            // Route::post('vouchers/{voucher}/complete', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'complete'])->name('vouchers.complete');
             Route::get('stock', function () {
                 return 'Stock Report Page (Coming Soon)';
             })->name('stock.index');
@@ -157,7 +153,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
 
             // Virtual Try-On Models management
-            // Route::resource('vton-models', App\Http\Controllers\Admin\VtonModelController::class);
         });
 
         // Blog Management (Admin & Staff)
