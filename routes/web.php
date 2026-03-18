@@ -123,9 +123,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('orders/{order}/query-payment', [App\Http\Controllers\Admin\OrderController::class, 'queryPayment'])->name('orders.query-payment');
         Route::post('orders/{order}/refund-payment', [App\Http\Controllers\Admin\OrderController::class, 'refundPayment'])->name('orders.refund-payment');
         Route::post('orders-trigger-auto-cancel', [App\Http\Controllers\Admin\OrderController::class, 'triggerAutoCancel'])->name('orders.trigger-auto-cancel');
-        Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
+        Route::delete('products/bulk-delete', [App\Http\Controllers\Admin\ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
+        Route::delete('products/delete-all', [App\Http\Controllers\Admin\ProductController::class, 'deleteAll'])->name('products.delete-all');
         Route::delete('products/gallery/{image}', [App\Http\Controllers\Admin\ProductController::class, 'deleteGalleryImage'])->name('products.gallery.delete');
-
+        Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
 
         // Product Attributes
         Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);

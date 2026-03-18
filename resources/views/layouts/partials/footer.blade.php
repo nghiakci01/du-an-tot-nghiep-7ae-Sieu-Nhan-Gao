@@ -1,8 +1,8 @@
 <footer class="footer_widgets footer_six">
     <div class="footer_support" style="border-top: 1px solid #ebebeb; padding: 40px 0; background: #fff;">
         <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-md-auto mb-4 mb-md-0" style="margin-right: 50px;">
+            <div class="row justify-content-center" style="gap: 20px;">
+                <div class="col-lg-auto col-md-12 mb-4 mb-lg-0 px-3 px-lg-4">
                     <div class="support_block" style="text-align: left;">
                         <p style="text-transform: uppercase; font-size: 14px; color: #333; margin-bottom: 15px; font-weight: 500;">GỌI MUA HÀNG ( 8:30 - 22:20 )</p>
                         <div class="support_phone" style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
@@ -12,8 +12,8 @@
                         <p style="color: #666; font-size: 13px; margin-bottom: 0;">Tất cả các ngày trong tuần</p>
                     </div>
                 </div>
-                <div class="col-md-auto mb-4 mb-md-0" style="margin-right: 50px;">
-                    <div class="support_block" style="text-align: left; ">
+                <div class="col-lg-auto col-md-12 mb-4 mb-lg-0 px-3 px-lg-4">
+                    <div class="support_block" style="text-align: left;">
                         <p style="text-transform: uppercase; font-size: 14px; color: #333; margin-bottom: 15px; font-weight: 500;">GÓP Ý, KHIẾU NẠI ( 8:00 - 17:00 )</p>
                         <div class="support_phone" style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
                             <i class="fa fa-phone" style="background: #df2d2d; color: #fff; width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 50%; font-size: 20px;"></i>
@@ -22,10 +22,10 @@
                         <p style="color: #666; font-size: 13px; margin-bottom: 0;">Các ngày trong tuần ( trừ ngày lễ )</p>
                     </div>
                 </div>
-                <div class="col-md-auto">
+                <div class="col-lg-auto col-md-12 px-3 px-lg-4">
                     <div class="support_block" style="text-align: left;">
                         <p style="text-transform: uppercase; font-size: 16px; color: #333; margin-bottom: 15px; font-weight: 500;">THEO DÕI CHÚNG TÔI</p>
-                        <div class="social_follow" style="display: flex; gap: 10px; align-items: center;">
+                        <div class="social_follow" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                             <a href="{{ $settings['social_facebook'] ?? 'https://www.facebook.com/profile.php?id=61577211110743' }}" target="_blank" rel="noopener noreferrer" style="color: #333; font-size: 32px; transition: color 0.3s;"><i class="fa fa-facebook-square"></i></a>
                             <a href="{{ $settings['social_instagram'] ?? 'https://www.instagram.com/' }}" target="_blank" rel="noopener noreferrer" style="color: #333; font-size: 32px; transition: color 0.3s;"><i class="fa fa-instagram"></i></a>
                             <a href="#" target="_blank" rel="noopener noreferrer" style="transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">

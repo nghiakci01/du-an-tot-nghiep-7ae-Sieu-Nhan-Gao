@@ -193,18 +193,6 @@ class ProductController extends Controller
             },
         ])->orderBy('display_order', 'asc')->get();
 
-        $tags = Tag::withCount([
-            'products' => function ($q) {
-                $q->where('products.is_active', true);
-            })->withCount([
-                'productVariants as products_count' => function ($q) {
-                    $q->whereHas('product', function ($pq) {
-                        $pq->where('products.is_active', true);
-                    });
-                },
-            ])->limit(10)->get();
-        });
-
         $tags = Cache::remember('shop_sidebar_tags', 3600, function () {
             return Tag::withCount([
                 'products' => function ($q) {
@@ -250,6 +238,7 @@ class ProductController extends Controller
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
             ->with(['images', 'variants', 'reviews'])
+            ->inRandomOrder()
             ->take(4)
             ->get();
 
