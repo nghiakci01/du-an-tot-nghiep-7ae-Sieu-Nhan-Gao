@@ -215,28 +215,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     });
 });
 
-// Test Route for Gemini Chatbot
-Route::get('/test-gemini', function () {
-    $chatService = app(\App\Services\ChatService::class);
-
-    $tests = [
-        'Xin chào, bạn có thể giúp gì cho tôi?' => 'Simple Greeting',
-        'Có sản phẩm laptop không?' => 'Product Query (RAG)',
-        'Cho tôi xem sản phẩm iPhone' => 'Specific Product Search',
-    ];
-
-    $results = [];
-    foreach ($tests as $question => $testName) {
-        $response = $chatService->generateResponse($question);
-        $results[] = [
-            'test' => $testName,
-            'question' => $question,
-            'response' => $response,
-        ];
-    }
-
-    return view('test-gemini', compact('results'));
-});
 
 // Quick Test Route
 Route::get('lang/{locale}', function ($locale) {
@@ -246,8 +224,3 @@ Route::get('lang/{locale}', function ($locale) {
 
 })->name('lang.switch');
 
-// Realtime testing route
-Route::get('/test-broadcast', function () {
-    \App\Events\TestEvent::dispatch('Gửi từ Web.php lúc ' . now()->format('H:i:s'));
-    return view('test-broadcast');
-});
