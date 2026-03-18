@@ -258,6 +258,13 @@
         .product_ratting ul li {
             margin-right: 5px !important;
         }
+
+        /* Product name bold */
+        .product_d_right h1 {
+            font-weight: 700;
+            color: black;
+            font-family: 
+        }
         
     </style>
     <!--breadcrumbs area start-->
@@ -666,7 +673,7 @@
                                 </script>
                             @endif
 
-                            <div class="product_variant quantity" style="display: flex; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
+                            <div class="product_variant quantity" style="display: flex; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
                                 <div style="display: flex; flex-direction: column; gap: 5px;">
                                     <label style="margin-bottom: 0; font-weight: 700;">{{ __('messages.quantity') }}</label>
                                     <div class="quantity-selector" style="margin-top: 0;">
@@ -674,9 +681,9 @@
                                         <input min="1" value="1" type="number" name="quantity" id="quantity_input">
                                         <button type="button" class="qty-btn plus">+</button>
                                     </div>
+                                    <span id="stock-info" style="display: none; font-size: 13px; color: #ef233c;"></span>
                                 </div>
-                                <span id="stock-info" style="display: none; font-size: 13px; margin-bottom: 10px;"></span>
-                                <div style="display: flex; gap: 10px; align-items: center;">
+                                <div style="display: flex; gap: 10px; align-items: center; padding-top: 26px;">
                                     <input type="hidden" name="action" id="action_input" value="add_to_cart">
                                     <button class="button" type="button" style="margin: 0;"
                                         id="btn-add-to-cart">{{ __('messages.add_to_cart') }}</button>

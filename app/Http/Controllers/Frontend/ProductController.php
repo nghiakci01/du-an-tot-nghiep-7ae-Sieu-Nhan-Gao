@@ -128,6 +128,16 @@ class ProductController extends Controller
         // Sorting
         if ($request->has('sort')) {
             switch ($request->sort) {
+                case 'popularity':
+                    $query->withSum(['orderItems as total_sold_sum' => function ($q) {
+                        $q->whereHas('order', fn ($qo) => $qo->whereNotIn('status', ['cancelled', 'failed', 'returned']));
+                    }], 'quantity')
+                    ->orderByRaw('COALESCE(total_sold_sum, 0) DESC');
+                    break;
+                case 'rating':
+                    $query->withAvg('reviews', 'rating')
+                        ->orderByRaw('COALESCE(reviews_avg_rating, 0) DESC');
+                    break;
                 case 'price_asc':
                     $query->orderBy('price', 'asc');
                     break;

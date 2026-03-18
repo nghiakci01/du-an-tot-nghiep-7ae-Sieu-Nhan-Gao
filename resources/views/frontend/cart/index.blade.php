@@ -3,6 +3,70 @@
 @section('title', __('messages.shopping_cart') . ' | Elite')
 
 @section('content')
+<style>
+    /* Quantity Selector Styles synced from detail page */
+    .quantity-selector {
+        display: flex !important;
+        align-items: center;
+        border: 0.5px solid #ccc;
+        width: 140px !important;
+        height: 40px !important;
+        margin: 0 auto;
+        overflow: hidden !important;
+        border-radius: 4px;
+        box-sizing: border-box !important;
+        background: #fff;
+    }
+    .quantity-selector * {
+        box-sizing: border-box !important;
+    }
+    .qty-btn {
+        flex: 0 0 40px !important;
+        width: 40px !important;
+        height: 40px !important;
+        border: 0 !important;
+        background: #fff !important;
+        color: #333 !important;
+        font-size: 20px !important;
+        font-weight: bold !important;
+        cursor: pointer;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .qty-btn:hover {
+        background: #f8f8f8 !important;
+        color: #ff6a28 !important; /* Elite theme color */
+    }
+    .qty-btn:active {
+        background: #d1d1d1 !important;
+    }
+    .quantity-selector input {
+        flex: 0 0 59px !important;
+        width: 59px !important;
+        height: 40px !important;
+        border: 0 !important;
+        border-left: 0.5px solid #ccc !important;
+        border-right: 0.5px solid #ccc !important;
+        text-align: center;
+        font-weight: 500;
+        font-size: 14px;
+        -moz-appearance: textfield;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff;
+        color: #333;
+        outline: none !important;
+    }
+    .quantity-selector input::-webkit-outer-spin-button,
+    .quantity-selector input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area other_bread">
         <div class="container">
@@ -64,7 +128,6 @@
                                         <thead>
                                             <tr>
                                                 <th class="product_check" style="width: 50px;"><input type="checkbox" id="check-all" style="width: 18px; height: 18px; cursor: pointer;"></th>
-                                                <!-- <th class="product_remove">{{ __('messages.remove') }}</th> -->
                                                 <th class="product_thumb">{{ __('messages.image') }}</th>
                                                 <th class="product_name">{{ __('messages.product') }}</th>
                                                 <th class="product-price">{{ __('messages.price') }}</th>
@@ -81,11 +144,6 @@
                                                     <td class="product_check" style="vertical-align: middle;">
                                                         <input type="checkbox" class="check-item" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;" {{ $isOutOfStock ? 'disabled' : '' }}>
                                                     </td>
-                                                    <!-- <td class="product_remove">
-                                                        <a href="javascript:void(0)" class="remove-from-cart">
-                                                            <i class="fa fa-trash-o"></i>
-                                                        </a>
-                                                    </td> -->
                                                     <td class="product_thumb" style="position: relative;">
                                                         <a href="{{ route('product.detail', $details['slug']) }}">
                                                             <img src="{{ $details['image'] ? asset('storage/' . $details['image']) : asset('frontend-assets/img/s-product/product.jpg') }}"
@@ -101,19 +159,7 @@
                                                     </td>
                                                     <td class="product_name">
                                                         <a href="{{ route('product.detail', $details['slug']) }}" class="cart-product-link font-weight-bold" style="font-size: 16px;">{{ $details['name'] }}</a>
-                                                        <div class="cart-variant-info mt-2 text-center" style="display: flex; flex-direction: column; align-items: center;">
-                                                            <div class="text-muted small mb-1" style="font-size: 15px;">
-                                                                {{ __('messages.size') }}: <strong>{{ $details['size'] }}</strong> | 
-                                                                {{ __('messages.color') }}: <strong>{{ $details['color'] }}</strong>
-                                                            </div>
-                                                            <button type="button" class="btn btn-sm edit-variant-btn mt-2" 
-                                                                    style="font-size: 0.85rem; color: #ff6a28; border: 1px solid #ff6a28; background: transparent; padding: 3px 10px; border-radius: 4px;"
-                                                                    {{ $isOutOfStock ? 'disabled' : '' }}>
-                                                                <i class="fa fa-pencil-square-o"></i> {{ __('messages.edit') }}
-                                                            </button>
-                                                        </div>
-
-                                                        <div class="cart-variant-selectors mt-2" style="display: none;">
+                                                        <div class="cart-variant-selectors mt-2">
                                                             <!-- Product selection removed based on user request -->
                                                             
                                                             @if(isset($details['available_sizes_array']) && count($details['available_sizes_array']) > 0)
@@ -141,10 +187,6 @@
                                                                     </select>
                                                                 </div>
                                                             @endif
-                        <div class="mt-2">
-                            <button type="button" class="btn btn-sm save-variant-btn" style="background-color: #ff6a28; color: #fff; border-color: #ff6a28;">Đổi biến thể</button>
-                            <button type="button" class="btn btn-sm btn-secondary cancel-variant-btn">Hủy</button>
-                        </div>
                     </div>
                                                         <input type="hidden" class="product-id" value="{{ $details['product_id'] }}">
                                                         <input type="hidden" class="current-variant-id" value="{{ $id }}">
@@ -155,13 +197,21 @@
                                                             $stockQty = isset($details['stock_quantity']) ? $details['stock_quantity'] : (\App\Models\ProductVariant::find($id)?->stock_quantity ?? 100);
                                                         @endphp
                                                         @if($isOutOfStock)
-                                                            <input type="text" value="0" class="quantity text-center text-muted" disabled style="background-color: #f8f9fa;">
+                                                            <div class="quantity-selector disabled" style="background: #f8f9fa; border-color: #eee;">
+                                                                <button type="button" class="qty-btn" disabled>-</button>
+                                                                <input type="text" value="0" disabled style="background: #f8f9fa;">
+                                                                <button type="button" class="qty-btn" disabled>+</button>
+                                                            </div>
                                                             <small class="d-block text-danger mt-1" style="font-size:11px;">Hết hàng</small>
                                                         @else
-                                                            <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
-                                                                class="quantity update-cart item-quantity"
-                                                                data-stock="{{ $stockQty }}"
-                                                                title="Còn {{ $stockQty }} sản phẩm trong kho">
+                                                            <div class="quantity-selector">
+                                                                <button type="button" class="qty-btn minus">-</button>
+                                                                <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
+                                                                    class="quantity update-cart item-quantity"
+                                                                    data-stock="{{ $stockQty }}"
+                                                                    title="Còn {{ $stockQty }} sản phẩm trong kho">
+                                                                <button type="button" class="qty-btn plus">+</button>
+                                                            </div>
                                                             <small class="d-block text-muted mt-1" style="font-size:11px;"
                                                                 data-stock-label>Kho: {{ $stockQty }}</small>
                                                         @endif
@@ -180,9 +230,7 @@
                                     <button type="button" class="btn btn-warning" id="delete-selected" style="display: none; margin-left: 10px; color: #fff;">
                                         <i class="fa fa-trash"></i> Xóa mục đã chọn
                                     </button>
-                                    <button type="button" class="btn btn-danger" id="clear-cart">
-                                        <i class="fa fa-trash"></i> {{ __('messages.clear_cart') }}
-                                    </button>
+                                    <!-- 'Clear Cart' button remains removed per previous user request -->
                                 </div>
                             </div>
                         </div>
@@ -545,6 +593,9 @@
             $('#cart-grand-total').text(new Intl.NumberFormat('vi-VN').format(grandTotal) + ' đ');
         }
 
+        // calculateCartTotal on page load
+        calculateCartTotal();
+
         // Check All logic
         $('#check-all').on('change', function() {
             $('.check-item:not(:disabled)').prop('checked', $(this).prop('checked'));
@@ -642,23 +693,37 @@
                 }
             });
         });
-        // Toggle variant selectors
-        $(".edit-variant-btn").on('click', function() {
-            var row = $(this).parents("td");
-            row.find(".cart-variant-info").hide();
-            row.find(".cart-variant-selectors").fadeIn();
+        // Quantity Plus/Minus buttons in Cart
+        $(document).on('click', '.qty-btn', function() {
+            var $btn = $(this);
+            var $input = $btn.siblings('.item-quantity');
+            var val = parseInt($input.val()) || 1;
+            var max = parseInt($input.attr('max')) || 100;
+
+            if ($btn.hasClass('plus')) {
+                if (val < max) {
+                    $input.val(val + 1).trigger('change');
+                } else {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: 'Chỉ còn ' + max + ' sản phẩm trong kho!',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            } else if ($btn.hasClass('minus')) {
+                if (val > 1) {
+                    $input.val(val - 1).trigger('change');
+                }
+            }
         });
 
-        $(".cancel-variant-btn").on('click', function() {
-            var row = $(this).parents("td");
-            row.find(".cart-variant-selectors").hide();
-            row.find(".cart-variant-info").fadeIn();
-        });
-
-        // Change variant (Product/Size/Color) via Submit Button
-        $(".save-variant-btn").on('click', function() {
+        // Change variant (Product/Size/Color) automatically on change
+        $(document).on('change', '.variant-select', function() {
             var ele = $(this);
-            var row = ele.parents("tr");
+            var row = ele.closest("tr");
             var productId = row.find(".product-id").val();
             var newProductId = row.find(".product-select").val() || productId;
             var oldVariantId = row.find(".current-variant-id").val();
@@ -688,17 +753,18 @@
                             window.location.href = response.redirect;
                         }
                     } else {
-                        alert(response.message || config.msgError);
+                        Swal.fire({ icon: 'error', title: 'Lỗi', text: response.message || config.msgError });
                         window.location.reload();
                     }
                 },
                 error: function(xhr) {
                     var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : config.msgError;
-                    alert(errorMsg);
+                    Swal.fire({ icon: 'error', title: 'Lỗi', text: errorMsg });
                     window.location.reload();
                 }
             });
         });
+
 
         // Apply coupon
         $(document).on('click', '#apply-coupon', function() {
