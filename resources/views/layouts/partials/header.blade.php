@@ -148,11 +148,18 @@
                                                     .custom-shop-mega-left a {
                                                         color: #333 !important;
                                                         font-size: 14px !important;
-                                                        font-weight: 600 !important;
+                                                        font-weight: 400 !important;
                                                         text-decoration: none;
                                                         transition: color 0.3s;
                                                         display: block;
                                                         line-height: 1.4;
+                                                    }
+                                                    .custom-shop-mega-left .parent-cat-link {
+                                                        font-weight: 700 !important;
+                                                        font-size: 15px !important;
+                                                        color:  !important;
+                                                        margin-bottom: 8px !important;
+                                                        text-transform: uppercase;
                                                     }
                                                     .custom-shop-mega-left a:hover {
                                                         color: #ef233c !important;
@@ -197,7 +204,20 @@
                                                     <li class="custom-shop-mega-left">
                                                         <ul>
                                                             @foreach($categories as $category) @php /** @var \App\Models\Category $category */ @endphp
-                                                                <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                                                <li>
+                                                                    <a href="{{ route('shop', ['category' => $category->slug]) }}" class="parent-cat-link">{{ $category->name }}</a>
+                                                                    @if($category->children->count() > 0)
+                                                                        <ul style="display: block; padding-left: 0; margin-bottom: 20px;">
+                                                                            @foreach($category->children as $child)
+                                                                                <li style="margin-bottom: 8px !important;">
+                                                                                    <a href="{{ route('shop', ['category' => $child->slug]) }}"><i class="fa fa-angle-right" style="margin-right: 5px; font-size: 12px; color: #999;"></i> {{ $child->name }}</a>
+                                                                                </li>
+                                                                            @endforeach
+                                                                        </ul>
+                                                                    @else
+                                                                        <div style="margin-bottom: 20px;"></div>
+                                                                    @endif
+                                                                </li>
                                                             @endforeach
                                                         </ul>
                                                     </li>
@@ -301,7 +321,20 @@
                                                     <li class="custom-shop-mega-left">
                                                         <ul>
                                                             @foreach($categories as $category) @php /** @var \App\Models\Category $category */ @endphp
-                                                                <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                                                <li>
+                                                                    <a href="{{ route('shop', ['category' => $category->slug]) }}" class="parent-cat-link">{{ $category->name }}</a>
+                                                                    @if($category->children->count() > 0)
+                                                                        <ul style="display: block; padding-left: 0; margin-bottom: 20px;">
+                                                                            @foreach($category->children as $child)
+                                                                                <li style="margin-bottom: 8px !important;">
+                                                                                    <a href="{{ route('shop', ['category' => $child->slug]) }}"><i class="fa fa-angle-right" style="margin-right: 5px; font-size: 12px; color: #999;"></i> {{ $child->name }}</a>
+                                                                                </li>
+                                                                            @endforeach
+                                                                        </ul>
+                                                                    @else
+                                                                        <div style="margin-bottom: 20px;"></div>
+                                                                    @endif
+                                                                </li>
                                                             @endforeach
                                                         </ul>
                                                     </li>

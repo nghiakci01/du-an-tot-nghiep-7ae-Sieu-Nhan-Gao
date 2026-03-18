@@ -25,6 +25,9 @@ class PaymentController extends Controller
         $order = Order::findOrFail($order_id);
 
         if ($order->payment_status === 'paid') {
+            if (!\Illuminate\Support\Facades\Auth::check()) {
+                session(['verified_order_id' => $order->id]);
+            }
             return redirect()->route('checkout.success', $order->id)
                 ->with('info', 'Đơn hàng đã được thanh toán.');
         }
@@ -66,6 +69,10 @@ class PaymentController extends Controller
                 } catch (\Exception $e) {
                     Log::error('VNPAY: Email failed for order #' . $orderId . ': ' . $e->getMessage());
                 }
+            }
+
+            if (!\Illuminate\Support\Facades\Auth::check()) {
+                session(['verified_order_id' => $orderId]);
             }
 
             return redirect()->route('checkout.success', $orderId)

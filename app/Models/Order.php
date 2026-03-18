@@ -61,6 +61,13 @@ class Order extends Model
         return $this->hasMany(OrderHistory::class)->orderBy('created_at', 'desc');
     }
 
+    public function getSubtotalAttribute()
+    {
+        return $this->items->sum(function ($item) {
+            return $item->quantity * $item->price;
+        });
+    }
+
     public function getStatusTextAttribute()
     {
         return match ($this->status) {

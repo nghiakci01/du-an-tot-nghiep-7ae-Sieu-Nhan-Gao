@@ -267,6 +267,11 @@ class CheckoutController extends Controller
                 \Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: '.$e->getMessage());
             }
 
+            // Set session for guest verification if not logged in
+            if (!Auth::check()) {
+                session(['verified_order_id' => $order->id]);
+            }
+
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');
 
         } catch (\Exception $e) {
