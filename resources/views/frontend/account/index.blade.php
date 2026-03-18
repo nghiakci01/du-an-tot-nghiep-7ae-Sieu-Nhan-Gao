@@ -612,20 +612,13 @@
                   @endif
                 </td>
                 <td style="padding:14px 16px;">
-                  <div class="d-flex gap-2">
-                    <button type="button"
-                      class="btn btn-sm btn-outline-dark rounded-pill px-3"
-                      onclick="openEditBankModal({{ $ub->id }}, '{{ $ub->bank_name }}', '{{ $ub->bank_id }}', '{{ $ub->account_number }}', '{{ $ub->account_name }}', {{ $ub->is_default ? 'true' : 'false' }})">
-                      <i class="bi bi-pencil me-1"></i>Sửa
+                  <form action="{{ route('account.bank-accounts.destroy', $ub->id) }}" method="POST"
+                        onsubmit="return confirm('Xóa tài khoản {{ $ub->bank_name }} - {{ $ub->account_number }}?')">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                      <i class="bi bi-trash me-1"></i>Xóa
                     </button>
-                    <form action="{{ route('account.bank-accounts.destroy', $ub->id) }}" method="POST"
-                          onsubmit="return confirm('Xóa tài khoản {{ $ub->bank_name }} - {{ $ub->account_number }}?')">
-                      @csrf @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                        <i class="bi bi-trash me-1"></i>Xóa
-                      </button>
-                    </form>
-                  </div>
+                  </form>
                 </td>
               </tr>
               @empty
@@ -709,63 +702,6 @@
       </div>
     </div>
 
-    {{-- ========== MODAL: EDIT BANK ACCOUNT ========== --}}
-    <div class="modal fade" id="modalEditBank" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-          <div class="modal-header border-0 pb-0">
-            <h5 class="modal-title fw-bold"><i class="bi bi-pencil me-2"></i>Sửa tài khoản ngân hàng</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <form id="formEditBank" method="POST">
-            @csrf @method('PUT')
-            <div class="modal-body pt-3">
-              <div class="mb-3">
-                <label class="form-label fw-semibold small">Ngân hàng <span class="text-danger">*</span></label>
-                <select name="bank_id" id="edit-bank-id" class="form-select" required onchange="onBankSelectChange(this, 'edit')">
-                  <option value="">-- Chọn ngân hàng --</option>
-                  <option value="970436" data-name="Vietcombank">970436 - Vietcombank</option>
-                  <option value="970418" data-name="BIDV">970418 - BIDV</option>
-                  <option value="970415" data-name="Vietinbank">970415 - Vietinbank</option>
-                  <option value="970422" data-name="MB Bank">970422 - MB Bank</option>
-                  <option value="970407" data-name="Techcombank">970407 - Techcombank</option>
-                  <option value="970405" data-name="Agribank">970405 - Agribank</option>
-                  <option value="970416" data-name="ACB">970416 - ACB</option>
-                  <option value="970432" data-name="VPBank">970432 - VPBank</option>
-                  <option value="796500" data-name="MSB">796500 - MSB</option>
-                  <option value="970426" data-name="TPBank">970426 - TPBank</option>
-                  <option value="970441" data-name="VIB">970441 - VIB</option>
-                  <option value="970425" data-name="HDBank">970425 - HDBank</option>
-                  <option value="970443" data-name="SHB">970443 - SHB</option>
-                  <option value="970403" data-name="Sacombank">970403 - Sacombank</option>
-                  <option value="970431" data-name="Eximbank">970431 - Eximbank</option>
-                  <option value="970449" data-name="LPBank">970449 - LPBank</option>
-                  <option value="MoMo" data-name="Ví MoMo">MoMo - Ví MoMo</option>
-                  <option value="ZaloPay" data-name="Ví ZaloPay">ZaloPay - Ví ZaloPay</option>
-                </select>
-                <input type="hidden" name="bank_name" id="edit-bank-name">
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-semibold small">Số tài khoản <span class="text-danger">*</span></label>
-                <input type="text" name="account_number" id="edit-account-number" class="form-control" required>
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-semibold small">Tên chủ tài khoản <span class="text-danger">*</span></label>
-                <input type="text" name="account_name" id="edit-account-name" class="form-control" style="text-transform:uppercase;" required>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="is_default" value="1" id="edit-is-default">
-                <label class="form-check-label small" for="edit-is-default">Đặt làm tài khoản mặc định</label>
-              </div>
-            </div>
-            <div class="modal-footer border-0">
-              <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
-              <button type="submit" class="btn btn-dark rounded-pill px-5">Cập nhật</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
 
 
   </div>{{-- col-md-9 --}}
