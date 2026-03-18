@@ -405,14 +405,13 @@
                     @endguest
 
                     <div class="user-actions">
-                        <h3>
+                        <h3 style="margin-bottom: 15px;">
                             <i class="fa fa-tag" aria-hidden="true"></i>
                             {{ __('messages.have_coupon') }}?
-                            <a class="Returning" href="#" data-bs-toggle="collapse" data-bs-target="#checkout_coupon"
-                                aria-expanded="false">{{ __('messages.click_here_enter_code') }}</a>
                         </h3>
-                        <div id="checkout_coupon" class="collapse" data-bs-parent="#accordion">
-                            <div class="checkout_info">
+                        <div id="checkout_coupon">
+                            <div class="checkout_info" style="border-top: 1px solid #dee2e6;">
+                                <div id="couponMessage"></div>
                                 @if($coupon)
                                     <div class="coupon-applied">
                                         <div>
@@ -427,9 +426,6 @@
                                     <div class="coupon-input-group">
                                         <input type="text" id="couponCode" placeholder="{{ __('messages.coupon_code') }}">
                                         <button type="button" id="applyCouponBtn">{{ __('messages.apply_coupon') }}</button>
-                                    </div>
-                                    <div class="text-end mt-2">
-                                        <a href="javascript:void(0)" onclick="$('#checkout_coupon').collapse('hide')" class="text-secondary" style="text-decoration: none;"><i class="fa fa-angle-up"></i> Thu gọn</a>
                                     </div>
                                 @endif
                             </div>
