@@ -190,7 +190,7 @@
                 @endforeach
             </div>
             <div class="chat-input-admin">
-                <form action="{{ route('admin.chat.reply', $sessionId) }}" method="POST">
+                <form action="{{ route('admin.chat.reply', $sessionId) }}" method="POST" class="no-pjax">
                     @csrf
                     <div class="admin-input-group">
                         <input type="text" name="message" class="form-control" placeholder="Nhập câu trả lời cho khách hàng..." required autocomplete="off">
