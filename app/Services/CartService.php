@@ -86,4 +86,20 @@ class CartService
             session()->forget('cart');
         }
     }
+
+    /**
+     * Xóa các items cụ thể ra khỏi giỏ hàng
+     */
+    public function removeItems(array $variantIds): void
+    {
+        if (empty($variantIds)) return;
+
+        $this->updateCart(function (&$cart) use ($variantIds) {
+            foreach ($variantIds as $vid) {
+                if (isset($cart[$vid])) {
+                    unset($cart[$vid]);
+                }
+            }
+        });
+    }
 }

@@ -324,8 +324,22 @@
                                             btn.style.opacity = '0.7';
                                             btn.style.pointerEvents = 'none';
 
+                                            var selectedIds = [];
+                                            document.querySelectorAll('.check-item:checked').forEach(function(checkbox) {
+                                                selectedIds.push(checkbox.value);
+                                            });
+
+                                            if (selectedIds.length === 0) {
+                                                alert('Vui lòng chọn ít nhất một sản phẩm để thanh toán!');
+                                                btn.style.opacity = '';
+                                                btn.style.pointerEvents = '';
+                                                return;
+                                            }
+
                                             var config = document.getElementById('cart-config').dataset;
-                                            fetch(config.routeValidate, {
+                                            var validateUrl = config.routeValidate + '?ids=' + selectedIds.join(',');
+
+                                            fetch(validateUrl, {
                                                 method: 'GET',
                                                 headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': config.csrf }
                                             })
