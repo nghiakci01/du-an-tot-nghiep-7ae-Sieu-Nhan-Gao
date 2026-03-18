@@ -75,8 +75,14 @@ class CheckoutController extends Controller
         $finalTotal += $shippingFee;
 
         $provinces = config('vietnam_provinces');
+        
+        // Lấy thông tin tài khoản ngân hàng mặc định
+        $defaultBank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first();
+        if (!$defaultBank) {
+            $defaultBank = \App\Models\BankSetting::where('is_active', true)->first();
+        }
 
-        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces'));
+        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces', 'defaultBank'));
     }
 
     /**

@@ -569,6 +569,23 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="panel-default mt-3">
+                                        <input id="payment_bank" name="payment_method" type="radio" value="BANK_TRANSFER"
+                                            data-bs-target="#method_bank" required />
+                                        <label for="payment_bank" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_bank"
+                                            aria-controls="method_bank">
+                                            Chuyển khoản ngân hàng (VietQR)
+                                        </label>
+                                        <div id="method_bank" class="collapse" data-bs-parent="#accordion">
+                                            <div class="card-body1">
+                                                <p>Chuyển khoản trực tiếp vào tài khoản ngân hàng của chúng tôi. Đơn hàng sẽ được xử lý sau khi tiền đã nổi trong tài khoản.</p>
+                                                <div class="alert alert-warning py-2 mb-0">
+                                                    <i class="fa fa-info-circle"></i> Bạn sẽ thấy mã QR thanh toán ở bước tiếp theo để quét nhanh.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-5 col-md-6">
@@ -683,6 +700,40 @@
                                             </tr>
                                         </tfoot>
                                     </table>
+                                </div>
+
+                                <!-- Bank Transfer Detail & QR Code -->
+                                <div id="bank-transfer-info" class="mt-4 p-4 border rounded bg-white shadow-sm" style="display: none;">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6">
+                                            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                                                <i class="fa fa-university me-2 text-primary"></i> Thông tin chuyển khoản
+                                            </h5>
+                                            <div class="mb-2">
+                                                <span class="text-muted">Ngân hàng:</span>
+                                                <div class="fw-bold">{{ $defaultBank->bank_name ?? 'N/A' }}</div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <span class="text-muted">Số tài khoản:</span>
+                                                <div class="fw-bold fs-5 text-primary">{{ $defaultBank->account_number ?? 'N/A' }}</div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <span class="text-muted">Chủ tài khoản:</span>
+                                                <div class="fw-bold">{{ $defaultBank->account_name ?? 'N/A' }}</div>
+                                            </div>
+                                            <div class="mb-0">
+                                                <span class="text-muted">Nội dung chuyển khoản:</span>
+                                                <div class="fw-bold text-danger">THANHTOAN DH</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 text-center border-start">
+                                            <h6 class="fw-bold mb-2">Quét mã QR để thanh toán nhanh</h6>
+                                            <div class="qr-container bg-light p-2 rounded d-inline-block border">
+                                                <img id="bank_qr_image" src="" alt="VietQR" style="max-width: 250px; height: auto;">
+                                            </div>
+                                            <p class="text-muted small mt-2 mb-0">Sử dụng ứng dụng Ngân hàng hoặc Ví điện tử để quét</p>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="order_button mt-4">
@@ -858,7 +909,21 @@
                     $('#confirm-email').text($('input[name="email"]').val());
                     $('#confirm-address').text($('input[name="address"]').val() + ', ' + $('select[name="province"]').val());
                     $('#confirm-shipping').text($('input[name="shipping_provider"]:checked').data('service-name'));
-                    $('#confirm-payment').text($('input[name="payment_method"]:checked').val() === 'COD' ? 'Tiền mặt khi nhận hàng' : 'VNPAY (ATM/Banking)');
+                    
+                    const pMethod = $('input[name="payment_method"]:checked').val();
+                    let pMethodText = 'Tiền mặt khi nhận hàng';
+                    if (pMethod === 'VNPAY') pMethodText = 'VNPAY (ATM/Banking)';
+                    if (pMethod === 'BANK_TRANSFER') pMethodText = 'Chuyển khoản ngân hàng';
+                    
+                    $('#confirm-payment').text(pMethodText);
+
+                    // Show/hide bank transfer info
+                    if (pMethod === 'BANK_TRANSFER') {
+                        $('#bank-transfer-info').show();
+                    } else {
+                        $('#bank-transfer-info').hide();
+                    }
+
                     $('#final_total_display_confirm').html($('#final_total_display').html());
 
                     $('#checkout-step-2').fadeOut(300, function() {
@@ -1107,7 +1172,7 @@
                 var targetId = $(this).attr('data-bs-target');
                 
                 // Ẩn tất cả các panel thanh toán
-                $('#method_cod, #method_bank').collapse('hide');
+                $('#method_cod, #method_bank, #method_vnpay').collapse('hide');
                 
                 // Hiện panel của phương thức được chọn
                 $(targetId).collapse('show');

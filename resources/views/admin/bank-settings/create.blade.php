@@ -74,7 +74,46 @@
                             <div class="col-md-6 mb-3">
                                 <label for="bank_select" class="form-label">Chọn Ngân Hàng <span class="text-danger">*</span></label>
                                 <select id="bank_select" class="form-select select2" required>
-                                    <option value="">-- Đang tải danh sách ngân hàng --</option>
+                                    <option value="">-- Chọn Ngân Hàng --</option>
+                                    <!-- Top 10 Preferred Banks -->
+                                    <option value="970436" data-logo="https://api.vietqr.io/img/VCB.png" data-shortname="Vietcombank" data-name="Ngan hang Ngoai Thuong Viet Nam">Vietcombank</option>
+                                    <option value="970418" data-logo="https://api.vietqr.io/img/BIDV.png" data-shortname="BIDV" data-name="Ngan hang Dau tu va Phat trien Viet Nam">BIDV</option>
+                                    <option value="970405" data-logo="https://api.vietqr.io/img/VBA.png" data-shortname="Agribank" data-name="Ngan hang Nong nghiep va Phat trien Nong thon Viet Nam">Agribank</option>
+                                    <option value="970415" data-logo="https://api.vietqr.io/img/CTG.png" data-shortname="VietinBank" data-name="Ngan hang Cong Thuong Viet Nam">VietinBank</option>
+                                    <option value="970407" data-logo="https://api.vietqr.io/img/TCB.png" data-shortname="Techcombank" data-name="Ngan hang Ky thuong Viet Nam">Techcombank</option>
+                                    <option value="970422" data-logo="https://api.vietqr.io/img/MB.png" data-shortname="MBBank" data-name="Ngan hang Quan doi">MBBank</option>
+                                    <option value="970416" data-logo="https://api.vietqr.io/img/ACB.png" data-shortname="ACB" data-name="Ngan hang A Chau">ACB</option>
+                                    <option value="970403" data-logo="https://api.vietqr.io/img/STB.png" data-shortname="Sacombank" data-name="Ngan hang Sai Gon Thuong Tin">Sacombank</option>
+                                    <option value="970432" data-logo="https://api.vietqr.io/img/VPB.png" data-shortname="VPBank" data-name="Ngan hang Viet Nam Thinh Vuong">VPBank</option>
+                                    <option value="970423" data-logo="https://api.vietqr.io/img/TPB.png" data-shortname="TPBank" data-name="Ngan hang Tien Phong">TPBank</option>
+                                    
+                                    <!-- Other Banks -->
+                                    <option value="970437" data-logo="https://api.vietqr.io/img/HDB.png" data-shortname="HDBank" data-name="Ngan hang Phat trien TP.HCM">HDBank</option>
+                                    <option value="970441" data-logo="https://api.vietqr.io/img/VIB.png" data-shortname="VIB" data-name="Ngan hang Quoc te">VIB</option>
+                                    <option value="970443" data-logo="https://api.vietqr.io/img/SHB.png" data-shortname="SHB" data-name="Ngan hang Sai Gon - Ha Noi">SHB</option>
+                                    <option value="970426" data-logo="https://api.vietqr.io/img/MSB.png" data-shortname="MSB" data-name="Ngan hang Hang Hai">MSB</option>
+                                    <option value="970440" data-logo="https://api.vietqr.io/img/SEAB.png" data-shortname="SeABank" data-name="Ngan hang TMCP Dong Nam A">SeABank</option>
+                                    <option value="970449" data-logo="https://api.vietqr.io/img/LPB.png" data-shortname="LPBank" data-name="Ngan hang TMCP Loc Phat">LPBank</option>
+                                    <option value="970428" data-logo="https://api.vietqr.io/img/NAB.png" data-shortname="NamABank" data-name="Ngan hang Nam A">NamABank</option>
+                                    <option value="970414" data-logo="https://api.vietqr.io/img/OCB.png" data-shortname="OCB" data-name="Ngan hang Phuong Dong">OCB</option>
+                                    <option value="970431" data-logo="https://api.vietqr.io/img/EIB.png" data-shortname="Eximbank" data-name="Ngan hang Xuat Nhap Khau">Eximbank</option>
+                                    <option value="970438" data-logo="https://api.vietqr.io/img/BVB.png" data-shortname="BVBank" data-name="Ngan hang Ban Viet">BVBank</option>
+                                    <option value="970429" data-logo="https://api.vietqr.io/img/SCB.png" data-shortname="SCB" data-name="Ngan hang Sai Gon">SCB</option>
+                                    <option value="970427" data-logo="https://api.vietqr.io/img/VAB.png" data-shortname="VietABank" data-name="Ngan hang Viet A">VietABank</option>
+                                    <option value="970430" data-logo="https://api.vietqr.io/img/PGB.png" data-shortname="PGBank" data-name="Ngan hang Xang dau Petrolimex">PGBank</option>
+                                    <option value="970409" data-logo="https://api.vietqr.io/img/BAB.png" data-shortname="BacABank" data-name="Ngan hang Bac A">BacABank</option>
+                                    <option value="970448" data-logo="https://api.vietqr.io/img/OCB.png" data-shortname="PVcomBank" data-name="Ngan hang Dai chung Viet Nam">PVcomBank</option>
+                                    <option value="970433" data-logo="https://api.vietqr.io/img/VIETBANK.png" data-shortname="VietBank" data-name="Ngan hang Viet Nam Thuong Tin">VietBank</option>
+                                    <option value="970425" data-logo="https://api.vietqr.io/img/ABB.png" data-shortname="ABBANK" data-name="Ngan hang An Binh">ABBANK</option>
+                                    <option value="970412" data-logo="https://api.vietqr.io/img/PVB.png" data-shortname="BAOVIET Bank" data-name="Ngan hang Bao Viet">BAOVIET Bank</option>
+                                    <option value="970454" data-logo="https://api.vietqr.io/img/VCCB.png" data-shortname="VietCapitalBank" data-name="Ngan hang Ban Viet">VietCapitalBank</option>
+                                    <option value="970442" data-logo="https://api.vietqr.io/img/GPB.png" data-shortname="GPBank" data-name="Ngan hang Dau khi Toan cau">GPBank</option>
+                                    <option value="970419" data-logo="https://api.vietqr.io/img/NCB.png" data-shortname="NCB" data-name="Ngan hang Quoc Dan">NCB</option>
+                                    <option value="970408" data-logo="https://api.vietqr.io/img/GPB.png" data-shortname="PG Bank" data-name="Ngan hang Xang dau Petrolimex">PG Bank</option>
+                                    <option value="970406" data-logo="https://api.vietqr.io/img/DOB.png" data-shortname="DongABank" data-name="Ngan hang Dong A">DongABank</option>
+                                    <option value="970421" data-logo="https://api.vietqr.io/img/VBB.png" data-shortname="VietBank" data-name="Ngan hang Viet Nam Thuong Tin">VietBank</option>
+                                    <option value="970444" data-logo="https://api.vietqr.io/img/VNCB.png" data-shortname="CB" data-name="Ngan hang Xay dung">CB</option>
+                                    <option value="970441" data-logo="https://api.vietqr.io/img/VIB.png" data-shortname="VIB" data-name="Ngan hang Quoc te">VIB</option>
                                 </select>
                                 <input type="hidden" name="bank_name" id="bank_name" value="{{ old('bank_name') }}">
                             </div>
@@ -117,12 +156,15 @@
         </div>
     </div>
 </div>
-@endsection
 
-@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-    $(document).ready(function() {
+    function initBankScript() {
+        if (typeof jQuery === 'undefined' || typeof jQuery.fn.select2 === 'undefined') {
+            setTimeout(initBankScript, 100);
+            return;
+        }
+
         let banksData = [];
 
         function formatBank(bank) {
@@ -151,65 +193,12 @@
             }
         });
 
-        // Fetch danh sách ngân hàng từ VietQR
-        $.ajax({
-            url: 'https://api.vietqr.io/v2/banks',
-            method: 'GET',
-            success: function(response) {
-                if (response.code == '00') {
-                    banksData = response.data;
-                    let options = '<option value="">-- Chọn Ngân Hàng --</option>';
-                    
-                    // Lấy giá trị old (nếu có)
-                    const oldBankName = $('#bank_name').val();
-                    const oldBankId = $('#bank_id').val();
-                    let selectedBin = '';
-
-                    // Danh sách ưu tiên
-                    const preferredShortNames = [
-                        'Vietcombank',
-                        'BIDV',
-                        'Agribank',
-                        'VietinBank',
-                        'Techcombank',
-                        'MBBank', // VietQR uses MBBank
-                        'ACB',
-                        'Sacombank',
-                        'VPBank',
-                        'TPBank'
-                    ];
-
-                    let preferredBanks = [];
-                    let otherBanks = [];
-
-                    banksData.forEach(function(bank) {
-                       if (preferredShortNames.includes(bank.shortName)) {
-                           preferredBanks.push(bank);
-                       } else {
-                           otherBanks.push(bank);
-                       }
-                    });
-
-                    // Sort preferred banks according to the order in the array
-                    preferredBanks.sort((a, b) => preferredShortNames.indexOf(a.shortName) - preferredShortNames.indexOf(b.shortName));
-
-                    let sortedBanks = preferredBanks.concat(otherBanks);
-
-                    sortedBanks.forEach(function(bank) {
-                        let isSelected = (oldBankName == bank.name || oldBankId == bank.shortName) ? 'selected' : '';
-                        if (isSelected) selectedBin = bank.bin;
-                        options += `<option value="${bank.bin}" data-logo="${bank.logo}" data-shortname="${bank.shortName}" data-name="${bank.name}" ${isSelected}>${bank.shortName} - ${bank.name}</option>`;
-                    });
-                    
-                    $('#bank_select').html(options);
-                    // Force refresh select2
-                    $('#bank_select').trigger('change.select2');
-                }
-            },
-            error: function() {
-                $('#bank_select').html('<option value="">Lỗi tải danh sách ngân hàng</option>');
-            }
-        });
+        // Ngừng fetch danh sách ngân hàng từ VietQR vì đã hardcode để load nhanh
+        // Khôi phục giá trị cũ nếu có (trong trường hợp validate lỗi)
+        const oldBankId = "{{ old('bank_id') }}";
+        if (oldBankId) {
+            $('#bank_select').val(oldBankId).trigger('change.select2');
+        }
 
         // Khi thay đổi ngân hàng, cập nhật hidden inputs
         $('#bank_select').on('change', function() {
@@ -272,6 +261,9 @@
                 });
             }
         }
-    });
+    }
+
+    // Khởi chạy script
+    initBankScript();
 </script>
-@endpush
+@endsection
