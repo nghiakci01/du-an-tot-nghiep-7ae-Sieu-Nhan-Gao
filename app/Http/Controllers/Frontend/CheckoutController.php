@@ -329,10 +329,11 @@ class CheckoutController extends Controller
         // Ghi lại lịch sử (nếu có hệ thống lịch sử đơn hàng)
         if (class_exists(\App\Models\OrderHistory::class)) {
             \App\Models\OrderHistory::create([
-                'order_id' => $order->id,
-                'status' => $order->status,
-                'note' => 'Khách hàng xác nhận đã chuyển khoản. Chờ Admin kiểm tra.',
-                'user_id' => Auth::id()
+                'order_id'        => $order->id,
+                'previous_status' => $order->status,
+                'new_status'      => 'waiting_confirmation',
+                'note'            => 'Khách hàng xác nhận đã chuyển khoản. Chờ Admin kiểm tra.',
+                'user_id'         => Auth::id()
             ]);
         }
 
