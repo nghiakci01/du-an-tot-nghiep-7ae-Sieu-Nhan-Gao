@@ -77,6 +77,7 @@
                         @error('image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        <div id="main-image-preview"></div>
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="gallery_images" class="form-label">Ảnh Gallery (Tối đa 6 ảnh)</label>
@@ -286,11 +287,8 @@
     </form>
     </div>
 </div>
-@endsection
-
-@section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
         let variantIndex = Number("{{ $product->variants->count() > 0 ? $product->variants->count() : 1 }}");
         const tableBody = document.querySelector('#variants-table tbody');
         const addBtn = document.getElementById('add-variant-btn');
@@ -470,6 +468,37 @@
                 }
             });
         });
-    });
+
+        // Main image preview
+        const mainImageInput = document.getElementById('image');
+        const mainImagePreview = document.getElementById('main-image-preview');
+
+        if (mainImageInput && mainImagePreview) {
+            mainImageInput.addEventListener('change', function(e) {
+                mainImagePreview.innerHTML = '';
+                const file = e.target.files[0];
+                
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        mainImagePreview.innerHTML = `<img src="${e.target.result}" width="150" class="border rounded mt-2">`;
+                        
+                        // Hide current image if exists
+                        const currentImgDiv = mainImageInput.parentElement.querySelector('.mb-2');
+                        if (currentImgDiv) {
+                            currentImgDiv.style.display = 'none';
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // Show current image again if user cancels selection
+                    const currentImgDiv = mainImageInput.parentElement.querySelector('.mb-2');
+                    if (currentImgDiv) {
+                        currentImgDiv.style.display = 'block';
+                    }
+                }
+            });
+        }
+    })();
 </script>
 @endsection

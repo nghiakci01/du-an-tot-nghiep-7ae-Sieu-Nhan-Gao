@@ -155,6 +155,15 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     * Display the specified resource.
+     * Fallback for Pjax/URL issues
+     */
+    public function show(Product $product)
+    {
+        return redirect()->route('admin.products.index');
+    }
+
     public function edit(Product $product)
     {
         $product->load('variants');
