@@ -3,6 +3,7 @@
 @section('content')
     <!--slider area start-->
     <div class="slider_section slider_section_six mb-30" style="background: #fff;">
+        <h1 class="visually-hidden">Elite - E-commerce Fashion Store</h1>
         <div style="padding: 0; width: 1521px; max-width: 100%; margin: 0 auto;">
             <div class="row no-gutters">
                 <div class="col-12">
@@ -20,15 +21,6 @@
                                     </div>
                                 </div>
                             @endforeach
-                        @else
-                            <div class="single_slider" data-bgimg="{{ asset('reid/assets/img/slider/slider10.jpg') }}" style="height: 856px !important;">
-                                <div class="slider_content_inner">
-                                    <div class="slider_content">
-                                        <h2>Wide Banner Placeholder</h2>
-                                        <p>1521 x 856 px</p>
-                                    </div>
-                                </div>
-                            </div>
                         @endif
                     </div>
                 </div>
@@ -36,6 +28,17 @@
         </div>
     </div>
     <style>
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
         /* Responsive Banner Styles */
         .banner-wide-slider .single_slider {
             background-size: cover !important;
@@ -184,16 +187,16 @@
                             <div class="single_product">
                                 <div class="product_thumb">
                                     <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
+                                        <img loading="lazy" src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                     </a>
+                                    @php
+                                        $hoverImage = $product->images->firstWhere('image_path', '!=', $product->image);
+                                    @endphp
+                                    @if($hoverImage)
                                     <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                        @php
-                                            $secondaryImage = $product->images->count() > 0 
-                                                ? $product->images->first()?->image_url 
-                                                : $product->image_url;
-                                        @endphp
-                                        <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
+                                        <img loading="lazy" src="{{ $hoverImage->image_url }}" alt="{{ $product->name }}">
                                     </a>
+                                    @endif
                                     <div class="product_action">
                                         <div class="hover_action">
                                            <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
@@ -265,16 +268,16 @@
                             <div class="single_product">
                                 <div class="product_thumb">
                                     <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
+                                        <img loading="lazy" src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                     </a>
+                                    @php
+                                        $hoverImage = $product->images->firstWhere('image_path', '!=', $product->image);
+                                    @endphp
+                                    @if($hoverImage)
                                     <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                        @php
-                                            $secondaryImage = $product->images->count() > 0 
-                                                ? $product->images->first()?->image_url 
-                                                : $product->image_url;
-                                        @endphp
-                                        <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
+                                        <img loading="lazy" src="{{ $hoverImage->image_url }}" alt="{{ $product->name }}">
                                     </a>
+                                    @endif
                                     <div class="product_action">
                                         <div class="hover_action">
                                            <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
@@ -345,16 +348,16 @@
                                 <div class="single_product">
                                     <div class="product_thumb">
                                         <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
+                                            <img loading="lazy" src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                         </a>
+                                        @php
+                                            $hoverImage = $product->images->firstWhere('image_path', '!=', $product->image);
+                                        @endphp
+                                        @if($hoverImage)
                                         <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            @php
-                                                $secondaryImage = $product->images->count() > 0 
-                                                    ? $product->images->first()?->image_url 
-                                                    : $product->image_url;
-                                            @endphp
-                                            <img src="{{ $secondaryImage }}" alt="{{ $product->name }}">
+                                            <img loading="lazy" src="{{ $hoverImage->image_url }}" alt="{{ $product->name }}">
                                         </a>
+                                        @endif
                                         <div class="product_action">
                                             <div class="hover_action">
                                                 <a href="{{ route('product.detail', $product->slug) }}"><i
@@ -418,7 +421,7 @@
     </section>
     <!--product section area end (Top Wishlisted)-->
 
-    @if($midBanner)
+    @if($midBanner && $midBanner->image)
     <!--Middle Banner area start-->
     <section class="middle_banner_section mb-30">
         <div class="container-fluid">
@@ -585,11 +588,11 @@
                                     <div class="modal_social">
                                         <h2>Chia sẻ sản phẩm</h2>
                                         <ul>
-                                            <li class="facebook"><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                            <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                            <li class="pinterest"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-                                            <li class="google-plus"><a href="#"><i class="fa fa-google-plus"></i></a></li>
-                                            <li class="linkedin"><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                                            <li class="facebook"><a href="{{ $settings['social_facebook'] ?? 'https://www.facebook.com/profile.php?id=61577211110743' }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook"></i></a></li>
+                                            <li class="twitter"><a href="https://twitter.com/" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a></li>
+                                            <li class="pinterest"><a href="https://www.pinterest.com/" target="_blank" rel="noopener noreferrer"><i class="fa fa-pinterest"></i></a></li>
+                                            <li class="google-plus"><a href="https://plus.google.com/" target="_blank" rel="noopener noreferrer"><i class="fa fa-google-plus"></i></a></li>
+                                            <li class="linkedin"><a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer"><i class="fa fa-linkedin"></i></a></li>
                                         </ul>
                                     </div>
                                 </div>

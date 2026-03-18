@@ -68,7 +68,7 @@ class SearchController extends Controller
                     'id' => $product->id,
                     'name' => $product->name,
                     'slug' => $product->slug,
-                    'image' => $product->image ? asset('storage/'.$product->image) : asset('frontend-assets/img/product/product21.jpg'),
+                    'image' => $product->image_url,
                     'price' => $product->price,
                     'sale_price' => $product->sale_price,
                     'url' => route('product.detail', $product->slug),

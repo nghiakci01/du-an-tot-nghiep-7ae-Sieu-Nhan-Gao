@@ -696,10 +696,20 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
                     });
                 }
 
-                // Polling for updates (staff replies or new bot messages if async)
-                setInterval(() => {
-                    this.pollMessages();
-                }, 4000);
+                // Listen for real-time messages via Laravel Echo instead of polling
+                if (typeof window.Echo !== 'undefined') {
+                    window.Echo.channel('chat.{{ session()->getId() }}')
+                        .listen('.message.sent', (e) => {
+                            if (e.chatMessage.sender_type !== 'user') {
+                                this.pollMessages();
+                            }
+                        });
+                } else {
+                    // Fallback to polling if Echo is not available
+                    setInterval(() => {
+                        this.pollMessages();
+                    }, 4000);
+                }
             },
 
             async pollMessages() {

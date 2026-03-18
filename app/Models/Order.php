@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Traits\Auditable;
 
 class Order extends Model
 {
-    use HasFactory, Auditable;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
@@ -62,6 +61,13 @@ class Order extends Model
         return $this->hasMany(OrderHistory::class)->orderBy('created_at', 'desc');
     }
 
+    public function getSubtotalAttribute()
+    {
+        return $this->items->sum(function ($item) {
+            return $item->quantity * $item->price;
+        });
+    }
+
     public function getStatusTextAttribute()
     {
         return match ($this->status) {
@@ -79,20 +85,20 @@ class Order extends Model
     public function getStatusBadgeAttribute()
     {
         return match ($this->status) {
-            self::STATUS_PENDING => 'bg-warning',
-            self::STATUS_CONFIRMED => 'bg-info',
-            self::STATUS_SHIPPED => 'bg-primary',
-            self::STATUS_COMPLETED => 'bg-success',
-            self::STATUS_CANCELLED => 'bg-danger',
-            self::STATUS_FAILED => 'bg-danger',
-            self::STATUS_RETURNED => 'bg-warning',
-            default => 'bg-secondary',
+            self::STATUS_PENDING => 'bg-light-warning',
+            self::STATUS_CONFIRMED => 'bg-light-info',
+            self::STATUS_SHIPPED => 'bg-light-primary',
+            self::STATUS_COMPLETED => 'bg-light-success',
+            self::STATUS_CANCELLED => 'bg-light-danger',
+            self::STATUS_FAILED => 'bg-light-danger',
+            self::STATUS_RETURNED => 'bg-light-warning',
+            default => 'bg-light-secondary',
         };
     }
 
     public function getAllowedTransitions()
     {
-        return match ($this->status) {
+        $transitions = match ($this->status) {
             self::STATUS_PENDING => [self::STATUS_CONFIRMED, self::STATUS_CANCELLED],
             self::STATUS_CONFIRMED => [self::STATUS_SHIPPED, self::STATUS_CANCELLED],
             self::STATUS_SHIPPED => [self::STATUS_COMPLETED, self::STATUS_RETURNED, self::STATUS_FAILED],
@@ -102,6 +108,12 @@ class Order extends Model
             self::STATUS_RETURNED => [],
             default => [],
         };
+
+        if ($this->payment_method !== 'COD' && $this->payment_method !== 'CASH' && $this->payment_status !== 'paid') {
+            $transitions = array_values(array_intersect($transitions, [self::STATUS_CANCELLED, self::STATUS_FAILED]));
+        }
+
+        return $transitions;
     }
 
     public function canTransitionTo($newStatus)

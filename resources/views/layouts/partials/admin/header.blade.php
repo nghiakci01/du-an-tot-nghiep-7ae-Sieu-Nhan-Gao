@@ -22,18 +22,22 @@
                 <use xlink:href="#custom-sun-1"></use>
               </svg></a>
             <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
-              <a href="#!" class="dropdown-item" onclick="layout_change('dark')"><svg class="pc-icon">
+              <a href="#!" class="dropdown-item" onclick="layout_change('dark'); localStorage.setItem('theme','dark')">
+                <svg class="pc-icon">
                   <use xlink:href="#custom-moon"></use>
                 </svg>
-                <span>Tối</span> </a><a href="#!" class="dropdown-item" onclick="layout_change('light')"><svg
-                  class="pc-icon">
+                <span>Tối</span>
+              </a>
+              <a href="#!" class="dropdown-item" onclick="layout_change('light'); localStorage.setItem('theme','light')">
+                <svg class="pc-icon">
                   <use xlink:href="#custom-sun-1"></use>
                 </svg>
-                <span>Sáng</span> </a><a href="#!" class="dropdown-item" onclick="layout_change_default()"><svg
-                  class="pc-icon">
-                  <use xlink:href="#custom-setting-2"></use>
-                </svg>
-                <span>Mặc định</span></a>
+                <span>Sáng</span>
+              </a>
+              <a href="#!" class="dropdown-item" onclick="layout_change_default()">
+                <i class="ph-duotone ph-cpu pc-icon"></i>
+                <span>Tự động</span>
+              </a>
             </div>
           </li>
 
@@ -54,8 +58,8 @@
 
           {{-- Notification Sound Toggle --}}
           <li class="pc-h-item">
-            <a href="#" class="pc-head-link me-0" id="notif-sound-toggle" title="Bật/Tắt âm thanh thông báo">
-              <i class="ti ti-volume fs-5" id="notif-sound-icon"></i>
+            <a href="#" class="pc-head-link me-0" id="notif-sound-toggle-main" title="Bật/Tắt âm thanh thông báo">
+              <i class="ph-duotone ph-speaker-high fs-4" id="notif-sound-icon-main"></i>
             </a>
           </li>
 
@@ -84,7 +88,7 @@
                 style="max-height: calc(100vh - 215px)">
                 @if(isset($admin_notifications) && $admin_notifications->count() > 0)
                   @foreach($admin_notifications as $notification)
-                    <div class="card mb-2 notification-item {{ $notification->read_at ? '' : 'bg-light-primary' }}">
+                    <div class="card mb-2 notification-item {{ $notification->read_at ? '' : 'bg-primary-subtle border-primary border-opacity-25' }}">
                       <div class="card-body">
                         <div class="d-flex">
                           <div class="flex-shrink-0">
@@ -128,7 +132,9 @@
               </div>
             </div>
           </li>
-          <li class="dropdown pc-h-item header-user-profile">
+          
+          <!-- User Profile Admin-->
+          <li class="dropdown pc-h-item header-user-profile pc-user-profile-header">
             <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
               aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
                 @if(Auth::check() && Auth::user()->avatar)
@@ -143,60 +149,129 @@
               </div>
               <div class="dropdown-body">
                 <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
-                  <div class="d-flex mb-1">
+
+                  {{-- Avatar + info --}}
+                  <div class="d-flex align-items-center mb-2">
                     <div class="flex-shrink-0">
                       @if(Auth::check() && Auth::user()->avatar)
-                          <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="user-image" class="user-avtar wid-35" />
+                          <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="user-image" class="user-avtar wid-45 rounded-circle" style="object-fit:cover" />
                       @else
-                          <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::check() ? Auth::user()->name : 'Admin') }}&background=random" alt="user-image" class="user-avtar wid-35" />
+                          <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::check() ? Auth::user()->name : 'Admin') }}&background=random" alt="user-image" class="user-avtar wid-45 rounded-circle" />
                       @endif
                     </div>
                     <div class="flex-grow-1 ms-3">
-                      <h6 class="mb-1">{{ Auth::check() ? Auth::user()->name : 'Admin' }} 🖖</h6>
-                      <span><a href="mailto:{{ Auth::check() ? Auth::user()->email : '#' }}" class="__cf_email__">{{ Auth::check() ? Auth::user()->email : 'admin@example.com' }}</a></span>
+                      <h6 class="mb-0">{{ Auth::check() ? Auth::user()->name : 'Admin' }}</h6>
+                      <small class="text-muted">{{ ucfirst(Auth::check() ? Auth::user()->role : 'admin') }}</small><br>
+                      <small><a href="mailto:{{ Auth::check() ? Auth::user()->email : '#' }}" class="text-muted">{{ Auth::check() ? Auth::user()->email : 'admin@example.com' }}</a></small>
                     </div>
                   </div>
-                  <hr class="border-secondary border-opacity-50" />
-                  <div class="card">
-                    <div class="card-body py-3">
-                      <div class="d-flex align-items-center justify-content-between">
-                        <h5 class="mb-0 d-inline-flex align-items-center">
-                          <svg class="pc-icon text-muted me-2">
-                            <use xlink:href="#custom-notification-outline"></use>
-                          </svg>Thông báo
-                        </h5>
-                        <div class="form-check form-switch form-check-reverse m-0">
-                          <input class="form-check-input f-18" type="checkbox" role="switch" />
-                        </div>
-                      </div>
+
+                  <hr class="border-secondary border-opacity-50 mt-1" />
+
+                  {{-- Sound toggle --}}
+                  <div class="d-flex align-items-center justify-content-between px-3 py-2">
+                    <h6 class="mb-0 d-inline-flex align-items-center text-muted">
+                      <i class="ph-duotone ph-speaker-high me-2 f-18" id="header-sound-icon"></i>
+                      Âm thanh thông báo
+                    </h6>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input f-18" type="checkbox" role="switch"
+                             id="header-sound-toggle" title="Bật/Tắt âm thanh thông báo" style="cursor: pointer;">
                     </div>
                   </div>
+
                   <hr class="border-secondary border-opacity-50" />
                   <p class="text-span">Quản lý</p>
-                  <a href="{{ route('admin.profile.index') }}" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
-                        <use xlink:href="#custom-setting-outline"></use>
-                      </svg>
+
+                  <a href="{{ route('admin.profile.index') }}" class="dropdown-item">
+                    <span>
+                      <i class="ti ti-user text-muted me-2 f-18"></i>
+                      <span>Tài khoản của tôi</span>
+                    </span>
+                  </a>
+                  <a href="{{ route('admin.settings.index') }}" class="dropdown-item">
+                    <span>
+                      <i class="ti ti-settings text-muted me-2 f-18"></i>
                       <span>Cài đặt</span>
-                    </span></a><a href="{{ route('admin.profile.index') }}" class="dropdown-item"><span><svg class="pc-icon text-muted me-2">
-                        <use xlink:href="#custom-lock-outline"></use>
-                      </svg>
-                      <span>Đổi mật khẩu</span></span></a>
+                    </span>
+                  </a>
+                  <a href="{{ route('admin.profile.index') }}" class="dropdown-item">
+                    <span>
+                      <i class="ti ti-key text-muted me-2 f-18"></i>
+                      <span>Đổi mật khẩu</span>
+                    </span>
+                  </a>
+                  <a href="{{ route('admin.lock') ?? '#' }}" class="dropdown-item">
+                    <span>
+                      <i class="ti ti-lock text-muted me-2 f-18"></i>
+                      <span>Khóa màn hình</span>
+                    </span>
+                  </a>
+
                   <hr class="border-secondary border-opacity-50" />
-                  <div class="d-grid mb-3 mt-3">
+
+                  <div class="d-grid mb-2 mt-2">
                     <form method="POST" action="{{ route('logout') }}">
                       @csrf
                       <button class="btn btn-primary w-100" type="submit">
-                        <svg class="pc-icon me-2">
-                          <use xlink:href="#custom-logout-1-outline"></use>
-                        </svg>Đăng xuất
+                        <svg class="pc-icon me-2"><use xlink:href="#custom-logout-1-outline"></use></svg>
+                        Đăng xuất
                       </button>
                     </form>
                   </div>
+
                 </div>
               </div>
             </div>
           </li>
+          
         </ul>
       </div>
     </div>
   </header>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const mainToggle = document.getElementById('notif-sound-toggle-main');
+    const mainIcon = document.getElementById('notif-sound-icon-main');
+    const headerToggle = document.getElementById('header-sound-toggle');
+    const headerIcon = document.getElementById('header-sound-icon');
+    const sidebarToggle = document.getElementById('sidebar-sound-toggle');
+    const sidebarIcon = document.getElementById('sidebar-sound-icon');
+
+    const updateSoundIcons = (isMuted) => {
+        const iconClass = isMuted ? 'ph-duotone ph-speaker-slash' : 'ph-duotone ph-speaker-high';
+        const colorClass = isMuted ? 'text-muted' : 'text-primary';
+        
+        if (mainIcon) mainIcon.className = `${iconClass} fs-4 ${isMuted ? '' : 'text-primary'}`;
+        if (headerIcon) headerIcon.className = `${iconClass} text-muted me-2 f-18`;
+        if (sidebarIcon) sidebarIcon.className = `${iconClass} f-18`;
+    };
+
+    // Sync state
+    const isSoundMuted = localStorage.getItem('sound_muted') === 'true';
+    if (headerToggle) headerToggle.checked = !isSoundMuted;
+    if (sidebarToggle) sidebarToggle.checked = !isSoundMuted;
+    updateSoundIcons(isSoundMuted);
+
+    const onToggle = (e) => {
+        const isMuted = e.target.id === 'notif-sound-toggle-main' ? 
+                       (localStorage.getItem('sound_muted') !== 'true') : 
+                       !e.target.checked;
+                       
+        localStorage.setItem('sound_muted', isMuted);
+        
+        if (headerToggle) headerToggle.checked = !isMuted;
+        if (sidebarToggle) sidebarToggle.checked = !isMuted;
+        
+        updateSoundIcons(isMuted);
+    };
+
+    if (mainToggle) mainToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        onToggle({target: {id: 'notif-sound-toggle-main'}});
+    });
+    if (headerToggle) headerToggle.addEventListener('change', onToggle);
+    if (sidebarToggle) sidebarToggle.addEventListener('change', onToggle);
+});
+</script>

@@ -30,7 +30,7 @@ class DashboardTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_view_dashboard()
     {
         $admin = $this->makeAdmin();
@@ -41,7 +41,7 @@ class DashboardTest extends TestCase
         $response->assertViewIs('admin.dashboard');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_access_dashboard()
     {
         $response = $this->get(route('admin.dashboard'));
@@ -49,7 +49,7 @@ class DashboardTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function customer_cannot_access_admin_dashboard()
     {
         $customer = $this->makeCustomer();

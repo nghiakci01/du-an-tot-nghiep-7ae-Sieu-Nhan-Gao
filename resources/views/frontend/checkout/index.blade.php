@@ -395,7 +395,10 @@
                                             <span> {{ __('messages.remember_me') }} </span>
                                         </label>
                                     </div>
-                                    <a href="{{ route('password.request') }}">{{ __('messages.lost_password') }}?</a>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <a href="{{ route('password.request') }}">{{ __('messages.lost_password') }}?</a>
+                                        <a href="javascript:void(0)" onclick="$('#checkout_login').collapse('hide')" class="text-secondary" style="text-decoration: none;"><i class="fa fa-angle-up"></i> Thu gọn</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -425,7 +428,9 @@
                                         <input type="text" id="couponCode" placeholder="{{ __('messages.coupon_code') }}">
                                         <button type="button" id="applyCouponBtn">{{ __('messages.apply_coupon') }}</button>
                                     </div>
-                                    <div id="couponMessage" style="margin-top: 15px;"></div>
+                                    <div class="text-end mt-2">
+                                        <a href="javascript:void(0)" onclick="$('#checkout_coupon').collapse('hide')" class="text-secondary" style="text-decoration: none;"><i class="fa fa-angle-up"></i> Thu gọn</a>
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -881,6 +886,7 @@
             });
 
             // ============ COUPON ============
+
             $('#applyCouponBtn').click(function () {
                 const couponCode = $('#couponCode').val().trim();
                 if (!couponCode) {

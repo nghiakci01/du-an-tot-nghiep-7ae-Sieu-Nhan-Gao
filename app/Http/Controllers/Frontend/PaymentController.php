@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\OrderService;
 use App\Services\VnpayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -11,7 +12,10 @@ use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
-    public function __construct(protected VnpayService $vnpayService) {}
+    public function __construct(
+        protected VnpayService $vnpayService,
+        protected OrderService $orderService
+    ) {}
 
     /**
      * Redirect user to VNPAY to complete payment.
@@ -21,6 +25,9 @@ class PaymentController extends Controller
         $order = Order::findOrFail($order_id);
 
         if ($order->payment_status === 'paid') {
+            if (!\Illuminate\Support\Facades\Auth::check()) {
+                session(['verified_order_id' => $order->id]);
+            }
             return redirect()->route('checkout.success', $order->id)
                 ->with('info', 'Đơn hàng đã được thanh toán.');
         }
@@ -64,14 +71,23 @@ class PaymentController extends Controller
                 }
             }
 
+            if (!\Illuminate\Support\Facades\Auth::check()) {
+                session(['verified_order_id' => $orderId]);
+            }
+
             return redirect()->route('checkout.success', $orderId)
                 ->with('success', 'Thanh toán VNPAY thành công! 🎉');
         }
 
         $message = VnpayService::getResponseMessage($responseCode);
 
-        if ($order && $order->payment_status !== 'paid') {
+        if ($order && $order->payment_status !== 'paid' && $order->status === Order::STATUS_PENDING) {
             $order->update(['payment_status' => 'failed']);
+            try {
+                $this->orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, null, 'Hủy đơn do thanh toán VNPAY thất bại/khách tự hủy: ' . $message);
+            } catch (\Exception $e) {
+                Log::error('VNPAY Return: Failed to cancel order #' . $orderId . ': ' . $e->getMessage());
+            }
         }
 
         Log::warning('VNPAY Return: Payment failed', ['order_id' => $orderId, 'code' => $responseCode, 'message' => $message]);
@@ -140,7 +156,16 @@ class PaymentController extends Controller
 
             Log::info('VNPAY IPN: Order #' . $orderId . ' payment confirmed');
         } else {
-            $order->update(['payment_status' => 'failed']);
+            if ($order->status === Order::STATUS_PENDING) {
+                $order->update(['payment_status' => 'failed']);
+                try {
+                    $this->orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, null, 'Hủy đơn qua IPN do giao dịch lỗi VNPAY mã: ' . $responseCode);
+                } catch (\Exception $e) {
+                    Log::error('VNPAY IPN: Failed to cancel order #' . $orderId . ': ' . $e->getMessage());
+                }
+            } else {
+                $order->update(['payment_status' => 'failed']);
+            }
             Log::warning('VNPAY IPN: Order #' . $orderId . ' payment failed with code ' . $responseCode);
         }
 

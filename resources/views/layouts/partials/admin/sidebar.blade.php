@@ -3,11 +3,13 @@
         <div class="m-header d-flex align-items-center justify-content-center">
             <a href="{{ route('admin.dashboard') }}"
                 class="b-brand text-primary d-flex align-items-center" style="text-decoration: none;">
-                <h3 class="mb-0 fw-bolder text-dark ls-1">Elite Admin</h3>
+                <h3 class="mb-0 fw-bolder text-body ls-1">Elite Admin</h3>
             </a>
         </div>
         <div class="navbar-content">
-            <div class="card pc-user-card">
+
+            <!-- User Profile Admin Sidebar -->
+            <div class="card pc-user-card pc-user-profile-sidebar">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="flex-shrink-0">
@@ -25,12 +27,25 @@
                     </div>
                     <div class="collapse pc-user-links" id="pc_sidebar_userlink">
                         <div class="pt-3">
+                            {{-- Âm thanh thông báo --}}
+                            <div class="d-flex align-items-center justify-content-between px-3 py-2 mb-2" 
+                                 style="border-radius:8px; background: rgba(var(--bs-primary-rgb), 0.05); border: 1px solid rgba(var(--bs-primary-rgb), 0.1); transition: all 0.2s ease;">
+                                <span class="d-flex align-items-center gap-2 text-muted fw-medium" style="font-size:0.82rem">
+                                    Âm thanh thông báo
+                                </span>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input f-16" type="checkbox" role="switch"
+                                           id="sidebar-sound-toggle" title="Bật/Tắt âm thanh thông báo" style="cursor: pointer;">
+                                </div>
+                            </div>
+                            
                             <a href="{{ route('admin.profile.index') }}"><i class="ti ti-user"></i>
-                                <span data-i18n="My Account">Tài khoản của tôi</span> </a><a
-                                href="{{ route('admin.settings.index') }}"><i class="ti ti-settings"></i>
-                                <span data-i18n="Settings">Cài đặt</span> </a><a href="{{ route('admin.lock') }}"><i
-                                    class="ti ti-lock"></i>
-                                <span data-i18n="Lock Screen">Khóa màn hình</span> </a><a href="{{ route('logout') }}"
+                                <span data-i18n="My Account">Tài khoản của tôi</span> </a>
+                            <a href="{{ route('admin.settings.index') }}"><i class="ti ti-settings"></i>
+                                <span data-i18n="Settings">Cài đặt</span> </a>
+                            <a href="{{ route('admin.lock') }}"><i class="ti ti-lock"></i>
+                                <span data-i18n="Lock Screen">Khóa màn hình</span> </a>
+                            <a href="{{ route('logout') }}"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
                                     class="ti ti-power"></i>
                                 <span data-i18n="Logout">Đăng xuất</span></a>
@@ -38,6 +53,8 @@
                     </div>
                 </div>
             </div>
+            <!-- End User Profile Admin Sidebar -->
+
             <ul class="pc-navbar">
                 <li class="pc-item pc-caption">
                     <label>Điều hướng</label>
@@ -54,7 +71,7 @@
                 </li>
 
                 <li class="pc-item">
-                    <a href="{{ route('welcome') }}" class="pc-link" target="_blank">
+                    <a href="{{ route('welcome') }}" class="pc-link" target="_blank" data-pjax="false">
                         <span class="pc-micon">
                             <i class="ti ti-world"></i>
                         </span>
@@ -131,7 +148,7 @@
                             <span class="pc-micon">
                                 <i class="ti ti-photo"></i>
                             </span>
-                            <span class="pc-mtext">Quản lý Banner</span>
+                            <span class="pc-mtext">Banner</span>
                         </a>
                     </li>
                     <li class="pc-item">
@@ -142,14 +159,14 @@
                             <span class="pc-mtext">Mã Giảm Giá</span>
                         </a>
                     </li>
-                    <li class="pc-item">
+                    {{-- <li class="pc-item">
                         <a href="{{ route('admin.vton-models.index') }}" class="pc-link">
                             <span class="pc-micon">
                                 <i class="ti ti-user-plus"></i>
                             </span>
                             <span class="pc-mtext">Người mẫu AI (VTON)</span>
                         </a>
-                    </li>
+                    </li> --}}
                 @endif
                 {{-- Removed corrupted stock report item --}}
                 <li class="pc-item">
@@ -203,27 +220,11 @@
                 @endif
                 @if (auth()->user()->isAdmin())
                     <li class="pc-item">
-                        <a href="{{ route('admin.loyalty-points.index') }}" class="pc-link">
-                            <span class="pc-micon">
-                                <i class="ti ti-coin"></i>
-                            </span>
-                            <span class="pc-mtext">Cấu hình Tích điểm</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
                         <a href="{{ route('admin.users.index') }}" class="pc-link">
                             <span class="pc-micon">
                                 <i class="ti ti-users"></i>
                             </span>
                             <span class="pc-mtext">Người dùng</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('admin.audit-logs.index') }}" class="pc-link">
-                            <span class="pc-micon">
-                                <i class="ti ti-history"></i>
-                            </span>
-                            <span class="pc-mtext">Nhật ký hệ thống</span>
                         </a>
                     </li>
                     <li class="pc-item">

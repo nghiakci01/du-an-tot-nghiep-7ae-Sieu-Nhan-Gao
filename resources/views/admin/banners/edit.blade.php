@@ -64,6 +64,7 @@
                                             <option value="slider" {{ old('position', $banner->position) == 'slider' ? 'selected' : '' }}>Slider Chính Trang Chủ</option>
                                             <option value="about_us" {{ old('position', $banner->position) == 'about_us' ? 'selected' : '' }}>Banner Trang Về Chúng Tôi</option>
                                             <option value="home_middle" {{ old('position', $banner->position) == 'home_middle' ? 'selected' : '' }}>Banner Giữa Trang Chủ (Thay Instagram)</option>
+                                            <option value="banner_middle" {{ old('position', $banner->position) == 'banner_middle' ? 'selected' : '' }}>Banner Khu Vực Khác</option>
                                         </select>
                                         @error('position')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -84,6 +85,7 @@
 
                                     <div class="mb-3">
                                         <div class="form-check form-switch">
+                                            <input type="hidden" name="is_active" value="0">
                                             <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {{ old('is_active', $banner->is_active) ? 'checked' : '' }} value="1">
                                             <label class="form-check-label fw-bold" for="is_active">Trạng thái hiển thị</label>
                                         </div>

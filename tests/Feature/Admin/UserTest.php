@@ -24,7 +24,7 @@ class UserTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_view_users_list()
     {
         $response = $this->actingAs($this->admin)->get(route('admin.users.index'));
@@ -33,7 +33,7 @@ class UserTest extends TestCase
         $response->assertViewIs('admin.users.index');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_view_user_detail()
     {
         $user = User::create([
@@ -48,7 +48,7 @@ class UserTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_filter_users_by_role()
     {
         $response = $this->actingAs($this->admin)->get(route('admin.users.index', ['role' => 'customer']));
@@ -56,7 +56,7 @@ class UserTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_cannot_delete_themselves()
     {
         $response = $this->actingAs($this->admin)->delete(route('admin.users.destroy', $this->admin));
@@ -65,7 +65,7 @@ class UserTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $this->admin->id]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_cannot_delete_last_admin()
     {
         // Chỉ có 1 admin ($this->admin), không thể xóa chính mình
@@ -76,7 +76,7 @@ class UserTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $this->admin->id]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_delete_customer()
     {
         // Tạo user trực tiếp thay vì qua POST request để tránh validation
@@ -93,7 +93,7 @@ class UserTest extends TestCase
         $this->assertDatabaseMissing('users', ['id' => $customer->id]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_access_users_management()
     {
         $response = $this->get(route('admin.users.index'));

@@ -113,7 +113,7 @@
     left: 50% !important;
     width: 20px !important;
     height: 2px !important;
-    background-color: #ff6a00 !important;
+    background-color: #ef233c !important;
     transform: translateX(-50%) scaleX(0) !important;
     transform-origin: center !important;
     transition: transform 0.3s ease !important;
@@ -285,7 +285,8 @@
     justify-content: space-between !important;
     gap: 0 !important;
     height: 100% !important;
-    min-height: 50px; /* Ensure enough height for vertical centering */
+    min-height: 50px;
+    /* Ensure enough height for vertical centering */
 }
 
 .header_six .middel_right_info .search_bar {
@@ -302,10 +303,12 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    align-self: stretch !important; /* Take full height of parent for vertical centering */
+    align-self: stretch !important;
+    /* Take full height of parent for vertical centering */
     margin: 0 !important;
     padding: 0 15px !important;
-    float: none !important; /* Clear legacy floats */
+    float: none !important;
+    /* Clear legacy floats */
     position: relative !important;
     top: auto !important;
     right: auto !important;
@@ -318,7 +321,7 @@
     align-self: center !important;
 }
 
-.header_six .middel_right_info .top_right > ul {
+.header_six .middel_right_info .top_right>ul {
     margin: 0 !important;
     padding: 0 !important;
     display: flex !important;
@@ -328,7 +331,7 @@
     list-style: none !important;
 }
 
-.header_six .middel_right_info .top_right > ul > li {
+.header_six .middel_right_info .top_right>ul>li {
     margin: 0 !important;
     padding: 0 !important;
     display: flex !important;
@@ -337,8 +340,9 @@
     position: relative !important;
 }
 
-.header_six .middel_right_info .top_right > ul > li::before {
-    display: none !important; /* Block old separators */
+.header_six .middel_right_info .top_right>ul>li::before {
+    display: none !important;
+    /* Block old separators */
 }
 
 .header_six .user-account-link {
@@ -351,7 +355,8 @@
     font-weight: 500 !important;
     text-decoration: none !important;
     white-space: nowrap;
-    line-height: 1 !important; /* Perfect vertical centering fix */
+    line-height: 1 !important;
+    /* Perfect vertical centering fix */
     height: 100% !important;
 }
 
@@ -368,7 +373,8 @@
 }
 
 .header_six .dropdown_links.open {
-    max-height: 300px !important; /* Allow for more links */
+    max-height: 300px !important;
+    /* Allow for more links */
     padding: 10px 15px !important;
 }
 

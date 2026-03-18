@@ -217,6 +217,7 @@ return [
     'already_reviewed' => 'Bạn đã gửi đánh giá cho sản phẩm này.',
     'manufacturer' => 'Thương hiệu',
     'select_by_color' => 'Chọn theo màu sắc',
+    'select_by_size' => 'Chọn theo kích thước',
     'popular_tags' => 'Thẻ phổ biến',
     'review_purchase_required' => 'Bạn cần mua và nhận sản phẩm này trước khi có thể đánh giá.',
     'buy_to_review' => 'Mua ngay để đánh giá',
@@ -229,6 +230,7 @@ return [
     'feature_in_development' => 'Tính năng đang phát triển',
     'confirm_remove_cart_item' => 'Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?',
     'confirm_clear_cart' => 'Bạn có chắc chắn muốn xóa toàn bộ giỏ hàng?',
+    'you_may_also_like' => 'Có thể bạn cũng thích',
     'ai_try_on' => 'Thử đồ với AI (Phòng thử đồ ảo)',
 
     'ai_try_on_modal_title' => 'Trải nghiệm Thử Đồ AI',

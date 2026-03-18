@@ -62,10 +62,10 @@ class ChatManagementController extends Controller
             $chatSession->save();
             $status = $chatSession->is_bot_enabled ? 'đã bật' : 'đã tắt';
 
-            return redirect()->back()->with('success', "Chatbot tự động {$status} cho hội thoại này!");
+            return redirect()->route('admin.chat.show', $sessionId)->with('success', "Chatbot tự động {$status} cho hội thoại này!");
         }
 
-        return redirect()->back()->with('error', 'Không tìm thấy phiên hội thoại.');
+        return redirect()->route('admin.chat.index')->with('error', 'Không tìm thấy phiên hội thoại.');
     }
 
     public function reply(Request $request, $sessionId)
@@ -74,13 +74,15 @@ class ChatManagementController extends Controller
             'message' => 'required|string',
         ]);
 
-        ChatMessage::create([
+        $staffMessage = ChatMessage::create([
             'session_id' => $sessionId,
             'user_id' => auth()->id(),
             'message' => $request->message,
             'sender_type' => 'staff',
             'is_read' => true,
         ]);
+        
+        event(new \App\Events\ChatMessageSent($staffMessage));
 
         // Auto-disable bot when staff replies to prevent interference
         \App\Models\ChatSession::updateOrCreate(
@@ -88,7 +90,7 @@ class ChatManagementController extends Controller
             ['is_bot_enabled' => false, 'last_activity' => now()]
         );
 
-        return redirect()->back()->with('success', 'Đã gửi phản hồi và tạm dừng Chatbot!');
+        return redirect()->route('admin.chat.show', $sessionId)->with('success', 'Đã gửi phản hồi và tạm dừng Chatbot!');
     }
 
     public function destroy($sessionId)
@@ -143,6 +145,6 @@ class ChatManagementController extends Controller
         $sessionId = $message->session_id;
         $message->delete();
 
-        return redirect()->back()->with('success', 'Đã xóa tin nhắn!');
+        return redirect()->route('admin.chat.show', $sessionId)->with('success', 'Đã xóa tin nhắn!');
     }
 }

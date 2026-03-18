@@ -220,6 +220,7 @@ return [
     'feature_in_development' => 'Feature in development',
     'confirm_remove_cart_item' => 'Are you sure you want to remove this product from the cart?',
     'confirm_clear_cart' => 'Are you sure you want to clear the cart?',
+    'you_may_also_like' => 'You may also like',
     'ai_try_on' => 'AI Try On',
 
     'ai_try_on_modal_title' => 'AI Try On Experience',
