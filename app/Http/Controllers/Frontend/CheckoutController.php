@@ -16,11 +16,20 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
 
+use App\Services\CartService;
+
 class CheckoutController extends Controller
 {
+    protected $cartService;
+
+    public function __construct(CartService $cartService)
+    {
+        $this->cartService = $cartService;
+    }
+
     public function index()
     {
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
         if (count($cart) == 0) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
         }
@@ -75,7 +84,7 @@ class CheckoutController extends Controller
      */
     public function validateCart()
     {
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
 
         if (empty($cart)) {
             return response()->json(['valid' => false, 'message' => 'Giỏ hàng trống!']);
@@ -152,7 +161,7 @@ class CheckoutController extends Controller
             'province.in' => 'Tỉnh thành không hợp lệ.',
         ]);
 
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
         if (count($cart) == 0) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
@@ -233,7 +242,8 @@ class CheckoutController extends Controller
             Notification::send($admins, new NewOrderNotification($order));
 
             // Clear cart and coupon session
-            Session::forget(['cart', 'coupon_code', 'discount_amount']);
+            $this->cartService->clearCart();
+            Session::forget(['coupon_code', 'discount_amount']);
 
             // Nếu chọn VNPAY -> redirect sang trang thanh toán VNPAY
             if ($request->payment_method === 'VNPAY') {
@@ -347,7 +357,7 @@ class CheckoutController extends Controller
             'coupon_code' => 'required|string|max:50',
         ]);
 
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
         if (count($cart) == 0) {
             return response()->json([
                 'success' => false,

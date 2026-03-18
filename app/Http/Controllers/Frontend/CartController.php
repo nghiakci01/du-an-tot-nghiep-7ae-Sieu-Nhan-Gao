@@ -7,12 +7,20 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Events\CartUpdatedEvent;
 use Illuminate\Http\Request;
+use App\Services\CartService;
 
 class CartController extends Controller
 {
+    protected $cartService;
+
+    public function __construct(CartService $cartService)
+    {
+        $this->cartService = $cartService;
+    }
+
     public function index()
     {
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
         $total = 0;
 
         // Enrich cart data with available variants for selection in UI
@@ -129,7 +137,7 @@ class CartController extends Controller
         $changedType = $request->changed_type;
         $productId = $newProductId;
 
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
 
         if (! isset($cart[$oldVariantId])) {
             return response()->json(['success' => false, 'message' => 'Sản phẩm không tồn tại trong giỏ hàng'], 404);
@@ -188,31 +196,31 @@ class CartController extends Controller
             $itemPrice = $newVariant->sale_price;
         }
 
-        unset($cart[$oldVariantId]); // Remove old variant
+        $this->cartService->updateCart(function(&$cart) use ($oldVariantId, $newVariant, $productId, $product, $oldQuantity, $itemPrice) {
+            unset($cart[$oldVariantId]); // Remove old variant
 
-        if (isset($cart[$newVariant->id])) {
-            $cart[$newVariant->id]['quantity'] += $oldQuantity; // Merge
-        } else {
-            // Add new variant
-            $cart[$newVariant->id] = [
-                'product_id' => $productId,
-                'variant_id' => $newVariant->id,
-                'name' => $product->name,
-                'quantity' => $oldQuantity,
-                'price' => $itemPrice,
-                'image' => $product->image,
-                'size' => $newVariant->sizeRelationship ? $newVariant->sizeRelationship->name : $newVariant->size,
-                'color' => $newVariant->colorRelationship ? $newVariant->colorRelationship->name : $newVariant->color,
-                'size_id' => $newVariant->size_id,
-                'color_id' => $newVariant->color_id,
-                'slug' => $product->slug,
-            ];
-        }
-
-        session()->put('cart', $cart);
+            if (isset($cart[$newVariant->id])) {
+                $cart[$newVariant->id]['quantity'] += $oldQuantity; // Merge
+            } else {
+                // Add new variant
+                $cart[$newVariant->id] = [
+                    'product_id' => $productId,
+                    'variant_id' => $newVariant->id,
+                    'name' => $product->name,
+                    'quantity' => $oldQuantity,
+                    'price' => $itemPrice,
+                    'image' => $product->image,
+                    'size' => $newVariant->sizeRelationship ? $newVariant->sizeRelationship->name : $newVariant->size,
+                    'color' => $newVariant->colorRelationship ? $newVariant->colorRelationship->name : $newVariant->color,
+                    'size_id' => $newVariant->size_id,
+                    'color_id' => $newVariant->color_id,
+                    'slug' => $product->slug,
+                ];
+            }
+        });
 
         // Fire event
-        $cartCount = array_sum(array_column($cart, 'quantity'));
+        $cartCount = array_sum(array_column($this->cartService->getCart(), 'quantity'));
         CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
 
         return response()->json([
@@ -256,7 +264,7 @@ class CartController extends Controller
         }
 
         $variant = ProductVariant::findOrFail($variantId);
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
 
         // Check tồn kho — tính cả số lượng đã có trong giỏ
         $existingQty = isset($cart[$variant->id]) ? $cart[$variant->id]['quantity'] : 0;
@@ -286,35 +294,36 @@ class CartController extends Controller
             return redirect()->back()->with('error', $msg);
         }
 
-        if (isset($cart[$variant->id])) {
-            $cart[$variant->id]['quantity'] += $request->quantity;
-        } else {
-            // Determine price: Use variant's sale_price if it exists and is less than price, else use variant price
-            // Fallback to product price if variant price is null
-            $itemPrice = $variant->price ?? $product->price;
-            if ($variant->sale_price && $variant->sale_price < ($variant->price ?? PHP_INT_MAX)) {
-                $itemPrice = $variant->sale_price;
+        $this->cartService->updateCart(function(&$cart) use ($variant, $request, $product) {
+            if (isset($cart[$variant->id])) {
+                $cart[$variant->id]['quantity'] += $request->quantity;
+            } else {
+                // Determine price: Use variant's sale_price if it exists and is less than price, else use variant price
+                // Fallback to product price if variant price is null
+                $itemPrice = $variant->price ?? $product->price;
+                if ($variant->sale_price && $variant->sale_price < ($variant->price ?? PHP_INT_MAX)) {
+                    $itemPrice = $variant->sale_price;
+                }
+
+                $cart[$variant->id] = [
+                    'product_id' => $product->id,
+                    'variant_id' => $variant->id,
+                    'name' => $product->name,
+                    'quantity' => $request->quantity,
+                    'price' => $itemPrice,
+                    'image' => $product->image,
+                    'size' => $variant->sizeRelationship ? $variant->sizeRelationship->name : $variant->size,
+                    'color' => $variant->colorRelationship ? $variant->colorRelationship->name : $variant->color,
+                    'size_id' => $variant->size_id,
+                    'color_id' => $variant->color_id,
+                    'slug' => $product->slug,
+                ];
             }
-
-            $cart[$variant->id] = [
-                'product_id' => $product->id,
-                'variant_id' => $variant->id,
-                'name' => $product->name,
-                'quantity' => $request->quantity,
-                'price' => $itemPrice,
-                'image' => $product->image,
-                'size' => $variant->sizeRelationship ? $variant->sizeRelationship->name : $variant->size,
-                'color' => $variant->colorRelationship ? $variant->colorRelationship->name : $variant->color,
-                'size_id' => $variant->size_id,
-                'color_id' => $variant->color_id,
-                'slug' => $product->slug,
-            ];
-        }
-
-        session()->put('cart', $cart);
+        });
 
         // Fire Event
-        $cartCount = array_sum(array_column($cart, 'quantity'));
+        $cartAfterEdit = $this->cartService->getCart();
+        $cartCount = array_sum(array_column($cartAfterEdit, 'quantity'));
         CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
 
         if ($request->input('action') === 'buy_now') {
@@ -332,7 +341,7 @@ class CartController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Sản phẩm đã được thêm vào giỏ hàng!',
-                'count' => array_sum(array_column(session()->get('cart', []), 'quantity')),
+                'count' => $cartCount,
             ]);
         }
 
@@ -342,12 +351,15 @@ class CartController extends Controller
     public function updateCart(Request $request)
     {
         if ($request->id && $request->quantity) {
-            $cart = session()->get('cart', []);
+            $cart = $this->cartService->getCart();
             $variant = ProductVariant::find($request->id);
 
             if ($variant && $variant->stock_quantity >= $request->quantity) {
-                $cart[$request->id]['quantity'] = $request->quantity;
-                session()->put('cart', $cart);
+                $this->cartService->updateCart(function(&$cart) use ($request) {
+                    $cart[$request->id]['quantity'] = $request->quantity;
+                });
+                
+                $cart = $this->cartService->getCart();
 
                 // Calculate new totals
                 $itemTotal = $cart[$request->id]['price'] * $request->quantity;
@@ -403,7 +415,7 @@ class CartController extends Controller
     public function remove(Request $request)
     {
         $id = $request->id ?: $request->get('id');
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
 
         \Log::info('Cart Remove Request', [
             'method' => $request->method(),
@@ -426,8 +438,11 @@ class CartController extends Controller
             }
 
             if ($foundKey !== null) {
-                unset($cart[$foundKey]);
-                session()->put('cart', $cart);
+                $this->cartService->updateCart(function(&$cart) use ($foundKey) {
+                    unset($cart[$foundKey]);
+                });
+                
+                $cart = $this->cartService->getCart();
 
                 // Calculate new totals
                 $subtotal = 0;
@@ -475,7 +490,7 @@ class CartController extends Controller
 
     public function clearCart(Request $request)
     {
-        session()->forget('cart');
+        $this->cartService->clearCart();
         session()->forget(['coupon_code', 'discount_amount']); // Also clear coupon info
 
         // Recalculate totals for an empty cart
@@ -502,7 +517,7 @@ class CartController extends Controller
 
     public function getCartCount()
     {
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
         $count = 0;
         foreach ($cart as $item) {
             $count += $item['quantity'];
@@ -517,7 +532,7 @@ class CartController extends Controller
             'coupon_code' => 'required|string|max:50',
         ]);
 
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
         if (count($cart) == 0) {
             return response()->json(['success' => false, 'message' => 'Giỏ hàng của bạn đang trống.'], 400);
         }
@@ -573,7 +588,7 @@ class CartController extends Controller
     {
         session()->forget(['coupon_code', 'discount_amount']);
 
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
         $total = 0;
         foreach ($cart as $details) {
             $total += $details['price'] * $details['quantity'];

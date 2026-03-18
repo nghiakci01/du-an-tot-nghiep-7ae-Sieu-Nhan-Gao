@@ -5,9 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ProductVariant;
 use Illuminate\Http\Request;
+use App\Services\CartService;
 
 class InventoryCheckController extends Controller
 {
+    protected $cartService;
+
+    public function __construct(CartService $cartService)
+    {
+        $this->cartService = $cartService;
+    }
+
     /**
      * Kiểm tra tồn kho cho danh sách sản phẩm gửi từ frontend
      */
@@ -16,7 +24,7 @@ class InventoryCheckController extends Controller
         $items = $request->input('items', []);
         
         if (empty($items)) {
-            $cart = session()->get('cart', []);
+            $cart = $this->cartService->getCart();
             if (empty($cart)) {
                 return response()->json([
                     'success' => false,
