@@ -201,7 +201,7 @@
                                                         <div class="custom-shop-product">
                                                             <a href="{{ route('product.detail', $product->slug) }}">
                                                                 <div class="custom-shop-product-img">
-                                                                    <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('frontend-assets/img/product/product1.jpg') }}" alt="{{ $product->name }}">
+                                                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                                                 </div>
                                                                 <h5>{{ Str::limit($product->name, 25) }}</h5>
                                                             </a>
@@ -305,7 +305,7 @@
                                                         <div class="custom-shop-product">
                                                             <a href="{{ route('product.detail', $product->slug) }}">
                                                                 <div class="custom-shop-product-img">
-                                                                    <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('frontend-assets/img/product/product1.jpg') }}" alt="{{ $product->name }}">
+                                                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                                                 </div>
                                                                 <h5>{{ Str::limit($product->name, 25) }}</h5>
                                                             </a>
