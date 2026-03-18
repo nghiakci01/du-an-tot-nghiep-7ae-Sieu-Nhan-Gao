@@ -37,7 +37,9 @@ class AppServiceProvider extends ServiceProvider
                 try {
                 // Check if categories is already set to avoid double query or overriding
                 if (! isset($view->getData()['categories'])) {
-                    $categories = Category::whereNull('parent_id')->get();
+                    $categories = \Illuminate\Support\Facades\Cache::remember('global_navigation_categories', 3600, function () {
+                        return Category::whereNull('parent_id')->with('children')->get();
+                    });
                     $view->with('categories', $categories);
                 }
 

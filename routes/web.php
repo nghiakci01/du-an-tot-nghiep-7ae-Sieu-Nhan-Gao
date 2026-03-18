@@ -29,7 +29,6 @@ Route::get('/cart/count', [App\Http\Controllers\Frontend\CartController::class, 
 Route::get('/cart/validate', [App\Http\Controllers\Frontend\CheckoutController::class, 'validateCart'])->name('cart.validate');
 Route::post('/api/checkout/check-inventory', [App\Http\Controllers\Api\InventoryCheckController::class, 'checkInventory'])->name('api.checkout.checkInventory');
 
-Route::get('/home', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
 Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'store'])->name('checkout.store');
 Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
@@ -151,9 +150,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
             // Inventory Management
             Route::resource('suppliers', App\Http\Controllers\Admin\SupplierController::class);
-            // Route::resource('warehouses', App\Http\Controllers\Admin\WarehouseController::class);
-            // Route::resource('vouchers', App\Http\Controllers\Admin\InventoryVoucherController::class);
-            // Route::post('vouchers/{voucher}/complete', [App\Http\Controllers\Admin\InventoryVoucherController::class, 'complete'])->name('vouchers.complete');
             Route::get('stock', function () {
                 return 'Stock Report Page (Coming Soon)';
             })->name('stock.index');
@@ -172,7 +168,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
 
             // Virtual Try-On Models management
-            // Route::resource('vton-models', App\Http\Controllers\Admin\VtonModelController::class);
         });
 
         // Blog Management (Admin & Staff)
@@ -230,28 +225,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     });
 });
 
-// Test Route for Gemini Chatbot
-Route::get('/test-gemini', function () {
-    $chatService = app(\App\Services\ChatService::class);
-
-    $tests = [
-        'Xin chào, bạn có thể giúp gì cho tôi?' => 'Simple Greeting',
-        'Có sản phẩm laptop không?' => 'Product Query (RAG)',
-        'Cho tôi xem sản phẩm iPhone' => 'Specific Product Search',
-    ];
-
-    $results = [];
-    foreach ($tests as $question => $testName) {
-        $response = $chatService->generateResponse($question);
-        $results[] = [
-            'test' => $testName,
-            'question' => $question,
-            'response' => $response,
-        ];
-    }
-
-    return view('test-gemini', compact('results'));
-});
 
 // Quick Test Route
 Route::get('lang/{locale}', function ($locale) {
@@ -261,8 +234,3 @@ Route::get('lang/{locale}', function ($locale) {
 
 })->name('lang.switch');
 
-// Realtime testing route
-Route::get('/test-broadcast', function () {
-    \App\Events\TestEvent::dispatch('Gửi từ Web.php lúc ' . now()->format('H:i:s'));
-    return view('test-broadcast');
-});

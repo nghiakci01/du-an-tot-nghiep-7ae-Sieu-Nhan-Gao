@@ -22,8 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Bypass CSRF for cart routes and API endpoints
         $middleware->validateCsrfTokens(except: [
             'cart/*',
-            'api/vton',
         ]);
+
 
         $middleware->web(append: [
             \App\Http\Middleware\SetLanguage::class,
