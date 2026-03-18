@@ -129,9 +129,8 @@ return [
 
         'vton' => [
             'driver' => 'single',
-            'path' => storage_path('logs/vton.log'),
-            'level' => 'debug',
-            'replace_placeholders' => true,
+            'path' => storage_path('logs/ai_errors.log'),
+            'level' => env('LOG_LEVEL', 'error'),
         ],
 
     ],
