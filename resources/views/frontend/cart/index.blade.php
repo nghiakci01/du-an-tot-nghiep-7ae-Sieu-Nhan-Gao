@@ -66,6 +66,36 @@
         -webkit-appearance: none;
         margin: 0;
     }
+
+    /* Cart Submit Buttons Styles */
+    .cart_submit {
+        margin-top: 20px;
+    }
+    .cart_submit .btn {
+        background: #333 !important;
+        color: #fff !important;
+        border: none !important;
+        padding: 5px 20px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .cart_submit .btn:hover {
+        background: #000 !important;
+        color: #fff !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .cart_submit .btn i {
+        font-size: 14px;
+    }
 </style>
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area other_bread">
@@ -224,10 +254,10 @@
                                     </table>
                                 </div>
                                 <div class="cart_submit">
-                                    <a href="{{ route('shop') }}" class="btn btn-secondary">
+                                    <a href="{{ route('shop') }}" class="btn">
                                         <i class="fa fa-arrow-left"></i> {{ __('messages.continue_shopping') }}
                                     </a>
-                                    <button type="button" class="btn btn-warning" id="delete-selected" style="display: none; margin-left: 10px; color: #fff;">
+                                    <button type="button" class="btn" id="delete-selected" style="display: none; margin-left: 10px;">
                                         <i class="fa fa-trash"></i> Xóa mục đã chọn
                                     </button>
                                     <!-- 'Clear Cart' button remains removed per previous user request -->
@@ -294,8 +324,22 @@
                                             btn.style.opacity = '0.7';
                                             btn.style.pointerEvents = 'none';
 
+                                            var selectedIds = [];
+                                            document.querySelectorAll('.check-item:checked').forEach(function(checkbox) {
+                                                selectedIds.push(checkbox.value);
+                                            });
+
+                                            if (selectedIds.length === 0) {
+                                                alert('Vui lòng chọn ít nhất một sản phẩm để thanh toán!');
+                                                btn.style.opacity = '';
+                                                btn.style.pointerEvents = '';
+                                                return;
+                                            }
+
                                             var config = document.getElementById('cart-config').dataset;
-                                            fetch(config.routeValidate, {
+                                            var validateUrl = config.routeValidate + '?ids=' + selectedIds.join(',');
+
+                                            fetch(validateUrl, {
                                                 method: 'GET',
                                                 headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': config.csrf }
                                             })

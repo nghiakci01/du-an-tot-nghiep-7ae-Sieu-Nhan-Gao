@@ -52,7 +52,7 @@
                             </p>
 
                             <div class="login_submit">
-                                <button type="submit">{{ __('messages.reset_password') }}</button>
+                                <button type="submit">đặt lại mật khẩu mới</button>
                             </div>
                         </form>
                     </div>

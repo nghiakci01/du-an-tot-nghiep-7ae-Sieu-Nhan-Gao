@@ -27,9 +27,16 @@ class CheckoutController extends Controller
         $this->cartService = $cartService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $cart = $this->cartService->getCart();
+        
+        // Lọc giỏ hàng theo các item đã chọn (nếu có)
+        $selectedIds = session('selected_checkout_ids');
+        if ($selectedIds && is_array($selectedIds)) {
+            $cart = array_intersect_key($cart, array_flip($selectedIds));
+        }
+
         if (count($cart) == 0) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
         }
@@ -88,12 +95,26 @@ class CheckoutController extends Controller
     /**
      * AJAX: Kiểm tra giỏ hàng trước khi chuyển sang checkout
      */
-    public function validateCart()
+    public function validateCart(Request $request)
     {
         $cart = $this->cartService->getCart();
 
+        // Lọc các item được chọn
+        $selectedIds = $request->input('ids');
+        if ($selectedIds) {
+            if (is_string($selectedIds)) {
+                $selectedIds = explode(',', $selectedIds);
+            }
+            $cart = array_intersect_key($cart, array_flip($selectedIds));
+            // Lưu vào session để trang checkout sử dụng
+            session(['selected_checkout_ids' => $selectedIds]);
+        } else {
+            // Nếu không gửi ids lên, ta giả định là checkout toàn bộ (hoặc clear session cũ)
+            session()->forget('selected_checkout_ids');
+        }
+
         if (empty($cart)) {
-            return response()->json(['valid' => false, 'message' => 'Giỏ hàng trống!']);
+            return response()->json(['valid' => false, 'message' => 'Vui lòng chọn ít nhất một sản phẩm để thanh toán!']);
         }
 
         $errors = [];
@@ -168,6 +189,13 @@ class CheckoutController extends Controller
         ]);
 
         $cart = $this->cartService->getCart();
+        
+        // Lọc giỏ hàng theo các item đã chọn
+        $selectedIds = session('selected_checkout_ids');
+        if ($selectedIds && is_array($selectedIds)) {
+            $cart = array_intersect_key($cart, array_flip($selectedIds));
+        }
+
         if (count($cart) == 0) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
@@ -247,9 +275,13 @@ class CheckoutController extends Controller
             $admins = User::getAdmins();
             Notification::send($admins, new NewOrderNotification($order));
 
-            // Clear cart and coupon session
-            $this->cartService->clearCart();
-            Session::forget(['coupon_code', 'discount_amount']);
+            // Clear only selected items and session
+            if ($selectedIds && is_array($selectedIds)) {
+                $this->cartService->removeItems($selectedIds);
+            } else {
+                $this->cartService->clearCart();
+            }
+            session()->forget(['coupon_code', 'discount_amount', 'selected_checkout_ids']);
 
             // Nếu chọn VNPAY -> redirect sang trang thanh toán VNPAY
             if ($request->payment_method === 'VNPAY') {
