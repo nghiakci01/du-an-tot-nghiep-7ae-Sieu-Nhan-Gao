@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('welcome');
+Route::get('/home', [App\Http\Controllers\Frontend\HomeController::class, 'index'])->name('home');
 Route::get('/shop', [App\Http\Controllers\Frontend\ProductController::class, 'index'])->name('shop');
 Route::get('/product/{slug}', [App\Http\Controllers\Frontend\ProductController::class, 'show'])->name('product.detail');
 Route::post('/product/{id}/review', [App\Http\Controllers\Frontend\ReviewController::class, 'store'])->name('product.review.store');
