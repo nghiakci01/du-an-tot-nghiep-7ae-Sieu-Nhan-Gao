@@ -134,6 +134,25 @@ class AccountController extends Controller
         return redirect()->back()->with('success', 'Order cancelled successfully!');
     }
 
+    public function returnOrder($id, \App\Services\OrderService $orderService)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $order = $user->orders()->findOrFail($id);
+
+        if (!in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_SHIPPED])) {
+            return redirect()->back()->with('error', 'Chỉ có thể hoàn hàng cho đơn hàng đã giao hoặc hoàn thành.');
+        }
+
+        try {
+            $orderService->updateOrderStatus($order, Order::STATUS_RETURNED, $user, 'Khách hàng yêu cầu hoàn hàng');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Yêu cầu hoàn hàng đã được ghi nhận!');
+    }
+
     // ===== USER BANK ACCOUNTS =====
 
     public function storeBankAccount(Request $request)
