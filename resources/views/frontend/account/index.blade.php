@@ -243,6 +243,14 @@
           </a>
         </li>
         <li>
+          <a href="#wallet" data-tab="wallet" class="nav-tab-link">
+            <i class="bi bi-wallet2"></i> Ví của tôi
+            @if($user && $user->wallet_balance > 0)
+            <span class="badge ms-auto rounded-pill" style="background:#e8f5e9;color:#2e7d32;font-size:0.65rem;">{{ number_format($user->wallet_balance) }}đ</span>
+            @endif
+          </a>
+        </li>
+        <li>
           <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-account').submit();" class="text-danger">
             <i class="bi bi-box-arrow-right"></i> Đăng xuất
           </a>
@@ -702,6 +710,145 @@
       </div>
     </div>
 
+    {{-- =============== TAB: WALLET =============== --}}
+    <div class="account-content tab-pane-block d-none" id="tab-wallet">
+      <div class="tab-head">
+        <h4><i class="bi bi-wallet2 me-2"></i>Ví của tôi</h4>
+      </div>
+      <div class="tab-body">
+        @if(session('wallet_success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ session('wallet_success') }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @endif
+
+        @if($user)
+        {{-- Balance Card --}}
+        <div class="row g-4 mb-4">
+          <div class="col-md-5">
+            <div style="background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);border-radius:20px;padding:28px;color:white;position:relative;overflow:hidden;">
+              <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.05);"></div>
+              <div style="position:absolute;bottom:-30px;left:-10px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,0.03);"></div>
+              <div style="font-size:0.72rem;opacity:0.6;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Số dư hiện tại</div>
+              <div style="font-size:2.2rem;font-weight:800;letter-spacing:1px;">
+                {{ number_format($user->wallet_balance) }}<span style="font-size:1rem;opacity:0.7;"> đ</span>
+              </div>
+              <div class="mt-3" style="font-size:0.8rem;opacity:0.6;">{{ $user->name }}</div>
+            </div>
+          </div>
+
+          <div class="col-md-7">
+            {{-- Top-up Request Form --}}
+            <div class="p-4 rounded-3 border" style="background:#fafafa;">
+              <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2 text-success"></i>Yêu cầu nạp tiền</h6>
+              <form action="{{ route('wallet.topup.request') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small">Số tiền muốn nạp (VND) <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <input type="number" name="amount" class="form-control" placeholder="100,000" min="10000" max="100000000" step="1000" required>
+                    <span class="input-group-text">VND</span>
+                  </div>
+                  <div class="form-text">Tối thiểu 10,000đ — Tối đa 100,000,000đ</div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small">Ngân hàng đã chuyển khoản</label>
+                  <input type="text" name="bank_name" class="form-control" placeholder="Ví dụ: Vietcombank, MB Bank...">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small">Nội dung chuyển khoản</label>
+                  <input type="text" name="transfer_note" class="form-control" placeholder="Nội dung khi bạn chuyển khoản">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small">Ảnh minh chứng (tùy chọn)</label>
+                  <input type="file" name="proof_image" class="form-control" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-dark rounded-pill px-5">
+                  <i class="bi bi-send me-1"></i>Gửii yêu cầu
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        {{-- Top-up Requests Status --}}
+        @if($walletTopupRequests->isNotEmpty())
+        <div class="mb-4">
+          <h6 class="fw-bold mb-3"><i class="bi bi-clock-history me-2"></i>Yêu cầu nạp gần đây</h6>
+          <div class="table-responsive">
+            <table class="table align-middle" style="font-size:0.88rem;">
+              <thead style="background:#f5f5f7;">
+                <tr>
+                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ngày gửii</th>
+                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Số tiền</th>
+                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ngân hàng</th>
+                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Trạng thái</th>
+                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ghi chú</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach($walletTopupRequests as $tr)
+                <tr style="border-color:#f0f0f0;">
+                  <td style="padding:12px 14px;">{{ $tr->created_at->format('d/m/Y H:i') }}</td>
+                  <td style="padding:12px 14px;" class="fw-bold text-success">+{{ number_format($tr->amount) }}đ</td>
+                  <td style="padding:12px 14px;">{{ $tr->bank_name ?: '—' }}</td>
+                  <td style="padding:12px 14px;">
+                    @if($tr->isPending())
+                      <span class="badge rounded-pill" style="background:#fff3cd;color:#856404;">Chờ duyệt</span>
+                    @elseif($tr->isApproved())
+                      <span class="badge rounded-pill" style="background:#d1e7dd;color:#0a3622;">Đã duyệt</span>
+                    @else
+                      <span class="badge rounded-pill bg-danger text-white">ỬTừ chối</span>
+                    @endif
+                  </td>
+                  <td style="padding:12px 14px;" class="text-muted">{{ $tr->admin_note ?: '—' }}</td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+        @endif
+
+        {{-- Transaction History --}}
+        <div>
+          <h6 class="fw-bold mb-3"><i class="bi bi-list-ul me-2"></i>Lịch sử giao dịch</h6>
+          @if($walletTransactions->isEmpty())
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-wallet2" style="font-size:2.5rem;color:#ddd;display:block;margin-bottom:10px;"></i>
+            Chưa có giao dịch nào.
+          </div>
+          @else
+          <div class="table-responsive">
+            <table class="table align-middle" style="font-size:0.88rem;">
+              <thead style="background:#f5f5f7;">
+                <tr>
+                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Thời gian</th>
+                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Mô tả</th>
+                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Số tiền</th>
+                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Số dư sau</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach($walletTransactions as $tx)
+                <tr style="border-color:#f0f0f0;">
+                  <td style="padding:12px 14px;" class="text-muted">{{ $tx->created_at->format('d/m/Y H:i') }}</td>
+                  <td style="padding:12px 14px;">{{ $tx->description }}</td>
+                  <td style="padding:12px 14px;" class="fw-bold {{ $tx->isCredit() ? 'text-success' : 'text-danger' }}">
+                    {{ $tx->isCredit() ? '+' : '-' }}{{ number_format($tx->amount) }}đ
+                  </td>
+                  <td style="padding:12px 14px;" class="fw-semibold">{{ number_format($tx->balance_after) }}đ</td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+          @endif
+        </div>
+        @endif
+      </div>
+    </div>
 
 
   </div>{{-- col-md-9 --}}
@@ -723,6 +870,7 @@ document.addEventListener('DOMContentLoaded', function() {
     'coupons'         : 'tab-coupons',
     'account-details' : 'tab-account-details',
     'bank-accounts'   : 'tab-bank-accounts',
+    'wallet'          : 'tab-wallet',
   };
 
   function showTab(tabId) {

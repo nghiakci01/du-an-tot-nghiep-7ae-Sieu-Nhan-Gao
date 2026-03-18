@@ -79,11 +79,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/my-account/bank-accounts', [App\Http\Controllers\Frontend\AccountController::class, 'storeBankAccount'])->name('account.bank-accounts.store');
     Route::delete('/my-account/bank-accounts/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'destroyBankAccount'])->name('account.bank-accounts.destroy');
 
+    // Wallet
+    Route::post('/my-account/wallet/topup', [App\Http\Controllers\Frontend\WalletController::class, 'requestTopup'])->name('wallet.topup.request');
 
     // Wishlist Routes
     Route::get('/wishlist', [App\Http\Controllers\Frontend\WishlistController::class, 'index'])->name('wishlist.index');
     Route::delete('/wishlist/{id}', [App\Http\Controllers\Frontend\WishlistController::class, 'destroy'])->name('wishlist.destroy');
 });
+
 
 // Wishlist Add (Handled with manual auth check for AJX)
 Route::post('/wishlist/add', [App\Http\Controllers\Frontend\WishlistController::class, 'store'])->name('wishlist.add');
@@ -160,6 +163,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
             
             // Cài đặt ngân hàng thanh toán (QR Bank Settings)
             Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
+
+            // Wallet Management
+            Route::get('wallet', [App\Http\Controllers\Admin\WalletController::class, 'index'])->name('wallet.index');
+            Route::post('wallet/{topupRequest}/approve', [App\Http\Controllers\Admin\WalletController::class, 'approve'])->name('wallet.approve');
+            Route::post('wallet/{topupRequest}/reject', [App\Http\Controllers\Admin\WalletController::class, 'reject'])->name('wallet.reject');
+            Route::post('wallet/manual-adjust', [App\Http\Controllers\Admin\WalletController::class, 'manualAdjust'])->name('wallet.manual-adjust');
+
 
             // Virtual Try-On Models management
             // Route::resource('vton-models', App\Http\Controllers\Admin\VtonModelController::class);
