@@ -189,14 +189,14 @@
                                     <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
                                         <img loading="lazy" src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                     </a>
+                                    @php
+                                        $hoverImage = $product->images->firstWhere('image_path', '!=', $product->image);
+                                    @endphp
+                                    @if($hoverImage)
                                     <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                        @php
-                                            $secondaryImage = $product->images->count() > 0 
-                                                ? $product->images->first()?->image_url 
-                                                : $product->image_url;
-                                        @endphp
-                                        <img loading="lazy" src="{{ $secondaryImage }}" alt="{{ $product->name }}">
+                                        <img loading="lazy" src="{{ $hoverImage->image_url }}" alt="{{ $product->name }}">
                                     </a>
+                                    @endif
                                     <div class="product_action">
                                         <div class="hover_action">
                                            <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
@@ -270,14 +270,14 @@
                                     <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
                                         <img loading="lazy" src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                     </a>
+                                    @php
+                                        $hoverImage = $product->images->firstWhere('image_path', '!=', $product->image);
+                                    @endphp
+                                    @if($hoverImage)
                                     <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                        @php
-                                            $secondaryImage = $product->images->count() > 0 
-                                                ? $product->images->first()?->image_url 
-                                                : $product->image_url;
-                                        @endphp
-                                        <img loading="lazy" src="{{ $secondaryImage }}" alt="{{ $product->name }}">
+                                        <img loading="lazy" src="{{ $hoverImage->image_url }}" alt="{{ $product->name }}">
                                     </a>
+                                    @endif
                                     <div class="product_action">
                                         <div class="hover_action">
                                            <a href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-plus"></i></a>
@@ -350,14 +350,14 @@
                                         <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
                                             <img loading="lazy" src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                         </a>
+                                        @php
+                                            $hoverImage = $product->images->firstWhere('image_path', '!=', $product->image);
+                                        @endphp
+                                        @if($hoverImage)
                                         <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                                            @php
-                                                $secondaryImage = $product->images->count() > 0 
-                                                    ? $product->images->first()?->image_url 
-                                                    : $product->image_url;
-                                            @endphp
-                                            <img loading="lazy" src="{{ $secondaryImage }}" alt="{{ $product->name }}">
+                                            <img loading="lazy" src="{{ $hoverImage->image_url }}" alt="{{ $product->name }}">
                                         </a>
+                                        @endif
                                         <div class="product_action">
                                             <div class="hover_action">
                                                 <a href="{{ route('product.detail', $product->slug) }}"><i

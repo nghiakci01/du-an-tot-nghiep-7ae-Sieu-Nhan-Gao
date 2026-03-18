@@ -238,6 +238,7 @@ class ProductController extends Controller
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
             ->with(['images', 'variants', 'reviews'])
+            ->inRandomOrder()
             ->take(4)
             ->get();
 

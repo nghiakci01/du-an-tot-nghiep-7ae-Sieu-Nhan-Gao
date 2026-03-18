@@ -76,16 +76,58 @@ class CategoryController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     * Fallback for Pjax/URL issues
+     */
+    public function show(Category $category)
+    {
+        return redirect()->route('admin.categories.index');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Category $category)
     {
-        if ($category->children()->count() > 0) {
-            return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục có danh mục con.');
+        // Thay vì báo lỗi, ta sẽ đệ quy xóa tất cả danh mục con của nó
+        foreach ($category->children as $child) {
+            $response = $this->destroy($child);
+            // Nếu việc xóa danh mục con bị lỗi (ví dụ do có sản phẩm đang hoạt động), dừng lại và báo lỗi
+            if ($response && session()->has('error') && session('error')) {
+                return $response;
+            }
         }
 
+        // Nếu danh mục vẫn có sản phẩm đang hoạt động -> Chặn
         if ($category->products()->count() > 0) {
-            return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục có chứa sản phẩm.');
+            return redirect()->route('admin.categories.index')->with('error', 'Không thể xóa danh mục vì vẫn còn sản phẩm đang hoạt động bên trong.');
+        }
+
+        // Nếu danh mục chỉ còn các sản phẩm "trong thùng rác" (soft deleted)
+        // -> Dọn sạch thùng rác vĩnh viễn trước khi xóa danh mục để tránh lỗi Database
+        $trashedProducts = $category->products()->onlyTrashed();
+        if ($trashedProducts->count() > 0) {
+            $trashedProductIds = $trashedProducts->pluck('id')->toArray();
+
+            // Xóa cứng (force delete) các liên kết khóa ngoại
+            \App\Models\ProductImage::whereIn('product_id', $trashedProductIds)->delete();
+            \App\Models\Review::whereIn('product_id', $trashedProductIds)->delete();
+            \App\Models\Wishlist::whereIn('product_id', $trashedProductIds)->delete();
+            \Illuminate\Support\Facades\DB::table('product_tag')->whereIn('product_id', $trashedProductIds)->delete();
+            \Illuminate\Support\Facades\DB::table('order_items')->whereIn('product_id', $trashedProductIds)->delete();
+            
+            // Xóa các bảng liên kết với variants
+            $trashedVariants = \App\Models\ProductVariant::withTrashed()->whereIn('product_id', $trashedProductIds);
+            $trashedVariantIds = $trashedVariants->pluck('id')->toArray();
+            
+            \App\Models\WarehouseStock::whereIn('product_variant_id', $trashedVariantIds)->delete();
+            \App\Models\InventoryVoucherDetail::whereIn('product_variant_id', $trashedVariantIds)->delete();
+
+            // Xóa biến thể (variants) của những sản phẩm đang ở trong thùng rác
+            $trashedVariants->forceDelete(); 
+            
+            // Cuối cùng xóa cứng sản phẩm
+            $trashedProducts->forceDelete();
         }
 
         $category->delete();

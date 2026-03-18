@@ -286,11 +286,8 @@
     </form>
     </div>
 </div>
-@endsection
-
-@section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
         let variantIndex = Number("{{ $product->variants->count() > 0 ? $product->variants->count() : 1 }}");
         const tableBody = document.querySelector('#variants-table tbody');
         const addBtn = document.getElementById('add-variant-btn');
@@ -470,6 +467,6 @@
                 }
             });
         });
-    });
+    })();
 </script>
 @endsection
