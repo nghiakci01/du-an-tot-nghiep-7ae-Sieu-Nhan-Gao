@@ -9,9 +9,14 @@
             <a class="primary_img" href="{{ route('product.detail', $product->slug) }}">
                 <img loading="lazy" src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product21.jpg') }}" alt="{{ $product->name }}">
             </a>
+            @php
+                $hoverImage = $product->images->firstWhere('image_path', '!=', $product->image);
+            @endphp
+            @if($hoverImage)
             <a class="secondary_img" href="{{ route('product.detail', $product->slug) }}">
-                <img loading="lazy" src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product22.jpg') }}" alt="{{ $product->name }}">
+                <img loading="lazy" src="{{ $hoverImage->image_url }}" alt="{{ $product->name }}">
             </a>
+            @endif
             <div class="product_action">
                 <div class="hover_action">
                     <a href="#"><i class="fa fa-plus"></i></a>

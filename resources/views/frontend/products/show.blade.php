@@ -1063,10 +1063,8 @@
                 </div>
             </div>
             <div class="product_area">
-                <div class="row">
-                    <div class="product_carousel product_three_column4 owl-carousel">
-                        @foreach ($relatedProducts as $related)
-                            <div class="col-lg-3">
+                <div class="product_carousel product_three_column4 owl-carousel">
+                    @foreach ($relatedProducts as $related)
                                 <div class="single_product">
                                     <div class="product_thumb">
                                         <a class="primary_img" href="{{ route('product.detail', $related->slug) }}">
@@ -1101,9 +1099,7 @@
                                         ])
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>

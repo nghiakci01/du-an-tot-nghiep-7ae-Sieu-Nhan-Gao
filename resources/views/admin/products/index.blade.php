@@ -56,6 +56,9 @@
                         <table class="table table-striped table-bordered">
                             <thead>
                                 <tr>
+                                    <th style="width: 40px; text-align: center; vertical-align: middle;">
+                                        <input type="checkbox" id="selectAll" style="width: 18px; height: 18px; cursor: pointer;">
+                                    </th>
                                     <th>ID</th>
                                     <th>Hình ảnh</th>
                                     <th>Tên sản phẩm</th>
@@ -69,6 +72,9 @@
                             <tbody>
                                 @foreach($products as $product)
                                     <tr>
+                                        <td style="text-align: center; vertical-align: middle;">
+                                            <input class="product-checkbox" type="checkbox" name="ids[]" value="{{ $product->id }}" style="width: 18px; height: 18px; cursor: pointer;">
+                                        </td>
                                         <td>{{ $product->id }}</td>
                                         <td>
                                             @if($product->image)
@@ -131,6 +137,123 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Bulk Actions -->
+            <div class="mb-3 mt-3 d-flex gap-2">
+                <form id="bulk-delete-form" action="{{ route('admin.products.bulk-delete') }}" method="POST" class="bulk-action-form">
+                    @csrf
+                    @method('DELETE')
+                    <div id="bulk-delete-inputs"></div>
+                    <button type="button" class="btn btn-warning btn-sm btn-bulk-delete" disabled>
+                        <i class="ti ti-trash"></i> Xóa các mục đã chọn
+                    </button>
+                </form>
+
+                <form id="delete-all-form" action="{{ route('admin.products.delete-all') }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" class="btn btn-danger btn-sm btn-delete-all">
+                        <i class="ti ti-alert-triangle"></i> Xóa tất cả
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+<script>
+    (function() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        const bulkForm = document.querySelector('.bulk-action-form');
+        
+        function updateBulkActionsVisibility() {
+            const checkedCount = document.querySelectorAll('.product-checkbox:checked').length;
+            const btnBulkDelete = document.querySelector('.btn-bulk-delete');
+            if (btnBulkDelete) {
+                btnBulkDelete.disabled = checkedCount === 0;
+            }
+        }
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function() {
+                checkboxes.forEach(cb => {
+                    cb.checked = selectAll.checked;
+                });
+                updateBulkActionsVisibility();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                // Update 'select all' state
+                const allChecked = Array.from(checkboxes).every(c => c.checked);
+                const someChecked = Array.from(checkboxes).some(c => c.checked);
+                
+                if (selectAll) {
+                    selectAll.checked = allChecked;
+                    selectAll.indeterminate = someChecked && !allChecked;
+                }
+                
+                updateBulkActionsVisibility();
+            });
+        });
+
+        const btnBulkDelete = document.querySelector('.btn-bulk-delete');
+        if (btnBulkDelete) {
+            btnBulkDelete.addEventListener('click', function() {
+                const checkedBoxes = document.querySelectorAll('.product-checkbox:checked');
+                if (checkedBoxes.length === 0) return;
+
+                Swal.fire({
+                    title: 'Bạn có chắc chắn?',
+                    text: `Bạn đang chọn xóa ${checkedBoxes.length} sản phẩm. Hành động này không thể hoàn tác!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Vâng, xóa chúng!',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('bulk-delete-form');
+                        const inputsContainer = document.getElementById('bulk-delete-inputs');
+                        inputsContainer.innerHTML = '';
+                        
+                        checkedBoxes.forEach(cb => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'ids[]';
+                            input.value = cb.value;
+                            inputsContainer.appendChild(input);
+                        });
+                        
+                        form.submit();
+                    }
+                });
+            });
+        }
+
+        const btnDeleteAll = document.querySelector('.btn-delete-all');
+        if (btnDeleteAll) {
+            btnDeleteAll.addEventListener('click', function() {
+                Swal.fire({
+                    title: 'CẢNH BÁO NGUY HIỂM!',
+                    text: 'Bạn đang chọn XÓA TOÀN BỘ SẢN PHẨM trong hệ thống. Hành động này bao gồm cả biến thể và KHÔNG THỂ HOÀN TÁC. Bạn có chắc chắn không?',
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'XÓA TẤT CẢ',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('delete-all-form').submit();
+                    }
+                });
+            });
+        }
+    })();
+</script>
 @endsection
