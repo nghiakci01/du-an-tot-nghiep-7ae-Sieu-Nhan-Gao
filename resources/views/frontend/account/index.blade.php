@@ -238,6 +238,11 @@
           </a>
         </li>
         <li>
+          <a href="#bank-accounts" data-tab="bank-accounts" class="nav-tab-link">
+            <i class="bi bi-bank"></i> Tài khoản ngân hàng
+          </a>
+        </li>
+        <li>
           <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-account').submit();" class="text-danger">
             <i class="bi bi-box-arrow-right"></i> Đăng xuất
           </a>
@@ -553,6 +558,86 @@
       </div>
     </div>
 
+    {{-- =============== TAB: BANK ACCOUNTS =============== --}}
+    @php
+      $shopBank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first()
+                ?? \App\Models\BankSetting::where('is_active', true)->first();
+    @endphp
+    <div class="account-content tab-pane-block d-none" id="tab-bank-accounts">
+      <div class="tab-head">
+        <h4><i class="bi bi-bank me-2"></i>Tài khoản ngân hàng thanh toán</h4>
+      </div>
+      <div class="tab-body">
+        @if($shopBank)
+        <p class="text-muted mb-4">Dưới đây là tài khoản ngân hàng của chúng tôi để nhận chuyển khoản. Vui lòng ghi rõ <strong>mã đơn hàng</strong> trong nội dung chuyển tiền.</p>
+        <div class="row g-4 align-items-center">
+          <div class="col-md-6">
+            <div class="p-4 rounded-3" style="background:#f9fafb; border:1px solid #eee;">
+              <h5 class="fw-bold mb-4"><i class="bi bi-bank2 me-2 text-primary"></i>Thông tin tài khoản</h5>
+              <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#e8f4fd;flex-shrink:0;">
+                    <i class="bi bi-building text-primary"></i>
+                  </div>
+                  <div>
+                    <div class="text-muted small">Ngân hàng</div>
+                    <div class="fw-bold">{{ $shopBank->bank_name }}</div>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#e8f4fd;flex-shrink:0;">
+                    <i class="bi bi-credit-card text-primary"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="text-muted small">Số tài khoản</div>
+                    <div class="fw-bold fs-5">{{ $shopBank->account_number }}</div>
+                  </div>
+                  <button class="btn btn-sm btn-outline-dark rounded-pill" onclick="copyBankAccount('{{ $shopBank->account_number }}', this)">
+                    <i class="bi bi-clipboard me-1"></i>Sao chép
+                  </button>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#e8f4fd;flex-shrink:0;">
+                    <i class="bi bi-person text-primary"></i>
+                  </div>
+                  <div>
+                    <div class="text-muted small">Chủ tài khoản</div>
+                    <div class="fw-bold">{{ Str::upper($shopBank->account_name) }}</div>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#fff3e0;flex-shrink:0;">
+                    <i class="bi bi-pencil text-warning"></i>
+                  </div>
+                  <div>
+                    <div class="text-muted small">Nội dung chuyển khoản</div>
+                    <div class="fw-bold text-danger">THANHTOAN DH[Mã đơn hàng]</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 text-center">
+            <p class="text-muted small mb-3">Quét mã QR bằng ứng dụng ngân hàng để thanh toán nhanh</p>
+            <div class="d-inline-block p-3 rounded-3 border bg-white shadow-sm">
+              <img
+                src="https://img.vietqr.io/image/{{ $shopBank->bank_id }}-{{ $shopBank->account_number }}-compact2.png?accountName={{ urlencode($shopBank->account_name) }}"
+                alt="VietQR"
+                style="width:200px;height:auto;"
+              >
+            </div>
+            <p class="text-muted mt-2 mb-0" style="font-size:0.78rem;">Hỗ trợ tất cả ứng dụng ngân hàng Việt Nam</p>
+          </div>
+        </div>
+        @else
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-bank" style="font-size:3rem; color:#eee;"></i>
+          <p class="mt-2">Chưa có thông tin tài khoản ngân hàng. Vui lòng liên hệ shop.</p>
+        </div>
+        @endif
+      </div>
+    </div>
+
   </div>{{-- col-md-9 --}}
 </div>{{-- row --}}
 </div>{{-- container --}}
@@ -569,6 +654,7 @@ document.addEventListener('DOMContentLoaded', function() {
     'wishlist'        : 'tab-wishlist',
     'coupons'         : 'tab-coupons',
     'account-details' : 'tab-account-details',
+    'bank-accounts'   : 'tab-bank-accounts',
   };
 
   function showTab(tabId) {
