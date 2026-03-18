@@ -560,85 +560,202 @@
 
     {{-- =============== TAB: BANK ACCOUNTS =============== --}}
     @php
-      $shopBank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first()
-                ?? \App\Models\BankSetting::where('is_active', true)->first();
+      $allBanks = \App\Models\BankSetting::orderByDesc('is_default')->orderByDesc('is_active')->get();
+      $shopBank = $allBanks->firstWhere('is_default', true) ?? $allBanks->where('is_active', true)->first();
+      $isAdmin  = $user && in_array($user->role, ['admin', 'superadmin', 'staff']);
     @endphp
     <div class="account-content tab-pane-block d-none" id="tab-bank-accounts">
       <div class="tab-head">
-        <h4><i class="bi bi-bank me-2"></i>Tài khoản ngân hàng thanh toán</h4>
+        <h4><i class="bi bi-bank me-2"></i>Tài khoản ngân hàng</h4>
+        @if($isAdmin)
+        <a href="{{ route('admin.bank-settings.create') }}" class="btn btn-dark btn-sm rounded-pill px-3">
+          <i class="bi bi-plus-lg me-1"></i>Thêm tài khoản
+        </a>
+        @endif
       </div>
       <div class="tab-body">
+
+        @if($isAdmin)
+        {{-- ======= ADMIN VIEW: TABLE + CRUD ======= --}}
+        @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show py-2" role="alert">
+          {{ session('success') }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @endif
+
+        <div class="table-responsive">
+          <table class="table align-middle" style="font-size:0.9rem;">
+            <thead style="background:#f5f5f7;">
+              <tr>
+                <th style="padding:12px 14px;font-weight:600;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">#</th>
+                <th style="padding:12px 14px;font-weight:600;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ngân hàng</th>
+                <th style="padding:12px 14px;font-weight:600;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Số tài khoản</th>
+                <th style="padding:12px 14px;font-weight:600;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Chủ tài khoản</th>
+                <th style="padding:12px 14px;font-weight:600;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Trạng thái</th>
+                <th style="padding:12px 14px;font-weight:600;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($allBanks as $i => $bank)
+              <tr style="border-color:#f0f0f0;">
+                <td style="padding:14px;">{{ $i + 1 }}</td>
+                <td style="padding:14px;">
+                  <div class="d-flex align-items-center gap-2">
+                    <img src="https://api.vietqr.io/img/{{ $bank->bank_id }}.png"
+                         alt="{{ $bank->bank_name }}"
+                         style="height:26px;width:50px;object-fit:contain;border-radius:4px;"
+                         onerror="this.style.display='none'">
+                    <div>
+                      <div class="fw-semibold">{{ $bank->bank_name }}</div>
+                      <div class="text-muted" style="font-size:0.75rem;">{{ $bank->bank_id }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td style="padding:14px;">
+                  <code class="fw-bold text-dark">{{ $bank->account_number }}</code>
+                </td>
+                <td style="padding:14px;">{{ Str::upper($bank->account_name) }}</td>
+                <td style="padding:14px;">
+                  <div class="d-flex gap-1 flex-wrap">
+                    @if($bank->is_active)
+                      <span class="badge rounded-pill" style="background:#d1e7dd;color:#0a3622;font-weight:600;">Hoạt động</span>
+                    @else
+                      <span class="badge rounded-pill bg-secondary">Tạm ẩn</span>
+                    @endif
+                    @if($bank->is_default)
+                      <span class="badge rounded-pill" style="background:#fff3cd;color:#856404;font-weight:600;"><i class="bi bi-star-fill me-1" style="font-size:0.6rem;"></i>Mặc định</span>
+                    @endif
+                  </div>
+                </td>
+                <td style="padding:14px;">
+                  <div class="d-flex gap-2">
+                    <a href="{{ route('admin.bank-settings.edit', $bank->id) }}"
+                       class="btn btn-sm btn-outline-dark rounded-pill px-3">
+                      <i class="bi bi-pencil me-1"></i>Sửa
+                    </a>
+                    <form action="{{ route('admin.bank-settings.destroy', $bank->id) }}" method="POST"
+                          onsubmit="return confirm('Xác nhận xóa tài khoản {{ $bank->bank_name }}?')">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                        <i class="bi bi-trash me-1"></i>Xóa
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              @empty
+              <tr>
+                <td colspan="6" class="text-center py-5 text-muted">
+                  <i class="bi bi-bank" style="font-size:2.5rem;color:#ddd;display:block;margin-bottom:12px;"></i>
+                  Chưa có tài khoản ngân hàng nào.
+                  <br>
+                  <a href="{{ route('admin.bank-settings.create') }}" class="btn btn-dark btn-sm mt-3 rounded-pill px-4">
+                    <i class="bi bi-plus-lg me-1"></i>Thêm ngay
+                  </a>
+                </td>
+              </tr>
+              @endforelse
+            </tbody>
+          </table>
+        </div>
+
         @if($shopBank)
-        <p class="text-muted mb-4">Dưới đây là tài khoản ngân hàng của chúng tôi để nhận chuyển khoản. Vui lòng ghi rõ <strong>mã đơn hàng</strong> trong nội dung chuyển tiền.</p>
-        <div class="row g-4 align-items-center">
-          <div class="col-md-6">
-            <div class="p-4 rounded-3" style="background:#f9fafb; border:1px solid #eee;">
-              <h5 class="fw-bold mb-4"><i class="bi bi-bank2 me-2 text-primary"></i>Thông tin tài khoản</h5>
-              <div class="d-flex flex-column gap-3">
-                <div class="d-flex align-items-center gap-3">
-                  <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#e8f4fd;flex-shrink:0;">
-                    <i class="bi bi-building text-primary"></i>
-                  </div>
-                  <div>
-                    <div class="text-muted small">Ngân hàng</div>
-                    <div class="fw-bold">{{ $shopBank->bank_name }}</div>
-                  </div>
+        <hr class="my-4">
+        <h6 class="fw-bold mb-3"><i class="bi bi-qr-code me-2"></i>QR Preview — Tài khoản mặc định</h6>
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+          <div class="p-3 rounded-3 bg-white border shadow-sm text-center">
+            <img src="https://img.vietqr.io/image/{{ $shopBank->bank_id }}-{{ $shopBank->account_number }}-compact2.png?accountName={{ urlencode($shopBank->account_name) }}"
+                 alt="VietQR" style="width:160px;height:auto;">
+            <div class="text-muted mt-1" style="font-size:0.72rem;">{{ $shopBank->bank_name }} — {{ $shopBank->account_number }}</div>
+          </div>
+        </div>
+        @endif
+
+        @else
+        {{-- ======= USER VIEW: QR PAYMENT INFO ======= --}}
+        @if($shopBank)
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);border-radius:20px;padding:28px;color:white;position:relative;overflow:hidden;">
+              <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05);"></div>
+              <div style="position:absolute;bottom:-40px;left:-20px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.03);"></div>
+              <div class="d-flex align-items-center gap-3 mb-4">
+                <div style="width:52px;height:52px;border-radius:14px;background:white;display:flex;align-items:center;justify-content:center;padding:6px;flex-shrink:0;">
+                  <img id="bank-logo-display" src="https://api.vietqr.io/img/{{ $shopBank->bank_id }}.png"
+                       style="width:100%;height:100%;object-fit:contain;" onerror="this.src='https://api.vietqr.io/img/other.png'">
                 </div>
-                <div class="d-flex align-items-center gap-3">
-                  <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#e8f4fd;flex-shrink:0;">
-                    <i class="bi bi-credit-card text-primary"></i>
-                  </div>
-                  <div class="flex-grow-1">
-                    <div class="text-muted small">Số tài khoản</div>
-                    <div class="fw-bold fs-5">{{ $shopBank->account_number }}</div>
-                  </div>
-                  <button class="btn btn-sm btn-outline-dark rounded-pill" onclick="copyBankAccount('{{ $shopBank->account_number }}', this)">
-                    <i class="bi bi-clipboard me-1"></i>Sao chép
+                <div>
+                  <div style="font-size:0.72rem;opacity:0.6;text-transform:uppercase;letter-spacing:1px;">Ngân hàng</div>
+                  <div class="fw-bold fs-6" id="display-bank-name">{{ $shopBank->bank_name }}</div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div style="font-size:0.72rem;opacity:0.6;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Số tài khoản</div>
+                <div class="d-flex align-items-center gap-2">
+                  <span id="display-account-number" style="font-size:1.5rem;font-weight:800;letter-spacing:3px;font-family:monospace;">{{ $shopBank->account_number }}</span>
+                  <button type="button" class="btn btn-sm ms-auto"
+                    style="background:rgba(255,255,255,0.15);color:white;border:none;border-radius:8px;padding:6px 12px;"
+                    onclick="copyBankAccount('{{ $shopBank->account_number }}', this)">
+                    <i class="bi bi-clipboard"></i>
                   </button>
                 </div>
-                <div class="d-flex align-items-center gap-3">
-                  <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#e8f4fd;flex-shrink:0;">
-                    <i class="bi bi-person text-primary"></i>
-                  </div>
-                  <div>
-                    <div class="text-muted small">Chủ tài khoản</div>
-                    <div class="fw-bold">{{ Str::upper($shopBank->account_name) }}</div>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                  <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#fff3e0;flex-shrink:0;">
-                    <i class="bi bi-pencil text-warning"></i>
-                  </div>
-                  <div>
-                    <div class="text-muted small">Nội dung chuyển khoản</div>
-                    <div class="fw-bold text-danger">THANHTOAN DH[Mã đơn hàng]</div>
-                  </div>
+              </div>
+              <div class="mb-4">
+                <div style="font-size:0.72rem;opacity:0.6;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Chủ tài khoản</div>
+                <div class="fw-bold" id="display-account-name">{{ Str::upper($shopBank->account_name) }}</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.08);border-radius:12px;padding:14px;">
+                <div style="font-size:0.72rem;opacity:0.7;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Nội dung chuyển khoản</div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-bold text-warning">THANHTOAN DH[Mã đơn hàng]</span>
+                  <button type="button" class="btn btn-sm ms-auto"
+                    style="background:rgba(255,255,255,0.1);color:white;border:none;border-radius:8px;padding:4px 10px;"
+                    onclick="copyBankAccount('THANHTOAN DH', this)">
+                    <i class="bi bi-clipboard"></i>
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="col-md-6 text-center">
-            <p class="text-muted small mb-3">Quét mã QR bằng ứng dụng ngân hàng để thanh toán nhanh</p>
-            <div class="d-inline-block p-3 rounded-3 border bg-white shadow-sm">
-              <img
-                src="https://img.vietqr.io/image/{{ $shopBank->bank_id }}-{{ $shopBank->account_number }}-compact2.png?accountName={{ urlencode($shopBank->account_name) }}"
-                alt="VietQR"
-                style="width:200px;height:auto;"
-              >
+            <div class="mt-3 p-3 rounded-3" style="background:#f9fafb;border:1px solid #eee;">
+              <label class="form-label fw-semibold small mb-2"><i class="bi bi-cash-coin me-1 text-success"></i>Nhập số tiền (tuỳ chọn)</label>
+              <div class="input-group">
+                <input type="number" id="qr-amount-input" class="form-control" placeholder="Ví dụ: 250000" min="0" step="1000">
+                <span class="input-group-text">VND</span>
+                <button class="btn btn-dark" type="button" onclick="updateQRWithAmount()"><i class="bi bi-qr-code me-1"></i>Tạo QR</button>
+              </div>
             </div>
-            <p class="text-muted mt-2 mb-0" style="font-size:0.78rem;">Hỗ trợ tất cả ứng dụng ngân hàng Việt Nam</p>
+          </div>
+          <div class="col-lg-6 text-center d-flex flex-column align-items-center justify-content-center">
+            <p class="text-muted small mb-3"><i class="bi bi-camera me-1"></i>Quét QR bằng app ngân hàng</p>
+            <div id="qr-wrapper" class="d-inline-block p-3 rounded-4 bg-white shadow" style="border:2px solid #e8e8e8;">
+              <img id="qr-image"
+                src="https://img.vietqr.io/image/{{ $shopBank->bank_id }}-{{ $shopBank->account_number }}-qr_only.png?accountName={{ urlencode($shopBank->account_name) }}"
+                alt="VietQR" style="width:230px;height:230px;object-fit:contain;">
+            </div>
+            <p class="text-muted mt-2 mb-3" style="font-size:0.78rem;">Hỗ trợ 40+ ngân hàng Việt Nam</p>
+            <a id="qr-download-btn"
+               href="https://img.vietqr.io/image/{{ $shopBank->bank_id }}-{{ $shopBank->account_number }}-qr_only.png?accountName={{ urlencode($shopBank->account_name) }}"
+               download="qr.png" class="btn btn-outline-dark btn-sm rounded-pill px-4">
+              <i class="bi bi-download me-1"></i>Tải QR
+            </a>
           </div>
         </div>
         @else
         <div class="text-center py-5 text-muted">
-          <i class="bi bi-bank" style="font-size:3rem; color:#eee;"></i>
-          <p class="mt-2">Chưa có thông tin tài khoản ngân hàng. Vui lòng liên hệ shop.</p>
+          <i class="bi bi-bank" style="font-size:3rem;color:#eee;"></i>
+          <p class="mt-2">Chưa có thông tin tài khoản ngân hàng.</p>
         </div>
         @endif
+        @endif
+
       </div>
     </div>
 
+
+
   </div>{{-- col-md-9 --}}
+
 </div>{{-- row --}}
 </div>{{-- container --}}
 </div>{{-- account-wrapper --}}
@@ -727,15 +844,81 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function copyBankAccount(number, btn) {
   if (!navigator.clipboard) return;
-  navigator.clipboard.writeText(number).then(() => {
-    const orig = btn.innerHTML;
-    btn.innerHTML = '<i class="bi bi-check2 me-1"></i>Đã sao chép!';
-    btn.classList.replace('btn-outline-dark', 'btn-dark');
-    setTimeout(() => {
-      btn.innerHTML = orig;
-      btn.classList.replace('btn-dark', 'btn-outline-dark');
-    }, 2000);
+  navigator.clipboard.writeText(number).then(function() {
+    var orig = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check2"></i>';
+    setTimeout(function() { btn.innerHTML = orig; }, 2000);
   });
 }
+
+// Track current bank
+var _currentBankId = '';
+var _currentAccount = document.getElementById('display-account-number')
+  ? document.getElementById('display-account-number').textContent.trim() : '';
+var _currentName = document.getElementById('display-account-name')
+  ? document.getElementById('display-account-name').textContent.trim() : '';
+
+// Init bank id from logo src
+(function(){
+  var logo = document.getElementById('bank-logo-display');
+  if (logo) {
+    var m = logo.src.match(/img\/([^.]+)\.png/);
+    if (m) _currentBankId = m[1];
+  }
+})();
+
+function _refreshQR(bankId, account, name, amount) {
+  var qrImg  = document.getElementById('qr-image');
+  var dlBtn  = document.getElementById('qr-download-btn');
+  if (!qrImg) return;
+  var url = 'https://img.vietqr.io/image/' + bankId + '-' + account + '-qr_only.png?accountName=' + encodeURIComponent(name);
+  if (amount && Number(amount) > 0) url += '&amount=' + amount;
+  qrImg.style.opacity = '0.4';
+  qrImg.onload = function() { qrImg.style.opacity = '1'; };
+  qrImg.src = url;
+  if (dlBtn) dlBtn.href = url;
+}
+
+document.querySelectorAll('.bank-select-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.bank-select-btn').forEach(function(b) {
+      b.classList.remove('btn-dark');
+      b.classList.add('btn-outline-secondary');
+    });
+    this.classList.remove('btn-outline-secondary');
+    this.classList.add('btn-dark');
+
+    var bankId   = this.dataset.bankId;
+    var account  = this.dataset.account;
+    var name     = this.dataset.name;
+    var bankName = this.dataset.bankname;
+
+    _currentBankId = bankId;
+    _currentAccount = account;
+    _currentName = name;
+
+    var logoEl = document.getElementById('bank-logo-display');
+    if (logoEl) logoEl.src = 'https://api.vietqr.io/img/' + bankId + '.png';
+    var nameEl = document.getElementById('display-bank-name');
+    if (nameEl) nameEl.textContent = bankName;
+    var accEl = document.getElementById('display-account-number');
+    if (accEl) accEl.textContent = account;
+    var ownerEl = document.getElementById('display-account-name');
+    if (ownerEl) ownerEl.textContent = name.toUpperCase();
+
+    var amount = document.getElementById('qr-amount-input') ? document.getElementById('qr-amount-input').value : '';
+    _refreshQR(bankId, account, name, amount);
+  });
+});
+
+function updateQRWithAmount() {
+  var amount = document.getElementById('qr-amount-input') ? document.getElementById('qr-amount-input').value : '';
+  _refreshQR(_currentBankId, _currentAccount, _currentName, amount);
+}
+
+var amtInput = document.getElementById('qr-amount-input');
+if (amtInput) amtInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') updateQRWithAmount();
+});
 </script>
 @endpush
