@@ -77,8 +77,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     // User Bank Accounts
     Route::post('/my-account/bank-accounts', [App\Http\Controllers\Frontend\AccountController::class, 'storeBankAccount'])->name('account.bank-accounts.store');
-    Route::put('/my-account/bank-accounts/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'updateBankAccount'])->name('account.bank-accounts.update');
     Route::delete('/my-account/bank-accounts/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'destroyBankAccount'])->name('account.bank-accounts.destroy');
+
 
     // Wishlist Routes
     Route::get('/wishlist', [App\Http\Controllers\Frontend\WishlistController::class, 'index'])->name('wishlist.index');
