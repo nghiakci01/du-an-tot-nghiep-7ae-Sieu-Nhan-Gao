@@ -3,6 +3,63 @@
 @section('title', 'Thêm Tài Khoản Ngân Hàng')
 
 @section('content')
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container .select2-selection--single {
+        height: 48px;
+        display: flex;
+        align-items: center;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 48px;
+        padding-left: 12px;
+        padding-right: 36px;
+        display: flex;
+        align-items: center;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 46px;
+    }
+    .bank-logo {
+        height: 24px;
+        width: auto;
+        max-width: 60px;
+        object-fit: contain;
+        margin-right: 12px;
+        vertical-align: middle;
+    }
+    .bank-item {
+        display: flex;
+        align-items: center;
+        padding: 4px 0;
+    }
+    [data-pc-theme="dark"] .select2-container .select2-selection--single {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    [data-pc-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #fff;
+    }
+    [data-pc-theme="dark"] .select2-dropdown {
+        background-color: #1a1a1a;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    [data-pc-theme="dark"] .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: #333;
+    }
+    [data-pc-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #4680ff;
+    }
+    [data-pc-theme="dark"] .select2-search input {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+</style>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -63,9 +120,36 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
         let banksData = [];
+
+        function formatBank(bank) {
+            if (!bank.id) {
+                return bank.text;
+            }
+            var logoUrl = $(bank.element).data('logo');
+            if(logoUrl) {
+                var $bank = $('<div class="bank-item"><img src="' + logoUrl + '" class="bank-logo" /> <span>' + bank.text + '</span></div>');
+                return $bank;
+            }
+            return bank.text;
+        }
+
+        // Khởi tạo Select2
+        $('#bank_select').select2({
+            placeholder: '-- Chọn Ngân Hàng --',
+            allowClear: true,
+            templateResult: formatBank,
+            templateSelection: formatBank,
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return "Không tìm thấy kết quả";
+                }
+            }
+        });
 
         // Fetch danh sách ngân hàng từ VietQR
         $.ajax({
@@ -81,20 +165,45 @@
                     const oldBankId = $('#bank_id').val();
                     let selectedBin = '';
 
+                    // Danh sách ưu tiên
+                    const preferredShortNames = [
+                        'Vietcombank',
+                        'BIDV',
+                        'Agribank',
+                        'VietinBank',
+                        'Techcombank',
+                        'MBBank', // VietQR uses MBBank
+                        'ACB',
+                        'Sacombank',
+                        'VPBank',
+                        'TPBank'
+                    ];
+
+                    let preferredBanks = [];
+                    let otherBanks = [];
+
                     banksData.forEach(function(bank) {
+                       if (preferredShortNames.includes(bank.shortName)) {
+                           preferredBanks.push(bank);
+                       } else {
+                           otherBanks.push(bank);
+                       }
+                    });
+
+                    // Sort preferred banks according to the order in the array
+                    preferredBanks.sort((a, b) => preferredShortNames.indexOf(a.shortName) - preferredShortNames.indexOf(b.shortName));
+
+                    let sortedBanks = preferredBanks.concat(otherBanks);
+
+                    sortedBanks.forEach(function(bank) {
                         let isSelected = (oldBankName == bank.name || oldBankId == bank.shortName) ? 'selected' : '';
                         if (isSelected) selectedBin = bank.bin;
-                        options += `<option value="${bank.bin}" data-shortname="${bank.shortName}" data-name="${bank.name}" ${isSelected}>${bank.shortName} - ${bank.name}</option>`;
+                        options += `<option value="${bank.bin}" data-logo="${bank.logo}" data-shortname="${bank.shortName}" data-name="${bank.name}" ${isSelected}>${bank.shortName} - ${bank.name}</option>`;
                     });
                     
                     $('#bank_select').html(options);
-
-                    // Khởi tạo Select2 nếu có
-                    if ($.fn.select2) {
-                        $('#bank_select').select2({
-                            theme: 'bootstrap-5'
-                        });
-                    }
+                    // Force refresh select2
+                    $('#bank_select').trigger('change.select2');
                 }
             },
             error: function() {
@@ -105,7 +214,7 @@
         // Khi thay đổi ngân hàng, cập nhật hidden inputs
         $('#bank_select').on('change', function() {
             let selectedOption = $(this).find('option:selected');
-            if(selectedOption.val() !== "") {
+            if(selectedOption.val() && selectedOption.val() !== "") {
                 $('#bank_name').val(selectedOption.data('name'));
                 $('#bank_id').val(selectedOption.data('shortname'));
                 checkAccountName(); // Kiểm tra lại tên nếu đã nhập stk
@@ -140,8 +249,8 @@
                     url: 'https://api.vietqr.io/v2/lookup',
                     method: 'POST',
                     headers: {
-                        'x-client-id': 'b85a3c26-f831-4a5f-abaa-ae57d25e40e2', // Public client id you can use for standard lookups or remove if unauthorized. You can also use sepay API or similar if you have credentials.
-                        'x-api-key': 'd102dc85-2eec-4752-9654-20a221f7e34a', // Public key for testing
+                        'x-client-id': 'b85a3c26-f831-4a5f-abaa-ae57d25e40e2',
+                        'x-api-key': 'd102dc85-2eec-4752-9654-20a221f7e34a',
                         'Content-Type': 'application/json'
                     },
                     data: JSON.stringify({
@@ -153,11 +262,9 @@
                             $('#account_name').val(res.data.accountName);
                         } else {
                             $('#account_name').val('');
-                            // Không tìm thấy hoặc lỗi, cho phép user tự nhập
                         }
                     },
                     error: function() {
-                        // Trả lại giá trị cũ nếu lỗi, để user tự xoay sở
                         if ($('#account_name').val() === 'Đang tra cứu...') {
                            $('#account_name').val('');
                         }
