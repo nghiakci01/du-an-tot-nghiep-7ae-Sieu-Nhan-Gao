@@ -42,4 +42,97 @@ window.update_active_menu = function() {
     }
 };
 window.update_active_menu(); // Call the function to set initial active menu
-for(var tc=document.querySelectorAll(".prod-likes .form-check-input"),t=0;t<tc.length;t++){var prod_like=tc[t];prod_like.addEventListener("change",function(e){var t=e.currentTarget;if(t.checked)t.parentNode.insertAdjacentHTML("beforeend",'<div class="pc-like"><div class="like-wrapper"><span><span class="pc-group"><span class="pc-dots"></span><span class="pc-dots"></span><span class="pc-dots"></span><span class="pc-dots"></span></span></span></div></div>'),t.parentNode.querySelector(".pc-like").classList.add("pc-like-animate"),setTimeout(function(){try{t.parentNode.querySelector(".pc-like").remove()}catch(e){console.error("Error removing like animation:",e)}},3e3);else try{t.parentNode.querySelector(".pc-like").remove()}catch(e){console.error("Error removing like animation:",e)}})}for(tc=document.querySelectorAll(".auth-main.v2 .img-brand"),t=0;t<tc.length;t++)tc[t].setAttribute("src","assets/images/logo-white.html");function main_layout_change(e){var t;document.getElementsByTagName("body")[0].setAttribute("data-pc-layout",e),document.querySelector(".pct-offcanvas")&&((t=document.querySelector(".theme-main-layout > a.active"))&&t.classList.remove("active"),t=document.querySelector(".theme-main-layout > a[data-value='"+e+"']"))&&t.classList.add("active")}function removeClassByPrefix(t,r){for(let e=0;e<t.classList.length;e++){var o=t.classList[e];o.startsWith(r)&&t.classList.remove(o)}}let slideUp=(e,t=0)=>{e.style.transitionProperty="height, margin, padding",e.style.transitionDuration=t+"ms",e.style.boxSizing="border-box",e.style.height=e.offsetHeight+"px",e.offsetHeight,e.style.overflow="hidden",e.style.height=0,e.style.paddingTop=0,e.style.paddingBottom=0,e.style.marginTop=0,e.style.marginBottom=0},slideDown=(e,t=0)=>{e.style.removeProperty("display");let r=window.getComputedStyle(e).display;"none"===r&&(r="block"),e.style.display=r;var o=e.offsetHeight;e.style.overflow="hidden",e.style.height=0,e.style.paddingTop=0,e.style.paddingBottom=0,e.style.marginTop=0,e.style.marginBottom=0,e.offsetHeight,e.style.boxSizing="border-box",e.style.transitionProperty="height, margin, padding",e.style.transitionDuration=t+"ms",e.style.height=o+"px",e.style.removeProperty("padding-top"),e.style.removeProperty("padding-bottom"),e.style.removeProperty("margin-top"),e.style.removeProperty("margin-bottom"),window.setTimeout(()=>{e.style.removeProperty("height"),e.style.removeProperty("overflow"),e.style.removeProperty("transition-duration"),e.style.removeProperty("transition-property")},t)};var slideToggle=(e,t=0)=>("none"===window.getComputedStyle(e).display?slideDown:slideUp)(e,t);
+
+// Global Checkbox and Bulk Action Handers (Pjax-compatible via delegation)
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'selectAll') {
+        var checkboxes = document.querySelectorAll('.product-checkbox');
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = e.target.checked;
+        }
+        if (window.updateBulkActionsVisibility) window.updateBulkActionsVisibility();
+    }
+    if (e.target && e.target.classList.contains('product-checkbox')) {
+        var checkboxes = document.querySelectorAll('.product-checkbox');
+        var selectAll = document.getElementById('selectAll');
+        if (selectAll) {
+            var allChecked = true;
+            var someChecked = false;
+            for (var j = 0; j < checkboxes.length; j++) {
+                if (checkboxes[j].checked) someChecked = true;
+                else allChecked = false;
+            }
+            selectAll.checked = allChecked;
+            selectAll.indeterminate = someChecked && !allChecked;
+        }
+        if (window.updateBulkActionsVisibility) window.updateBulkActionsVisibility();
+    }
+});
+
+window.updateBulkActionsVisibility = function() {
+    var checkedCount = document.querySelectorAll('.product-checkbox:checked').length;
+    var btnBulkDelete = document.querySelector('.btn-bulk-delete');
+    if (btnBulkDelete) {
+        btnBulkDelete.disabled = checkedCount === 0;
+    }
+};
+
+document.addEventListener('click', function(e) {
+    var bulkDeleteBtn = e.target.closest('.btn-bulk-delete');
+    if (bulkDeleteBtn) {
+        var checkedBoxes = document.querySelectorAll('.product-checkbox:checked');
+        if (checkedBoxes.length === 0) return;
+
+        if (window.Swal) {
+            Swal.fire({
+                title: 'Bạn có chắc chắn?',
+                text: 'Bạn đang chọn xóa ' + checkedBoxes.length + ' mục. Hành động này không thể hoàn tác!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Vâng, xóa chúng!',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var form = document.getElementById('bulk-delete-form');
+                    var inputsContainer = document.getElementById('bulk-delete-inputs');
+                    if (form && inputsContainer) {
+                        inputsContainer.innerHTML = '';
+                        checkedBoxes.forEach(function(cb) {
+                            var input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'ids[]';
+                            input.value = cb.value;
+                            inputsContainer.appendChild(input);
+                        });
+                        form.submit();
+                    }
+                }
+            });
+        }
+    }
+
+    var deleteAllBtn = e.target.closest('.btn-delete-all');
+    if (deleteAllBtn) {
+        if (window.Swal) {
+            Swal.fire({
+                title: 'CẢNH BÁO NGUY HIỂM!',
+                text: 'Bạn đang chọn XÓA TOÀN BỘ trong hệ thống. Hành động này KHÔNG THỂ HOÀN TÁC. Bạn có chắc chắn không?',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'XÓA TẤT CẢ',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var form = document.getElementById('delete-all-form');
+                    if (form) form.submit();
+                }
+            });
+        }
+    }
+});
+
+for(var tc=document.querySelectorAll(".prod-likes .form-check-input"),t=0;t<tc.length;t++){var prod_like=tc[t];prod_like.addEventListener("change",function(e){var t=e.currentTarget;if(t.checked)t.parentNode.insertAdjacentHTML("beforeend",'<div class="pc-like"><div class="like-wrapper"><span><span class="pc-group"><span class="pc-dots"></span><span class="pc-dots"></span><span class="pc-dots"></span><span class="pc-dots"></span></span></span></div></div>'),t.parentNode.querySelector(".pc-like").classList.add("pc-like-animate"),setTimeout(function(){try{t.parentNode.querySelector(".pc-like").remove()}catch(e){console.error("Error removing like animation:",e)}},3e3);else try{t.parentNode.querySelector(".pc-like").remove()}catch(e){console.error("Error removing like animation:",e)}})}for(tc=document.querySelectorAll(".auth-main.v2 .img-brand"),t=0;t<tc.length;t++)tc[t].setAttribute("src","assets/images/logo-white.html");function main_layout_change(e){var t;document.getElementsByTagName("body")[0].setAttribute("data-pc-layout",e),document.querySelector(".pct-offcanvas")&&((t=document.querySelector(".theme-main-layout > a.active"))&&t.classList.remove("active"),t=document.querySelector(".theme-main-layout > a[data-value='"+e+"']"))&&t.classList.add("active")}function removeClassByPrefix(t,r){for(let e=0;e<t.classList.length;e++){var o=t.classList[e];o.startsWith(r)&&t.classList.remove(o)}}let slideUp=(e,t=0)=>{e.style.transitionProperty="height, margin, padding",e.style.transitionDuration=t+"ms",e.style.boxSizing="border-box",e.style.height=e.offsetHeight+"px",e.offsetHeight,e.style.overflow="hidden",e.style.height=0,e.style.paddingTop=0,e.style.paddingBottom=0,e.style.marginTop=0,e.style.marginBottom=0},slideDown=(e,t=0)=>{e.style.removeProperty("display");let r=window.getComputedStyle(e).display;"none"===r&&(r="block"),e.style.display=r;var o=e.offsetHeight;e.style.overflow="hidden",e.style.height=0,e.style.paddingTop=0,e.style.paddingBottom=0,e.style.marginTop=0,e.style.marginBottom=0,e.offsetHeight,e.style.boxSizing="border-box",e.style.transitionProperty="height, margin, padding",e.style.transitionDuration=t+"ms",e.style.height=o+"px",e.style.removeProperty("padding-top"),e.style.removeProperty("padding-bottom"),e.style.removeProperty("margin-top"),e.style.removeProperty("margin-bottom"),window.setTimeout(()=>{e.style.removeProperty("height"),e.style.removeProperty("overflow"),e.style.removeProperty("transition-duration"),e.style.removeProperty("transition-property")},t)};var slideToggle=(e,t=0)=>("none"===window.getComputedStyle(e).display?slideDown:slideUp)(e,t);
