@@ -131,12 +131,13 @@
                             </div>
                             <div class="niceselect_option">
                                 <form class="select_option" action="{{ route('shop') }}" method="GET">
-                                    <select name="sort" id="short" onchange="this.form.submit()">
+                                    @foreach(request()->except('sort', 'page') as $key => $value)
+                                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                    @endforeach
+                                    <select name="sort" id="short">
                                         <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>{{ __('messages.sort_by_latest') }}</option>
                                         <option value="popularity" {{ request('sort') == 'popularity' ? 'selected' : '' }}>{{ __('messages.sort_by_popularity') }}</option>
                                         <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>{{ __('messages.sort_by_rating') }}</option>
-                                        <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>{{ __('messages.sort_by_price_asc') }}</option>
-                                        <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>{{ __('messages.sort_by_price_desc') }}</option>
                                         <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>{{ __('messages.product_name_az') }}</option>
                                     </select>
                                 </form>
@@ -191,3 +192,24 @@
     </div>
     <!--shop  area end-->
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        // Handle sorting change
+        $('#short').on('change', function() {
+            console.log('Sort triggered via standard change event');
+            $(this).closest('form').submit();
+        });
+
+        // Some versions of nice-select don't trigger standard change
+        // We can listen to the choice click as a backup
+        $(document).on('click', '.niceselect_option .option', function() {
+            var val = $(this).data('value');
+            if(val) {
+                $('#short').val(val).trigger('change');
+            }
+        });
+    });
+</script>
+@endpush
