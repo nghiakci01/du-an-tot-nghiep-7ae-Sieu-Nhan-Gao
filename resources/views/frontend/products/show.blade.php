@@ -900,6 +900,114 @@
     </section>
     <!--product section area end-->
 
+    <!-- AI Try On Modal -->
+    <div class="modal fade" id="aiTryOnModal" tabindex="-1" aria-labelledby="aiTryOnModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px; overflow: hidden; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                <div class="modal-header" style="background: linear-gradient(45deg, #111, #333); color: white; border-bottom: none; padding: 20px 25px;">
+                    <h5 class="modal-title" id="aiTryOnModalLabel" style="font-weight: 700; letter-spacing: 1px; margin: 0; color: white;">
+                        <i class="fa fa-magic text-warning" style="margin-right: 8px;"></i> {{ __('messages.ai_try_on_modal_title') ?? 'Trải nghiệm Phòng Thử Đồ AI' }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="row g-0">
+                        <!-- Left side: Instructions & Upload -->
+                        <div class="col-md-5 p-4" style="background: #f8f9fa; border-right: 1px solid #eee;">
+                            <h6 style="font-weight: 600; color: #ef233c; margin-bottom: 15px;">Hướng dẫn:</h6>
+                            <ol style="padding-left: 15px; font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 25px;">
+                                <li>Tải lên một bức ảnh rõ nét của bạn.</li>
+                                <li>Nên chọn ảnh chụp toàn thân hoặc bán thân thẳng đứng.</li>
+                                <li>Đợi AI xử lý trang phục (<span style="color: #ef233c; font-weight: bold;">~15-30 giây</span>).</li>
+                            </ol>
+                            
+                            <!-- Sample Guide (Hidden by default, shown on error) -->
+                            <div id="vton-guide-sample" style="display: none; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                                <h6 style="color: #856404; margin-bottom: 10px; font-size: 14px; font-weight: bold;">
+                                    <i class="fa fa-info-circle"></i> Ảnh mẫu hợp lệ:
+                                </h6>
+                                <p style="font-size: 13px; color: #856404; margin-bottom: 10px;">Vui lòng nhìn thẳng, rõ khuôn mặt và dáng người (không bị che khuất). Tránh ảnh phong cảnh hoặc chỉ có mỗi khuôn mặt.</p>
+                                <div class="d-flex justify-content-center">
+                                    <div style="width: 100px; height: 130px; background: #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 2px dashed #856404;">
+                                        <i class="fa fa-user" style="font-size: 40px; color: #aaa;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <form id="vtonForm">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <div class="mb-4">
+                                    <label for="user_image" class="form-label fw-bold" style="font-size: 14px;">Tải ảnh của bạn lên:</label>
+                                    <input class="form-control" type="file" id="user_image" name="user_image" accept="image/jpeg, image/png, image/webp" required style="font-size: 14px; padding: 10px;">
+                                </div>
+                                <button type="submit" class="btn w-100 py-3" id="btn-vton-submit" style="background: #111; color: white; font-weight: bold; border-radius: 6px; border: none; transition: 0.3s;">
+                                    Bắt đầu thử đồ
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Right side: Preview area -->
+                        <div class="col-md-7 p-4 d-flex flex-column align-items-center justify-content-center" style="min-height: 400px; background: #fff; position: relative;">
+                            <!-- Initial State -->
+                            <div id="vton-initial" class="text-center text-muted">
+                                <i class="fa fa-picture-o" style="font-size: 50px; color: #ddd; margin-bottom: 15px;"></i>
+                                <p style="font-size: 15px; margin: 0;">Kết quả thử đồ sẽ hiển thị tại đây</p>
+                            </div>
+                            
+                            <!-- Loading State -->
+                            <div id="vton-loading" class="text-center w-100 px-4" style="display: none;">
+                                <div class="spinner-border text-danger mb-4" role="status" style="width: 3.5rem; height: 3.5rem; border-width: 4px;">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                
+                                <h5 id="vton-progress-title" style="font-weight: 700; color: #111; margin-bottom: 15px; font-size: 18px;">Đang khởi tạo...</h5>
+                                
+                                <!-- Progress Bar -->
+                                <div class="progress mb-3" style="height: 10px; border-radius: 10px; background-color: #f0f0f0; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+                                    <div id="vton-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; background-color: #ef233c; transition: width 0.5s ease;"></div>
+                                </div>
+                                
+                                <p id="vton-progress-text" style="color: #666; font-size: 14px; margin-bottom: 8px;">Vui lòng đợi trong giây lát</p>
+                                <p style="font-size: 12px; color: #999; margin: 0; font-style: italic;">Quá trình này phụ thuộc vào tốc độ xử lý của AI (15-40s).</p>
+                            </div>
+                            
+                            <!-- Result State -->
+                            <div id="vton-result" class="text-center" style="display: none; width: 100%; perspective: 1000px;">
+                                <div id="vton-3d-card" style="display: inline-block; padding: 12px; background: linear-gradient(135deg, rgba(239, 35, 60, 0.05), rgba(255, 255, 255, 0.5)); backdrop-filter: blur(10px); border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.8); transform-style: preserve-3d; cursor: pointer; transition: all 0.3s ease;">
+                                    <img id="vton-result-image" src="" alt="Virtual Try On Result" style="max-height: 480px; max-width: 100%; border-radius: 10px; transform: translateZ(40px); filter: drop-shadow(0 15px 25px rgba(0,0,0,0.25)); transition: transform 0.3s ease;">
+                                    
+                                    <!-- Hiệu ứng đổ bóng dưới cùng cho cảm giác đứng trong không gian -->
+                                    <div style="position: absolute; bottom: -15px; left: 10%; right: 10%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 70%); filter: blur(5px); transform: translateZ(-20px); z-index: -1;"></div>
+                                </div>
+                                <div class="mt-4 d-flex justify-content-center gap-2">
+                                    <button type="button" id="vton-add-to-cart" class="btn text-white rounded-pill px-4 shadow-sm" style="background: linear-gradient(45deg, #ef233c, #d90429); border: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                        <i class="fa fa-shopping-cart"></i> Giữ ản phẩm & Thêm vào giỏ
+                                    </button>
+                                    <a id="vton-download" href="#" download="ai-try-on.jpg" class="btn btn-dark rounded-pill px-4 shadow-sm" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                        <i class="fa fa-download"></i> Tải ảnh 3D về
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0 py-3 d-flex justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-success me-2 d-none" id="vton-success-badge">
+                            <i class="fa fa-check-circle"></i> Đã thử xong
+                        </span>
+                        <small class="text-muted" id="vton-footer-note">Cảm ơn bạn đã tin dùng dịch vụ!</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                        <div id="vton-post-actions" class="d-none">
+                            <button type="button" id="vton-add-to-cart" class="btn btn-primary rounded-pill px-4 shadow-sm" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                <i class="fa fa-shopping-cart"></i> Giữ sản phẩm & Thêm vào giỏ
+                            </button>
+                            <a id="vton-download" href="#" download="ai-try-on.jpg" class="btn btn-dark rounded-pill px-4 shadow-sm" style="transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                <i class="fa fa-download"></i> Tải ảnh 3D về
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -1192,5 +1300,196 @@
                 });
             }
         });
+
+        function showSmartError(message, type = 'error') {
+            Swal.fire({
+                icon: type === 'error' ? 'error' : 'warning',
+                title: type === 'error' ? 'Lỗi ảnh' : 'Lưu ý ảnh',
+                text: message,
+                confirmButtonColor: '#ef233c',
+            });
+        }
+
+        document.getElementById('user_image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // 1. Kiểm tra dung lượng (Max 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                showSmartError("File quá lớn. Vui lòng tải ảnh dung lượng dưới 5MB.");
+                e.target.value = ''; // Reset input
+                return;
+            }
+
+            // 2. Kiểm tra định dạng (.jpg, .png)
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                showSmartError("Định dạng file không hỗ trợ. Vui lòng chọn ảnh JPG, PNG hoặc WEBP.");
+                e.target.value = '';
+                return;
+            }
+
+            // 3. Kiểm tra độ phân giải & Cảnh báo chụp toàn thân
+            const fileURL = window.URL || window.webkitURL;
+            const img = new Image();
+            img.onload = function() {
+                fileURL.revokeObjectURL(this.src); // Xóa bộ nhớ đệm
+                
+                // Kiểm tra resolution tối thiểu (600x800 hoặc 800x600 nếu chụp ngang)
+                const isMinResValid = (this.width >= 600 && this.height >= 800) || (this.width >= 800 && this.height >= 600);
+                if (!isMinResValid) {
+                    showSmartError("Ảnh quá nhỏ hoặc mờ. Vui lòng chụp ảnh có độ phân giải tối thiểu 600x800px hoặc 800x600px.");
+                    e.target.value = '';
+                    return;
+                }
+
+                // Cảnh báo thêm UX: Gợi ý đứng thẳng nếu khung ảnh là ảnh vuông (Square) hoặc quá dị dạng
+                const ratio = this.height / this.width;
+                if (ratio < 1.0) {
+                    // Ảnh đang nằm ngang (landscape) -> Báo với User là server sẽ tự dựng đứng ảnh hoặc cảnh báo
+                    console.info("Hệ thống sẽ tự động xoay ảnh về chiều dọc.");
+                } else if (ratio < 1.2) {
+                    // Ảnh gần dạng vuông -> Khả năng cao không thấy toàn thân
+                    showSmartError("Vui lòng đứng thẳng và chụp rõ toàn thân từ đầu đến chân để thử đồ chính xác nhất.", 'warning');
+                }
+            };
+            img.src = fileURL.createObjectURL(file);
+        });
+
+        // VTON handling
+        let progressInterval;
+        
+        function updateVtonProgress(percentage, title, text) {
+            $('#vton-progress-bar').css('width', percentage + '%').attr('aria-valuenow', percentage);
+            $('#vton-progress-title').text(title);
+            if(text) $('#vton-progress-text').text(text);
+        }
+
+        function startFakeProgress() {
+            let p = 5;
+            updateVtonProgress(p, "Đang khởi tạo...", "Đang kết nối tới AI Engine...");
+            
+            progressInterval = setInterval(() => {
+                if (p < 85) {
+                    p += Math.floor(Math.random() * 5) + 2;
+                    if (p > 85) p = 85;
+
+                    let title = "Đang xử lý...";
+                    let text = "AI đang phân tích trang phục...";
+                    if (p > 30) { title = "Đang ghép đồ..."; text = "Đang áp dụng công nghệ Virtual Try-On..."; }
+                    if (p > 60) { title = "Đang hoàn thiện..."; text = "Đang tối ưu hóa chất lượng ảnh..."; }
+
+                    updateVtonProgress(p, title, text);
+                }
+            }, 3000);
+        }
+        
+        $('#vtonForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = new FormData(this);
+            var btn = $('#btn-vton-submit');
+            
+            // Khởi tạo UI
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
+            $('#vton-initial, #vton-result').hide();
+            $('#vton-loading').fadeIn();
+            
+            // Reset Progress State
+            updateVtonProgress(10, 'Bước 1/4: Đang tải ảnh...', 'Đang gửi ảnh của bạn lên hệ thống an toàn.');
+            
+            // Giả lập Progress Bar (Client side simulated progress)
+            let currentProgress = 10;
+            clearInterval(progressInterval);
+            progressInterval = setInterval(() => {
+                if (currentProgress < 30) {
+                    currentProgress += 5;
+                    updateVtonProgress(currentProgress, 'Bước 2/4: Phân tích người mẫu...', 'AI đang quét cấu trúc cơ thể và trang phục cũ.');
+                } else if (currentProgress < 60) {
+                    currentProgress += 2;
+                    updateVtonProgress(currentProgress, 'Bước 3/4: Đang thử đồ (Renderer)...', 'Đang tính toán nếp gấp vải và ánh sáng.');
+                } else if (currentProgress < 95) {
+                    currentProgress += 1;
+                    updateVtonProgress(currentProgress, 'Bước 4/4: Hoàn thiện chi tiết...', 'Đang gộp hình ảnh mượt mà, sắp xong rồi...');
+                }
+            }, 1200);
+            
+            $.ajax({
+                url: '{{ route("api.vton.tryOn") }}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    btn.prop('disabled', false).text('Thử ảnh khác');
+                    $('#vton-loading').hide();
+                    clearInterval(progressInterval);
+                    
+                    if(response.success && response.image_url) {
+                        $('#vton-guide-sample').slideUp();
+                        updateVtonProgress(100, 'Hoàn thành!', 'Đã tạo xong ảnh thử đồ.');
+                        
+                        $('#vton-result-image').attr('src', response.image_url);
+                        $('#vton-download').attr('href', response.image_url);
+                        $('#vton-result').fadeIn(400, function() {
+                            // Init 3D Tilt Effect
+                            if (typeof VanillaTilt !== 'undefined') {
+                                VanillaTilt.init(document.querySelector("#vton-3d-card"), {
+                                    max: 12,
+                                    speed: 400,
+                                    glare: true,
+                                    "max-glare": 0.4,
+                                    perspective: 1000,
+                                    scale: 1.03
+                                });
+                            }
+                        });
+                    } else {
+                        $('#vton-initial').fadeIn();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Thử đồ thất bại',
+                            text: response.message || 'Đã có lỗi xảy ra',
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).text('Thử đồ lại');
+                    $('#vton-loading').hide();
+                    $('#vton-initial').fadeIn();
+                    clearInterval(progressInterval);
+                    
+                    let msg = 'Máy chủ AI hiện không phản hồi hoặc đang quá tải. Hãy thử lại.';
+                    
+                    if(xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                        // Hiển thị khung hướng dẫn nếu lỗi do không tìm thấy người
+                        if(xhr.responseJSON.error_code === 'NO_HUMAN_DETECTED') {
+                            $('#vton-guide-sample').slideDown();
+                        }
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi hệ thống',
+                        text: msg,
+                    });
+                }
+            });
+        });
+
+        // Add to cart from VTON modal
+        $('#vton-add-to-cart').on('click', function(e) {
+            e.preventDefault();
+            
+            // Close the modal
+            $('#aiTryOnModal').modal('hide');
+            
+            // Trigger the main add to cart button
+            // If variants exist, it will show the alert if not selected
+            $('#btn-add-to-cart').trigger('click');
+        });
+
     </script>
 @endsection
