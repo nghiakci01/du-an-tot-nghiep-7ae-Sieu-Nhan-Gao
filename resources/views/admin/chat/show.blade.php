@@ -118,7 +118,7 @@
                 <div class="page-header-title d-flex justify-content-between align-items-center">
                     <h2 class="mb-0">Hội thoại với {{ $user ? $user->name : substr($sessionId, 0, 8) }}</h2>
                     <div class="d-flex gap-2">
-                        <form action="{{ route('admin.chat.toggle_bot', $sessionId) }}" method="POST">
+                        <form action="{{ route('admin.chat.toggle_bot', $sessionId) }}" method="POST" class="no-pjax">
                             @csrf
                             <button type="submit" class="btn btn-sm rounded-pill shadow-sm px-4 {{ ($chatSession->is_bot_enabled ?? true) ? 'btn-success' : 'btn-secondary' }}">
                                 <i class="ti ti-robot me-1"></i> 
@@ -177,7 +177,7 @@
                             
                             <!-- Delete Message Action -->
                             <div class="ms-2">
-                                <form action="{{ route('admin.chat.destroy_message', $msg->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tin nhắn này?')">
+                                <form action="{{ route('admin.chat.destroy_message', $msg->id) }}" method="POST" class="no-pjax" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tin nhắn này?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-link text-danger p-0 d-flex align-items-center" title="Xóa tin nhắn">
@@ -190,7 +190,7 @@
                 @endforeach
             </div>
             <div class="chat-input-admin">
-                <form action="{{ route('admin.chat.reply', $sessionId) }}" method="POST">
+                <form action="{{ route('admin.chat.reply', $sessionId) }}" method="POST" class="no-pjax">
                     @csrf
                     <div class="admin-input-group">
                         <input type="text" name="message" class="form-control" placeholder="Nhập câu trả lời cho khách hàng..." required autocomplete="off">
@@ -207,6 +207,34 @@
     // Scroll to bottom
     const box = document.getElementById('admin-chat-box');
     box.scrollTop = box.scrollHeight;
+
+    if (typeof window.Echo !== 'undefined') {
+        window.Echo.channel('chat.{{ $sessionId }}')
+            .listen('.message.sent', (e) => {
+                const msg = e.chatMessage;
+                // Only append if it's not a staff message (since staff messages reload anyway, though we could make it ajax later)
+                if (msg.sender_type !== 'staff') {
+                    let senderName = msg.sender_type === 'user' ? 'KHÁCH HÀNG' : 'AI ASSISTANT';
+                    let timeParts = msg.created_at.split('T')[1].split(':');
+                    let timeStr = timeParts[0] + ':' + timeParts[1]; // Get HH:mm
+                    
+                    let html = `
+                        <div class="msg-wrapper ${msg.sender_type} position-relative">
+                            <div class="msg-bubble">
+                                ${msg.message}
+                            </div>
+                            <div class="msg-info d-flex justify-content-between align-items-center w-100 mt-2">
+                                <span class="flex-grow-1">
+                                    ${senderName} • ${timeStr}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    box.insertAdjacentHTML('beforeend', html);
+                    box.scrollTop = box.scrollHeight;
+                }
+            });
+    }
 </script>
 @endsection
 @endsection
