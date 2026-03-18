@@ -10001,12 +10001,12 @@ textarea:-ms-input-placeholder {
 }
 
 .product_info_button ul li a.active {
-  background: #ff6a28;
+  background: #1a1a1a;
   color: #ffffff;
 }
 
 .product_info_button ul li a:hover {
-  background: #ff6a28;
+  background: #1a1a1a;
   color: #ffffff;
 }
 
