@@ -17,11 +17,16 @@ class VnpayService
 
     public function __construct()
     {
-        $this->tmnCode = config('services.vnpay.tmn_code');
-        $this->hashSecret = config('services.vnpay.hash_secret');
-        $this->paymentUrl = config('services.vnpay.url');
-        $this->returnUrl = config('services.vnpay.return_url');
-        $this->apiUrl = config('services.vnpay.api_url', 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction');
+        // Read from DB settings first, fallback to config/env
+        $this->tmnCode     = \App\Models\Setting::get('vnpay_tmn_code')
+                              ?: config('services.vnpay.tmn_code', '');
+        $this->hashSecret  = \App\Models\Setting::get('vnpay_hash_secret')
+                              ?: config('services.vnpay.hash_secret', '');
+        $this->paymentUrl  = \App\Models\Setting::get('vnpay_url')
+                              ?: config('services.vnpay.url', 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html');
+        $this->returnUrl   = \App\Models\Setting::get('vnpay_return_url')
+                              ?: config('services.vnpay.return_url', url('/vnpay/return'));
+        $this->apiUrl      = config('services.vnpay.api_url', 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction');
     }
 
     /**
