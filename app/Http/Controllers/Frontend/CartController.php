@@ -28,11 +28,28 @@ class CartController extends Controller
             $total += $details['price'] * $details['quantity'];
 
             $product = Product::with(['category', 'variants.sizeRelationship', 'variants.colorRelationship'])->find($details['product_id']);
+            
+            // Set default flags
+            $details['is_deleted'] = false;
+            $details['is_inactive'] = false;
+            $details['variant_exists'] = true;
+            $details['is_out_of_stock'] = false;
+
             if ($product) {
+                // Check if product is active
+                if (!$product->is_active) {
+                    $details['is_inactive'] = true;
+                }
+
                 // Determine stock
-                $currentVariant = ProductVariant::find($id);
-                $details['stock_quantity'] = $currentVariant ? $currentVariant->stock_quantity : 0;
-                $details['is_out_of_stock'] = $details['stock_quantity'] <= 0;
+                $currentVariant = $product->variants->find($id);
+                if (!$currentVariant) {
+                    $details['variant_exists'] = false;
+                } else {
+                    $details['stock_quantity'] = $currentVariant->stock_quantity;
+                    $details['is_out_of_stock'] = $details['stock_quantity'] <= 0;
+                }
+
                 $details['category_slug'] = $product->category ? $product->category->slug : null;
 
 
@@ -72,14 +89,18 @@ class CartController extends Controller
                 } else {
                     $details['category_products'] = collect([]);
                 }
+            } else {
+                $details['is_deleted'] = true;
+                $details['variant_exists'] = false;
+                $details['is_out_of_stock'] = true;
             }
         }
 
-        // Sort cart to put out of stock items at the bottom
+        // Sort cart to put unavailable/out of stock items at the bottom
         uasort($cart, function ($a, $b) {
-            $aOut = isset($a['is_out_of_stock']) && $a['is_out_of_stock'] ? 1 : 0;
-            $bOut = isset($b['is_out_of_stock']) && $b['is_out_of_stock'] ? 1 : 0;
-            return $aOut <=> $bOut;
+            $aUnavailable = (isset($a['is_deleted']) && $a['is_deleted']) || (isset($a['is_inactive']) && $a['is_inactive']) || (isset($a['is_out_of_stock']) && $a['is_out_of_stock']) ? 1 : 0;
+            $bUnavailable = (isset($b['is_deleted']) && $b['is_deleted']) || (isset($b['is_inactive']) && $b['is_inactive']) || (isset($b['is_out_of_stock']) && $b['is_out_of_stock']) ? 1 : 0;
+            return $aUnavailable <=> $bUnavailable;
         });
 
         // Get applied coupon from session

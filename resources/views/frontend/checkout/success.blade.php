@@ -152,7 +152,6 @@
   $shippingFee = $order->shipping_fee ?? 0;
   $displayTotal = ($order->final_total > 0) ? $order->final_total : ($order->total_price + $shippingFee);
   $isBankTransfer = $order->payment_method == 'BANK_TRANSFER';
-  $isVnpay = $order->payment_method == 'VNPAY';
 @endphp
 
 <div class="success-page-wrapper">
@@ -212,7 +211,7 @@
             <div class="order-badge">
               @if($order->payment_method == 'COD') 💵 Thanh toán khi nhận hàng
               @elseif($order->payment_method == 'BANK_TRANSFER') 🏦 Chuyển khoản ngân hàng
-              @elseif($order->payment_method == 'VNPAY') 💳 Thanh toán VNPAY
+              @elseif($order->payment_method == 'WALLET') 💳 Ví Elite
               @else {{ $order->payment_method }}
               @endif
             </div>
@@ -375,27 +374,6 @@
             </div>
             @endif
 
-            {{-- VNPAY PAYMENT SUCCESS INFO --}}
-            @if($isVnpay)
-            <div class="col-12">
-              <div class="p-4 rounded-3" style="background: linear-gradient(135deg,#e8f5e9,#f1f8e9); border: 1.5px solid #a5d6a7;">
-                <div class="d-flex align-items-center gap-3">
-                  <div style="width:52px;height:52px;background:#28a745;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="bi bi-shield-check text-white" style="font-size:1.4rem;"></i>
-                  </div>
-                  <div>
-                    <div class="fw-bold" style="color:#1b5e20;font-size:1.05rem;">Thanh toán VNPAY thành công! 🎉</div>
-                    <div class="text-muted small">Số tiền: <strong class="text-danger">{{ number_format($displayTotal) }}&thinsp;đ</strong>
-                      @if($order->transaction_id)
-                        &nbsp;&bull;&nbsp; Mã giao dịch: <code>{{ $order->transaction_id }}</code>
-                      @endif
-                    </div>
-                    <div class="text-muted small mt-1">Trạng thái đơn hàng đã được cập nhật. Chúng tôi sẽ xử lý ngay!</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            @endif
 
           </div>
         </div>

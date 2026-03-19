@@ -168,24 +168,44 @@
                                         <tbody>
                                             @foreach($cart as $id => $details)
                                                 @php
-                                                    $isOutOfStock = isset($details['is_out_of_stock']) ? $details['is_out_of_stock'] : false;
+                                                    $isDeleted = isset($details['is_deleted']) && $details['is_deleted'];
+                                                    $isInactive = isset($details['is_inactive']) && $details['is_inactive'];
+                                                    $variantExists = isset($details['variant_exists']) ? $details['variant_exists'] : true;
+                                                    $isOutOfStock = isset($details['is_out_of_stock']) && $details['is_out_of_stock'];
+                                                    
+                                                    $isUnavailable = $isDeleted || $isInactive || !$variantExists || $isOutOfStock;
                                                 @endphp
-                                                <tr data-id="{{ $id }}" class="{{ $isOutOfStock ? 'opacity-50' : '' }}">
+                                                <tr data-id="{{ $id }}" class="{{ $isUnavailable ? 'cart-item-unavailable' : '' }}" style="{{ $isUnavailable ? 'filter: grayscale(1); opacity: 0.7;' : '' }}">
                                                     <td class="product_check" style="vertical-align: middle;">
-                                                        <input type="checkbox" class="check-item" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;" {{ $isOutOfStock ? 'disabled' : '' }}>
+                                                        <input type="checkbox" class="check-item {{ $isUnavailable ? 'item-unavailable' : '' }}" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;">
                                                     </td>
                                                     <td class="product_thumb" style="position: relative;">
-                                                        <a href="{{ route('product.detail', $details['slug']) }}">
+                                                        @if(!$isDeleted)
+                                                            <a href="{{ route('product.detail', $details['slug']) }}">
+                                                        @endif
                                                             <img src="{{ $details['image'] ? asset('storage/' . $details['image']) : asset('frontend-assets/img/s-product/product.jpg') }}"
                                                                 alt="{{ $details['name'] }}"
-                                                                style="width: 100px; height: 100px; object-fit: cover;">
-                                                            @if($isOutOfStock)
-                                                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.6); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 5px;">
-                                                                    <span class="badge bg-danger mb-1" style="font-size: 0.8rem; padding: 5px 10px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">{{ __('messages.out_of_stock') ?? 'Hết hàng' }}</span>
-                                                                    <a href="{{ isset($details['category_slug']) && $details['category_slug'] ? route('shop', ['category' => $details['category_slug']]) : route('shop') }}" class="btn btn-sm btn-dark" style="font-size: 0.65rem; padding: 2px 5px; white-space: nowrap; font-weight: normal;">Xem sản phẩm tương tự</a>
+                                                                style="width: 100px; height: 100px; object-fit: cover; {{ $isUnavailable ? 'filter: blur(1px);' : '' }}">
+                                                            @if($isUnavailable)
+                                                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2;">
+                                                                    @if($isDeleted)
+                                                                        <span class="badge bg-danger mb-1" style="font-size: 0.75rem;">Sản phẩm đã bị xóa</span>
+                                                                    @elseif($isInactive)
+                                                                        <span class="badge bg-warning text-dark mb-1" style="font-size: 0.75rem;">Ngừng kinh doanh</span>
+                                                                    @elseif(!$variantExists)
+                                                                        <span class="badge bg-secondary mb-1" style="font-size: 0.75rem;">Phiên bản không tồn tại</span>
+                                                                    @elseif($isOutOfStock)
+                                                                        <span class="badge bg-danger mb-1" style="font-size: 0.75rem;">{{ __('messages.out_of_stock') ?? 'Hết hàng' }}</span>
+                                                                    @endif
+                                                                    
+                                                                    @if(!$isDeleted)
+                                                                        <a href="{{ isset($details['category_slug']) && $details['category_slug'] ? route('shop', ['category' => $details['category_slug']]) : route('shop') }}" class="btn btn-sm btn-dark" style="font-size: 0.65rem; padding: 2px 5px; white-space: nowrap; font-weight: normal; margin-top: 5px;">Xem sản phẩm khác</a>
+                                                                    @endif
                                                                 </div>
                                                             @endif
-                                                        </a>
+                                                        @if(!$isDeleted)
+                                                            </a>
+                                                        @endif
                                                     </td>
                                                     <td class="product_name">
                                                         <a href="{{ route('product.detail', $details['slug']) }}" class="cart-product-link font-weight-bold" style="font-size: 16px;">{{ $details['name'] }}</a>
@@ -195,7 +215,7 @@
                                                             @if(isset($details['available_sizes_array']) && count($details['available_sizes_array']) > 0)
                                                                 <div class="d-inline-block me-2">
                                                                     <label class="small text-muted d-block">{{ __('messages.size') }}</label>
-                                                                    <select class="form-select form-select-sm variant-select size-select" data-type="size">
+                                                                    <select class="form-select form-select-sm variant-select size-select" data-type="size" {{ $isUnavailable ? 'disabled' : '' }}>
                                                                         @foreach($details['available_sizes_array'] as $key => $name)
                                                                             <option value="{{ $key }}" {{ (isset($details['size_id']) && $details['size_id'] == $key) || (empty($details['size_id']) && isset($details['size']) && $details['size'] == $key) ? 'selected' : '' }}>
                                                                                 {{ $name }}
@@ -208,7 +228,7 @@
                                                             @if(isset($details['available_colors_array']) && count($details['available_colors_array']) > 0)
                                                                 <div class="d-inline-block">
                                                                     <label class="small text-muted d-block">{{ __('messages.color') }}</label>
-                                                                    <select class="form-select form-select-sm variant-select color-select" data-type="color">
+                                                                    <select class="form-select form-select-sm variant-select color-select" data-type="color" {{ $isUnavailable ? 'disabled' : '' }}>
                                                                         @foreach($details['available_colors_array'] as $key => $name)
                                                                             <option value="{{ $key }}" {{ (isset($details['color_id']) && $details['color_id'] == $key) || (empty($details['color_id']) && isset($details['color']) && $details['color'] == $key) ? 'selected' : '' }}>
                                                                                 {{ $name }}
@@ -224,15 +244,23 @@
                                                     <td class="product-price">{{ number_format($details['price']) }} VND</td>
                                                     <td class="product_quantity">
                                                         @php
-                                                            $stockQty = isset($details['stock_quantity']) ? $details['stock_quantity'] : (\App\Models\ProductVariant::find($id)?->stock_quantity ?? 100);
+                                                            $stockQty = isset($details['stock_quantity']) ? $details['stock_quantity'] : 0;
                                                         @endphp
-                                                        @if($isOutOfStock)
+                                                        @if($isUnavailable)
                                                             <div class="quantity-selector disabled" style="background: #f8f9fa; border-color: #eee;">
                                                                 <button type="button" class="qty-btn" disabled>-</button>
-                                                                <input type="text" value="0" disabled style="background: #f8f9fa;">
+                                                                <input type="text" value="{{ $isDeleted || $isInactive || !$variantExists ? '0' : $details['quantity'] }}" disabled style="background: #f8f9fa;">
                                                                 <button type="button" class="qty-btn" disabled>+</button>
                                                             </div>
-                                                            <small class="d-block text-danger mt-1" style="font-size:11px;">Hết hàng</small>
+                                                            @if($isDeleted)
+                                                                <small class="d-block text-danger mt-1" style="font-size:11px;">Đã xóa</small>
+                                                            @elseif($isInactive)
+                                                                <small class="d-block text-warning mt-1" style="font-size:11px;">Ngừng kinh doanh</small>
+                                                            @elseif(!$variantExists)
+                                                                <small class="d-block text-danger mt-1" style="font-size:11px;">Hết phiên bản</small>
+                                                            @else
+                                                                <small class="d-block text-danger mt-1" style="font-size:11px;">Hết hàng</small>
+                                                            @endif
                                                         @else
                                                             <div class="quantity-selector">
                                                                 <button type="button" class="qty-btn minus">-</button>
@@ -642,15 +670,15 @@
 
         // Check All logic
         $('#check-all').on('change', function() {
-            $('.check-item:not(:disabled)').prop('checked', $(this).prop('checked'));
+            $('.check-item:not(.item-unavailable)').prop('checked', $(this).prop('checked'));
             toggleDeleteSelectedBtn();
             calculateCartTotal();
         });
 
         // Check Item logic
         $(document).on('change', '.check-item', function() {
-            var totalItems = $('.check-item:not(:disabled)').length;
-            var checkedItems = $('.check-item:not(:disabled):checked').length;
+            var totalItems = $('.check-item:not(.item-unavailable)').length;
+            var checkedItems = $('.check-item:not(.item-unavailable):checked').length;
             $('#check-all').prop('checked', totalItems === checkedItems && totalItems > 0);
             toggleDeleteSelectedBtn();
             calculateCartTotal();

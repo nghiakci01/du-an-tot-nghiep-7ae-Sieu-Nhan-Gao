@@ -38,11 +38,6 @@ Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutCont
 Route::post('/checkout/order/{id}/confirm-transfer', [App\Http\Controllers\Frontend\CheckoutController::class, 'confirmTransfer'])->name('checkout.confirm_transfer');
 Route::post('/checkout/order/{id}/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancelOrder'])->name('checkout.cancel_order');
 
-// VNPAY Routes
-Route::get('/vnpay/payment/{order_id}', [App\Http\Controllers\Frontend\PaymentController::class, 'createPayment'])->name('vnpay.payment');
-Route::get('/vnpay/callback', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('vnpay.callback');
-Route::get('/vnpay/return', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('vnpay.return');
-Route::get('/vnpay/ipn', [App\Http\Controllers\Frontend\PaymentController::class, 'ipn'])->name('vnpay.ipn');
 
 // Guest Order Tracking Routes
 Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'index'])->name('order-tracking.index');
