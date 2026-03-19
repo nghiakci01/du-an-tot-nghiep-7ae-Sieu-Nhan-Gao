@@ -151,30 +151,34 @@
 
                                             <hr>
 
-                                            <!-- Form Hành Động -->
+                                            <!-- Khu vực Hành Động -->
                                             @if($req->isPending())
-                                                <h6><strong>Xử lý Yêu cầu (Duyệt cho trả hàng / Từ chối)</strong></h6>
-                                                <form method="POST" id="actionForm{{$req->id}}">
-                                                    @csrf
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="text-muted small d-block">TRẠNG THÁI</label>
-                                                        <span class="badge {{ $req->status_badge }}">{{ $req->status_text }}</span>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                                            <label class="form-label mb-0">Phản hồi / Mã vận chuyển Gửi trả <span class="text-danger">*</span></label>
-                                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="document.getElementById('admin_note_{{ $req->id }}').value = 'Mã KS-RET-{{ $req->order_id }}-{{ strtoupper(Str::random(5)) }}\nVui lòng gửi hàng về địa chỉ kho, ghi rõ mã này trên kiện hàng.'">
-                                                                <i class="fas fa-magic"></i> Tạo mã tự động
-                                                            </button>
+                                                <div class="card border-warning mb-3">
+                                                    <div class="card-body">
+                                                        <h6 class="fw-bold text-warning"><i class="fas fa-edit me-1"></i> Xử lý Yêu cầu (Duyệt / Từ chối)</h6>
+                                                        <div class="mb-3">
+                                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                <label class="form-label mb-0 small fw-bold">Phản hồi / Mã vận chuyển Gửi trả <span class="text-danger">*</span></label>
+                                                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="document.getElementById('admin_note_{{ $req->id }}').value = 'Mã KS-RET-{{ $req->order_id }}-{{ strtoupper(Str::random(5)) }}\nVui lòng gửi hàng về địa chỉ kho, ghi rõ mã này trên kiện hàng.'">
+                                                                    <i class="fas fa-magic"></i> Tạo mã tự động
+                                                                </button>
+                                                            </div>
+                                                            <textarea id="admin_note_{{ $req->id }}" name="admin_note" class="form-control" rows="3" required placeholder="Ví dụ mã vận chuyển GHTK, hướng dẫn đóng gói... hoặc lý do từ chối"></textarea>
                                                         </div>
-                                                        <textarea id="admin_note_{{ $req->id }}" name="admin_note" class="form-control" rows="3" required placeholder="Ví dụ mã vận chuyển GHTK, hướng dẫn đóng gói... hoặc lý do từ chối"></textarea>
-                                                        <small class="text-muted">Khách hàng sẽ nhìn thấy nội dung này.</small>
+                                                        <div class="d-flex justify-content-end gap-2">
+                                                            <form action="{{ route('admin.returns.reject', $req->id) }}" method="POST" class="d-inline">
+                                                                @csrf
+                                                                <input type="hidden" name="admin_note" id="admin_note_reject_val_{{ $req->id }}">
+                                                                <button type="submit" class="btn btn-outline-danger" onclick="const note = document.getElementById('admin_note_{{ $req->id }}').value; if(!note){alert('Vui lòng nhập phản hồi!'); return false;} document.getElementById('admin_note_reject_val_{{ $req->id }}').value = note; return confirm('Xác nhận từ chối yêu cầu này?');">Từ chối</button>
+                                                            </form>
+                                                            <form action="{{ route('admin.returns.approve', $req->id) }}" method="POST" class="d-inline">
+                                                                @csrf
+                                                                <input type="hidden" name="admin_note" id="admin_note_approve_val_{{ $req->id }}">
+                                                                <button type="submit" class="btn btn-success" onclick="const note = document.getElementById('admin_note_{{ $req->id }}').value; if(!note){alert('Vui lòng nhập phản hồi!'); return false;} document.getElementById('admin_note_approve_val_{{ $req->id }}').value = note; return confirm('Chấp nhận duyệt yêu cầu này?');">Đồng ý & Duyệt</button>
+                                                            </form>
+                                                        </div>
                                                     </div>
-                                                    <div class="d-flex justify-content-end gap-2">
-                                                        <button type="submit" formaction="{{ route('admin.returns.reject', $req->id) }}" class="btn btn-outline-danger" onclick="return confirm('Xác nhận từ chối yêu cầu?');">Từ chối Yêu cầu</button>
-                                                        <button type="submit" formaction="{{ route('admin.returns.approve', $req->id) }}" class="btn btn-success" onclick="return confirm('Chấp nhận cho trả hàng?');">Đồng ý (Chờ gửi hàng)</button>
-                                                    </div>
-                                                </form>
+                                                </div>
                                             @elseif($req->isApproved())
                                                 <h6><strong>Xử lý tiếp theo</strong></h6>
                                                 <div class="alert alert-info">Bạn đã duyệt yêu cầu. Bây giờ bạn có thể theo dõi hàng gửi về hoặc <b>Hoàn tiền ngay</b> nếu muốn.</div>
