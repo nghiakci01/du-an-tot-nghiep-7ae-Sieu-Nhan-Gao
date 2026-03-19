@@ -70,99 +70,12 @@
                             </div>
                         </div>
 
-                        {{-- ====== VNPAY SETTINGS ====== --}}
-                        <hr class="my-4">
-                        <h6 class="mb-3 text-primary">
-                            <img src="https://sandbox.vnpayment.vn/paymentv2/images/img/logoVNPAY.svg" alt="VNPAY" style="height:22px; margin-right:6px;">
-                            Cấu hình cổng thanh toán VNPAY
-                        </h6>
-                        <div class="alert alert-info py-2 mb-3">
-                            <i class="ti ti-info-circle"></i>
-                            Lấy thông tin tại:
-                            <a href="https://sandbox.vnpayment.vn/devreg/" target="_blank">VNPAY Sandbox</a> (thử nghiệm)
-                            hoặc <a href="https://merchant.vnpay.vn" target="_blank">VNPAY Merchant Portal</a> (thực tế).
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Môi trường</label>
-                                <select class="form-select" name="vnpay_env" id="vnpay_env_select">
-                                    <option value="sandbox" {{ ($settings['vnpay_env'] ?? 'sandbox') === 'sandbox' ? 'selected' : '' }}>
-                                        🧪 Sandbox (Test)
-                                    </option>
-                                    <option value="production" {{ ($settings['vnpay_env'] ?? '') === 'production' ? 'selected' : '' }}>
-                                        🚀 Production (Thực tế)
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">TMN Code <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control font-monospace" name="vnpay_tmn_code"
-                                    placeholder="Ví dụ: ABCD1234"
-                                    value="{{ $settings['vnpay_tmn_code'] ?? '' }}">
-                                <small class="text-muted">Mã Terminal/Merchant từ VNPAY cấp.</small>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Hash Secret Key <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="password" class="form-control font-monospace" name="vnpay_hash_secret"
-                                        id="vnpay_hash_secret"
-                                        placeholder="••••••••••••••••••••"
-                                        value="{{ $settings['vnpay_hash_secret'] ?? '' }}">
-                                    <button type="button" class="btn btn-outline-secondary" id="toggleSecret"
-                                        onclick="toggleVnpaySecret()">
-                                        <i class="ti ti-eye" id="toggleSecretIcon"></i>
-                                    </button>
-                                </div>
-                                <small class="text-muted">Khóa bí mật do VNPAY cấp để tạo chữ ký.</small>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Payment URL</label>
-                                <input type="text" class="form-control font-monospace" name="vnpay_url"
-                                    id="vnpay_url_input"
-                                    placeholder="https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-                                    value="{{ $settings['vnpay_url'] ?? '' }}">
-                                <small class="text-muted">URL cổng thanh toán (tự động điền theo môi trường).</small>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Return URL</label>
-                                <input type="text" class="form-control" name="vnpay_return_url"
-                                    value="{{ $settings['vnpay_return_url'] ?? url('/vnpay/return') }}">
-                                <small class="text-muted">URL VNPAY sẽ redirect sau thanh toán.</small>
-                            </div>
-                        </div>
-
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy"></i> Lưu Cấu
-                                Hình</button>
+                            <button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy"></i> Lưu Cấu Hình</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        // Auto-fill URL based on selected environment
-        const sandboxUrl = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
-        const productionUrl = 'https://pay.vnpay.vn/vpcpay.html';
-
-        document.getElementById('vnpay_env_select').addEventListener('change', function() {
-            const urlInput = document.getElementById('vnpay_url_input');
-            if (!urlInput.value || urlInput.value === sandboxUrl || urlInput.value === productionUrl) {
-                urlInput.value = this.value === 'production' ? productionUrl : sandboxUrl;
-            }
-        });
-
-        function toggleVnpaySecret() {
-            const input = document.getElementById('vnpay_hash_secret');
-            const icon = document.getElementById('toggleSecretIcon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'ti ti-eye-off';
-            } else {
-                input.type = 'password';
-                icon.className = 'ti ti-eye';
-            }
-        }
-    </script>
 @endsection

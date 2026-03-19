@@ -205,7 +205,7 @@
             let selectedOption = $(this).find('option:selected');
             if(selectedOption.val() && selectedOption.val() !== "") {
                 $('#bank_name').val(selectedOption.data('name'));
-                $('#bank_id').val(selectedOption.data('shortname'));
+                $('#bank_id').val(selectedOption.val());  // Use BIN instead of shortname
                 checkAccountName(); // Kiểm tra lại tên nếu đã nhập stk
             } else {
                 $('#bank_name').val('');

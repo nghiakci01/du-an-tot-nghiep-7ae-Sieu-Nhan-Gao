@@ -551,36 +551,6 @@
                                     <div class="payment_method">
                                         <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #007bff;">Phương thức thanh toán</h3>
                                         
-                                        @auth
-                                        <div class="panel-default mb-3 p-3 border rounded @if(auth()->user()->wallet_balance < $finalTotal) bg-light text-muted @else border-primary bg-light-primary @endif" style="transition: all 0.3s ease;">
-                                            <div class="d-flex justify-content-between align-items-center mb-0">
-                                                <div class="d-flex align-items-center">
-                                                    <input id="payment_wallet" name="payment_method" type="radio" value="WALLET" 
-                                                        style="width:20px;height:20px;"
-                                                        @if(auth()->user()->wallet_balance < $finalTotal) disabled @else required @endif />
-                                                    <label for="payment_wallet" class="mb-0 ms-2 fw-bold" style="cursor:pointer; font-size: 1.1rem;">
-                                                        Ví Elite (Thanh toán tự động)
-                                                    </label>
-                                                </div>
-                                                <div class="text-end">
-                                                    <span class="d-block small text-muted">Số dư hiện tại</span>
-                                                    <span class="fw-bold @if(auth()->user()->wallet_balance < $finalTotal) text-danger @else text-success @endif" style="font-size: 1.1rem;">
-                                                        {{ number_format(auth()->user()->wallet_balance) }}đ
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            @if(auth()->user()->wallet_balance < $finalTotal)
-                                            <div class="mt-2 text-danger small">
-                                                <i class="fa fa-exclamation-triangle me-1"></i> Số dư không đủ để thanh toán đơn hàng này.
-                                                <a href="{{ route('account.index') }}#wallet" class="text-primary fw-bold ms-1">Nạp thêm tiền</a>
-                                            </div>
-                                            @else
-                                            <div class="mt-2 text-success small">
-                                                <i class="fa fa-check-circle me-1"></i> Đơn hàng sẽ được tự động xác nhận sau khi đặt thành công.
-                                            </div>
-                                            @endif
-                                        </div>
-                                        @endauth
 
                                         <div class="panel-default">
                                             <input id="payment_cod" name="payment_method" type="radio" value="COD"
@@ -594,45 +564,6 @@
                                             </div>
                                         </div>
 
-                                        <div class="panel-default mt-3">
-                                            <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY"
-                                                data-bs-target="#method_vnpay" required />
-                                            <label for="payment_vnpay" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_vnpay"
-                                                aria-controls="method_vnpay">
-                                                Cổng thanh toán VNPAY
-                                            </label>
-                                            <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
-                                                <div class="card-body1 p-3 bg-light rounded mt-2">
-                                                    <p class="mb-2 fw-bold small text-primary">Chọn phương thức thanh toán qua VNPAY:</p>
-                                                    <div class="vnpay-options d-flex flex-column gap-2">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="radio" name="bank_code" id="vnp_any" value="" checked>
-                                                            <label class="form-check-label small" for="vnp_any">
-                                                                Cổng VNPAY (Tự chọn ngân hàng sau)
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="radio" name="bank_code" id="vnp_qr" value="VNPAYQR">
-                                                            <label class="form-check-label small" for="vnp_qr">
-                                                                Thanh toán qua ứng dụng hỗ trợ VNPAYQR
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="radio" name="bank_code" id="vnp_atm" value="VNBANK">
-                                                            <label class="form-check-label small" for="vnp_atm">
-                                                                Thẻ ATM / Tài khoản ngân hàng nội địa
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="radio" name="bank_code" id="vnp_intl" value="INTCARD">
-                                                            <label class="form-check-label small" for="vnp_intl">
-                                                                Thẻ thanh toán quốc tế (Visa, Mastercard, JCB)
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
 
                                         <div class="panel-default mt-3">
                                             <input id="payment_bank" name="payment_method" type="radio" value="BANK_TRANSFER"

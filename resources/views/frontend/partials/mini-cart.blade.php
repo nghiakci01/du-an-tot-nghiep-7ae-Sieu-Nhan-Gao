@@ -23,17 +23,34 @@
         @if(count($cart) > 0)
             <div class="cart_items_wrapper" style="max-height: 335px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
                 @foreach($cart as $id => $details)
-                <div class="cart_item {{ $loop->first ? 'top' : ($loop->last ? 'bottom' : '') }}">
-                    <div class="cart_img" style="width: 60px; height: 60px; flex: 0 0 60px;">
-                        <a href="{{ route('product.detail', $details['slug']) }}">
+                @php
+                    $isUnavailable = (isset($details['is_deleted']) && $details['is_deleted']) || 
+                                    (isset($details['is_inactive']) && $details['is_inactive']) || 
+                                    (isset($details['is_out_of_stock']) && $details['is_out_of_stock']);
+                @endphp
+                <div class="cart_item {{ $loop->first ? 'top' : ($loop->last ? 'bottom' : '') }}" style="{{ $isUnavailable ? 'opacity: 0.6; filter: grayscale(1);' : '' }}">
+                    <div class="cart_img" style="width: 60px; height: 60px; flex: 0 0 60px; position: relative;">
+                        <a href="{{ isset($details['slug']) ? route('product.detail', $details['slug']) : 'javascript:void(0)' }}">
                             <img src="{{ $details['image'] ? asset('storage/' . $details['image']) : asset('frontend-assets/img/s-product/product.jpg') }}" 
                                  alt="{{ $details['name'] }}" 
                                  style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #f1f1f1;">
+                            @if($isUnavailable)
+                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; color: #d00;">
+                                    BỊ LỖI
+                                </div>
+                            @endif
                         </a>
                     </div>
                     <div class="cart_info" style="padding-left: 15px;">
-                        <a href="{{ route('product.detail', $details['slug']) }}" style="font-size: 13px;">{{ Str::limit($details['name'], 25) }}</a>
+                        <a href="{{ isset($details['slug']) ? route('product.detail', $details['slug']) : 'javascript:void(0)' }}" style="font-size: 13px;">{{ Str::limit($details['name'], 25) }}</a>
                         <span style="font-size: 12px;">{{ $details['quantity'] }}x {{ number_format($details['price']) }} VND</span>
+                        @if(isset($details['is_deleted']) && $details['is_deleted'])
+                            <p class="text-danger m-0" style="font-size: 10px;">Đã bị xóa</p>
+                        @elseif(isset($details['is_inactive']) && $details['is_inactive'])
+                            <p class="text-warning m-0" style="font-size: 10px;">Ngừng bán</p>
+                        @elseif(isset($details['is_out_of_stock']) && $details['is_out_of_stock'])
+                            <p class="text-danger m-0" style="font-size: 10px;">Hết hàng</p>
+                        @endif
                     </div>
                     <div class="cart_remove">
                         <a href="javascript:void(0)" class="mini-cart-remove" data-id="{{ $id }}">

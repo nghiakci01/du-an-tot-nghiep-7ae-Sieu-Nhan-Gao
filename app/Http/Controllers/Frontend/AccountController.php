@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Review;
-use App\Models\UserBankAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -31,23 +30,14 @@ class AccountController extends Controller
                 ->whereRaw('used_count < usage_limit')
                 ->get();
             $wishlists            = $user->wishlists()->with('product')->get();
-            $userBankAccounts     = $user->bankAccounts()->get();
-            $walletTransactions   = $user->walletTransactions()->take(20)->get();
-            $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();
-            $walletWithdrawRequests = $user->walletWithdrawRequests()->take(10)->get();
         } else {
             $orders   = collect();
             $coupons  = collect();
             $wishlists = collect();
-            $userBankAccounts    = collect();
-            $walletTransactions  = collect();
-            $walletTopupRequests = collect();
-            $walletWithdrawRequests = collect();
         }
 
         return view('frontend.account.index', compact(
-            'user', 'orders', 'coupons', 'wishlists',
-            'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests'
+            'user', 'orders', 'coupons', 'wishlists'
         ));
 
     }
@@ -201,71 +191,6 @@ class AccountController extends Controller
             ->with('success', 'Yêu cầu hoàn trả của bạn đã được gửi và đang chờ xử lý.');
     }
 
-    // ===== USER BANK ACCOUNTS =====
-
-    public function storeBankAccount(Request $request)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-
-        $request->validate([
-            'bank_name'      => 'required|string|max:100',
-            'bank_id'        => 'required|string|max:50',
-            'account_number' => 'required|string|max:100',
-            'account_name'   => 'required|string|max:255',
-        ]);
-
-        if ($request->boolean('is_default')) {
-            $user->bankAccounts()->update(['is_default' => false]);
-        }
-
-        $user->bankAccounts()->create([
-            'bank_name'      => $request->bank_name,
-            'bank_id'        => $request->bank_id,
-            'account_number' => $request->account_number,
-            'account_name'   => $request->account_name,
-            'is_default'     => $request->boolean('is_default'),
-        ]);
-
-        return redirect()->back()->with('success', 'Thêm tài khoản ngân hàng thành công!');
-    }
-
-    public function updateBankAccount(Request $request, $id)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $bank = $user->bankAccounts()->findOrFail($id);
-
-        $request->validate([
-            'bank_name'      => 'required|string|max:100',
-            'bank_id'        => 'required|string|max:50',
-            'account_number' => 'required|string|max:100',
-            'account_name'   => 'required|string|max:255',
-        ]);
-
-        if ($request->boolean('is_default')) {
-            $user->bankAccounts()->where('id', '!=', $id)->update(['is_default' => false]);
-        }
-
-        $bank->update([
-            'bank_name'      => $request->bank_name,
-            'bank_id'        => $request->bank_id,
-            'account_number' => $request->account_number,
-            'account_name'   => $request->account_name,
-            'is_default'     => $request->boolean('is_default'),
-        ]);
-
-        return redirect()->back()->with('success', 'Cập nhật tài khoản ngân hàng thành công!');
-    }
-
-    public function destroyBankAccount($id)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $user->bankAccounts()->findOrFail($id)->delete();
-
-        return redirect()->back()->with('success', 'Đã xóa tài khoản ngân hàng.');
-    }
 
     /**
      * Khách hàng nộp thông tin vận chuyển khi hàng hoàn đã được Duyệt (Approved)

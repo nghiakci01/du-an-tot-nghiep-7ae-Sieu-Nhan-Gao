@@ -6,7 +6,6 @@ use App\Mail\OrderAutoCancelledMail;
 use App\Mail\PaymentReminderMail;
 use App\Models\Order;
 use App\Services\OrderService;
-use App\Services\VnpayService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -29,8 +28,7 @@ class CheckUnpaidOrders extends Command
     protected $description = 'Kiểm tra và nhắc nhở / tự động hủy đơn hàng thanh toán online chưa thanh toán';
 
     public function __construct(
-        protected OrderService $orderService,
-        protected VnpayService $vnpayService
+        protected OrderService $orderService
     ) {
         parent::__construct();
     }
@@ -96,10 +94,7 @@ class CheckUnpaidOrders extends Command
         try {
             $paymentUrl = '';
             
-            // Generate link for VNPAY
-            if ($order->payment_method === 'VNPAY') {
-                $paymentUrl = $this->vnpayService->createPaymentUrl($order, '127.0.0.1');
-            }
+            // No online payment URL needed after VNPAY removal
 
             if ($order->email) {
                 Mail::to($order->email)->send(new PaymentReminderMail($order, $paymentUrl, $step));

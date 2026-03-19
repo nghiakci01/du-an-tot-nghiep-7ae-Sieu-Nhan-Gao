@@ -18,13 +18,7 @@ Hệ thống ghi nhận đơn hàng **#{{ $order->id }}** của bạn đang ở 
 
 ## Chi tiết số tiền cần thanh toán
 **Tổng cộng:** <span style="color:#d32f2f;font-size:18px;font-weight:bold;">{{ number_format($order->final_total) }} đ</span>
-**Phương thức:** {{ $order->payment_method == 'VNPAY' ? 'Thanh toán quét mã VNPAY' : 'Chuyển khoản / Phương thức định sẵn' }}
-
-@if($paymentUrl)
-<x-mail::button :url="$paymentUrl" color="success">
-    Nhấn vào đây để Thanh toán ngay
-</x-mail::button>
-@endif
+**Phương thức:** {{ $order->payment_method == 'COD' ? 'Thanh toán khi nhận hàng' : 'Chuyển khoản / Phương thức định sẵn' }}
 
 Nếu bạn gặp khó khăn trong quá trình thanh toán, vui lòng liên hệ với chúng tôi qua email này hoặc hotline để được hỗ trợ.
 
