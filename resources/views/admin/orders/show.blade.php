@@ -162,6 +162,22 @@
                 <h4 class="mb-3">
                     <span class="badge {{ $order->status_badge }} px-3 py-2 fs-6 shadow-sm">{{ $order->status_text }}</span>
                 </h4>
+
+                @if($order->returnRequest)
+                    <div class="alert alert-warning text-start mb-3">
+                        <h6 class="alert-heading fw-bold"><i class="feather icon-rotate-ccw me-1"></i> Đơn hàng có yêu cầu hoàn trả</h6>
+                        <hr class="my-2">
+                        <p class="mb-1 small">Trạng thái: 
+                            <span class="badge bg-{{ $order->returnRequest->status == 'completed' ? 'success' : ($order->returnRequest->status == 'rejected' ? 'danger' : 'warning text-dark') }}">
+                                {{ $order->returnRequest->status }}
+                            </span>
+                        </p>
+                        <p class="mb-2 small">Số tiền hoàn: <strong>{{ number_format($order->returnRequest->refund_amount) }}đ</strong></p>
+                        <a href="{{ route('admin.returns.index', ['order_id' => $order->id]) }}" class="btn btn-sm btn-info w-100">
+                            <i class="feather icon-external-link"></i> Xem chi tiết yêu cầu
+                        </a>
+                    </div>
+                @endif
                 
                 @if($order->canTransitionTo($order->status)) 
                 @php $allowed = $order->getAllowedTransitions(); @endphp
