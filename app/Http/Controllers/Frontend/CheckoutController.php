@@ -275,13 +275,16 @@ class CheckoutController extends Controller
             $admins = User::getAdmins();
             Notification::send($admins, new NewOrderNotification($order));
 
-            // Clear only selected items and session
-            if ($selectedIds && is_array($selectedIds)) {
-                $this->cartService->removeItems($selectedIds);
-            } else {
-                $this->cartService->clearCart();
+            // Clear only selected items and session for non-VNPAY orders
+            // For VNPAY, we keep the cart until payment is successful
+            if ($request->payment_method !== 'VNPAY') {
+                if ($selectedIds && is_array($selectedIds)) {
+                    $this->cartService->removeItems($selectedIds);
+                } else {
+                    $this->cartService->clearCart();
+                }
+                session()->forget(['coupon_code', 'discount_amount', 'selected_checkout_ids']);
             }
-            session()->forget(['coupon_code', 'discount_amount', 'selected_checkout_ids']);
 
             // Nếu chọn VNPAY -> redirect sang trang thanh toán VNPAY
             if ($request->payment_method === 'VNPAY') {

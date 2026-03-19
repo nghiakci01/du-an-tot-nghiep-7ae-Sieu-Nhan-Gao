@@ -75,6 +75,15 @@ class PaymentController extends Controller
                 session(['verified_order_id' => $orderId]);
             }
 
+            // Clear the cart upon successful VNPAY payment
+            $selectedIds = session('selected_checkout_ids');
+            if ($selectedIds && is_array($selectedIds)) {
+                app(\App\Services\CartService::class)->removeItems($selectedIds);
+            } else {
+                app(\App\Services\CartService::class)->clearCart();
+            }
+            session()->forget(['coupon_code', 'discount_amount', 'selected_checkout_ids']);
+
             return redirect()->route('checkout.success', $orderId)
                 ->with('success', 'Thanh toán VNPAY thành công! 🎉');
         }
