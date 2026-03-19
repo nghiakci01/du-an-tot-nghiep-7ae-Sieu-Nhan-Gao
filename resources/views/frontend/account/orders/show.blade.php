@@ -155,9 +155,9 @@
 @php
   $shippingFee  = $order->shipping_fee ?? 0;
   $displayTotal = ($order->final_total > 0) ? $order->final_total : ($order->total_price + $shippingFee);
-  $statusSteps  = ['pending','confirmed','shipped','completed'];
+  $statusSteps  = ['pending','confirmed','shipped','completed','returned'];
   $curIdx       = array_search(strtolower($order->status), $statusSteps);
-  $isCancelled  = in_array(strtolower($order->status), ['cancelled','failed','returned']);
+  $isCancelled  = in_array(strtolower($order->status), ['cancelled','failed']);
   $progressW    = ($curIdx !== false && !$isCancelled) ? ($curIdx / (count($statusSteps)-1)) * 84 : 0;
   $pmLabel = match($order->payment_method) {
     'COD'           => '💵 Thanh toán khi nhận hàng (COD)',
@@ -213,10 +213,10 @@
     @if(!$isCancelled)
     <div class="status-track mt-4 pb-1">
       <div class="track-fill" style="--track-width: {{ $progressW }}%; width: var(--track-width);"></div>
-      @foreach(['pending'=>['Chờ xác nhận','bi-clipboard-check'],'confirmed'=>['Đã xác nhận','bi-shield-check'],'shipped'=>['Đang giao','bi-truck'],'completed'=>['Hoàn thành','bi-house-check']] as $s=>[$lbl,$icn])
+      @foreach(['pending'=>['Chờ xác nhận','bi-clipboard-check'],'confirmed'=>['Đã xác nhận','bi-shield-check'],'shipped'=>['Đang giao','bi-truck'],'completed'=>['Hoàn thành','bi-house-check'],'returned'=>['Hoàn hàng','bi-arrow-return-left']] as $s=>[$lbl,$icn])
         @php $idx = array_search($s, $statusSteps); $cls = $idx < $curIdx ? 'done' : ($idx == $curIdx ? 'active' : 'idle'); @endphp
         <div class="track-step">
-          <div class="track-dot {{ $cls }}"><i class="{{ $cls !== 'idle' && ($s==='completed'||$idx<$curIdx) ? 'bi bi-check-lg' : 'bi '.$icn }}"></i></div>
+          <div class="track-dot {{ $cls }}"><i class="{{ $cls !== 'idle' && ($s==='completed' || $s==='returned' || $idx<$curIdx) ? 'bi bi-check-lg' : 'bi '.$icn }}"></i></div>
           <span class="track-lbl {{ $cls }}">{{ $lbl }}</span>
         </div>
       @endforeach

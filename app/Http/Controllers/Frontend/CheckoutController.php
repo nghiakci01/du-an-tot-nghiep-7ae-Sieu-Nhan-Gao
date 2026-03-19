@@ -174,8 +174,7 @@ class CheckoutController extends Controller
             'email' => 'required|email:rfc,dns|max:255',
             'province' => 'required|string|in:'.implode(',', $provinces),
             'address' => 'required|string|max:500',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY,MOMO,WALLET',
-            'bank_setting_id' => 'required_if:payment_method,BANK_TRANSFER|nullable|exists:bank_settings,id',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY,WALLET',
             'shipping_provider' => 'nullable|string',
             'shipping_service_name' => 'nullable|string',
             'shipping_fee' => 'nullable|numeric',
@@ -239,7 +238,6 @@ class CheckoutController extends Controller
                 'shipping_service_name' => $shippingServiceName,
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
-                'bank_setting_id' => $request->payment_method === 'BANK_TRANSFER' ? $request->bank_setting_id : null,
                 'payment_status' => 'pending',
                 'shipping_address' => $request->address.', '.$request->province.' - '.$request->phone.' - '.$request->name,
                 'note' => $request->note,
@@ -316,12 +314,6 @@ class CheckoutController extends Controller
                     'order_id' => $order->id, 
                     'bank_code' => $request->bank_code
                 ]);
-            }
-
-            // Nếu chọn MOMO -> hiện tại mô phỏng qua trang hướng dẫn hoặc redirect (Tùy cấu hình)
-            if ($request->payment_method === 'MOMO') {
-                // Giả định MoMo thành công hoặc redirect tới trang chờ
-                return redirect()->route('checkout.success', $order->id)->with('success', 'Đơn hàng đã được ghi nhận. Vui lòng hoàn tất thanh toán qua ví MoMo.');
             }
 
             // Mark any abandoned carts as recovered for this user/session

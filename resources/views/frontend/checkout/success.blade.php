@@ -291,21 +291,21 @@
 
             {{-- BANK TRANSFER INFO --}}
             @if($isBankTransfer)
+            @php
+                $bank = $order->bankSetting;
+                if (!$bank) {
+                    $bank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first() ?: \App\Models\BankSetting::where('is_active', true)->first();
+                }
+                $bName = $bank?->bank_name ?? 'N/A';
+                $bAccount = $bank?->account_number ?? 'N/A';
+                $bOwner = $bank?->account_name ?? 'N/A';
+                $bId = $bank?->bank_id ?? '';
+            @endphp
             <div class="col-12">
               <div class="p-4 rounded-4 @if($order->payment_status == 'waiting_confirmation') bg-light-success @else bank-info-box @endif">
                 <div class="row align-items-center">
                   <div class="col-md-7">
                     @if($order->payment_status == 'pending')
-                      @php
-                        $bank = $order->bankSetting;
-                        if (!$bank) {
-                            $bank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first() ?: \App\Models\BankSetting::where('is_active', true)->first();
-                        }
-                        $bName = $bank?->bank_name ?? 'N/A';
-                        $bAccount = $bank?->account_number ?? 'N/A';
-                        $bOwner = $bank?->account_name ?? 'N/A';
-                        $bId = $bank?->bank_id ?? '';
-                      @endphp
                       <p class="section-label mb-2">Thông tin chuyển khoản</p>
                       <p class="fw-bold mb-3" style="color:#d4860a;">⚠️ Vui lòng chuyển khoản và nhấn nút xác nhận bên dưới.</p>
                       <div class="bank-info-row">
@@ -326,7 +326,7 @@
                       </div>
                       <div class="bank-info-row" style="border-bottom:none;">
                         <span class="text-muted">Nội dung CK</span>
-                        <span class="fw-bold text-danger">THANHTOAN DH{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
+                        <span class="fw-bold text-danger">THANHTOAN ELITE {{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
                       </div>
 
                       <div class="mt-4 d-flex gap-2">
@@ -364,7 +364,7 @@
                   <div class="col-md-5 text-center mt-4 mt-md-0">
                     <div class="qr-holder">
                       @php
-                        $qrUrl = "https://img.vietqr.io/image/{$bId}-{$bAccount}-compact2.png?amount={$displayTotal}&addInfo=THANHTOAN%20DH{$order->id}&accountName=" . urlencode($bOwner);
+                        $qrUrl = "https://img.vietqr.io/image/{$bId}-{$bAccount}-compact2.png?amount={$displayTotal}&addInfo=THANHTOAN%20ELITE%20{$order->id}&accountName=" . urlencode($bOwner);
                       @endphp
                       <img src="{{ $qrUrl }}" alt="VietQR" class="img-fluid" style="max-width: 190px;">
                     </div>
