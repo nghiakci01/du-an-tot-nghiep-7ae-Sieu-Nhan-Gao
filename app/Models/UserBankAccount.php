@@ -22,4 +22,9 @@ class UserBankAccount extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function withdrawRequests()
+    {
+        return $this->hasMany(WalletWithdrawRequest::class, 'user_bank_account_id');
+    }
 }

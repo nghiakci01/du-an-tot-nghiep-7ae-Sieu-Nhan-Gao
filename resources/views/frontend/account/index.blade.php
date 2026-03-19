@@ -739,77 +739,199 @@
           </div>
 
           <div class="col-md-7">
-            {{-- Top-up Request Form --}}
-            <div class="p-4 rounded-3 border" style="background:#fafafa;">
-              <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2 text-success"></i>Yêu cầu nạp tiền</h6>
-              <form action="{{ route('wallet.topup.request') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="mb-3">
-                  <label class="form-label fw-semibold small">Số tiền muốn nạp (VND) <span class="text-danger">*</span></label>
-                  <div class="input-group">
-                    <input type="number" name="amount" class="form-control" placeholder="100,000" min="10000" max="100000000" step="1000" required>
-                    <span class="input-group-text">VND</span>
-                  </div>
-                  <div class="form-text">Tối thiểu 10,000đ — Tối đa 100,000,000đ</div>
+            {{-- Tabs for Topup and Withdraw --}}
+            <ul class="nav nav-pills mb-3" id="wallet-pills-tab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-pill px-4" id="pills-topup-tab" data-bs-toggle="pill" data-bs-target="#pills-topup" type="button" role="tab" aria-controls="pills-topup" aria-selected="true"><i class="bi bi-box-arrow-in-down me-1"></i>Nạp tiền</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill px-4" id="pills-withdraw-tab" data-bs-toggle="pill" data-bs-target="#pills-withdraw" type="button" role="tab" aria-controls="pills-withdraw" aria-selected="false"><i class="bi bi-box-arrow-up me-1"></i>Rút tiền</button>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="pills-tabContent">
+              <div class="tab-pane fade show active" id="pills-topup" role="tabpanel" aria-labelledby="pills-topup-tab">
+                {{-- Top-up Request Form --}}
+                <div class="p-4 rounded-3 border" style="background:#fafafa;">
+                  <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2 text-success"></i>Yêu cầu nạp tiền</h6>
+                  <form action="{{ route('wallet.topup.request') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold small">Số tiền muốn nạp (VND) <span class="text-danger">*</span></label>
+                      <div class="input-group">
+                        <input type="number" name="amount" class="form-control" placeholder="100,000" min="10000" max="100000000" step="1000" required>
+                        <span class="input-group-text">VND</span>
+                      </div>
+                      <div class="form-text">Tối thiểu 10,000đ — Tối đa 100,000,000đ</div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold small">Ngân hàng đã chuyển khoản</label>
+                      <input type="text" name="bank_name" class="form-control" placeholder="Ví dụ: Vietcombank, MB Bank...">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold small">Nội dung chuyển khoản</label>
+                      <input type="text" name="transfer_note" class="form-control" placeholder="Nội dung khi bạn chuyển khoản">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold small">Ảnh minh chứng (tùy chọn)</label>
+                      <input type="file" name="proof_image" class="form-control" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-dark rounded-pill px-5">
+                      <i class="bi bi-send me-1"></i>Gửi yêu cầu
+                    </button>
+                  </form>
                 </div>
-                <div class="mb-3">
-                  <label class="form-label fw-semibold small">Ngân hàng đã chuyển khoản</label>
-                  <input type="text" name="bank_name" class="form-control" placeholder="Ví dụ: Vietcombank, MB Bank...">
+              </div>
+
+              <div class="tab-pane fade" id="pills-withdraw" role="tabpanel" aria-labelledby="pills-withdraw-tab">
+                {{-- Withdraw Request Form --}}
+                <div class="p-4 rounded-3 border" style="background:#fafafa;">
+                  <h6 class="fw-bold mb-3"><i class="bi bi-dash-circle me-2 text-warning"></i>Yêu cầu rút tiền</h6>
+                  <form action="{{ route('wallet.withdraw.request') }}" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold small">Số dư ví khả dụng <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control fw-bold text-success" value="{{ number_format($user->wallet_balance) }} VND" disabled>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold small">Số tiền muốn rút (VND) <span class="text-danger">*</span></label>
+                      <div class="input-group">
+                        <input type="number" name="amount" class="form-control" placeholder="50,000" min="50000" max="{{ $user->wallet_balance }}" step="1000" required>
+                        <span class="input-group-text">VND</span>
+                      </div>
+                      <div class="form-text text-muted">Tối thiểu 50,000đ — Tối đa {{ number_format($user->wallet_balance) }}đ</div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold small">Rút về tài khoản ngân hàng <span class="text-danger">*</span></label>
+                      @if($userBankAccounts->count() > 0)
+                      <select name="user_bank_account_id" class="form-select" required>
+                        <option value="">-- Chọn tài khoản nhận tiền --</option>
+                        @foreach($userBankAccounts as $bank)
+                        <option value="{{ $bank->id }}" {{ $bank->is_default ? 'selected' : '' }}>
+                          {{ $bank->bank_name }} - {{ $bank->account_number }} ({{ $bank->account_name }})
+                        </option>
+                        @endforeach
+                      </select>
+                      @else
+                      <div class="alert alert-warning py-2 small mb-0">Bạn chưa thêm tài khoản ngân hàng nào. <a href="#" onclick="document.querySelector('[data-tab=bank-accounts]').click(); return false;" class="fw-bold text-dark text-decoration-underline">Thêm ngay</a></div>
+                      @endif
+                    </div>
+                    <button type="submit" class="btn btn-dark rounded-pill px-5" {{ $userBankAccounts->count() == 0 || $user->wallet_balance < 50000 ? 'disabled' : '' }}>
+                      <i class="bi bi-send me-1"></i>Gửi yêu cầu rút
+                    </button>
+                  </form>
                 </div>
-                <div class="mb-3">
-                  <label class="form-label fw-semibold small">Nội dung chuyển khoản</label>
-                  <input type="text" name="transfer_note" class="form-control" placeholder="Nội dung khi bạn chuyển khoản">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label fw-semibold small">Ảnh minh chứng (tùy chọn)</label>
-                  <input type="file" name="proof_image" class="form-control" accept="image/*">
-                </div>
-                <button type="submit" class="btn btn-dark rounded-pill px-5">
-                  <i class="bi bi-send me-1"></i>Gửii yêu cầu
-                </button>
-              </form>
+              </div>
             </div>
           </div>
         </div>
 
-        {{-- Top-up Requests Status --}}
-        @if($walletTopupRequests->isNotEmpty())
-        <div class="mb-4">
-          <h6 class="fw-bold mb-3"><i class="bi bi-clock-history me-2"></i>Yêu cầu nạp gần đây</h6>
-          <div class="table-responsive">
-            <table class="table align-middle" style="font-size:0.88rem;">
-              <thead style="background:#f5f5f7;">
-                <tr>
-                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ngày gửii</th>
-                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Số tiền</th>
-                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ngân hàng</th>
-                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Trạng thái</th>
-                  <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ghi chú</th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach($walletTopupRequests as $tr)
-                <tr style="border-color:#f0f0f0;">
-                  <td style="padding:12px 14px;">{{ $tr->created_at->format('d/m/Y H:i') }}</td>
-                  <td style="padding:12px 14px;" class="fw-bold text-success">+{{ number_format($tr->amount) }}đ</td>
-                  <td style="padding:12px 14px;">{{ $tr->bank_name ?: '—' }}</td>
-                  <td style="padding:12px 14px;">
-                    @if($tr->isPending())
-                      <span class="badge rounded-pill" style="background:#fff3cd;color:#856404;">Chờ duyệt</span>
-                    @elseif($tr->isApproved())
-                      <span class="badge rounded-pill" style="background:#d1e7dd;color:#0a3622;">Đã duyệt</span>
-                    @else
-                      <span class="badge rounded-pill bg-danger text-white">ỬTừ chối</span>
-                    @endif
-                  </td>
-                  <td style="padding:12px 14px;" class="text-muted">{{ $tr->admin_note ?: '—' }}</td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
+        {{-- Top-up/Withdraw Requests Status --}}
+        <h6 class="fw-bold mb-3 mt-2"><i class="bi bi-clock-history me-2"></i>Lịch sử yêu cầu</h6>
+        
+        <ul class="nav nav-tabs mb-3" id="wallet-history-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active text-dark" id="history-topup-tab" data-bs-toggle="tab" data-bs-target="#history-topup" type="button" role="tab" aria-controls="history-topup" aria-selected="true">Yêu cầu nạp</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link text-dark" id="history-withdraw-tab" data-bs-toggle="tab" data-bs-target="#history-withdraw" type="button" role="tab" aria-controls="history-withdraw" aria-selected="false">Yêu cầu rút</button>
+          </li>
+        </ul>
+
+        <div class="tab-content mb-4" id="walletHistoryContent">
+          <div class="tab-pane fade show active" id="history-topup" role="tabpanel" aria-labelledby="history-topup-tab">
+            @if($walletTopupRequests->isNotEmpty())
+            <div class="table-responsive">
+              <table class="table align-middle" style="font-size:0.88rem;">
+                <thead style="background:#f5f5f7;">
+                  <tr>
+                    <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ngày gửi</th>
+                    <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Số tiền</th>
+                    <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ngân hàng</th>
+                    <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Trạng thái</th>
+                    <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ghi chú</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach($walletTopupRequests as $tr)
+                  <tr style="border-color:#f0f0f0;">
+                    <td style="padding:12px 14px;">{{ $tr->created_at->format('d/m/Y H:i') }}</td>
+                    <td style="padding:12px 14px;" class="fw-bold text-success">+{{ number_format($tr->amount) }}đ</td>
+                    <td style="padding:12px 14px;">{{ $tr->bank_name ?: '—' }}</td>
+                    <td style="padding:12px 14px;">
+                      @if($tr->isPending())
+                        <span class="badge rounded-pill" style="background:#fff3cd;color:#856404;">Chờ duyệt</span>
+                      @elseif($tr->isApproved())
+                        <span class="badge rounded-pill" style="background:#d1e7dd;color:#0a3622;">Đã duyệt</span>
+                      @else
+                        <span class="badge rounded-pill bg-danger text-white">Từ chối</span>
+                      @endif
+                    </td>
+                    <td style="padding:12px 14px;" class="text-muted">{{ Str::limit($tr->admin_note, 30) ?: '—' }}</td>
+                  </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+            @else
+            <div class="text-center py-4 text-muted small">Không có yêu cầu nạp tiền nào.</div>
+            @endif
+          </div>
+
+          <div class="tab-pane fade" id="history-withdraw" role="tabpanel" aria-labelledby="history-withdraw-tab">
+            @if($walletWithdrawRequests->isNotEmpty())
+            <div class="table-responsive">
+              <table class="table align-middle" style="font-size:0.88rem;">
+                <thead style="background:#f5f5f7;">
+                  <tr>
+                    <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ngày gửi</th>
+                    <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Số tiền rút</th>
+                    <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Tài khoản nhận</th>
+                    <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Trạng thái</th>
+                    <th style="padding:10px 14px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Minh chứng/Lý do</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach($walletWithdrawRequests as $wr)
+                  <tr style="border-color:#f0f0f0;">
+                    <td style="padding:12px 14px;">{{ $wr->created_at->format('d/m/Y H:i') }}</td>
+                    <td style="padding:12px 14px;" class="fw-bold text-danger">-{{ number_format($wr->amount) }}đ</td>
+                    <td style="padding:12px 14px;">
+                      @if($wr->bankAccount)
+                        {{ $wr->bankAccount->bank_name }}<br>
+                        <span class="small text-muted">{{ $wr->bankAccount->account_number }}</span>
+                      @else
+                        Tài khoản đã xoá
+                      @endif
+                    </td>
+                    <td style="padding:12px 14px;">
+                      @if($wr->isPending())
+                        <span class="badge rounded-pill" style="background:#fff3cd;color:#856404;">Chờ duyệt</span>
+                      @elseif($wr->isApproved())
+                        <span class="badge rounded-pill" style="background:#d1e7dd;color:#0a3622;">Đã chuyển khoản</span>
+                      @else
+                        <span class="badge rounded-pill bg-danger text-white">Từ chối (Hoàn tiền)</span>
+                      @endif
+                    </td>
+                    <td style="padding:12px 14px;">
+                      @if($wr->isApproved() && $wr->proof_image)
+                        <a href="{{ Storage::url($wr->proof_image) }}" target="_blank" class="text-success small fw-bold"><i class="bi bi-image"></i> Xem UNC</a>
+                      @elseif($wr->isRejected())
+                        <span class="text-muted small">{{ Str::limit($wr->admin_note, 30) ?: 'Không có' }}</span>
+                      @else
+                        <span class="text-muted">—</span>
+                      @endif
+                    </td>
+                  </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+            @else
+            <div class="text-center py-4 text-muted small">Không có yêu cầu rút tiền nào.</div>
+            @endif
           </div>
         </div>
-        @endif
 
         {{-- Transaction History --}}
         <div>

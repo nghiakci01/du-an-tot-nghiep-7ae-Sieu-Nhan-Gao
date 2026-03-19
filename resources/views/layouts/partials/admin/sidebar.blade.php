@@ -193,6 +193,31 @@
                         <span class="pc-mtext">Đánh giá sản phẩm</span>
                     </a>
                 </li>
+                @if (auth()->user()->isAdmin())
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-wallet"></i>
+                            </span>
+                            <span class="pc-mtext">Giao dịch Ví</span>
+                            <span class="pc-arrow">
+                                <i data-feather="chevron-right"></i>
+                            </span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item">
+                                <a href="{{ route('admin.wallet.index') }}" class="pc-link">
+                                    <span class="pc-mtext">Yêu cầu nạp tiền</span>
+                                </a>
+                            </li>
+                            <li class="pc-item">
+                                <a href="{{ route('admin.wallet.withdrawals') }}" class="pc-link">
+                                    <span class="pc-mtext">Yêu cầu rút tiền</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
                 @if (auth()->user()->isAdmin() || auth()->user()->isStaff())
                     <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link">
