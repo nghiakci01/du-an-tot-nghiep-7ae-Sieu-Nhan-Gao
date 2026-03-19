@@ -319,7 +319,14 @@
                     <div class="fw-bold">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</div>
                     <div class="text-muted small">{{ $order->created_at->format('d/m/Y') }}</div>
                   </div>
-                  <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
+                  <div class="d-flex flex-column align-items-end">
+                    <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
+                    @if($order->returnRequest)
+                      <span class="badge mt-1 {{ $order->returnRequest->status == 'completed' ? 'bg-success' : ($order->returnRequest->status == 'rejected' ? 'bg-danger' : 'bg-warning text-dark') }}" style="font-size: 0.65rem;">
+                        Hoàn: {{ $order->returnRequest->status == 'pending' ? 'Chờ duyệt' : ($order->returnRequest->status == 'approved' ? 'Đã duyệt' : ($order->returnRequest->status == 'completed' ? 'Đã hoàn tiền' : 'Từ chối')) }}
+                      </span>
+                    @endif
+                  </div>
                   <span class="fw-bold">{{ number_format($order->final_total ?: $order->total_price) }}đ</span>
                 </div>
             </a>
@@ -366,12 +373,22 @@
               </td>
               <td class="text-muted">{{ $order->created_at->format('d/m/Y') }}</td>
               <td>
-                <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
+                <div class="d-flex flex-column align-items-start">
+                  <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
+                  @if($order->returnRequest)
+                    <span class="badge mt-1 {{ $order->returnRequest->status == 'completed' ? 'bg-success' : ($order->returnRequest->status == 'rejected' ? 'bg-danger' : 'bg-warning text-dark') }}" style="font-size: 0.7rem;">
+                      Hoàn trả: {{ $order->returnRequest->status == 'pending' ? 'Chờ duyệt' : ($order->returnRequest->status == 'approved' ? 'Chờ gửi hàng' : ($order->returnRequest->status == 'completed' ? 'Đã hoàn tiền' : 'Từ chối')) }}
+                    </span>
+                  @endif
+                </div>
               </td>
               <td class="fw-semibold">{{ number_format($order->final_total ?: $order->total_price) }}đ</td>
               <td style="padding-right:28px;">
                 <div class="d-flex gap-2">
                   <a href="{{ route('account.orders.show', $order->id) }}" class="btn btn-sm btn-dark px-3 rounded-pill">Xem</a>
+                  @if(($order->status == 'completed' || $order->status == 'shipped') && !$order->returnRequest)
+                    <a href="{{ route('account.orders.return_form', $order->id) }}" class="btn btn-sm btn-outline-warning rounded-pill px-3">Hoàn hàng</a>
+                  @endif
                   @if($order->status == 'pending')
                     <form action="{{ route('account.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn hủy đơn này?');">
                       @csrf

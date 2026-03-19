@@ -269,6 +269,40 @@
         </div>
       </div>
 
+      {{-- Return Request Details (if any) --}}
+      @if($order->returnRequest)
+      <div class="detail-card" style="border: 2px solid #ffca2c;">
+        <div class="detail-card-header" style="background-color: #fff9e6;">
+          <h5 class="text-dark"><i class="bi bi-arrow-return-left me-2"></i>Chi tiết Yêu cầu Hoàn trả</h5>
+          <span class="badge {{ $order->returnRequest->status == 'completed' ? 'bg-success' : ($order->returnRequest->status == 'rejected' ? 'bg-danger' : 'bg-warning text-dark') }}">
+            @if($order->returnRequest->status == 'pending')
+              Đang chờ duyệt
+            @elseif($order->returnRequest->status == 'approved')
+              Đã duyệt - Chờ nhận hàng
+            @elseif($order->returnRequest->status == 'completed')
+              Đã hoàn tiền
+            @elseif($order->returnRequest->status == 'rejected')
+              Bị từ chối
+            @endif
+          </span>
+        </div>
+        <div class="detail-card-body">
+          <div class="mb-3">
+            <strong>Lý do:</strong> {{ $order->returnRequest->reason }}<br>
+            <strong>Ghi chú của bạn:</strong> {{ $order->returnRequest->note ?: 'Không có' }}<br>
+            <strong>Số tiền hoàn đề nghị:</strong> <span class="text-danger fw-bold">{{ number_format($order->returnRequest->refund_amount) }}đ</span><br>
+            <strong>Ngày yêu cầu:</strong> {{ $order->returnRequest->created_at->format('H:i - d/m/Y') }}
+          </div>
+          @if($order->returnRequest->admin_note)
+            <div class="alert alert-info mb-0">
+              <strong>Phản hồi từ Cửa hàng / Hướng dẫn gửi trả:</strong><br>
+              {!! nl2br(e($order->returnRequest->admin_note)) !!}
+            </div>
+          @endif
+        </div>
+      </div>
+      @endif
+
       {{-- Order History (if has) --}}
       @if(isset($order->histories) && $order->histories->count() > 0)
       <div class="detail-card">
@@ -364,6 +398,11 @@
         <a href="{{ route('account.index') }}?tab=orders" class="btn btn-outline-dark rounded-pill py-2">
           <i class="bi bi-arrow-left me-1"></i> Quay lại đơn hàng
         </a>
+        @if(($order->status == 'completed' || $order->status == 'shipped') && !$order->returnRequest)
+          <a href="{{ route('account.orders.return_form', $order->id) }}" class="btn btn-outline-warning rounded-pill py-2 w-100">
+            <i class="bi bi-arrow-return-left me-1"></i> Yêu cầu Hoàn hàng
+          </a>
+        @endif
         @if(strtolower($order->status) == 'pending')
           <form action="{{ route('account.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?');">
             @csrf
