@@ -9,6 +9,8 @@ use App\Models\UserBankAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\NewOrderReturnRequestNotification;
 
 class AccountController extends Controller
 {
@@ -181,7 +183,7 @@ class AccountController extends Controller
             }
         }
 
-        \App\Models\OrderReturnRequest::create([
+        $returnRequest = \App\Models\OrderReturnRequest::create([
             'user_id' => $user->id,
             'order_id' => $order->id,
             'reason' => $request->reason,
@@ -190,6 +192,10 @@ class AccountController extends Controller
             'refund_amount' => $order->final_total,
             'status' => 'pending',
         ]);
+
+        // Thông báo cho các Admin
+        $admins = \App\Models\User::getAdmins();
+        Notification::send($admins, new NewOrderReturnRequestNotification($returnRequest));
 
         return redirect()->route('account.orders.show', $order->id)
             ->with('success', 'Yêu cầu hoàn trả của bạn đã được gửi và đang chờ xử lý.');

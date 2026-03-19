@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Notifications\OrderReturnRequestStatusNotification;
 
 class OrderReturnController extends Controller
 {
@@ -39,6 +40,9 @@ class OrderReturnController extends Controller
             'processed_at' => now(),
         ]);
 
+        // Thông báo cho khách hàng
+        $returnReq->user->notify(new OrderReturnRequestStatusNotification($returnReq, 'approved'));
+
         return redirect()->back()->with('success', 'Đã duyệt yêu cầu hoàn trả và cấp hướng dẫn/mã vận chuyển.');
     }
 
@@ -59,6 +63,9 @@ class OrderReturnController extends Controller
             'processed_by' => auth()->id(),
             'processed_at' => now(),
         ]);
+
+        // Thông báo cho khách hàng
+        $returnReq->user->notify(new OrderReturnRequestStatusNotification($returnReq, 'rejected'));
 
         return redirect()->back()->with('success', 'Yêu cầu hoàn trả đã bị từ chối.');
     }
@@ -92,6 +99,9 @@ class OrderReturnController extends Controller
                 // 3. Update order status to STATUS_RETURNED
                 $orderService->updateOrderStatus($returnReq->order, \App\Models\Order::STATUS_RETURNED, auth()->user(), 'Admin xác nhận hoàn tiền');
             });
+
+            // Thông báo cho khách hàng (sau transaction để chắc chắn)
+            $returnReq->user->notify(new OrderReturnRequestStatusNotification($returnReq, 'completed'));
 
             return redirect()->back()->with('success', 'Đã xác nhận nhận hàng và hoàn trả tiền vào ví khách hàng thành công.');
         } catch (\Exception $e) {
