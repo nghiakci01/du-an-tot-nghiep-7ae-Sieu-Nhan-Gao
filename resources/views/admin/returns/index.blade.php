@@ -92,19 +92,9 @@
                                 </td>
                                 <td>{{ $req->created_at->format('d/m/Y H:i') }}</td>
                                 <td>
-                                    @if ($req->isPending())
-                                        <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Chờ duyệt</span>
-                                    @elseif ($req->isApproved())
-                                        <span class="badge bg-info"><i class="fas fa-box-open me-1"></i> Chờ gửi hàng</span>
-                                    @elseif ($req->isShipping())
-                                        <span class="badge bg-primary"><i class="fas fa-truck me-1"></i> Đang di chuyển</span>
-                                    @elseif ($req->isReceived())
-                                        <span class="badge bg-dark"><i class="fas fa-warehouse me-1"></i> Đã nhận hàng</span>
-                                    @elseif ($req->isCompleted())
-                                        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Hoàn tiền xong</span>
-                                    @elseif ($req->isRejected())
-                                        <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i> Từ chối</span>
-                                    @endif
+                                    <span class="badge {{ $req->status_badge }}">
+                                        {{ $req->status_text }}
+                                    </span>
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailModal{{ $req->id }}" title="Chi tiết / Xử lý">
@@ -131,6 +121,7 @@
                                                 <div class="col-md-6 text-md-end">
                                                     <strong>Khách hàng:</strong> {{ $req->user->name }}<br>
                                                     <strong>Ngày gửi:</strong> {{ $req->created_at->format('d/m/Y H:i') }}<br>
+                                                    <strong>Trạng thái:</strong> <span class="badge {{ $req->status_badge }}">{{ $req->status_text }}</span>
                                                 </div>
                                             </div>
                                             <div class="mb-3">
@@ -165,6 +156,10 @@
                                                 <h6><strong>Xử lý Yêu cầu (Duyệt cho trả hàng / Từ chối)</strong></h6>
                                                 <form method="POST" id="actionForm{{$req->id}}">
                                                     @csrf
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="text-muted small d-block">TRẠNG THÁI</label>
+                                                        <span class="badge {{ $req->status_badge }}">{{ $req->status_text }}</span>
+                                                    </div>
                                                     <div class="mb-3">
                                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                                             <label class="form-label mb-0">Phản hồi / Mã vận chuyển Gửi trả <span class="text-danger">*</span></label>

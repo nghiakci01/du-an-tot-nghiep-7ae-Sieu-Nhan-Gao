@@ -105,14 +105,15 @@ class ReturnService
             );
 
             // 3. Update Order Status & Payment Status
+            $order = $returnRequest->order;
             $this->orderService->updateOrderStatus(
-                $returnRequest->order, 
+                $order, 
                 Order::STATUS_RETURNED, 
                 $processor, 
                 'Hệ thống đã tự động hoàn lại tiền vào ví khách hàng.'
             );
 
-            $returnRequest->order->update(['payment_status' => 'refunded']);
+            $order->update(['payment_status' => 'refunded']);
 
             // 4. Notify User
             Notification::send($returnRequest->user, new OrderReturnRequestStatusNotification($returnRequest, 'completed'));
