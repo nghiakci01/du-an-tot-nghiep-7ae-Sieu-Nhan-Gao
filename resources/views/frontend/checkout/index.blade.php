@@ -360,6 +360,17 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show">
                     {{ session('success') }}
@@ -624,20 +635,6 @@
                                         </div>
 
                                         <div class="panel-default mt-3">
-                                            <input id="payment_momo" name="payment_method" type="radio" value="MOMO"
-                                                data-bs-target="#method_momo" required />
-                                            <label for="payment_momo" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_momo"
-                                                aria-controls="method_momo">
-                                                Ví điện tử MoMo
-                                            </label>
-                                            <div id="method_momo" class="collapse" data-bs-parent="#accordion">
-                                                <div class="card-body1 p-3 bg-light rounded mt-2">
-                                                    <p class="mb-0 small">Sử dụng ứng dụng MoMo để quét mã và thanh toán. Đơn hàng sẽ được xác nhận ngay sau khi hoàn tất.</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="panel-default mt-3">
                                             <input id="payment_bank" name="payment_method" type="radio" value="BANK_TRANSFER"
                                                 data-bs-target="#method_bank" required />
                                             <label for="payment_bank" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_bank"
@@ -646,20 +643,8 @@
                                             </label>
                                             <div id="method_bank" class="collapse" data-bs-parent="#accordion">
                                                 <div class="card-body1 p-3 bg-light rounded mt-2">
-                                                    <p class="mb-2 fw-bold small text-primary">Chọn ngân hàng thụ hưởng của Shop:</p>
-                                                    <div class="bank-options d-flex flex-column gap-2">
-                                                        @foreach($banks as $bank)
-                                                        <div class="form-check p-2 border rounded bg-white">
-                                                            <input class="form-check-input ms-0" type="radio" name="bank_setting_id" id="bank_{{ $bank->id }}" value="{{ $bank->id }}" @if($bank->is_default) checked @endif required>
-                                                            <label class="form-check-label small ms-4 d-block" for="bank_{{ $bank->id }}">
-                                                                <span class="fw-bold">{{ $bank->bank_name }}</span><br>
-                                                                <span class="text-muted">{{ $bank->account_number }} - {{ $bank->account_name }}</span>
-                                                            </label>
-                                                        </div>
-                                                        @endforeach
-                                                    </div>
-                                                    <div class="alert alert-info py-2 mt-3 mb-0 small">
-                                                        <i class="fa fa-info-circle"></i> Vui lòng chọn ngân hàng bạn muốn chuyển tới. Mã QR sẽ hiển thị ở bước tiếp theo.
+                                                    <div class="alert alert-info py-2 mb-0 small">
+                                                        <i class="fa fa-info-circle"></i> Bạn sẽ nhận được thông tin số tài khoản và mã QR để chuyển khoản sau khi nhấn "Đặt hàng".
                                                     </div>
                                                 </div>
                                             </div>
@@ -801,7 +786,7 @@
                                             </div>
                                             <div class="mb-0">
                                                 <span class="text-muted">Nội dung chuyển khoản:</span>
-                                                <div class="fw-bold text-danger">THANHTOAN DH</div>
+                                                <div class="fw-bold text-danger">THANHTOAN ELITE</div>
                                             </div>
                                         </div>
                                         <div class="col-md-6 text-center border-start">
@@ -1229,7 +1214,7 @@
                 let bankAccount = config.bankAccount;
                 let bankId = config.bankId;
                 let bankName = config.bankName;
-                let qrUrl = `https://img.vietqr.io/image/${bankId}-${bankAccount}-compact.png?amount=${finalTotal}&addInfo=THANHTOAN%20DH&accountName=${bankName}`;
+                let qrUrl = `https://img.vietqr.io/image/${bankId}-${bankAccount}-compact.png?amount=${finalTotal}&addInfo=THANHTOAN%20ELITE&accountName=${bankName}`;
                 
                 if (bankAccount !== '0') {
                     $('#bank_qr_image').attr('src', qrUrl);
