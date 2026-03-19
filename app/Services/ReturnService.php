@@ -46,10 +46,17 @@ class ReturnService
     /**
      * Mark as shipping
      */
-    public function markAsShipping(OrderReturnRequest $returnRequest)
+    public function markAsShipping(OrderReturnRequest $returnRequest, User $processor)
     {
-        $returnRequest->update(['status' => 'shipping']);
+        Log::info("Cập nhật trạng thái 'Đang vận chuyển' cho yêu cầu #{$returnRequest->id}");
+        $returnRequest->update([
+            'status' => 'shipping',
+            'processed_by' => $processor->id,
+            'processed_at' => now(),
+        ]);
+
         Notification::send($returnRequest->user, new OrderReturnRequestStatusNotification($returnRequest, 'shipping'));
+
         return $returnRequest;
     }
 

@@ -1,141 +1,105 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý Yêu cầu Hoàn hàng')
+@section('title', 'Quản lý hoàn trả')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-12 d-flex justify-content-between align-items-center">
-            <h1 class="h3 mb-0 text-gray-800">Yêu cầu hoàn trả cửa hàng</h1>
-        </div>
-    </div>
+<div class="row">
+    <div class="col-12">
+        <div class="card card-outline card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Yêu cầu hoàn trả cửa hàng</h3>
+            </div>
+            <div class="card-body">
+                <!-- Tab điều hướng trạng thái -->
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link {{ !request('status') ? 'active' : '' }}" href="{{ route('admin.returns.index') }}">Tất cả</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') === 'pending' ? 'active alert-warning' : '' }}" href="{{ route('admin.returns.index', ['status' => 'pending']) }}">Chờ duyệt</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') === 'approved' ? 'active alert-info' : '' }}" href="{{ route('admin.returns.index', ['status' => 'approved']) }}">Chờ gửi hàng</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') === 'shipping' ? 'active alert-primary' : '' }}" href="{{ route('admin.returns.index', ['status' => 'shipping']) }}">Đang di chuyển</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') === 'received' ? 'active alert-success' : '' }}" href="{{ route('admin.returns.index', ['status' => 'received']) }}">Đã nhận hàng</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') === 'completed' ? 'active alert-success' : '' }}" href="{{ route('admin.returns.index', ['status' => 'completed']) }}">Hoàn thành</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') === 'rejected' ? 'active alert-danger' : '' }}" href="{{ route('admin.returns.index', ['status' => 'rejected']) }}">Từ chối</a>
+                    </li>
+                </ul>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <ul class="nav nav-tabs card-header-tabs">
-                <li class="nav-item">
-                    <a class="nav-link {{ $tab == 'all' ? 'active' : '' }}" href="{{ route('admin.returns.index', ['status' => 'all']) }}">Tất cả</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-warning {{ $tab == 'pending' ? 'active font-weight-bold border-bottom-warning' : '' }}" href="{{ route('admin.returns.index', ['status' => 'pending']) }}">Chờ duyệt</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-info {{ $tab == 'approved' ? 'active font-weight-bold border-bottom-info' : '' }}" href="{{ route('admin.returns.index', ['status' => 'approved']) }}">Chờ gửi hàng</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-primary {{ $tab == 'shipping' ? 'active font-weight-bold border-bottom-primary' : '' }}" href="{{ route('admin.returns.index', ['status' => 'shipping']) }}">Đang di chuyển</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-dark {{ $tab == 'received' ? 'active font-weight-bold border-bottom-dark' : '' }}" href="{{ route('admin.returns.index', ['status' => 'received']) }}">Đã nhận hàng</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-success {{ $tab == 'completed' ? 'active font-weight-bold border-bottom-success' : '' }}" href="{{ route('admin.returns.index', ['status' => 'completed']) }}">Hoàn thành</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-danger {{ $tab == 'rejected' ? 'active font-weight-bold border-bottom-danger' : '' }}" href="{{ route('admin.returns.index', ['status' => 'rejected']) }}">Từ chối</a>
-                </li>
-            </ul>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-light">
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <th>Mã ĐH</th>
-                            <th>Khách hàng</th>
-                            <th>Lý do</th>
-                            <th>Tiền hoàn</th>
-                            <th>Ngày YC</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
+                            <th>MÃ ĐH</th>
+                            <th>KHÁCH HÀNG</th>
+                            <th>LÝ DO</th>
+                            <th>TIỀN HOÀN</th>
+                            <th>NGÀY YC</th>
+                            <th>TRẠNG THÁI</th>
+                            <th>THAO TÁC</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($requests as $req)
+                        @forelse($requests as $req)
                             <tr>
+                                <td><a href="{{ route('admin.orders.show', $req->order_id) }}" class="fw-bold">#{{ str_pad($req->order_id, 6, '0', STR_PAD_LEFT) }}</a></td>
                                 <td>
-                                    <a href="{{ route('admin.orders.show', $req->order_id) }}">#{{ str_pad($req->order_id, 6, '0', STR_PAD_LEFT) }}</a>
-                                </td>
-                                <td>
-                                    <div class="fw-bold">{{ $req->user->name }}</div>
-                                    <div class="small text-muted">{{ $req->user->email }}</div>
+                                    <strong>{{ $req->user->name }}</strong><br>
+                                    <small class="text-muted">{{ $req->user->email }}</small>
                                 </td>
                                 <td>
-                                    <span class="badge bg-secondary">{{ $req->reason }}</span>
+                                    <span class="badge bg-light text-dark border">{{ $req->reason_text }}</span>
                                 </td>
-                                <td class="text-danger fw-bold">
-                                    {{ number_format($req->refund_amount) }}đ
-                                </td>
+                                <td><span class="text-danger fw-bold">{{ number_format($req->refund_amount) }}đ</span></td>
                                 <td>{{ $req->created_at->format('d/m/Y H:i') }}</td>
+                                <td>{!! $req->status_badge !!}</td>
                                 <td>
-                                    <span class="badge {{ $req->status_badge }}">
-                                        {{ $req->status_text }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailModal{{ $req->id }}" title="Chi tiết / Xử lý">
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailModal{{ $req->id }}">
                                         <i class="fas fa-eye"></i> Xử lý
                                     </button>
                                 </td>
                             </tr>
 
-                            <!-- Detail & Action Modal -->
-                            <div class="modal fade" id="detailModal{{ $req->id }}" tabindex="-1" aria-labelledby="detailLabel{{ $req->id }}" aria-hidden="true">
+                            <!-- Modal Chi tiết & Xử lý -->
+                            <div class="modal fade" id="detailModal{{ $req->id }}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="detailLabel{{ $req->id }}">Chi tiết Yêu cầu Hoàn trả #{{ $req->id }}</h5>
+                                            <h5 class="modal-title">Chi tiết yêu cầu #{{ $req->id }} (Đơn hàng #{{ $req->order_id }})</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
-                                                    <strong>Mã đơn hàng:</strong> <a href="{{ route('admin.orders.show', $req->order_id) }}">#{{ str_pad($req->order_id, 6, '0', STR_PAD_LEFT) }}</a><br>
-                                                    <strong>Lý do:</strong> {{ $req->reason }}<br>
-                                                    <strong>Tiền cần hoàn:</strong> <span class="text-danger fw-bold">{{ number_format($req->refund_amount) }}đ</span>
+                                                    <h6>Thông tin khách hàng:</h6>
+                                                    <p>Họ tên: <strong>{{ $req->user->name }}</strong><br>Email: {{ $req->user->email }}</p>
                                                 </div>
-                                                <div class="col-md-6 text-md-end">
-                                                    <strong>Khách hàng:</strong> {{ $req->user->name }}<br>
-                                                    <strong>Ngày gửi:</strong> {{ $req->created_at->format('d/m/Y H:i') }}<br>
-                                                    <strong>Trạng thái:</strong> <span class="badge {{ $req->status_badge }}">{{ $req->status_text }}</span>
+                                                <div class="col-md-6 text-end">
+                                                    <h6>Thông tin hoàn trả:</h6>
+                                                    <p>Số tiền: <strong class="text-danger">{{ number_format($req->refund_amount) }}đ</strong><br>Lý do: {{ $req->reason_text }}</p>
                                                 </div>
                                             </div>
+
                                             <div class="mb-3">
-                                                <strong>Mô tả chi tiết từ khách:</strong>
-                                                <p class="p-2 bg-light border rounded">{{ $req->note ?: 'Không có' }}</p>
+                                                <h6>Mô tả chi tiết:</h6>
+                                                <div class="p-2 bg-light border rounded">{{ $req->description ?: 'Không có mô tả' }}</div>
                                             </div>
-                                            
-                                            @if($req->images && is_array($req->images) && count($req->images) > 0)
-                                            <div class="mb-4">
-                                                <strong>Ảnh từ khách hàng:</strong>
-                                                <div class="d-flex flex-wrap gap-2 mt-2">
+
+                                            @if($req->images)
+                                            <div class="mb-3">
+                                                <h6>Hình ảnh minh chứng:</h6>
+                                                <div class="d-flex flex-wrap gap-2">
                                                     @foreach($req->images as $img)
                                                         <a href="{{ asset('storage/'.$img) }}" target="_blank">
-                                                            <img src="{{ asset('storage/'.$img) }}" class="img-thumbnail" style="width:100px; height:100px; object-fit:cover;">
+                                                            <img src="{{ asset('storage/'.$img) }}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
                                                         </a>
                                                     @endforeach
                                                 </div>
@@ -144,95 +108,65 @@
 
                                             @if($req->admin_note)
                                             <div class="mb-3">
-                                                <strong>Ghi chú từ cửa hàng (Mã vận chuyển/Lý do):</strong>
-                                                <p class="p-2 bg-light border rounded text-danger">{{ $req->admin_note }}</p>
+                                                <h6>Ghi chú/Phản hồi cửa hàng:</h6>
+                                                <p class="p-2 border rounded text-danger bg-light">{{ $req->admin_note }}</p>
                                             </div>
                                             @endif
 
                                             <hr>
 
-                                            <!-- Khu vực Hành Động -->
+                                            <!-- Xử lý hành động -->
                                             @if($req->isPending())
-                                                <div class="card border-warning mb-3">
+                                                <div class="card border-warning mb-0 shadow-sm">
                                                     <div class="card-body">
-                                                        <h6 class="fw-bold text-warning"><i class="fas fa-edit me-1"></i> Xử lý Yêu cầu (Duyệt / Từ chối)</h6>
+                                                        <h6 class="fw-bold text-warning mb-3">Xử lý yêu cầu mới</h6>
                                                         <div class="mb-3">
-                                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                                <label class="form-label mb-0 small fw-bold">Phản hồi / Mã vận chuyển Gửi trả <span class="text-danger">*</span></label>
-                                                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="document.getElementById('admin_note_{{ $req->id }}').value = 'Mã KS-RET-{{ $req->order_id }}-{{ strtoupper(Str::random(5)) }}\nVui lòng gửi hàng về địa chỉ kho, ghi rõ mã này trên kiện hàng.'">
-                                                                    <i class="fas fa-magic"></i> Tạo mã tự động
-                                                                </button>
+                                                            <div class="d-flex justify-content-between mb-2">
+                                                                <label class="small fw-bold">Phản hồi / Mã vận chuyển <span class="text-danger">*</span></label>
+                                                                <button type="button" class="btn btn-xs btn-link p-0 text-decoration-none" onclick="document.getElementById('admin_note_{{ $req->id }}').value = 'Mã KS-RET-{{ $req->order_id }}-{{ strtoupper(Str::random(5)) }}\nVui lòng đóng gói và gửi về kho.'">Tạo mã vận chuyển mẫu</button>
                                                             </div>
-                                                            <textarea id="admin_note_{{ $req->id }}" name="admin_note" class="form-control" rows="3" required placeholder="Ví dụ mã vận chuyển GHTK, hướng dẫn đóng gói... hoặc lý do từ chối"></textarea>
+                                                            <textarea id="admin_note_{{ $req->id }}" class="form-control" rows="3" placeholder="Nhập mã vận chuyển hoặc lý do từ chối..."></textarea>
                                                         </div>
                                                         <div class="d-flex justify-content-end gap-2">
-                                                            <form action="{{ route('admin.returns.reject', $req->id) }}" method="POST" class="d-inline">
-                                                                @csrf
-                                                                <input type="hidden" name="admin_note" id="admin_note_reject_val_{{ $req->id }}">
-                                                                <button type="submit" class="btn btn-outline-danger" onclick="const note = document.getElementById('admin_note_{{ $req->id }}').value; if(!note){alert('Vui lòng nhập phản hồi!'); return false;} document.getElementById('admin_note_reject_val_{{ $req->id }}').value = note; return confirm('Xác nhận từ chối yêu cầu này?');">Từ chối</button>
-                                                            </form>
-                                                            <form action="{{ route('admin.returns.approve', $req->id) }}" method="POST" class="d-inline">
-                                                                @csrf
-                                                                <input type="hidden" name="admin_note" id="admin_note_approve_val_{{ $req->id }}">
-                                                                <button type="submit" class="btn btn-success" onclick="const note = document.getElementById('admin_note_{{ $req->id }}').value; if(!note){alert('Vui lòng nhập phản hồi!'); return false;} document.getElementById('admin_note_approve_val_{{ $req->id }}').value = note; return confirm('Chấp nhận duyệt yêu cầu này?');">Đồng ý & Duyệt</button>
-                                                            </form>
+                                                            <button type="button" class="btn btn-outline-danger" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.reject', $req->id) }}', 'Từ chối yêu cầu này?')">Từ chối</button>
+                                                            <button type="button" class="btn btn-success" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.approve', $req->id) }}', 'Duyệt yêu cầu hoàn trả này?')">Đồng ý & Duyệt</button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             @elseif($req->isApproved())
-                                                <h6><strong>Xử lý tiếp theo</strong></h6>
-                                                <div class="alert alert-info">Bạn đã duyệt yêu cầu. Bây giờ bạn có thể theo dõi hàng gửi về hoặc <b>Hoàn tiền ngay</b> nếu muốn.</div>
-                                                <div class="d-flex flex-column gap-2 mt-3">
-                                                    <form action="{{ route('admin.returns.shipping', $req->id) }}" method="POST">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-outline-info w-100" onclick="return confirm('Xác nhận hàng đã bắt đầu di chuyển?');">
-                                                            <i class="fas fa-truck me-1"></i> 1. Đã bắt đầu di chuyển
-                                                        </button>
-                                                    </form>
-                                                    <div class="text-center small text-muted">Hoặc</div>
-                                                    <form action="{{ route('admin.returns.complete', $req->id) }}" method="POST">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-success w-100" onclick="return confirm('Xác nhận HOÀN TIỀN NGAY vào ví khách hàng?');">
-                                                            <i class="fas fa-money-bill-wave me-1"></i> 2. Hoàn tiền ngay (Bỏ qua các bước sau)
-                                                        </button>
-                                                    </form>
+                                                <div class="card border-info mb-0 shadow-sm">
+                                                    <div class="card-body">
+                                                        <h6 class="fw-bold text-info mb-3">Trạng thái: Đã duyệt (Chờ khách gửi hàng)</h6>
+                                                        <div class="d-flex gap-2">
+                                                            <button type="button" class="btn btn-outline-info flex-grow-1" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.shipping', $req->id) }}', 'Xác nhận khách đã bắt đầu gửi hàng?')">Hàng đang di chuyển</button>
+                                                            <button type="button" class="btn btn-success flex-grow-1" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.complete', $req->id) }}', 'Bỏ qua các bước và HOÀN TIỀN NGAY?')">Hoàn tiền ngay</button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             @elseif($req->isShipping())
-                                                <h6><strong>Hàng đang trên đường về kho</strong></h6>
-                                                <div class="alert alert-primary">Bạn đang theo dõi hàng gửi trả. Bấm nút dưới đây khi đã nhận hàng hoặc hoàn tiền luôn.</div>
-                                                <div class="d-flex flex-column gap-2 mt-3">
-                                                    <form action="{{ route('admin.returns.received', $req->id) }}" method="POST">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-outline-primary w-100" onclick="return confirm('Xác nhận đã nhận hàng tại kho?');">
-                                                            <i class="fas fa-warehouse me-1"></i> 1. Xác nhận đã nhận hàng tại kho
-                                                        </button>
-                                                    </form>
-                                                    <div class="text-center small text-muted">Hoặc</div>
-                                                    <form action="{{ route('admin.returns.complete', $req->id) }}" method="POST">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-success w-100" onclick="return confirm('Xác nhận HOÀN TIỀN NGAY vào ví khách hàng?');">
-                                                            <i class="fas fa-money-bill-wave me-1"></i> 2. Hoàn tiền ngay
-                                                        </button>
-                                                    </form>
+                                                <div class="card border-primary mb-0 shadow-sm">
+                                                    <div class="card-body">
+                                                        <h6 class="fw-bold text-primary mb-3">Trạng thái: Hàng đang trên đường về kho</h6>
+                                                        <div class="d-flex gap-2">
+                                                            <button type="button" class="btn btn-outline-primary flex-grow-1" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.received', $req->id) }}', 'Xác nhận đã nhận được hàng thực tế?')">Đã nhận được hàng</button>
+                                                            <button type="button" class="btn btn-success flex-grow-1" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.complete', $req->id) }}', 'Hoàn tất và HOÀN TIỀN?')">Hoàn tiền</button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             @elseif($req->isReceived())
-                                                <h6><strong>Hàng đã ở trong kho</strong></h6>
-                                                <div class="alert alert-success">Hàng đã về kho thành công. Hãy bấm nút dưới đây để cộng tiền hoàn lại vào ví khách.</div>
-                                                <form action="{{ route('admin.returns.complete', $req->id) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-success w-100 py-3" onclick="return confirm('Xác nhận hoàn tiền vào ví khách?');">
-                                                        <i class="fas fa-check-circle me-2 fa-lg"></i> XÁC NHẬN HOÀN TIỀN
-                                                    </button>
-                                                </form>
-                                            @elseif($req->isCompleted() || $req->isRejected())
-                                                <div class="alert alert-secondary mb-0">Yêu cầu này đã được xử lý xong bởi {{ $req->processor->name ?? 'Admin' }} lúc {{ $req->processed_at ? $req->processed_at->format('d/m/Y H:i') : '' }}.</div>
+                                                <div class="card border-success mb-0 shadow-sm">
+                                                    <div class="card-body text-center">
+                                                        <h6 class="fw-bold text-success mb-3">Hàng đã ở trong kho - Sẵn sàng hoàn tiền</h6>
+                                                        <button type="button" class="btn btn-success w-100 py-2" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.complete', $req->id) }}', 'Cộng tiền vào ví khách hàng và đóng yêu cầu?')">BẤM VÀO ĐÂY ĐỂ HOÀN TIỀN</button>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="alert alert-secondary mb-0">Yêu cầu này đã xử lý xong.</div>
                                             @endif
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         @empty
                             <tr>
                                 <td colspan="7" class="text-center py-4 text-muted">Không có yêu cầu nào!</td>
@@ -240,12 +174,55 @@
                         @endforelse
                     </tbody>
                 </table>
-            </div>
 
-            <div class="d-flex justify-content-end mt-3">
-                {{ $requests->appends(request()->query())->links('pagination::bootstrap-5') }}
+                <div class="d-flex justify-content-end mt-3">
+                    {{ $requests->appends(request()->query())->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Global Hidden Form - Tránh lỗi MethodNotAllowed do Pjax -->
+<form id="globalReturnForm" method="POST" style="display: none;" data-pjax="false">
+    @csrf
+    <input type="hidden" name="admin_note" id="global_admin_note">
+</form>
+@endsection
+
+@section('scripts')
+<script>
+    function submitReturnAction(requestId, actionUrl, confirmMessage) {
+        if (!confirm(confirmMessage)) return;
+
+        const form = document.getElementById('globalReturnForm');
+        const noteArea = document.getElementById('admin_note_' + requestId);
+        const globalInput = document.getElementById('global_admin_note');
+
+        form.action = actionUrl;
+        
+        if (noteArea) {
+            if (!noteArea.value.trim()) {
+                alert('Vui lòng nhập phản hồi xử lý!');
+                noteArea.focus();
+                return;
+            }
+            globalInput.value = noteArea.value;
+        } else {
+            globalInput.value = '';
+        }
+
+        console.log('Submitting POST action to:', actionUrl);
+        form.submit();
+    }
+
+    // Cleanup Modal Backdrop
+    function clearBackdrop() {
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open').css({'padding-right': '', 'overflow': ''});
+    }
+
+    $(document).on('pjax:end', clearBackdrop);
+    $(document).ready(clearBackdrop);
+</script>
 @endsection

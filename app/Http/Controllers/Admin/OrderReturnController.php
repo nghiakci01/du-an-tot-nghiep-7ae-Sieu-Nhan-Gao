@@ -74,7 +74,7 @@ class OrderReturnController extends Controller
         //     return redirect()->back()->with('error', 'Chỉ có thể chuyển sang trạng thái đang di chuyển khi đã duyệt.');
         // }
 
-        $this->returnService->markAsShipping($returnReq);
+        $this->returnService->markAsShipping($returnReq, auth()->user());
         
         return redirect()->back()->with('success', 'Đã cập nhật trạng thái đang di chuyển.');
     }
