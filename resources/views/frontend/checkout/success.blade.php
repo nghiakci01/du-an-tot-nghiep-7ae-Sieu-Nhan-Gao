@@ -211,7 +211,6 @@
             <div class="order-badge">
               @if($order->payment_method == 'COD') 💵 Thanh toán khi nhận hàng
               @elseif($order->payment_method == 'BANK_TRANSFER') 🏦 Chuyển khoản ngân hàng
-              @elseif($order->payment_method == 'WALLET') 💳 Ví Elite
               @else {{ $order->payment_method }}
               @endif
             </div>

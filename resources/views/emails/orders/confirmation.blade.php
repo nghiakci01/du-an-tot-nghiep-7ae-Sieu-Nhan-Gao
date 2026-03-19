@@ -9,7 +9,7 @@ Cảm ơn bạn đã đặt hàng tại **{{ config('app.name') }}**.
 ## Thông tin đơn hàng
 - **Mã đơn hàng:** #{{ $order->id }}
 - **Ngày đặt:** {{ $order->created_at->format('d/m/Y H:i') }}
-- **Phương thức thanh toán:** {{ $order->payment_method == 'COD' ? 'Thanh toán khi nhận hàng' : ($order->payment_method == 'WALLET' ? 'Thanh toán bằng ví Elite' : 'Chuyển khoản ngân hàng') }}
+- **Phương thức thanh toán:** {{ $order->payment_method == 'COD' ? 'Thanh toán khi nhận hàng' : 'Chuyển khoản ngân hàng' }}
 - **Trạng thái thanh toán:** {{ $order->status == 'confirmed' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
 
 ## Địa chỉ giao hàng

@@ -184,7 +184,7 @@ class CheckoutController extends Controller
             'email' => 'required|email:rfc,dns|max:255',
             'province' => 'required|string|in:'.implode(',', $provinces),
             'address' => 'required|string|max:500',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER',
             'shipping_provider' => 'nullable|string',
             'shipping_service_name' => 'nullable|string',
             'shipping_fee' => 'nullable|numeric',

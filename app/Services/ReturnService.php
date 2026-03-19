@@ -12,12 +12,10 @@ use Illuminate\Support\Facades\Notification;
 
 class ReturnService
 {
-    protected $walletService;
     protected $orderService;
 
-    public function __construct(WalletService $walletService, OrderService $orderService)
+    public function __construct(OrderService $orderService)
     {
-        $this->walletService = $walletService;
         $this->orderService = $orderService;
     }
 
@@ -106,14 +104,6 @@ class ReturnService
                 'processed_at' => now(),
             ]);
 
-            // 2. Credit Wallet
-            $this->walletService->credit(
-                $returnRequest->user, 
-                $returnRequest->refund_amount, 
-                'Hoàn tiền đơn hàng #' . $returnRequest->order_id . ' (Yêu cầu trả hàng #' . $returnRequest->id . ')', 
-                'order_return', 
-                $returnRequest->id
-            );
 
             // 3. Update Order Status & Payment Status
             $order = $returnRequest->order;
@@ -121,7 +111,7 @@ class ReturnService
                 $order, 
                 Order::STATUS_RETURNED, 
                 $processor, 
-                'Hệ thống đã tự động hoàn lại tiền vào ví khách hàng.'
+                'Hàng đã được hoàn trả thành công.'
             );
 
             $order->update(['payment_status' => 'refunded']);
