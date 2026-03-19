@@ -53,6 +53,16 @@ class OrderReturnRequest extends Model
         return $this->status === 'approved';
     }
 
+    public function isShipping()
+    {
+        return $this->status === 'shipping';
+    }
+
+    public function isReceived()
+    {
+        return $this->status === 'received';
+    }
+
     public function isCompleted()
     {
         return $this->status === 'completed';

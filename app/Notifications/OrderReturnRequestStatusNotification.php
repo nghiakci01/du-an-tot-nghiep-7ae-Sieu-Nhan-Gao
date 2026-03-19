@@ -26,9 +26,11 @@ class OrderReturnRequestStatusNotification extends Notification
     public function toArray(object $notifiable): array
     {
         $statusText = match($this->status) {
-            'approved' => 'được chấp nhận (Chờ gửi hàng)',
+            'approved' => 'được chấp nhận (Chờ bạn gửi hàng)',
+            'shipping' => 'đang được vận chuyển về kho',
+            'received' => 'đã được nhận tại kho (Đang chờ hoàn tiền)',
+            'completed' => 'hoàn thành (Đã hoàn tiền vào ví)',
             'rejected' => 'bị từ chối',
-            'completed' => 'hoàn thành (Đã hoàn tiền)',
             default => 'thay đổi trạng thái',
         };
 

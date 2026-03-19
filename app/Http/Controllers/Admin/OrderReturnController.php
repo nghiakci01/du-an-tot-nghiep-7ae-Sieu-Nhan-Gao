@@ -70,12 +70,42 @@ class OrderReturnController extends Controller
         return redirect()->back()->with('success', 'Yêu cầu hoàn trả đã bị từ chối.');
     }
 
+    public function markAsShipping($id)
+    {
+        $returnReq = \App\Models\OrderReturnRequest::findOrFail($id);
+        if (!$returnReq->isApproved()) {
+            return redirect()->back()->with('error', 'Chỉ có thể chuyển sang trạng thái đang di chuyển khi đã duyệt.');
+        }
+
+        $returnReq->update(['status' => 'shipping']);
+        
+        // Thông báo cho khách hàng
+        $returnReq->user->notify(new OrderReturnRequestStatusNotification($returnReq, 'shipping'));
+
+        return redirect()->back()->with('success', 'Đã cập nhật trạng thái: Đang di chuyển.');
+    }
+
+    public function markAsReceived($id)
+    {
+        $returnReq = \App\Models\OrderReturnRequest::findOrFail($id);
+        if (!$returnReq->isShipping()) {
+            return redirect()->back()->with('error', 'Chỉ có thể xác nhận đã nhận hàng khi hàng đang di chuyển.');
+        }
+
+        $returnReq->update(['status' => 'received']);
+        
+        // Thông báo cho khách hàng
+        $returnReq->user->notify(new OrderReturnRequestStatusNotification($returnReq, 'received'));
+
+        return redirect()->back()->with('success', 'Đã cập nhật trạng thái: Đã nhận hàng tại kho.');
+    }
+
     public function completeRefund(Request $request, $id, \App\Services\WalletService $walletService, \App\Services\OrderService $orderService)
     {
         $returnReq = \App\Models\OrderReturnRequest::with(['user', 'order'])->findOrFail($id);
         
-        if (!$returnReq->isApproved()) {
-            return redirect()->back()->with('error', 'Chỉ có thể hoàn tiền cho yêu cầu đã được duyệt chờ nhận hàng.');
+        if (!$returnReq->isReceived()) {
+            return redirect()->back()->with('error', 'Chỉ có thể hoàn tiền khi hàng đã được xác nhận nhận tại kho.');
         }
 
         try {

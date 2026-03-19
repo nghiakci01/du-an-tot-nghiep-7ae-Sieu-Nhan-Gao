@@ -376,8 +376,27 @@
                 <div class="d-flex flex-column align-items-start">
                   <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
                   @if($order->returnRequest)
-                    <span class="badge mt-1 {{ $order->returnRequest->status == 'completed' ? 'bg-success' : ($order->returnRequest->status == 'rejected' ? 'bg-danger' : 'bg-warning text-dark') }}" style="font-size: 0.7rem;">
-                      Hoàn trả: {{ $order->returnRequest->status == 'pending' ? 'Chờ duyệt' : ($order->returnRequest->status == 'approved' ? 'Chờ gửi hàng' : ($order->returnRequest->status == 'completed' ? 'Đã hoàn tiền' : 'Từ chối')) }}
+                    @php
+                        $retStatus = $order->returnRequest->status;
+                        $retLabel = match($retStatus) {
+                            'pending' => 'Chờ duyệt',
+                            'approved' => 'Chờ gửi hàng',
+                            'shipping' => 'Đang di chuyển',
+                            'received' => 'Đã nhận tại kho',
+                            'completed' => 'Đã hoàn tiền',
+                            'rejected' => 'Từ chối',
+                            default => 'Đang xử lý'
+                        };
+                        $retClass = match($retStatus) {
+                            'completed' => 'bg-success',
+                            'rejected' => 'bg-danger',
+                            'shipping', 'received' => 'bg-primary',
+                            'approved' => 'bg-info',
+                            default => 'bg-warning text-dark'
+                        };
+                    @endphp
+                    <span class="badge mt-1 {{ $retClass }}" style="font-size: 0.7rem;">
+                      Hoàn trả: {{ $retLabel }}
                     </span>
                   @endif
                 </div>

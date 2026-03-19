@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('order_return_requests', function (Blueprint $table) {
-            //
-        });
+        // MySQL doesn't support direct enum modification easily with Schema::table and change() 
+        // without Doctrine DBAL or using raw SQL. Let's use raw SQL for MySQL enum.
+        \Illuminate\Support\Facades\DB::statement("ALTER TABLE order_return_requests MODIFY COLUMN status ENUM('pending', 'approved', 'shipping', 'received', 'completed', 'rejected') DEFAULT 'pending'");
     }
 
     /**
@@ -21,8 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('order_return_requests', function (Blueprint $table) {
-            //
-        });
+        \Illuminate\Support\Facades\DB::statement("ALTER TABLE order_return_requests MODIFY COLUMN status ENUM('pending', 'approved', 'completed', 'rejected') DEFAULT 'pending'");
     }
 };
