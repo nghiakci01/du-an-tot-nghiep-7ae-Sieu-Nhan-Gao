@@ -99,4 +99,74 @@ class WalletController extends Controller
 
         return back()->with('success', $msg);
     }
+
+    /**
+     * List all withdrawal requests.
+     */
+    public function withdrawals(Request $request)
+    {
+        $status   = $request->get('status', 'pending');
+        $requests = \App\Models\WalletWithdrawRequest::with(['user', 'bankAccount'])
+            ->when($status !== 'all', fn ($q) => $q->where('status', $status))
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.wallet.withdrawals', compact('requests', 'status'));
+    }
+
+    /**
+     * Approve a withdrawal request.
+     */
+    public function approveWithdraw(Request $request, \App\Models\WalletWithdrawRequest $withdrawRequest)
+    {
+        if (! $withdrawRequest->isPending()) {
+            return back()->with('error', 'Yêu cầu này đã được xử lý.');
+        }
+
+        $request->validate([
+            'proof_image' => 'nullable|image|max:5120',
+        ]);
+
+        $imagePath = null;
+        if ($request->hasFile('proof_image')) {
+            $imagePath = $request->file('proof_image')->store('wallet/withdraw_proofs', 'public');
+        }
+
+        $withdrawRequest->update([
+            'status'       => 'approved',
+            'proof_image'  => $imagePath,
+            'processed_by' => Auth::id(),
+            'processed_at' => now(),
+        ]);
+
+        return back()->with('success', 'Đã duyệt yêu cầu rút '.number_format($withdrawRequest->amount).'₫.');
+    }
+
+    /**
+     * Reject a withdrawal request.
+     */
+    public function rejectWithdraw(Request $request, \App\Models\WalletWithdrawRequest $withdrawRequest)
+    {
+        if (! $withdrawRequest->isPending()) {
+            return back()->with('error', 'Yêu cầu này đã được xử lý.');
+        }
+
+        // Hoàn lại tiền vào ví
+        $this->walletService->credit(
+            $withdrawRequest->user,
+            (float) $withdrawRequest->amount,
+            'Hoàn lại tiền rút ví - Yêu cầu bị từ chối: ' . $request->admin_note,
+            'withdraw_refund',
+            $withdrawRequest->id
+        );
+
+        $withdrawRequest->update([
+            'status'       => 'rejected',
+            'admin_note'   => $request->admin_note,
+            'processed_by' => Auth::id(),
+            'processed_at' => now(),
+        ]);
+
+        return back()->with('success', 'Đã từ chối và hoàn tiền lại vào ví.');
+    }
 }

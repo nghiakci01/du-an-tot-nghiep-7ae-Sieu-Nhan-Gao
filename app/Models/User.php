@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\WalletTransaction;
 use App\Models\WalletTopupRequest;
+use App\Models\WalletWithdrawRequest;
 
 class User extends Authenticatable
 {
@@ -105,6 +106,11 @@ class User extends Authenticatable
     public function walletTopupRequests()
     {
         return $this->hasMany(WalletTopupRequest::class)->latest();
+    }
+
+    public function walletWithdrawRequests()
+    {
+        return $this->hasMany(WalletWithdrawRequest::class)->latest();
     }
 
     public function getAvatarUrlAttribute()

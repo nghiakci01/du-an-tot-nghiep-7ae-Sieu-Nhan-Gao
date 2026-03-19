@@ -32,6 +32,7 @@ class AccountController extends Controller
             $userBankAccounts     = $user->bankAccounts()->get();
             $walletTransactions   = $user->walletTransactions()->take(20)->get();
             $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();
+            $walletWithdrawRequests = $user->walletWithdrawRequests()->take(10)->get();
         } else {
             $orders   = collect();
             $coupons  = collect();
@@ -39,11 +40,12 @@ class AccountController extends Controller
             $userBankAccounts    = collect();
             $walletTransactions  = collect();
             $walletTopupRequests = collect();
+            $walletWithdrawRequests = collect();
         }
 
         return view('frontend.account.index', compact(
             'user', 'orders', 'coupons', 'wishlists',
-            'userBankAccounts', 'walletTransactions', 'walletTopupRequests'
+            'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests'
         ));
 
     }

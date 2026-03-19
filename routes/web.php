@@ -82,6 +82,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Wallet
     Route::post('/my-account/wallet/topup', [App\Http\Controllers\Frontend\WalletController::class, 'requestTopup'])->name('wallet.topup.request');
+    Route::post('/my-account/wallet/withdraw', [App\Http\Controllers\Frontend\WalletController::class, 'requestWithdraw'])->name('wallet.withdraw.request');
 
     // Wishlist Routes
     Route::get('/wishlist', [App\Http\Controllers\Frontend\WishlistController::class, 'index'])->name('wishlist.index');
@@ -164,8 +165,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
             // Wallet Management
             Route::get('wallet', [App\Http\Controllers\Admin\WalletController::class, 'index'])->name('wallet.index');
+            Route::get('wallet/withdrawals', [App\Http\Controllers\Admin\WalletController::class, 'withdrawals'])->name('wallet.withdrawals');
             Route::post('wallet/{topupRequest}/approve', [App\Http\Controllers\Admin\WalletController::class, 'approve'])->name('wallet.approve');
             Route::post('wallet/{topupRequest}/reject', [App\Http\Controllers\Admin\WalletController::class, 'reject'])->name('wallet.reject');
+            Route::post('wallet/withdraw/{withdrawRequest}/approve', [App\Http\Controllers\Admin\WalletController::class, 'approveWithdraw'])->name('wallet.withdraw.approve');
+            Route::post('wallet/withdraw/{withdrawRequest}/reject', [App\Http\Controllers\Admin\WalletController::class, 'rejectWithdraw'])->name('wallet.withdraw.reject');
             Route::post('wallet/manual-adjust', [App\Http\Controllers\Admin\WalletController::class, 'manualAdjust'])->name('wallet.manual-adjust');
 
 
