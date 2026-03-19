@@ -136,23 +136,63 @@ class AccountController extends Controller
         return redirect()->back()->with('success', 'Order cancelled successfully!');
     }
 
-    public function returnOrder($id, \App\Services\OrderService $orderService)
+    public function returnOrderForm($id)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
         $order = $user->orders()->findOrFail($id);
 
         if (!in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_SHIPPED])) {
-            return redirect()->back()->with('error', 'Chỉ có thể hoàn hàng cho đơn hàng đã giao hoặc hoàn thành.');
+            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã giao hoặc hoàn thành.');
         }
 
-        try {
-            $orderService->updateOrderStatus($order, Order::STATUS_RETURNED, $user, 'Khách hàng yêu cầu hoàn hàng');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
+        if ($order->returnRequest) {
+            return redirect()->route('account.orders.show', $order->id)->with('info', 'Đơn hàng này đã có yêu cầu hoàn trả.');
         }
 
-        return redirect()->back()->with('success', 'Yêu cầu hoàn hàng đã được ghi nhận!');
+        return view('frontend.account.orders.return_form', compact('order'));
+    }
+
+    public function submitReturnRequest(Request $request, $id)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $order = $user->orders()->findOrFail($id);
+
+        if (!in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_SHIPPED])) {
+            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã giao hoặc hoàn thành.');
+        }
+
+        if ($order->returnRequest) {
+            return redirect()->back()->with('error', 'Đơn hàng này đã có yêu cầu hoàn trả.');
+        }
+
+        $request->validate([
+            'reason' => 'required|string|max:255',
+            'note' => 'nullable|string|max:1000',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('returns', 'public');
+                $imagePaths[] = $path;
+            }
+        }
+
+        \App\Models\OrderReturnRequest::create([
+            'user_id' => $user->id,
+            'order_id' => $order->id,
+            'reason' => $request->reason,
+            'note' => $request->note,
+            'images' => $imagePaths,
+            'refund_amount' => $order->final_total,
+            'status' => 'pending',
+        ]);
+
+        return redirect()->route('account.orders.show', $order->id)
+            ->with('success', 'Yêu cầu hoàn trả của bạn đã được gửi và đang chờ xử lý.');
     }
 
     // ===== USER BANK ACCOUNTS =====

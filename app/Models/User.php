@@ -113,6 +113,11 @@ class User extends Authenticatable
         return $this->hasMany(WalletWithdrawRequest::class)->latest();
     }
 
+    public function orderReturnRequests()
+    {
+        return $this->hasMany(OrderReturnRequest::class)->latest();
+    }
+
     public function getAvatarUrlAttribute()
     {
         if (! $this->avatar) {
