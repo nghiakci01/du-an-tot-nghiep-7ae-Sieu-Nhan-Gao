@@ -348,6 +348,9 @@ class CartController extends Controller
         CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
 
         if ($request->input('action') === 'buy_now') {
+            // Set session for checkout
+            session(['selected_checkout_ids' => [(string)$variant->id]]);
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => true,
