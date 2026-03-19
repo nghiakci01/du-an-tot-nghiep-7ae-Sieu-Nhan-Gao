@@ -104,8 +104,8 @@ class OrderReturnController extends Controller
     {
         $returnReq = \App\Models\OrderReturnRequest::with(['user', 'order'])->findOrFail($id);
         
-        if (!$returnReq->isReceived()) {
-            return redirect()->back()->with('error', 'Chỉ có thể hoàn tiền khi hàng đã được xác nhận nhận tại kho.');
+        if (!in_array($returnReq->status, ['approved', 'shipping', 'received'])) {
+            return redirect()->back()->with('error', 'Chỉ có thể hoàn tiền cho yêu cầu đã được duyệt.');
         }
 
         try {

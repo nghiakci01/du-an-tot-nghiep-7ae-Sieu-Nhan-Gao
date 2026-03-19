@@ -130,4 +130,9 @@ class Order extends Model
 
         return in_array($newStatus, $this->getAllowedTransitions());
     }
+
+    public function returnRequest()
+    {
+        return $this->hasOne(OrderReturnRequest::class);
+    }
 }

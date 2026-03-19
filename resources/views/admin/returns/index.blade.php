@@ -181,37 +181,49 @@
                                                     </div>
                                                 </form>
                                             @elseif($req->isApproved())
-                                                <h6><strong>Xác nhận hàng đang được gửi</strong></h6>
-                                                <div class="alert alert-info">Bấm nút dưới đây khi khách hàng đã bàn giao hàng cho đơn vị vận chuyển hoặc hàng đã bắt đầu di chuyển về kho.</div>
-                                                <form action="{{ route('admin.returns.shipping', $req->id) }}" method="POST">
-                                                    @csrf
-                                                    <div class="d-flex justify-content-end">
-                                                        <button type="submit" class="btn btn-info text-white" onclick="return confirm('Xác nhận hàng đã bắt đầu di chuyển?');">
-                                                            <i class="fas fa-truck me-1"></i> Xác nhận Đang di chuyển
+                                                <h6><strong>Xử lý tiếp theo</strong></h6>
+                                                <div class="alert alert-info">Bạn đã duyệt yêu cầu. Bây giờ bạn có thể theo dõi hàng gửi về hoặc <b>Hoàn tiền ngay</b> nếu muốn.</div>
+                                                <div class="d-flex flex-column gap-2 mt-3">
+                                                    <form action="{{ route('admin.returns.shipping', $req->id) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-outline-info w-100" onclick="return confirm('Xác nhận hàng đã bắt đầu di chuyển?');">
+                                                            <i class="fas fa-truck me-1"></i> 1. Đã bắt đầu di chuyển
                                                         </button>
-                                                    </div>
-                                                </form>
+                                                    </form>
+                                                    <div class="text-center small text-muted">Hoặc</div>
+                                                    <form action="{{ route('admin.returns.complete', $req->id) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-success w-100" onclick="return confirm('Xác nhận HOÀN TIỀN NGAY vào ví khách hàng?');">
+                                                            <i class="fas fa-money-bill-wave me-1"></i> 2. Hoàn tiền ngay (Bỏ qua các bước sau)
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             @elseif($req->isShipping())
-                                                <h6><strong>Xác nhận đã nhận hàng tại kho</strong></h6>
-                                                <div class="alert alert-primary">Bấm nút dưới đây khi hàng đã được ship đến kho của bạn thành công.</div>
-                                                <form action="{{ route('admin.returns.received', $req->id) }}" method="POST">
-                                                    @csrf
-                                                    <div class="d-flex justify-content-end">
-                                                        <button type="submit" class="btn btn-primary" onclick="return confirm('Xác nhận đã nhận hàng tại kho?');">
-                                                            <i class="fas fa-warehouse me-1"></i> Đã nhận hàng tại kho
+                                                <h6><strong>Hàng đang trên đường về kho</strong></h6>
+                                                <div class="alert alert-primary">Bạn đang theo dõi hàng gửi trả. Bấm nút dưới đây khi đã nhận hàng hoặc hoàn tiền luôn.</div>
+                                                <div class="d-flex flex-column gap-2 mt-3">
+                                                    <form action="{{ route('admin.returns.received', $req->id) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-outline-primary w-100" onclick="return confirm('Xác nhận đã nhận hàng tại kho?');">
+                                                            <i class="fas fa-warehouse me-1"></i> 1. Xác nhận đã nhận hàng tại kho
                                                         </button>
-                                                    </div>
-                                                </form>
+                                                    </form>
+                                                    <div class="text-center small text-muted">Hoặc</div>
+                                                    <form action="{{ route('admin.returns.complete', $req->id) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-success w-100" onclick="return confirm('Xác nhận HOÀN TIỀN NGAY vào ví khách hàng?');">
+                                                            <i class="fas fa-money-bill-wave me-1"></i> 2. Hoàn tiền ngay
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             @elseif($req->isReceived())
-                                                <h6><strong>Xác nhận Nhận Hàng & Hoàn Tiền</strong></h6>
-                                                <div class="alert alert-success">Hàng đã ở trong kho. Bấm nút dưới đây để hoàn tất quy trình và cộng <b>{{ number_format($req->refund_amount) }}đ</b> vào Ví của khách hàng.</div>
+                                                <h6><strong>Hàng đã ở trong kho</strong></h6>
+                                                <div class="alert alert-success">Hàng đã về kho thành công. Hãy bấm nút dưới đây để cộng tiền hoàn lại vào ví khách.</div>
                                                 <form action="{{ route('admin.returns.complete', $req->id) }}" method="POST">
                                                     @csrf
-                                                    <div class="d-flex justify-content-end">
-                                                        <button type="submit" class="btn btn-success" onclick="return confirm('Xác nhận hoàn tiền vào ví khách?');">
-                                                            <i class="fas fa-check-circle me-1"></i> Xác nhận Hoàn Tiền
-                                                        </button>
-                                                    </div>
+                                                    <button type="submit" class="btn btn-success w-100 py-3" onclick="return confirm('Xác nhận hoàn tiền vào ví khách?');">
+                                                        <i class="fas fa-check-circle me-2 fa-lg"></i> XÁC NHẬN HOÀN TIỀN
+                                                    </button>
                                                 </form>
                                             @elseif($req->isCompleted() || $req->isRejected())
                                                 <div class="alert alert-secondary mb-0">Yêu cầu này đã được xử lý xong bởi {{ $req->processor->name ?? 'Admin' }} lúc {{ $req->processed_at ? $req->processed_at->format('d/m/Y H:i') : '' }}.</div>
