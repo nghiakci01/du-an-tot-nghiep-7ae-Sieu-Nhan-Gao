@@ -443,6 +443,32 @@
         </div>
       </div>
 
+      {{-- Return Shipping Action --}}
+      @if($order->returnRequest && $order->returnRequest->status === 'approved')
+      <div class="detail-card border-warning bg-light-warning mb-3">
+        <div class="detail-header bg-warning text-white">
+          <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Gửi hàng hoàn trả</h5>
+        </div>
+        <div class="detail-body">
+          <p class="small text-muted mb-3">Yêu cầu trả hàng của bạn đã được duyệt. Vui lòng gửi hàng về kho và nộp thông tin vận đơn tại đây.</p>
+          <form action="{{ route('account.orders.return.shipping', $order->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Thông tin vận chuyển</label>
+              <textarea name="shipping_info" class="form-control form-control-sm" rows="2" placeholder="VD: Giao hàng nhanh - Mã: 12345678" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Ảnh minh chứng gửi hàng</label>
+              <input type="file" name="shipping_proof" class="form-control form-control-sm" accept="image/*" required>
+            </div>
+            <button type="submit" class="btn btn-warning rounded-pill w-100 py-2">
+              <i class="bi bi-send me-1"></i> Xác nhận đã gửi hàng
+            </button>
+          </form>
+        </div>
+      </div>
+      @endif
+
       {{-- Actions --}}
       <div class="d-flex flex-column gap-2">
         <a href="{{ route('account.index') }}?tab=orders" class="btn btn-outline-dark rounded-pill py-2">

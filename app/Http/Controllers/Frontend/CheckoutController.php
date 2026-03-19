@@ -21,10 +21,12 @@ use App\Services\CartService;
 class CheckoutController extends Controller
 {
     protected $cartService;
+    protected $walletService;
 
-    public function __construct(CartService $cartService)
+    public function __construct(CartService $cartService, \App\Services\WalletService $walletService)
     {
         $this->cartService = $cartService;
+        $this->walletService = $walletService;
     }
 
     public function index(Request $request)
@@ -83,13 +85,11 @@ class CheckoutController extends Controller
 
         $provinces = config('vietnam_provinces');
         
-        // Lấy thông tin tài khoản ngân hàng mặc định
-        $defaultBank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first();
-        if (!$defaultBank) {
-            $defaultBank = \App\Models\BankSetting::where('is_active', true)->first();
-        }
+        // Lấy thông tin các tài khoản ngân hàng đang hoạt động
+        $banks = \App\Models\BankSetting::where('is_active', true)->get();
+        $defaultBank = $banks->where('is_default', true)->first() ?: $banks->first();
 
-        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces', 'defaultBank'));
+        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces', 'banks', 'defaultBank'));
     }
 
     /**
@@ -174,8 +174,8 @@ class CheckoutController extends Controller
             'email' => 'required|email:rfc,dns|max:255',
             'province' => 'required|string|in:'.implode(',', $provinces),
             'address' => 'required|string|max:500',
-            'note' => 'nullable|string|max:1000',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY,MOMO,WALLET',
+            'bank_setting_id' => 'required_if:payment_method,BANK_TRANSFER|nullable|exists:bank_settings,id',
             'shipping_provider' => 'nullable|string',
             'shipping_service_name' => 'nullable|string',
             'shipping_fee' => 'nullable|numeric',
@@ -239,6 +239,8 @@ class CheckoutController extends Controller
                 'shipping_service_name' => $shippingServiceName,
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
+                'bank_setting_id' => $request->payment_method === 'BANK_TRANSFER' ? $request->bank_setting_id : null,
+                'payment_status' => 'pending',
                 'shipping_address' => $request->address.', '.$request->province.' - '.$request->phone.' - '.$request->name,
                 'note' => $request->note,
             ]);
@@ -249,6 +251,28 @@ class CheckoutController extends Controller
                 if ($coupon) {
                     $coupon->increment('used_count');
                 }
+            }
+
+            // Xử lý thanh toán Ví Elite
+            if ($request->payment_method === 'WALLET') {
+                $user = Auth::user();
+                if (!$user) {
+                    throw new \Exception('Vui lòng đăng nhập để sử dụng Ví Elite.');
+                }
+
+                $result = $this->walletService->debit(
+                    $user, 
+                    $finalTotal, 
+                    'Thanh toán đơn hàng #' . $order->id, 
+                    Order::class, 
+                    $order->id
+                );
+
+                if (!$result) {
+                    throw new \Exception('Số dư ví không đủ để thanh toán.');
+                }
+
+                $order->update(['payment_status' => 'paid', 'status' => Order::STATUS_CONFIRMED]);
             }
 
             foreach ($cart as $id => $details) {
@@ -286,9 +310,18 @@ class CheckoutController extends Controller
                 session()->forget(['coupon_code', 'discount_amount', 'selected_checkout_ids']);
             }
 
-            // Nếu chọn VNPAY -> redirect sang trang thanh toán VNPAY
+            // Nếu chọn VNPAY -> redirect sang trang thanh toán VNPAY (kèm bank_code nếu có)
             if ($request->payment_method === 'VNPAY') {
-                return redirect()->route('vnpay.payment', $order->id);
+                return redirect()->route('vnpay.payment', [
+                    'order_id' => $order->id, 
+                    'bank_code' => $request->bank_code
+                ]);
+            }
+
+            // Nếu chọn MOMO -> hiện tại mô phỏng qua trang hướng dẫn hoặc redirect (Tùy cấu hình)
+            if ($request->payment_method === 'MOMO') {
+                // Giả định MoMo thành công hoặc redirect tới trang chờ
+                return redirect()->route('checkout.success', $order->id)->with('success', 'Đơn hàng đã được ghi nhận. Vui lòng hoàn tất thanh toán qua ví MoMo.');
             }
 
             // Mark any abandoned carts as recovered for this user/session

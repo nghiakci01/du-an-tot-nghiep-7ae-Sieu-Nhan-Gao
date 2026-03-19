@@ -266,4 +266,53 @@ class AccountController extends Controller
 
         return redirect()->back()->with('success', 'Đã xóa tài khoản ngân hàng.');
     }
+
+    /**
+     * Khách hàng nộp thông tin vận chuyển khi hàng hoàn đã được Duyệt (Approved)
+     */
+    public function submitShipping(Request $request, $id)
+    {
+        $order = Order::where('user_id', Auth::id())->findOrFail($id);
+        $returnRequest = $order->returnRequest;
+
+        if (!$returnRequest || $returnRequest->status !== 'approved') {
+            return redirect()->back()->with('error', 'Yêu cầu trả hàng không ở trạng thái được phép gửi hàng.');
+        }
+
+        $request->validate([
+            'shipping_info' => 'required|string|max:1000',
+            'shipping_proof' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'shipping_info.required' => 'Vui lòng nhập thông tin vận chuyển (Mã vận đơn, đơn vị vận chuyển...).',
+            'shipping_proof.required' => 'Vui lòng tải lên ảnh minh chứng đã gửi hàng.',
+        ]);
+
+        $data = [
+            'shipping_info' => $request->shipping_info,
+            'status' => 'shipping', // Chuyển sang trạng thái Đang gửi hàng
+        ];
+
+        if ($request->hasFile('shipping_proof')) {
+            $image = $request->file('shipping_proof');
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            \Illuminate\Support\Facades\File::ensureDirectoryExists(public_path('uploads/returns'));
+            $image->move(public_path('uploads/returns'), $imageName);
+            $data['shipping_proof'] = 'uploads/returns/' . $imageName;
+        }
+
+        $returnRequest->update($data);
+
+        // Ghi lịch sử
+        if (class_exists(\App\Models\OrderHistory::class)) {
+            \App\Models\OrderHistory::create([
+                'order_id' => $order->id,
+                'previous_status' => $order->status,
+                'new_status' => $order->status,
+                'note' => 'Khách hàng đã nộp thông tin vận chuyển hàng hoàn: ' . $request->shipping_info,
+                'user_id' => Auth::id()
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Gửi thông tin vận chuyển thành công. Chúng tôi sẽ thông báo khi nhận được hàng.');
+    }
 }

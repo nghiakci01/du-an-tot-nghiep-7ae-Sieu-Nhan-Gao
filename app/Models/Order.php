@@ -30,6 +30,7 @@ class Order extends Model
         'transaction_id',
         'shipping_address',
         'note',
+        'bank_setting_id',
     ];
 
     const STATUS_PENDING = 'pending';
@@ -64,6 +65,11 @@ class Order extends Model
     public function returnRequest()
     {
         return $this->hasOne(OrderReturnRequest::class);
+    }
+
+    public function bankSetting()
+    {
+        return $this->belongsTo(BankSetting::class, 'bank_setting_id');
     }
 
     public function getSubtotalAttribute()

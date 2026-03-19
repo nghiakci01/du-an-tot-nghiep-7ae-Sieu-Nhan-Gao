@@ -113,6 +113,21 @@
                                             </div>
                                             @endif
 
+                                            @if($req->shipping_info)
+                                            <div class="mb-3 p-3 border rounded border-warning bg-light-warning">
+                                                <h6 class="text-warning fw-bold"><i class="bi bi-truck me-1"></i> Thông tin gửi hàng từ khách:</h6>
+                                                <p class="mb-2">{{ $req->shipping_info }}</p>
+                                                @if($req->shipping_proof)
+                                                <div class="mt-2">
+                                                    <a href="{{ asset($req->shipping_proof) }}" target="_blank">
+                                                        <img src="{{ asset($req->shipping_proof) }}" class="img-thumbnail" style="max-width: 200px;">
+                                                    </a>
+                                                    <div class="small text-muted mt-1">Click vào ảnh để xem kích thước đầy đủ</div>
+                                                </div>
+                                                @endif
+                                            </div>
+                                            @endif
+
                                             <hr>
 
                                             <!-- Xử lý hành động -->

@@ -32,7 +32,7 @@ class PaymentController extends Controller
                 ->with('info', 'Đơn hàng đã được thanh toán.');
         }
 
-        $paymentUrl = $this->vnpayService->createPaymentUrl($order, $request->ip());
+        $paymentUrl = $this->vnpayService->createPaymentUrl($order, $request->ip(), $request->bank_code);
 
         Log::info('VNPAY: Redirecting order #' . $order->id . ' to payment gateway');
 
