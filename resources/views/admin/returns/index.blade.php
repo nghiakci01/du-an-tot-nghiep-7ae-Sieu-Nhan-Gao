@@ -156,8 +156,13 @@
                                                 <form method="POST" id="actionForm{{$req->id}}">
                                                     @csrf
                                                     <div class="mb-3">
-                                                        <label class="form-label">Phản hồi / Mã vận chuyển Gửi trả <span class="text-danger">*</span></label>
-                                                        <textarea name="admin_note" class="form-control" rows="3" required placeholder="Ví dụ mã vận chuyển GHTK, hướng dẫn đóng gói... hoặc lý do từ chối"></textarea>
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <label class="form-label mb-0">Phản hồi / Mã vận chuyển Gửi trả <span class="text-danger">*</span></label>
+                                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="document.getElementById('admin_note_{{ $req->id }}').value = 'Mã KS-RET-{{ $req->order_id }}-{{ strtoupper(Str::random(5)) }}\nVui lòng gửi hàng về địa chỉ kho, ghi rõ mã này trên kiện hàng.'">
+                                                                <i class="fas fa-magic"></i> Tạo mã tự động
+                                                            </button>
+                                                        </div>
+                                                        <textarea id="admin_note_{{ $req->id }}" name="admin_note" class="form-control" rows="3" required placeholder="Ví dụ mã vận chuyển GHTK, hướng dẫn đóng gói... hoặc lý do từ chối"></textarea>
                                                         <small class="text-muted">Khách hàng sẽ nhìn thấy nội dung này.</small>
                                                     </div>
                                                     <div class="d-flex justify-content-end gap-2">
