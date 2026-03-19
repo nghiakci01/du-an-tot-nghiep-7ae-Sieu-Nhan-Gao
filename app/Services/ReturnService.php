@@ -7,6 +7,7 @@ use App\Models\OrderReturnRequest;
 use App\Models\User;
 use App\Notifications\OrderReturnRequestStatusNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class ReturnService
@@ -25,6 +26,7 @@ class ReturnService
      */
     public function approve(OrderReturnRequest $returnRequest, User $processor, string $adminNote = null)
     {
+        Log::info("Đang duyệt hoàn trả cho đơn hàng #{$returnRequest->order_id} bởi user #{$processor->id}");
         return DB::transaction(function () use ($returnRequest, $processor, $adminNote) {
             $returnRequest->update([
                 'status' => 'approved',
@@ -35,6 +37,8 @@ class ReturnService
 
             Notification::send($returnRequest->user, new OrderReturnRequestStatusNotification($returnRequest, 'approved'));
 
+            Log::info("Hoàn trả #{$returnRequest->id} đã được duyệt.");
+
             return $returnRequest;
         });
     }
@@ -42,10 +46,17 @@ class ReturnService
     /**
      * Mark as shipping
      */
-    public function markAsShipping(OrderReturnRequest $returnRequest)
+    public function markAsShipping(OrderReturnRequest $returnRequest, User $processor)
     {
-        $returnRequest->update(['status' => 'shipping']);
+        Log::info("Cập nhật trạng thái 'Đang vận chuyển' cho yêu cầu #{$returnRequest->id}");
+        $returnRequest->update([
+            'status' => 'shipping',
+            'processed_by' => $processor->id,
+            'processed_at' => now(),
+        ]);
+
         Notification::send($returnRequest->user, new OrderReturnRequestStatusNotification($returnRequest, 'shipping'));
+
         return $returnRequest;
     }
 
@@ -117,6 +128,8 @@ class ReturnService
 
             // 4. Notify User
             Notification::send($returnRequest->user, new OrderReturnRequestStatusNotification($returnRequest, 'completed'));
+
+            Log::info("Hoàn trả hoàn thành thành công cho đơn hàng #{$returnRequest->order_id}");
 
             return $returnRequest;
         });
