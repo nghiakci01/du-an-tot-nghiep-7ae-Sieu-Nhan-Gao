@@ -32,7 +32,7 @@ class VnpayService
     /**
      * Build VNPAY payment URL and redirect user.
      */
-    public function createPaymentUrl(Order $order, string $ipAddr = '127.0.0.1'): string
+    public function createPaymentUrl(Order $order, string $ipAddr = '127.0.0.1', ?string $bankCode = null): string
     {
         $inputData = [
             'vnp_Version'    => '2.1.0',
@@ -49,6 +49,10 @@ class VnpayService
             'vnp_TxnRef'     => $order->id . '_' . time(),
             'vnp_ExpireDate' => date('YmdHis', strtotime('+15 minutes')),
         ];
+
+        if ($bankCode) {
+            $inputData['vnp_BankCode'] = $bankCode;
+        }
 
         ksort($inputData);
         $hashData = $this->buildHashData($inputData);

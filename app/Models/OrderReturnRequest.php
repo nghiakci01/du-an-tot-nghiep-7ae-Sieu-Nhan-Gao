@@ -15,6 +15,8 @@ class OrderReturnRequest extends Model
         'reason',
         'note',
         'images',
+        'shipping_info',
+        'shipping_proof',
         'status',
         'admin_note',
         'refund_amount',

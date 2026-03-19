@@ -296,19 +296,29 @@
                 <div class="row align-items-center">
                   <div class="col-md-7">
                     @if($order->payment_status == 'pending')
+                      @php
+                        $bank = $order->bankSetting;
+                        if (!$bank) {
+                            $bank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first() ?: \App\Models\BankSetting::where('is_active', true)->first();
+                        }
+                        $bName = $bank?->bank_name ?? 'N/A';
+                        $bAccount = $bank?->account_number ?? 'N/A';
+                        $bOwner = $bank?->account_name ?? 'N/A';
+                        $bId = $bank?->bank_id ?? '';
+                      @endphp
                       <p class="section-label mb-2">Thông tin chuyển khoản</p>
                       <p class="fw-bold mb-3" style="color:#d4860a;">⚠️ Vui lòng chuyển khoản và nhấn nút xác nhận bên dưới.</p>
                       <div class="bank-info-row">
                         <span class="text-muted">Ngân hàng</span>
-                        <span class="fw-semibold">{{ $bankName }}</span>
+                        <span class="fw-semibold">{{ $bName }}</span>
                       </div>
                       <div class="bank-info-row">
                         <span class="text-muted">Số tài khoản</span>
-                        <span class="fw-bold text-dark">{{ $bankAccount }}</span>
+                        <span class="fw-bold text-dark">{{ $bAccount }}</span>
                       </div>
                       <div class="bank-info-row">
                         <span class="text-muted">Chủ tài khoản</span>
-                        <span class="fw-semibold">{{ $bankOwner }}</span>
+                        <span class="fw-semibold">{{ $bOwner }}</span>
                       </div>
                       <div class="bank-info-row">
                         <span class="text-muted">Số tiền</span>
@@ -354,7 +364,7 @@
                   <div class="col-md-5 text-center mt-4 mt-md-0">
                     <div class="qr-holder">
                       @php
-                        $qrUrl = "https://img.vietqr.io/image/{$bankId}-{$bankAccount}-compact2.png?amount={$displayTotal}&addInfo=THANHTOAN%20DH{$order->id}&accountName=" . urlencode($bankOwner);
+                        $qrUrl = "https://img.vietqr.io/image/{$bId}-{$bAccount}-compact2.png?amount={$displayTotal}&addInfo=THANHTOAN%20DH{$order->id}&accountName=" . urlencode($bOwner);
                       @endphp
                       <img src="{{ $qrUrl }}" alt="VietQR" class="img-fluid" style="max-width: 190px;">
                     </div>
