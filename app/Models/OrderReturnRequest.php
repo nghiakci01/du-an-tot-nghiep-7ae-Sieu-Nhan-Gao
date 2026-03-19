@@ -53,6 +53,16 @@ class OrderReturnRequest extends Model
         return $this->status === 'approved';
     }
 
+    public function isShipping()
+    {
+        return $this->status === 'shipping';
+    }
+
+    public function isReceived()
+    {
+        return $this->status === 'received';
+    }
+
     public function isCompleted()
     {
         return $this->status === 'completed';
@@ -61,5 +71,31 @@ class OrderReturnRequest extends Model
     public function isRejected()
     {
         return $this->status === 'rejected';
+    }
+
+    public function getStatusTextAttribute()
+    {
+        return match($this->status) {
+            'pending' => 'Chờ duyệt',
+            'approved' => 'Đã duyệt/Chờ hàng',
+            'shipping' => 'Đang vận chuyển',
+            'received' => 'Đã nhận tại kho',
+            'completed' => 'Đã hoàn tất',
+            'rejected' => 'Bị từ chối',
+            default => 'Không xác định'
+        };
+    }
+
+    public function getStatusBadgeAttribute()
+    {
+        return match($this->status) {
+            'pending' => 'bg-warning text-dark',
+            'approved' => 'bg-info',
+            'shipping' => 'bg-primary',
+            'received' => 'bg-dark',
+            'completed' => 'bg-success',
+            'rejected' => 'bg-danger',
+            default => 'bg-secondary'
+        };
     }
 }

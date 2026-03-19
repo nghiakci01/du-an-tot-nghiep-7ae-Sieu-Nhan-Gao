@@ -376,8 +376,8 @@
                 <div class="d-flex flex-column align-items-start">
                   <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
                   @if($order->returnRequest)
-                    <span class="badge mt-1 {{ $order->returnRequest->status == 'completed' ? 'bg-success' : ($order->returnRequest->status == 'rejected' ? 'bg-danger' : 'bg-warning text-dark') }}" style="font-size: 0.7rem;">
-                      Hoàn trả: {{ $order->returnRequest->status == 'pending' ? 'Chờ duyệt' : ($order->returnRequest->status == 'approved' ? 'Chờ gửi hàng' : ($order->returnRequest->status == 'completed' ? 'Đã hoàn tiền' : 'Từ chối')) }}
+                    <span class="badge mt-1 {{ $order->returnRequest->status_badge }}" style="font-size: 0.7rem;">
+                      Hoàn tiền: {{ $order->returnRequest->status_text }}
                     </span>
                   @endif
                 </div>

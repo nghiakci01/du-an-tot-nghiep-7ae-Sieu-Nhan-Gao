@@ -274,16 +274,8 @@
       <div class="detail-card" style="border: 2px solid #ffca2c;">
         <div class="detail-card-header" style="background-color: #fff9e6;">
           <h5 class="text-dark"><i class="bi bi-arrow-return-left me-2"></i>Chi tiết Yêu cầu Hoàn trả</h5>
-          <span class="badge {{ $order->returnRequest->status == 'completed' ? 'bg-success' : ($order->returnRequest->status == 'rejected' ? 'bg-danger' : 'bg-warning text-dark') }}">
-            @if($order->returnRequest->status == 'pending')
-              Đang chờ duyệt
-            @elseif($order->returnRequest->status == 'approved')
-              Đã duyệt - Chờ nhận hàng
-            @elseif($order->returnRequest->status == 'completed')
-              Đã hoàn tiền
-            @elseif($order->returnRequest->status == 'rejected')
-              Bị từ chối
-            @endif
+          <span class="badge {{ $order->returnRequest->status_badge }}">
+            {{ $order->returnRequest->status_text }}
           </span>
         </div>
         <div class="detail-card-body">

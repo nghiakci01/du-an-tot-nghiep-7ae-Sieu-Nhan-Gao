@@ -138,6 +138,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         // Order Returns Management
         Route::get('returns', [App\Http\Controllers\Admin\OrderReturnController::class, 'index'])->name('returns.index');
         Route::post('returns/{id}/approve', [App\Http\Controllers\Admin\OrderReturnController::class, 'approve'])->name('returns.approve');
+        Route::post('returns/{id}/shipping', [App\Http\Controllers\Admin\OrderReturnController::class, 'markAsShipping'])->name('returns.shipping');
+        Route::post('returns/{id}/received', [App\Http\Controllers\Admin\OrderReturnController::class, 'markAsReceived'])->name('returns.received');
         Route::post('returns/{id}/reject', [App\Http\Controllers\Admin\OrderReturnController::class, 'reject'])->name('returns.reject');
         Route::post('returns/{id}/complete', [App\Http\Controllers\Admin\OrderReturnController::class, 'completeRefund'])->name('returns.complete');
 
