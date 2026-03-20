@@ -32,13 +32,6 @@ Module quản lý mã giảm giá (coupon) và chương trình điểm tích lũ
 
 ---
 
-### A7.2 Điểm Tích Lũy (Loyalty Points)
-- **Route:** `GET /admin/loyalty-points`
-- **Controller:** `Admin\LoyaltyPointController@index`
-- **Mô tả:** Xem toàn bộ lịch sử điểm tích lũy của khách hàng.
-- **Nghiệp vụ:**
-  - Điểm được cộng tự động khi đơn hàng hoàn thành.
-  - Số điểm tích lũy phụ thuộc vào tổng giá trị đơn hàng.
 
 ---
 
@@ -49,25 +42,6 @@ Module quản lý mã giảm giá (coupon) và chương trình điểm tích lũ
 
 ---
 
-### A7.4 Hệ Thống Điểm Thưởng (Reward Points) *(MỚI)*
-- **Models:** `RewardPoint`, `RewardPointHistory`, `CustomerTier`
-- **Mô tả:** Hệ thống điểm thưởng đa cấp cho khách hàng thân thiết.
-- **RewardPoint:**
-  - Lưu trữ tổng điểm tích lũy của từng user
-  - Điểm được cộng khi hoàn thành đơn hàng (dựa theo setting tỷ lệ)
-- **RewardPointHistory:**
-  - Lịch sử mỗi lần cộng/trừ điểm (nguyên nhân, số lượng, ngày)
-- **CustomerTier:**
-  - Phân hạng khách hàng (Đồng / Bạc / Vàng / Kim Cương...)
-  - Áp dụng ưu đãi riêng theo hạng (discount, ưu tiên hỗ trợ)
-- **Lưu ý:** Tích hợp với bảng `users.reward_points` và `orders.reward_points_earned`
-
----
-
-### A7.5 Chương Trình Khuyến Mãi (Promotions) *(MỚI)*
-- **Model:** `Promotion` — Bảng `promotions`
-- **Mô tả:** Module dành cho các chương trình khuyến mãi thời gian có hạn (flash sale, theo sự kiện...).
-- **Tích hợp:** Liên kết với `Product.sale_start_date` / `sale_end_date` để tự động bật/tắt giá sale.
 
 ---
 
@@ -75,15 +49,7 @@ Module quản lý mã giảm giá (coupon) và chương trình điểm tích lũ
 | Hành động | Staff | Admin |
 |-----------|-------|-------|
 | Quản lý Coupon | ❌ | ✅ |
-| Xem Loyalty Points | ❌ | ✅ |
-| Xem Reward Points | ❌ | ✅ |
 | Xem Payment History | ❌ | ✅ |
-| Quản lý Promotions | ❌ | ✅ |
 
 ## Models Liên Quan
 - `Coupon` — Bảng `coupons`
-- `LoyaltyPoint` — Bảng `loyalty_points`
-- `RewardPoint` — Bảng `reward_points` *(mới)*
-- `RewardPointHistory` — Bảng `reward_point_histories` *(mới)*
-- `CustomerTier` — Bảng `customer_tiers` *(mới)*
-- `Promotion` — Bảng `promotions` *(mới)*
