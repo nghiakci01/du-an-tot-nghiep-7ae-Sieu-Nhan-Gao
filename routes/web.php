@@ -232,3 +232,4 @@ Route::get('lang/{locale}', function ($locale) {
 
 })->name('lang.switch');
 
+

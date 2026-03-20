@@ -28,9 +28,10 @@ class CategoryTest extends TestCase
 
     public function test_admin_can_create_category()
     {
-        $response = $this->actingAs($this->admin)->post('/admin/categories', [
+        $response = $this->actingAs($this->admin)->post(route('admin.categories.store'), [
             'name' => 'Test Category',
-            'status' => 1
+            'slug' => 'test-category',
+            'description' => 'Test'
         ]);
         $response->assertRedirect();
         $this->assertDatabaseHas('categories', ['name' => 'Test Category']);

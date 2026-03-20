@@ -4,7 +4,8 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\User;
+use App\Models\Product;
+use App\Models\Category;
 
 class ProductTest extends TestCase
 {
@@ -12,7 +13,10 @@ class ProductTest extends TestCase
 
     public function test_user_can_view_products()
     {
-        $response = $this->get('/products');
+        Category::create(['name' => 'Test', 'slug' => 'test']);
+        Product::factory(5)->create();
+
+        $response = $this->get('/shop');
         $response->assertStatus(200);
     }
 }

@@ -181,4 +181,12 @@ class OrderTest extends TestCase
         // AdminMiddleware redirect về '/' hoặc login
         $response->assertStatus(302);
     }
+
+    protected function tearDown(): void
+    {
+        // Clean up error and exception handlers
+        restore_error_handler();
+        restore_exception_handler();
+        parent::tearDown();
+    }
 }

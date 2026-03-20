@@ -92,7 +92,7 @@ $btn-border-radius-lg: 14px; */
 [data-bs-theme=light] {
   --bs-blue: #4680ff;
   --bs-indigo: #6610f2;
-  --bs-purple: #673ab7;
+  --bs-teal: #673ab7;
   --bs-pink: #e83e8c;
   --bs-red: #dc2626;
   --bs-orange: #fd7e14;
@@ -18342,76 +18342,76 @@ textarea.is-invalid.dataTable-input {
   color: var(--bs-indigo-900);
 }
 
-.bg-purple-100 {
-  background: var(--bs-purple-100);
+.bg-teal-100 {
+  background: var(--bs-teal-100);
 }
 
-.text-purple-100 {
-  color: var(--bs-purple-100);
+.text-teal-100 {
+  color: var(--bs-teal-100);
 }
 
-.bg-purple-200 {
-  background: var(--bs-purple-200);
+.bg-teal-200 {
+  background: var(--bs-teal-200);
 }
 
-.text-purple-200 {
-  color: var(--bs-purple-200);
+.text-teal-200 {
+  color: var(--bs-teal-200);
 }
 
-.bg-purple-300 {
-  background: var(--bs-purple-300);
+.bg-teal-300 {
+  background: var(--bs-teal-300);
 }
 
-.text-purple-300 {
-  color: var(--bs-purple-300);
+.text-teal-300 {
+  color: var(--bs-teal-300);
 }
 
-.bg-purple-400 {
-  background: var(--bs-purple-400);
+.bg-teal-400 {
+  background: var(--bs-teal-400);
 }
 
-.text-purple-400 {
-  color: var(--bs-purple-400);
+.text-teal-400 {
+  color: var(--bs-teal-400);
 }
 
-.bg-purple-500 {
-  background: var(--bs-purple-500);
+.bg-teal-500 {
+  background: var(--bs-teal-500);
 }
 
-.text-purple-500 {
-  color: var(--bs-purple-500);
+.text-teal-500 {
+  color: var(--bs-teal-500);
 }
 
-.bg-purple-600 {
-  background: var(--bs-purple-600);
+.bg-teal-600 {
+  background: var(--bs-teal-600);
 }
 
-.text-purple-600 {
-  color: var(--bs-purple-600);
+.text-teal-600 {
+  color: var(--bs-teal-600);
 }
 
-.bg-purple-700 {
-  background: var(--bs-purple-700);
+.bg-teal-700 {
+  background: var(--bs-teal-700);
 }
 
-.text-purple-700 {
-  color: var(--bs-purple-700);
+.text-teal-700 {
+  color: var(--bs-teal-700);
 }
 
-.bg-purple-800 {
-  background: var(--bs-purple-800);
+.bg-teal-800 {
+  background: var(--bs-teal-800);
 }
 
-.text-purple-800 {
-  color: var(--bs-purple-800);
+.text-teal-800 {
+  color: var(--bs-teal-800);
 }
 
-.bg-purple-900 {
-  background: var(--bs-purple-900);
+.bg-teal-900 {
+  background: var(--bs-teal-900);
 }
 
-.text-purple-900 {
-  color: var(--bs-purple-900);
+.text-teal-900 {
+  color: var(--bs-teal-900);
 }
 
 .bg-pink-100 {
@@ -19009,15 +19009,15 @@ textarea.is-invalid.dataTable-input {
   --bs-indigo-700: #530cee;
   --bs-indigo-800: #4909ec;
   --bs-indigo-900: #3805e8;
-  --bs-purple-100: #d1c4e9;
-  --bs-purple-200: #b39ddb;
-  --bs-purple-300: #9575cd;
-  --bs-purple-400: #7e58c2;
-  --bs-purple-500: #673ab7;
-  --bs-purple-600: #5f34b0;
-  --bs-purple-700: #542ca7;
-  --bs-purple-800: #4a259f;
-  --bs-purple-900: #391890;
+  --bs-teal-100: #d1c4e9;
+  --bs-teal-200: #b39ddb;
+  --bs-teal-300: #9575cd;
+  --bs-teal-400: #7e58c2;
+  --bs-teal-500: #673ab7;
+  --bs-teal-600: #5f34b0;
+  --bs-teal-700: #542ca7;
+  --bs-teal-800: #4a259f;
+  --bs-teal-900: #391890;
   --bs-pink-100: #f8c5dd;
   --bs-pink-200: #f49fc6;
   --bs-pink-300: #ef78af;
@@ -19568,58 +19568,58 @@ pre[class*=language-] > code {
 .color-block.text-indigo-900 {
   background-color: #ffffff;
 }
-.color-block.bg-purple-100 {
+.color-block.bg-teal-100 {
   color: #ffffff;
 }
-.color-block.text-purple-100 {
+.color-block.text-teal-100 {
   background-color: #ffffff;
 }
-.color-block.bg-purple-200 {
+.color-block.bg-teal-200 {
   color: #ffffff;
 }
-.color-block.text-purple-200 {
+.color-block.text-teal-200 {
   background-color: #ffffff;
 }
-.color-block.bg-purple-300 {
+.color-block.bg-teal-300 {
   color: #ffffff;
 }
-.color-block.text-purple-300 {
+.color-block.text-teal-300 {
   background-color: #ffffff;
 }
-.color-block.bg-purple-400 {
+.color-block.bg-teal-400 {
   color: #ffffff;
 }
-.color-block.text-purple-400 {
+.color-block.text-teal-400 {
   background-color: #ffffff;
 }
-.color-block.bg-purple-500 {
+.color-block.bg-teal-500 {
   color: #ffffff;
 }
-.color-block.text-purple-500 {
+.color-block.text-teal-500 {
   background-color: #ffffff;
 }
-.color-block.bg-purple-600 {
+.color-block.bg-teal-600 {
   color: #ffffff;
 }
-.color-block.text-purple-600 {
+.color-block.text-teal-600 {
   background-color: #ffffff;
 }
-.color-block.bg-purple-700 {
+.color-block.bg-teal-700 {
   color: #ffffff;
 }
-.color-block.text-purple-700 {
+.color-block.text-teal-700 {
   background-color: #ffffff;
 }
-.color-block.bg-purple-800 {
+.color-block.bg-teal-800 {
   color: #ffffff;
 }
-.color-block.text-purple-800 {
+.color-block.text-teal-800 {
   background-color: #ffffff;
 }
-.color-block.bg-purple-900 {
+.color-block.bg-teal-900 {
   color: #ffffff;
 }
-.color-block.text-purple-900 {
+.color-block.text-teal-900 {
   background-color: #ffffff;
 }
 .color-block.bg-pink-100 {
