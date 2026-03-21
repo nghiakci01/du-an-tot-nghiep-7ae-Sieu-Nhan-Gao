@@ -157,12 +157,12 @@
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th class="product_check" style="width: 50px;"><input type="checkbox" id="check-all" style="width: 18px; height: 18px; cursor: pointer;"></th>
                                                 <th class="product_thumb">{{ __('messages.image') }}</th>
                                                 <th class="product_name">{{ __('messages.product') }}</th>
                                                 <th class="product-price">{{ __('messages.price') }}</th>
                                                 <th class="product_quantity">{{ __('messages.quantity') }}</th>
                                                 <th class="product_total">{{ __('messages.total') }}</th>
+                                                <th class="product_remove">{{ __('delete') ?? 'Action' }}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -176,9 +176,6 @@
                                                     $isUnavailable = $isDeleted || $isInactive || !$variantExists || $isOutOfStock;
                                                 @endphp
                                                 <tr data-id="{{ $id }}" class="{{ $isUnavailable ? 'cart-item-unavailable' : '' }}" style="{{ $isUnavailable ? 'filter: grayscale(1); opacity: 0.7;' : '' }}">
-                                                    <td class="product_check" style="vertical-align: middle;">
-                                                        <input type="checkbox" class="check-item {{ $isUnavailable ? 'item-unavailable' : '' }}" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;">
-                                                    </td>
                                                     <td class="product_thumb" style="position: relative;">
                                                         @if(!$isDeleted)
                                                             <a href="{{ route('product.detail', $details['slug']) }}">
@@ -276,6 +273,9 @@
                                                     </td>
                                                     <td class="product_total item-total-price" data-price="{{ $details['price'] }}">
                                                         {{ number_format($details['price'] * $details['quantity']) }} VND</td>
+                                                    <td class="product_remove" style="text-align: center;">
+                                                        <a href="#" class="remove-from-cart" style="color: #ff6a28; font-size: 18px; text-decoration: none;"><i class="fa fa-trash-o"></i></a>
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -285,10 +285,6 @@
                                     <a href="{{ route('shop') }}" class="btn">
                                         <i class="fa fa-arrow-left"></i> {{ __('messages.continue_shopping') }}
                                     </a>
-                                    <button type="button" class="btn" id="delete-selected" style="display: none; margin-left: 10px;">
-                                        <i class="fa fa-trash"></i> Xóa mục đã chọn
-                                    </button>
-                                    <!-- 'Clear Cart' button remains removed per previous user request -->
                                 </div>
                             </div>
                         </div>
@@ -353,8 +349,8 @@
                                             btn.style.pointerEvents = 'none';
 
                                             var selectedIds = [];
-                                            document.querySelectorAll('.check-item:checked').forEach(function(checkbox) {
-                                                selectedIds.push(checkbox.value);
+                                            document.querySelectorAll('table tbody tr').forEach(function(row) {
+                                                selectedIds.push(row.getAttribute('data-id'));
                                             });
 
                                             if (selectedIds.length === 0) {
@@ -543,7 +539,6 @@
 
                         // Cập nhật giá trị html cho item
                         row.find('.product_total').text(response.item_total);
-                        calculateCartTotal(); // Tính toán lại theo các dòng được check
 
                         // Toast nhỏ xác nhận cập nhật
                         Swal.fire({

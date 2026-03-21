@@ -29,7 +29,7 @@ class CheckoutController extends Controller
     public function index(Request $request)
     {
         $cart = $this->cartService->getCart();
-        
+
         // Lọc giỏ hàng theo các item đã chọn (nêu có trong session)
         $selectedIds = session('selected_checkout_ids');
         if ($selectedIds && is_array($selectedIds)) {
@@ -87,7 +87,7 @@ class CheckoutController extends Controller
         $finalTotal += $shippingFee;
 
         $provinces = config('vietnam_provinces');
-        
+
         // Lấy thông tin các tài khoản ngân hàng đang hoạt động
         $banks = \App\Models\BankSetting::where('is_active', true)->get();
         $defaultBank = $banks->where('is_default', true)->first() ?: $banks->first();
@@ -110,7 +110,7 @@ class CheckoutController extends Controller
             }
             // Chuyển tất cả về string để so khớp chính xác
             $selectedIds = array_values(array_map('strval', (array)$selectedIds));
-            
+
             $cart = array_filter($cart, function($key) use ($selectedIds) {
                 return in_array(strval($key), $selectedIds);
             }, ARRAY_FILTER_USE_KEY);
@@ -184,7 +184,7 @@ class CheckoutController extends Controller
             'email' => 'required|email:rfc,dns|max:255',
             'province' => 'required|string|in:'.implode(',', $provinces),
             'address' => 'required|string|max:500',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
             'shipping_provider' => 'nullable|string',
             'shipping_service_name' => 'nullable|string',
             'shipping_fee' => 'nullable|numeric',
@@ -198,7 +198,7 @@ class CheckoutController extends Controller
         ]);
 
         $cart = $this->cartService->getCart();
-        
+
         // Lọc giỏ hàng theo các item đã chọn
         $selectedIds = session('selected_checkout_ids');
         if ($selectedIds && is_array($selectedIds)) {
@@ -321,6 +321,17 @@ class CheckoutController extends Controller
                 session(['verified_order_id' => $order->id]);
             }
 
+            // Nếu là VNPAY, redirect đến gateway thanh toán
+            if ($request->payment_method === 'VNPAY') {
+                $vnpayService = app(\App\Services\VnpayService::class);
+                $paymentUrl = $vnpayService->getPaymentUrl(
+                    $order->id,
+                    $finalTotal,
+                    $request->input('bank_code') // Optional bank code
+                );
+                return redirect($paymentUrl);
+            }
+
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');
 
         } catch (\Exception $e) {
@@ -336,7 +347,7 @@ class CheckoutController extends Controller
 
         // Lấy thông tin tài khoản ngân hàng mặc định
         $bank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first();
-        
+
         // Nếu không có mặc định, lấy cái đầu tiên đang hoạt động
         if (!$bank) {
             $bank = \App\Models\BankSetting::where('is_active', true)->first();

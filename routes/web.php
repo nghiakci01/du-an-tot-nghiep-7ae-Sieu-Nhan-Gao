@@ -38,6 +38,11 @@ Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutCont
 Route::post('/checkout/order/{id}/confirm-transfer', [App\Http\Controllers\Frontend\CheckoutController::class, 'confirmTransfer'])->name('checkout.confirm_transfer');
 Route::post('/checkout/order/{id}/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancelOrder'])->name('checkout.cancel_order');
 
+// VNPay Payment Routes
+Route::get('/payment/vnpay/return', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('payment.vnpay.return');
+Route::post('/payment/vnpay/callback', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayCallback'])->name('payment.vnpay.callback');
+Route::get('/payment/check-status/{id}', [App\Http\Controllers\Frontend\PaymentController::class, 'checkPaymentStatus'])->name('payment.check_status');
+
 
 // Guest Order Tracking Routes
 Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'index'])->name('order-tracking.index');
@@ -105,7 +110,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
         Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/api/dashboard/revenue', [\App\Http\Controllers\Admin\DashboardController::class, 'revenueApi'])->name('api.dashboard.revenue');
-        
+
         Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
         Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
         Route::post('/profile/password', [\App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('profile.password.update');
@@ -124,7 +129,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('orders/{order}/query-payment', [App\Http\Controllers\Admin\OrderController::class, 'queryPayment'])->name('orders.query-payment');
         Route::post('orders/{order}/refund-payment', [App\Http\Controllers\Admin\OrderController::class, 'refundPayment'])->name('orders.refund-payment');
         Route::any('orders-trigger-auto-cancel', [App\Http\Controllers\Admin\OrderController::class, 'triggerAutoCancel'])->name('orders.trigger-auto-cancel');
-        
+
         // Order Returns Management
         Route::get('returns', [App\Http\Controllers\Admin\OrderReturnController::class, 'index'])->name('returns.index');
         Route::post('returns/{id}/approve', [App\Http\Controllers\Admin\OrderReturnController::class, 'approve'])->name('returns.approve');
@@ -141,7 +146,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         // Product Attributes
         Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
         Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
-        
+
         // General APIs for Admin Panel
         Route::get('api/variants/search', [App\Http\Controllers\Admin\ProductController::class, 'variantsSearch'])->name('api.variants.search');
 
@@ -159,7 +164,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
 
-            
+
             // Cài đặt ngân hàng thanh toán (QR Bank Settings)
             Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
 
@@ -213,7 +218,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
         // Audit Logs (Admin only)
         Route::middleware(['admin.only'])->group(function () {
-            
+
             // Notifications
             Route::get('notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
             Route::post('notifications/mark-all-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
