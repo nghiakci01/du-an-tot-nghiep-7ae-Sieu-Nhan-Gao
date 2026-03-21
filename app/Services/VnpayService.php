@@ -61,6 +61,8 @@ class VnpayService
         $i = 0;
         $hashdata = "";
         foreach ($inputData as $key => $value) {
+            $key = (string) $key;
+            $value = (string) $value;
             if ($i == 1) {
                 $hashdata .= '&' . urlencode($key) . "=" . urlencode($value);
             } else {
@@ -108,6 +110,8 @@ class VnpayService
         $hashdata = "";
         $i = 0;
         foreach ($inputData as $key => $value) {
+            $key = (string) $key;
+            $value = (string) $value;
             if ($i == 1) {
                 $hashdata .= '&' . urlencode($key) . "=" . urlencode($value);
             } else {
@@ -167,10 +171,10 @@ class VnpayService
         } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
         } else {
-            $ip = $_SERVER['REMOTE_ADDR'];
+            $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         }
 
-        return $ip;
+        return $ip ?: '127.0.0.1';
     }
 
     /**
