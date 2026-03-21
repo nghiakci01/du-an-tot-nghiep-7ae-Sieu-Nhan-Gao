@@ -631,17 +631,40 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.copy-coupon').forEach(btn => {
     btn.addEventListener('click', function() {
       const code = this.getAttribute('data-code');
-      navigator.clipboard?.writeText(code).then(() => {
-        this.innerHTML = '<i class="bi bi-check2 me-1"></i>Đã sao chép!';
-        setTimeout(() => { this.innerHTML = '<i class="bi bi-clipboard me-1"></i>Sao chép mã'; }, 2000);
-      }).catch(() => {
+      const button = this;
+
+      function onSuccess() {
+        button.innerHTML = '<i class="bi bi-check2 me-1"></i>Đã sao chép!';
+        button.classList.remove('btn-outline-dark');
+        button.classList.add('btn-success');
+        setTimeout(() => {
+          button.innerHTML = '<i class="bi bi-clipboard me-1"></i>Sao chép mã';
+          button.classList.remove('btn-success');
+          button.classList.add('btn-outline-dark');
+        }, 2000);
+      }
+
+      function fallbackCopy() {
         const ta = document.createElement('textarea');
         ta.value = code;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
         document.body.appendChild(ta);
         ta.select();
-        document.execCommand('copy');
+        try {
+          document.execCommand('copy');
+          onSuccess();
+        } catch(e) {
+          alert('Không thể sao chép. Vui lòng copy thủ công: ' + code);
+        }
         document.body.removeChild(ta);
-      });
+      }
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(onSuccess).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
     });
   });
 

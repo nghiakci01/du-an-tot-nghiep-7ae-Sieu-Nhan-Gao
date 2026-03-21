@@ -215,8 +215,17 @@ class CheckoutController extends Controller
         }
 
         $total = 0;
+        $totalQuantity = 0;
         foreach ($cart as $details) {
             $total += $details['price'] * $details['quantity'];
+            $totalQuantity += $details['quantity'];
+        }
+
+        // Giới hạn số lượng sản phẩm cho đơn COD
+        if ($request->payment_method === 'COD' && $totalQuantity > 10) {
+            return redirect()->back()
+                ->with('error', 'Đơn hàng COD chỉ được tối đa 10 sản phẩm. Bạn đang có ' . $totalQuantity . ' sản phẩm. Vui lòng giảm số lượng hoặc chọn phương thức thanh toán khác.')
+                ->withInput();
         }
 
         try {
