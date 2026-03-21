@@ -309,39 +309,27 @@ class CheckoutController extends Controller
                 \Log::warning('Cart abandonment recovery tracking failed: ' . $e->getMessage());
             }
 
-            // COD & BANK_TRANSFER: gửi email xác nhận và chuyển đến trang thành công
-            try {
-                \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
-            } catch (\Exception $e) {
-                \Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: '.$e->getMessage());
-            }
-
             // Set session for guest verification if not logged in
             if (!Auth::check()) {
                 session(['verified_order_id' => $order->id]);
             }
 
-            // Nếu là VNPAY
+            // Nếu là VNPAY: redirect đến cổng thanh toán VNPay
             if ($request->payment_method === 'VNPAY') {
-                // Check if in development/test mode
-                if (config('app.env') === 'local' && env('VNPAY_ENV_MODE') === 'test') {
-                    // Test mode: Auto-approve payment
-                    $order->update([
-                        'payment_status' => 'paid',
-                        'transaction_id' => 'TEST_' . uniqid(),
-                    ]);
-                    return redirect()->route('checkout.success', $order->id)
-                        ->with('success', '✓ Đơn hàng thành công! (Test Mode)');
-                } else {
-                    // Production: Redirect to VNPay gateway
-                    $vnpayService = app(\App\Services\VnpayService::class);
-                    $paymentUrl = $vnpayService->getPaymentUrl(
-                        $order->id,
-                        $finalTotal,
-                        $request->input('bank_code') // Optional bank code
-                    );
-                    return redirect($paymentUrl);
-                }
+                $vnpayService = app(\App\Services\VnpayService::class);
+                $paymentUrl = $vnpayService->getPaymentUrl(
+                    $order->id,
+                    $finalTotal,
+                    $request->input('bank_code')
+                );
+                return redirect($paymentUrl);
+            }
+
+            // COD & BANK_TRANSFER: gửi email xác nhận ngay
+            try {
+                \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
+            } catch (\Exception $e) {
+                \Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: '.$e->getMessage());
             }
 
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');

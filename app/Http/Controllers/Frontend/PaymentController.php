@@ -19,52 +19,49 @@ class PaymentController extends Controller
     }
 
     /**
-     * VNPay Callback Handler
+     * VNPay IPN (Server-to-Server callback)
      */
     public function vnpayCallback(Request $request)
     {
-        Log::info('VNPay Callback received:', $request->all());
+        Log::info('VNPay IPN received:', $request->all());
 
-        // Xác thực callback
         $result = $this->vnpayService->verifyCallback($request->all());
 
-        // Lấy order ID từ TxnRef
         $orderId = $this->vnpayService->getOrderIdFromRef($result['data']['txn_ref'] ?? '');
 
         if (!$orderId) {
-            Log::error('Invalid order ID from VNPay callback');
-            return response()->json(['success' => false, 'message' => 'Order ID không hợp lệ']);
+            Log::error('Invalid order ID from VNPay IPN');
+            return response()->json(['RspCode' => '01', 'Message' => 'Order not found']);
         }
 
-        $order = Order::findOrFail($orderId);
+        $order = Order::find($orderId);
+
+        if (!$order) {
+            return response()->json(['RspCode' => '01', 'Message' => 'Order not found']);
+        }
+
+        // Kiểm tra trùng lặp: nếu đã paid thì không update lại
+        if ($order->payment_status === 'paid') {
+            return response()->json(['RspCode' => '02', 'Message' => 'Order already confirmed']);
+        }
 
         if ($result['success']) {
-            // Thanh toán thành công
             $order->update([
                 'payment_status' => 'paid',
                 'transaction_id' => $result['data']['transaction_id'] ?? null,
             ]);
 
-            Log::info('Payment successful for order ' . $orderId);
+            Log::info('VNPay IPN: Payment successful for order #' . $orderId);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Thanh toán thành công',
-                'order_id' => $orderId
-            ]);
+            return response()->json(['RspCode' => '00', 'Message' => 'Confirm Success']);
         } else {
-            // Thanh toán thất bại
             $order->update([
                 'payment_status' => 'failed',
             ]);
 
-            Log::warning('Payment failed for order ' . $orderId . ': ' . $result['message']);
+            Log::warning('VNPay IPN: Payment failed for order #' . $orderId . ': ' . $result['message']);
 
-            return response()->json([
-                'success' => false,
-                'message' => $result['message'],
-                'order_id' => $orderId
-            ]);
+            return response()->json(['RspCode' => '00', 'Message' => 'Confirm Success']);
         }
     }
 
@@ -75,44 +72,59 @@ class PaymentController extends Controller
     {
         Log::info('VNPay Return received:', $request->all());
 
-        // Xác thực callback
         $result = $this->vnpayService->verifyCallback($request->all());
 
-        // Lấy order ID từ TxnRef
         $orderId = $this->vnpayService->getOrderIdFromRef($result['data']['txn_ref'] ?? '');
 
         if (!$orderId) {
-            return redirect()->route('checkout.index')->with('error', 'Order ID không hợp lệ');
+            return redirect()->route('shop')->with('error', 'Không tìm thấy đơn hàng từ VNPay.');
         }
 
         $order = Order::find($orderId);
 
         if (!$order) {
-            return redirect()->route('checkout.index')->with('error', 'Đơn hàng không tồn tại');
+            return redirect()->route('shop')->with('error', 'Đơn hàng không tồn tại.');
+        }
+
+        // Set session for guest verification
+        if (!Auth::check()) {
+            session(['verified_order_id' => $order->id]);
         }
 
         if ($result['success']) {
-            // Cập nhật trạng thái thanh toán
-            $order->update([
-                'payment_status' => 'paid',
-                'transaction_id' => $result['data']['transaction_id'] ?? null,
-            ]);
+            // Cập nhật trạng thái thanh toán (nếu IPN chưa xử lý)
+            if ($order->payment_status !== 'paid') {
+                $order->update([
+                    'payment_status' => 'paid',
+                    'transaction_id' => $result['data']['transaction_id'] ?? null,
+                ]);
+            }
 
-            // Set session for guest verification if not logged in
-            if (!Auth::check()) {
-                session(['verified_order_id' => $order->id]);
+            // Gửi email xác nhận đơn hàng
+            try {
+                \Illuminate\Support\Facades\Mail::to($order->email)
+                    ->send(new \App\Mail\OrderConfirmationMail($order));
+            } catch (\Exception $e) {
+                Log::error('Lỗi gửi email xác nhận đơn hàng VNPAY #' . $orderId . ': ' . $e->getMessage());
             }
 
             return redirect()->route('checkout.success', $order->id)
                 ->with('success', 'Thanh toán VNPay thành công!');
         } else {
-            return redirect()->route('checkout.index')
-                ->with('error', 'Thanh toán VNPay thất bại: ' . $result['message']);
+            // Thanh toán thất bại - vẫn redirect đến trang success (hiển thị trạng thái thất bại)
+            if ($order->payment_status !== 'paid') {
+                $order->update([
+                    'payment_status' => 'failed',
+                ]);
+            }
+
+            return redirect()->route('checkout.success', $order->id)
+                ->with('error', 'Thanh toán VNPay không thành công. Bạn có thể thử lại.');
         }
     }
 
     /**
-     * Check payment status
+     * Check payment status (AJAX)
      */
     public function checkPaymentStatus($orderId)
     {
@@ -129,4 +141,32 @@ class PaymentController extends Controller
             'transaction_id' => $order->transaction_id,
         ]);
     }
+
+    /**
+     * Retry VNPay payment for a failed/pending order
+     */
+    public function retryVnpay($orderId)
+    {
+        $order = Order::findOrFail($orderId);
+
+        if ($order->payment_method !== 'VNPAY') {
+            return redirect()->back()->with('error', 'Phương thức thanh toán không hợp lệ.');
+        }
+
+        if ($order->payment_status === 'paid') {
+            return redirect()->route('checkout.success', $order->id)
+                ->with('success', 'Đơn hàng này đã được thanh toán.');
+        }
+
+        // Reset payment status to pending
+        $order->update(['payment_status' => 'pending']);
+
+        $paymentUrl = $this->vnpayService->getPaymentUrl(
+            $order->id,
+            $order->final_total
+        );
+
+        return redirect($paymentUrl);
+    }
 }
+

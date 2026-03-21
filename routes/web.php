@@ -42,6 +42,7 @@ Route::post('/checkout/order/{id}/cancel', [App\Http\Controllers\Frontend\Checko
 Route::get('/payment/vnpay/return', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('payment.vnpay.return');
 Route::post('/payment/vnpay/callback', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayCallback'])->name('payment.vnpay.callback');
 Route::get('/payment/check-status/{id}', [App\Http\Controllers\Frontend\PaymentController::class, 'checkPaymentStatus'])->name('payment.check_status');
+Route::get('/payment/vnpay/retry/{id}', [App\Http\Controllers\Frontend\PaymentController::class, 'retryVnpay'])->name('payment.vnpay.retry');
 
 
 // Guest Order Tracking Routes

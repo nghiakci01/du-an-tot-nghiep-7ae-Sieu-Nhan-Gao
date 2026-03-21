@@ -73,7 +73,7 @@ class VnpayService
         }
 
         // Tạo secure hash
-        $vnpSecureHash = hash_hmac('sha256', $hashdata, $this->hashSecret);
+        $vnpSecureHash = hash_hmac('sha512', $hashdata, $this->hashSecret);
 
         $paymentUrl = $this->vnpayUrl . "?" . $query . "vnp_SecureHash=" . $vnpSecureHash;
 
@@ -121,7 +121,7 @@ class VnpayService
         }
 
         // Tính toán secure hash
-        $secureHash = hash_hmac('sha256', $hashdata, $this->hashSecret);
+        $secureHash = hash_hmac('sha512', $hashdata, $this->hashSecret);
 
         // So sánh secure hash
         if ($secureHash !== $vnp_SecureHash) {
