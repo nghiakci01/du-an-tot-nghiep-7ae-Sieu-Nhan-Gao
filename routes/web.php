@@ -237,4 +237,97 @@ Route::get('lang/{locale}', function ($locale) {
 
 })->name('lang.switch');
 
+// ============ VNPAY TEST ROUTES (Development Only) ============
+Route::prefix('test-payment')->name('test.payment.')->middleware('web')->group(function () {
+    // Test: Create order and generate payment URL
+    Route::get('/create-order', function () {
+        $order = \App\Models\Order::create([
+            'user_id' => null,
+            'name' => 'Test Customer',
+            'email' => 'test@example.com',
+            'phone' => '0912345678',
+            'province' => 'Hồ Chí Minh',
+            'address' => '123 Test Street',
+            'status' => 'pending',
+            'total_price' => 500000,
+            'discount_amount' => 0,
+            'shipping_fee' => 30000,
+            'final_total' => 530000,
+            'payment_method' => 'VNPAY',
+            'payment_status' => 'pending',
+            'shipping_address' => '123 Test Street, HCM',
+        ]);
+
+        $service = app(\App\Services\VnpayService::class);
+        $paymentUrl = $service->getPaymentUrl($order->id, $order->final_total);
+
+        return response()->json([
+            'status' => 'success',
+            'order_id' => $order->id,
+            'amount' => $order->final_total,
+            'payment_url' => $paymentUrl,
+            'message' => 'Đơn hàng #' . $order->id . ' đã được tạo. URL thanh toán đã được sinh ra.',
+        ]);
+    })->name('create-order');
+
+    // Test: Simulate VNPay success callback
+    Route::get('/simulate-success/{orderId}', function ($orderId) {
+        $order = \App\Models\Order::find($orderId);
+        if (!$order) {
+            return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
+        }
+
+        // Simulate VNPay returning success
+        session(['verified_order_id' => $orderId]);
+
+        // Update order status to paid
+        $order->update([
+            'payment_status' => 'paid',
+            'transaction_id' => 'TEST_' . uniqid(),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'order_id' => $orderId,
+            'payment_status' => $order->payment_status,
+            'transaction_id' => $order->transaction_id,
+            'message' => 'Thanh toán thành công (mô phỏng)',
+            'redirect_to' => route('checkout.success', $orderId),
+        ]);
+    })->name('simulate-success');
+
+    // Test: Simulate VNPay failed callback
+    Route::get('/simulate-failed/{orderId}', function ($orderId) {
+        $order = \App\Models\Order::find($orderId);
+        if (!$order) {
+            return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
+        }
+
+        // Update order status to failed
+        $order->update([
+            'payment_status' => 'failed',
+        ]);
+
+        return response()->json([
+            'status' => 'failed',
+            'order_id' => $orderId,
+            'payment_status' => $order->payment_status,
+            'message' => 'Thanh toán thất bại (mô phỏng)',
+        ]);
+    })->name('simulate-failed');
+
+    // Test: Check order status
+    Route::get('/check-order/{orderId}', function ($orderId) {
+        $order = \App\Models\Order::with(['items.product'])->find($orderId);
+        if (!$order) {
+            return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'order' => $order,
+        ]);
+    })->name('check-order');
+});
+
 

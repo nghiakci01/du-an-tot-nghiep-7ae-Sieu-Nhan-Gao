@@ -321,15 +321,27 @@ class CheckoutController extends Controller
                 session(['verified_order_id' => $order->id]);
             }
 
-            // Nếu là VNPAY, redirect đến gateway thanh toán
+            // Nếu là VNPAY
             if ($request->payment_method === 'VNPAY') {
-                $vnpayService = app(\App\Services\VnpayService::class);
-                $paymentUrl = $vnpayService->getPaymentUrl(
-                    $order->id,
-                    $finalTotal,
-                    $request->input('bank_code') // Optional bank code
-                );
-                return redirect($paymentUrl);
+                // Check if in development/test mode
+                if (config('app.env') === 'local' && env('VNPAY_ENV_MODE') === 'test') {
+                    // Test mode: Auto-approve payment
+                    $order->update([
+                        'payment_status' => 'paid',
+                        'transaction_id' => 'TEST_' . uniqid(),
+                    ]);
+                    return redirect()->route('checkout.success', $order->id)
+                        ->with('success', '✓ Đơn hàng thành công! (Test Mode)');
+                } else {
+                    // Production: Redirect to VNPay gateway
+                    $vnpayService = app(\App\Services\VnpayService::class);
+                    $paymentUrl = $vnpayService->getPaymentUrl(
+                        $order->id,
+                        $finalTotal,
+                        $request->input('bank_code') // Optional bank code
+                    );
+                    return redirect($paymentUrl);
+                }
             }
 
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');
