@@ -215,9 +215,15 @@
               @endif
             </div>
             <div class="mt-2">
-              <span class="badge" style="background:rgba(40,167,69,0.3);color:#a3f7bf;font-size:0.85rem;padding:6px 14px;border-radius:50px;">
-                ✅ {{ ucfirst($order->status ?? 'pending') }}
-              </span>
+              @if(($order->status ?? 'pending') == 'pending')
+                <span class="badge" style="background:rgba(255, 193, 7, 0.2);color:#d4860a;font-size:0.85rem;padding:6px 14px;border-radius:50px;">
+                  ⏳ {{ ucfirst($order->status ?? 'pending') }}
+                </span>
+              @else
+                <span class="badge" style="background:rgba(40, 167, 69, 0.2);color:#28a745;font-size:0.85rem;padding:6px 14px;border-radius:50px;">
+                  ✅ {{ ucfirst($order->status ?? 'pending') }}
+                </span>
+              @endif
             </div>
           </div>
         </div>
