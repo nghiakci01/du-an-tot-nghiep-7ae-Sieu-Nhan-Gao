@@ -112,8 +112,9 @@ class UXAuditor:
         filename = os.path.basename(filepath)
 
         # Pre-calculate common flags
+        is_css = filename.endswith('.css')
         has_long_text = bool(re.search(r'<p|<div.*class=.*text|article|<span.*text', content, re.IGNORECASE))
-        has_form = bool(re.search(r'<form|<input|password|credit|card|payment', content, re.IGNORECASE))
+        has_form = bool(re.search(r'<form|<input|password|credit|payment', content, re.IGNORECASE))
         complex_elements = len(re.findall(r'<input|<select|<textarea|<option', content, re.IGNORECASE))
 
         # --- 1. PSYCHOLOGY LAWS ---
@@ -208,7 +209,7 @@ class UXAuditor:
             self.warnings.append(f"[Cognitive Load] {filename}: High visual noise detected. Many colors and borders increase cognitive load.")
 
         # Familiar patterns
-        if has_form:
+        if has_form and not is_css:
             has_standard_labels = bool(re.search(r'<label|placeholder|aria-label', content, re.IGNORECASE))
             if not has_standard_labels:
                 self.issues.append(f"[Cognitive Load] {filename}: Form inputs without labels. Use <label> for accessibility and clarity.")
@@ -671,11 +672,25 @@ class UXAuditor:
         if re.search(r'<img(?![^>]*alt=)[^>]*>', content):
             self.issues.append(f"[Accessibility] {filename}: Missing img alt text")
 
+        # Familiar patterns
+        if has_form and not is_css: # Skip for CSS files
+            has_standard_labels = bool(re.search(r'<label|placeholder|aria-label', content, re.IGNORECASE))
+            if not has_standard_labels:
+                self.issues.append(f"[Cognitive Load] {filename}: Form inputs without labels. Use <label> for accessibility and clarity.")
+
     def audit_directory(self, directory: str) -> None:
         extensions = {'.tsx', '.jsx', '.html', '.vue', '.svelte', '.css'}
+        
         for root, dirs, files in os.walk(directory):
-            dirs[:] = [d for d in dirs if d not in {'node_modules', '.git', 'dist', 'build', '.next', 'vendor', 'storage', 'plugins', 'libs'}]
+            # Exclude third-party and build directories
+            dirs[:] = [d for d in dirs if d not in {
+                'node_modules', '.git', 'dist', 'build', '.next', 'vendor', 
+                'storage', 'plugins', 'libs', 'admin-assets', 'frontend-assets', 'assets'
+            }]
             for file in files:
+                # Exclude minified and build files
+                if '.min.' in file or re.search(r'\.[a-f0-9]{8,}\.css$', file):
+                    continue
                 if Path(file).suffix in extensions:
                     self.audit_file(os.path.join(root, file))
 

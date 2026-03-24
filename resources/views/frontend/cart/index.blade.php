@@ -348,6 +348,7 @@
                                             btn.style.opacity = '0.7';
                                             btn.style.pointerEvents = 'none';
 
+                                            var selectedIds = [];
                                             document.querySelectorAll('table tbody tr:not(.cart-item-unavailable)').forEach(function(row) {
                                                 selectedIds.push(row.getAttribute('data-id'));
                                             });
