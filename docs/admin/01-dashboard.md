@@ -22,10 +22,18 @@ Trang tổng quan hệ thống dành cho Admin và Staff, hiển thị số li�
 
 ---
 
-### A1.2 Biểu Đồ Doanh Thu (API)
+### A1.2 Bộ Lọc Preset Dashboard
+- **Route:** `GET /admin/dashboard?preset=week|month|quarter|year`
+- **Controller:** `Admin\DashboardController@index`
+- **Preset có sẵn:** Hôm nay, Tuần này, Tháng này, Quý này, Năm nay, Tùy chỉnh (nhập ngày).
+- **Nghiệp vụ:** Dùng Carbon để tính `start_date` và `end_date` từ preset. Tất cả widget (thẻ thống kê, biểu đồ, funnel) đều lọc theo khoảng thời gian đã chọn.
+
+---
+
+### A1.3 Biểu Đồ Doanh Thu (API)
 - **Route:** `GET /admin/api/dashboard/revenue`
 - **Controller:** `Admin\DashboardController@revenueApi`
-- **Đầu vào:** `?period=7d|30d|12m`
+- **Đầu vào:** `?period=7d|30d|12m|quarter|year`
 - **Đầu ra:** JSON dữ liệu doanh thu theo ngày/tháng để vẽ biểu đồ (Chart.js).
 
 ---

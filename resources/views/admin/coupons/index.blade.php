@@ -133,48 +133,45 @@
 
 @section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.copy-code-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            const code = this.getAttribute('data-code');
-            const button = this;
+// Dùng event delegation — chỉ đăng ký 1 lần, hoạt động sau mọi lần Pjax navigate
+$(document).off('click.copyCode').on('click.copyCode', '.copy-code-btn', function() {
+    const code = $(this).data('code');
+    const button = this;
 
-            function showSuccess() {
-                const icon = button.querySelector('i');
-                icon.className = 'ti ti-check';
-                button.classList.remove('btn-outline-secondary');
-                button.classList.add('btn-success');
-                setTimeout(function() {
-                    icon.className = 'ti ti-copy';
-                    button.classList.remove('btn-success');
-                    button.classList.add('btn-outline-secondary');
-                }, 1500);
-            }
+    function showSuccess() {
+        const icon = button.querySelector('i');
+        icon.className = 'ti ti-check';
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-success');
+        setTimeout(function() {
+            icon.className = 'ti ti-copy';
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-secondary');
+        }, 1500);
+    }
 
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(code).then(showSuccess).catch(fallbackCopy);
-            } else {
-                fallbackCopy();
-            }
+    function fallbackCopy() {
+        const textarea = document.createElement('textarea');
+        textarea.value = code;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            showSuccess();
+        } catch(e) {
+            alert('Không thể copy tự động. Mã: ' + code);
+        }
+        document.body.removeChild(textarea);
+    }
 
-            function fallbackCopy() {
-                const textarea = document.createElement('textarea');
-                textarea.value = code;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                document.body.appendChild(textarea);
-                textarea.focus();
-                textarea.select();
-                try {
-                    document.execCommand('copy');
-                    showSuccess();
-                } catch(e) {
-                    alert('Không thể copy tự động. Mã: ' + code);
-                }
-                document.body.removeChild(textarea);
-            }
-        });
-    });
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(showSuccess).catch(fallbackCopy);
+    } else {
+        fallbackCopy();
+    }
 });
 </script>
 @endsection

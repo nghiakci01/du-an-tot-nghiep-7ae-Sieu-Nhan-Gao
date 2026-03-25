@@ -1,7 +1,7 @@
-# Admin 07. Khuyến Mãi & Điểm Tích Lũy
+# Admin 07. Khuyến Mãi & Lịch Sử Thanh Toán
 
 ## Mô tả
-Module quản lý mã giảm giá (coupon) và chương trình điểm tích lũy khách hàng thân thiết.
+Module quản lý mã giảm giá (coupon) và lịch sử giao dịch thanh toán toàn hệ thống.
 
 ---
 
@@ -30,18 +30,14 @@ Module quản lý mã giảm giá (coupon) và chương trình điểm tích lũ
   - ⚫ Hết lượt dùng
   - 🔵 Chưa bắt đầu
 
+- **Tính năng UI:** Nút copy-to-clipboard để sao chép mã nhanh (hoạt động trên HTTP và HTTPS).
+
 ---
 
-
----
-
-### A7.3 Lịch Sử Thanh Toán (Payment History)
+### A7.2 Lịch Sử Thanh Toán (Payment History)
 - **Route:** `GET /admin/payment-history`
 - **Controller:** `Admin\PaymentHistoryController@index`
 - **Mô tả:** Xem toàn bộ giao dịch thanh toán (VNPAY, COD, chuyển khoản).
-
----
-
 
 ---
 

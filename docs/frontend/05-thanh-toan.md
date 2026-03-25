@@ -1,7 +1,7 @@
 # 05. Thanh Toán (Checkout & Payment)
 
 ## Mô tả
-Module xử lý toàn bộ quy trình đặt hàng và thanh toán bao gồm các phương thức: COD (tiền mặt khi nhận hàng), chuyển khoản ngân hàng và VNPAY.
+Module xử lý toàn bộ quy trình đặt hàng và thanh toán bao gồm các phương thức: COD (tiền mặt khi nhận hàng), chuyển khoản ngân hàng, VNPAY và ví điện tử.
 
 ---
 
@@ -33,6 +33,8 @@ Module xử lý toàn bộ quy trình đặt hàng và thanh toán bao gồm cá
   | `cod` | Tiền mặt khi nhận hàng | Tạo đơn → trạng thái `pending` |
   | `bank_transfer` | Chuyển khoản | Tạo đơn → hiển thị QR code ngân hàng |
   | `vnpay` | VNPAY | Tạo đơn → chuyển hướng sang cổng VNPAY |
+  | `wallet` | Ví điện tử | Trừ tiền từ `wallet_balance` ngay khi đặt hàng |
+- **Điều kiện thanh toán ví:** Số dư ví ≥ tổng giá trị đơn hàng. Tùy chọn này chỉ hiển thị khi số dư đủ.
 - **Nghiệp vụ sau đặt hàng:**
   1. Tạo bản ghi `Order` và các `OrderItem`.
   2. Giảm tồn kho biến thể sản phẩm tương ứng.
@@ -96,3 +98,4 @@ pending → confirmed → shipped → completed
 - `OrderHistory` — Bảng `order_histories` (nhật ký thay đổi trạng thái)
 - `Coupon` — Bảng `coupons`
 - `BankSetting` — Bảng `bank_settings` (thông tin tài khoản ngân hàng QR)
+- `WalletTransaction` — Bảng `wallet_transactions` (giao dịch ví khi thanh toán)
