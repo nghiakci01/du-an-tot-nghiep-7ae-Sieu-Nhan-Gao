@@ -54,7 +54,12 @@
                                 @foreach($coupons as $coupon)
                             <tr>
                                 <td>{{ $coupon->id }}</td>
-                                <td><strong>{{ $coupon->code }}</strong></td>
+                                <td>
+                                    <strong>{{ $coupon->code }}</strong>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary ms-1 py-0 px-1 copy-code-btn" data-code="{{ $coupon->code }}" title="Sao chép mã">
+                                        <i class="ti ti-copy"></i>
+                                    </button>
+                                </td>
                                 <td>
                                     @if($coupon->type === 'percentage')
                                         <span class="badge bg-info">Phần trăm</span>
@@ -125,3 +130,35 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.copy-code-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const code = this.getAttribute('data-code');
+            const button = this;
+            navigator.clipboard.writeText(code).then(function() {
+                const icon = button.querySelector('i');
+                icon.className = 'ti ti-check';
+                button.classList.remove('btn-outline-secondary');
+                button.classList.add('btn-success');
+                setTimeout(function() {
+                    icon.className = 'ti ti-copy';
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-secondary');
+                }, 1500);
+            }).catch(function() {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            });
+        });
+    });
+});
+</script>
+@endpush

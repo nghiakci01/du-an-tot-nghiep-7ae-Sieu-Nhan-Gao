@@ -51,6 +51,35 @@
   border-radius: 8px; object-fit: cover;
   border: 1px solid #ddd;
 }
+
+/* Video Upload UI */
+.video-upload-wrap {
+  position: relative;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  cursor: pointer;
+  background: #fafafa;
+  transition: all 0.2s;
+}
+.video-upload-wrap:hover { background: #f0f0f0; border-color: #bbb; }
+.video-upload-wrap i { font-size: 2rem; color: #888; margin-bottom: 10px; }
+.video-upload-wrap input[type=file] {
+  position: absolute; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer; top: 0; left: 0;
+}
+#video-preview-container {
+  margin-top: 15px;
+}
+#video-preview-container video {
+  max-width: 100%;
+  max-height: 240px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
 </style>
 @endpush
 
@@ -123,30 +152,27 @@
               </div>
 
               {{-- Images --}}
-              <div class="mb-5">
-                <label class="form-label fw-bold">Ảnh minh chứng <span class="text-muted fw-normal">(Tùy chọn)</span></label>
+              <div class="mb-4">
+                <label class="form-label fw-bold">Ảnh minh chứng <span class="text-muted fw-normal">(Tùy chọn, tối đa 4 ảnh)</span></label>
                 <div class="image-upload-wrap">
                   <div class="text-center">
                     <i class="bi bi-cloud-arrow-up"></i>
-                    <p class="mb-0 text-muted">Nhấn vào đây để tải ảnh lên (Tối đa 4 ảnh)</p>
+                    <p class="mb-0 text-muted">Nhấn vào đây để tải ảnh lên</p>
                   </div>
                   <input type="file" name="images[]" id="return-images" multiple accept="image/*">
                 </div>
-                <!-- Preview area -->
                 <div id="preview-container"></div>
+              {{-- Videos --}}
               <div class="mb-5">
-                <label class="form-label fw-bold">Video minh chứng <span class="text-muted fw-normal">(Tùy chọn)</span></label>
-                <div class="image-upload-wrap">
+                <label class="form-label fw-bold"><i class="bi bi-camera-reels me-1"></i>Video minh chứng <span class="text-muted fw-normal">(Tùy chọn, tối đa 1 video, 50MB)</span></label>
+                <div class="video-upload-wrap">
                   <div class="text-center">
-                    <i class="bi bi-camera-video"></i>
-                    <p class="mb-0 text-muted">Nhấn vào đây để tải video lên (Tối đa 1 video, dung lượng < 20MB)</p>
+                    <i class="bi bi-film"></i>
+                    <p class="mb-0 text-muted">Nhấn vào đây để tải video lên (MP4, MOV, AVI, WebM)</p>
                   </div>
-                  <input type="file" name="video" id="return-video" accept="video/mp4,video/quicktime,video/ogg">
+                  <input type="file" name="videos[]" id="return-videos" accept="video/mp4,video/quicktime,video/x-msvideo,video/webm">
                 </div>
-                <!-- Preview area for video -->
-                <div id="video-preview-container" class="mt-3" style="display: none;">
-                  <video id="video-preview" controls style="width: 100%; max-height: 300px; border-radius: 8px; border: 1px solid #ddd;"></video>
-                </div>
+                <div id="video-preview-container"></div>
               </div>
 
               <div class="d-flex justify-content-end gap-2">
@@ -168,10 +194,11 @@
 
 @push('scripts')
 <script>
+// Image preview
 document.getElementById('return-images').addEventListener('change', function(e) {
   const container = document.getElementById('preview-container');
   container.innerHTML = '';
-  const files = Array.from(e.target.files).slice(0, 4); // limit 4
+  const files = Array.from(e.target.files).slice(0, 4);
   files.forEach(file => {
     if(file.type.startsWith('image/')) {
       const img = document.createElement('img');
@@ -182,26 +209,30 @@ document.getElementById('return-images').addEventListener('change', function(e) 
   });
 });
 
-document.getElementById('return-video').addEventListener('change', function(e) {
+// Video preview
+document.getElementById('return-videos').addEventListener('change', function(e) {
   const container = document.getElementById('video-preview-container');
-  const videoPreview = document.getElementById('video-preview');
-  
-  if (e.target.files && e.target.files[0]) {
-    const file = e.target.files[0];
-    
-    if (file.size > 20 * 1024 * 1024) {
-        alert('Dung lượng video quá lớn, vui lòng chọn video nhỏ hơn 20MB');
-        e.target.value = '';
-        container.style.display = 'none';
-        return;
-    }
+  container.innerHTML = '';
+  const file = e.target.files[0];
+  if (!file) return;
 
-    if (file.type.startsWith('video/')) {
-      container.style.display = 'block';
-      videoPreview.src = URL.createObjectURL(file);
-    }
-  } else {
-    container.style.display = 'none';
+  // Validate size (50MB)
+  if (file.size > 50 * 1024 * 1024) {
+    alert('Video không được vượt quá 50MB');
+    e.target.value = '';
+    return;
+  }
+
+  if (file.type.startsWith('video/')) {
+    const video = document.createElement('video');
+    video.controls = true;
+    video.src = URL.createObjectURL(file);
+    container.appendChild(video);
+
+    const info = document.createElement('p');
+    info.className = 'text-muted small mt-1';
+    info.textContent = file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + ' MB)';
+    container.appendChild(info);
   }
 });
 </script>

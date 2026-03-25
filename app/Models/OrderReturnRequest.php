@@ -15,7 +15,7 @@ class OrderReturnRequest extends Model
         'reason',
         'note',
         'images',
-        'video_proof',
+        'videos',
         'shipping_info',
         'shipping_proof',
         'status',
@@ -27,6 +27,7 @@ class OrderReturnRequest extends Model
 
     protected $casts = [
         'images' => 'array',
+        'videos' => 'array',
         'processed_at' => 'datetime',
         'refund_amount' => 'decimal:2',
     ];

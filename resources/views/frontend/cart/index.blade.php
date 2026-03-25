@@ -157,12 +157,12 @@
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th class="product_check" style="width: 50px;"><input type="checkbox" id="check-all" style="width: 18px; height: 18px; cursor: pointer;"></th>
                                                 <th class="product_thumb">{{ __('messages.image') }}</th>
                                                 <th class="product_name">{{ __('messages.product') }}</th>
                                                 <th class="product-price">{{ __('messages.price') }}</th>
                                                 <th class="product_quantity">{{ __('messages.quantity') }}</th>
                                                 <th class="product_total">{{ __('messages.total') }}</th>
+                                                <th class="product_remove">{{ __('delete') ?? 'Action' }}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -176,9 +176,6 @@
                                                     $isUnavailable = $isDeleted || $isInactive || !$variantExists || $isOutOfStock;
                                                 @endphp
                                                 <tr data-id="{{ $id }}" class="{{ $isUnavailable ? 'cart-item-unavailable' : '' }}" style="{{ $isUnavailable ? 'filter: grayscale(1); opacity: 0.7;' : '' }}">
-                                                    <td class="product_check" style="vertical-align: middle;">
-                                                        <input type="checkbox" class="check-item {{ $isUnavailable ? 'item-unavailable' : '' }}" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;">
-                                                    </td>
                                                     <td class="product_thumb" style="position: relative;">
                                                         @if(!$isDeleted)
                                                             <a href="{{ route('product.detail', $details['slug']) }}">
@@ -193,7 +190,7 @@
                                                                     @elseif($isInactive)
                                                                         <span class="badge bg-warning text-dark mb-1" style="font-size: 0.75rem;">Ngừng kinh doanh</span>
                                                                     @elseif(!$variantExists)
-                                                                        <span class="badge bg-secondary mb-1" style="font-size: 0.75rem;">Phiên bản không tồn tại</span>
+                                                                        <span class="badge bg-secondary mb-1" style="font-size: 0.75rem;">Biến thể không tồn tại hoặc hết hàng</span>
                                                                     @elseif($isOutOfStock)
                                                                         <span class="badge bg-danger mb-1" style="font-size: 0.75rem;">{{ __('messages.out_of_stock') ?? 'Hết hàng' }}</span>
                                                                     @endif
@@ -276,6 +273,9 @@
                                                     </td>
                                                     <td class="product_total item-total-price" data-price="{{ $details['price'] }}">
                                                         {{ number_format($details['price'] * $details['quantity']) }} VND</td>
+                                                    <td class="product_remove" style="text-align: center;">
+                                                        <a href="#" class="remove-from-cart" style="color: #ff6a28; font-size: 18px; text-decoration: none;"><i class="fa fa-trash-o"></i></a>
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -285,10 +285,6 @@
                                     <a href="{{ route('shop') }}" class="btn">
                                         <i class="fa fa-arrow-left"></i> {{ __('messages.continue_shopping') }}
                                     </a>
-                                    <button type="button" class="btn" id="delete-selected" style="display: none; margin-left: 10px;">
-                                        <i class="fa fa-trash"></i> Xóa mục đã chọn
-                                    </button>
-                                    <!-- 'Clear Cart' button remains removed per previous user request -->
                                 </div>
                             </div>
                         </div>
@@ -353,12 +349,17 @@
                                             btn.style.pointerEvents = 'none';
 
                                             var selectedIds = [];
-                                            document.querySelectorAll('.check-item:checked').forEach(function(checkbox) {
-                                                selectedIds.push(checkbox.value);
+                                            document.querySelectorAll('table tbody tr:not(.cart-item-unavailable)').forEach(function(row) {
+                                                selectedIds.push(row.getAttribute('data-id'));
                                             });
 
                                             if (selectedIds.length === 0) {
-                                                alert('Vui lòng chọn ít nhất một sản phẩm để thanh toán!');
+                                                Swal.fire({
+                                                    icon: 'info',
+                                                    title: 'Giỏ hàng trống!',
+                                                    text: 'Vui lòng thêm sản phẩm hợp lệ vào giỏ hàng trước khi thanh toán.',
+                                                    confirmButtonColor: '#333'
+                                                });
                                                 btn.style.opacity = '';
                                                 btn.style.pointerEvents = '';
                                                 return;
@@ -543,7 +544,6 @@
 
                         // Cập nhật giá trị html cho item
                         row.find('.product_total').text(response.item_total);
-                        calculateCartTotal(); // Tính toán lại theo các dòng được check
 
                         // Toast nhỏ xác nhận cập nhật
                         Swal.fire({
@@ -623,12 +623,12 @@
             });
         });
 
-        // Tính toán lại tổng tiền dựa trên các sản phẩm được check
+        // Tính toán lại tổng tiền dựa trên tất cả sản phẩm hợp lệ
         function calculateCartTotal() {
             let subtotal = 0;
             
-            $('.check-item:checked').each(function() {
-                var row = $(this).closest('tr');
+            $('table tbody tr:not(.cart-item-unavailable)').each(function() {
+                var row = $(this);
                 var price = parseFloat(row.find('.item-total-price').attr('data-price'));
                 var quantity = parseInt(row.find('.item-quantity').val());
                 if (!isNaN(price) && !isNaN(quantity)) {
@@ -651,12 +651,9 @@
                 $('#shipping-fee span').text('Miễn phí');
             }
 
-            // Tính discount nếu có mã (logic cơ bản hiển thị lại session discount)
-            let discountDoc = $('#cart-discount').text().replace(/[^\d]/g, '');
-            let discount = discountDoc ? parseInt(discountDoc) : 0;
-            if (!$("#discount-row").is(":visible")) {
-                discount = 0; 
-            }
+            // Tính discount nếu có mã (lấy từ dữ liệu hiển thị hiện tại)
+            let discountText = $('#cart-discount').text().replace(/[^-0-9]/g, '');
+            let discount = Math.abs(parseInt(discountText)) || 0;
             
             // Grand Total
             let grandTotal = subtotal + shippingFee - discount;
@@ -668,76 +665,8 @@
         // calculateCartTotal on page load
         calculateCartTotal();
 
-        // Check All logic
-        $('#check-all').on('change', function() {
-            $('.check-item:not(.item-unavailable)').prop('checked', $(this).prop('checked'));
-            toggleDeleteSelectedBtn();
-            calculateCartTotal();
-        });
-
-        // Check Item logic
-        $(document).on('change', '.check-item', function() {
-            var totalItems = $('.check-item:not(.item-unavailable)').length;
-            var checkedItems = $('.check-item:not(.item-unavailable):checked').length;
-            $('#check-all').prop('checked', totalItems === checkedItems && totalItems > 0);
-            toggleDeleteSelectedBtn();
-            calculateCartTotal();
-        });
-
-        // Initialize total calculation on page load (nếu cần tự check sẵn hoặc không)
-        // Mặc định tick tất cả khi load file
-        $('#check-all').prop('checked', true).trigger('change');
-
-        function toggleDeleteSelectedBtn() {
-            if ($('.check-item:checked').length > 0) {
-                $('#delete-selected').fadeIn(200);
-            } else {
-                $('#delete-selected').fadeOut(200);
-            }
-        }
-
-        // Xóa các item đã chọn
-        $('#delete-selected').on('click', function() {
-            var selectedRows = $('.check-item:checked').closest('tr');
-            if (selectedRows.length === 0) return;
-
-            Swal.fire({
-                title: 'Xóa các sản phẩm đã chọn?',
-                text: `Bạn có chắc muốn xóa ${selectedRows.length} sản phẩm đã chọn khỏi giỏ hàng?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#ef233c',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Xóa',
-                cancelButtonText: 'Hủy',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Đang xóa...',
-                        allowOutsideClick: false,
-                        didOpen: () => { Swal.showLoading(); }
-                    });
-
-                    var promises = [];
-                    selectedRows.each(function() {
-                        var id = $(this).attr('data-id');
-                        promises.push(
-                            $.ajax({
-                                url: config.routeRemove,
-                                method: 'POST',
-                                data: { _token: config.csrf, _method: 'DELETE', id: id }
-                            })
-                        );
-                    });
-
-                    Promise.all(promises).then(function() {
-                        window.location.reload();
-                    }).catch(function() {
-                        window.location.reload();
-                    });
-                }
-            });
-        });
+        // Initialize total calculation on page load
+        calculateCartTotal();
 
         // Xóa toàn bộ giỏ hàng
         $("#clear-cart").on('click', function(e) {
@@ -802,7 +731,14 @@
             var sizeId = row.find(".size-select").val();
             var colorId = row.find(".color-select").val();
             
-            var changedType = (productId !== newProductId) ? 'product' : null;
+            var changedType = null;
+            if (productId !== newProductId) {
+                changedType = 'product';
+            } else if (ele.hasClass('size-select')) {
+                changedType = 'size';
+            } else if (ele.hasClass('color-select')) {
+                changedType = 'color';
+            }
 
             $.ajax({
                 url: config.routeChangeVariant,
@@ -821,18 +757,42 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        if (response.redirect) {
+                        if (response.no_change) {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'info',
+                                title: response.message || 'Biến thể không thay đổi',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            row.css('opacity', '1');
+                        } else if (response.redirect) {
                             window.location.href = response.redirect;
+                        } else {
+                            window.location.reload();
                         }
                     } else {
-                        Swal.fire({ icon: 'error', title: 'Lỗi', text: response.message || config.msgError });
-                        window.location.reload();
+                        Swal.fire({ 
+                            icon: 'error', 
+                            title: 'Lỗi', 
+                            text: response.message || config.msgError,
+                            confirmButtonColor: '#ef233c'
+                        }).then(() => {
+                            window.location.reload();
+                        });
                     }
                 },
                 error: function(xhr) {
                     var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : config.msgError;
-                    Swal.fire({ icon: 'error', title: 'Lỗi', text: errorMsg });
-                    window.location.reload();
+                    Swal.fire({ 
+                        icon: 'error', 
+                        title: 'Không thể cập nhật!', 
+                        text: errorMsg,
+                        confirmButtonColor: '#ef233c'
+                    }).then(() => {
+                        window.location.reload();
+                    });
                 }
             });
         });

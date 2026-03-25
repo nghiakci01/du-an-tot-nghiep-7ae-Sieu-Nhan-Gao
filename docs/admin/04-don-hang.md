@@ -82,6 +82,20 @@ Module xử lý toàn bộ vòng đời đơn hàng từ khi nhận đến khi h
 
 ---
 
+### A4.9 Quản Lý Hoàn Trả (Return Requests) *(MỚI)*
+- **Route:** `GET /admin/returns`
+- **Controller:** `Admin\OrderReturnController`
+- **Quy trình xử lý:**
+  1. **Danh sách:** Xem toàn bộ yêu cầu hoàn trả từ khách hàng.
+  2. **Duyệt (Approve):** Chấp nhận yêu cầu, yêu cầu khách gửi hàng về kho. Trạng thái: `pending` → `approved`.
+  3. **Đang gửi (Shipping):** Cập nhật khi khách nộp bằng chứng gửi hàng. Trạng thái: `approved` → `shipping`.
+  4. **Đã nhận (Received):** Kho xác nhận đã nhận được hàng. Trạng thái: `shipping` → `received`.
+  5. **Hoàn tất (Complete):** Xác nhận hoàn tiền thành công cho khách. Trạng thái: `received` → `completed`. Đơn hàng gốc chuyển sang `returned`, trạng thái thanh toán là `refunded`.
+  6. **Từ chối (Reject):** Từ chối yêu cầu hoàn trả nếu không hợp lệ.
+- **Thông báo:** Hệ thống tự động gửi thông báo cho khách hàng qua mỗi bước chuyển trạng thái.
+
+---
+
 ## Phân Quyền
 | Hành động | Staff | Admin |
 |-----------|-------|-------|
@@ -93,5 +107,6 @@ Module xử lý toàn bộ vòng đời đơn hàng từ khi nhận đến khi h
 
 ## Models Liên Quan
 - `Order`, `OrderItem`, `OrderHistory`
+- `OrderReturnRequest` — Quản lý thông tin và hình ảnh yêu cầu hoàn trả
 - `Order.shipping_provider` — Nhà vận chuyển được gắn với đơn hàng
 

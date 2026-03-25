@@ -106,6 +106,7 @@
                                             </div>
                                             @endif
 
+<<<<<<< HEAD
                                             @if($req->video_proof)
                                             <div class="mb-3">
                                                 <h6>Video minh chứng:</h6>
@@ -115,6 +116,19 @@
                                                         Trình duyệt của bạn không hỗ trợ thẻ video.
                                                     </video>
                                                 </div>
+=======
+                                            @if($req->videos && count($req->videos) > 0)
+                                            <div class="mb-3">
+                                                <h6><i class="bi bi-camera-reels me-1"></i>Video minh chứng:</h6>
+                                                @foreach($req->videos as $vid)
+                                                <div class="mb-2">
+                                                    <video controls style="max-width: 100%; max-height: 300px; border-radius: 8px; border: 1px solid #ddd;">
+                                                        <source src="{{ asset('storage/'.$vid) }}" type="video/mp4">
+                                                        Trình duyệt không hỗ trợ video.
+                                                    </video>
+                                                </div>
+                                                @endforeach
+>>>>>>> 5c7a5fb53fde68670aa44137c948991bf9e4e69a
                                             </div>
                                             @endif
 
@@ -210,46 +224,60 @@
     </div>
 </div>
 
-<!-- Global Hidden Form - Tránh lỗi MethodNotAllowed do Pjax -->
-<form id="globalReturnForm" method="POST" style="display: none;" data-pjax="false">
-    @csrf
-    <input type="hidden" name="admin_note" id="global_admin_note">
-</form>
-@endsection
+    {{-- Hidden form moved inside content for Pjax --}}
+    <form id="globalReturnForm" method="POST" style="display: none;" class="no-pjax" data-pjax="false">
+        @csrf
+        <input type="hidden" name="admin_note" id="global_admin_note">
+    </form>
 
-@section('scripts')
-<script>
-    function submitReturnAction(requestId, actionUrl, confirmMessage) {
-        if (!confirm(confirmMessage)) return;
-
-        const form = document.getElementById('globalReturnForm');
-        const noteArea = document.getElementById('admin_note_' + requestId);
-        const globalInput = document.getElementById('global_admin_note');
-
-        form.action = actionUrl;
+    <script>
+        console.log('Return management script loaded/re-loaded.');
         
-        if (noteArea) {
-            if (!noteArea.value.trim()) {
-                alert('Vui lòng nhập phản hồi xử lý!');
-                noteArea.focus();
+        function submitReturnAction(requestId, actionUrl, confirmMessage) {
+            console.log('Action triggered:', actionUrl, 'for ID:', requestId);
+            
+            if (!confirm(confirmMessage)) return;
+
+            const form = document.getElementById('globalReturnForm');
+            const noteArea = document.getElementById('admin_note_' + requestId);
+            const globalInput = document.getElementById('global_admin_note');
+
+            if (!form) {
+                console.error('globalReturnForm not found!');
+                alert('Có lỗi hệ thống: Không tìm thấy form xử lý.');
                 return;
             }
-            globalInput.value = noteArea.value;
-        } else {
-            globalInput.value = '';
+
+            form.action = actionUrl;
+            
+            if (noteArea) {
+                if (!noteArea.value.trim()) {
+                    alert('Vui lòng nhập phản hồi xử lý hoặc mã vận chuyển!');
+                    noteArea.focus();
+                    return;
+                }
+                globalInput.value = noteArea.value;
+            } else {
+                globalInput.value = '';
+            }
+
+            console.log('Submitting form to:', actionUrl);
+            form.submit();
         }
 
-        console.log('Submitting POST action to:', actionUrl);
-        form.submit();
-    }
-
-    // Cleanup Modal Backdrop
-    function clearBackdrop() {
-        $('.modal-backdrop').remove();
-        $('body').removeClass('modal-open').css({'padding-right': '', 'overflow': ''});
-    }
-
-    $(document).on('pjax:end', clearBackdrop);
-    $(document).ready(clearBackdrop);
-</script>
+        // Cleanup Modal Backdrop
+        if (typeof clearBackdrop !== 'function') {
+            window.clearBackdrop = function() {
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open').css({'padding-right': '', 'overflow': ''});
+            };
+        }
+        
+        // Immediate cleanup on load
+        clearBackdrop();
+        
+        // Re-bind to pjax:end if not already
+        $(document).off('pjax:end.returns').on('pjax:end.returns', clearBackdrop);
+    </script>
+</div>
 @endsection
