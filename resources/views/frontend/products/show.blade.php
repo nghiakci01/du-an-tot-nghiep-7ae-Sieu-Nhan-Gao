@@ -629,13 +629,9 @@
                                                             }
                                                         }
                                                         if (stockInfo) {
-                                                            if (matchedVariant.stock_quantity <= 5) {
-                                                                stockInfo.textContent = `(Còn ${matchedVariant.stock_quantity} sản phẩm)`;
-                                                                stockInfo.style.display = 'inline';
-                                                                stockInfo.style.color = '#ef233c';
-                                                            } else {
-                                                                stockInfo.style.display = 'none';
-                                                            }
+                                                            stockInfo.textContent = `(Còn ${matchedVariant.stock_quantity} sản phẩm)`;
+                                                            stockInfo.style.display = 'inline';
+                                                            stockInfo.style.color = matchedVariant.stock_quantity <= 5 ? '#ef233c' : '#666';
                                                         }
                                                     } else {
                                                         variantInput.value = '';
@@ -1009,20 +1005,30 @@
                             // Change icon to filled heart
                             icon.removeClass('fa-heart-o').addClass('fa-heart').css('color',
                                 'red');
-                            alert(response.message);
+                            Swal.fire({
+                                icon: response.status,
+                                title: 'Yêu thích',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
                         } else {
-                            // This else block seems to be part of a different context in the provided snippet.
-                            // Reverting to original logic for wishlist success.
-                            alert(response.message);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: response.message
+                            });
                         }
                     },
                     error: function(xhr) {
-                        // The provided snippet's error handling seems to be for a different context (AI/VTON).
-                        // Reverting to original logic for wishlist error.
                         if (xhr.status === 401) {
                             window.location.href = config.routeLogin;
                         } else {
-                            alert('An error occurred, please try again!');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: 'Có lỗi xảy ra, vui lòng thử lại sau!'
+                            });
                         }
                     }
                 });

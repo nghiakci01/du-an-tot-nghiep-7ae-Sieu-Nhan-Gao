@@ -19,10 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
         );
         $middleware->trustProxies(at: '*');
 
-        // Bypass CSRF for cart routes and API endpoints
-        $middleware->validateCsrfTokens(except: [
-            'cart/*',
-        ]);
+        // Bypass CSRF for cart routes, API endpoints, tests, and testing environment
+        $except = ['cart/*', 'api/*'];
+        if (env('APP_ENV') === 'testing') {
+            $except[] = '*'; // Disable CSRF for all routes in testing
+        }
+        $middleware->validateCsrfTokens(except: $except);
 
 
         $middleware->web(append: [

@@ -238,19 +238,6 @@
           </a>
         </li>
         <li>
-          <a href="#bank-accounts" data-tab="bank-accounts" class="nav-tab-link">
-            <i class="bi bi-bank"></i> Tài khoản ngân hàng
-          </a>
-        </li>
-        <li>
-          <a href="#wallet" data-tab="wallet" class="nav-tab-link">
-            <i class="bi bi-wallet2"></i> Ví của tôi
-            @if($user && $user->wallet_balance > 0)
-            <span class="badge ms-auto rounded-pill" style="background:#e8f5e9;color:#2e7d32;font-size:0.65rem;">{{ number_format($user->wallet_balance) }}đ</span>
-            @endif
-          </a>
-        </li>
-        <li>
           <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-account').submit();" class="text-danger">
             <i class="bi bi-box-arrow-right"></i> Đăng xuất
           </a>
@@ -583,26 +570,8 @@
       </div>
     </div>
 
-    {{-- =============== TAB: BANK ACCOUNTS =============== --}}
-    <div class="account-content tab-pane-block d-none" id="tab-bank-accounts">
-      <div class="tab-head">
-        <h4><i class="bi bi-credit-card-2-back me-2"></i>Tài khoản ngân hàng của tôi</h4>
-        @if($user)
-        <button type="button" class="btn btn-dark btn-sm rounded-pill px-3" onclick="openAddBankModal()">
-          <i class="bi bi-plus-lg me-1"></i>Thêm tài khoản
-        </button>
-        @endif
-      </div>
-      <div class="tab-body">
-        @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
-          {{ session('success') }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        @endif
 
-        @if($user)
-        <p class="text-muted small mb-4">Quản lý tài khoản ngân hàng cá nhân của bạn. Thông tin này chỉ dùng để nhận hoàn tiền hoặc thanh toán từ shop.</p>
+
 
         <div class="table-responsive">
           <table class="table align-middle" style="font-size:0.9rem;">
@@ -1074,6 +1043,7 @@
     </div>
 
 
+
   </div>{{-- col-md-9 --}}
 
 
@@ -1092,8 +1062,6 @@ document.addEventListener('DOMContentLoaded', function() {
     'wishlist'        : 'tab-wishlist',
     'coupons'         : 'tab-coupons',
     'account-details' : 'tab-account-details',
-    'bank-accounts'   : 'tab-bank-accounts',
-    'wallet'          : 'tab-wallet',
   };
 
   function showTab(tabId) {
@@ -1133,17 +1101,40 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.copy-coupon').forEach(btn => {
     btn.addEventListener('click', function() {
       const code = this.getAttribute('data-code');
-      navigator.clipboard?.writeText(code).then(() => {
-        this.innerHTML = '<i class="bi bi-check2 me-1"></i>Đã sao chép!';
-        setTimeout(() => { this.innerHTML = '<i class="bi bi-clipboard me-1"></i>Sao chép mã'; }, 2000);
-      }).catch(() => {
+      const button = this;
+
+      function onSuccess() {
+        button.innerHTML = '<i class="bi bi-check2 me-1"></i>Đã sao chép!';
+        button.classList.remove('btn-outline-dark');
+        button.classList.add('btn-success');
+        setTimeout(() => {
+          button.innerHTML = '<i class="bi bi-clipboard me-1"></i>Sao chép mã';
+          button.classList.remove('btn-success');
+          button.classList.add('btn-outline-dark');
+        }, 2000);
+      }
+
+      function fallbackCopy() {
         const ta = document.createElement('textarea');
         ta.value = code;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
         document.body.appendChild(ta);
         ta.select();
-        document.execCommand('copy');
+        try {
+          document.execCommand('copy');
+          onSuccess();
+        } catch(e) {
+          alert('Không thể sao chép. Vui lòng copy thủ công: ' + code);
+        }
         document.body.removeChild(ta);
-      });
+      }
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(onSuccess).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
     });
   });
 
@@ -1163,6 +1154,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
 
 function copyBankAccount(number, btn) {
   if (!navigator.clipboard) return;
@@ -1285,5 +1277,6 @@ var amtInput = document.getElementById('qr-amount-input');
 if (amtInput) amtInput.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') updateQRWithAmount();
 });
+
 </script>
 @endpush

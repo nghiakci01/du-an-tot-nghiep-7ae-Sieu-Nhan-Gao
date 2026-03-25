@@ -53,6 +53,23 @@ Trang quản lý tài khoản cá nhân cho khách hàng đã đăng nhập: xem
 
 ---
 
+### 6.6 Yêu Cầu Hoàn Trả (Return Order) *(MỚI)*
+- **Route:** `GET /my-account/orders/{id}/return`
+- **Controller:** `Frontend\AccountController@returnOrderForm`
+- **Nghiệp vụ:**
+  - Áp dụng cho đơn hàng `completed` hoặc `shipped`.
+  - Khách hàng nhập lý do, ghi chú và tải lên tối đa 5 ảnh minh họa.
+  - Sau khi Admin duyệt, khách hàng nộp thông tin vận chuyển (mã vận đơn, chứng từ).
+
+---
+
+### 6.7 Quản Lý Tài Khoản Ngân Hàng *(MỚI)*
+- **Mô tả:** Khách hàng lưu thông tin tài khoản ngân hàng để nhận tiền hoàn trả.
+- **Model:** `UserBankAccount`
+- **Thông tin:** Tên ngân hàng, Số tài khoản, Tên chủ tài khoản, Chi nhánh.
+
+---
+
 ## Quyền Hạn
 | Hành động | Guest | User |
 |-----------|-------|------|

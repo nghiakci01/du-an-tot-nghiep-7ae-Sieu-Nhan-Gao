@@ -61,6 +61,7 @@ class UserTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->delete(route('admin.users.destroy', $this->admin));
 
+        $response->assertRedirect();
         $response->assertSessionHas('error');
         $this->assertDatabaseHas('users', ['id' => $this->admin->id]);
     }
@@ -72,6 +73,7 @@ class UserTest extends TestCase
         // Theo logic UserController: không cho xóa chính mình => error
         $response = $this->actingAs($this->admin)->delete(route('admin.users.destroy', $this->admin));
 
+        $response->assertRedirect();
         $response->assertSessionHas('error');
         $this->assertDatabaseHas('users', ['id' => $this->admin->id]);
     }
