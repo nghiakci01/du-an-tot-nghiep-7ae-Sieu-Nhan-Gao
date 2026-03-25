@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Review;
 use App\Models\UserBankAccount;
+use App\Models\BankSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -35,6 +36,7 @@ class AccountController extends Controller
             $walletTransactions   = $user->walletTransactions()->take(20)->get();
             $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();
             $walletWithdrawRequests = $user->walletWithdrawRequests()->take(10)->get();
+            $bankSettings = BankSetting::where('is_active', true)->get();
         } else {
             $orders   = collect();
             $coupons  = collect();
@@ -43,11 +45,13 @@ class AccountController extends Controller
             $walletTransactions  = collect();
             $walletTopupRequests = collect();
             $walletWithdrawRequests = collect();
+            $bankSettings = collect();
         }
 
         return view('frontend.account.index', compact(
             'user', 'orders', 'coupons', 'wishlists',
-            'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests'
+            'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests',
+            'bankSettings'
         ));
 
     }

@@ -60,7 +60,14 @@
                     <div class="text-muted small">Ví: <strong>{{ number_format($req->user->wallet_balance) }}đ</strong></div>
                   </td>
                   <td class="px-4 py-3 fw-bold text-success">{{ number_format($req->amount) }}đ</td>
-                  <td class="px-4 py-3">{{ $req->bank_name ?: '—' }}</td>
+                  <td class="px-4 py-3">
+                    @if($req->dest_bank_name)
+                      <div class="fw-bold">{{ $req->dest_bank_name }}</div>
+                      <div class="text-muted small">{{ $req->dest_account_number }}</div>
+                    @else
+                      {{ $req->bank_name ?: '—' }}
+                    @endif
+                  </td>
                   <td class="px-4 py-3 text-muted">{{ $req->transfer_note ?: '—' }}</td>
                   <td class="px-4 py-3">
                     @if($req->proof_image)

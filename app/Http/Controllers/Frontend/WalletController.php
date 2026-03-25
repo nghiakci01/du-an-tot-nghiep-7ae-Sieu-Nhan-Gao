@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\WalletTopupRequest;
+use App\Models\BankSetting;
 use App\Services\WalletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,27 +28,38 @@ class WalletController extends Controller
     public function requestTopup(Request $request)
     {
         $request->validate([
-            'amount'        => 'required|numeric|min:10000|max:100000000',
-            'bank_name'     => 'nullable|string|max:100',
-            'transfer_note' => 'nullable|string|max:255',
-            'proof_image'   => 'nullable|image|max:5120',
+            'amount'          => 'required|numeric|min:10000|max:100000000',
+            'bank_setting_id' => 'required|exists:bank_settings,id,is_active,1',
+            'transfer_note'   => 'nullable|string|max:255',
+            'proof_image'     => 'nullable|image|max:5120',
         ]);
+
+        $bankSetting = BankSetting::find($request->bank_setting_id);
+        
+        // Generate a unique transfer note if not provided
+        $transferNote = $request->transfer_note ?: ('NAP' . Auth::id() . strtoupper(\Illuminate\Support\Str::random(4)));
 
         $imagePath = null;
         if ($request->hasFile('proof_image')) {
             $imagePath = $request->file('proof_image')->store('wallet/proofs', 'public');
         }
 
-        WalletTopupRequest::create([
-            'user_id'       => Auth::id(),
-            'amount'        => $request->amount,
-            'bank_name'     => $request->bank_name,
-            'transfer_note' => $request->transfer_note,
-            'proof_image'   => $imagePath,
-            'status'        => 'pending',
+        $topup = WalletTopupRequest::create([
+            'user_id'             => Auth::id(),
+            'bank_setting_id'     => $bankSetting->id,
+            'amount'              => $request->amount,
+            'dest_bank_name'      => $bankSetting->bank_name,
+            'dest_account_number' => $bankSetting->account_number,
+            'dest_account_name'   => $bankSetting->account_name,
+            'transfer_note'       => $transferNote,
+            'proof_image'         => $imagePath,
+            'status'              => 'pending',
         ]);
 
-        return back()->with('wallet_success', 'Yêu cầu nạp tiền đã được gửi! Vui lòng chờ admin xét duyệt.');
+        return back()->with([
+            'wallet_success' => 'Yêu cầu nạp tiền đã được khởi tạo! Vui lòng chuyển khoản theo thông tin bên dưới.',
+            'show_qr_id'     => $topup->id
+        ]);
     }
 
     /**

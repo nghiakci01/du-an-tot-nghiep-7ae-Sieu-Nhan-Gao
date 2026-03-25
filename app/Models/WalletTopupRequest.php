@@ -9,7 +9,11 @@ class WalletTopupRequest extends Model
 {
     protected $fillable = [
         'user_id',
+        'bank_setting_id',
         'amount',
+        'dest_bank_name',
+        'dest_account_number',
+        'dest_account_name',
         'bank_name',
         'transfer_note',
         'proof_image',
@@ -36,6 +40,11 @@ class WalletTopupRequest extends Model
     public function processedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'processed_by');
+    }
+
+    public function bankSetting(): BelongsTo
+    {
+        return $this->belongsTo(BankSetting::class);
     }
 
     public function isPending(): bool  { return $this->status === self::STATUS_PENDING; }
