@@ -38,12 +38,6 @@ Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutCont
 Route::post('/checkout/order/{id}/confirm-transfer', [App\Http\Controllers\Frontend\CheckoutController::class, 'confirmTransfer'])->name('checkout.confirm_transfer');
 Route::post('/checkout/order/{id}/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancelOrder'])->name('checkout.cancel_order');
 
-// VNPay Payment Routes
-Route::get('/payment/vnpay/return', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('payment.vnpay.return');
-Route::post('/payment/vnpay/callback', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayCallback'])->name('payment.vnpay.callback');
-Route::get('/payment/check-status/{id}', [App\Http\Controllers\Frontend\PaymentController::class, 'checkPaymentStatus'])->name('payment.check_status');
-Route::get('/payment/vnpay/retry/{id}', [App\Http\Controllers\Frontend\PaymentController::class, 'retryVnpay'])->name('payment.vnpay.retry');
-
 
 // Guest Order Tracking Routes
 Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'index'])->name('order-tracking.index');
@@ -79,13 +73,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/my-account/orders/{id}/return', [App\Http\Controllers\Frontend\AccountController::class, 'submitReturnRequest'])->name('account.orders.return_submit');
     Route::post('/my-account/orders/{id}/return/shipping', [App\Http\Controllers\Frontend\AccountController::class, 'submitShipping'])->name('account.orders.return.shipping');
 
-    // User Bank Accounts
-    Route::post('/my-account/bank-accounts', [App\Http\Controllers\Frontend\AccountController::class, 'storeBankAccount'])->name('account.bank-accounts.store');
-    Route::delete('/my-account/bank-accounts/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'destroyBankAccount'])->name('account.bank-accounts.destroy');
 
-    // Wallet
-    Route::post('/my-account/wallet/topup', [App\Http\Controllers\Frontend\WalletController::class, 'requestTopup'])->name('wallet.topup.request');
-    Route::post('/my-account/wallet/withdraw', [App\Http\Controllers\Frontend\WalletController::class, 'requestWithdraw'])->name('wallet.withdraw.request');
 
     // Wishlist Routes
     Route::get('/wishlist', [App\Http\Controllers\Frontend\WishlistController::class, 'index'])->name('wishlist.index');
@@ -117,7 +105,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
         Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/api/dashboard/revenue', [\App\Http\Controllers\Admin\DashboardController::class, 'revenueApi'])->name('api.dashboard.revenue');
-
+        
         Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
         Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
         Route::post('/profile/password', [\App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('profile.password.update');
@@ -136,7 +124,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('orders/{order}/query-payment', [App\Http\Controllers\Admin\OrderController::class, 'queryPayment'])->name('orders.query-payment');
         Route::post('orders/{order}/refund-payment', [App\Http\Controllers\Admin\OrderController::class, 'refundPayment'])->name('orders.refund-payment');
         Route::any('orders-trigger-auto-cancel', [App\Http\Controllers\Admin\OrderController::class, 'triggerAutoCancel'])->name('orders.trigger-auto-cancel');
-
+        
         // Order Returns Management
         Route::get('returns', [App\Http\Controllers\Admin\OrderReturnController::class, 'index'])->name('returns.index');
         Route::post('returns/{id}/approve', [App\Http\Controllers\Admin\OrderReturnController::class, 'approve'])->name('returns.approve');
@@ -153,7 +141,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         // Product Attributes
         Route::resource('sizes', App\Http\Controllers\Admin\SizeController::class);
         Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
-
+        
         // General APIs for Admin Panel
         Route::get('api/variants/search', [App\Http\Controllers\Admin\ProductController::class, 'variantsSearch'])->name('api.variants.search');
 
@@ -171,18 +159,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
 
-
+            
             // Cài đặt ngân hàng thanh toán (QR Bank Settings)
             Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
 
-            // Wallet Management
-            Route::get('wallet', [App\Http\Controllers\Admin\WalletController::class, 'index'])->name('wallet.index');
-            Route::get('wallet/withdrawals', [App\Http\Controllers\Admin\WalletController::class, 'withdrawals'])->name('wallet.withdrawals');
-            Route::post('wallet/{topupRequest}/approve', [App\Http\Controllers\Admin\WalletController::class, 'approve'])->name('wallet.approve');
-            Route::post('wallet/{topupRequest}/reject', [App\Http\Controllers\Admin\WalletController::class, 'reject'])->name('wallet.reject');
-            Route::post('wallet/withdraw/{withdrawRequest}/approve', [App\Http\Controllers\Admin\WalletController::class, 'approveWithdraw'])->name('wallet.withdraw.approve');
-            Route::post('wallet/withdraw/{withdrawRequest}/reject', [App\Http\Controllers\Admin\WalletController::class, 'rejectWithdraw'])->name('wallet.withdraw.reject');
-            Route::post('wallet/manual-adjust', [App\Http\Controllers\Admin\WalletController::class, 'manualAdjust'])->name('wallet.manual-adjust');
+
 
             // Virtual Try-On Models management
         });
@@ -232,7 +213,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
         // Audit Logs (Admin only)
         Route::middleware(['admin.only'])->group(function () {
-
+            
             // Notifications
             Route::get('notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
             Route::post('notifications/mark-all-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
@@ -250,98 +231,4 @@ Route::get('lang/{locale}', function ($locale) {
     }
 
 })->name('lang.switch');
-
-// ============ VNPAY TEST ROUTES (Development Only) ============
-Route::prefix('test-payment')->name('test.payment.')->middleware('web')->group(function () {
-    // Test: Create order and generate payment URL
-    Route::get('/create-order', function () {
-        $order = \App\Models\Order::create([
-            'user_id' => null,
-            'name' => 'Test Customer',
-            'email' => 'test@example.com',
-            'phone' => '0912345678',
-            'province' => 'Hồ Chí Minh',
-            'address' => '123 Test Street',
-            'status' => 'pending',
-            'total_price' => 500000,
-            'discount_amount' => 0,
-            'shipping_fee' => 30000,
-            'final_total' => 530000,
-            'payment_method' => 'VNPAY',
-            'payment_status' => 'pending',
-            'shipping_address' => '123 Test Street, HCM',
-        ]);
-
-        $service = app(\App\Services\VnpayService::class);
-        $paymentUrl = $service->getPaymentUrl($order->id, $order->final_total);
-
-        return response()->json([
-            'status' => 'success',
-            'order_id' => $order->id,
-            'amount' => $order->final_total,
-            'payment_url' => $paymentUrl,
-            'message' => 'Đơn hàng #' . $order->id . ' đã được tạo. URL thanh toán đã được sinh ra.',
-        ]);
-    })->name('create-order');
-
-    // Test: Simulate VNPay success callback
-    Route::get('/simulate-success/{orderId}', function ($orderId) {
-        $order = \App\Models\Order::find($orderId);
-        if (!$order) {
-            return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
-        }
-
-        // Simulate VNPay returning success
-        session(['verified_order_id' => $orderId]);
-
-        // Update order status to paid
-        $order->update([
-            'payment_status' => 'paid',
-            'transaction_id' => 'TEST_' . uniqid(),
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'order_id' => $orderId,
-            'payment_status' => $order->payment_status,
-            'transaction_id' => $order->transaction_id,
-            'message' => 'Thanh toán thành công (mô phỏng)',
-            'redirect_to' => route('checkout.success', $orderId),
-        ]);
-    })->name('simulate-success');
-
-    // Test: Simulate VNPay failed callback
-    Route::get('/simulate-failed/{orderId}', function ($orderId) {
-        $order = \App\Models\Order::find($orderId);
-        if (!$order) {
-            return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
-        }
-
-        // Update order status to failed
-        $order->update([
-            'payment_status' => 'failed',
-        ]);
-
-        return response()->json([
-            'status' => 'failed',
-            'order_id' => $orderId,
-            'payment_status' => $order->payment_status,
-            'message' => 'Thanh toán thất bại (mô phỏng)',
-        ]);
-    })->name('simulate-failed');
-
-    // Test: Check order status
-    Route::get('/check-order/{orderId}', function ($orderId) {
-        $order = \App\Models\Order::with(['items.product'])->find($orderId);
-        if (!$order) {
-            return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'order' => $order,
-        ]);
-    })->name('check-order');
-});
-
 
