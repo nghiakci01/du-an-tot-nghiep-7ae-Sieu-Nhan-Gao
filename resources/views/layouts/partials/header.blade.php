@@ -295,6 +295,7 @@
                                         </li> 
                                     </ul>
                                 </div>   
+                                @include('frontend.partials.notification-bell')
                                 @include('frontend.partials.mini-cart')
                             </div>
                         </div>

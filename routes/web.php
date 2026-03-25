@@ -79,6 +79,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/my-account/orders/{id}/return', [App\Http\Controllers\Frontend\AccountController::class, 'submitReturnRequest'])->name('account.orders.return_submit');
     Route::post('/my-account/orders/{id}/return/shipping', [App\Http\Controllers\Frontend\AccountController::class, 'submitShipping'])->name('account.orders.return.shipping');
 
+    // User Notifications
+    Route::get('/notifications', [App\Http\Controllers\Frontend\NotificationController::class, 'index'])->name('notifications.list');
+    Route::post('/notifications/{id}/mark-as-read', [App\Http\Controllers\Frontend\NotificationController::class, 'markAsRead'])->name('notifications.mark_as_read');
+    Route::post('/notifications/mark-all-read', [App\Http\Controllers\Frontend\NotificationController::class, 'markAllAsRead'])->name('notifications.mark_all_read');
+
     // User Bank Accounts
     Route::post('/my-account/bank-accounts', [App\Http\Controllers\Frontend\AccountController::class, 'storeBankAccount'])->name('account.bank-accounts.store');
     Route::delete('/my-account/bank-accounts/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'destroyBankAccount'])->name('account.bank-accounts.destroy');
