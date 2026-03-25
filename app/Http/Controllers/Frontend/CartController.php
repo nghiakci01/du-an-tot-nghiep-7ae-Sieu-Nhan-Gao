@@ -184,25 +184,6 @@ class CartController extends Controller
         }
         $newVariant = $query->first();
 
-        // If exact combination doesn't exist, try to find a variant matching the CHANGED attribute
-        if (!$newVariant && $changedType) {
-            $query = ProductVariant::where('product_id', $productId);
-            if ($changedType === 'size' && $sizeId) {
-                $query->where(function ($q) use ($sizeId) {
-                    $q->where('size_id', $sizeId)->orWhere('size', $sizeId);
-                });
-            }
-            elseif ($changedType === 'color' && $colorId) {
-                $query->where(function ($q) use ($colorId) {
-                    $q->where('color_id', $colorId)->orWhere('color', $colorId);
-                });
-            }
-            elseif ($changedType === 'product') {
-            // If product changed, just pick the first available variant
-            }
-            $newVariant = $query->first(); // Get first available alternative
-        }
-
         if (!$newVariant) {
             return response()->json(['success' => false, 'message' => 'Phiên bản này không tồn tại hoặc hiện đang hết hàng'], 404);
         }

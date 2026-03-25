@@ -90,11 +90,14 @@ class AccountController extends Controller
         $user->name = $request->name;
         $user->phone = $request->phone;
 
-        if ($request->hasFile('avatar')) {
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             if ($user->avatar) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
             }
-            $user->avatar = $request->file('avatar')->store('avatars', 'public');
+            $avatar = $request->file('avatar');
+            $avatarName = time() . '_' . uniqid() . '.' . $avatar->getClientOriginalExtension();
+            $avatar->move(storage_path('app/public/avatars'), $avatarName);
+            $user->avatar = 'avatars/' . $avatarName;
         }
 
         if ($request->filled('new_password')) {
@@ -163,13 +166,26 @@ class AccountController extends Controller
             'reason' => 'required|string|max:255',
             'note' => 'nullable|string|max:1000',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'videos.*' => 'nullable|file|mimes:mp4,mov,avi,webm|max:51200',
         ]);
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
+            \Illuminate\Support\Facades\File::ensureDirectoryExists(storage_path('app/public/returns'));
             foreach ($request->file('images') as $image) {
-                $path = $image->store('returns', 'public');
-                $imagePaths[] = $path;
+                $name = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(storage_path('app/public/returns'), $name);
+                $imagePaths[] = 'returns/' . $name;
+            }
+        }
+
+        $videoPaths = [];
+        if ($request->hasFile('videos')) {
+            \Illuminate\Support\Facades\File::ensureDirectoryExists(storage_path('app/public/returns/videos'));
+            foreach ($request->file('videos') as $video) {
+                $name = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
+                $video->move(storage_path('app/public/returns/videos'), $name);
+                $videoPaths[] = 'returns/videos/' . $name;
             }
         }
 
@@ -179,6 +195,7 @@ class AccountController extends Controller
             'reason' => $request->reason,
             'note' => $request->note,
             'images' => $imagePaths,
+            'videos' => $videoPaths,
             'refund_amount' => $order->final_total,
             'status' => 'pending',
         ]);
