@@ -19,6 +19,7 @@ class OpenAIProvider implements AIProviderInterface
     public function generateResponse(string $prompt, array $options = []): ?string
     {
         try {
+            /** @var \Illuminate\Http\Client\Response $response */
             $response = Http::withOptions([
                 'curl' => [
                     CURLOPT_SSL_VERIFYPEER => true,

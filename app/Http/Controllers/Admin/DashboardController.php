@@ -74,7 +74,7 @@ class DashboardController extends Controller
         // Tính tổng số lượng sản phẩm đã bán trong kỳ để làm thanh tiến trình
         $totalProductsSold = \DB::table('order_items')
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
-            ->where('orders.status', \App\Models\Order::STATUS_COMPLETED)
+            ->where('orders.status', Order::STATUS_COMPLETED)
             ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->sum('order_items.quantity');
 
@@ -111,7 +111,7 @@ class DashboardController extends Controller
      */
     public function revenueApi(Request $request)
     {
-        $filter = $request->get('filter', 'month');
+        $filter = $request->input('filter', 'month');
 
         if ($filter === 'week') {
             $startDate = now()->startOfWeek();
@@ -148,7 +148,7 @@ class DashboardController extends Controller
                 'summary' => [
                     'total_revenue' => $overviewStats['total_revenue'],
                     'total_orders' => $overviewStats['total_orders'],
-                    'successful_orders' => \App\Models\Order::where('status', \App\Models\Order::STATUS_COMPLETED)->whereBetween('created_at', [$startDate, $endDate])->count(),
+                    'successful_orders' => Order::where('status', Order::STATUS_COMPLETED)->whereBetween('created_at', [$startDate, $endDate])->count(),
                 ],
                 'chart' => [
                     'labels' => $revenueChart['labels'],

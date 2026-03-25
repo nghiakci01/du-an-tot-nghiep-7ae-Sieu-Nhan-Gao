@@ -8,6 +8,7 @@ use App\Models\OrderHistory;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class OrderService
@@ -57,14 +58,15 @@ class OrderService
 
         });
 
-        // Dispatch Database & Email Notifications
-        try {
-            if ($order->user) {
-                // If the order belongs to a registered user, send via Notification system (DB + Mail)
-                $order->user->notify(new \App\Notifications\OrderStatusNotification($order, $oldStatus, $newStatus));
-            } elseif ($newStatus === Order::STATUS_SHIPPED && $order->email) {
-                // For guest orders (no user registered), fallback to direct email on shipping
-                \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderShippedMail($order));
+        // Send email if shipped
+        if ($newStatus === Order::STATUS_SHIPPED) {
+            try {
+                $email = $order->email ?? ($order->user->email ?? null);
+                if ($email) {
+                    Mail::to($email)->send(new OrderShippedMail($order));
+                }
+            } catch (Exception $e) {
+                Log::error('Failed to send shipped email for order '.$order->id.': '.$e->getMessage());
             }
         } catch (\Exception $e) {
             \Log::error('Failed to send notification/email for order '.$order->id.': '.$e->getMessage());

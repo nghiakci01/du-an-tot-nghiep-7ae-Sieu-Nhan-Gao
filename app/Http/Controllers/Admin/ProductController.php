@@ -403,12 +403,11 @@ class ProductController extends Controller
             return response()->json([]);
         }
 
-        $variants = ProductVariant::with(['product', 'sizeRelationship', 'colorRelationship'])
-            ->where(function ($query) use ($q) {
-                $query->where('sku', 'like', "%{$q}%")
-                      ->orWhereHas('product', function ($q2) use ($q) {
-                          $q2->where('name', 'like', "%{$q}%");
-                      });
+        /** @var \Illuminate\Database\Eloquent\Builder $queryBuilder */
+        $queryBuilder = ProductVariant::with(['product', 'sizeRelationship', 'colorRelationship']);
+        $variants = $queryBuilder->where('sku', 'like', "%{$q}%")
+            ->orWhereHas('product', function (\Illuminate\Database\Eloquent\Builder $q2) use ($q) {
+                $q2->where('name', 'like', "%{$q}%");
             })
             ->latest()
             ->get();

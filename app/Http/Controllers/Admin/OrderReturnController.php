@@ -19,7 +19,7 @@ class OrderReturnController extends Controller
     }
     public function index(Request $request)
     {
-        $query = \App\Models\OrderReturnRequest::with(['user', 'order']);
+        $query = OrderReturnRequest::with(['user', 'order']);
         
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -30,20 +30,25 @@ class OrderReturnController extends Controller
         }
         
         $requests = $query->latest()->paginate(15);
-        $tab = $request->get('status', 'all');
+        $tab = $request->input('status', 'all');
         
         return view('admin.returns.index', compact('requests', 'tab'));
     }
 
     public function approve(Request $request, $id)
     {
-        try {
-            $request->validate([
-                'admin_note' => 'required|string|max:1000'
-            ]);
-            
-            $returnReq = OrderReturnRequest::findOrFail($id);
-            $this->returnService->approve($returnReq, auth()->user(), $request->admin_note);
+        $request->validate([
+            'admin_note' => 'required|string|max:1000'
+        ]);
+        
+        $returnReq = OrderReturnRequest::findOrFail($id);
+        // if (!$returnReq->isPending()) { // This check is now handled by the service
+        //     return redirect()->back()->with('error', 'Chỉ có thể duyệt yêu cầu đang chờ xử lý.');
+        // }
+
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $this->returnService->approve($returnReq, $user, $request->admin_note);
 
             return redirect()->back()->with('success', 'Đã duyệt yêu cầu trả hàng.');
         } catch (\Exception $e) {
@@ -54,13 +59,18 @@ class OrderReturnController extends Controller
 
     public function reject(Request $request, $id)
     {
-        try {
-            $request->validate([
-                'admin_note' => 'required|string|max:1000'
-            ]);
-            
-            $returnReq = OrderReturnRequest::findOrFail($id);
-            $this->returnService->reject($returnReq, auth()->user(), $request->admin_note);
+        $request->validate([
+            'admin_note' => 'required|string|max:1000'
+        ]);
+        
+        $returnReq = OrderReturnRequest::findOrFail($id);
+        // if ($returnReq->isCompleted()) { // This check is now handled by the service
+        //     return redirect()->back()->with('error', 'Không thể từ chối yêu cầu đã hoàn thành.');
+        // }
+
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $this->returnService->reject($returnReq, $user, $request->admin_note);
 
             return redirect()->back()->with('success', 'Yêu cầu trả hàng đã bị từ chối.');
         } catch (\Exception $e) {
@@ -71,14 +81,16 @@ class OrderReturnController extends Controller
 
     public function markAsShipping($id)
     {
-        try {
-            $returnReq = OrderReturnRequest::findOrFail($id);
-            $this->returnService->markAsShipping($returnReq, auth()->user());
-            
-            return redirect()->back()->with('success', 'Đã cập nhật trạng thái đang di chuyển.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
-        }
+        $returnReq = OrderReturnRequest::findOrFail($id);
+        // if (!$returnReq->isApproved()) { // This check is now handled by the service
+        //     return redirect()->back()->with('error', 'Chỉ có thể chuyển sang trạng thái đang di chuyển khi đã duyệt.');
+        // }
+
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $this->returnService->markAsShipping($returnReq, $user);
+        
+        return redirect()->back()->with('success', 'Đã cập nhật trạng thái đang di chuyển.');
     }
 
     public function markAsReceived($id)
@@ -102,7 +114,9 @@ class OrderReturnController extends Controller
             //     return redirect()->back()->with('error', 'Chỉ có thể hoàn tiền cho yêu cầu đã được duyệt.');
             // }
 
-            $this->returnService->complete($returnReq, auth()->user());
+            /** @var \App\Models\User $user */
+            $user = auth()->user();
+            $this->returnService->complete($returnReq, $user);
             
             return redirect()->back()->with('success', 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.');
         } catch (\Exception $e) {

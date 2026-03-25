@@ -21,6 +21,7 @@ class ChatManagementController extends Controller
             ->paginate(15);
 
         foreach ($conversations as $chat) {
+            /** @var ChatMessage $chat */
             $chat->last_message = ChatMessage::where('session_id', $chat->session_id)
                 ->orderBy('created_at', 'desc')
                 ->value('message');
@@ -114,11 +115,13 @@ class ChatManagementController extends Controller
             ->paginate(15);
 
         foreach ($conversations as $chat) {
+            /** @var ChatMessage $chat */
             $lastMsg = ChatMessage::onlyTrashed()
                 ->where('session_id', $chat->session_id)
                 ->orderBy('created_at', 'desc')
                 ->first();
 
+            /** @var ChatMessage|null $lastMsg */
             $chat->last_message = $lastMsg ? $lastMsg->message : '';
         }
 

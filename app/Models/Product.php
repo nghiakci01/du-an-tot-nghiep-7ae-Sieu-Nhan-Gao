@@ -49,7 +49,7 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
-    public function images(): HasMany
+    public function images()
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }

@@ -108,7 +108,7 @@ Route::get('/api/chat/messages', [App\Http\Controllers\Api\ChatController::class
 
 
 // Admin & Staff Routes
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'admin']], function () {
 
     // Lock Screen Routes (No admin.lock)
     Route::get('/lock', [\App\Http\Controllers\Admin\LockScreenController::class, 'lock'])->name('lock');
@@ -198,7 +198,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
 
         // Chatbot Management (Admin & Staff)
-        Route::prefix('chat')->name('chat.')->group(function () {
+        Route::group(['prefix' => 'chat', 'as' => 'chat.'], function () {
             Route::get('/', [\App\Http\Controllers\Admin\ChatManagementController::class, 'index'])->name('index');
             Route::get('/trash', [\App\Http\Controllers\Admin\ChatManagementController::class, 'trash'])->name('trash');
             Route::get('/{sessionId}', [\App\Http\Controllers\Admin\ChatManagementController::class, 'show'])->name('show');
@@ -218,14 +218,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
         // Chatbot Questions (Admin only)
         Route::middleware(['admin.only'])->group(function () {
-            Route::prefix('chatbot')->name('chatbot.')->group(function () {
+            Route::group(['prefix' => 'chatbot', 'as' => 'chatbot.'], function () {
                 Route::resource('questions', \App\Http\Controllers\Admin\ChatbotSuggestedQuestionController::class);
             });
         });
 
         // Chatbot Settings (Admin only)
         Route::middleware(['admin.only'])->group(function () {
-            Route::prefix('settings')->name('settings.')->group(function () {
+            Route::group(['prefix' => 'settings', 'as' => 'settings.'], function () {
                 Route::get('/chatbot', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'index'])->name('chatbot');
                 Route::post('/chatbot', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'update'])->name('chatbot.update');
                 Route::post('/chatbot/test', [\App\Http\Controllers\Admin\ChatbotSettingController::class, 'testConnection'])->name('chatbot.test');

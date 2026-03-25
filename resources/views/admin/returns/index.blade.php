@@ -106,17 +106,15 @@
                                             </div>
                                             @endif
 
-                                            @if($req->videos && count($req->videos) > 0)
+                                            @if($req->video_proof)
                                             <div class="mb-3">
-                                                <h6><i class="bi bi-camera-reels me-1"></i>Video minh chứng:</h6>
-                                                @foreach($req->videos as $vid)
-                                                <div class="mb-2">
-                                                    <video controls style="max-width: 100%; max-height: 300px; border-radius: 8px; border: 1px solid #ddd;">
-                                                        <source src="{{ asset('storage/'.$vid) }}" type="video/mp4">
-                                                        Trình duyệt không hỗ trợ video.
+                                                <h6>Video minh chứng:</h6>
+                                                <div class="border rounded p-2 bg-light">
+                                                    <video controls style="width: 100%; max-height: 300px; border-radius: 8px;">
+                                                        <source src="{{ asset('storage/'.$req->video_proof) }}" type="video/mp4">
+                                                        Trình duyệt của bạn không hỗ trợ thẻ video.
                                                     </video>
                                                 </div>
-                                                @endforeach
                                             </div>
                                             @endif
 

@@ -23,6 +23,7 @@ class GeminiProvider implements AIProviderInterface
         try {
             $url = "https://generativelanguage.googleapis.com/{$this->version}/models/{$this->model}:generateContent?key={$this->apiKey}";
 
+            /** @var \Illuminate\Http\Client\Response $response */
             $response = Http::withOptions([
                 'curl' => [
                     CURLOPT_SSL_VERIFYPEER => true,

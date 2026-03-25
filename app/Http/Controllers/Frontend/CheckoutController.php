@@ -13,6 +13,7 @@ use App\Notifications\NewOrderNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
 
@@ -315,7 +316,7 @@ class CheckoutController extends Controller
                     session()->getId()
                 );
             } catch (\Exception $e) {
-                \Log::warning('Cart abandonment recovery tracking failed: ' . $e->getMessage());
+                Log::warning('Cart abandonment recovery tracking failed: ' . $e->getMessage());
             }
 
             // Set session for guest verification if not logged in
@@ -338,7 +339,7 @@ class CheckoutController extends Controller
             try {
                 \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
             } catch (\Exception $e) {
-                \Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: '.$e->getMessage());
+                Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: '.$e->getMessage());
             }
 
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');

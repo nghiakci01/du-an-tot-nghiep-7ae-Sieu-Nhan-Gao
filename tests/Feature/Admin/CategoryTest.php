@@ -122,15 +122,15 @@ class CategoryTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
-    public function admin_cannot_delete_category_with_children()
+    public function admin_can_delete_category_with_empty_children()
     {
         $parent = Category::create(['name' => 'Parent', 'slug' => 'parent']);
         Category::create(['name' => 'Child', 'slug' => 'child', 'parent_id' => $parent->id]);
 
         $response = $this->actingAs($this->admin)->delete(route('admin.categories.destroy', $parent));
 
-        $response->assertSessionHas('error');
-        $this->assertDatabaseHas('categories', ['id' => $parent->id]);
+        $response->assertSessionHas('success');
+        $this->assertDatabaseMissing('categories', ['id' => $parent->id]);
     }
 
     #[\PHPUnit\Framework\Attributes\Test]

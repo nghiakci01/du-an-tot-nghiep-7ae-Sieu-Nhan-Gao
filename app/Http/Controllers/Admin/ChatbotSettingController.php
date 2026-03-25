@@ -77,6 +77,7 @@ class ChatbotSettingController extends Controller
     private function testGemini($apiKey)
     {
         try {
+            /** @var \Illuminate\Http\Client\Response $response */
             $response = \Illuminate\Support\Facades\Http::withOptions([
                 'curl' => [
                     CURLOPT_SSL_VERIFYPEER => true,
@@ -102,6 +103,7 @@ class ChatbotSettingController extends Controller
     private function testOpenAI($apiKey)
     {
         try {
+            /** @var \Illuminate\Http\Client\Response $response */
             $response = \Illuminate\Support\Facades\Http::withOptions([
                 'curl' => [
                     CURLOPT_SSL_VERIFYPEER => true,

@@ -15,17 +15,20 @@ class SearchController extends Controller
     {
         $query = $request->input('q', '');
 
-        $products = Product::query()
-            ->where('is_active', true)
-            ->where(function ($q) use ($query) {
+        /** @var \Illuminate\Database\Eloquent\Builder $queryBuilder */
+        $queryBuilder = Product::query()->where('is_active', true);
+        
+        /** @var mixed $searchFilter */
+        $searchFilter = function (\Illuminate\Database\Eloquent\Builder $q) use ($query) {
                 $q->where('name', 'LIKE', "%{$query}%")
                     ->orWhere('short_description', 'LIKE', "%{$query}%")
                     ->orWhere('description', 'LIKE', "%{$query}%")
-                    ->orWhereHas('category', function ($categoryQuery) use ($query) {
+                    ->orWhereHas('category', function (\Illuminate\Database\Eloquent\Builder $categoryQuery) use ($query) {
                         $categoryQuery->where('name', 'LIKE', "%{$query}%");
                     });
-            })
-
+            };
+            
+        $products = $queryBuilder->{'where'}($searchFilter)
             ->with(['category', 'images', 'reviews', 'variants'])
             ->orderByRaw('CASE 
                 WHEN name LIKE ? THEN 1 
@@ -49,12 +52,16 @@ class SearchController extends Controller
             return response()->json([]);
         }
 
-        $products = Product::query()
-            ->where('is_active', true)
-            ->where(function ($q) use ($query) {
+        /** @var \Illuminate\Database\Eloquent\Builder $queryBuilder */
+        $queryBuilder = Product::query()->where('is_active', true);
+
+        /** @var mixed $suggestionFilter */
+        $suggestionFilter = function (\Illuminate\Database\Eloquent\Builder $q) use ($query) {
                 $q->where('name', 'LIKE', "%{$query}%")
                     ->orWhere('short_description', 'LIKE', "%{$query}%");
-            })
+            };
+
+        $products = $queryBuilder->{'where'}($suggestionFilter)
             ->select('id', 'name', 'slug', 'image', 'price', 'sale_price')
             ->orderByRaw('CASE 
                 WHEN name LIKE ? THEN 1 

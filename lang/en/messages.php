@@ -187,7 +187,6 @@ return [
     'apply_coupon' => 'Apply coupon',
     'enter_coupon_code' => 'Please enter coupon code',
     'processing' => 'Processing',
-    'error_occurred' => 'An error occurred, please try again',
     'confirm_remove_coupon' => 'Are you sure you want to remove the coupon?',
     'billing_details' => 'Billing Details',
     'street_address' => 'House number and street name',

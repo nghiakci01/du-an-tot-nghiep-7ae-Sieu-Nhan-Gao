@@ -73,7 +73,9 @@ class AccountController extends Controller
         }
 
         // Lấy danh sách product_id đã được user review trong đơn hàng này
-        $productIds = collect($order->items)->pluck('product_id')->filter()->unique();
+        /** @var \Illuminate\Database\Eloquent\Collection $items */
+        $items = $order->items;
+        $productIds = $items->pluck('product_id')->filter()->unique();
         $userReviews = collect();
         
         if ($user) {
@@ -180,7 +182,7 @@ class AccountController extends Controller
             'reason' => 'required|string|max:255',
             'note' => 'nullable|string|max:1000',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'videos.*' => 'nullable|file|mimes:mp4,mov,avi,webm|max:51200',
+            'video' => 'nullable|mimes:mp4,mov,ogg,qt|max:20480',
         ]);
 
         $imagePaths = [];
@@ -203,13 +205,18 @@ class AccountController extends Controller
             }
         }
 
+        $videoPath = null;
+        if ($request->hasFile('video')) {
+            $videoPath = $request->file('video')->store('returns', 'public');
+        }
+
         $returnRequest = \App\Models\OrderReturnRequest::create([
             'user_id' => $user->id,
             'order_id' => $order->id,
             'reason' => $request->reason,
             'note' => $request->note,
             'images' => $imagePaths,
-            'videos' => $videoPaths,
+            'video_proof' => $videoPath,
             'refund_amount' => $order->final_total,
             'status' => 'pending',
         ]);

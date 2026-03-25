@@ -20,6 +20,7 @@ class ListGeminiModels extends Command
         $this->newLine();
         try {
             // Try to list models
+            /** @var \Illuminate\Http\Client\Response $response */
             $response = Http::timeout(10)
                 ->get('https://generativelanguage.googleapis.com/v1/models?key='.$apiKey);
 
