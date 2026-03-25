@@ -42,6 +42,7 @@ class SetProductPricing extends Command
         $updated = 0;
 
         foreach ($products as $product) {
+            /** @var Product $product */
             $pricing = $this->calculatePricing($product);
 
             $product->update([

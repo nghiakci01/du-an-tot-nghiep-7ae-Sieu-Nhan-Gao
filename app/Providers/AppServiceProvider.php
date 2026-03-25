@@ -48,10 +48,10 @@ class AppServiceProvider extends ServiceProvider
                     $hasChatbotTable = \Illuminate\Support\Facades\Schema::hasTable('chatbot_settings');
                     if ($hasChatbotTable) {
                         $sharedData['chatbot_enabled'] = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_enabled', 3600, function () {
-                            return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_enabled')->first()?->value ?? '0';
+                            return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_enabled')->value('value') ?? '0';
                         }) == '1';
                         $sharedData['chatbot_mode'] = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_mode', 3600, function () {
-                            return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_mode')->first()?->value ?? 'rules';
+                            return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_mode')->value('value') ?? 'rules';
                         });
                     } else {
                         $sharedData['chatbot_enabled'] = false;

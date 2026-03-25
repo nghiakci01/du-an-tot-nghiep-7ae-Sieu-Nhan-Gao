@@ -134,6 +134,19 @@
                 </div>
                 <!-- Preview area -->
                 <div id="preview-container"></div>
+              <div class="mb-5">
+                <label class="form-label fw-bold">Video minh chứng <span class="text-muted fw-normal">(Tùy chọn)</span></label>
+                <div class="image-upload-wrap">
+                  <div class="text-center">
+                    <i class="bi bi-camera-video"></i>
+                    <p class="mb-0 text-muted">Nhấn vào đây để tải video lên (Tối đa 1 video, dung lượng < 20MB)</p>
+                  </div>
+                  <input type="file" name="video" id="return-video" accept="video/mp4,video/quicktime,video/ogg">
+                </div>
+                <!-- Preview area for video -->
+                <div id="video-preview-container" class="mt-3" style="display: none;">
+                  <video id="video-preview" controls style="width: 100%; max-height: 300px; border-radius: 8px; border: 1px solid #ddd;"></video>
+                </div>
               </div>
 
               <div class="d-flex justify-content-end gap-2">
@@ -167,6 +180,29 @@ document.getElementById('return-images').addEventListener('change', function(e) 
       container.appendChild(img);
     }
   });
+});
+
+document.getElementById('return-video').addEventListener('change', function(e) {
+  const container = document.getElementById('video-preview-container');
+  const videoPreview = document.getElementById('video-preview');
+  
+  if (e.target.files && e.target.files[0]) {
+    const file = e.target.files[0];
+    
+    if (file.size > 20 * 1024 * 1024) {
+        alert('Dung lượng video quá lớn, vui lòng chọn video nhỏ hơn 20MB');
+        e.target.value = '';
+        container.style.display = 'none';
+        return;
+    }
+
+    if (file.type.startsWith('video/')) {
+      container.style.display = 'block';
+      videoPreview.src = URL.createObjectURL(file);
+    }
+  } else {
+    container.style.display = 'none';
+  }
 });
 </script>
 @endpush

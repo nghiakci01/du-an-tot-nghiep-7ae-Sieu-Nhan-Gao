@@ -7,6 +7,7 @@ use App\Mail\ContactNotification;
 use App\Models\ContactMessage;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
@@ -40,7 +41,7 @@ class ContactController extends Controller
                 Mail::to($recipients)->send(new ContactNotification($contactMessage));
             }
         } catch (\Exception $e) {
-            \Log::error('Failed to send contact notification: '.$e->getMessage());
+            Log::error('Failed to send contact notification: '.$e->getMessage());
         }
 
         if ($request->ajax()) {

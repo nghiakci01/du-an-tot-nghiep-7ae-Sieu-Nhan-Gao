@@ -8,6 +8,7 @@ use App\Models\OrderHistory;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class OrderService
@@ -64,8 +65,8 @@ class OrderService
                 if ($email) {
                     Mail::to($email)->send(new OrderShippedMail($order));
                 }
-            } catch (\Exception $e) {
-                \Log::error('Failed to send shipped email for order '.$order->id.': '.$e->getMessage());
+            } catch (Exception $e) {
+                Log::error('Failed to send shipped email for order '.$order->id.': '.$e->getMessage());
             }
         }
 

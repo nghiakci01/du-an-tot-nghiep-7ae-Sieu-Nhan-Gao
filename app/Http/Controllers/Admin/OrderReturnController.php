@@ -19,7 +19,7 @@ class OrderReturnController extends Controller
     }
     public function index(Request $request)
     {
-        $query = \App\Models\OrderReturnRequest::with(['user', 'order']);
+        $query = OrderReturnRequest::with(['user', 'order']);
         
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -30,7 +30,7 @@ class OrderReturnController extends Controller
         }
         
         $requests = $query->latest()->paginate(15);
-        $tab = $request->get('status', 'all');
+        $tab = $request->input('status', 'all');
         
         return view('admin.returns.index', compact('requests', 'tab'));
     }
@@ -46,7 +46,9 @@ class OrderReturnController extends Controller
         //     return redirect()->back()->with('error', 'Chỉ có thể duyệt yêu cầu đang chờ xử lý.');
         // }
 
-        $this->returnService->approve($returnReq, auth()->user(), $request->admin_note);
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $this->returnService->approve($returnReq, $user, $request->admin_note);
 
         return redirect()->back()->with('success', 'Đã duyệt yêu cầu trả hàng.');
     }
@@ -62,7 +64,9 @@ class OrderReturnController extends Controller
         //     return redirect()->back()->with('error', 'Không thể từ chối yêu cầu đã hoàn thành.');
         // }
 
-        $this->returnService->reject($returnReq, auth()->user(), $request->admin_note);
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $this->returnService->reject($returnReq, $user, $request->admin_note);
 
         return redirect()->back()->with('success', 'Yêu cầu trả hàng đã bị từ chối.');
     }
@@ -74,7 +78,9 @@ class OrderReturnController extends Controller
         //     return redirect()->back()->with('error', 'Chỉ có thể chuyển sang trạng thái đang di chuyển khi đã duyệt.');
         // }
 
-        $this->returnService->markAsShipping($returnReq, auth()->user());
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $this->returnService->markAsShipping($returnReq, $user);
         
         return redirect()->back()->with('success', 'Đã cập nhật trạng thái đang di chuyển.');
     }
@@ -100,7 +106,9 @@ class OrderReturnController extends Controller
             //     return redirect()->back()->with('error', 'Chỉ có thể hoàn tiền cho yêu cầu đã được duyệt.');
             // }
 
-            $this->returnService->complete($returnReq, auth()->user());
+            /** @var \App\Models\User $user */
+            $user = auth()->user();
+            $this->returnService->complete($returnReq, $user);
             
             return redirect()->back()->with('success', 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.');
         } catch (\Exception $e) {

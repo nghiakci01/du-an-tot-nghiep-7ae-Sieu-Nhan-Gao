@@ -187,7 +187,7 @@ class BannerTest extends TestCase
     {
         // Giả lập một file UploadedFile nhưng bị lỗi (ví dụ vượt quá kích thước PHP cho phép)
         // Khi đó isValid() sẽ trả về false và getRealPath() có thể là false/empty
-        $file = new \Illuminate\Http\UploadedFile(
+        $file = new UploadedFile(
             path: '',
             originalName: 'large_image.jpg',
             mimeType: 'image/jpeg',

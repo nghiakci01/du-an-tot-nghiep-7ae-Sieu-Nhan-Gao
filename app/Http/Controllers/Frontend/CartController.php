@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Events\CartUpdatedEvent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Services\CartService;
 
 class CartController extends Controller
@@ -438,10 +439,10 @@ class CartController extends Controller
 
     public function remove(Request $request)
     {
-        $id = $request->id ?: $request->get('id');
+        $id = $request->id ?: $request->input('id');
         $cart = $this->cartService->getCart();
 
-        \Log::info('Cart Remove Request', [
+        Log::info('Cart Remove Request', [
             'method' => $request->method(),
             'id' => $id,
             'cart_keys' => array_keys($cart),

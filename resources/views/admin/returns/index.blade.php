@@ -106,6 +106,18 @@
                                             </div>
                                             @endif
 
+                                            @if($req->video_proof)
+                                            <div class="mb-3">
+                                                <h6>Video minh chứng:</h6>
+                                                <div class="border rounded p-2 bg-light">
+                                                    <video controls style="width: 100%; max-height: 300px; border-radius: 8px;">
+                                                        <source src="{{ asset('storage/'.$req->video_proof) }}" type="video/mp4">
+                                                        Trình duyệt của bạn không hỗ trợ thẻ video.
+                                                    </video>
+                                                </div>
+                                            </div>
+                                            @endif
+
                                             @if($req->admin_note)
                                             <div class="mb-3">
                                                 <h6>Ghi chú/Phản hồi cửa hàng:</h6>

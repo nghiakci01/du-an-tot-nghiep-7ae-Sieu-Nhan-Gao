@@ -71,7 +71,7 @@ class HomeController extends Controller
 
     public function about()
     {
-        $aboutBanner = \App\Models\Banner::where('position', 'about_us')
+        $aboutBanner = Banner::where('position', 'about_us')
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->first();
