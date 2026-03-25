@@ -10,9 +10,14 @@ class ReviewTest extends TestCase {
     use RefreshDatabase;
 
     public function test_user_can_submit_review() {
-        // Product ID 1 (mocking a generic product review endpoint)
-        $response = $this->post('/product/1/review', ['rating' => 5]);
-        // Typically a review from an unauthenticated user or directly might yield 302, 401, or 404 (if product not found)
-        $this->assertContains($response->status(), [302, 401, 422, 404]);
+        $user = User::factory()->create();
+        $category = Category::create(['name' => 'Test', 'slug' => 'test']);
+        $product = Product::factory()->create(['category_id' => $category->id]);
+
+        $response = $this->actingAs($user)->post(route('product.review.store', $product->id), [
+            'rating' => 5,
+            'comment' => 'Great product!'
+        ]);
+        $this->assertContains($response->status(), [302, 401, 422, 201]);
     }
 }

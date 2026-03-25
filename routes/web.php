@@ -257,7 +257,7 @@ Route::get('lang/{locale}', function ($locale) {
 })->name('lang.switch');
 
 // ============ VNPAY TEST ROUTES (Development Only) ============
-Route::prefix('test-payment')->name('test.payment.')->middleware('web')->group(function () {
+Route::name('test.payment.')->prefix('test-payment')->middleware('web')->group(function () {
     // Test: Create order and generate payment URL
     Route::get('/create-order', function () {
         $order = \App\Models\Order::create([

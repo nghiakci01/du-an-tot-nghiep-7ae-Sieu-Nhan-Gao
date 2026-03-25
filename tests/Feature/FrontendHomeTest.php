@@ -14,6 +14,6 @@ class FrontendHomeTest extends TestCase {
         Product::factory(3)->create();
 
         $response = $this->get('/');
-        $this->assertIn($response->status(), [200, 302]);
+        $this->assertContains($response->status(), [200, 302]);
     }
 }
