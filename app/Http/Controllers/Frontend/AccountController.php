@@ -73,13 +73,9 @@ class AccountController extends Controller
         }
 
         // Lấy danh sách product_id đã được user review trong đơn hàng này
-<<<<<<< HEAD
         /** @var \Illuminate\Database\Eloquent\Collection $items */
         $items = $order->items;
         $productIds = $items->pluck('product_id')->filter()->unique();
-=======
-        $productIds = collect($order->items)->pluck('product_id')->filter()->unique();
->>>>>>> 5c7a5fb53fde68670aa44137c948991bf9e4e69a
         $userReviews = collect();
         
         if ($user) {
@@ -186,11 +182,7 @@ class AccountController extends Controller
             'reason' => 'required|string|max:255',
             'note' => 'nullable|string|max:1000',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-<<<<<<< HEAD
-            'video' => 'nullable|mimes:mp4,mov,ogg,qt|max:20480',
-=======
             'videos.*' => 'nullable|file|mimes:mp4,mov,avi,webm|max:51200',
->>>>>>> 5c7a5fb53fde68670aa44137c948991bf9e4e69a
         ]);
 
         $imagePaths = [];
@@ -213,22 +205,13 @@ class AccountController extends Controller
             }
         }
 
-        $videoPath = null;
-        if ($request->hasFile('video')) {
-            $videoPath = $request->file('video')->store('returns', 'public');
-        }
-
         $returnRequest = \App\Models\OrderReturnRequest::create([
             'user_id' => $user->id,
             'order_id' => $order->id,
             'reason' => $request->reason,
             'note' => $request->note,
             'images' => $imagePaths,
-<<<<<<< HEAD
-            'video_proof' => $videoPath,
-=======
             'videos' => $videoPaths,
->>>>>>> 5c7a5fb53fde68670aa44137c948991bf9e4e69a
             'refund_amount' => $order->final_total,
             'status' => 'pending',
         ]);

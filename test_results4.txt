@@ -1,0 +1,281 @@
+
+   PASS  Tests\Unit\ExampleTest
+  ✓ that true is true   0.01s  
+
+   PASS  Tests\Feature\AdminBannerTest
+  ✓ admin banner manag… 0.62s  
+
+   PASS  Tests\Feature\AdminPostTest
+  ✓ admin post managem… 0.02s  
+
+   PASS  Tests\Feature\AdminUserTest
+  ✓ admin user managem… 0.03s  
+
+   PASS  Tests\Feature\Admin\BannerTest
+  ✓ admin can view ban… 0.10s  
+  ✓ admin can view cre… 0.03s  
+  ✓ admin can create b… 0.06s  
+  ✓ creating banner wi… 0.03s  
+  ✓ admin can edit ban… 0.03s  
+  ✓ admin can update b… 0.03s  
+  ✓ admin can update b… 0.03s  
+  ✓ admin can delete b… 0.04s  
+  ✓ banner image must…  0.03s  
+  ✓ banner upload with… 0.02s  
+
+   PASS  Tests\Feature\Admin\DashboardTest
+  ✓ admin can view das… 0.04s  
+  ✓ guest cannot acces… 0.02s  
+  ✓ customer cannot ac… 0.02s  
+
+   FAIL  Tests\Feature\Admin\OrderTest
+  ✓ admin can view ord… 0.04s  
+  ⨯ admin can view sin… 0.93s  
+  ✓ admin can filter o… 0.03s  
+  ✓ admin can update o… 0.03s  
+  ✓ order status is re… 0.03s  
+  ✓ admin can delete c… 0.03s  
+  ✓ admin cannot delet… 0.03s  
+  ✓ admin can print or… 0.03s  
+  ✓ admin cannot updat… 0.03s  
+  ✓ guest cannot acces… 0.03s  
+
+   PASS  Tests\Feature\Admin\ProductVariantTest
+  ✓ can create product… 0.04s  
+  ✓ cannot create prod… 0.03s  
+  ✓ sale price must be… 0.03s  
+  ✓ can update variant… 0.04s  
+
+   PASS  Tests\Feature\Admin\ReportTest
+  ✓ admin can view das… 0.05s  
+  ✓ admin can export o… 0.04s  
+  ✓ admin can export r… 0.23s  
+
+   PASS  Tests\Feature\Admin\UserTest
+  ✓ admin can view use… 0.03s  
+  ✓ admin can view use… 0.03s  
+  ✓ admin can filter u… 0.03s  
+  ✓ admin cannot delet… 0.02s  
+  ✓ admin cannot delet… 0.03s  
+  ✓ admin can delete c… 0.03s  
+  ✓ guest cannot acces… 0.02s  
+
+   PASS  Tests\Feature\CartAuditTest
+  ✓ it requires varian… 0.03s  
+  ✓ it auto selects va… 0.04s  
+  ✓ it prevents adding… 0.03s  
+  ✓ it prevents adding… 0.03s  
+  ✓ it accumulates qua… 0.03s  
+  ✓ it can update cart… 0.04s  
+  ✓ it can remove item… 0.03s  
+
+   PASS  Tests\Feature\CartTest
+  ✓ user can view cart  0.03s  
+
+   PASS  Tests\Feature\CheckoutTest
+  ✓ user can access ch… 0.02s  
+
+   PASS  Tests\Feature\UserAuthTest
+  ✓ user can login      0.03s  
+
+   PASS  Tests\Feature\WishlistTest
+  ✓ wishlist access     0.02s  
+  ───────────────────────────  
+   FAILED  Tests\Feature\Ad…   
+  Expected response status code [200] but received 500.
+Failed asserting that 500 is identical to 200.
+
+The following exception occurred during the last request:
+
+ParseError: syntax error, unexpected token "<<", expecting "]" in C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Models\OrderReturnRequest.php:18
+Stack trace:
+#0 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\composer\ClassLoader.php(427): Composer\Autoload\{closure}('C:\\laragon\\www\\...')
+#1 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasRelationships.php(1035): Composer\Autoload\ClassLoader->loadClass('App\\Models\\Orde...')
+#2 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasRelationships.php(214): Illuminate\Database\Eloquent\Model->newRelatedInstance('App\\Models\\Orde...')
+#3 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Models\Order.php(66): Illuminate\Database\Eloquent\Model->hasOne('App\\Models\\Orde...')
+#4 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasAttributes.php(623): App\Models\Order->returnRequest()
+#5 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasAttributes.php(575): Illuminate\Database\Eloquent\Model->getRelationshipFromMethod('returnRequest')
+#6 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\HasAttributes.php(494): Illuminate\Database\Eloquent\Model->getRelationValue('returnRequest')
+#7 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php(2423): Illuminate\Database\Eloquent\Model->getAttribute('returnRequest')
+#8 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\storage\framework\views\4f0acb8ed03bc7938d376717be5e7e2f.php(164): Illuminate\Database\Eloquent\Model->__get('returnRequest')
+#9 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php(123): require('C:\\laragon\\www\\...')
+#10 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php(124): Illuminate\Filesystem\Filesystem::Illuminate\Filesystem\{closure}()
+#11 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php(57): Illuminate\Filesystem\Filesystem->getRequire('C:\\laragon\\www\\...', Array)
+#12 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php(76): Illuminate\View\Engines\PhpEngine->evaluatePath('C:\\laragon\\www\\...', Array)
+#13 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\View.php(208): Illuminate\View\Engines\CompilerEngine->get('C:\\laragon\\www\\...', Array)
+#14 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\View.php(191): Illuminate\View\View->getContents()
+#15 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\View.php(160): Illuminate\View\View->renderContents()
+#16 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Response.php(78): Illuminate\View\View->render()
+#17 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Response.php(34): Illuminate\Http\Response->setContent(Object(Illuminate\View\View))
+#18 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(939): Illuminate\Http\Response->__construct(Object(Illuminate\View\View), 200, Array)
+#19 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(906): Illuminate\Routing\Router::toResponse(Object(Illuminate\Http\Request), Object(Illuminate\View\View))
+#20 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Routing\Router->prepareResponse(Object(Illuminate\Http\Request), Object(Illuminate\View\View))
+#21 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Routing\Router->Illuminate\Routing\{closure}(Object(Illuminate\Http\Request))
+#22 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Http\Middleware\AdminLockMiddleware.php(34): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#23 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\AdminLockMiddleware->handle(Object(Illuminate\Http\Request), Object(Closure))
+#24 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Http\Middleware\AdminMiddleware.php(20): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#25 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\AdminMiddleware->handle(Object(Illuminate\Http\Request), Object(Closure))
+#26 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Http\Middleware\TrackRecentlyViewed.php(12): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#27 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\TrackRecentlyViewed->handle(Object(Illuminate\Http\Request), Object(Closure))
+#28 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Http\Middleware\PreventBackHistory.php(18): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#29 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\PreventBackHistory->handle(Object(Illuminate\Http\Request), Object(Closure))
+#30 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Http\Middleware\SetLanguage.php(24): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#31 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\SetLanguage->handle(Object(Illuminate\Http\Request), Object(Closure))
+#32 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Middleware\SubstituteBindings.php(50): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#33 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#34 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Auth\Middleware\Authenticate.php(63): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#35 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Auth\Middleware\Authenticate->handle(Object(Illuminate\Http\Request), Object(Closure))
+#36 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken.php(87): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#37 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\VerifyCsrfToken->handle(Object(Illuminate\Http\Request), Object(Closure))
+#38 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\Middleware\ShareErrorsFromSession.php(48): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#39 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\View\Middleware\ShareErrorsFromSession->handle(Object(Illuminate\Http\Request), Object(Closure))
+#40 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Session\Middleware\StartSession.php(120): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#41 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Session\Middleware\StartSession.php(63): Illuminate\Session\Middleware\StartSession->handleStatefulRequest(Object(Illuminate\Http\Request), Object(Illuminate\Session\Store), Object(Closure))
+#42 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Session\Middleware\StartSession->handle(Object(Illuminate\Http\Request), Object(Closure))
+#43 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse.php(36): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#44 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse->handle(Object(Illuminate\Http\Request), Object(Closure))
+#45 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Cookie\Middleware\EncryptCookies.php(74): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#46 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Cookie\Middleware\EncryptCookies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#47 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#48 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#49 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(800): Illuminate\Routing\Router->runRouteWithinStack(Object(Illuminate\Routing\Route), Object(Illuminate\Http\Request))
+#50 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(764): Illuminate\Routing\Router->runRoute(Object(Illuminate\Http\Request), Object(Illuminate\Routing\Route))
+#51 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(753): Illuminate\Routing\Router->dispatchToRoute(Object(Illuminate\Http\Request))
+#52 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(200): Illuminate\Routing\Router->dispatch(Object(Illuminate\Http\Request))
+#53 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Foundation\Http\Kernel->Illuminate\Foundation\Http\{closure}(Object(Illuminate\Http\Request))
+#54 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#55 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#56 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle(Object(Illuminate\Http\Request), Object(Closure))
+#57 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#58 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#59 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#60 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#61 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle(Object(Illuminate\Http\Request), Object(Closure))
+#62 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#63 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle(Object(Illuminate\Http\Request), Object(Closure))
+#64 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Middleware\HandleCors.php(61): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#65 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle(Object(Illuminate\Http\Request), Object(Closure))
+#66 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Middleware\TrustProxies.php(58): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#67 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#68 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#69 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle(Object(Illuminate\Http\Request), Object(Closure))
+#70 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePathEncoding.php(26): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#71 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle(Object(Illuminate\Http\Request), Object(Closure))
+#72 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#73 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(175): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#74 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter(Object(Illuminate\Http\Request))
+#75 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#76 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(368): Illuminate\Foundation\Testing\TestCase->call('GET', 'https://elite.t...', Array, Array, Array, Array)
+#77 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\OrderTest.php(70): Illuminate\Foundation\Testing\TestCase->get('https://elite.t...')
+#78 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestCase.php(1667): Tests\Feature\Admin\OrderTest->admin_can_view_single_order()
+#79 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#80 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestRunner\TestRunner.php(87): PHPUnit\Framework\TestCase->runBare()
+#81 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestCase.php(365): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\Admin\OrderTest))
+#82 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestSuite.php(369): PHPUnit\Framework\TestCase->run()
+#83 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#84 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#85 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#86 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\TextUI\Application.php(211): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+#87 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\phpunit(104): PHPUnit\TextUI\Application->run(Array)
+#88 {main}
+
+Next Illuminate\View\ViewException: syntax error, unexpected token "<<", expecting "]" (View: C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\resources\views\admin\orders\show.blade.php) in C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Models\OrderReturnRequest.php:18
+Stack trace:
+#0 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php(59): Illuminate\View\Engines\CompilerEngine->handleViewException(Object(ParseError), 1)
+#1 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php(76): Illuminate\View\Engines\PhpEngine->evaluatePath('C:\\laragon\\www\\...', Array)
+#2 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\View.php(208): Illuminate\View\Engines\CompilerEngine->get('C:\\laragon\\www\\...', Array)
+#3 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\View.php(191): Illuminate\View\View->getContents()
+#4 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\View.php(160): Illuminate\View\View->renderContents()
+#5 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Response.php(78): Illuminate\View\View->render()
+#6 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Response.php(34): Illuminate\Http\Response->setContent(Object(Illuminate\View\View))
+#7 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(939): Illuminate\Http\Response->__construct(Object(Illuminate\View\View), 200, Array)
+#8 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(906): Illuminate\Routing\Router::toResponse(Object(Illuminate\Http\Request), Object(Illuminate\View\View))
+#9 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Routing\Router->prepareResponse(Object(Illuminate\Http\Request), Object(Illuminate\View\View))
+#10 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Routing\Router->Illuminate\Routing\{closure}(Object(Illuminate\Http\Request))
+#11 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Http\Middleware\AdminLockMiddleware.php(34): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#12 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\AdminLockMiddleware->handle(Object(Illuminate\Http\Request), Object(Closure))
+#13 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Http\Middleware\AdminMiddleware.php(20): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#14 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\AdminMiddleware->handle(Object(Illuminate\Http\Request), Object(Closure))
+#15 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Http\Middleware\TrackRecentlyViewed.php(12): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#16 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\TrackRecentlyViewed->handle(Object(Illuminate\Http\Request), Object(Closure))
+#17 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Http\Middleware\PreventBackHistory.php(18): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#18 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\PreventBackHistory->handle(Object(Illuminate\Http\Request), Object(Closure))
+#19 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\app\Http\Middleware\SetLanguage.php(24): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#20 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\SetLanguage->handle(Object(Illuminate\Http\Request), Object(Closure))
+#21 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Middleware\SubstituteBindings.php(50): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#22 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#23 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Auth\Middleware\Authenticate.php(63): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#24 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Auth\Middleware\Authenticate->handle(Object(Illuminate\Http\Request), Object(Closure))
+#25 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken.php(87): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#26 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\VerifyCsrfToken->handle(Object(Illuminate\Http\Request), Object(Closure))
+#27 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\View\Middleware\ShareErrorsFromSession.php(48): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#28 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\View\Middleware\ShareErrorsFromSession->handle(Object(Illuminate\Http\Request), Object(Closure))
+#29 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Session\Middleware\StartSession.php(120): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#30 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Session\Middleware\StartSession.php(63): Illuminate\Session\Middleware\StartSession->handleStatefulRequest(Object(Illuminate\Http\Request), Object(Illuminate\Session\Store), Object(Closure))
+#31 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Session\Middleware\StartSession->handle(Object(Illuminate\Http\Request), Object(Closure))
+#32 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse.php(36): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#33 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse->handle(Object(Illuminate\Http\Request), Object(Closure))
+#34 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Cookie\Middleware\EncryptCookies.php(74): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#35 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Cookie\Middleware\EncryptCookies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#36 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#37 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#38 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(800): Illuminate\Routing\Router->runRouteWithinStack(Object(Illuminate\Routing\Route), Object(Illuminate\Http\Request))
+#39 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(764): Illuminate\Routing\Router->runRoute(Object(Illuminate\Http\Request), Object(Illuminate\Routing\Route))
+#40 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Routing\Router.php(753): Illuminate\Routing\Router->dispatchToRoute(Object(Illuminate\Http\Request))
+#41 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(200): Illuminate\Routing\Router->dispatch(Object(Illuminate\Http\Request))
+#42 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Foundation\Http\Kernel->Illuminate\Foundation\Http\{closure}(Object(Illuminate\Http\Request))
+#43 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#44 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#45 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle(Object(Illuminate\Http\Request), Object(Closure))
+#46 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#47 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#48 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#49 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#50 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle(Object(Illuminate\Http\Request), Object(Closure))
+#51 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#52 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle(Object(Illuminate\Http\Request), Object(Closure))
+#53 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Middleware\HandleCors.php(61): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#54 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle(Object(Illuminate\Http\Request), Object(Closure))
+#55 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Middleware\TrustProxies.php(58): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#56 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#57 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#58 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle(Object(Illuminate\Http\Request), Object(Closure))
+#59 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePathEncoding.php(26): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#60 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle(Object(Illuminate\Http\Request), Object(Closure))
+#61 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#62 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(175): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#63 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter(Object(Illuminate\Http\Request))
+#64 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#65 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(368): Illuminate\Foundation\Testing\TestCase->call('GET', 'https://elite.t...', Array, Array, Array, Array)
+#66 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\OrderTest.php(70): Illuminate\Foundation\Testing\TestCase->get('https://elite.t...')
+#67 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestCase.php(1667): Tests\Feature\Admin\OrderTest->admin_can_view_single_order()
+#68 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#69 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestRunner\TestRunner.php(87): PHPUnit\Framework\TestCase->runBare()
+#70 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestCase.php(365): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\Admin\OrderTest))
+#71 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestSuite.php(369): PHPUnit\Framework\TestCase->run()
+#72 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#73 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\Framework\TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#74 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#75 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\src\TextUI\Application.php(211): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+#76 C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\phpunit\phpunit\phpunit(104): PHPUnit\TextUI\Application->run(Array)
+#77 {main}
+
+----------------------------------------------------------------------------------
+
+syntax error, unexpected token "<<", expecting "]" (View: C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\resources\views\admin\orders\show.blade.php)
+
+  at tests\Feature\Admin\OrderTest.php:72
+     68▕         $order = $this->makeOrder();
+     69▕ 
+     70▕         $response = $this->actingAs($this->admin)->get(route('admin.orders.show', $order));
+     71▕ 
+  ➜  72▕         $response->assertStatus(200);
+     73▕         $response->assertViewIs('admin.orders.show');
+     74▕     }
+     75▕ 
+     76▕     #[\PHPUnit\Framework\Attributes\Test]
+
+
+  Tests:    1 failed, 51 passed (110 assertions)
+  Duration: 3.67s
+

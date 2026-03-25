@@ -1,0 +1,21 @@
+
+   ParseError 
+
+  syntax error, unexpected token "<<"
+
+  at app\Services\OrderService.php:61
+     57▕             $this->handleStockAdjustment($order, $oldStatus, $newStatus);
+     58▕ 
+     59▕         });
+     60▕ 
+  ➜  61▕ <<<<<<< HEAD
+     62▕         // Send email if shipped
+     63▕         if ($newStatus === Order::STATUS_SHIPPED) {
+     64▕             try {
+     65▕                 $email = $order->email ?? ($order->user->email ?? null);
+
+  1   vendor\composer\ClassLoader.php:427
+
+  2   [internal]:0
+      Composer\Autoload\ClassLoader::loadClass("App\Services\OrderService")
+

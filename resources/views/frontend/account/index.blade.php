@@ -824,7 +824,10 @@
                     @endif
                   @endif
 
-                  <form action="{{ route('wallet.topup.request') }}" method="POST" enctype="multipart/form-data">
+                  <form action="{{ Route::has('wallet.topup.request') ? route('wallet.topup.request') : 'javascript:void(0)' }}" 
+                        method="POST" 
+                        enctype="multipart/form-data" 
+                        @if(!Route::has('wallet.topup.request')) onsubmit="alert('Tính năng nạp tiền hiện đang bảo trì.'); return false;" @endif>
                     @csrf
                     <div class="row">
                       <div class="col-md-6 mb-3">
@@ -888,7 +891,9 @@
                 {{-- Withdraw Request Form --}}
                 <div class="p-4 rounded-3 border" style="background:#fafafa;">
                   <h6 class="fw-bold mb-3"><i class="bi bi-dash-circle me-2 text-warning"></i>Yêu cầu rút tiền</h6>
-                  <form action="{{ route('wallet.withdraw.request') }}" method="POST">
+                  <form action="{{ Route::has('wallet.withdraw.request') ? route('wallet.withdraw.request') : 'javascript:void(0)' }}" 
+                        method="POST" 
+                        @if(!Route::has('wallet.withdraw.request')) onsubmit="alert('Tính năng rút tiền hiện đang bảo trì.'); return false;" @endif>
                     @csrf
                     <div class="mb-3">
                       <label class="form-label fw-semibold small">Số dư ví khả dụng <span class="text-danger">*</span></label>
