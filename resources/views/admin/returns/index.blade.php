@@ -119,8 +119,6 @@
                                                 @endforeach
                                             </div>
                                             @endif
-                                            </div>
-                                            @endif
 
                                             @if($req->admin_note)
                                             <div class="mb-3">

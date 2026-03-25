@@ -17,43 +17,52 @@ class AccountController extends Controller
 {
     public function index()
     {
-        /** @var \App\Models\User $user */
         $user = Auth::user();
 
+        $socialAccounts = collect();
+        $orders = collect();
+        $wishlists = collect();
+        $coupons = collect();
+        $userBankAccounts = collect();
+        $walletTransactions = collect();
+        $walletTopupRequests = collect();
+        $walletWithdrawRequests = collect();
+        $bankSettings = BankSetting::where('is_active', true)->get();
+        $totalOrders = 0;
+        $totalSpent = 0;
+        $wishCount = 0;
+
         if ($user) {
-            $orders = $user->orders()->orderBy('created_at', 'desc')->paginate(10);
+            $orders = $user->orders()->latest()->paginate(10);
+            $wishCount = $user->wishlists()->count();
+            $wishlists = $user->wishlists()->with('product')->get();
+            $userBankAccounts = $user->bankAccounts;
+            
             $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
                 $q->whereNull('user_id')->orWhere('user_id', $user->id);
             })
                 ->where('is_active', true)
+                ->where('start_date', '<=', now())
                 ->where(function ($q) {
                     $q->whereNull('end_date')->orWhere('end_date', '>=', now());
                 })
                 ->whereRaw('used_count < usage_limit')
                 ->get();
-            $wishlists            = $user->wishlists()->with('product')->get();
-            $userBankAccounts     = $user->bankAccounts()->get();
+            
             $walletTransactions   = $user->walletTransactions()->take(20)->get();
             $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();
             $walletWithdrawRequests = $user->walletWithdrawRequests()->take(10)->get();
-            $bankSettings = BankSetting::where('is_active', true)->get();
-        } else {
-            $orders   = collect();
-            $coupons  = collect();
-            $wishlists = collect();
-            $userBankAccounts    = collect();
-            $walletTransactions  = collect();
-            $walletTopupRequests = collect();
-            $walletWithdrawRequests = collect();
-            $bankSettings = collect();
+
+            $totalOrders = $orders->total();
+            $totalSpent = $user->orders()->where('status', 'completed')->sum('final_total');
+            $socialAccounts = $user->socialAccounts;
         }
 
         return view('frontend.account.index', compact(
             'user', 'orders', 'coupons', 'wishlists',
             'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests',
-            'bankSettings'
+            'bankSettings', 'totalOrders', 'totalSpent', 'wishCount', 'socialAccounts'
         ));
-
     }
 
     public function showOrder($id)
@@ -64,7 +73,7 @@ class AccountController extends Controller
         if ($user) {
             $order = $user->orders()->with(['items.product', 'histories'])->findOrFail($id);
         } else {
-            // Guest access verification
+            // Guest access verification (Trigger re-scan)
             if (session('verified_order_id') != $id) {
                 return redirect()->route('order-tracking.index')
                     ->with('error', 'Vui lòng xác thực thông tin đơn hàng để xem chi tiết.');
