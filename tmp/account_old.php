@@ -6,12 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Review;
 use App\Models\UserBankAccount;
-use App\Models\BankSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Notification;
-use App\Notifications\NewOrderReturnRequestNotification;
 
 class AccountController extends Controller
 {
@@ -35,8 +32,6 @@ class AccountController extends Controller
             $userBankAccounts     = $user->bankAccounts()->get();
             $walletTransactions   = $user->walletTransactions()->take(20)->get();
             $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();
-            $walletWithdrawRequests = $user->walletWithdrawRequests()->take(10)->get();
-            $bankSettings = BankSetting::where('is_active', true)->get();
         } else {
             $orders   = collect();
             $coupons  = collect();
@@ -44,14 +39,11 @@ class AccountController extends Controller
             $userBankAccounts    = collect();
             $walletTransactions  = collect();
             $walletTopupRequests = collect();
-            $walletWithdrawRequests = collect();
-            $bankSettings = collect();
         }
 
         return view('frontend.account.index', compact(
             'user', 'orders', 'coupons', 'wishlists',
-            'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests',
-            'bankSettings'
+            'userBankAccounts', 'walletTransactions', 'walletTopupRequests'
         ));
 
     }
@@ -104,14 +96,11 @@ class AccountController extends Controller
         $user->name = $request->name;
         $user->phone = $request->phone;
 
-        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+        if ($request->hasFile('avatar')) {
             if ($user->avatar) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
             }
-            $avatar = $request->file('avatar');
-            $avatarName = time() . '_' . uniqid() . '.' . $avatar->getClientOriginalExtension();
-            $avatar->move(storage_path('app/public/avatars'), $avatarName);
-            $user->avatar = 'avatars/' . $avatarName;
+            $user->avatar = $request->file('avatar')->store('avatars', 'public');
         }
 
         if ($request->filled('new_password')) {
@@ -143,133 +132,6 @@ class AccountController extends Controller
         }
 
         return redirect()->back()->with('success', 'Order cancelled successfully!');
-    }
-
-    public function returnOrderForm($id)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $order = $user->orders()->findOrFail($id);
-
-        if (!in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_SHIPPED])) {
-            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã giao hoặc hoàn thành.');
-        }
-
-        if ($order->returnRequest) {
-            return redirect()->route('account.orders.show', $order->id)->with('info', 'Đơn hàng này đã có yêu cầu hoàn trả.');
-        }
-
-        return view('frontend.account.orders.return_form', compact('order'));
-    }
-
-    public function submitReturnRequest(Request $request, $id)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $order = $user->orders()->findOrFail($id);
-
-        if (!in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_SHIPPED])) {
-            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã giao hoặc hoàn thành.');
-        }
-
-        if ($order->returnRequest) {
-            return redirect()->back()->with('error', 'Đơn hàng này đã có yêu cầu hoàn trả.');
-        }
-
-        $request->validate([
-            'reason' => 'required|string|max:255',
-            'note' => 'nullable|string|max:1000',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'videos.*' => 'nullable|file|mimes:mp4,mov,avi,webm|max:51200',
-        ]);
-
-        $imagePaths = [];
-        if ($request->hasFile('images')) {
-            \Illuminate\Support\Facades\File::ensureDirectoryExists(storage_path('app/public/returns'));
-            foreach ($request->file('images') as $image) {
-                $name = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                $image->move(storage_path('app/public/returns'), $name);
-                $imagePaths[] = 'returns/' . $name;
-            }
-        }
-
-        $videoPaths = [];
-        if ($request->hasFile('videos')) {
-            \Illuminate\Support\Facades\File::ensureDirectoryExists(storage_path('app/public/returns/videos'));
-            foreach ($request->file('videos') as $video) {
-                $name = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
-                $video->move(storage_path('app/public/returns/videos'), $name);
-                $videoPaths[] = 'returns/videos/' . $name;
-            }
-        }
-
-        $returnRequest = \App\Models\OrderReturnRequest::create([
-            'user_id' => $user->id,
-            'order_id' => $order->id,
-            'reason' => $request->reason,
-            'note' => $request->note,
-            'images' => $imagePaths,
-            'videos' => $videoPaths,
-            'refund_amount' => $order->final_total,
-            'status' => 'pending',
-        ]);
-
-        // Thông báo cho các Admin
-        $admins = \App\Models\User::getAdmins();
-        Notification::send($admins, new NewOrderReturnRequestNotification($returnRequest));
-
-        return redirect()->route('account.orders.show', $order->id)
-            ->with('success', 'Yêu cầu hoàn trả của bạn đã được gửi và đang chờ xử lý.');
-    }
-
-
-    /**
-     * Khách hàng nộp thông tin vận chuyển khi hàng hoàn đã được Duyệt (Approved)
-     */
-    public function submitShipping(Request $request, $id)
-    {
-        $order = Order::where('user_id', Auth::id())->findOrFail($id);
-        $returnRequest = $order->returnRequest;
-
-        if (!$returnRequest || $returnRequest->status !== 'approved') {
-            return redirect()->back()->with('error', 'Yêu cầu trả hàng không ở trạng thái được phép gửi hàng.');
-        }
-
-        $request->validate([
-            'shipping_info' => 'required|string|max:1000',
-            'shipping_proof' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ], [
-            'shipping_info.required' => 'Vui lòng nhập thông tin vận chuyển (Mã vận đơn, đơn vị vận chuyển...).',
-            'shipping_proof.required' => 'Vui lòng tải lên ảnh minh chứng đã gửi hàng.',
-        ]);
-
-        $data = [
-            'shipping_info' => $request->shipping_info,
-            'status' => 'shipping', // Chuyển sang trạng thái Đang gửi hàng
-        ];
-
-        if ($request->hasFile('shipping_proof')) {
-            $image = $request->file('shipping_proof');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            \Illuminate\Support\Facades\File::ensureDirectoryExists(public_path('uploads/returns'));
-            $image->move(public_path('uploads/returns'), $imageName);
-            $data['shipping_proof'] = 'uploads/returns/' . $imageName;
-        }
-
-        $returnRequest->update($data);
-
-        // Ghi lịch sử
-        if (class_exists(\App\Models\OrderHistory::class)) {
-            \App\Models\OrderHistory::create([
-                'order_id' => $order->id,
-                'previous_status' => $order->status,
-                'new_status' => $order->status,
-                'note' => 'Khách hàng đã nộp thông tin vận chuyển hàng hoàn: ' . $request->shipping_info,
-                'user_id' => Auth::id()
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Gửi thông tin vận chuyển thành công. Chúng tôi sẽ thông báo khi nhận được hàng.');
     }
 
     // ===== USER BANK ACCOUNTS =====
