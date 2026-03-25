@@ -23,8 +23,48 @@ class DashboardController extends Controller
 
     public function index(Request $request)
     {
-        $startDate = $request->start_date ? \Carbon\Carbon::parse($request->start_date)->startOfDay() : now()->subDays(30)->startOfDay();
-        $endDate = $request->end_date ? \Carbon\Carbon::parse($request->end_date)->endOfDay() : now()->endOfDay();
+        $preset = $request->input('preset', 'last_30_days');
+        
+        // Mặc định cho Tùy chỉnh nếu có start_date và end_date
+        if ($preset === 'custom' || ($request->has('start_date') && $request->has('end_date') && !$request->has('preset'))) {
+            $preset = 'custom';
+            $startDate = $request->start_date ? \Carbon\Carbon::parse($request->start_date)->startOfDay() : now()->subDays(30)->startOfDay();
+            $endDate = $request->end_date ? \Carbon\Carbon::parse($request->end_date)->endOfDay() : now()->endOfDay();
+        } else {
+            // Xử lý các Preset
+            switch ($preset) {
+                case 'today':
+                    $startDate = now()->startOfDay();
+                    $endDate = now()->endOfDay();
+                    break;
+                case 'this_week':
+                    $startDate = now()->startOfWeek();
+                    $endDate = now()->endOfWeek();
+                    break;
+                case 'this_month':
+                    $startDate = now()->startOfMonth();
+                    $endDate = now()->endOfMonth();
+                    break;
+                case 'this_quarter':
+                    $startDate = now()->startOfQuarter();
+                    $endDate = now()->endOfQuarter();
+                    break;
+                case 'this_year':
+                    $startDate = now()->startOfYear();
+                    $endDate = now()->endOfYear();
+                    break;
+                case 'last_7_days':
+                    $startDate = now()->subDays(7)->startOfDay();
+                    $endDate = now()->endOfDay();
+                    break;
+                case 'last_30_days':
+                default:
+                    $preset = 'last_30_days'; // Đảm bảo fallback về đúng key
+                    $startDate = now()->subDays(30)->startOfDay();
+                    $endDate = now()->endOfDay();
+                    break;
+            }
+        }
 
         $stats = $this->reportService->getOverviewStats($startDate, $endDate);
         $revenueChart = $this->reportService->getRevenueChartData($startDate, $endDate);
@@ -61,6 +101,7 @@ class DashboardController extends Controller
             'totalProductsSold' => $totalProductsSold > 0 ? $totalProductsSold : 1, // Tránh chia cho 0
             'startDate' => $startDate->format('Y-m-d'),
             'endDate' => $endDate->format('Y-m-d'),
+            'preset' => $preset,
             'funnelStats' => $funnelStats,
         ]);
     }
@@ -75,6 +116,12 @@ class DashboardController extends Controller
         if ($filter === 'week') {
             $startDate = now()->startOfWeek();
             $endDate = now()->endOfWeek();
+        } elseif ($filter === 'quarter') {
+            $startDate = now()->startOfQuarter();
+            $endDate = now()->endOfQuarter();
+        } elseif ($filter === 'year') {
+            $startDate = now()->startOfYear();
+            $endDate = now()->endOfYear();
         } else {
             // Default is current month
             $startDate = now()->startOfMonth();

@@ -99,6 +99,21 @@ class User extends Authenticatable
         return $this->hasMany(OrderReturnRequest::class)->latest();
     }
 
+    public function walletTransactions()
+    {
+        return $this->hasMany(WalletTransaction::class)->latest();
+    }
+
+    public function walletTopupRequests()
+    {
+        return $this->hasMany(WalletTopupRequest::class)->latest();
+    }
+
+    public function walletWithdrawRequests()
+    {
+        return $this->hasMany(WalletWithdrawRequest::class)->latest();
+    }
+
     public function getAvatarUrlAttribute()
     {
         if (! $this->avatar) {

@@ -2,7 +2,7 @@
 
 > **Dự án:** Elite — Hệ thống thương mại điện tử thời trang nam  
 > **Công nghệ:** Laravel 10+, MySQL, Bootstrap, Blade Templates, Gemini AI  
-> **Cập nhật:** 14/03/2026
+> **Cập nhật:** 20/03/2026
 
 ---
 
@@ -69,8 +69,8 @@ docs/
 | [03-danh-muc.md](admin/03-danh-muc.md) | Danh mục, màu sắc, kích thước, thương hiệu, tags |
 | [04-don-hang.md](admin/04-don-hang.md) | Quản lý đơn hàng, xác nhận chuyển khoản, VNPAY refund, in hóa đơn |
 | [05-nguoi-dung.md](admin/05-nguoi-dung.md) | Quản lý tài khoản và phân quyền |
-| [06-kho-hang.md](admin/06-kho-hang.md) | Nhà cung cấp, kho hàng, phiếu nhập/xuất, cảnh báo tồn kho |
-| [07-khuyen-mai.md](admin/07-khuyen-mai.md) | Coupon giảm giá, điểm tích lũy, reward points, hạng khách hàng |
+| [06-kho-hang.md](admin/06-kho-hang.md) | Quản lý danh sách nhà cung cấp |
+| [07-khuyen-mai.md](admin/07-khuyen-mai.md) | Quản lý mã giảm giá (Coupon) và lịch sử thanh toán |
 | [08-blog.md](admin/08-blog.md) | Bài viết và danh mục bài viết |
 | [09-chatbot.md](admin/09-chatbot.md) | Quản lý chat, cài đặt AI Gemini, câu hỏi gợi ý |
 | [10-bao-cao.md](admin/10-bao-cao.md) | Xuất báo cáo Excel/PDF, lịch sử thanh toán |
@@ -94,27 +94,24 @@ docs/
 
 ```
 Elite E-Commerce (Laravel 10+)
-├── Frontend (Khách hàng)     → routes/web.php + Controllers/Frontend/ (14 controllers)
-├── Admin Panel               → /admin prefix + Controllers/Admin/ (28 controllers)
-├── API Layer                 → Controllers/Api/ (Chatbot)
-├── Services/                 → ChatService, VnpayService, LoyaltyPointService,
-│                                ConversionTrackingService, OrderService, ReportService,
-│                                ShippingService
-└── Database                  → 36 Models, MySQL (70+ migrations)
+├── Frontend (Khách hàng)     → routes/web.php + Controllers/Frontend/ (11 controllers)
+├── Admin Panel               → /admin prefix + Controllers/Admin/ (26 controllers)
+├── API Layer                 → Controllers/Api/ (3 controllers)
+├── Services/                 → ChatService, VnpayService, OrderService, ReportService,
+│                                ConversionTrackingService, ReturnService, ShippingService
+└── Database                  → 31 Models, MySQL (82 migrations)
 ```
 
-## 📦 Danh Sách Models (36 Models)
+## 📦 Danh Sách Models (31 Models)
 
 | Nhóm | Models |
-|------|--------|
-| **Người dùng** | `User`, `SocialAccount` |
-| **Sản phẩm** | `Product`, `ProductVariant`, `ProductImage`, `Category`, `Brand`, `Tag`, `Size`, `Color` |
-| **Đơn hàng** | `Order`, `OrderItem`, `OrderHistory` |
-| **Giỏ hàng** | `CartAbandonment` *(mới)* |
-| **Khuyến mãi** | `Coupon`, `LoyaltyPoint`, `RewardPoint`, `RewardPointHistory`, `CustomerTier`, `Promotion` |
-| **Kho hàng** | `Supplier` |
-| **Thanh toán** | `BankSetting` |
-| **Chatbot** | `ChatSession`, `ChatMessage`, `ChatbotSetting`, `ChatbotSuggestedQuestion` |
-| **Blog** | `Post`, `PostCategory` |
-| **VTON (Thử đồ)** | `VtonModel`, `VtonHistory` |
-| **Hệ thống** | `Setting`, `Banner`, `AuditLog`, `ContactMessage`, `Review`, `Wishlist` |
+2. | **Người dùng** | `User`, `SocialAccount` |
+3. | **Sản phẩm** | `Product`, `ProductVariant`, `ProductImage`, `Category`, `Brand`, `Tag`, `Size`, `Color` |
+4. | **Đơn hàng** | `Order`, `OrderItem`, `OrderHistory`, `OrderReturnRequest` *(mới)* |
+5. | **Giỏ hàng** | `CartAbandonment` |
+6. | **Khuyến mãi** | `Coupon` |
+7. | **Kho hàng** | `Supplier` |
+8. | **Thanh toán** | `BankSetting`, `UserBankAccount` *(mới)* |
+9. | **Chatbot** | `ChatSession`, `ChatMessage`, `ChatbotSetting`, `ChatbotSuggestedQuestion` |
+10. | **Blog** | `Post`, `PostCategory` |
+11. | **Hệ thống** | `Setting`, `Banner`, `AuditLog`, `ContactMessage`, `Review`, `Wishlist` |

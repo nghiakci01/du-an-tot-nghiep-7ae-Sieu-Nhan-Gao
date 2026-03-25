@@ -56,7 +56,7 @@ class ProductVariantTest extends TestCase
             ],
         ]);
 
-        $response->assertStatus(302);
+        $response->assertRedirect();
         $this->assertDatabaseHas('product_variants', [
             'size_id' => $size->id,
             'color_id' => $color->id,
@@ -148,7 +148,7 @@ class ProductVariantTest extends TestCase
             ],
         ]);
 
-        $response->assertStatus(302);
+        $response->assertRedirect();
         $this->assertDatabaseHas('product_variants', [
             'id' => $variant->id,
             'color_id' => $newColor->id,

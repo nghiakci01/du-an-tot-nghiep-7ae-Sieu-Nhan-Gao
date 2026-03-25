@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Review;
+use App\Models\UserBankAccount;
+use App\Models\BankSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -30,14 +32,26 @@ class AccountController extends Controller
                 ->whereRaw('used_count < usage_limit')
                 ->get();
             $wishlists            = $user->wishlists()->with('product')->get();
+            $userBankAccounts     = $user->bankAccounts()->get();
+            $walletTransactions   = $user->walletTransactions()->take(20)->get();
+            $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();
+            $walletWithdrawRequests = $user->walletWithdrawRequests()->take(10)->get();
+            $bankSettings = BankSetting::where('is_active', true)->get();
         } else {
             $orders   = collect();
             $coupons  = collect();
             $wishlists = collect();
+            $userBankAccounts    = collect();
+            $walletTransactions  = collect();
+            $walletTopupRequests = collect();
+            $walletWithdrawRequests = collect();
+            $bankSettings = collect();
         }
 
         return view('frontend.account.index', compact(
-            'user', 'orders', 'coupons', 'wishlists'
+            'user', 'orders', 'coupons', 'wishlists',
+            'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests',
+            'bankSettings'
         ));
 
     }
@@ -92,11 +106,14 @@ class AccountController extends Controller
         $user->name = $request->name;
         $user->phone = $request->phone;
 
-        if ($request->hasFile('avatar')) {
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             if ($user->avatar) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
             }
-            $user->avatar = $request->file('avatar')->store('avatars', 'public');
+            $avatar = $request->file('avatar');
+            $avatarName = time() . '_' . uniqid() . '.' . $avatar->getClientOriginalExtension();
+            $avatar->move(storage_path('app/public/avatars'), $avatarName);
+            $user->avatar = 'avatars/' . $avatarName;
         }
 
         if ($request->filled('new_password')) {
@@ -170,9 +187,21 @@ class AccountController extends Controller
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
+            \Illuminate\Support\Facades\File::ensureDirectoryExists(storage_path('app/public/returns'));
             foreach ($request->file('images') as $image) {
-                $path = $image->store('returns', 'public');
-                $imagePaths[] = $path;
+                $name = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(storage_path('app/public/returns'), $name);
+                $imagePaths[] = 'returns/' . $name;
+            }
+        }
+
+        $videoPaths = [];
+        if ($request->hasFile('videos')) {
+            \Illuminate\Support\Facades\File::ensureDirectoryExists(storage_path('app/public/returns/videos'));
+            foreach ($request->file('videos') as $video) {
+                $name = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
+                $video->move(storage_path('app/public/returns/videos'), $name);
+                $videoPaths[] = 'returns/videos/' . $name;
             }
         }
 
@@ -248,5 +277,71 @@ class AccountController extends Controller
         }
 
         return redirect()->back()->with('success', 'Gửi thông tin vận chuyển thành công. Chúng tôi sẽ thông báo khi nhận được hàng.');
+    }
+
+    // ===== USER BANK ACCOUNTS =====
+
+    public function storeBankAccount(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $request->validate([
+            'bank_name'      => 'required|string|max:100',
+            'bank_id'        => 'required|string|max:50',
+            'account_number' => 'required|string|max:100',
+            'account_name'   => 'required|string|max:255',
+        ]);
+
+        if ($request->boolean('is_default')) {
+            $user->bankAccounts()->update(['is_default' => false]);
+        }
+
+        $user->bankAccounts()->create([
+            'bank_name'      => $request->bank_name,
+            'bank_id'        => $request->bank_id,
+            'account_number' => $request->account_number,
+            'account_name'   => $request->account_name,
+            'is_default'     => $request->boolean('is_default'),
+        ]);
+
+        return redirect()->back()->with('success', 'Thêm tài khoản ngân hàng thành công!');
+    }
+
+    public function updateBankAccount(Request $request, $id)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $bank = $user->bankAccounts()->findOrFail($id);
+
+        $request->validate([
+            'bank_name'      => 'required|string|max:100',
+            'bank_id'        => 'required|string|max:50',
+            'account_number' => 'required|string|max:100',
+            'account_name'   => 'required|string|max:255',
+        ]);
+
+        if ($request->boolean('is_default')) {
+            $user->bankAccounts()->where('id', '!=', $id)->update(['is_default' => false]);
+        }
+
+        $bank->update([
+            'bank_name'      => $request->bank_name,
+            'bank_id'        => $request->bank_id,
+            'account_number' => $request->account_number,
+            'account_name'   => $request->account_name,
+            'is_default'     => $request->boolean('is_default'),
+        ]);
+
+        return redirect()->back()->with('success', 'Cập nhật tài khoản ngân hàng thành công!');
+    }
+
+    public function destroyBankAccount($id)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $user->bankAccounts()->findOrFail($id)->delete();
+
+        return redirect()->back()->with('success', 'Đã xóa tài khoản ngân hàng.');
     }
 }

@@ -13,11 +13,12 @@ Trang tổng quan hệ thống dành cho Admin và Staff, hiển thị số li�
 - **Dữ liệu hiển thị:**
   | Chỉ số | Mô tả |
   |--------|-------|
-  | Tổng doanh thu | Tổng `final_total` của đơn hoàn thành |
-  | Đơn hàng hôm nay | Số đơn tạo trong ngày |
-  | Đơn chờ xác nhận | Đơn có `status = pending` |
-  | Khách hàng mới | Đăng ký trong tháng |
-  | Sản phẩm sắp hết hàng | Biến thể có `stock <= 5` |
+  | Tổng doanh thu | Tổng `final_total` của đơn hoàn thành trong kỳ |
+  | Lợi nhuận | Doanh thu trừ giá vốn (Cost Price) |
+  | Đơn hàng mới | Số đơn tạo trong kỳ được chọn |
+  | Khách hàng mới | Số tài khoản đăng ký mới |
+  | Sản phẩm sắp hết hàng | Biến thể có `stock <= threshold` (cảnh báo tồn kho) |
+  | Tỷ lệ chuyển đổi | Conversion funnel (View -> Add to Cart -> Checkout -> Success) |
 
 ---
 

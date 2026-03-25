@@ -54,7 +54,7 @@ class OrderController extends Controller
             'items' => 'required|array|min:1',
             'items.*.variant_id' => 'required|exists:product_variants,id',
             'items.*.quantity' => 'required|integer|min:1',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER,CASH',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,CASH,VNPAY',
             'status' => 'required|string',
             'manual_discount' => 'nullable|numeric|min:0',
             'note' => 'nullable|string',
@@ -66,15 +66,15 @@ class OrderController extends Controller
             $totalPrice = 0;
             foreach ($request->items as $item) {
                 $variant = ProductVariant::where('id', $item['variant_id'])->lockForUpdate()->first();
-                
+
                 if (!$variant) {
                     throw new \Exception('Sản phẩm không tồn tại.');
                 }
 
                 if ($variant->stock_quantity < $item['quantity']) {
                     $productName = $variant->product->name;
-                    $variantInfo = ($variant->sizeRelationship ? $variant->sizeRelationship->name : ( $variant->size ?: '' )) . 
-                                   ' - ' . 
+                    $variantInfo = ($variant->sizeRelationship ? $variant->sizeRelationship->name : ( $variant->size ?: '' )) .
+                                   ' - ' .
                                    ($variant->colorRelationship ? $variant->colorRelationship->name : ( $variant->color ?: '' ));
                     throw new \Exception("Sản phẩm '{$productName}' ({$variantInfo}) chỉ còn {$variant->stock_quantity} trong kho.");
                 }
@@ -106,7 +106,7 @@ class OrderController extends Controller
 
             foreach ($request->items as $item) {
                 $variant = ProductVariant::find($item['variant_id']);
-                
+
                 // Deduct stock
                 $variant->decrement('stock_quantity', $item['quantity']);
 

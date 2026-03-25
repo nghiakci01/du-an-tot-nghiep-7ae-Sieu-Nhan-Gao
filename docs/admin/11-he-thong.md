@@ -16,7 +16,6 @@ Module cấu hình toàn bộ hệ thống, bao gồm thông tin shop, banner qu
   | Thông tin shop | Tên, logo, địa chỉ, hotline, email |
   | Mạng xã hội | Facebook, Instagram, TikTok URLs |
   | Vận chuyển | Phí ship theo tỉnh/thành, miễn ship từ X VNĐ |
-  | Điểm tích lũy | Tỷ lệ tích điểm, tỷ giá quy đổi |
 - **Lưu trữ:** Bảng `settings` dạng key-value.
 
 ---
@@ -99,3 +98,4 @@ Module cấu hình toàn bộ hệ thống, bao gồm thông tin shop, banner qu
 - `Banner` — Bảng `banners`
 - `BankSetting` — Bảng `bank_settings`
 - `AuditLog` — Bảng `audit_logs`
+- `Notification` — Bảng `notifications`

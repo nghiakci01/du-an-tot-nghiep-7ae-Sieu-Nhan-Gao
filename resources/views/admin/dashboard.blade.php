@@ -6,12 +6,25 @@
     <div class="col-12 mb-4">
       <div class="card shadow-sm">
         <div class="card-body">
-          <form action="{{ route('admin.dashboard') }}" method="GET" class="row align-items-end g-3">
-            <div class="col-md-3">
+          <form action="{{ route('admin.dashboard') }}" method="GET" id="filter-form" class="row align-items-end g-3">
+            <div class="col-md-2">
+              <label class="form-label fw-bold">Khoảng thời gian</label>
+              <select name="preset" id="preset-select" class="form-select">
+                <option value="today" {{ (isset($preset) && $preset == 'today') ? 'selected' : '' }}>Hôm nay</option>
+                <option value="last_7_days" {{ (isset($preset) && $preset == 'last_7_days') ? 'selected' : '' }}>7 ngày qua</option>
+                <option value="this_week" {{ (isset($preset) && $preset == 'this_week') ? 'selected' : '' }}>Tuần này</option>
+                <option value="this_month" {{ (isset($preset) && $preset == 'this_month') ? 'selected' : '' }}>Tháng này</option>
+                <option value="last_30_days" {{ (!isset($preset) || $preset == 'last_30_days') ? 'selected' : '' }}>30 ngày qua</option>
+                <option value="this_quarter" {{ (isset($preset) && $preset == 'this_quarter') ? 'selected' : '' }}>Quý này</option>
+                <option value="this_year" {{ (isset($preset) && $preset == 'this_year') ? 'selected' : '' }}>Năm nay</option>
+                <option value="custom" {{ (isset($preset) && $preset == 'custom') ? 'selected' : '' }}>Tùy chỉnh</option>
+              </select>
+            </div>
+            <div class="col-md-2 custom-date-group" style="{{ (isset($preset) && $preset != 'custom') ? 'display: none;' : '' }}">
               <label class="form-label fw-bold">Từ ngày</label>
               <input type="date" name="start_date" class="form-control" value="{{ $startDate }}">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2 custom-date-group" style="{{ (isset($preset) && $preset != 'custom') ? 'display: none;' : '' }}">
               <label class="form-label fw-bold">Đến ngày</label>
               <input type="date" name="end_date" class="form-control" value="{{ $endDate }}">
             </div>
@@ -26,10 +39,10 @@
                   <i class="ti ti-download me-1"></i> Xuất Báo Cáo
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li><a class="dropdown-item" href="{{ route('admin.reports.orders.excel', request()->all()) }}">
+                  <li><a class="dropdown-item" href="{{ route('admin.reports.orders.excel', ['start_date' => $startDate, 'end_date' => $endDate]) }}">
                     <i class="ti ti-file-spreadsheet me-2"></i> Xuất Excel Đơn hàng
                   </a></li>
-                  <li><a class="dropdown-item" href="{{ route('admin.reports.revenue.pdf', request()->all()) }}">
+                  <li><a class="dropdown-item" href="{{ route('admin.reports.revenue.pdf', ['start_date' => $startDate, 'end_date' => $endDate]) }}">
                     <i class="ti ti-file-description me-2"></i> Xuất PDF Doanh thu
                   </a></li>
                 </ul>
@@ -347,6 +360,17 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      const presetSelect = document.getElementById('preset-select');
+      const customGroups = document.querySelectorAll('.custom-date-group');
+      
+      presetSelect.addEventListener('change', function() {
+          if (this.value === 'custom') {
+              customGroups.forEach(el => el.style.display = 'block');
+          } else {
+              document.getElementById('filter-form').submit();
+          }
+      });
+
       // Revenue Chart
       var revenueOptions = {
         series: [{

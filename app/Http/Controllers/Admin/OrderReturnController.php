@@ -50,7 +50,11 @@ class OrderReturnController extends Controller
         $user = auth()->user();
         $this->returnService->approve($returnReq, $user, $request->admin_note);
 
-        return redirect()->back()->with('success', 'Đã duyệt yêu cầu trả hàng.');
+            return redirect()->back()->with('success', 'Đã duyệt yêu cầu trả hàng.');
+        } catch (\Exception $e) {
+            \Log::error("Approve return error: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi duyệt: ' . $e->getMessage());
+        }
     }
 
     public function reject(Request $request, $id)
@@ -68,7 +72,11 @@ class OrderReturnController extends Controller
         $user = auth()->user();
         $this->returnService->reject($returnReq, $user, $request->admin_note);
 
-        return redirect()->back()->with('success', 'Yêu cầu trả hàng đã bị từ chối.');
+            return redirect()->back()->with('success', 'Yêu cầu trả hàng đã bị từ chối.');
+        } catch (\Exception $e) {
+            \Log::error("Reject return error: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi từ chối: ' . $e->getMessage());
+        }
     }
 
     public function markAsShipping($id)
@@ -87,14 +95,14 @@ class OrderReturnController extends Controller
 
     public function markAsReceived($id)
     {
-        $returnReq = OrderReturnRequest::findOrFail($id);
-        // if (!$returnReq->isShipping()) { // This check is now handled by the service
-        //     return redirect()->back()->with('error', 'Chỉ có thể xác nhận đã nhận hàng khi hàng đang di chuyển.');
-        // }
-
-        $this->returnService->markAsReceived($returnReq);
-        
-        return redirect()->back()->with('success', 'Đã xác nhận nhận hàng tại kho.');
+        try {
+            $returnReq = OrderReturnRequest::findOrFail($id);
+            $this->returnService->markAsReceived($returnReq);
+            
+            return redirect()->back()->with('success', 'Đã xác nhận nhận hàng tại kho.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
     }
 
     public function completeRefund(Request $request, $id)

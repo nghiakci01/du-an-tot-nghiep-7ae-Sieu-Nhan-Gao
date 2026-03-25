@@ -201,9 +201,6 @@
       </div>
       <div class="d-flex align-items-center gap-2">
         <span class="s-badge s-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
-        <a href="{{ route('order-tracking.index', ['order_id' => $order->id]) }}" class="btn btn-sm rounded-pill px-3" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);">
-          <i class="bi bi-truck me-1"></i>Theo dõi
-        </a>
       </div>
     </div>
 
