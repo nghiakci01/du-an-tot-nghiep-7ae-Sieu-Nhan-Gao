@@ -131,14 +131,15 @@
 </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.copy-code-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
             const code = this.getAttribute('data-code');
             const button = this;
-            navigator.clipboard.writeText(code).then(function() {
+
+            function showSuccess() {
                 const icon = button.querySelector('i');
                 icon.className = 'ti ti-check';
                 button.classList.remove('btn-outline-secondary');
@@ -148,17 +149,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     button.classList.remove('btn-success');
                     button.classList.add('btn-outline-secondary');
                 }, 1500);
-            }).catch(function() {
-                // Fallback
+            }
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(code).then(showSuccess).catch(fallbackCopy);
+            } else {
+                fallbackCopy();
+            }
+
+            function fallbackCopy() {
                 const textarea = document.createElement('textarea');
                 textarea.value = code;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
                 document.body.appendChild(textarea);
+                textarea.focus();
                 textarea.select();
-                document.execCommand('copy');
+                try {
+                    document.execCommand('copy');
+                    showSuccess();
+                } catch(e) {
+                    alert('Không thể copy tự động. Mã: ' + code);
+                }
                 document.body.removeChild(textarea);
-            });
+            }
         });
     });
 });
 </script>
-@endpush
+@endsection
