@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Review;
+use App\Models\UserBankAccount;
+use App\Models\BankSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -30,14 +32,26 @@ class AccountController extends Controller
                 ->whereRaw('used_count < usage_limit')
                 ->get();
             $wishlists            = $user->wishlists()->with('product')->get();
+            $userBankAccounts     = $user->bankAccounts()->get();
+            $walletTransactions   = $user->walletTransactions()->take(20)->get();
+            $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();
+            $walletWithdrawRequests = $user->walletWithdrawRequests()->take(10)->get();
+            $bankSettings = BankSetting::where('is_active', true)->get();
         } else {
             $orders   = collect();
             $coupons  = collect();
             $wishlists = collect();
+            $userBankAccounts    = collect();
+            $walletTransactions  = collect();
+            $walletTopupRequests = collect();
+            $walletWithdrawRequests = collect();
+            $bankSettings = collect();
         }
 
         return view('frontend.account.index', compact(
-            'user', 'orders', 'coupons', 'wishlists'
+            'user', 'orders', 'coupons', 'wishlists',
+            'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests',
+            'bankSettings'
         ));
 
     }
