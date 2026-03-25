@@ -11,7 +11,7 @@ class AccountTest extends TestCase
 
     public function test_account_dashboard_requires_login()
     {
-        $response = $this->get('/account');
+        $response = $this->get('/my-account');
         $this->assertContains($response->status(), [302, 200]);
     }
 }

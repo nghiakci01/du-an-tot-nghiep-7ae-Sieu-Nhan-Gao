@@ -112,7 +112,7 @@ class CartValidationTest extends TestCase
         $product->delete();
 
         // Try to validate cart for checkout
-        $response = $this->getJson('/checkout/validate?ids=' . $variant->id);
+        $response = $this->getJson('/cart/validate?ids=' . $variant->id);
         
         $response->assertStatus(200)
                  ->assertJsonPath('valid', false);

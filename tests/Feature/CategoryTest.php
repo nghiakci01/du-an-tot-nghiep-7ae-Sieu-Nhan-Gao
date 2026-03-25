@@ -16,12 +16,14 @@ class CategoryTest extends TestCase
     {
         parent::setUp();
         // Giả lập user admin
-        $this->admin = User::factory()->create(['role' => 'ADMIN']);
+        $this->admin = User::factory()->create(['role' => 'admin']);
     }
 
     public function test_admin_can_view_categories()
     {
-        Category::factory()->count(3)->create();
+        Category::create(['name' => 'Cat 1', 'slug' => 'cat-1']);
+        Category::create(['name' => 'Cat 2', 'slug' => 'cat-2']);
+        Category::create(['name' => 'Cat 3', 'slug' => 'cat-3']);
         $response = $this->actingAs($this->admin)->get('/admin/categories');
         $response->assertStatus(200);
     }

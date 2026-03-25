@@ -12,7 +12,7 @@ class ProductTest extends TestCase
 
     public function test_user_can_view_products()
     {
-        $response = $this->get('/products');
+        $response = $this->get('/shop');
         $response->assertStatus(200);
     }
 }

@@ -65,7 +65,7 @@ class CheckoutAuditTest extends TestCase
         $response = $this->get('/checkout');
 
         $response->assertRedirect(route('cart.index'))
-                 ->assertSessionHas('error', 'Giỏ hàng của bạn đang trống.');
+                 ->assertSessionHas('error', 'Vui lòng chọn sản phẩm trong giỏ hàng trước khi thanh toán.');
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
@@ -109,6 +109,7 @@ class CheckoutAuditTest extends TestCase
             ]
         ];
         Session::put('cart', $cart);
+        Session::put('selected_checkout_ids', [$variant->id]);
 
         $response = $this->post('/checkout', [
             'name' => 'John Doe',
@@ -155,6 +156,7 @@ class CheckoutAuditTest extends TestCase
             ]
         ];
         Session::put('cart', $cart);
+        Session::put('selected_checkout_ids', [$variant->id]);
         
         // Applied 50k discount
         Session::put('coupon_code', 'TEST50');
