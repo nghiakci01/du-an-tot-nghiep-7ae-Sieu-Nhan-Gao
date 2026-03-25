@@ -1,6 +1,6 @@
 # Kế hoạch Hoàn thiện Dự án (Project Completion)
 
-> **Mục tiêu:** Hoàn thiện các công đoạn cuối cùng của dự án "Website Bán Quần Áo" theo đúng `PROJECT_PLAN.md` (Giai đoạn 4), chuẩn bị sẵn sàng cho việc bảo vệ đồ án.
+> **Mục tiêu:** Hoàn thiện các công đoạn cuối cùng của dự án "Website Bán Quần Áo" theo đúng `docs/plans/PROJECT_PLAN.md` (Giai đoạn 4), chuẩn bị sẵn sàng cho việc bảo vệ đồ án.
 > **Trạng thái:** Các chức năng code lõi và test (Unit/Feature) đã Passed 100%.
 
 ## 1. Tổng quan Dự án (Hiện tại)
