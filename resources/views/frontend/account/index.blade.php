@@ -242,14 +242,14 @@
             <i class="bi bi-bank"></i> Tài khoản ngân hàng
           </a>
         </li>
-        <li>
+        {{-- <li>
           <a href="#wallet" data-tab="wallet" class="nav-tab-link">
             <i class="bi bi-wallet2"></i> Ví của tôi
             @if($user && $user->wallet_balance > 0)
             <span class="badge ms-auto rounded-pill" style="background:#e8f5e9;color:#2e7d32;font-size:0.65rem;">{{ number_format($user->wallet_balance) }}đ</span>
             @endif
           </a>
-        </li>
+        </li> --}}
         <li>
           <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-account').submit();" class="text-danger">
             <i class="bi bi-box-arrow-right"></i> Đăng xuất
