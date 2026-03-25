@@ -661,6 +661,7 @@
             </tbody>
           </table>
         </div>
+        @endif
       </div>
     </div>
 
@@ -1092,6 +1093,8 @@ document.addEventListener('DOMContentLoaded', function() {
     'wishlist'        : 'tab-wishlist',
     'coupons'         : 'tab-coupons',
     'account-details' : 'tab-account-details',
+    'bank-accounts'   : 'tab-bank-accounts',
+    'wallet'          : 'tab-wallet',
   };
 
   function showTab(tabId) {
