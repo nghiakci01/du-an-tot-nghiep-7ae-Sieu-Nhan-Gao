@@ -73,7 +73,7 @@ class AccountController extends Controller
         }
 
         // Lấy danh sách product_id đã được user review trong đơn hàng này
-        $productIds = $order->items->pluck('product_id')->filter()->unique();
+        $productIds = collect($order->items)->pluck('product_id')->filter()->unique();
         $userReviews = collect();
         
         if ($user) {
