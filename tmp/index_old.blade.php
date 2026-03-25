@@ -319,14 +319,7 @@
                     <div class="fw-bold">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</div>
                     <div class="text-muted small">{{ $order->created_at->format('d/m/Y') }}</div>
                   </div>
-                  <div class="d-flex flex-column align-items-end">
-                    <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
-                    @if($order->returnRequest)
-                      <span class="badge mt-1 {{ $order->returnRequest->status == 'completed' ? 'bg-success' : ($order->returnRequest->status == 'rejected' ? 'bg-danger' : 'bg-warning text-dark') }}" style="font-size: 0.65rem;">
-                        Hoàn: {{ $order->returnRequest->status == 'pending' ? 'Chờ duyệt' : ($order->returnRequest->status == 'approved' ? 'Đã duyệt' : ($order->returnRequest->status == 'completed' ? 'Đã hoàn tiền' : 'Từ chối')) }}
-                      </span>
-                    @endif
-                  </div>
+                  <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
                   <span class="fw-bold">{{ number_format($order->final_total ?: $order->total_price) }}đ</span>
                 </div>
             </a>
@@ -373,22 +366,12 @@
               </td>
               <td class="text-muted">{{ $order->created_at->format('d/m/Y') }}</td>
               <td>
-                <div class="d-flex flex-column align-items-start">
-                  <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
-                  @if($order->returnRequest)
-                    <span class="badge mt-1 {{ $order->returnRequest->status_badge }}" style="font-size: 0.7rem;">
-                      Hoàn tiền: {{ $order->returnRequest->status_text }}
-                    </span>
-                  @endif
-                </div>
+                <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
               </td>
               <td class="fw-semibold">{{ number_format($order->final_total ?: $order->total_price) }}đ</td>
               <td style="padding-right:28px;">
                 <div class="d-flex gap-2">
                   <a href="{{ route('account.orders.show', $order->id) }}" class="btn btn-sm btn-dark px-3 rounded-pill">Xem</a>
-                  @if(($order->status == 'completed' || $order->status == 'shipped') && !$order->returnRequest)
-                    <a href="{{ route('account.orders.return_form', $order->id) }}" class="btn btn-sm btn-outline-warning rounded-pill px-3">Hoàn hàng</a>
-                  @endif
                   @if($order->status == 'pending')
                     <form action="{{ route('account.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn hủy đơn này?');">
                       @csrf
@@ -661,6 +644,7 @@
             </tbody>
           </table>
         </div>
+        @endif
       </div>
     </div>
 
@@ -768,116 +752,32 @@
             <div class="tab-content" id="pills-tabContent">
               <div class="tab-pane fade show active" id="pills-topup" role="tabpanel" aria-labelledby="pills-topup-tab">
                 {{-- Top-up Request Form --}}
-                <div class="p-4 rounded-3 border mb-4" style="background:#fafafa;">
-                  <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2 text-success"></i>Tạo yêu cầu nạp tiền</h6>
-                  
-                  @if(session('show_qr_id'))
-                    @php
-                      $justCreated = \App\Models\WalletTopupRequest::find(session('show_qr_id'));
-                    @endphp
-                    @if($justCreated)
-                    <div class="alert alert-success border-0 shadow-sm rounded-4 p-4 mb-4">
-                        <div class="row align-items-center">
-                            <div class="col-md-7">
-                                <h5 class="fw-bold text-success mb-3"><i class="bi bi-check-circle-fill me-2"></i>{{ session('wallet_success') }}</h5>
-                                <div class="bg-white p-3 rounded-3 border mb-3">
-                                    <div class="d-flex justify-content-between mb-2 small">
-                                        <span class="text-muted">Ngân hàng:</span>
-                                        <span class="fw-bold">{{ $justCreated->dest_bank_name }}</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2 small">
-                                        <span class="text-muted">Số tài khoản:</span>
-                                        <span class="fw-bold text-primary">{{ $justCreated->dest_account_number }}</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2 small">
-                                        <span class="text-muted">Chủ tài khoản:</span>
-                                        <span class="fw-bold">{{ mb_strtoupper($justCreated->dest_account_name) }}</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2 small">
-                                        <span class="text-muted">Số tiền:</span>
-                                        <span class="fw-bold text-success">{{ number_format($justCreated->amount) }}đ</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between small">
-                                        <span class="text-muted">Nội dung:</span>
-                                        <span class="fw-bold text-danger">{{ $justCreated->transfer_note }}</span>
-                                    </div>
-                                </div>
-                                <p class="small text-muted mb-0"><i class="bi bi-info-circle me-1"></i>Vui lòng chuyển khoản đúng <strong>Số tiền</strong> và <strong>Nội dung</strong> để hệ thống tự động xử lý nhanh nhất.</p>
-                            </div>
-                            <div class="col-md-5 text-center mt-3 mt-md-0">
-                                <div class="bg-white p-2 rounded-3 border d-inline-block shadow-sm">
-                                    @php
-                                        // Bank IDs mapping for VietQR if needed, but BankSetting->bank_id should be the code
-                                        $qrUrl = "https://img.vietqr.io/image/{$justCreated->bankSetting->bank_id}-{$justCreated->dest_account_number}-compact2.png?amount={$justCreated->amount}&addInfo=" . urlencode($justCreated->transfer_note) . "&accountName=" . urlencode($justCreated->dest_account_name);
-                                    @endphp
-                                    <img src="{{ $qrUrl }}" alt="VietQR" class="img-fluid" style="max-width: 220px;">
-                                </div>
-                                <div class="mt-2">
-                                    <a href="{{ $qrUrl }}" download="VietQR_Payment.png" class="btn btn-sm btn-outline-dark rounded-pill">
-                                        <i class="bi bi-download me-1"></i>Tải mã QR
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-                  @endif
-
+                <div class="p-4 rounded-3 border" style="background:#fafafa;">
+                  <h6 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2 text-success"></i>Yêu cầu nạp tiền</h6>
                   <form action="{{ route('wallet.topup.request') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="row">
-                      <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold small">Số tiền muốn nạp (VND) <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                          <input type="number" name="amount" class="form-control" placeholder="100,000" min="10000" max="100000000" step="1000" required>
-                          <span class="input-group-text">VND</span>
-                        </div>
-                        <div class="form-text small">Tối thiểu 10,000đ — Tối đa 100,000,000đ</div>
-                      </div>
-                      
-                      <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold small">Chọn ngân hàng thụ hưởng <span class="text-danger">*</span></label>
-                        <select name="bank_setting_id" id="topup-bank-select" class="form-select" required onchange="updateDestBankInfo(this)">
-                          <option value="">-- Chọn ngân hàng --</option>
-                          @foreach($bankSettings as $bs)
-                          <option value="{{ $bs->id }}" 
-                                  data-bank-id="{{ $bs->bank_id }}"
-                                  data-bank-name="{{ $bs->bank_name }}"
-                                  data-account-number="{{ $bs->account_number }}"
-                                  data-account-name="{{ $bs->account_name }}">
-                            {{ $bs->bank_name }} - {{ $bs->account_number }}
-                          </option>
-                          @endforeach
-                        </select>
-                      </div>
-                    </div>
-
-                    <div id="dest-bank-info" class="p-3 rounded-3 border bg-white mb-3 d-none">
-                      <div class="row small">
-                        <div class="col-sm-6 mb-2 mb-sm-0">
-                          <div class="text-muted">Chủ tài khoản:</div>
-                          <div id="dest-acc-name" class="fw-bold text-uppercase"></div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="text-muted">Số tài khoản:</div>
-                            <div id="dest-acc-number" class="fw-bold text-primary"></div>
-                        </div>
-                      </div>
-                    </div>
-
                     <div class="mb-3">
-                      <label class="form-label fw-semibold small">Ghi chú / Lời nhắn (Tùy chọn)</label>
-                      <input type="text" name="transfer_note" class="form-control" placeholder="Để lại lời nhắn nếu cần">
-                      <div class="form-text small">Ví dụ: Bill chuyển khoản của tôi, nạp cho tk...</div>
+                      <label class="form-label fw-semibold small">Số tiền muốn nạp (VND) <span class="text-danger">*</span></label>
+                      <div class="input-group">
+                        <input type="number" name="amount" class="form-control" placeholder="100,000" min="10000" max="100000000" step="1000" required>
+                        <span class="input-group-text">VND</span>
+                      </div>
+                      <div class="form-text">Tối thiểu 10,000đ — Tối đa 100,000,000đ</div>
                     </div>
-                    
                     <div class="mb-3">
-                      <label class="form-label fw-semibold small">Ảnh minh chứng chuyển khoản (Nếu đã chuyển)</label>
+                      <label class="form-label fw-semibold small">Ngân hàng đã chuyển khoản</label>
+                      <input type="text" name="bank_name" class="form-control" placeholder="Ví dụ: Vietcombank, MB Bank...">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold small">Nội dung chuyển khoản</label>
+                      <input type="text" name="transfer_note" class="form-control" placeholder="Nội dung khi bạn chuyển khoản">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold small">Ảnh minh chứng (tùy chọn)</label>
                       <input type="file" name="proof_image" class="form-control" accept="image/*">
                     </div>
-
                     <button type="submit" class="btn btn-dark rounded-pill px-5">
-                      <i class="bi bi-qr-code-scan me-1"></i>Khởi tạo & Hiện QR
+                      <i class="bi bi-send me-1"></i>Gửi yêu cầu
                     </button>
                   </form>
                 </div>
@@ -957,7 +857,7 @@
                   <tr style="border-color:#f0f0f0;">
                     <td style="padding:12px 14px;">{{ $tr->created_at->format('d/m/Y H:i') }}</td>
                     <td style="padding:12px 14px;" class="fw-bold text-success">+{{ number_format($tr->amount) }}đ</td>
-                    <td style="padding:12px 14px;">{{ $tr->dest_bank_name ?: ($tr->bank_name ?: '—') }}</td>
+                    <td style="padding:12px 14px;">{{ $tr->bank_name ?: '—' }}</td>
                     <td style="padding:12px 14px;">
                       @if($tr->isPending())
                         <span class="badge rounded-pill" style="background:#fff3cd;color:#856404;">Chờ duyệt</span>
@@ -1073,7 +973,6 @@
     </div>
 
 
-
   </div>{{-- col-md-9 --}}
 
 
@@ -1092,6 +991,8 @@ document.addEventListener('DOMContentLoaded', function() {
     'wishlist'        : 'tab-wishlist',
     'coupons'         : 'tab-coupons',
     'account-details' : 'tab-account-details',
+    'bank-accounts'   : 'tab-bank-accounts',
+    'wallet'          : 'tab-wallet',
   };
 
   function showTab(tabId) {
@@ -1131,40 +1032,17 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.copy-coupon').forEach(btn => {
     btn.addEventListener('click', function() {
       const code = this.getAttribute('data-code');
-      const button = this;
-
-      function onSuccess() {
-        button.innerHTML = '<i class="bi bi-check2 me-1"></i>Đã sao chép!';
-        button.classList.remove('btn-outline-dark');
-        button.classList.add('btn-success');
-        setTimeout(() => {
-          button.innerHTML = '<i class="bi bi-clipboard me-1"></i>Sao chép mã';
-          button.classList.remove('btn-success');
-          button.classList.add('btn-outline-dark');
-        }, 2000);
-      }
-
-      function fallbackCopy() {
+      navigator.clipboard?.writeText(code).then(() => {
+        this.innerHTML = '<i class="bi bi-check2 me-1"></i>Đã sao chép!';
+        setTimeout(() => { this.innerHTML = '<i class="bi bi-clipboard me-1"></i>Sao chép mã'; }, 2000);
+      }).catch(() => {
         const ta = document.createElement('textarea');
         ta.value = code;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
         document.body.appendChild(ta);
         ta.select();
-        try {
-          document.execCommand('copy');
-          onSuccess();
-        } catch(e) {
-          alert('Không thể sao chép. Vui lòng copy thủ công: ' + code);
-        }
+        document.execCommand('copy');
         document.body.removeChild(ta);
-      }
-
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(code).then(onSuccess).catch(fallbackCopy);
-      } else {
-        fallbackCopy();
-      }
+      });
     });
   });
 
@@ -1184,7 +1062,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
-
 
 function copyBankAccount(number, btn) {
   if (!navigator.clipboard) return;
@@ -1220,21 +1097,6 @@ function openEditBankModal(id, bankName, bankId, accountNumber, accountName, isD
   document.getElementById('edit-is-default').checked = isDefault;
 
   new bootstrap.Modal(document.getElementById('modalEditBank')).show();
-}
-
-function updateDestBankInfo(select) {
-    const container = document.getElementById('dest-bank-info');
-    const accName = document.getElementById('dest-acc-name');
-    const accNumber = document.getElementById('dest-acc-number');
-    
-    if (select.value) {
-        const option = select.options[select.selectedIndex];
-        accName.textContent = option.dataset.accountName;
-        accNumber.textContent = option.dataset.accountNumber;
-        container.classList.remove('d-none');
-    } else {
-        container.classList.add('d-none');
-    }
 }
 
 
@@ -1307,6 +1169,5 @@ var amtInput = document.getElementById('qr-amount-input');
 if (amtInput) amtInput.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') updateQRWithAmount();
 });
-
 </script>
 @endpush
