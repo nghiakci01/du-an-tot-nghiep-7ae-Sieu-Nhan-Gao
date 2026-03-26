@@ -203,7 +203,7 @@
                                             <div class="action_button">
                                                 <ul>
                                                     <li><a title="{{ __('messages.add_to_cart') }}" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" class="add-to-wishlist" data-id="{{ $product->id }}" title="{{ __('messages.add_to_wishlist') }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                                                    <li><a href="javascript:void(0)" class="add-to-wishlist" data-id="{{ $product->id }}" title="{{ __('messages.add_to_wishlist') }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
                                                 </ul>
                                             </div>
                                        </div>
@@ -284,7 +284,7 @@
                                             <div class="action_button">
                                                 <ul>
                                                     <li><a title="add to cart" href="{{ route('product.detail', $product->slug) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                                                    <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>                                                </ul>
+                                                    <li><a href="javascript:void(0)" class="add-to-wishlist" data-id="{{ $product->id }}" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>                                                </ul>
                                             </div>
                                        </div>
                                     </div>
@@ -369,7 +369,7 @@
                                                                     class="fa fa-shopping-basket" aria-hidden="true"></i></a>
                                                         </li>
                                                         <li>
-                                                            <a href="#" class="add-to-wishlist" data-id="{{ $product->id }}"
+                                                            <a href="javascript:void(0)" class="add-to-wishlist" data-id="{{ $product->id }}"
                                                                 title="Add to Wishlist">
                                                                 <i class="fa fa-heart-o" aria-hidden="true"></i>
                                                             </a>
@@ -606,47 +606,4 @@
     <!-- modal area end-->
     <!-- modal area end-->
 
-    @section('scripts')
-        <script>
-            $(document).ready(function () {
-                $('.add-to-wishlist').click(function (e) {
-                    e.preventDefault();
-                    var productId = $(this).data('id');
-                    var icon = $(this).find('i');
-
-                    $.ajax({
-                        url: '{{ route("wishlist.add") }}',
-                        method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            product_id: productId
-                        },
-                        success: function (response) {
-                            if (response.status === 'success' || response.status === 'info') {
-                                icon.removeClass('fa-heart-o').addClass('fa-heart').css('color', 'red');
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'success',
-                                    title: response.message,
-                                    showConfirmButton: false,
-                                    timer: 2500,
-                                    timerProgressBar: true,
-                                });
-                            } else {
-                                Swal.fire({ icon: 'info', title: response.message, confirmButtonColor: '#333' });
-                            }
-                        },
-                        error: function (xhr) {
-                            if (xhr.status === 401) {
-                                window.location.href = "{{ route('login') }}";
-                            } else {
-                                Swal.fire({ icon: 'error', title: 'Lỗi!', text: 'Có lỗi xảy ra, vui lòng thử lại!' });
-                            }
-                        }
-                    });
-                });
-            });
-        </script>
-    @endsection
 @endsection

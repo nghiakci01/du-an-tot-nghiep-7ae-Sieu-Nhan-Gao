@@ -782,7 +782,7 @@
                             <div class="product_d_action">
                                 <ul>
                                     <li>
-                                        <a href="#" class="add-to-wishlist" data-id="{{ $product->id }}"
+                                        <a href="javascript:void(0)" class="add-to-wishlist" data-id="{{ $product->id }}"
                                             title="{{ __('messages.add_to_wishlist') }}">
                                             <i class="fa fa-heart-o" aria-hidden="true"></i>
                                             {{ __('messages.add_to_wishlist') }}
@@ -1076,54 +1076,6 @@
                 $('html, body').animate({
                     scrollTop: $(".product_d_info").offset().top - 100
                 }, 500);
-            });
-
-            $('.add-to-wishlist').click(function(e) {
-                e.preventDefault();
-                const config = document.getElementById('product-details-container').dataset;
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-                var productId = $(this).data('id');
-                var icon = $(this).find('i');
-
-                $.ajax({
-                    url: config.routeWishlistAdd,
-                    method: 'POST',
-                    data: {
-                        _token: csrfToken,
-                        product_id: productId
-                    },
-                    success: function(response) {
-                        if (response.status === 'success' || response.status === 'info') {
-                            // Change icon to filled heart
-                            icon.removeClass('fa-heart-o').addClass('fa-heart').css('color',
-                                'red');
-                            Swal.fire({
-                                icon: response.status,
-                                title: 'Yêu thích',
-                                text: response.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Lỗi',
-                                text: response.message
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        if (xhr.status === 401) {
-                            window.location.href = config.routeLogin;
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Lỗi',
-                                text: 'Có lỗi xảy ra, vui lòng thử lại sau!'
-                            });
-                        }
-                    }
-                });
             });
 
             // AJAX Add to Cart

@@ -399,6 +399,47 @@
             display: inline-block;
         }
     </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(document).on('click', '.add-to-wishlist', function (e) {
+                e.preventDefault();
+                var productId = $(this).data('id');
+                var icon = $(this).find('i');
+
+                $.ajax({
+                    url: '{{ route("wishlist.add") }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        product_id: productId
+                    },
+                    success: function (response) {
+                        if (response.status === 'success' || response.status === 'info') {
+                            icon.removeClass('fa-heart-o').addClass('fa-heart').css('color', 'red');
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: response.message,
+                                showConfirmButton: false,
+                                timer: 2500,
+                                timerProgressBar: true,
+                            });
+                        } else {
+                            Swal.fire({ icon: 'info', title: response.message, confirmButtonColor: '#333' });
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.href = "{{ route('login') }}";
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Lỗi!', text: 'Có lỗi xảy ra, vui lòng thử lại!' });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 
