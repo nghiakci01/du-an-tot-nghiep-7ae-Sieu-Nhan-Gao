@@ -524,7 +524,12 @@
                                                 checkSelection();
                                                 return;
                                             }
-                                            if ($(this).hasClass('disabled')) return;
+                                            if ($(this).hasClass('disabled')) {
+                                                // Disabled because current color doesn't have this size:
+                                                // Reset color, then select this size
+                                                $('.color-swatches .swatch-item').removeClass('active disabled');
+                                                colorInput.value = '';
+                                            }
                                             $('.size-swatches .swatch-item').removeClass('active');
                                             $(this).addClass('active');
                                             const val = $(this).data('value');
@@ -545,7 +550,12 @@
                                                 checkSelection();
                                                 return;
                                             }
-                                            if ($(this).hasClass('disabled')) return;
+                                            if ($(this).hasClass('disabled')) {
+                                                // Disabled because current size doesn't have this color:
+                                                // Reset size, then select this color
+                                                $('.size-swatches .swatch-item').removeClass('active disabled');
+                                                sizeInput.value = '';
+                                            }
                                             $('.color-swatches .swatch-item').removeClass('active');
                                             $(this).addClass('active');
                                             const val = $(this).data('value');
