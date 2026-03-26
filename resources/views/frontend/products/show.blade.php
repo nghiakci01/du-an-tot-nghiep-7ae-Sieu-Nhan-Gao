@@ -460,63 +460,79 @@
 
                                         const originalPriceHtml = priceContainer.innerHTML;
 
+                                        <style>
+                                            .swatch-item.active {
+                                                border: 2px solid #ef233c !important;
+                                                color: #ef233c;
+                                                position: relative;
+                                            }
+                                            .swatch-item.active::after {
+                                                content: '✓';
+                                                position: absolute;
+                                                bottom: 0px;
+                                                right: 2px;
+                                                font-size: 10px;
+                                                line-height: 1;
+                                            }
+                                            .swatch-item.disabled-swatch {
+                                                opacity: 0.4;
+                                                background-color: #f9f9f9;
+                                                color: #999;
+                                                text-decoration: line-through;
+                                                border: 1px dashed #ccc;
+                                                position: relative;
+                                                cursor: not-allowed;
+                                            }
+                                        </style>
                                         // Filter swatches based on current selection
                                         function filterSwatches() {
                                             const selectedSize = sizeInput.value;
                                             const selectedColor = colorInput.value;
 
                                             if (selectedSize && selectedColor) {
-                                                // BOTH selected: hide everything except the active ones
+                                                // BOTH selected: disable everything except the active ones
                                                 $('.size-swatches .swatch-item').each(function() {
                                                     String($(this).data('value')) === String(selectedSize)
-                                                        ? $(this).show()
-                                                        : $(this).hide();
+                                                        ? $(this).removeClass('disabled-swatch')
+                                                        : $(this).addClass('disabled-swatch');
                                                 });
                                                 $('.color-swatches .swatch-item').each(function() {
                                                     String($(this).data('value')) === String(selectedColor)
-                                                        ? $(this).show()
-                                                        : $(this).hide();
+                                                        ? $(this).removeClass('disabled-swatch')
+                                                        : $(this).addClass('disabled-swatch');
                                                 });
                                             } else if (selectedSize) {
-                                                // Only size selected: show all sizes, filter colors for this size
-                                                $('.size-swatches .swatch-item').show();
+                                                // Only size selected: enable all sizes, disable colors for this size
+                                                $('.size-swatches .swatch-item').removeClass('disabled-swatch');
                                                 const availableColorIds = variants
                                                     .filter(v => v.size_id == selectedSize && v.stock_quantity > 0)
                                                     .map(v => String(v.color_id));
                                                 $('.color-swatches .swatch-item').each(function() {
                                                     const colorId = String($(this).data('value'));
                                                     if (availableColorIds.includes(colorId)) {
-                                                        $(this).show();
+                                                        $(this).removeClass('disabled-swatch');
                                                     } else {
-                                                        $(this).hide();
-                                                        if (colorId === String(selectedColor)) {
-                                                            $(this).removeClass('active');
-                                                            colorInput.value = '';
-                                                        }
+                                                        $(this).addClass('disabled-swatch');
                                                     }
                                                 });
                                             } else if (selectedColor) {
-                                                // Only color selected: show all colors, filter sizes for this color
-                                                $('.color-swatches .swatch-item').show();
+                                                // Only color selected: enable all colors, disable sizes for this color
+                                                $('.color-swatches .swatch-item').removeClass('disabled-swatch');
                                                 const availableSizeIds = variants
                                                     .filter(v => v.color_id == selectedColor && v.stock_quantity > 0)
                                                     .map(v => String(v.size_id));
                                                 $('.size-swatches .swatch-item').each(function() {
                                                     const sizeId = String($(this).data('value'));
                                                     if (availableSizeIds.includes(sizeId)) {
-                                                        $(this).show();
+                                                        $(this).removeClass('disabled-swatch');
                                                     } else {
-                                                        $(this).hide();
-                                                        if (sizeId === String(selectedSize)) {
-                                                            $(this).removeClass('active');
-                                                            sizeInput.value = '';
-                                                        }
+                                                        $(this).addClass('disabled-swatch');
                                                     }
                                                 });
                                             } else {
-                                                // Nothing selected: show ALL
-                                                $('.size-swatches .swatch-item').show();
-                                                $('.color-swatches .swatch-item').show();
+                                                // Nothing selected: enable ALL
+                                                $('.size-swatches .swatch-item').removeClass('disabled-swatch');
+                                                $('.color-swatches .swatch-item').removeClass('disabled-swatch');
                                             }
                                         }
 
@@ -527,16 +543,17 @@
                                                 $(this).removeClass('active');
                                                 sizeInput.value = '';
                                                 $(niceSize).val('').trigger('change');
-                                                $('.color-swatches .swatch-item').removeClass('disabled');
+                                                $('.color-swatches .swatch-item').removeClass('disabled-swatch');
                                                 filterSwatches();
                                                 checkSelection();
                                                 return;
                                             }
-                                            if ($(this).hasClass('disabled')) {
+                                            if ($(this).hasClass('disabled-swatch')) {
                                                 // Disabled because current color doesn't have this size:
                                                 // Reset color, then select this size
-                                                $('.color-swatches .swatch-item').removeClass('active disabled');
+                                                $('.color-swatches .swatch-item').removeClass('active');
                                                 colorInput.value = '';
+                                                $(niceColor).val('').trigger('change');
                                             }
                                             $('.size-swatches .swatch-item').removeClass('active');
                                             $(this).addClass('active');
@@ -553,16 +570,17 @@
                                                 $(this).removeClass('active');
                                                 colorInput.value = '';
                                                 $(niceColor).val('').trigger('change');
-                                                $('.size-swatches .swatch-item').removeClass('disabled');
+                                                $('.size-swatches .swatch-item').removeClass('disabled-swatch');
                                                 filterSwatches();
                                                 checkSelection();
                                                 return;
                                             }
-                                            if ($(this).hasClass('disabled')) {
+                                            if ($(this).hasClass('disabled-swatch')) {
                                                 // Disabled because current size doesn't have this color:
                                                 // Reset size, then select this color
-                                                $('.size-swatches .swatch-item').removeClass('active disabled');
+                                                $('.size-swatches .swatch-item').removeClass('active');
                                                 sizeInput.value = '';
+                                                $(niceSize).val('').trigger('change');
                                             }
                                             $('.color-swatches .swatch-item').removeClass('active');
                                             $(this).addClass('active');

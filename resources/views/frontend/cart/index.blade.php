@@ -175,7 +175,7 @@
                                                     
                                                     $isUnavailable = $isDeleted || $isInactive || !$variantExists || $isOutOfStock;
                                                 @endphp
-                                                <tr data-id="{{ $id }}" class="{{ $isUnavailable ? 'cart-item-unavailable' : '' }}" style="{{ $isUnavailable ? 'filter: grayscale(1); opacity: 0.7;' : '' }}">
+                                                <tr data-id="{{ $id }}" data-variants="{{ json_encode(isset($details['product_variants']) ? $details['product_variants'] : []) }}" class="cart-item-row {{ $isUnavailable ? 'cart-item-unavailable' : '' }}" style="{{ $isUnavailable ? 'filter: grayscale(1); opacity: 0.7;' : '' }}">
                                                     <td class="product_thumb" style="position: relative;">
                                                         @if(!$isDeleted)
                                                             <a href="{{ route('product.detail', $details['slug']) }}">
@@ -214,8 +214,27 @@
                                                                     <label class="small text-muted d-block">{{ __('messages.size') }}</label>
                                                                     <select class="form-select form-select-sm variant-select size-select" data-type="size" {{ $isUnavailable ? 'disabled' : '' }}>
                                                                         @foreach($details['available_sizes_array'] as $key => $name)
-                                                                            <option value="{{ $key }}" {{ (isset($details['size_id']) && $details['size_id'] == $key) || (empty($details['size_id']) && isset($details['size']) && $details['size'] == $key) ? 'selected' : '' }}>
-                                                                                {{ $name }}
+                                                                            @php
+                                                                                $isSelected = (isset($details['size_id']) && $details['size_id'] == $key) || (empty($details['size_id']) && isset($details['size']) && $details['size'] == $key);
+                                                                                $isValid = false;
+                                                                                if(isset($details['product_variants'])) {
+                                                                                    foreach($details['product_variants'] as $v) {
+                                                                                        $matchSize = ($v->size_id == $key) || ($v->size == $key);
+                                                                                        $matchColor = true;
+                                                                                        if(isset($details['color_id'])) {
+                                                                                            $matchColor = ($v->color_id == $details['color_id']) || ($v->color == $details['color_id']);
+                                                                                        }
+                                                                                        if($matchSize && $matchColor && $v->stock_quantity > 0) {
+                                                                                            $isValid = true;
+                                                                                            break;
+                                                                                        }
+                                                                                    }
+                                                                                } else {
+                                                                                    $isValid = true; // Fallback if variants not loaded
+                                                                                }
+                                                                            @endphp
+                                                                            <option value="{{ $key }}" {{ $isSelected ? 'selected' : '' }} {{ !$isValid && !$isSelected ? 'disabled' : '' }} style="{{ !$isValid && !$isSelected ? 'color: #aaa; background: #eee;' : '' }}">
+                                                                                {{ $name }} {{ !$isValid && !$isSelected ? '(Hết)' : '' }}
                                                                             </option>
                                                                         @endforeach
                                                                     </select>
@@ -227,8 +246,27 @@
                                                                     <label class="small text-muted d-block">{{ __('messages.color') }}</label>
                                                                     <select class="form-select form-select-sm variant-select color-select" data-type="color" {{ $isUnavailable ? 'disabled' : '' }}>
                                                                         @foreach($details['available_colors_array'] as $key => $name)
-                                                                            <option value="{{ $key }}" {{ (isset($details['color_id']) && $details['color_id'] == $key) || (empty($details['color_id']) && isset($details['color']) && $details['color'] == $key) ? 'selected' : '' }}>
-                                                                                {{ $name }}
+                                                                            @php
+                                                                                $isSelected = (isset($details['color_id']) && $details['color_id'] == $key) || (empty($details['color_id']) && isset($details['color']) && $details['color'] == $key);
+                                                                                $isValid = false;
+                                                                                if(isset($details['product_variants'])) {
+                                                                                    foreach($details['product_variants'] as $v) {
+                                                                                        $matchColor = ($v->color_id == $key) || ($v->color == $key);
+                                                                                        $matchSize = true;
+                                                                                        if(isset($details['size_id'])) {
+                                                                                            $matchSize = ($v->size_id == $details['size_id']) || ($v->size == $details['size_id']);
+                                                                                        }
+                                                                                        if($matchSize && $matchColor && $v->stock_quantity > 0) {
+                                                                                            $isValid = true;
+                                                                                            break;
+                                                                                        }
+                                                                                    }
+                                                                                } else {
+                                                                                    $isValid = true; // Fallback
+                                                                                }
+                                                                            @endphp
+                                                                            <option value="{{ $key }}" {{ $isSelected ? 'selected' : '' }} {{ !$isValid && !$isSelected ? 'disabled' : '' }} style="{{ !$isValid && !$isSelected ? 'color: #aaa; background: #eee;' : '' }}">
+                                                                                {{ $name }} {{ !$isValid && !$isSelected ? '(Hết)' : '' }}
                                                                             </option>
                                                                         @endforeach
                                                                     </select>
@@ -721,9 +759,9 @@
             }
         });
 
-        // Hiển thị nút Đổi khi thay đổi Select
+        // Hiển thị nút Đổi khi thay đổi Select và Lọc thuộc tính
         $(document).on('change', '.variant-select', function() {
-            var row = $(this).closest("tr");
+            var row = $(this).closest(".cart-item-row");
             
             // Xóa nút cũ nếu có
             row.find('.btn-update-variant').remove();
@@ -731,6 +769,60 @@
             // Thêm nút Đổi bên dưới select box
             var btnHtml = `<button type="button" class="btn btn-dark btn-sm mt-2 btn-update-variant" style="font-size: 11px; padding: 3px 8px;">Đổi thuộc tính</button>`;
             row.find('.cart-variant-selectors').append(btnHtml);
+
+            // -- Logic lọc các options Hết hàng --
+            var variantsData = row.attr('data-variants');
+            if(variantsData) {
+                var variants = JSON.parse(variantsData);
+                var currentSizeId = row.find('.size-select').val();
+                var currentColorId = row.find('.color-select').val();
+
+                // Lọc Size options
+                row.find('.size-select option').each(function() {
+                    var option = $(this);
+                    var sizeVal = option.val();
+                    var match = variants.find(function(v) {
+                        var sizeMatch = (v.size_id == sizeVal) || (v.size == sizeVal);
+                        var colorMatch = currentColorId ? ((v.color_id == currentColorId) || (v.color == currentColorId)) : true;
+                        return sizeMatch && colorMatch && v.stock_quantity > 0;
+                    });
+                    
+                    if(!match && !option.is(':selected')) {
+                        option.prop('disabled', true);
+                        option.css({color: '#aaa', background: '#eee'});
+                        if(option.text().indexOf('(Hết)') === -1) {
+                            option.text(option.text().trim() + ' (Hết)');
+                        }
+                    } else {
+                        option.prop('disabled', false);
+                        option.css({color: '', background: ''});
+                        option.text(option.text().replace(' (Hết)', ''));
+                    }
+                });
+
+                // Lọc Color options
+                row.find('.color-select option').each(function() {
+                    var option = $(this);
+                    var colorVal = option.val();
+                    var match = variants.find(function(v) {
+                        var colorMatch = (v.color_id == colorVal) || (v.color == colorVal);
+                        var sizeMatch = currentSizeId ? ((v.size_id == currentSizeId) || (v.size == currentSizeId)) : true;
+                        return sizeMatch && colorMatch && v.stock_quantity > 0;
+                    });
+                    
+                    if(!match && !option.is(':selected')) {
+                        option.prop('disabled', true);
+                        option.css({color: '#aaa', background: '#eee'});
+                        if(option.text().indexOf('(Hết)') === -1) {
+                            option.text(option.text().trim() + ' (Hết)');
+                        }
+                    } else {
+                        option.prop('disabled', false);
+                        option.css({color: '', background: ''});
+                        option.text(option.text().replace(' (Hết)', ''));
+                    }
+                });
+            }
         });
 
         // Xử lý khi click nút Đổi
