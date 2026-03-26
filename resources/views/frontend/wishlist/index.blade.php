@@ -51,7 +51,12 @@
                                                 <form action="{{ route('wishlist.destroy', $wish->id) }}" method="POST" id="delete-form-{{ $wish->id }}">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <a href="javascript:void(0)" onclick="if(confirm('{{ __('messages.confirm_remove_item') }}')) document.getElementById('delete-form-{{ $wish->id }}').submit();" class="text-danger">X</a>
+                                                    <button type="button"
+                                                        onclick="if(confirm('{{ __('messages.confirm_remove_item') }}')) document.getElementById('delete-form-{{ $wish->id }}').submit();"
+                                                        class="btn btn-outline-danger btn-sm"
+                                                        title="Xóa khỏi yêu thích">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
                                                 </form>
                                             </td>
                                             <td class="product_thumb">
