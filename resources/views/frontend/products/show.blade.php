@@ -473,10 +473,10 @@
                                                 $('.color-swatches .swatch-item').each(function() {
                                                     const colorId = String($(this).data('value'));
                                                     if (availableColorIds.includes(colorId)) {
-                                                        $(this).removeClass('disabled');
+                                                        $(this).show();
                                                     } else {
-                                                        $(this).addClass('disabled');
-                                                        // Deselect if current color no longer available
+                                                        $(this).hide();
+                                                        // Deselect if current color no longer visible
                                                         if (colorId === String(selectedColor)) {
                                                             $(this).removeClass('active');
                                                             colorInput.value = '';
@@ -485,7 +485,7 @@
                                                 });
                                             } else {
                                                 // No size selected: show all colors
-                                                $('.color-swatches .swatch-item').removeClass('disabled');
+                                                $('.color-swatches .swatch-item').show();
                                             }
 
                                             // Filter sizes based on selected color
@@ -496,10 +496,10 @@
                                                 $('.size-swatches .swatch-item').each(function() {
                                                     const sizeId = String($(this).data('value'));
                                                     if (availableSizeIds.includes(sizeId)) {
-                                                        $(this).removeClass('disabled');
+                                                        $(this).show();
                                                     } else {
-                                                        $(this).addClass('disabled');
-                                                        // Deselect if current size no longer available
+                                                        $(this).hide();
+                                                        // Deselect if current size no longer visible
                                                         if (sizeId === String(selectedSize)) {
                                                             $(this).removeClass('active');
                                                             sizeInput.value = '';
@@ -508,7 +508,7 @@
                                                 });
                                             } else {
                                                 // No color selected: show all sizes
-                                                $('.size-swatches .swatch-item').removeClass('disabled');
+                                                $('.size-swatches .swatch-item').show();
                                             }
                                         }
 
