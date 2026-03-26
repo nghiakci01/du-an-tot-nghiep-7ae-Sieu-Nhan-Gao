@@ -460,6 +460,58 @@
 
                                         const originalPriceHtml = priceContainer.innerHTML;
 
+                                        // Filter swatches based on current selection
+                                        function filterSwatches() {
+                                            const selectedSize = sizeInput.value;
+                                            const selectedColor = colorInput.value;
+
+                                            // Filter colors based on selected size
+                                            if (selectedSize) {
+                                                const availableColorIds = variants
+                                                    .filter(v => v.size_id == selectedSize && v.stock_quantity > 0)
+                                                    .map(v => String(v.color_id));
+                                                $('.color-swatches .swatch-item').each(function() {
+                                                    const colorId = String($(this).data('value'));
+                                                    if (availableColorIds.includes(colorId)) {
+                                                        $(this).removeClass('disabled');
+                                                    } else {
+                                                        $(this).addClass('disabled');
+                                                        // Deselect if current color no longer available
+                                                        if (colorId === String(selectedColor)) {
+                                                            $(this).removeClass('active');
+                                                            colorInput.value = '';
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                // No size selected: show all colors
+                                                $('.color-swatches .swatch-item').removeClass('disabled');
+                                            }
+
+                                            // Filter sizes based on selected color
+                                            if (selectedColor) {
+                                                const availableSizeIds = variants
+                                                    .filter(v => v.color_id == selectedColor && v.stock_quantity > 0)
+                                                    .map(v => String(v.size_id));
+                                                $('.size-swatches .swatch-item').each(function() {
+                                                    const sizeId = String($(this).data('value'));
+                                                    if (availableSizeIds.includes(sizeId)) {
+                                                        $(this).removeClass('disabled');
+                                                    } else {
+                                                        $(this).addClass('disabled');
+                                                        // Deselect if current size no longer available
+                                                        if (sizeId === String(selectedSize)) {
+                                                            $(this).removeClass('active');
+                                                            sizeInput.value = '';
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                // No color selected: show all sizes
+                                                $('.size-swatches .swatch-item').removeClass('disabled');
+                                            }
+                                        }
+
                                         // Handle Swatch changes
                                         $('.size-swatches .swatch-item').on('click', function() {
                                             if ($(this).hasClass('disabled')) return;
@@ -468,6 +520,7 @@
                                             const val = $(this).data('value');
                                             sizeInput.value = val;
                                             $(niceSize).val(val).trigger('change');
+                                            filterSwatches();
                                             checkSelection();
                                         });
 
@@ -478,6 +531,7 @@
                                             const val = $(this).data('value');
                                             colorInput.value = val;
                                             $(niceColor).val(val).trigger('change');
+                                            filterSwatches();
                                             checkSelection();
                                         });
 
