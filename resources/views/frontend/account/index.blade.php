@@ -426,6 +426,7 @@
         <div class="row g-3">
           @foreach($wishlists as $wish)
           @php $product = $wish->product; @endphp
+          @if($product)
           <div class="col-sm-6 col-lg-4">
             <div class="wish-card">
               <a href="{{ route('product.detail', $product->slug) }}">
@@ -448,6 +449,7 @@
               </div>
             </div>
           </div>
+          @endif
           @endforeach
         </div>
         @else
