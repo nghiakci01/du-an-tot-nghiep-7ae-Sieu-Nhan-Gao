@@ -422,11 +422,13 @@
         <span class="text-muted small">{{ $wishCount }} sản phẩm</span>
       </div>
       <div class="tab-body">
+        @php $hasValidProduct = false; @endphp
         @if($wishlists->isNotEmpty())
         <div class="row g-3">
           @foreach($wishlists as $wish)
           @php $product = $wish->product; @endphp
           @if($product)
+          @php $hasValidProduct = true; @endphp
           <div class="col-sm-6 col-lg-4">
             <div class="wish-card">
               <a href="{{ route('product.detail', $product->slug) }}">
@@ -452,7 +454,9 @@
           @endif
           @endforeach
         </div>
-        @else
+        @endif
+        
+        @if(!$hasValidProduct)
           <div class="text-center py-5 text-muted">
             <i class="bi bi-heart" style="font-size:3rem; color:#eee;"></i>
             <p class="mt-2">Danh sách yêu thích của bạn còn trống.</p>
