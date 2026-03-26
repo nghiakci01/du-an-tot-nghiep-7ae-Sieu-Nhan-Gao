@@ -465,8 +465,21 @@
                                             const selectedSize = sizeInput.value;
                                             const selectedColor = colorInput.value;
 
-                                            // Filter colors based on selected size
-                                            if (selectedSize) {
+                                            if (selectedSize && selectedColor) {
+                                                // BOTH selected: hide everything except the active ones
+                                                $('.size-swatches .swatch-item').each(function() {
+                                                    String($(this).data('value')) === String(selectedSize)
+                                                        ? $(this).show()
+                                                        : $(this).hide();
+                                                });
+                                                $('.color-swatches .swatch-item').each(function() {
+                                                    String($(this).data('value')) === String(selectedColor)
+                                                        ? $(this).show()
+                                                        : $(this).hide();
+                                                });
+                                            } else if (selectedSize) {
+                                                // Only size selected: show all sizes, filter colors for this size
+                                                $('.size-swatches .swatch-item').show();
                                                 const availableColorIds = variants
                                                     .filter(v => v.size_id == selectedSize && v.stock_quantity > 0)
                                                     .map(v => String(v.color_id));
@@ -476,20 +489,15 @@
                                                         $(this).show();
                                                     } else {
                                                         $(this).hide();
-                                                        // Deselect if current color no longer visible
                                                         if (colorId === String(selectedColor)) {
                                                             $(this).removeClass('active');
                                                             colorInput.value = '';
                                                         }
                                                     }
                                                 });
-                                            } else {
-                                                // No size selected: show all colors
+                                            } else if (selectedColor) {
+                                                // Only color selected: show all colors, filter sizes for this color
                                                 $('.color-swatches .swatch-item').show();
-                                            }
-
-                                            // Filter sizes based on selected color
-                                            if (selectedColor) {
                                                 const availableSizeIds = variants
                                                     .filter(v => v.color_id == selectedColor && v.stock_quantity > 0)
                                                     .map(v => String(v.size_id));
@@ -499,7 +507,6 @@
                                                         $(this).show();
                                                     } else {
                                                         $(this).hide();
-                                                        // Deselect if current size no longer visible
                                                         if (sizeId === String(selectedSize)) {
                                                             $(this).removeClass('active');
                                                             sizeInput.value = '';
@@ -507,8 +514,9 @@
                                                     }
                                                 });
                                             } else {
-                                                // No color selected: show all sizes
+                                                // Nothing selected: show ALL
                                                 $('.size-swatches .swatch-item').show();
+                                                $('.color-swatches .swatch-item').show();
                                             }
                                         }
 
