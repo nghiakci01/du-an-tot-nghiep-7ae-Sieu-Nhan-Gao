@@ -721,24 +721,30 @@
             }
         });
 
-        // Change variant (Product/Size/Color) automatically on change
+        // Hiển thị nút Đổi khi thay đổi Select
         $(document).on('change', '.variant-select', function() {
-            var ele = $(this);
-            var row = ele.closest("tr");
-            var productId = row.find(".product-id").val();
-            var newProductId = row.find(".product-select").val() || productId;
-            var oldVariantId = row.find(".current-variant-id").val();
-            var sizeId = row.find(".size-select").val();
-            var colorId = row.find(".color-select").val();
+            var row = $(this).closest("tr");
             
-            var changedType = null;
-            if (productId !== newProductId) {
-                changedType = 'product';
-            } else if (ele.hasClass('size-select')) {
-                changedType = 'size';
-            } else if (ele.hasClass('color-select')) {
-                changedType = 'color';
-            }
+            // Xóa nút cũ nếu có
+            row.find('.btn-update-variant').remove();
+            
+            // Thêm nút Đổi bên dưới select box
+            var btnHtml = `<button type="button" class="btn btn-dark btn-sm mt-2 btn-update-variant" style="font-size: 11px; padding: 3px 8px;">Đổi thuộc tính</button>`;
+            row.find('.cart-variant-selectors').append(btnHtml);
+        });
+
+        // Xử lý khi click nút Đổi
+        $(document).on('click', '.btn-update-variant', function() {
+            var btn = $(this);
+            var row = btn.closest("tr");
+            var productId = row.find(".product-id").val();
+            var newProductId = productId; // giữ nguyên, chỉ đổi variant
+            var oldVariantId = row.find(".current-variant-id").val();
+            var sizeId = row.find(".size-select").val() || null;
+            var colorId = row.find(".color-select").val() || null;
+            
+            // Xác định type thay đổi
+            var changedType = sizeId && colorId ? 'both' : (sizeId ? 'size' : 'color');
 
             $.ajax({
                 url: config.routeChangeVariant,
@@ -753,6 +759,7 @@
                     changed_type: changedType
                 },
                 beforeSend: function() {
+                    btn.text('Đang xử lý...').prop('disabled', true);
                     row.css('opacity', '0.5');
                 },
                 success: function(response) {
@@ -767,6 +774,7 @@
                                 timer: 3000
                             });
                             row.css('opacity', '1');
+                            btn.remove();
                         } else if (response.redirect) {
                             window.location.href = response.redirect;
                         } else {
