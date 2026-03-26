@@ -512,8 +512,18 @@
                                             }
                                         }
 
-                                        // Handle Swatch changes
+                                        // Handle Swatch changes (with toggle to deselect)
                                         $('.size-swatches .swatch-item').on('click', function() {
+                                            if ($(this).hasClass('active')) {
+                                                // Toggle off: deselect size, reset all colors
+                                                $(this).removeClass('active');
+                                                sizeInput.value = '';
+                                                $(niceSize).val('').trigger('change');
+                                                $('.color-swatches .swatch-item').removeClass('disabled');
+                                                filterSwatches();
+                                                checkSelection();
+                                                return;
+                                            }
                                             if ($(this).hasClass('disabled')) return;
                                             $('.size-swatches .swatch-item').removeClass('active');
                                             $(this).addClass('active');
@@ -525,6 +535,16 @@
                                         });
 
                                         $('.color-swatches .swatch-item').on('click', function() {
+                                            if ($(this).hasClass('active')) {
+                                                // Toggle off: deselect color, reset all sizes
+                                                $(this).removeClass('active');
+                                                colorInput.value = '';
+                                                $(niceColor).val('').trigger('change');
+                                                $('.size-swatches .swatch-item').removeClass('disabled');
+                                                filterSwatches();
+                                                checkSelection();
+                                                return;
+                                            }
                                             if ($(this).hasClass('disabled')) return;
                                             $('.color-swatches .swatch-item').removeClass('active');
                                             $(this).addClass('active');
