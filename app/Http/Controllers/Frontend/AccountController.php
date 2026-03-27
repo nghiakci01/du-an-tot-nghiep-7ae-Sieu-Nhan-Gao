@@ -23,6 +23,7 @@ class AccountController extends Controller
         $orders = collect();
         $wishlists = collect();
         $coupons = collect();
+        $addresses = collect();
         $userBankAccounts = collect();
         $walletTransactions = collect();
         $walletTopupRequests = collect();
@@ -37,6 +38,7 @@ class AccountController extends Controller
             $wishCount = $user->wishlists()->count();
             $wishlists = $user->wishlists()->with('product')->get();
             $userBankAccounts = $user->bankAccounts;
+            $addresses = $user->addresses()->get();
             
             $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
                 $q->whereNull('user_id')->orWhere('user_id', $user->id);
@@ -59,7 +61,7 @@ class AccountController extends Controller
         }
 
         return view('frontend.account.index', compact(
-            'user', 'orders', 'coupons', 'wishlists',
+            'user', 'orders', 'coupons', 'wishlists', 'addresses',
             'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests',
             'bankSettings', 'totalOrders', 'totalSpent', 'wishCount', 'socialAccounts'
         ));

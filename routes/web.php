@@ -95,6 +95,14 @@ Route::group(['middleware' => 'auth'], function () {
     // Wishlist Routes
     Route::get('/wishlist', [App\Http\Controllers\Frontend\WishlistController::class, 'index'])->name('wishlist.index');
     Route::delete('/wishlist/{id}', [App\Http\Controllers\Frontend\WishlistController::class, 'destroy'])->name('wishlist.destroy');
+
+    // User Addresses
+    Route::get('/my-account/addresses/create', [App\Http\Controllers\Frontend\AddressController::class, 'create'])->name('account.addresses.create');
+    Route::post('/my-account/addresses', [App\Http\Controllers\Frontend\AddressController::class, 'store'])->name('account.addresses.store');
+    Route::get('/my-account/addresses/{id}/edit', [App\Http\Controllers\Frontend\AddressController::class, 'edit'])->name('account.addresses.edit');
+    Route::put('/my-account/addresses/{id}', [App\Http\Controllers\Frontend\AddressController::class, 'update'])->name('account.addresses.update');
+    Route::delete('/my-account/addresses/{id}', [App\Http\Controllers\Frontend\AddressController::class, 'destroy'])->name('account.addresses.destroy');
+    Route::patch('/my-account/addresses/{id}/default', [App\Http\Controllers\Frontend\AddressController::class, 'setDefault'])->name('account.addresses.default');
 });
 
 
@@ -104,6 +112,10 @@ Route::post('/wishlist/add', [App\Http\Controllers\Frontend\WishlistController::
 // Public Chatbot Route (Moved from API to Web to access Session)
 Route::post('/api/chat/send', [App\Http\Controllers\Api\ChatController::class, 'sendMessage'])->name('api.chat.send');
 Route::get('/api/chat/messages', [App\Http\Controllers\Api\ChatController::class, 'getMessages'])->name('api.chat.messages');
+
+// VN Address Proxy (bypass CORS, cached 24h)
+Route::get('/api/vn-address/provinces', [App\Http\Controllers\Api\VnAddressController::class, 'provinces'])->name('api.vn-address.provinces');
+Route::get('/api/vn-address/communes/{provinceCode}', [App\Http\Controllers\Api\VnAddressController::class, 'communes'])->name('api.vn-address.communes');
 
 
 

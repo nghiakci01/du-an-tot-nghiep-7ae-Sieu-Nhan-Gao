@@ -242,6 +242,14 @@
             <i class="bi bi-bank"></i> Tài khoản ngân hàng
           </a>
         </li>
+        <li>
+          <a href="#addresses" data-tab="addresses" class="nav-tab-link">
+            <i class="bi bi-geo-alt"></i> Địa chỉ của tôi
+            @if(isset($addresses) && $addresses->count() > 0)
+              <span class="badge rounded-pill ms-auto" style="background:#f0f0f0;color:#555;font-size:0.65rem;">{{ $addresses->count() }}</span>
+            @endif
+          </a>
+        </li>
         {{-- <li>
           <a href="#wallet" data-tab="wallet" class="nav-tab-link">
             <i class="bi bi-wallet2"></i> Ví của tôi
@@ -501,7 +509,107 @@
       </div>
     </div>
 
+    {{-- =============== TAB: ADDRESSES =============== --}}
+    <div class="account-content tab-pane-block d-none" id="tab-addresses">
+      <div class="tab-head">
+        <h4><i class="bi bi-geo-alt me-2"></i>Địa chỉ của tôi</h4>
+        <a href="{{ route('account.addresses.create') }}" class="btn btn-sm btn-dark rounded-pill px-3">
+          <i class="bi bi-plus me-1"></i> Thêm địa chỉ
+        </a>
+      </div>
+      <div class="tab-body">
+        @if(isset($addresses) && $addresses->isNotEmpty())
+          <div class="row g-3" id="address-list">
+            @foreach($addresses as $addr)
+            <div class="col-md-6 address-card-wrap" id="addr-wrap-{{ $addr->id }}">
 
+              {{-- Card hiển thị --}}
+              <div class="addr-view" id="addr-view-{{ $addr->id }}">
+                <div class="p-3 rounded-3 h-100" style="border:1.5px solid #{{ $addr->is_default ? '1a1a2e' : 'e8e8e8' }};background:#fff;position:relative;">
+                  @if($addr->is_default)
+                    <span class="badge" style="background:#1a1a2e;color:#fff;font-size:0.65rem;position:absolute;top:12px;right:12px;">Mặc định</span>
+                  @endif
+                  <div class="fw-bold mb-1" style="font-size:0.95rem;">{{ $addr->receiver_name }}</div>
+                  <div class="text-muted small mb-1"><i class="bi bi-telephone me-1"></i>{{ $addr->phone }}</div>
+                  <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ $addr->address }}{{ $addr->commune ? ', ' . $addr->commune : '' }}, {{ $addr->province }}</div>
+                  <div class="d-flex gap-2 mt-3">
+                    <button class="btn btn-sm btn-outline-dark rounded-pill px-3" onclick="toggleAddrEdit({{ $addr->id }})">
+                      <i class="bi bi-pencil me-1"></i>Sửa
+                    </button>
+                    @if(!$addr->is_default)
+                    <form action="{{ route('account.addresses.default', $addr->id) }}" method="POST" class="d-inline">
+                      @csrf @method('PATCH')
+                      <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Đặt mặc định</button>
+                    </form>
+                    <form action="{{ route('account.addresses.destroy', $addr->id) }}" method="POST" class="d-inline"
+                          onsubmit="return confirm('Xoá địa chỉ này?')">
+                      @csrf @method('DELETE')
+                      <button class="btn btn-sm btn-outline-danger rounded-pill"><i class="bi bi-trash"></i></button>
+                    </form>
+                    @endif
+                  </div>
+                </div>
+              </div>
+
+              {{-- Inline Edit Form --}}
+              <div class="addr-edit d-none" id="addr-edit-{{ $addr->id }}">
+                <div class="p-3 rounded-3" style="border:1.5px solid #1a1a2e;background:#fafafa;">
+                  <div class="fw-semibold mb-3" style="font-size:0.9rem;">Chỉnh sửa địa chỉ</div>
+                  <form action="{{ route('account.addresses.update', $addr->id) }}" method="POST" class="addr-form" data-id="{{ $addr->id }}">
+                    @csrf @method('PUT')
+                    <div class="row g-2 mb-2">
+                      <div class="col-6">
+                        <input type="text" name="receiver_name" value="{{ $addr->receiver_name }}"
+                          class="form-control form-control-sm rounded-3" placeholder="Tên người nhận" required>
+                      </div>
+                      <div class="col-6">
+                        <input type="tel" name="phone" value="{{ $addr->phone }}"
+                          class="form-control form-control-sm rounded-3"
+                          placeholder="0901234567"
+                          pattern="^(03|05|07|08|09)\d{8}$"
+                          maxlength="10" minlength="10"
+                          title="10 chữ số, bắt đầu bằng 03, 05, 07, 08 hoặc 09"
+                          required>
+                      </div>
+                    </div>
+                    <div class="mb-2">
+                      <select name="province" class="form-select form-select-sm rounded-3 addr-province" data-selected="{{ $addr->province }}" required>
+                        <option value="">-- Đang tải tỉnh/thành... --</option>
+                      </select>
+                    </div>
+                    <div class="mb-2">
+                      <select name="commune" class="form-select form-select-sm rounded-3 addr-commune" data-selected="{{ $addr->commune }}" disabled required>
+                        <option value="">-- Chọn tỉnh trước --</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <input type="text" name="address" value="{{ $addr->address }}"
+                        class="form-control form-control-sm rounded-3" placeholder="Số nhà, tên đường..." required>
+                    </div>
+                    <div class="form-check mb-3">
+                      <input class="form-check-input" type="checkbox" name="is_default" value="1" id="def-{{ $addr->id }}" {{ $addr->is_default ? 'checked' : '' }}>
+                      <label class="form-check-label small" for="def-{{ $addr->id }}">Đặt làm địa chỉ mặc định</label>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <button type="submit" class="btn btn-sm btn-dark rounded-pill px-3"><i class="bi bi-check me-1"></i>Lưu</button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="toggleAddrEdit({{ $addr->id }})">Huỷ</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+            </div>
+            @endforeach
+          </div>
+        @else
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-geo-alt" style="font-size:3rem;color:#eee;"></i>
+            <p class="mt-2">Bạn chưa có địa chỉ nào.</p>
+            <a href="{{ route('account.addresses.create') }}" class="btn btn-dark rounded-pill px-4">Thêm địa chỉ mới</a>
+          </div>
+        @endif
+      </div>
+    </div>
     {{-- =============== TAB: ACCOUNT DETAILS =============== --}}
     <div class="account-content tab-pane-block d-none" id="tab-account-details">
       <div class="tab-head">
@@ -758,6 +866,7 @@ document.addEventListener('DOMContentLoaded', function() {
     'orders'          : 'tab-orders',
     'wishlist'        : 'tab-wishlist',
     'coupons'         : 'tab-coupons',
+    'addresses'       : 'tab-addresses',
     'account-details' : 'tab-account-details',
     'bank-accounts'   : 'tab-bank-accounts',
     'wallet'          : 'tab-wallet',
@@ -976,6 +1085,77 @@ var amtInput = document.getElementById('qr-amount-input');
 if (amtInput) amtInput.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') updateQRWithAmount();
 });
+
+// ===== ADDRESS INLINE EDIT =====
+let _vnProvincesCache = null;
+
+async function _loadVnProvinces() {
+    if (_vnProvincesCache) return _vnProvincesCache;
+    const res  = await fetch('{{ route("api.vn-address.provinces") }}');
+    _vnProvincesCache = await res.json();
+    return _vnProvincesCache;
+}
+
+async function initAddrForm(addrId) {
+    const form = document.querySelector(`.addr-form[data-id="${addrId}"]`);
+    if (!form) return;
+    const provinceEl = form.querySelector('.addr-province');
+    const communeEl  = form.querySelector('.addr-commune');
+    const selProvince = provinceEl.dataset.selected || '';
+    const selCommune  = communeEl.dataset.selected || '';
+
+    // Load provinces
+    const provinces = await _loadVnProvinces();
+    provinceEl.innerHTML = '<option value="">-- Chọn tỉnh/thành phố --</option>';
+    let selectedCode = '';
+    provinces.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.name; opt.dataset.code = p.code; opt.textContent = p.name;
+        if (p.name === selProvince) { opt.selected = true; selectedCode = p.code; }
+        provinceEl.appendChild(opt);
+    });
+
+    // Auto-load communes if province known
+    if (selectedCode) await loadAddrCommunes(communeEl, selectedCode, selCommune);
+
+    provinceEl.addEventListener('change', async function() {
+        const opt = this.options[this.selectedIndex];
+        communeEl.innerHTML = '<option value="">-- Đang tải... --</option>';
+        communeEl.disabled = true;
+        if (opt && opt.dataset.code) {
+            await loadAddrCommunes(communeEl, opt.dataset.code, '');
+        } else {
+            communeEl.innerHTML = '<option value="">-- Chọn tỉnh trước --</option>';
+        }
+    });
+}
+
+async function loadAddrCommunes(select, provinceCode, selectedCommune) {
+    try {
+        const res  = await fetch('{{ url("api/vn-address/communes") }}/' + provinceCode);
+        const data = await res.json();
+        select.innerHTML = '<option value="">-- Chọn xã/phường --</option>';
+        data.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.name; opt.textContent = c.name;
+            if (c.name === selectedCommune) opt.selected = true;
+            select.appendChild(opt);
+        });
+        select.disabled = false;
+    } catch(e) {
+        select.innerHTML = '<option value="">Lỗi tải xã/phường</option>';
+    }
+}
+
+function toggleAddrEdit(addrId) {
+    const view = document.getElementById('addr-view-' + addrId);
+    const edit = document.getElementById('addr-edit-' + addrId);
+    if (!view || !edit) return;
+    const isHidden = edit.classList.contains('d-none');
+    view.classList.toggle('d-none', isHidden);
+    edit.classList.toggle('d-none', !isHidden);
+    if (isHidden) initAddrForm(addrId);
+}
 
 </script>
 @endpush
