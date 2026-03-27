@@ -963,14 +963,6 @@
                                                 </div>
                                                 <button type="submit">{{ __('messages.submit') }}</button>
                                             </form>
-                                        @else
-                                            <div class="alert"
-                                                style="background:#fff8e1; border-left:4px solid #f39c12; padding:15px; border-radius:4px;">
-                                                <i class="fa fa-info-circle" style="color:#f39c12;"></i>
-                                                {{ __('messages.review_purchase_required') }}
-                                                <a href="{{ route('shop') }}" class="btn btn-sm"
-                                                    style="background:#ef233c; color:#fff; margin-left:10px; padding:4px 12px; border-radius:3px;">{{ __('messages.buy_to_review') }}</a>
-                                            </div>
                                         @endif
                                     @else
                                         <p>{!! __('messages.login_to_review', [
