@@ -11,6 +11,7 @@ class UserAddress extends Model
         'receiver_name',
         'phone',
         'province',
+        'commune',
         'address',
         'is_default',
     ];
