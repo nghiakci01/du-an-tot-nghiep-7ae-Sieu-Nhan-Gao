@@ -3,20 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 
 class VnAddressController extends Controller
 {
-    private const API_BASE = 'https://production.cas.so/address-kit/2025-07-01';
-    private const CACHE_TTL = 86400; // 24h
-
     /**
-     * Trả về danh sách tỉnh/thành unique (cache 24h)
+     * Trả về danh sách tỉnh/thành unique (từ file JSON tĩnh)
      */
     public function provinces()
     {
-        $communes = $this->fetchCommunes();
+        $communes = $this->loadCommunes();
 
         $provinces = collect($communes)
             ->unique('provinceCode')
@@ -31,11 +26,11 @@ class VnAddressController extends Controller
     }
 
     /**
-     * Trả về danh sách xã/phường theo provinceCode (cache 24h)
+     * Trả về danh sách xã/phường theo provinceCode (từ file JSON tĩnh)
      */
     public function communes(string $provinceCode)
     {
-        $communes = collect($this->fetchCommunes())
+        $communes = collect($this->loadCommunes())
             ->filter(fn($c) => $c['provinceCode'] === $provinceCode)
             ->sortBy('name')
             ->values()
@@ -48,11 +43,14 @@ class VnAddressController extends Controller
         return response()->json($communes);
     }
 
-    private function fetchCommunes(): array
+    private function loadCommunes(): array
     {
-        return Cache::remember('vn_communes', self::CACHE_TTL, function () {
-            $response = Http::timeout(15)->get(self::API_BASE . '/communes');
-            return $response->json('communes', []);
-        });
+        $filePath = storage_path('app/vn_communes.json');
+
+        if (! file_exists($filePath)) {
+            return [];
+        }
+
+        return json_decode(file_get_contents($filePath), true) ?? [];
     }
 }
