@@ -192,7 +192,36 @@ class AccountController extends Controller
             'note' => 'nullable|string|max:1000',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'videos.*' => 'nullable|file|mimes:mp4,mov,avi,webm|max:51200',
+            'items' => 'required|array',
+            'items.*.selected' => 'sometimes|boolean',
+            'items.*.quantity' => 'sometimes|integer|min:1',
         ]);
+
+        // Filter selected items and calculate refund amount
+        $selectedItems = [];
+        $totalRefund = 0;
+        
+        foreach ($request->items as $itemId => $data) {
+            if (isset($data['selected']) && $data['selected'] == 1) {
+                $orderItem = \App\Models\OrderItem::where('order_id', $order->id)->findOrFail($itemId);
+                
+                $qty = (int) ($data['quantity'] ?? 1);
+                if ($qty > $orderItem->quantity) {
+                    return redirect()->back()->with('error', "Số lượng trả của sản phẩm {$orderItem->product_name} vượt quá số lượng đã mua.");
+                }
+
+                $selectedItems[] = [
+                    'order_item_id' => $itemId,
+                    'quantity' => $qty,
+                    'price' => $orderItem->price,
+                ];
+                $totalRefund += $qty * $orderItem->price;
+            }
+        }
+
+        if (empty($selectedItems)) {
+            return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một sản phẩm để hoàn trả.');
+        }
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
@@ -214,23 +243,29 @@ class AccountController extends Controller
             }
         }
 
-        $returnRequest = \App\Models\OrderReturnRequest::create([
-            'user_id' => $user->id,
-            'order_id' => $order->id,
-            'reason' => $request->reason,
-            'note' => $request->note,
-            'images' => $imagePaths,
-            'videos' => $videoPaths,
-            'refund_amount' => $order->final_total,
-            'status' => 'pending',
-        ]);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($user, $order, $request, $imagePaths, $videoPaths, $selectedItems, $totalRefund) {
+            $returnRequest = \App\Models\OrderReturnRequest::create([
+                'user_id' => $user->id,
+                'order_id' => $order->id,
+                'reason' => $request->reason,
+                'note' => $request->note,
+                'images' => $imagePaths,
+                'videos' => $videoPaths,
+                'refund_amount' => $totalRefund,
+                'status' => 'pending',
+            ]);
 
-        // Thông báo cho các Admin
-        $admins = \App\Models\User::getAdmins();
-        Notification::send($admins, new NewOrderReturnRequestNotification($returnRequest));
+            foreach ($selectedItems as $itemData) {
+                $returnRequest->items()->create($itemData);
+            }
 
-        return redirect()->route('account.orders.show', $order->id)
-            ->with('success', 'Yêu cầu hoàn trả của bạn đã được gửi và đang chờ xử lý.');
+            // Thông báo cho các Admin
+            $admins = \App\Models\User::getAdmins();
+            Notification::send($admins, new \App\Notifications\NewOrderReturnRequestNotification($returnRequest));
+
+            return redirect()->route('account.orders.show', $order->id)
+                ->with('success', 'Yêu cầu hoàn trả của bạn đã được gửi và đang chờ xử lý.');
+        });
     }
 
 

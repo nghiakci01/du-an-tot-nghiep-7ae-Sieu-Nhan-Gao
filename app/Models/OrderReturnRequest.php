@@ -47,6 +47,11 @@ class OrderReturnRequest extends Model
         return $this->belongsTo(User::class, 'processed_by');
     }
 
+    public function items()
+    {
+        return $this->hasMany(OrderReturnItem::class, 'order_return_request_id');
+    }
+
     public function isPending()
     {
         return $this->status === 'pending';
