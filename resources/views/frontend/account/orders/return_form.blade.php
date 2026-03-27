@@ -132,6 +132,58 @@
             <form action="{{ route('account.orders.return_submit', $order->id) }}" method="POST" enctype="multipart/form-data">
               @csrf
 
+              {{-- Item Selection --}}
+              <div class="mb-5">
+                <label class="form-label fw-bold mb-3">Chọn sản phẩm muốn hoàn trả <span class="text-danger">*</span></label>
+                <div class="table-responsive">
+                  <table class="table table-borderless align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th width="50" class="text-center">Chọn</th>
+                        <th>Sản phẩm</th>
+                        <th width="120" class="text-center">Số lượng trả</th>
+                        <th width="150" class="text-end">Đơn giá</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @foreach($order->items as $item)
+                      <tr class="item-row border-bottom">
+                        <td class="text-center">
+                          <input type="checkbox" name="items[{{ $item->id }}][selected]" value="1" class="form-check-input item-checkbox" style="width:20px; height:20px;">
+                        </td>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            @if($item->product && $item->product->image)
+                              <img src="{{ asset('storage/' . $item->product->image) }}" class="rounded me-3" width="50" height="50" style="object-fit: cover;">
+                            @elseif($item->product && $item->product->images->count() > 0)
+                                <img src="{{ asset('storage/' . $item->product->images->first()->image_path) }}" class="rounded me-3" width="50" height="50" style="object-fit: cover;">
+                            @endif
+                            <div>
+                              <div class="fw-bold text-dark">{{ $item->product_name }}</div>
+                              @if($item->variant_name)
+                                <small class="text-muted">Phân loại: {{ $item->variant_name }}</small>
+                              @endif
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <input type="number" name="items[{{ $item->id }}][quantity]" value="{{ $item->quantity }}" min="1" max="{{ $item->quantity }}" class="form-control form-control-sm text-center item-qty" disabled>
+                        </td>
+                        <td class="text-end fw-bold">
+                          {{ number_format($item->price, 0, ',', '.') }}₫
+                          <input type="hidden" class="item-price" value="{{ $item->price }}">
+                        </td>
+                      </tr>
+                      @endforeach
+                    </tbody>
+                  </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3 p-3 bg-light rounded-3">
+                  <span class="fw-bold">Ước tính số tiền hoàn lại:</span>
+                  <span class="text-danger fw-bold fs-5" id="total-refund-preview">0₫</span>
+                </div>
+              </div>
+
               {{-- Reason --}}
               <div class="mb-4">
                 <label class="form-label fw-bold">Lý do hoàn trả <span class="text-danger">*</span></label>
@@ -194,6 +246,37 @@
 
 @push('scripts')
 <script>
+// Item selection and refund calculation
+const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+const itemQtys = document.querySelectorAll('.item-qty');
+const refundPreview = document.getElementById('total-refund-preview');
+
+function calculateTotalRefund() {
+  let total = 0;
+  document.querySelectorAll('.item-row').forEach(row => {
+    const checkbox = row.querySelector('.item-checkbox');
+    const qtyInput = row.querySelector('.item-qty');
+    const price = parseFloat(row.querySelector('.item-price').value);
+    
+    if (checkbox.checked) {
+      qtyInput.disabled = false;
+      const qty = parseInt(qtyInput.value) || 0;
+      total += qty * price;
+    } else {
+      qtyInput.disabled = true;
+    }
+  });
+  refundPreview.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total).replace('₫', '') + '₫';
+}
+
+itemCheckboxes.forEach(cb => {
+  cb.addEventListener('change', calculateTotalRefund);
+});
+
+itemQtys.forEach(qty => {
+  qty.addEventListener('input', calculateTotalRefund);
+});
+
 // Image preview
 document.getElementById('return-images').addEventListener('change', function(e) {
   const container = document.getElementById('preview-container');

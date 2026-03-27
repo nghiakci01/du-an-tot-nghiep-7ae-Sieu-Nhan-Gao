@@ -46,6 +46,8 @@ class Order extends Model
 
     const STATUS_RETURNED = 'returned';
 
+    const STATUS_PARTIALLY_RETURNED = 'partially_returned';
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -84,6 +86,7 @@ class Order extends Model
             self::STATUS_CANCELLED => 'Đã hủy',
             self::STATUS_FAILED => 'Thất bại',
             self::STATUS_RETURNED => 'Đã trả hàng',
+            self::STATUS_PARTIALLY_RETURNED => 'Trả hàng một phần',
             default => 'Không xác định',
         };
     }
@@ -98,6 +101,7 @@ class Order extends Model
             self::STATUS_CANCELLED => 'bg-light-danger',
             self::STATUS_FAILED => 'bg-light-danger',
             self::STATUS_RETURNED => 'bg-light-warning',
+            self::STATUS_PARTIALLY_RETURNED => 'bg-light-info',
             default => 'bg-light-secondary',
         };
     }
@@ -107,8 +111,8 @@ class Order extends Model
         $transitions = match ($this->status) {
             self::STATUS_PENDING => [self::STATUS_CONFIRMED, self::STATUS_CANCELLED],
             self::STATUS_CONFIRMED => [self::STATUS_SHIPPED, self::STATUS_CANCELLED],
-            self::STATUS_SHIPPED => [self::STATUS_COMPLETED, self::STATUS_RETURNED, self::STATUS_FAILED],
-            self::STATUS_COMPLETED => [self::STATUS_RETURNED],
+            self::STATUS_SHIPPED => [self::STATUS_COMPLETED, self::STATUS_RETURNED, self::STATUS_PARTIALLY_RETURNED, self::STATUS_FAILED],
+            self::STATUS_COMPLETED => [self::STATUS_RETURNED, self::STATUS_PARTIALLY_RETURNED],
             self::STATUS_CANCELLED => [],
             self::STATUS_FAILED => [],
             self::STATUS_RETURNED => [],

@@ -20,7 +20,7 @@ class OrderService
     /**
      * Update order status with history tracking and stock management
      */
-    public function updateOrderStatus(Order $order, string $newStatus, ?User $user = null, ?string $note = null)
+    public function updateOrderStatus(Order $order, string $newStatus, ?User $user = null, ?string $note = null, ?\App\Models\OrderReturnRequest $returnRequest = null)
     {
         // Prevent transitioning an unpaid online order to progressive statuses
         if ($order->payment_method !== 'COD' && $order->payment_status !== 'paid') {
@@ -39,7 +39,7 @@ class OrderService
 
         $oldStatus = $order->status;
 
-        DB::transaction(function () use ($order, $newStatus, $oldStatus, $user, $note) {
+        DB::transaction(function () use ($order, $newStatus, $oldStatus, $user, $note, $returnRequest) {
             // update status
             $order->update(['status' => $newStatus]);
 
@@ -53,7 +53,7 @@ class OrderService
             ]);
 
             // Handle stock logic
-            $this->handleStockAdjustment($order, $oldStatus, $newStatus);
+            $this->handleStockAdjustment($order, $oldStatus, $newStatus, $returnRequest);
 
         });
 
@@ -73,18 +73,18 @@ class OrderService
         return $order;
     }
 
-    protected function handleStockAdjustment(Order $order, $oldStatus, $newStatus)
+    protected function handleStockAdjustment(Order $order, $oldStatus, $newStatus, ?\App\Models\OrderReturnRequest $returnRequest = null)
     {
         // 1. If transition TO Cancelled/Returned/Failed -> Restore Stock (if coming from a status where stock was held)
         // Assuming stock IS deducted on Order Placement (which is standard).
         // So any transition TO Cancelled/Returned/Failed requires restoration.
         // UNLESS the old status was ALSO Cancelled/Returned/Failed (which shouldn't happen due to transition rules, but good to be safe)
 
-        $isCancelledState = in_array($newStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_FAILED]);
-        $wasCancelledState = in_array($oldStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_FAILED]);
+        $isCancelledState = in_array($newStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_PARTIALLY_RETURNED, Order::STATUS_FAILED]);
+        $wasCancelledState = in_array($oldStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_PARTIALLY_RETURNED, Order::STATUS_FAILED]);
 
         if ($isCancelledState && ! $wasCancelledState) {
-            $this->restoreStock($order);
+            $this->restoreStock($order, $returnRequest);
         }
 
         // 2. If transition FROM Cancelled/Returned/Failed TO Processing statuses -> Deduct Stock again
@@ -105,14 +105,30 @@ class OrderService
     /**
      * Khôi phục số lượng tồn kho cho các sản phẩm trong đơn hàng
      */
-    protected function restoreStock(Order $order)
+    protected function restoreStock(Order $order, ?\App\Models\OrderReturnRequest $returnRequest = null)
     {
-        foreach ($order->items as $item) {
-            if ($item->variant_id) {
-                // Sử dụng lockForUpdate để tránh Race Condition
-                $variant = \App\Models\ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
-                if ($variant) {
-                    $variant->increment('stock_quantity', $item->quantity);
+        if ($returnRequest && $returnRequest->items->count() > 0) {
+            // Restore ONLY specific items from return request
+            foreach ($returnRequest->items as $returnItem) {
+                $orderItem = $returnItem->orderItem;
+                if ($orderItem && $orderItem->variant_id) {
+                    $variant = \App\Models\ProductVariant::where('id', $orderItem->variant_id)->lockForUpdate()->first();
+                    if ($variant) {
+                        $variant->increment('stock_quantity', $returnItem->quantity);
+                        Log::info("Restored {$returnItem->quantity} units for variant #{$orderItem->variant_id} (ReturnRequest #{$returnRequest->id})");
+                    }
+                }
+            }
+        } else {
+            // Restore ALL items in the order (e.g. Cancelled status)
+            foreach ($order->items as $item) {
+                if ($item->variant_id) {
+                    // Sử dụng lockForUpdate để tránh Race Condition
+                    $variant = \App\Models\ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
+                    if ($variant) {
+                        $variant->increment('stock_quantity', $item->quantity);
+                        Log::info("Restored {$item->quantity} units for variant #{$item->variant_id} (Full restoration for order #{$order->id})");
+                    }
                 }
             }
         }

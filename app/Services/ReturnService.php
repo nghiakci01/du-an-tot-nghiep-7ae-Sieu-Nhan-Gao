@@ -107,19 +107,30 @@ class ReturnService
 
             // 3. Update Order Status & Payment Status
             $order = $returnRequest->order;
+            
+            // Determine if this is a full or partial return
+            $totalOrderedQty = $order->items->sum('quantity');
+            $totalReturnedQty = $returnRequest->items->sum('quantity');
+            
+            $newOrderStatus = ($totalReturnedQty >= $totalOrderedQty) 
+                ? Order::STATUS_RETURNED 
+                : Order::STATUS_PARTIALLY_RETURNED;
+            
             $this->orderService->updateOrderStatus(
                 $order, 
-                Order::STATUS_RETURNED, 
+                $newOrderStatus, 
                 $processor, 
-                'Hàng đã được hoàn trả thành công.'
+                'Hàng đã được hoàn trả thành công (Số lượng: ' . $totalReturnedQty . '/' . $totalOrderedQty . ').',
+                $returnRequest
             );
 
-            $order->update(['payment_status' => 'refunded']);
+            $paymentStatus = ($totalReturnedQty >= $totalOrderedQty) ? 'refunded' : 'partially_refunded';
+            $order->update(['payment_status' => $paymentStatus]);
 
             // 4. Notify User
             Notification::send($returnRequest->user, new OrderReturnRequestStatusNotification($returnRequest, 'completed'));
 
-            Log::info("Hoàn trả hoàn thành thành công cho đơn hàng #{$returnRequest->order_id}");
+            Log::info("Hoàn trả hoàn tất cho đơn hàng #{$returnRequest->order_id}. Số lượng: {$totalReturnedQty}/{$totalOrderedQty}");
 
             return $returnRequest;
         });
