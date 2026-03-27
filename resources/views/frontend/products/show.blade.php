@@ -882,20 +882,23 @@
                                 </div>
                                 @if(count($product->reviews) > 0)
                                     @foreach($product->reviews as $review)
-                                    <div class="product_info_inner">
-                                        <div class="product_ratting mb-10">
-                                            <ul>
+                                    <div class="product_info_inner" style="padding: 12px 0; display: flex; flex-direction: column; gap: 6px;">
+                                        {{-- Hàng 1: Tên + Ngày --}}
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <strong style="font-size: 14px; color: #222;">{{ $review->user->name ?? 'Guest' }}</strong>
+                                            <em style="font-size: 12px; color: #999;">{{ $review->created_at->format('d/m/Y') }}</em>
+                                        </div>
+                                        {{-- Hàng 2: Sao đánh giá --}}
+                                        <div class="product_ratting" style="display: block;">
+                                            <ul style="margin: 0; padding: 0; display: flex; flex-direction: row;">
                                                 @for ($i = 1; $i <= 5; $i++)
-                                                    <li><a href="javascript:void(0)"><i
-                                                                class="fa {{ $i <= $review->rating ? 'fa-star' : 'fa-star-o' }}"></i></a>
-                                                    </li>
+                                                    <li><a href="javascript:void(0)"><i class="fa {{ $i <= $review->rating ? 'fa-star' : 'fa-star-o' }}"></i></a></li>
                                                 @endfor
                                             </ul>
-                                            <strong>{{ $review->user->name ?? 'Guest' }}</strong>
-                                            <p>{{ $review->created_at->format('d/m/Y') }}</p>
                                         </div>
+                                        {{-- Hàng 3: Nội dung bình luận --}}
                                         <div class="product_demo">
-                                            <p>{{ $review->comment }}</p>
+                                            <p style="margin: 0; color: #444;">{{ $review->comment }}</p>
                                         </div>
                                     </div>
                                     <hr>
