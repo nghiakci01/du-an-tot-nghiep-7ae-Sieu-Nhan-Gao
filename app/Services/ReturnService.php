@@ -27,15 +27,28 @@ class ReturnService
         Log::info("Đang duyệt hoàn trả cho đơn hàng #{$returnRequest->order_id} bởi user #{$processor->id}");
         return DB::transaction(function () use ($returnRequest, $processor, $adminNote) {
             $returnRequest->update([
-                'status' => 'approved',
-                'admin_note' => $adminNote,
+                'status'       => 'approved',
+                'admin_note'   => $adminNote,
                 'processed_by' => $processor->id,
                 'processed_at' => now(),
             ]);
 
+            // Tự động chuyển order sang trạng thái "Khách trả hàng"
+            $order = $returnRequest->order;
+            $oldStatus = $order->status;
+            $order->update(['status' => Order::STATUS_RETURNED]);
+
+            \App\Models\OrderHistory::create([
+                'order_id'        => $order->id,
+                'user_id'         => $processor->id,
+                'previous_status' => $oldStatus,
+                'new_status'      => Order::STATUS_RETURNED,
+                'note'            => 'Admin đã duyệt yêu cầu hoàn hàng: ' . $adminNote,
+            ]);
+
             Notification::send($returnRequest->user, new OrderReturnRequestStatusNotification($returnRequest, 'approved'));
 
-            Log::info("Hoàn trả #{$returnRequest->id} đã được duyệt.");
+            Log::info("Hoàn trả #{$returnRequest->id} đã được duyệt, đơn hàng #{$order->id} chuyển sang returned.");
 
             return $returnRequest;
         });
