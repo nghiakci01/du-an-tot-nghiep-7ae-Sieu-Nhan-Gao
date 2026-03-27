@@ -739,11 +739,10 @@
         <h4><i class="bi bi-wallet2 me-2"></i>Ví của tôi</h4>
       </div>
       <div class="tab-body">
-
-
+      </div>{{-- tab-body --}}
+    </div>{{-- tab-wallet --}}
 
   </div>{{-- col-md-9 --}}
-
 
 </div>{{-- row --}}
 </div>{{-- container --}}

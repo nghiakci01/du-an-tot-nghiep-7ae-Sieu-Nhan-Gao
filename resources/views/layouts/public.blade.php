@@ -414,20 +414,20 @@
                         product_id: productId
                     },
                     success: function (response) {
-                        if (response.status === 'success' || response.status === 'info') {
+                        if (response.wishlisted) {
                             icon.removeClass('fa-heart-o').addClass('fa-heart').css('color', 'red');
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                title: response.message,
-                                showConfirmButton: false,
-                                timer: 2500,
-                                timerProgressBar: true,
-                            });
                         } else {
-                            Swal.fire({ icon: 'info', title: response.message, confirmButtonColor: '#333' });
+                            icon.removeClass('fa-heart').addClass('fa-heart-o').css('color', '');
                         }
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: response.wishlisted ? 'success' : 'info',
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 2500,
+                            timerProgressBar: true,
+                        });
                     },
                     error: function (xhr) {
                         if (xhr.status === 401) {

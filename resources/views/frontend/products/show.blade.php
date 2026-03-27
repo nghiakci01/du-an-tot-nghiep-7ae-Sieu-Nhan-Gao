@@ -797,12 +797,16 @@
                                         id="btn-buy-now">{{ __('messages.buy_now') }}</button>
                                 </div>
                             </div>
-                            <div class="product_d_action">
-                                <ul>
-                                    <li>
+                            <div class="product_d_action" style="padding: 0; margin: 8px 0 16px 0;">
+                                <ul style="padding: 0; margin: 0; list-style: none;">
+                                    <li style="padding: 0; margin: 0;">
+                                        @php $isWishlisted = in_array($product->id, $wishlistProductIds ?? []); @endphp
                                         <a href="javascript:void(0)" class="add-to-wishlist" data-id="{{ $product->id }}"
-                                            title="{{ __('messages.add_to_wishlist') }}">
-                                            <i class="fa fa-heart-o" aria-hidden="true"></i>
+                                            title="{{ __('messages.add_to_wishlist') }}"
+                                            style="padding: 0; margin: 0;">
+                                            <i class="fa {{ $isWishlisted ? 'fa-heart' : 'fa-heart-o' }}"
+                                               aria-hidden="true"
+                                               style="{{ $isWishlisted ? 'color: red;' : '' }}"></i>
                                             {{ __('messages.add_to_wishlist') }}
                                         </a>
                                     </li>
@@ -882,20 +886,23 @@
                                 </div>
                                 @if(count($product->reviews) > 0)
                                     @foreach($product->reviews as $review)
-                                    <div class="product_info_inner">
-                                        <div class="product_ratting mb-10">
-                                            <ul>
+                                    <div class="product_info_inner" style="padding: 12px 0; display: flex; flex-direction: column; gap: 6px;">
+                                        {{-- Hàng 1: Tên + Ngày --}}
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <strong style="font-size: 14px; color: #222;">{{ $review->user->name ?? 'Guest' }}</strong>
+                                            <em style="font-size: 12px; color: #999;">{{ $review->created_at->format('d/m/Y') }}</em>
+                                        </div>
+                                        {{-- Hàng 2: Sao đánh giá --}}
+                                        <div class="product_ratting" style="display: block;">
+                                            <ul style="margin: 0; padding: 0; display: flex; flex-direction: row;">
                                                 @for ($i = 1; $i <= 5; $i++)
-                                                    <li><a href="javascript:void(0)"><i
-                                                                class="fa {{ $i <= $review->rating ? 'fa-star' : 'fa-star-o' }}"></i></a>
-                                                    </li>
+                                                    <li><a href="javascript:void(0)"><i class="fa {{ $i <= $review->rating ? 'fa-star' : 'fa-star-o' }}"></i></a></li>
                                                 @endfor
                                             </ul>
-                                            <strong>{{ $review->user->name ?? 'Guest' }}</strong>
-                                            <p>{{ $review->created_at->format('d/m/Y') }}</p>
                                         </div>
-                                        <div class="product_demo">
-                                            <p>{{ $review->comment }}</p>
+                                        {{-- Hàng 3: Nội dung bình luận --}}
+                                        <div class="product_demo" style="padding: 0; margin: 0;">
+                                            <p style="margin: 0; padding: 0; color: #444;">{{ $review->comment }}</p>
                                         </div>
                                     </div>
                                     <hr>
@@ -963,14 +970,6 @@
                                                 </div>
                                                 <button type="submit">{{ __('messages.submit') }}</button>
                                             </form>
-                                        @else
-                                            <div class="alert"
-                                                style="background:#fff8e1; border-left:4px solid #f39c12; padding:15px; border-radius:4px;">
-                                                <i class="fa fa-info-circle" style="color:#f39c12;"></i>
-                                                {{ __('messages.review_purchase_required') }}
-                                                <a href="{{ route('shop') }}" class="btn btn-sm"
-                                                    style="background:#ef233c; color:#fff; margin-left:10px; padding:4px 12px; border-radius:3px;">{{ __('messages.buy_to_review') }}</a>
-                                            </div>
                                         @endif
                                     @else
                                         <p>{!! __('messages.login_to_review', [

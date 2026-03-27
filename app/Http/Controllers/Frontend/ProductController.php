@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Wishlist;
 use App\Models\Size;
 use App\Models\Tag;
 use Illuminate\Http\Request;
@@ -243,6 +244,14 @@ class ProductController extends Controller
                 ->exists();
         }
 
+        // Get wishlist product IDs for current user
+        $wishlistProductIds = [];
+        if (Auth::check()) {
+            $wishlistProductIds = Wishlist::where('user_id', Auth::id())
+                ->pluck('product_id')
+                ->toArray();
+        }
+
         // Get related products (same category, excluding current)
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
@@ -252,6 +261,6 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
-        return view('frontend.products.show', compact('product', 'relatedProducts', 'hasPurchased'));
+        return view('frontend.products.show', compact('product', 'relatedProducts', 'hasPurchased', 'wishlistProductIds'));
     }
 }

@@ -41,19 +41,24 @@ class WishlistController extends Controller
         $productId = $request->product_id;
         $userId = Auth::id();
 
-        // Check if already in wishlist
-        $exists = Wishlist::where('user_id', $userId)->where('product_id', $productId)->exists();
+        $existing = Wishlist::where('user_id', $userId)->where('product_id', $productId)->first();
 
-        if ($exists) {
-            return response()->json(['status' => 'info', 'message' => 'Sản phẩm đã có trong danh sách yêu thích!']);
+        if ($existing) {
+            $existing->delete();
+            return response()->json([
+                'status'     => 'removed',
+                'wishlisted' => false,
+                'message'    => 'Đã xóa khỏi danh sách yêu thích!',
+            ]);
         }
 
-        Wishlist::create([
-            'user_id' => $userId,
-            'product_id' => $productId,
-        ]);
+        Wishlist::create(['user_id' => $userId, 'product_id' => $productId]);
 
-        return response()->json(['status' => 'success', 'message' => 'Đã thêm vào danh sách yêu thích!']);
+        return response()->json([
+            'status'     => 'added',
+            'wishlisted' => true,
+            'message'    => 'Đã thêm vào danh sách yêu thích!',
+        ]);
     }
 
     /**
