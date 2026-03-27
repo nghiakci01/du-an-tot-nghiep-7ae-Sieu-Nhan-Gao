@@ -797,12 +797,16 @@
                                         id="btn-buy-now">{{ __('messages.buy_now') }}</button>
                                 </div>
                             </div>
-                            <div class="product_d_action">
-                                <ul>
-                                    <li>
+                            <div class="product_d_action" style="padding: 0; margin: 8px 0 16px 0;">
+                                <ul style="padding: 0; margin: 0; list-style: none;">
+                                    <li style="padding: 0; margin: 0;">
+                                        @php $isWishlisted = in_array($product->id, $wishlistProductIds ?? []); @endphp
                                         <a href="javascript:void(0)" class="add-to-wishlist" data-id="{{ $product->id }}"
-                                            title="{{ __('messages.add_to_wishlist') }}">
-                                            <i class="fa fa-heart-o" aria-hidden="true"></i>
+                                            title="{{ __('messages.add_to_wishlist') }}"
+                                            style="padding: 0; margin: 0;">
+                                            <i class="fa {{ $isWishlisted ? 'fa-heart' : 'fa-heart-o' }}"
+                                               aria-hidden="true"
+                                               style="{{ $isWishlisted ? 'color: red;' : '' }}"></i>
                                             {{ __('messages.add_to_wishlist') }}
                                         </a>
                                     </li>
@@ -897,8 +901,8 @@
                                             </ul>
                                         </div>
                                         {{-- Hàng 3: Nội dung bình luận --}}
-                                        <div class="product_demo">
-                                            <p style="margin: 0; color: #444;">{{ $review->comment }}</p>
+                                        <div class="product_demo" style="padding: 0; margin: 0;">
+                                            <p style="margin: 0; padding: 0; color: #444;">{{ $review->comment }}</p>
                                         </div>
                                     </div>
                                     <hr>
