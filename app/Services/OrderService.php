@@ -68,8 +68,6 @@ class OrderService
             } catch (Exception $e) {
                 Log::error('Failed to send shipped email for order '.$order->id.': '.$e->getMessage());
             }
-        } catch (\Exception $e) {
-            \Log::error('Failed to send notification/email for order '.$order->id.': '.$e->getMessage());
         }
 
         return $order;
