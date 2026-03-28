@@ -589,20 +589,9 @@
                                                 <i class="fa fa-credit-card"></i> VNPay (Thẻ ATM, Ví điện tử, QR Code)
                                             </label>
                                             <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
-                                                <div class="card-body1 p-3 bg-light border rounded mt-2">
-                                                    <p class="mb-3 text-dark fw-bold" style="font-size: 14px;">Tùy chọn thanh toán VNPAY:</p>
-                                                    
-                                                    <div class="form-check mb-2 ps-0 d-flex align-items-center">
-                                                        <input class="form-check-input me-2 mt-0" type="radio" name="bank_code" id="bank_vnpay" value="" checked style="width: auto;">
-                                                        <label class="form-check-label text-dark m-0 p-0 fs-6 fw-normal" for="bank_vnpay">
-                                                            Cổng thanh toán điện tử VNPAY (Mặc định)
-                                                        </label>
-                                                    </div>
-                                                    <div class="form-check mb-2 ps-0 d-flex align-items-center">
-                                                        <input class="form-check-input me-2 mt-0" type="radio" name="bank_code" id="bank_vnbank" value="VNBANK" style="width: auto;">
-                                                        <label class="form-check-label text-dark m-0 p-0 fs-6 fw-normal" for="bank_vnbank">
-                                                            Thẻ ATM / Tài khoản ngân hàng nội địa
-                                                        </label>
+                                                <div class="card-body1 p-3 bg-light rounded mt-2">
+                                                    <div class="alert alert-info py-2 mb-0 small">
+                                                        <i class="fa fa-info-circle"></i> Thanh toán an toàn qua VNPay. Bạn sẽ được chuyển hướng đến trang thanh toán VNPay sau khi nhấn "Đặt hàng".
                                                     </div>
                                                 </div>
                                             </div>
