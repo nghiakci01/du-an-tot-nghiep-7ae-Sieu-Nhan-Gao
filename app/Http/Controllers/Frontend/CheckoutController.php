@@ -418,7 +418,10 @@ class CheckoutController extends Controller
         try {
             $orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, Auth::user(), 'Khách hàng tự hủy đơn hàng từ trang thanh toán.');
 
-            return redirect()->route('shop')->with('success', 'Đơn hàng đã được hủy thành công.');
+            // Khôi phục lại giỏ hàng cho khách
+            app(\App\Services\CartService::class)->restoreOrderToCart($order);
+
+            return redirect()->route('shop')->with('success', 'Đơn hàng đã được hủy thành công. Các sản phẩm đã được hoàn lại vào giỏ hàng của bạn.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi hủy đơn hàng: ' . $e->getMessage());
         }

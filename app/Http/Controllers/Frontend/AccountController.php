@@ -151,11 +151,14 @@ class AccountController extends Controller
 
         try {
             $orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, $user, 'Customer cancelled order themselves');
+            
+            // Khôi phục lại giỏ hàng cho khách
+            app(\App\Services\CartService::class)->restoreOrderToCart($order);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', 'Order cancelled successfully!');
+        return redirect()->back()->with('success', 'Đơn hàng đã được hủy thành công. Các sản phẩm đã được hoàn lại vào giỏ hàng của bạn.');
     }
 
     public function returnOrderForm($id)
