@@ -181,6 +181,7 @@
     <p class="text-muted">Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
 
     {{-- ORDER PROGRESS STEPS --}}
+    @if(!($isVnpay && $order->payment_status == 'failed'))
     <div class="step-bar">
       <div class="step-item">
         <div class="step-circle done"><i class="bi bi-clipboard-check" style="font-size:1rem;"></i></div>
@@ -199,6 +200,7 @@
         <span class="step-label">Đã giao hàng</span>
       </div>
     </div>
+    @endif
   </div>
 
   {{-- ===== MAIN CARD ===== --}}

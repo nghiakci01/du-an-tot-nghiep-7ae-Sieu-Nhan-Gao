@@ -102,4 +102,43 @@ class CartService
             }
         });
     }
+
+    /**
+     * Khôi phục toàn bộ sản phẩm từ một đơn hàng bị hủy vào lại giỏ hàng
+     */
+    public function restoreOrderToCart(\App\Models\Order $order): void
+    {
+        $this->updateCart(function (&$cart) use ($order) {
+            foreach ($order->items as $item) {
+                $product = $item->product;
+                $variant = $item->variant;
+                
+                if (!$product || !$variant) continue;
+                
+                $vid = (string)$variant->id;
+                
+                if (isset($cart[$vid])) {
+                    $cart[$vid]['quantity'] += $item->quantity;
+                } else {
+                    $cart[$vid] = [
+                        'product_id' => $product->id,
+                        'variant_id' => $variant->id,
+                        'name' => $product->name,
+                        'quantity' => $item->quantity,
+                        'price' => $item->price, 
+                        'image' => $product->image,
+                        'size' => $variant->sizeRelationship ? $variant->sizeRelationship->name : $variant->size,
+                        'color' => $variant->colorRelationship ? $variant->colorRelationship->name : $variant->color,
+                        'size_id' => $variant->size_id,
+                        'color_id' => $variant->color_id,
+                        'slug' => $product->slug,
+                    ];
+                }
+            }
+        });
+        
+        // Kích hoạt event cập nhật số lượng badge icon giỏ hàng
+        $cartCount = array_sum(array_column($this->getCart(), 'quantity'));
+        \App\Events\CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+    }
 }
