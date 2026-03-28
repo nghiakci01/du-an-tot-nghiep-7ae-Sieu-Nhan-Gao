@@ -36,6 +36,9 @@
 
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -396,6 +399,47 @@
             display: inline-block;
         }
     </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(document).on('click', '.add-to-wishlist', function (e) {
+                e.preventDefault();
+                var productId = $(this).data('id');
+                var icon = $(this).find('i');
+
+                $.ajax({
+                    url: '{{ route("wishlist.add") }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        product_id: productId
+                    },
+                    success: function (response) {
+                        if (response.wishlisted) {
+                            icon.removeClass('fa-heart-o').addClass('fa-heart').css('color', 'red');
+                        } else {
+                            icon.removeClass('fa-heart').addClass('fa-heart-o').css('color', '');
+                        }
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: response.wishlisted ? 'success' : 'info',
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 2500,
+                            timerProgressBar: true,
+                        });
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            window.location.href = "{{ route('login') }}";
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Lỗi!', text: 'Có lỗi xảy ra, vui lòng thử lại!' });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 

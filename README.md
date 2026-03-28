@@ -20,7 +20,7 @@ composer dev
 Website được thiết kế với các tính năng:
 - Trang chủ tích hợp Theme Reid.
 - Hệ thống quản lý sản phẩm, danh mục.
-- Chatbot hỗ trợ AI tích hợp OpenAI.
+- Chatbot hỗ trợ AI tích hợp Gemini.
 - Quản lý giỏ hàng và thanh toán.
 
 ## Yêu cầu hệ thống

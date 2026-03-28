@@ -173,9 +173,20 @@
                             </span>
                         </p>
                         <p class="mb-2 small">Số tiền hoàn: <strong>{{ number_format($order->returnRequest->refund_amount) }}đ</strong></p>
-                        <a href="{{ route('admin.returns.index', ['order_id' => $order->id]) }}" class="btn btn-sm btn-info w-100">
+                        <a href="{{ route('admin.returns.index', ['order_id' => $order->id]) }}" class="btn btn-sm btn-info w-100 mb-2">
                             <i class="feather icon-external-link"></i> Xem chi tiết yêu cầu
                         </a>
+
+                        @if($order->returnRequest->videos && count($order->returnRequest->videos) > 0)
+                            <div class="mt-2 text-start">
+                                <h6 class="small fw-bold mb-1"><i class="bi bi-camera-reels me-1"></i>Video minh chứng:</h6>
+                                @foreach($order->returnRequest->videos as $vid)
+                                    <video controls style="width: 100%; max-height: 150px; border-radius: 4px; border: 1px solid #ddd;" class="mb-1">
+                                        <source src="{{ asset('storage/'.$vid) }}" type="video/mp4">
+                                    </video>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
                 @endif
                 

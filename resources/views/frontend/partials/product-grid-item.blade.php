@@ -31,8 +31,11 @@
                                         <input type="hidden" name="variant_id" value="{{ $product->variants->first()->id }}">
                                     @endif
                                 </form>
+                            <li>
+                                <a href="javascript:void(0)" class="add-to-wishlist" data-id="{{ $product->id }}" title="Add to Wishlist">
+                                    <i class="fa fa-heart-o" aria-hidden="true"></i>
+                                </a>
                             </li>
-                            <li><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
                         </ul>
                     </div>
                </div>

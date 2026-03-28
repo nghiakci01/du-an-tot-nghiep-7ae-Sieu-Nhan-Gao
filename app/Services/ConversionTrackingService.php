@@ -78,13 +78,15 @@ class ConversionTrackingService
             ->where('status', 'completed')
             ->count();
 
-        // Revenue
+        // Revenue (completed orders only - for display)
         $totalRevenue = Order::where('created_at', '>=', $startDate)
             ->where('status', 'completed')
             ->sum('final_total');
 
-        // Average order value
-        $avgOrderValue = $ordersCompleted > 0 ? $totalRevenue / $ordersCompleted : 0;
+        // Average order value: total revenue across ALL orders / total orders placed
+        $allOrdersRevenue = Order::where('created_at', '>=', $startDate)
+            ->sum('final_total');
+        $avgOrderValue = $ordersPlaced > 0 ? $allOrdersRevenue / $ordersPlaced : 0;
 
         // Abandoned cart value (potential lost revenue)
         $abandonedValue = CartAbandonment::abandoned()

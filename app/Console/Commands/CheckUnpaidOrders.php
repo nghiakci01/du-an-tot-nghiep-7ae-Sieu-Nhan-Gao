@@ -43,7 +43,7 @@ class CheckUnpaidOrders extends Command
         // Query all unpaid online orders that are not yet cancelled/failed/completed
         $orders = Order::where('payment_status', '!=', 'paid')
             ->where('payment_method', '!=', 'COD')
-            ->whereNotIn('status', [Order::STATUS_CANCELLED, Order::STATUS_FAILED, Order::STATUS_RETURNED, Order::STATUS_COMPLETED])
+            ->whereNotIn('status', [Order::STATUS_CANCELLED, Order::STATUS_FAILED, Order::STATUS_RETURNED, Order::STATUS_PARTIALLY_RETURNED, Order::STATUS_COMPLETED])
             ->get();
 
         $count = $orders->count();

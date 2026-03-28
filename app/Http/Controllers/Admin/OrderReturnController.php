@@ -7,6 +7,7 @@ use App\Models\OrderReturnRequest;
 use App\Models\User;
 use App\Services\ReturnService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class OrderReturnController extends Controller
@@ -37,60 +38,57 @@ class OrderReturnController extends Controller
 
     public function approve(Request $request, $id)
     {
-        $request->validate([
-            'admin_note' => 'required|string|max:1000'
-        ]);
-        
-        $returnReq = OrderReturnRequest::findOrFail($id);
-        // if (!$returnReq->isPending()) { // This check is now handled by the service
-        //     return redirect()->back()->with('error', 'Chỉ có thể duyệt yêu cầu đang chờ xử lý.');
-        // }
-
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
-        $this->returnService->approve($returnReq, $user, $request->admin_note);
+        try {
+            $request->validate([
+                'admin_note' => 'required|string|max:1000'
+            ]);
+            
+            /** @var \App\Models\User $user */
+            $user = auth()->user();
+            
+            $returnReq = OrderReturnRequest::findOrFail($id);
+            $this->returnService->approve($returnReq, $user, $request->admin_note);
 
             return redirect()->back()->with('success', 'Đã duyệt yêu cầu trả hàng.');
         } catch (\Exception $e) {
-            \Log::error("Approve return error: " . $e->getMessage());
+            Log::error("Approve return error: " . $e->getMessage());
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi duyệt: ' . $e->getMessage());
         }
     }
 
     public function reject(Request $request, $id)
     {
-        $request->validate([
-            'admin_note' => 'required|string|max:1000'
-        ]);
-        
-        $returnReq = OrderReturnRequest::findOrFail($id);
-        // if ($returnReq->isCompleted()) { // This check is now handled by the service
-        //     return redirect()->back()->with('error', 'Không thể từ chối yêu cầu đã hoàn thành.');
-        // }
-
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
-        $this->returnService->reject($returnReq, $user, $request->admin_note);
+        try {
+            $request->validate([
+                'admin_note' => 'required|string|max:1000'
+            ]);
+            
+            /** @var \App\Models\User $user */
+            $user = auth()->user();
+            
+            $returnReq = OrderReturnRequest::findOrFail($id);
+            $this->returnService->reject($returnReq, $user, $request->admin_note);
 
             return redirect()->back()->with('success', 'Yêu cầu trả hàng đã bị từ chối.');
         } catch (\Exception $e) {
-            \Log::error("Reject return error: " . $e->getMessage());
+            Log::error("Reject return error: " . $e->getMessage());
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi từ chối: ' . $e->getMessage());
         }
     }
 
     public function markAsShipping($id)
     {
-        $returnReq = OrderReturnRequest::findOrFail($id);
-        // if (!$returnReq->isApproved()) { // This check is now handled by the service
-        //     return redirect()->back()->with('error', 'Chỉ có thể chuyển sang trạng thái đang di chuyển khi đã duyệt.');
-        // }
-
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
-        $this->returnService->markAsShipping($returnReq, $user);
-        
-        return redirect()->back()->with('success', 'Đã cập nhật trạng thái đang di chuyển.');
+        try {
+            /** @var \App\Models\User $user */
+            $user = auth()->user();
+            
+            $returnReq = OrderReturnRequest::findOrFail($id);
+            $this->returnService->markAsShipping($returnReq, $user);
+            
+            return redirect()->back()->with('success', 'Đã cập nhật trạng thái đang di chuyển.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
     }
 
     public function markAsReceived($id)

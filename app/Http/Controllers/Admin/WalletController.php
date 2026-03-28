@@ -18,7 +18,7 @@ class WalletController extends Controller
      */
     public function index(Request $request)
     {
-        $status   = $request->get('status', 'pending');
+        $status   = $request->input('status', 'pending');
         $requests = WalletTopupRequest::with('user')
             ->when($status !== 'all', fn ($q) => $q->where('status', $status))
             ->latest()
@@ -105,7 +105,7 @@ class WalletController extends Controller
      */
     public function withdrawals(Request $request)
     {
-        $status   = $request->get('status', 'pending');
+        $status   = $request->input('status', 'pending');
         $requests = \App\Models\WalletWithdrawRequest::with(['user', 'bankAccount'])
             ->when($status !== 'all', fn ($q) => $q->where('status', $status))
             ->latest()

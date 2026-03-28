@@ -17,43 +17,54 @@ class AccountController extends Controller
 {
     public function index()
     {
-        /** @var \App\Models\User $user */
         $user = Auth::user();
 
+        $socialAccounts = collect();
+        $orders = collect();
+        $wishlists = collect();
+        $coupons = collect();
+        $addresses = collect();
+        $userBankAccounts = collect();
+        $walletTransactions = collect();
+        $walletTopupRequests = collect();
+        $walletWithdrawRequests = collect();
+        $bankSettings = BankSetting::where('is_active', true)->get();
+        $totalOrders = 0;
+        $totalSpent = 0;
+        $wishCount = 0;
+
         if ($user) {
-            $orders = $user->orders()->orderBy('created_at', 'desc')->paginate(10);
+            $orders = $user->orders()->latest()->paginate(10);
+            $wishCount = $user->wishlists()->count();
+            $wishlists = $user->wishlists()->with('product')->get();
+            $userBankAccounts = $user->bankAccounts;
+            $addresses = $user->addresses()->get();
+            
             $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
                 $q->whereNull('user_id')->orWhere('user_id', $user->id);
             })
                 ->where('is_active', true)
+                ->where('start_date', '<=', now())
                 ->where(function ($q) {
                     $q->whereNull('end_date')->orWhere('end_date', '>=', now());
                 })
                 ->whereRaw('used_count < usage_limit')
                 ->get();
-            $wishlists            = $user->wishlists()->with('product')->get();
-            $userBankAccounts     = $user->bankAccounts()->get();
+            
             $walletTransactions   = $user->walletTransactions()->take(20)->get();
             $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();
             $walletWithdrawRequests = $user->walletWithdrawRequests()->take(10)->get();
-            $bankSettings = BankSetting::where('is_active', true)->get();
-        } else {
-            $orders   = collect();
-            $coupons  = collect();
-            $wishlists = collect();
-            $userBankAccounts    = collect();
-            $walletTransactions  = collect();
-            $walletTopupRequests = collect();
-            $walletWithdrawRequests = collect();
-            $bankSettings = collect();
+
+            $totalOrders = $orders->total();
+            $totalSpent = $user->orders()->where('status', 'completed')->sum('final_total');
+            $socialAccounts = $user->socialAccounts;
         }
 
         return view('frontend.account.index', compact(
-            'user', 'orders', 'coupons', 'wishlists',
+            'user', 'orders', 'coupons', 'wishlists', 'addresses',
             'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests',
-            'bankSettings'
+            'bankSettings', 'totalOrders', 'totalSpent', 'wishCount', 'socialAccounts'
         ));
-
     }
 
     public function showOrder($id)
@@ -64,7 +75,7 @@ class AccountController extends Controller
         if ($user) {
             $order = $user->orders()->with(['items.product', 'histories'])->findOrFail($id);
         } else {
-            // Guest access verification
+            // Guest access verification (Trigger re-scan)
             if (session('verified_order_id') != $id) {
                 return redirect()->route('order-tracking.index')
                     ->with('error', 'Vui lòng xác thực thông tin đơn hàng để xem chi tiết.');
@@ -182,8 +193,37 @@ class AccountController extends Controller
             'reason' => 'required|string|max:255',
             'note' => 'nullable|string|max:1000',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video' => 'nullable|mimes:mp4,mov,ogg,qt|max:20480',
+            'videos.*' => 'nullable|file|mimes:mp4,mov,avi,webm|max:51200',
+            'items' => 'required|array',
+            'items.*.selected' => 'sometimes|boolean',
+            'items.*.quantity' => 'sometimes|integer|min:1',
         ]);
+
+        // Filter selected items and calculate refund amount
+        $selectedItems = [];
+        $totalRefund = 0;
+        
+        foreach ($request->items as $itemId => $data) {
+            if (isset($data['selected']) && $data['selected'] == 1) {
+                $orderItem = \App\Models\OrderItem::where('order_id', $order->id)->findOrFail($itemId);
+                
+                $qty = (int) ($data['quantity'] ?? 1);
+                if ($qty > $orderItem->quantity) {
+                    return redirect()->back()->with('error', "Số lượng trả của sản phẩm {$orderItem->product_name} vượt quá số lượng đã mua.");
+                }
+
+                $selectedItems[] = [
+                    'order_item_id' => $itemId,
+                    'quantity' => $qty,
+                    'price' => $orderItem->price,
+                ];
+                $totalRefund += $qty * $orderItem->price;
+            }
+        }
+
+        if (empty($selectedItems)) {
+            return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một sản phẩm để hoàn trả.');
+        }
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
@@ -205,28 +245,29 @@ class AccountController extends Controller
             }
         }
 
-        $videoPath = null;
-        if ($request->hasFile('video')) {
-            $videoPath = $request->file('video')->store('returns', 'public');
-        }
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($user, $order, $request, $imagePaths, $videoPaths, $selectedItems, $totalRefund) {
+            $returnRequest = \App\Models\OrderReturnRequest::create([
+                'user_id' => $user->id,
+                'order_id' => $order->id,
+                'reason' => $request->reason,
+                'note' => $request->note,
+                'images' => $imagePaths,
+                'videos' => $videoPaths,
+                'refund_amount' => $totalRefund,
+                'status' => 'pending',
+            ]);
 
-        $returnRequest = \App\Models\OrderReturnRequest::create([
-            'user_id' => $user->id,
-            'order_id' => $order->id,
-            'reason' => $request->reason,
-            'note' => $request->note,
-            'images' => $imagePaths,
-            'video_proof' => $videoPath,
-            'refund_amount' => $order->final_total,
-            'status' => 'pending',
-        ]);
+            foreach ($selectedItems as $itemData) {
+                $returnRequest->items()->create($itemData);
+            }
 
-        // Thông báo cho các Admin
-        $admins = \App\Models\User::getAdmins();
-        Notification::send($admins, new NewOrderReturnRequestNotification($returnRequest));
+            // Thông báo cho các Admin
+            $admins = \App\Models\User::getAdmins();
+            Notification::send($admins, new \App\Notifications\NewOrderReturnRequestNotification($returnRequest));
 
-        return redirect()->route('account.orders.show', $order->id)
-            ->with('success', 'Yêu cầu hoàn trả của bạn đã được gửi và đang chờ xử lý.');
+            return redirect()->route('account.orders.show', $order->id)
+                ->with('success', 'Yêu cầu hoàn trả của bạn đã được gửi và đang chờ xử lý.');
+        });
     }
 
 

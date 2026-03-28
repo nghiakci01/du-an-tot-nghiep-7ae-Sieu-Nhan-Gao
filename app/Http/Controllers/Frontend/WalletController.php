@@ -72,6 +72,7 @@ class WalletController extends Controller
             'user_bank_account_id' => 'required|exists:user_bank_accounts,id,user_id,' . Auth::id(),
         ]);
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         $amount = (float) $request->amount;
 

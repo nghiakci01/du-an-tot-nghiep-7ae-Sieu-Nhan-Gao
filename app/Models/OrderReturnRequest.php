@@ -15,7 +15,7 @@ class OrderReturnRequest extends Model
         'reason',
         'note',
         'images',
-        'video_proof',
+        'videos',
         'shipping_info',
         'shipping_proof',
         'status',
@@ -45,6 +45,11 @@ class OrderReturnRequest extends Model
     public function processor()
     {
         return $this->belongsTo(User::class, 'processed_by');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderReturnItem::class, 'order_return_request_id');
     }
 
     public function isPending()

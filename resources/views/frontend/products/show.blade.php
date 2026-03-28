@@ -443,6 +443,30 @@
                                 <div id="variant-message" class="text-danger mt-2 mb-3"
                                     style="font-weight: bold; display: none;"></div>
 
+                                <style>
+                                    .swatch-item.active {
+                                        border: 2px solid #ef233c !important;
+                                        color: #ef233c;
+                                        position: relative;
+                                    }
+                                    .swatch-item.active::after {
+                                        content: '✓';
+                                        position: absolute;
+                                        bottom: 0px;
+                                        right: 2px;
+                                        font-size: 10px;
+                                        line-height: 1;
+                                    }
+                                    .swatch-item.disabled-swatch {
+                                        opacity: 0.4;
+                                        background-color: #f9f9f9;
+                                        color: #999;
+                                        border: 1px dashed #ccc;
+                                        position: relative;
+                                        cursor: not-allowed;
+                                    }
+                                </style>
+
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function() {
                                         const config = document.getElementById('product-details-container').dataset;
@@ -460,24 +484,138 @@
 
                                         const originalPriceHtml = priceContainer.innerHTML;
 
+                                        // Filter swatches based on current selection
+                                        function filterSwatches() {
+                                            const selectedSize = sizeInput.value;
+                                            const selectedColor = colorInput.value;
+
+                                            if (selectedSize && selectedColor) {
+                                                // BOTH selected: dim sizes unavailable for current color,
+                                                // dim colors unavailable for current size
+                                                const availableColorsForSize = variants
+                                                    .filter(v => v.size_id == selectedSize && v.stock_quantity > 0)
+                                                    .map(v => String(v.color_id));
+                                                $('.color-swatches .swatch-item').each(function() {
+                                                    availableColorsForSize.includes(String($(this).data('value')))
+                                                        ? $(this).removeClass('disabled-swatch')
+                                                        : $(this).addClass('disabled-swatch');
+                                                });
+
+                                                const availableSizesForColor = variants
+                                                    .filter(v => v.color_id == selectedColor && v.stock_quantity > 0)
+                                                    .map(v => String(v.size_id));
+                                                $('.size-swatches .swatch-item').each(function() {
+                                                    availableSizesForColor.includes(String($(this).data('value')))
+                                                        ? $(this).removeClass('disabled-swatch')
+                                                        : $(this).addClass('disabled-swatch');
+                                                });
+                                            } else if (selectedSize) {
+                                                // Only size selected: enable all sizes, disable colors for this size
+                                                $('.size-swatches .swatch-item').removeClass('disabled-swatch');
+                                                const availableColorIds = variants
+                                                    .filter(v => v.size_id == selectedSize && v.stock_quantity > 0)
+                                                    .map(v => String(v.color_id));
+                                                $('.color-swatches .swatch-item').each(function() {
+                                                    const colorId = String($(this).data('value'));
+                                                    if (availableColorIds.includes(colorId)) {
+                                                        $(this).removeClass('disabled-swatch');
+                                                    } else {
+                                                        $(this).addClass('disabled-swatch');
+                                                    }
+                                                });
+                                            } else if (selectedColor) {
+                                                // Only color selected: enable all colors, disable sizes for this color
+                                                $('.color-swatches .swatch-item').removeClass('disabled-swatch');
+                                                const availableSizeIds = variants
+                                                    .filter(v => v.color_id == selectedColor && v.stock_quantity > 0)
+                                                    .map(v => String(v.size_id));
+                                                $('.size-swatches .swatch-item').each(function() {
+                                                    const sizeId = String($(this).data('value'));
+                                                    if (availableSizeIds.includes(sizeId)) {
+                                                        $(this).removeClass('disabled-swatch');
+                                                    } else {
+                                                        $(this).addClass('disabled-swatch');
+                                                    }
+                                                });
+                                            } else {
+                                                // Nothing selected: enable ALL
+                                                $('.size-swatches .swatch-item').removeClass('disabled-swatch');
+                                                $('.color-swatches .swatch-item').removeClass('disabled-swatch');
+                                            }
+                                        }
+
                                         // Handle Swatch changes
                                         $('.size-swatches .swatch-item').on('click', function() {
-                                            if ($(this).hasClass('disabled')) return;
+                                            // Disabled → không làm gì
+                                            if ($(this).hasClass('disabled-swatch')) return;
+
+                                            if ($(this).hasClass('active')) {
+                                                // Toggle off: bỏ chọn kích thước, reset bộ lọc màu
+                                                $(this).removeClass('active');
+                                                sizeInput.value = '';
+                                                $(niceSize).val('').trigger('change');
+                                                filterSwatches();
+                                                checkSelection();
+                                                return;
+                                            }
+
+                                            // Chọn size mới
                                             $('.size-swatches .swatch-item').removeClass('active');
                                             $(this).addClass('active');
                                             const val = $(this).data('value');
                                             sizeInput.value = val;
                                             $(niceSize).val(val).trigger('change');
+
+                                            // Nếu màu đang chọn không có trong size này → bỏ chọn màu
+                                            if (colorInput.value) {
+                                                const availableColors = variants
+                                                    .filter(v => v.size_id == val && v.stock_quantity > 0)
+                                                    .map(v => String(v.color_id));
+                                                if (!availableColors.includes(String(colorInput.value))) {
+                                                    $('.color-swatches .swatch-item').removeClass('active');
+                                                    colorInput.value = '';
+                                                    $(niceColor).val('').trigger('change');
+                                                }
+                                            }
+
+                                            filterSwatches();
                                             checkSelection();
                                         });
 
                                         $('.color-swatches .swatch-item').on('click', function() {
-                                            if ($(this).hasClass('disabled')) return;
+                                            // Disabled → không làm gì
+                                            if ($(this).hasClass('disabled-swatch')) return;
+
+                                            if ($(this).hasClass('active')) {
+                                                // Toggle off: bỏ chọn màu, reset bộ lọc size
+                                                $(this).removeClass('active');
+                                                colorInput.value = '';
+                                                $(niceColor).val('').trigger('change');
+                                                filterSwatches();
+                                                checkSelection();
+                                                return;
+                                            }
+
+                                            // Chọn màu mới
                                             $('.color-swatches .swatch-item').removeClass('active');
                                             $(this).addClass('active');
                                             const val = $(this).data('value');
                                             colorInput.value = val;
                                             $(niceColor).val(val).trigger('change');
+
+                                            // Nếu size đang chọn không có màu này → bỏ chọn size
+                                            if (sizeInput.value) {
+                                                const availableSizes = variants
+                                                    .filter(v => v.color_id == val && v.stock_quantity > 0)
+                                                    .map(v => String(v.size_id));
+                                                if (!availableSizes.includes(String(sizeInput.value))) {
+                                                    $('.size-swatches .swatch-item').removeClass('active');
+                                                    sizeInput.value = '';
+                                                    $(niceSize).val('').trigger('change');
+                                                }
+                                            }
+
+                                            filterSwatches();
                                             checkSelection();
                                         });
 
@@ -687,12 +825,16 @@
                                         id="btn-buy-now">{{ __('messages.buy_now') }}</button>
                                 </div>
                             </div>
-                            <div class="product_d_action">
-                                <ul>
-                                    <li>
-                                        <a href="#" class="add-to-wishlist" data-id="{{ $product->id }}"
-                                            title="{{ __('messages.add_to_wishlist') }}">
-                                            <i class="fa fa-heart-o" aria-hidden="true"></i>
+                            <div class="product_d_action" style="padding: 0; margin: 8px 0 16px 0;">
+                                <ul style="padding: 0; margin: 0; list-style: none;">
+                                    <li style="padding: 0; margin: 0;">
+                                        @php $isWishlisted = in_array($product->id, $wishlistProductIds ?? []); @endphp
+                                        <a href="javascript:void(0)" class="add-to-wishlist" data-id="{{ $product->id }}"
+                                            title="{{ __('messages.add_to_wishlist') }}"
+                                            style="padding: 0; margin: 0;">
+                                            <i class="fa {{ $isWishlisted ? 'fa-heart' : 'fa-heart-o' }}"
+                                               aria-hidden="true"
+                                               style="{{ $isWishlisted ? 'color: red;' : '' }}"></i>
                                             {{ __('messages.add_to_wishlist') }}
                                         </a>
                                     </li>
@@ -772,20 +914,23 @@
                                 </div>
                                 @if(count($product->reviews) > 0)
                                     @foreach($product->reviews as $review)
-                                    <div class="product_info_inner">
-                                        <div class="product_ratting mb-10">
-                                            <ul>
+                                    <div class="product_info_inner" style="padding: 12px 0; display: flex; flex-direction: column; gap: 6px;">
+                                        {{-- Hàng 1: Tên + Ngày --}}
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <strong style="font-size: 14px; color: #222;">{{ $review->user->name ?? 'Guest' }}</strong>
+                                            <em style="font-size: 12px; color: #999;">{{ $review->created_at->format('d/m/Y') }}</em>
+                                        </div>
+                                        {{-- Hàng 2: Sao đánh giá --}}
+                                        <div class="product_ratting" style="display: block;">
+                                            <ul style="margin: 0; padding: 0; display: flex; flex-direction: row;">
                                                 @for ($i = 1; $i <= 5; $i++)
-                                                    <li><a href="javascript:void(0)"><i
-                                                                class="fa {{ $i <= $review->rating ? 'fa-star' : 'fa-star-o' }}"></i></a>
-                                                    </li>
+                                                    <li><a href="javascript:void(0)"><i class="fa {{ $i <= $review->rating ? 'fa-star' : 'fa-star-o' }}"></i></a></li>
                                                 @endfor
                                             </ul>
-                                            <strong>{{ $review->user->name ?? 'Guest' }}</strong>
-                                            <p>{{ $review->created_at->format('d/m/Y') }}</p>
                                         </div>
-                                        <div class="product_demo">
-                                            <p>{{ $review->comment }}</p>
+                                        {{-- Hàng 3: Nội dung bình luận --}}
+                                        <div class="product_demo" style="padding: 0; margin: 0;">
+                                            <p style="margin: 0; padding: 0; color: #444;">{{ $review->comment }}</p>
                                         </div>
                                     </div>
                                     <hr>
@@ -853,14 +998,6 @@
                                                 </div>
                                                 <button type="submit">{{ __('messages.submit') }}</button>
                                             </form>
-                                        @else
-                                            <div class="alert"
-                                                style="background:#fff8e1; border-left:4px solid #f39c12; padding:15px; border-radius:4px;">
-                                                <i class="fa fa-info-circle" style="color:#f39c12;"></i>
-                                                {{ __('messages.review_purchase_required') }}
-                                                <a href="{{ route('shop') }}" class="btn btn-sm"
-                                                    style="background:#ef233c; color:#fff; margin-left:10px; padding:4px 12px; border-radius:3px;">{{ __('messages.buy_to_review') }}</a>
-                                            </div>
                                         @endif
                                     @else
                                         <p>{!! __('messages.login_to_review', [
@@ -984,54 +1121,6 @@
                 $('html, body').animate({
                     scrollTop: $(".product_d_info").offset().top - 100
                 }, 500);
-            });
-
-            $('.add-to-wishlist').click(function(e) {
-                e.preventDefault();
-                const config = document.getElementById('product-details-container').dataset;
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-                var productId = $(this).data('id');
-                var icon = $(this).find('i');
-
-                $.ajax({
-                    url: config.routeWishlistAdd,
-                    method: 'POST',
-                    data: {
-                        _token: csrfToken,
-                        product_id: productId
-                    },
-                    success: function(response) {
-                        if (response.status === 'success' || response.status === 'info') {
-                            // Change icon to filled heart
-                            icon.removeClass('fa-heart-o').addClass('fa-heart').css('color',
-                                'red');
-                            Swal.fire({
-                                icon: response.status,
-                                title: 'Yêu thích',
-                                text: response.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Lỗi',
-                                text: response.message
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        if (xhr.status === 401) {
-                            window.location.href = config.routeLogin;
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Lỗi',
-                                text: 'Có lỗi xảy ra, vui lòng thử lại sau!'
-                            });
-                        }
-                    }
-                });
             });
 
             // AJAX Add to Cart

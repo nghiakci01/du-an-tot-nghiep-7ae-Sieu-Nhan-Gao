@@ -33,7 +33,7 @@ class WalletService
      * Debit (subtract) money from user's wallet.
      * Returns false if insufficient balance.
      */
-    public function debit(User $user, float $amount, string $description, string $refType = null, int $refId = null): WalletTransaction|false
+    public function debit(User $user, float $amount, string $description, string $refType = null, int $refId = null): WalletTransaction|bool
     {
         if ($user->wallet_balance < $amount) {
             return false;
