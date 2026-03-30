@@ -353,11 +353,15 @@
     border-right: 0 !important;
 }
 
-/* Explicitly hide any common separator pseudo-elements in this area */
-.header_six .middel_right_info *::before,
-.header_six .middel_right_info *::after {
-    content: none !important;
+/* Explicitly hide specific structural separators to prevent hiding icon fonts (which use ::before/::after) */
+.header_six .middel_right_info > div::before,
+.header_six .middel_right_info > div::after,
+.header_six .middel_right_info .top_right > ul > li::before,
+.header_six .middel_right_info .top_right > ul > li::after,
+.header_six .search_bar form button::before,
+.header_six .search_bar form button::after {
     display: none !important;
+    content: none !important;
     border: 0 !important;
     width: 0 !important;
 }
