@@ -9,6 +9,9 @@ class VnAddressController extends Controller
     /**
      * Trả về danh sách tỉnh/thành unique (từ file JSON tĩnh)
      */
+    /**
+     * Trả về danh sách tỉnh/thành unique (từ file JSON tĩnh)
+     */
     public function provinces()
     {
         $communes = $this->loadCommunes();
@@ -19,14 +22,50 @@ class VnAddressController extends Controller
             ->values()
             ->map(fn($c) => [
                 'code' => $c['provinceCode'],
-                'name' => $c['provinceName'],
+                'name' => str_replace(['Tỉnh ', 'Thành phố '], '', $c['provinceName']),
             ]);
 
         return response()->json($provinces);
     }
 
     /**
-     * Trả về danh sách xã/phường theo provinceCode (từ file JSON tĩnh)
+     * Trả về danh sách quận/huyện theo provinceCode (Proxy tới Open API)
+     */
+    public function districts(string $provinceCode)
+    {
+        $url = "https://provinces.open-api.vn/api/p/{$provinceCode}?depth=2";
+        try {
+            $data = json_decode(file_get_contents($url), true);
+            $districts = collect($data['districts'] ?? [])->map(fn($d) => [
+                'code' => $d['code'],
+                'name' => $d['name'],
+            ]);
+            return response()->json($districts);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Could not fetch districts'], 500);
+        }
+    }
+
+    /**
+     * Trả về danh sách xã/phường theo districtCode (Proxy tới Open API)
+     */
+    public function wards(string $districtCode)
+    {
+        $url = "https://provinces.open-api.vn/api/d/{$districtCode}?depth=2";
+        try {
+            $data = json_decode(file_get_contents($url), true);
+            $wards = collect($data['wards'] ?? [])->map(fn($w) => [
+                'code' => $w['code'],
+                'name' => $w['name'],
+            ]);
+            return response()->json($wards);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Could not fetch wards'], 500);
+        }
+    }
+
+    /**
+     * Trả về danh sách xã/phường theo provinceCode (legacy)
      */
     public function communes(string $provinceCode)
     {

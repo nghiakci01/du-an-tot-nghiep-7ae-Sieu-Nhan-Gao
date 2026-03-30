@@ -15,6 +15,8 @@ class Order extends Model
         'email',
         'phone',
         'province',
+        'district',
+        'ward',
         'address',
         'status',
         'total_price',

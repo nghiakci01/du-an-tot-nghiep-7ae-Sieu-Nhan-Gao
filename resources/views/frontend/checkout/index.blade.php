@@ -447,6 +447,9 @@
 
             <form action="{{ route('checkout.store') }}" method="POST">
                 @csrf
+                <input type="hidden" name="province_name" id="province_name">
+                <input type="hidden" name="district_name" id="district_name">
+                <input type="hidden" name="ward_name" id="ward_name">
                 <div class="checkout_form">
                     <!-- STEP 1: SHIPPING DETAILS -->
                     <div id="checkout-step-1" class="checkout-step-content">
@@ -486,16 +489,16 @@
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <label class="mb-0">{{ __('messages.province_city') }} <span>*</span></label>
                                         <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-primary"
-                                            title="Sá»­ dá»¥ng vá»‹ tr­ hiá»‡n táº¡i cá»§a báº¡n">
+                                            title="Sử dụng vị trí hiện tại của bạn">
                                             <i class="fa fa-map-marker"></i> {{ __('messages.locate_me') }}
                                         </button>
                                     </div>
                                     <select name="province" id="province" required
                                         class="form-control @error('province') is-invalid @enderror">
                                         <option value="">{{ __('messages.select_province') }}</option>
-                                        @foreach($provinces as $province)
-                                            <option value="{{ $province }}" {{ (Auth::check() && str_contains(Auth::user()->address, $province)) || old('province') == $province ? 'selected' : '' }}>
-                                                {{ $province }}
+                                        @foreach($provinces as $p)
+                                            <option value="{{ $p['code'] }}" data-name="{{ $p['name'] }}" {{ (Auth::check() && str_contains(Auth::user()->address, $p['name'])) || old('province') == $p['code'] ? 'selected' : '' }}>
+                                                {{ $p['name'] }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -504,9 +507,32 @@
                                     @enderror
                                 </div>
 
+                                <div class="col-lg-6 mb-20">
+                                    <label>Quận / Huyện <span>*</span></label>
+                                    <select name="district" id="district" required
+                                        class="form-control @error('district') is-invalid @enderror">
+                                        <option value="">Chọn Quận/Huyện</option>
+                                    </select>
+                                    @error('district')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-lg-6 mb-20">
+                                    <label>Phường / Xã <span>*</span></label>
+                                    <select name="ward" id="ward" required
+                                        class="form-control @error('ward') is-invalid @enderror">
+                                        <option value="">Chọn Phường/Xã</option>
+                                    </select>
+                                    @error('ward')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
                                 <div class="col-12 mb-20">
                                     <label>{{ __('messages.shipping_address') }} <span>*</span></label>
                                     <input placeholder="{{ __('messages.street_address') }}" type="text" name="address"
+                                        id="address"
                                         value="{{ Auth::check() ? Auth::user()->address : old('address') }}" required
                                         minlength="5" class="@error('address') is-invalid @enderror">
                                     @error('address')
@@ -1039,6 +1065,63 @@
                 </div>`);
             }
 
+            // ============ ADDRESS HIERARCHY ============
+            function loadDistricts(provinceCode, selectedDistrictCode = null) {
+                if (!provinceCode) {
+                    $('#district').html('<option value="">Chọn Quận/Huyện</option>');
+                    $('#ward').html('<option value="">Chọn Phường/Xã</option>');
+                    return;
+                }
+
+                $('#district').html('<option value="">Đang tải...</option>');
+                $.get(`/api/districts/${provinceCode}`, function(data) {
+                    let html = '<option value="">Chọn Quận/Huyện</option>';
+                    data.forEach(d => {
+                        html += `<option value="${d.code}" ${selectedDistrictCode == d.code ? 'selected' : ''}>${d.name}</option>`;
+                    });
+                    $('#district').html(html);
+                    if (selectedDistrictCode) loadWards(selectedDistrictCode);
+                });
+            }
+
+            function loadWards(districtCode, selectedWardCode = null) {
+                if (!districtCode) {
+                    $('#ward').html('<option value="">Chọn Phường/Xã</option>');
+                    return;
+                }
+
+                $('#ward').html('<option value="">Đang tải...</option>');
+                $.get(`/api/wards/${districtCode}`, function(data) {
+                    let html = '<option value="">Chọn Phường/Xã</option>';
+                    data.forEach(w => {
+                        html += `<option value="${w.code}" ${selectedWardCode == w.code ? 'selected' : ''}>${w.name}</option>`;
+                    });
+                    $('#ward').html(html);
+                });
+            }
+
+            $('#province').on('change', function() {
+                const code = $(this).val();
+                const name = $(this).find('option:selected').data('name') || '';
+                $('#province_name').val(name);
+                loadDistricts(code);
+                calculateShippingFees();
+            });
+
+            $('#district').on('change', function() {
+                const code = $(this).val();
+                const name = $(this).find('option:selected').text() || '';
+                $('#district_name').val(name === 'Chọn Quận/Huyện' ? '' : name);
+                loadWards(code);
+                calculateShippingFees();
+            });
+
+            $('#ward').on('change', function() {
+                const name = $(this).find('option:selected').text() || '';
+                $('#ward_name').val(name === 'Chọn Phường/Xã' ? '' : name);
+                calculateShippingFees();
+            });
+
             // ============ FORM VALIDATION ============
             function validateName(value) {
                 if (!value || value.trim().length < 2) return 'Vui lòng nhập họ tên (ít nhất 2 ký tự)';
@@ -1060,6 +1143,14 @@
             }
             function validateProvince(value) {
                 if (!value) return 'Vui lòng chọn tỉnh thành';
+                return '';
+            }
+            function validateDistrict(value) {
+                if (!value) return 'Vui lòng chọn quận huyện';
+                return '';
+            }
+            function validateWard(value) {
+                if (!value) return 'Vui lòng chọn phường xã';
                 return '';
             }
 
@@ -1084,8 +1175,12 @@
             // ============ SHIPPING FEES CALCULATION ============
             let baseTotal = parseInt(config.baseTotal);
 
-            function calculateShippingFees(province) {
-                if (!province) {
+            function calculateShippingFees() {
+                const province = $('#province option:selected').data('name');
+                const district = $('#district option:selected').text();
+                const ward = $('#ward option:selected').text();
+
+                if (!province || !district || district === 'Chọn Quận/Huyện' || !ward || ward === 'Chọn Phường/Xã') {
                     $('#shipping_method_container').hide();
                     updateTotals(0);
                     return;
@@ -1100,8 +1195,8 @@
                     data: {
                         _token: config.csrf,
                         province: province,
-                        district: 'Quận/Huyện',
-                        ward: 'Phường/Xã',
+                        district: district,
+                        ward: ward,
                         weight: 1000
                     },
                     success: function (response) {
@@ -1121,11 +1216,9 @@
                                 `;
                             });
                             $('#shipping_options').html(html);
-
-                            // Trigger selection for the first one
                             $('input[name="shipping_provider"]:checked').trigger('change');
                         } else {
-                            $('#shipping_options').html('<div class="alert alert-warning">Không thể tính phí vận chuyển lúc này.</div>');
+                            $('#shipping_options').html('<div class="alert alert-warning">Không thể tính phí vận chuyển cho khu vực này.</div>');
                         }
                     },
                     error: function () {
@@ -1137,73 +1230,55 @@
             $(document).on('change', 'input[name="shipping_provider"]', function() {
                 let fee = $(this).data('fee');
                 let serviceName = $(this).data('service-name');
-
                 $('#hidden_shipping_fee').val(fee);
                 $('#hidden_shipping_service_name').val(serviceName);
-
                 updateTotals(fee);
             });
 
             function updateTotals(shippingFee) {
                 let finalTotal = baseTotal + parseInt(shippingFee);
-
-                // Update shipping display
                 if (shippingFee > 0) {
                     $('#shipping_fee_display').html('<strong>' + new Intl.NumberFormat('vi-VN').format(shippingFee) + ' đ</strong>');
                 } else {
                     $('#shipping_fee_display').html('<strong>Miễn phí</strong>');
                 }
-
-                // Update final total display
                 $('#final_total_display').html('<strong>' + new Intl.NumberFormat('vi-VN').format(finalTotal) + ' VND</strong>');
-
-                // Update QR code amount if banking selected
+                
                 let bankAccount = config.bankAccount;
                 let bankId = config.bankId;
                 let bankName = config.bankName;
                 let qrUrl = `https://img.vietqr.io/image/${bankId}-${bankAccount}-compact.png?amount=${finalTotal}&addInfo=THANHTOAN%20ELITE&accountName=${bankName}`;
-
-                if (bankAccount !== '0') {
-                    $('#bank_qr_image').attr('src', qrUrl);
-                }
+                if (bankAccount !== '0') $('#bank_qr_image').attr('src', qrUrl);
             }
 
-            // Trigger on load if province is already selected
-            if ($('select[name="province"]').val()) {
-                calculateShippingFees($('select[name="province"]').val());
-            }
-
-            $('select[name="province"]').on('change', function () {
-                showValidation(this, validateProvince($(this).val()));
-                calculateShippingFees($(this).val());
-            });
-
+            // ============ PAYMENT METHOD ============
             $('input[name="payment_method"]').on('change', function() {
                 var targetId = $(this).attr('data-bs-target');
-
-                // Ẩn tất cả các panel thanh toán
                 $('#method_cod, #method_bank, #method_vnpay').collapse('hide');
-
-                // Hiện panel của phương thức được chọn
                 $(targetId).collapse('show');
             });
 
-            $('input[name="name"],input[name="phone"],input[name="email"],input[name="address"],select[name="province"]').on('input change', function () {
-                if ($(this).hasClass('is-invalid')) { $(this).removeClass('is-invalid').next('.invalid-feedback').remove(); }
-            });
-
+            // ============ FORM SUBMISSION ============
             $('form').on('submit', function (e) {
+                if (currentStep !== 3) return; // Only validate on final step or let the step logic handle it
+
                 const nameError     = validateName($('input[name="name"]').val());
                 const phoneError    = validatePhone($('input[name="phone"]').val());
                 const emailError    = validateEmail($('input[name="email"]').val());
-                const provinceError = validateProvince($('select[name="province"]').val());
+                const provinceError = validateProvince($('#province').val());
+                const districtError = validateDistrict($('#district').val());
+                const wardError     = validateWard($('#ward').val());
                 const addressError  = validateAddress($('input[name="address"]').val());
+
                 showValidation('input[name="name"]', nameError);
                 showValidation('input[name="phone"]', phoneError);
                 showValidation('input[name="email"]', emailError);
-                showValidation('select[name="province"]', provinceError);
+                showValidation('#province', provinceError);
+                showValidation('#district', districtError);
+                showValidation('#ward', wardError);
                 showValidation('input[name="address"]', addressError);
-                if (nameError || phoneError || emailError || provinceError || addressError) {
+
+                if (nameError || phoneError || emailError || provinceError || districtError || wardError || addressError) {
                     e.preventDefault();
                     const firstError = $('.is-invalid').first();
                     if (firstError.length) $('html, body').animate({ scrollTop: firstError.offset().top - 100 }, 500);
@@ -1237,24 +1312,65 @@
                             success: function (data) {
                                 if (data && data.address) {
                                     const address = data.address;
-                                    let provinceName = address.city || address.province || address.state || address.town;
+                                    let provinceName = address.city || address.province || address.state || address.town || '';
+                                    let districtName = address.district || address.city_district || address.county || '';
+                                    let wardName = address.suburb || address.village || address.neighbourhood || address.quarter || '';
+                                    
                                     if (provinceName) {
                                         provinceName = provinceName.replace('Thành phố ', '').replace('Tỉnh ', '').trim();
                                         if (provinceName.toLowerCase().includes('hồ chí minh')) provinceName = 'TP Hồ Chí Minh';
-                                        let matchedProvince = '';
+                                        
+                                        let matchedProvince = null;
                                         $('#province option').each(function () {
-                                            const optionText = $(this).val();
+                                            const optionText = $(this).data('name') || '';
                                             if (provinceName.toLowerCase() === optionText.toLowerCase() || optionText.toLowerCase().includes(provinceName.toLowerCase())) {
-                                                matchedProvince = optionText; return false;
+                                                matchedProvince = $(this).val(); return false;
                                             }
                                         });
-                                        if (matchedProvince) $('#province').val(matchedProvince).trigger('change');
+
+                                        if (matchedProvince) {
+                                            $('#province').val(matchedProvince);
+                                            // Handle District and Ward matching
+                                            $('#district').html('<option value="">Đang tải...</option>');
+                                            $.get(`/api/districts/${matchedProvince}`, function(districts) {
+                                                let dHtml = '<option value="">Chọn Quận/Huyện</option>';
+                                                let matchedDistrict = null;
+                                                districts.forEach(d => {
+                                                    const clearD = d.name.replace('Quận ', '').replace('Huyện ', '').replace('Thành phố ', '').trim();
+                                                    if (districtName.toLowerCase().includes(clearD.toLowerCase()) || clearD.toLowerCase().includes(districtName.toLowerCase())) {
+                                                        matchedDistrict = d;
+                                                    }
+                                                    dHtml += `<option value="${d.code}" ${matchedDistrict && matchedDistrict.code == d.code ? 'selected' : ''}>${d.name}</option>`;
+                                                });
+                                                $('#district').html(dHtml);
+
+                                                if (matchedDistrict) {
+                                                    $('#ward').html('<option value="">Đang tải...</option>');
+                                                    $.get(`/api/wards/${matchedDistrict.code}`, function(wards) {
+                                                        let wHtml = '<option value="">Chọn Phường/Xã</option>';
+                                                        let matchedWard = null;
+                                                        wards.forEach(w => {
+                                                            const clearW = w.name.replace('Phường ', '').replace('Xã ', '').trim();
+                                                            if (wardName.toLowerCase().includes(clearW.toLowerCase()) || clearW.toLowerCase().includes(wardName.toLowerCase())) {
+                                                                matchedWard = w;
+                                                            }
+                                                            wHtml += `<option value="${w.code}" ${matchedWard && matchedWard.code == w.code ? 'selected' : ''}>${w.name}</option>`;
+                                                        });
+                                                        $('#ward').html(wHtml);
+                                                        calculateShippingFees();
+                                                    });
+                                                }
+                                            });
+                                        }
                                     }
-                                    const road = address.road || '', suburb = address.suburb || address.neighbourhood || '',
-                                          quarter = address.quarter || '', district = address.district || address.city_district || '';
-                                    const streetAddress = [road, suburb, quarter, district].filter(Boolean).join(', ');
-                                    if (streetAddress) { $('input[name="address"]').val(streetAddress); showValidation($('input[name="address"]')[0], ''); }
-                                    Swal.fire({ icon: 'success', title: 'Thành công', text: 'Đ cập nhật địa chỉ từ vị trí của bạn.', timer: 2000, showConfirmButton: false });
+
+                                    const road = address.road || '', houseNumber = address.house_number || '';
+                                    const streetAddress = [houseNumber, road].filter(Boolean).join(' ');
+                                    if (streetAddress) { 
+                                        $('input[name="address"]').val(streetAddress); 
+                                        showValidation($('input[name="address"]')[0], ''); 
+                                    }
+                                    Swal.fire({ icon: 'success', title: 'Thành công', text: 'Đã cập nhật địa chỉ từ vị trí của bạn.', timer: 2000, showConfirmButton: false });
                                 }
                             },
                             error: function () { Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể lấy thông tin địa chỉ từ tọa độ.' }); },
@@ -1263,11 +1379,17 @@
                     },
                     function (error) {
                         let message = 'Không thể lấy vị trí của bạn.';
-                        if (error.code === 1) message = 'Bạn đ từ chối quyền truy cập vị trí.';
+                        if (error.code === 1) message = 'Bạn đã từ chối quyền truy cập vị trí.';
                         else if (error.code === 2) message = 'Không thể xác định vị trí.';
                         else if (error.code === 3) message = 'Hết thời gian yêu cầu vị trí.';
                         Swal.fire({ icon: 'warning', title: 'Thông báo', text: message });
                         $btn.prop('disabled', false).html(originalHtml);
+                    },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            });
+        });
+    </script>
                     },
                     { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                 );

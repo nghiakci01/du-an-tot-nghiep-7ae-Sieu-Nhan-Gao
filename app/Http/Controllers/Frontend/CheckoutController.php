@@ -87,7 +87,7 @@ class CheckoutController extends Controller
         $shippingFee = \App\Models\Setting::getShippingFee($finalTotal);
         $finalTotal += $shippingFee;
 
-        $provinces = config('vietnam_provinces');
+        $provinces = app(\App\Http\Controllers\Api\VnAddressController::class)->provinces()->getData(true);
 
         // Lấy thông tin các tài khoản ngân hàng đang hoạt động
         $banks = \App\Models\BankSetting::where('is_active', true)->get();
@@ -183,7 +183,12 @@ class CheckoutController extends Controller
             'name' => 'required|string|max:255',
             'phone' => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
             'email' => 'required|email:rfc,dns|max:255',
-            'province' => 'required|string|in:'.implode(',', $provinces),
+            'province' => 'required',
+            'province_name' => 'required|string|in:'.implode(',', $provinces),
+            'district' => 'required',
+            'district_name' => 'required|string',
+            'ward' => 'required',
+            'ward_name' => 'required|string',
             'address' => 'required|string|max:500',
             'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
             'shipping_provider' => 'nullable|string',
@@ -194,8 +199,10 @@ class CheckoutController extends Controller
             'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
             'email.required' => 'Vui lòng nhập địa chỉ email.',
             'email.email' => 'Địa chỉ email không hợp lệ.',
-            'province.required' => 'Vui lòng chọn tỉnh thành.',
-            'province.in' => 'Tỉnh thành không hợp lệ.',
+            'province_name.required' => 'Vui lòng chọn tỉnh thành.',
+            'province_name.in' => 'Tỉnh thành không hợp lệ.',
+            'district_name.required' => 'Vui lòng chọn quận huyện.',
+            'ward_name.required' => 'Vui lòng chọn phường xã.',
         ]);
 
         $cart = $this->cartService->getCart();
@@ -252,7 +259,9 @@ class CheckoutController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'province' => $request->province,
+                'province' => $request->province_name,
+                'district' => $request->district_name,
+                'ward' => $request->ward_name,
                 'address' => $request->address,
                 'status' => 'pending',
                 'total_price' => $total,
@@ -264,7 +273,7 @@ class CheckoutController extends Controller
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
                 'payment_status' => 'pending',
-                'shipping_address' => $request->address.', '.$request->province.' - '.$request->phone.' - '.$request->name,
+                'shipping_address' => $request->address.', '.$request->ward_name.', '.$request->district_name.', '.$request->province_name.' - '.$request->phone.' - '.$request->name,
                 'note' => $request->note,
             ]);
 

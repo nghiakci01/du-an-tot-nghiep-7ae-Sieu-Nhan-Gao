@@ -8,14 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-<<<<<<< HEAD
-=======
-use App\Traits\Auditable;
 
->>>>>>> 4f71d05400f644293ba8c22639b92de9ffe4e7e6
+
 class Product extends Model
 {
-    use HasFactory, SoftDeletes, Auditable;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'category_id',
