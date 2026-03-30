@@ -279,7 +279,7 @@
                     </p>
 
 
-                    @if($order->payment_method == 'BANK_TRANSFER' && $order->payment_status == 'waiting_confirmation')
+                    @if($order->status !== \App\Models\Order::STATUS_CANCELLED && $order->payment_method == 'BANK_TRANSFER' && $order->payment_status == 'waiting_confirmation')
                         <form action="{{ route('admin.orders.confirm-payment', $order->id) }}" method="POST" onsubmit="return confirm('Bạn đã chắc chắn nhận được tiền cho đơn hàng này?')">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-success w-100">

@@ -457,7 +457,7 @@
                                 <div class="col-lg-6 mb-20">
                                     <label>{{ __('messages.full_name') }} <span>*</span></label>
                                     <input type="text" name="name"
-                                        value="{{ Auth::check() ? Auth::user()->name : old('name') }}" required
+                                        value="{{ old('name', Auth::check() ? Auth::user()->name : '') }}" required
                                         class="@error('name') is-invalid @enderror">
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -466,7 +466,7 @@
                                 <div class="col-12 mb-20">
                                     <label>{{ __('messages.phone_number') }} <span>*</span></label>
                                     <input type="tel" name="phone"
-                                        value="{{ Auth::check() ? Auth::user()->phone : old('phone') }}" required
+                                        value="{{ old('phone', Auth::check() ? Auth::user()->phone : '') }}" required
                                         pattern="^(03|05|07|08|09)\d{8}$" class="@error('phone') is-invalid @enderror">
                                     @error('phone')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -475,7 +475,7 @@
                                 <div class="col-12 mb-20">
                                     <label>{{ __('messages.email') }} <span>*</span></label>
                                     <input type="email" name="email"
-                                        value="{{ Auth::check() ? Auth::user()->email : old('email') }}" required
+                                        value="{{ old('email', Auth::check() ? Auth::user()->email : '') }}" required
                                         class="@error('email') is-invalid @enderror">
                                     @error('email')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -494,7 +494,7 @@
                                         class="form-control @error('province') is-invalid @enderror">
                                         <option value="">{{ __('messages.select_province') }}</option>
                                         @foreach($provinces as $province)
-                                            <option value="{{ $province }}" {{ (Auth::check() && str_contains(Auth::user()->address, $province)) || old('province') == $province ? 'selected' : '' }}>
+                                            <option value="{{ $province }}" {{ old('province') ? (old('province') == $province ? 'selected' : '') : (Auth::check() && str_contains(Auth::user()->address, $province) ? 'selected' : '') }}>
                                                 {{ $province }}
                                             </option>
                                         @endforeach
@@ -507,7 +507,7 @@
                                 <div class="col-12 mb-20">
                                     <label>{{ __('messages.shipping_address') }} <span>*</span></label>
                                     <input placeholder="{{ __('messages.street_address') }}" type="text" name="address"
-                                        value="{{ Auth::check() ? Auth::user()->address : old('address') }}" required
+                                        value="{{ old('address', Auth::check() ? Auth::user()->address : '') }}" required
                                         minlength="5" class="@error('address') is-invalid @enderror">
                                     @error('address')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -787,7 +787,26 @@
         $(document).ready(function () {
             const config = document.getElementById('checkout-config').dataset;
             // ============ MULTI-STEP LOGIC ============
-            let currentStep = 1;
+            let currentStep = {{ session('checkout_step', 1) }};
+
+            if (currentStep === 2) {
+                $('#checkout-step-1').hide();
+                $('#checkout-step-2').show();
+                updateProgressBar(2);
+                
+                // Trigger check inventory and shipping setup in background
+                checkInventoryAsync().then(response => {
+                    if ($('select[name="province"]').val()) {
+                        calculateShippingFees($('select[name="province"]').val());
+                    }
+                }).catch(xhr => {
+                    // if fails silently go back to step 1
+                    $('#checkout-step-2').hide();
+                    $('#checkout-step-1').show();
+                    currentStep = 1;
+                    updateProgressBar(1);
+                });
+            }
 
             function updateProgressBar(step) {
                 $('.checkout-step-item').each(function(index) {
