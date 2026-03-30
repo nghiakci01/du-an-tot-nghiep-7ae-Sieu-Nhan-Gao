@@ -215,6 +215,16 @@ class CartController extends Controller
         }
 
         $oldQuantity = $cart[$oldVariantId]['quantity'];
+        
+        // --- NEW: Limit max 10 items per variant ---
+        $existingQtyInNewVariant = isset($cart[$newVariant->id]) ? $cart[$newVariant->id]['quantity'] : 0;
+        if ($oldQuantity + $existingQtyInNewVariant > 10) {
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Thay đổi phân loại này làm tổng số lượng của sản phẩm trong giỏ vượt quá giới hạn 10.'
+             ], 400);
+        }
+        // -------------------------------------------
 
         // Determine price
         $itemPrice = $newVariant->price ?? $product->price;
@@ -326,6 +336,34 @@ class CartController extends Controller
             return redirect()->back()->with('error', $msg);
         }
 
+        // --- NEW: Limit max 10 items per product (sum of all variants) ---
+        $totalProductQtyInCart = 0;
+        foreach ($cart as $vId => $details) {
+            if (isset($details['product_id']) && $details['product_id'] == $product->id) {
+                if ($vId != $variant->id) {
+                    $totalProductQtyInCart += $details['quantity'];
+                }
+            }
+        }
+        
+        $totalQtyForProduct = $totalProductQtyInCart + $totalQty;
+
+        if ($totalQtyForProduct > 10) {
+            $alreadyInCartTotal = $totalProductQtyInCart + $existingQty;
+            $maxAllowed = 10 - $alreadyInCartTotal;
+            if ($maxAllowed <= 0) {
+                $msg = "Bạn chỉ được mua tối đa 10 sản phẩm này (tính tổng các phân loại). Bạn đã có {$alreadyInCartTotal} cái trong giỏ.";
+            } else {
+                $msg = "Bạn chỉ có thể thêm tối đa {$maxAllowed} sản phẩm này nữa, vì giới hạn mua là 10 (tổng các phân loại).";
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return redirect()->back()->with('error', $msg);
+        }
+        // -------------------------------------------
+
         $this->cartService->updateCart(function (&$cart) use ($variant, $request, $product) {
             if (isset($cart[$variant->id])) {
                 $cart[$variant->id]['quantity'] += $request->quantity;
@@ -390,6 +428,26 @@ class CartController extends Controller
         if ($request->id && $request->quantity) {
             $cart = $this->cartService->getCart();
             $variant = ProductVariant::find($request->id);
+
+            // --- NEW: Limit max 10 items per product (sum of all variants) ---
+            $totalProductQtyInCart = 0;
+            foreach ($cart as $vId => $details) {
+                if (isset($details['product_id']) && $details['product_id'] == $variant->product_id) {
+                    if ($vId != $variant->id) {
+                        $totalProductQtyInCart += $details['quantity'];
+                    }
+                }
+            }
+            
+            $totalQtyForProduct = $totalProductQtyInCart + $request->quantity;
+
+            if ($totalQtyForProduct > 10) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bạn chỉ được mua tối đa 10 sản phẩm này (tính tổng các phân loại).',
+                ], 400);
+            }
+            // -------------------------------------------
 
             if ($variant && $variant->stock_quantity >= $request->quantity) {
                 $this->cartService->updateCart(function (&$cart) use ($request) {
