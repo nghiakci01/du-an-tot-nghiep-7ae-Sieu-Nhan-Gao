@@ -26,18 +26,24 @@
         </div>
         
         <div class="notification-list" style="max-height: 350px; overflow-y: auto;">
-            @forelse($notifications as $notify)
-                <a href="{{ isset($notify->data['url']) ? $notify->data['url'] : (isset($notify->data['link']) ? $notify->data['link'] : 'javascript:void(0)') }}" 
-                   class="notify-item {{ is_null($notify->read_at) ? 'unread' : '' }}" 
-                   data-id="{{ $notify->id }}"
-                   style="display: block; padding: 12px 15px; border-bottom: 1px solid #f5f5f5; text-decoration: none; transition: background 0.2s; position: relative; {{ is_null($notify->read_at) ? 'background-color: #f4f8ff;' : 'background-color: white;' }}">
-                    
-                    @if(is_null($notify->read_at))
-                        <span class="unread-dot" style="position: absolute; right: 15px; top: 20px; width: 8px; height: 8px; background: #ef233c; border-radius: 50%;"></span>
-                    @endif
-                    
-                    <div style="font-size: 13px; color: #333; padding-right: 15px; line-height: 1.4;">
-                        {{ $notify->data['message'] ?? 'Bạn có thông báo mới' }}
+            @auth
+                @forelse($notifications as $notify)
+                    <a href="{{ isset($notify->data['url']) ? $notify->data['url'] : (isset($notify->data['link']) ? $notify->data['link'] : 'javascript:void(0)') }}" 
+                       class="notify-item {{ is_null($notify->read_at) ? 'unread' : '' }}" 
+                       data-id="{{ $notify->id }}"
+                       style="display: block; padding: 12px 15px; border-bottom: 1px solid #f5f5f5; text-decoration: none; transition: background 0.2s; position: relative; {{ is_null($notify->read_at) ? 'background-color: #f4f8ff;' : 'background-color: white;' }}">
+                        
+                        @if(is_null($notify->read_at))
+                            <span class="unread-dot" style="position: absolute; right: 15px; top: 20px; width: 8px; height: 8px; background: #ef233c; border-radius: 50%;"></span>
+                        @endif
+                        
+                        <div style="font-size: 13px; color: #333; padding-right: 15px; line-height: 1.4;">
+                            {{ $notify->data['message'] ?? 'Bạn có thông báo mới' }}
+                        </div>
+                    </a>
+                @empty
+                    <div class="p-4 text-center text-muted" style="font-size: 13px;">
+                        Chưa có thông báo nào.
                     </div>
                 @endforelse
             @else
