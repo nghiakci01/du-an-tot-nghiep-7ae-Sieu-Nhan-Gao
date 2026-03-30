@@ -50,6 +50,8 @@ class CheckoutController extends Controller
 
         // Validate tồn kho trước khi vào trang checkout
         $invalidItems = [];
+        $productQtyTracker = [];
+
         foreach ($cart as $variantId => $item) {
             $variant = ProductVariant::find($variantId);
             if (!$variant || !$variant->product) {
@@ -62,6 +64,13 @@ class CheckoutController extends Controller
             }
             if ($item['quantity'] > $variant->stock_quantity) {
                 $invalidItems[] = '“' . $item['name'] . '” - chỉ còn ' . $variant->stock_quantity . ' sản phẩm.';
+            }
+
+            // Track per-product totals to enforce 10-limit
+            $pid = $item['product_id'];
+            $productQtyTracker[$pid] = ($productQtyTracker[$pid] ?? 0) + $item['quantity'];
+            if ($productQtyTracker[$pid] > 10) {
+                $invalidItems[] = '“' . $item['name'] . '” đã vượt quá giới hạn mua tối đa 10 cái/khách hàng.';
             }
         }
 
@@ -130,6 +139,8 @@ class CheckoutController extends Controller
         }
 
         $errors = [];
+        $productQtyTracker = [];
+
         foreach ($cart as $variantId => $item) {
             $variant = ProductVariant::with('product')->find($variantId);
 
@@ -166,6 +177,18 @@ class CheckoutController extends Controller
                     'issue' => 'chỉ còn ' . $variant->stock_quantity . ' sản phẩm (bạn chọn ' . $item['quantity'] . ')',
                     'type' => 'insufficient_stock',
                     'available' => $variant->stock_quantity,
+                ];
+                continue;
+            }
+
+            // Track per-product limit
+            $pid = $item['product_id'];
+            $productQtyTracker[$pid] = ($productQtyTracker[$pid] ?? 0) + $item['quantity'];
+            if ($productQtyTracker[$pid] > 10) {
+                $errors[] = [
+                    'name' => $item['name'],
+                    'issue' => 'vượt khóa giới hạn mua 10 cái/sản phẩm.',
+                    'type' => 'exceeded_limit',
                 ];
             }
         }
@@ -226,8 +249,18 @@ class CheckoutController extends Controller
         // Giới hạn số lượng sản phẩm cho đơn COD
         if ($request->payment_method === 'COD' && $totalQuantity > 10) {
             return redirect()->back()
-                ->with('error', 'Đơn hàng COD chỉ được tối đa 10 sản phẩm. Bạn đang có ' . $totalQuantity . ' sản phẩm. Vui lòng giảm số lượng hoặc chọn phương thức thanh toán khác.')
+                ->with('error', 'Đơn hàng COD chỉ được tối đa 10 sản phẩm (hiện có ' . $totalQuantity . '). Vui lòng giảm số lượng hoặc chọn Chuyển khoản/VNPAY.')
                 ->withInput();
+        }
+
+        // Kiểm tra chặn giới hạn 10 sản phẩm TẠI MỤC THANH TOÁN (Tránh kẽ hở đã cho vào giỏ từ trước)
+        $productQtyTracker = [];
+        foreach ($cart as $details) {
+            $pid = $details['product_id'];
+            $productQtyTracker[$pid] = ($productQtyTracker[$pid] ?? 0) + $details['quantity'];
+            if ($productQtyTracker[$pid] > 10) {
+                return redirect()->route('cart.index')->with('error', 'Sản phẩm "' . $details['name'] . '" đã vượt qua giới hạn mua cho phép là 10. Vui lòng giảm số lượng trong giỏ hàng.');
+            }
         }
 
         try {

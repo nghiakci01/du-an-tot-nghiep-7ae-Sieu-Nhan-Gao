@@ -111,15 +111,41 @@ class PaymentController extends Controller
             return redirect()->route('checkout.success', $order->id)
                 ->with('success', 'Thanh toán VNPay thành công!');
         } else {
-            // Thanh toán thất bại - vẫn redirect đến trang success (hiển thị trạng thái thất bại)
+            // Thanh toán thất bại - hủy đơn hàng, khôi phục giỏ hàng và quay về trang thanh toán
             if ($order->payment_status !== 'paid') {
-                $order->update([
-                    'payment_status' => 'failed',
-                ]);
+                try {
+                    $orderService = app(\App\Services\OrderService::class);
+                    $orderService->updateOrderStatus($order, \App\Models\Order::STATUS_CANCELLED, null, 'Khách hàng hủy thanh toán VNPay.');
+                    
+                    // Khôi phục lại giỏ hàng cho khách
+                    app(\App\Services\CartService::class)->restoreOrderToCart($order);
+
+                    // Thiết lập lại session các sản phẩm đã chọn để có thể vào lại trang checkout
+                    $selectedIds = [];
+                    foreach ($order->items as $item) {
+                        $selectedIds[] = (string)$item->variant_id;
+                    }
+                    session(['selected_checkout_ids' => $selectedIds]);
+
+                    // Flash thông tin đơn hàng cũ để tự động điền form và chuyển sang bước 2
+                    session()->flashInput([
+                        'name' => $order->name,
+                        'phone' => $order->phone,
+                        'email' => $order->email,
+                        'province' => $order->province,
+                        'address' => $order->address,
+                        'note' => $order->note,
+                    ]);
+                    session()->flash('checkout_step', 2);
+                    
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Lỗi khi hủy đơn hàng VNPay (Return) #' . $order->id . ': ' . $e->getMessage());
+                    $order->update(['payment_status' => 'failed']);
+                }
             }
 
-            return redirect()->route('checkout.success', $order->id)
-                ->with('error', 'Thanh toán VNPay không thành công. Bạn có thể thử lại.');
+            return redirect()->route('checkout.index')
+                ->with('error', 'Thanh toán VNPay đã bị hủy. Bạn có thể chọn phương thức thanh toán khác hoặc thử lại.');
         }
     }
 

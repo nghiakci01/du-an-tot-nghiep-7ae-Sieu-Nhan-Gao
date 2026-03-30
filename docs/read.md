@@ -148,6 +148,8 @@ Hệ thống hoạt động trên trình duyệt web, hỗ trợ:
 #### FR-07: Quản lý thông tin cá nhân
 
 * **Actor:** User
+* **Quản lý sổ địa chỉ giao hàng:** Cho phép người dùng thêm nhiều địa chỉ nhận hàng, chọn làm địa chỉ mặc định.
+* **Tích hợp địa giới hành chính VN:** Chọn Tỉnh/Thành phố, Quận/Huyện, Phường/Xã với dữ liệu chuẩn hoá.
 
 #### FR-08: Đặt hàng
 
@@ -189,6 +191,8 @@ Hệ thống hoạt động trên trình duyệt web, hỗ trợ:
 
 * Trong vòng 7 ngày
 * Đủ điều kiện sản phẩm
+* **Yêu cầu trả hàng chi tiết:** Khách hàng có thể chọn từng sản phẩm cụ thể muốn trả (Order Return Items) và cung cấp lý do/hình ảnh minh chứng.
+* Hệ thống duyệt và quản lý trạng thái yêu cầu trả nguyên đơn hoặc trả một phần.
 
 ---
 

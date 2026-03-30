@@ -414,6 +414,82 @@
     </style>
     <script type="text/javascript">
         $(document).ready(function () {
+            // Global AJAX Add to Cart (for grid and card items)
+            $(document).on('click', '.btn-ajax-add-to-cart', function(e) {
+                e.preventDefault();
+                let formId = $(this).data('form-id');
+                let form = $('#' + formId);
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    method: form.attr('method'),
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            // Cập nhật số lượng trên icon giỏ hàng
+                            if (response.cart_count !== undefined) {
+                                let cartCountElements = document.querySelectorAll('.cart-count');
+                                cartCountElements.forEach(el => {
+                                    el.innerText = response.cart_count;
+                                    el.classList.remove('pulse-animation');
+                                    void el.offsetWidth;
+                                    el.classList.add('pulse-animation');
+                                });
+                            }
+
+                            // Cập nhật nội dung Mini Cart dropdown
+                            if (response.mini_cart_html) {
+                                $('.mini-cart-container').each(function() {
+                                    $(this).replaceWith(response.mini_cart_html);
+                                });
+                            }
+
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: response.message || 'Đã thêm vào giỏ hàng!',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                timerProgressBar: true,
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            // Missing variant or options
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Vui lòng chọn phân loại',
+                                text: 'Sản phẩm này có nhiều lựa chọn, vui lòng chọn kích thước/màu sắc trước khi thêm vào giỏ.',
+                                confirmButtonColor: '#ef233c',
+                            }).then((result) => {
+                                // Nếu sản phẩm không cấu hình sẵn form đầy đủ, chuyển hướng đến trang chi tiết
+                                let productLink = form.closest('.single_product').find('.primary_img').attr('href');
+                                if(productLink) {
+                                    window.location.href = productLink;
+                                }
+                            });
+                        } else if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.message) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Không thể thêm',
+                                text: xhr.responseJSON.message,
+                                confirmButtonColor: '#ef233c',
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: 'Đã có lỗi xảy ra, không thể thêm vào giỏ hàng!',
+                                confirmButtonColor: '#ef233c',
+                            });
+                        }
+                    }
+                });
+            });
+
+            // Add to wishlist
             $(document).on('click', '.add-to-wishlist', function (e) {
                 e.preventDefault();
                 var productId = $(this).data('id');

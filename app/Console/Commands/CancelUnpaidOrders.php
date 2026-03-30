@@ -15,30 +15,30 @@ class CancelUnpaidOrders extends Command
      *
      * @var string
      */
-    protected $signature = 'orders:cancel-unpaid {--hours=24 : Số giờ giới hạn cho đơn hàng chưa thanh toán}';
+    protected $signature = 'orders:cancel-unpaid {--minutes=60 : Số phút giới hạn cho đơn hàng chưa thanh toán}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Tự động hủy các đơn hàng thanh toán online (VNPAY, Momo...) nhưng chưa được thanh toán sau một khoảng thời gian nhất định (Mặc định: 24 giờ)';
+    protected $description = 'Tự động hủy các đơn hàng thanh toán online (VNPAY, Momo...) nhưng chưa được thanh toán sau một khoảng thời gian nhất định (Mặc định: 60 phút)';
 
     /**
      * Execute the console command.
      */
     public function handle(OrderService $orderService)
     {
-        $hours = $this->option('hours');
+        $minutes = $this->option('minutes');
 
-        // Nếu chạy không truyền params (mặc định 24), ta ưu tiên đọc từ Cài đặt Admin
-        if ($hours == 24) {
-            $settingHours = \App\Models\Setting::where('key', 'auto_cancel_unpaid_order_hours')->value('value');
-            if (is_numeric($settingHours) && $settingHours > 0) {
-                $hours = $settingHours;
+        // Nếu chạy không truyền params (mặc định 60), ta ưu tiên đọc từ Cài đặt Admin
+        if ($minutes == 60) {
+            $settingMinutes = \App\Models\Setting::where('key', 'auto_cancel_unpaid_order_minutes')->value('value');
+            if (is_numeric($settingMinutes) && $settingMinutes > 0) {
+                $minutes = $settingMinutes;
             }
         }
-        $timeLimit = Carbon::now()->subHours($hours);
+        $timeLimit = Carbon::now()->subMinutes($minutes);
 
         $this->info("Đang tìm kiếm các đơn hàng chưa thanh toán trước {$timeLimit}...");
 
@@ -67,7 +67,7 @@ class CancelUnpaidOrders extends Command
                     $order, 
                     Order::STATUS_CANCELLED, 
                     null, // User là null do hệ thống tự động chạy
-                    "Hệ thống tự động hủy đơn do quá {$hours} giờ không thanh toán."
+                    "Hệ thống tự động hủy đơn do quá {$minutes} phút không thanh toán."
                 );
 
                 $count++;

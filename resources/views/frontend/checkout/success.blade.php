@@ -105,45 +105,7 @@
     display: inline-block;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
-  .step-bar {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-    margin: 32px 0 0;
-  }
-  .step-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-    max-width: 150px;
-    position: relative;
-  }
-  .step-item:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    top: 18px;
-    left: 50%;
-    width: 100%;
-    height: 2px;
-    background: #e0e0e0;
-    z-index: 0;
-  }
-  .step-circle {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    z-index: 1;
-    position: relative;
-  }
-  .step-circle.done { background: #28a745; color: white; }
-  .step-circle.pending { background: #e9ecef; color: #aaa; }
-  .step-label { font-size: 0.72rem; margin-top: 8px; text-align: center; color: #666; }
-  .step-label.done { color: #28a745; font-weight: 600; }
+
 </style>
 @endpush
 
@@ -177,30 +139,10 @@
         Đặt hàng thành công!
       @endif
     </h2>
-    <p class="text-muted mb-0">Cảm ơn bạn đã tin tưởng mua sắm tại <strong>{{ $settings['site_title'] ?? 'Elite' }}</strong></p>
+    <p class="text-muted mb-0">Cảm ơn bạn đã tin tưởng mua sắm tại <strong>Elite Shop</strong></p>
     <p class="text-muted">Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
 
-    {{-- ORDER PROGRESS STEPS --}}
-    @if(!($isVnpay && $order->payment_status == 'failed'))
-    <div class="step-bar">
-      <div class="step-item">
-        <div class="step-circle done"><i class="bi bi-clipboard-check" style="font-size:1rem;"></i></div>
-        <span class="step-label done">Đã đặt hàng</span>
-      </div>
-      <div class="step-item">
-        <div class="step-circle pending"><i class="bi bi-box-seam" style="font-size:1rem;"></i></div>
-        <span class="step-label">Đang chuẩn bị</span>
-      </div>
-      <div class="step-item">
-        <div class="step-circle pending"><i class="bi bi-truck" style="font-size:1rem;"></i></div>
-        <span class="step-label">Đang vận chuyển</span>
-      </div>
-      <div class="step-item">
-        <div class="step-circle pending"><i class="bi bi-house-check" style="font-size:1rem;"></i></div>
-        <span class="step-label">Đã giao hàng</span>
-      </div>
-    </div>
-    @endif
+
   </div>
 
   {{-- ===== MAIN CARD ===== --}}
