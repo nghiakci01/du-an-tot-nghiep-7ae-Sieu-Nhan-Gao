@@ -142,6 +142,133 @@ document.addEventListener('DOMContentLoaded', function() {
             }).catch(console.error);
         });
     });
+
+    // Auto Refresh Notifications every 15 seconds (Real-time imitation)
+    @auth
+    setInterval(function() {
+        fetch('{{ route("notifications.list") }}', { headers: { 'Accept': 'application/json' } })
+            .then(res => res.json())
+            .then(data => {
+                const unreadCount = data.unread_count || 0;
+                const notifs = data.notifications || [];
+
+                // Update badges
+                document.querySelectorAll('.notification-toggle').forEach(toggle => {
+                    let badge = toggle.querySelector('.notification-badge');
+                    if (unreadCount > 0) {
+                        if (!badge) {
+                            badge = document.createElement('span');
+                            badge.className = 'notification-badge';
+                            badge.style.cssText = 'position: absolute; top: -2px; right: -8px; background: #ef233c; color: white; border-radius: 50%; padding: 2px 5px; font-size: 10px; font-weight: bold; line-height: 1;';
+                            toggle.appendChild(badge);
+                        }
+                        badge.style.display = 'inline-block';
+                        badge.innerText = unreadCount > 99 ? '99+' : unreadCount;
+                    } else {
+                        if (badge) badge.style.display = 'none';
+                    }
+                });
+
+                // Update mark all as read visibility
+                document.querySelectorAll('.mark-all-read').forEach(el => {
+                    if (unreadCount > 0) {
+                        el.style.display = 'inline';
+                    } else {
+                        el.style.display = 'none';
+                    }
+                });
+
+                // Re-render list
+                let html = '';
+                if (notifs.length > 0) {
+                    notifs.forEach(n => {
+                        const link = (n.data && n.data.url) ? n.data.url : ((n.data && n.data.link) ? n.data.link : 'javascript:void(0)');
+                        const message = (n.data && n.data.message) ? n.data.message : 'Bạn có thông báo mới';
+                        const isUnread = n.read_at === null;
+                        const bgStyle = isUnread ? 'background-color: #f4f8ff;' : 'background-color: white;';
+                        const unreadClass = isUnread ? 'unread' : '';
+                        
+                        html += `
+                            <a href="${link}" class="notify-item ${unreadClass}" data-id="${n.id}"
+                               style="display: block; padding: 12px 15px; border-bottom: 1px solid #f5f5f5; text-decoration: none; transition: background 0.2s; position: relative; ${bgStyle}">
+                                ${isUnread ? '<span class="unread-dot" style="position: absolute; right: 15px; top: 20px; width: 8px; height: 8px; background: #ef233c; border-radius: 50%;"></span>' : ''}
+                                <div style="font-size: 13px; color: #333; padding-right: 15px; line-height: 1.4;">
+                                    ${message}
+                                </div>
+                            </a>
+                        `;
+                    });
+                } else {
+                    html = `
+                        <div class="p-4 text-center text-muted" style="font-size: 13px;">
+                            Chưa có thông báo nào.
+                        </div>
+                    `;
+                }
+
+                document.querySelectorAll('.notification-list').forEach(list => {
+                    list.innerHTML = html;
+                    
+                    // Re-bind click event for newly injected items
+                    list.querySelectorAll('.notify-item.unread').forEach(item => {
+                        item.addEventListener('click', function(e) {
+                            const notifyId = this.dataset.id;
+                            const markUrl = '{{ url("/notifications") }}/' + notifyId + '/mark-as-read';
+                            fetch(markUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                }
+                            }).catch(console.error);
+                        });
+                    });
+                });
+
+                // --- ACCOUNT PAGE SYNC ---
+                const accountBadge = document.querySelector('.unread-badge-count');
+                if (accountBadge) {
+                    if (unreadCount > 0) {
+                        accountBadge.style.display = 'inline-block';
+                        accountBadge.innerText = unreadCount;
+                    } else {
+                        accountBadge.style.display = 'none';
+                    }
+                }
+
+                const accountTabList = document.querySelector('.notification-list-tab');
+                if (accountTabList) {
+                    let tabHtml = '';
+                    notifs.forEach(n => {
+                        const link = (n.data && n.data.url) ? n.data.url : ((n.data && n.data.link) ? n.data.link : 'javascript:void(0)');
+                        const message = (n.data && n.data.message) ? n.data.message : 'Thông báo mới';
+                        const isUnread = n.read_at === null;
+                        const dateStr = n.created_at_human || 'Mới đây';
+                        
+                        tabHtml += `
+                            <div class="notify-row d-flex align-items-center p-3 border-bottom ${isUnread ? 'bg-light' : ''}" style="position: relative; transition: background 0.2s;">
+                                <div class="flex-grow-1">
+                                    <a href="${link}" class="text-decoration-none text-dark mark-read-manual" data-id="${n.id}">
+                                        <div class="fw-semibold mb-1" style="font-size: 0.95rem;">
+                                            ${isUnread ? '<span class="badge bg-danger rounded-circle p-1 me-1" style="width:8px; height:8px; display:inline-block;"></span>' : ''}
+                                            ${message}
+                                        </div>
+                                        <div class="text-muted small"><i class="bi bi-clock me-1"></i>${dateStr}</div>
+                                    </a>
+                                </div>
+                                <div>
+                                    ${isUnread ? `<button class="btn btn-sm btn-link text-decoration-none p-0 mark-read-manual" data-id="${n.id}" title="Đánh dấu đã đọc"><i class="bi bi-check2-circle fs-5"></i></button>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    if(tabHtml !== '') {
+                        accountTabList.innerHTML = tabHtml;
+                    }
+                }
+            }).catch(console.error);
+    }, 15000); 
+    @endauth
 });
 </script>
 @endpush

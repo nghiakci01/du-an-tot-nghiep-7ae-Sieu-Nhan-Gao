@@ -13,7 +13,11 @@ class NotificationController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $notifications = $user->notifications()->take(10)->get();
+        $notifications = $user->notifications()->take(10)->get()->map(function($n) {
+            $data = $n->toArray();
+            $data['created_at_human'] = $n->created_at->diffForHumans();
+            return $data;
+        });
         $unreadCount = $user->unreadNotifications()->count();
 
         return response()->json([

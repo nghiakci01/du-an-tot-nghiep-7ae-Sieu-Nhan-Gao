@@ -201,6 +201,9 @@
                         <select name="status" class="form-select">
                             <option value="">-- Chọn thao tác --</option>
                             @foreach($allowed as $status)
+                                @if($status === \App\Models\Order::STATUS_RETURNED || $status === \App\Models\Order::STATUS_PARTIALLY_RETURNED)
+                                    @continue
+                                @endif
                                 <option value="{{ $status }}">
                                     @switch($status)
                                         @case(\App\Models\Order::STATUS_CONFIRMED) 🟢 Duyệt & Đã xác nhận @break
@@ -208,7 +211,6 @@
                                         @case(\App\Models\Order::STATUS_COMPLETED) ✅ Giao thành công (Hoàn thành) @break
                                         @case(\App\Models\Order::STATUS_CANCELLED) ❌ Hủy đơn này @break
                                         @case(\App\Models\Order::STATUS_FAILED) ⚠️ Giao thất bại @break
-                                        @case(\App\Models\Order::STATUS_RETURNED) 🔄 Khách trả hàng @break
                                         @default {{ $status }}
                                     @endswitch
                                 </option>

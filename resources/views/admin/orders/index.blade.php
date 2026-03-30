@@ -56,9 +56,11 @@
                             </option>
                             <option value="{{ \App\Models\Order::STATUS_SHIPPED }}" {{ request('status') == \App\Models\Order::STATUS_SHIPPED ? 'selected' : '' }}>Đang giao hàng
                             </option>
-                            <option value="{{ \App\Models\Order::STATUS_COMPLETED }}" {{ request('status') == \App\Models\Order::STATUS_COMPLETED ? 'selected' : '' }}>Hoàn thành
-                            </option>
+                            <option value="{{ \App\Models\Order::STATUS_COMPLETED }}" {{ request('status') == \App\Models\Order::STATUS_COMPLETED ? 'selected' : '' }}>Hoàn thành</option>
                             <option value="{{ \App\Models\Order::STATUS_CANCELLED }}" {{ request('status') == \App\Models\Order::STATUS_CANCELLED ? 'selected' : '' }}>Đã hủy</option>
+                            <option value="{{ \App\Models\Order::STATUS_RETURNED }}" {{ request('status') == \App\Models\Order::STATUS_RETURNED ? 'selected' : '' }}>Khách hoàn hàng</option>
+                            <option value="{{ \App\Models\Order::STATUS_PARTIALLY_RETURNED }}" {{ request('status') == \App\Models\Order::STATUS_PARTIALLY_RETURNED ? 'selected' : '' }}>Hoàn hàng một phần</option>
+                            <option value="{{ \App\Models\Order::STATUS_FAILED }}" {{ request('status') == \App\Models\Order::STATUS_FAILED ? 'selected' : '' }}>Thất bại</option>
                         </select>
                         <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
                     </form>
