@@ -177,7 +177,7 @@
         Đặt hàng thành công!
       @endif
     </h2>
-    <p class="text-muted mb-0">Cảm ơn bạn đã tin tưởng mua sắm tại <strong>{{ $settings['site_title'] ?? 'Elite' }}</strong></p>
+    <p class="text-muted mb-0">Cảm ơn bạn đã tin tưởng mua sắm tại <strong>Elite Shop</strong></p>
     <p class="text-muted">Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
 
     {{-- ORDER PROGRESS STEPS --}}
