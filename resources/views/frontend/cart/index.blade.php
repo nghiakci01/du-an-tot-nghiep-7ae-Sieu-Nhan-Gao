@@ -543,17 +543,18 @@
             if (val < 1 || isNaN(val)) $(this).val(1);
         });
 
-        // Update cart quantity (AJAX)
-        $(".update-cart").on('change', function (e) {
+        // Update cart quantity (AJAX) - Use delegation to be safe and handle all instances
+        $(document).on('change', '.update-cart', function (e) {
             const ele = $(this);
             const row = ele.closest("tr");
             const id = row.attr("data-id");
             const quantity = parseInt(ele.val());
             const max = parseInt(ele.attr('max')) || 100;
 
-            if (ele.data('prev-val') == quantity) return;
-            ele.data('prev-val', quantity);
-            if (quantity < 1) return;
+            if (quantity < 1) {
+                ele.val(1);
+                return;
+            }
 
             // Block nếu vượt stock (double-check trước AJAX)
             if (quantity > max) {
@@ -578,10 +579,14 @@
                         $('#cart-subtotal').text(response.cart_total);
                         $('#shipping-fee span').text(response.shipping_fee);
                         $('#cart-grand-total').text(response.grand_total);
-                        $('.cart-count').text(response.cart_count);
+                        $('.cart-count').each(function() { $(this).text(response.cart_count); });
 
-                        // Cập nhật giá trị html cho item
-                        row.find('.product_total').text(response.item_total);
+                        // Cập nhật Mini Cart HTML nếu có
+                        if (response.mini_cart_html) {
+                            $('.mini-cart-container').each(function() {
+                                $(this).replaceWith(response.mini_cart_html);
+                            });
+                        }
 
                         // Toast nhỏ xác nhận cập nhật
                         Swal.fire({
@@ -593,6 +598,7 @@
                             timer: 1500,
                         });
                     } else {
+                        // ...
                         Swal.fire({
                             icon: 'error',
                             title: 'Lỗi!',
@@ -645,7 +651,15 @@
                                 $('#cart-subtotal').text(response.cart_total);
                                 $('#shipping-fee span').text(response.shipping_fee);
                                 $('#cart-grand-total').text(response.grand_total);
-                                $('.cart-count').text(response.cart_count);
+                                $('.cart-count').each(function() { $(this).text(response.cart_count); });
+
+                                // Cập nhật Mini Cart HTML
+                                if (response.mini_cart_html) {
+                                    $('.mini-cart-container').each(function() {
+                                        $(this).replaceWith(response.mini_cart_html);
+                                    });
+                                }
+
                                 if (response.cart_count == 0) {
                                     setTimeout(function() { window.location.reload(); }, 600);
                                 }
