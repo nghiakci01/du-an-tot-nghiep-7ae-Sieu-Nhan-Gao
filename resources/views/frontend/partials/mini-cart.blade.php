@@ -10,7 +10,7 @@
     }
 @endphp
 
-<div class="cart_link" id="mini-cart-container"
+<div class="cart_link mini-cart-container"
      data-route-remove="{{ route('cart.remove') }}"
      data-csrf="{{ csrf_token() }}">
     <a href="{{ route('cart.index') }}">
@@ -117,12 +117,13 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    // Mini cart remove item
-    $('.mini-cart-remove').click(function(e) {
+    // Mini cart remove item - use delegation for AJAX-updated items
+    $(document).on('click', '.mini-cart-remove', function(e) {
         e.preventDefault();
-        var itemId = $(this).data('id');
-        var container = document.getElementById('mini-cart-container');
-        var config = container ? container.dataset : {};
+        var $btn = $(this);
+        var itemId = $btn.data('id');
+        var $container = $btn.closest('.mini-cart-container');
+        var config = $container.data();
         
             if(confirm('Remove this product from cart?')) {
                 $.ajax({

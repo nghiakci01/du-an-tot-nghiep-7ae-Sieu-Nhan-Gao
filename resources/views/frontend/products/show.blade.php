@@ -1275,17 +1275,12 @@
                                 void el.offsetWidth;
                                 el.classList.add('pulse-animation');
                             });
-                        } else {
-                            const config = document.getElementById('product-details-container').dataset;
-                            $.get(config.routeCartCount, function(res) {
-                                if (res && res.count !== undefined) {
-                                    cartCountElements.forEach(el => {
-                                        el.innerText = res.count;
-                                        el.classList.remove('pulse-animation');
-                                        void el.offsetWidth;
-                                        el.classList.add('pulse-animation');
-                                    });
-                                }
+                        }
+
+                        // Cập nhật Mini Cart HTML
+                        if (response.mini_cart_html) {
+                            $('.mini-cart-container').each(function() {
+                                $(this).replaceWith(response.mini_cart_html);
                             });
                         }
                     },

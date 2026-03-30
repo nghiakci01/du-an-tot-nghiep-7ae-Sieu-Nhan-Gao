@@ -64,7 +64,7 @@
 /* Menu items - evenly spaced */
 .header_middel .header_left .main_menu nav>ul {
     display: flex !important;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     flex-wrap: nowrap !important;
     gap: 4px;
@@ -282,8 +282,8 @@
 .header_six .middel_right_info {
     display: flex !important;
     align-items: center !important;
-    justify-content: space-between !important;
-    gap: 0 !important;
+    justify-content: flex-end !important;
+    gap: 15px !important;
     height: 100% !important;
     min-height: 50px;
     /* Ensure enough height for vertical centering */
@@ -297,9 +297,7 @@
 }
 
 .header_six .middel_right_info .top_right {
-    flex: 1 !important;
-    border-left: 1px solid #ebebeb !important;
-    border-right: 1px solid #ebebeb !important;
+    flex: 0 0 auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -312,6 +310,8 @@
     position: relative !important;
     top: auto !important;
     right: auto !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
 }
 
 .header_six .middel_right_info .cart_link {
@@ -319,6 +319,7 @@
     padding-left: 20px !important;
     flex: 0 0 auto !important;
     align-self: center !important;
+    border-left: 0 !important;
 }
 
 .header_six .middel_right_info .top_right>ul {
@@ -340,10 +341,45 @@
     position: relative !important;
 }
 
-.header_six .middel_right_info .top_right>ul>li::before {
-    display: none !important;
-    /* Block old separators */
+/* Aggressive Removal of ALL Vertical Separators in Header Right Side */
+.header_six .middel_right_info div,
+.header_six .middel_right_info ul,
+.header_six .middel_right_info li,
+.header_six .middel_right_info a,
+.header_six .middel_right_info button,
+.header_six .middel_right_info input,
+.header_six .middel_right_info .select_option {
+    border-left: 0 !important;
+    border-right: 0 !important;
 }
+
+/* Explicitly hide specific structural separators to prevent hiding icon fonts (which use ::before/::after) */
+.header_six .middel_right_info > div::before,
+.header_six .middel_right_info > div::after,
+.header_six .middel_right_info .top_right > ul > li::before,
+.header_six .middel_right_info .top_right > ul > li::after,
+.header_six .search_bar form button::before,
+.header_six .search_bar form button::after {
+    display: none !important;
+    content: none !important;
+    border: 0 !important;
+    width: 0 !important;
+}
+
+/* RESTORE outer pill shape for search bar form (only the main border) */
+.header_six .search_bar form {
+    border: 1px solid #ddd !important;
+    border-radius: 50px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* RESTORE outer pill shape for cart and account links if they use them */
+.header_six .cart_link > a {
+    border: 1px solid #ddd !important;
+    border-radius: 30px !important;
+}
+
 
 .header_six .user-account-link {
     display: flex !important;
@@ -403,3 +439,11 @@
         max-width: 80px !important;
     }
 } */
+
+/* Clean Desktop CSS Grid Settings */
+@media (min-width: 992px) {
+    /* Removing absolute positioning to prevent overlap */
+    .header_six .header_middel .header_left {
+        gap: 0 !important;
+    }
+}

@@ -378,6 +378,7 @@ class CartController extends Controller
                 'success' => true,
                 'message' => 'Sản phẩm đã được thêm vào giỏ hàng!',
                 'count' => $cartCount,
+                'mini_cart_html' => view('frontend.partials.mini-cart')->render(),
             ]);
         }
 
@@ -437,6 +438,7 @@ class CartController extends Controller
                     'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
                     'grand_total' => number_format($grandTotal) . ' đ',
                     'cart_count' => $cartCount,
+                    'mini_cart_html' => view('frontend.partials.mini-cart')->render(),
                 ]);
             }
             else {
@@ -521,6 +523,7 @@ class CartController extends Controller
                     'shipping_fee' => $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : 'Miễn phí',
                     'grand_total' => number_format($grandTotal) . ' đ',
                     'cart_count' => $cartCount,
+                    'mini_cart_html' => view('frontend.partials.mini-cart')->render(),
                 ]);
             }
         }
