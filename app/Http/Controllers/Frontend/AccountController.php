@@ -32,6 +32,7 @@ class AccountController extends Controller
         $totalOrders = 0;
         $totalSpent = 0;
         $wishCount = 0;
+        $notifications = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
 
         if ($user) {
             $orders = $user->orders()->latest()->paginate(10);
@@ -58,12 +59,15 @@ class AccountController extends Controller
             $totalOrders = $orders->total();
             $totalSpent = $user->orders()->where('status', 'completed')->sum('final_total');
             $socialAccounts = $user->socialAccounts;
+            
+            // Notifications pagination
+            $notifications = $user->notifications()->latest()->paginate(20, ['*'], 'notifications_page');
         }
 
         return view('frontend.account.index', compact(
             'user', 'orders', 'coupons', 'wishlists', 'addresses',
             'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests',
-            'bankSettings', 'totalOrders', 'totalSpent', 'wishCount', 'socialAccounts'
+            'bankSettings', 'totalOrders', 'totalSpent', 'wishCount', 'socialAccounts', 'notifications'
         ));
     }
 

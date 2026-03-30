@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Notifications\NewOrderNotification;
+use App\Notifications\OrderPlacedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -333,6 +334,11 @@ class CheckoutController extends Controller
             // Notify Admins
             $admins = User::getAdmins();
             Notification::send($admins, new NewOrderNotification($order));
+
+            // Notify User (if logged in)
+            if (Auth::check()) {
+                Auth::user()->notify(new OrderPlacedNotification($order));
+            }
 
             // Clear selected items and session
             if ($selectedIds && is_array($selectedIds)) {

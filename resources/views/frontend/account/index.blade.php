@@ -228,6 +228,14 @@
           </a>
         </li>
         <li>
+          <a href="#notifications" data-tab="notifications" class="nav-tab-link">
+            <i class="bi bi-bell"></i> Thông báo
+            @if(auth()->user()->unreadNotifications->count() > 0)
+              <span class="badge bg-danger ms-auto unread-badge-count">{{ auth()->user()->unreadNotifications->count() }}</span>
+            @endif
+          </a>
+        </li>
+        <li>
           <a href="#coupons" data-tab="coupons" class="nav-tab-link">
             <i class="bi bi-ticket-perforated"></i> Mã giảm giá
           </a>
@@ -504,6 +512,52 @@
           <div class="text-center py-5 text-muted">
             <i class="bi bi-ticket" style="font-size:3rem; color:#eee;"></i>
             <p class="mt-2">Bạn chưa có mã giảm giá nào.</p>
+          </div>
+        @endif
+      </div>
+    </div>
+
+    {{-- =============== TAB: NOTIFICATIONS =============== --}}
+    <div class="account-content tab-pane-block d-none" id="tab-notifications">
+      <div class="tab-head">
+        <h4><i class="bi bi-bell me-2"></i>Thông báo của tôi</h4>
+        @if(auth()->user()->unreadNotifications->count() > 0)
+          <button class="btn btn-sm btn-outline-danger rounded-pill px-3 mark-all-read-tab">Đánh dấu tất cả đã đọc</button>
+        @endif
+      </div>
+      <div class="tab-body p-0">
+        @if(isset($notifications) && $notifications->count() > 0)
+          <div class="notification-list-tab">
+            @foreach($notifications as $notify)
+              <div class="notify-row d-flex align-items-center p-3 border-bottom {{ is_null($notify->read_at) ? 'bg-light' : '' }}" style="position: relative; transition: background 0.2s;">
+                <div class="flex-grow-1">
+                  <a href="{{ $notify->data['url'] ?? 'javascript:void(0)' }}" class="text-decoration-none text-dark mark-read-manual" data-id="{{ $notify->id }}">
+                    <div class="fw-semibold mb-1" style="font-size: 0.95rem;">
+                      @if(is_null($notify->read_at))
+                        <span class="badge bg-danger rounded-circle p-1 me-1" style="width:8px; height:8px; display:inline-block;"></span>
+                      @endif
+                      {{ $notify->data['message'] ?? 'Thông báo mới' }}
+                    </div>
+                    <div class="text-muted small"><i class="bi bi-clock me-1"></i>{{ $notify->created_at->diffForHumans() }}</div>
+                  </a>
+                </div>
+                <div>
+                  @if(is_null($notify->read_at))
+                    <button class="btn btn-sm btn-link text-decoration-none p-0 mark-read-manual" data-id="{{ $notify->id }}" title="Đánh dấu đã đọc">
+                      <i class="bi bi-check2-circle fs-5"></i>
+                    </button>
+                  @endif
+                </div>
+              </div>
+            @endforeach
+          </div>
+          <div class="p-3 pagination-notifications">
+            {{ $notifications->appends(['notifications_page' => $notifications->currentPage()])->links('pagination::bootstrap-5') }}
+          </div>
+        @else
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-bell-slash" style="font-size:3rem; color:#eee;"></i>
+            <p class="mt-2">Bạn không có thông báo nào.</p>
           </div>
         @endif
       </div>
@@ -870,6 +924,7 @@ document.addEventListener('DOMContentLoaded', function() {
     'account-details' : 'tab-account-details',
     'bank-accounts'   : 'tab-bank-accounts',
     'wallet'          : 'tab-wallet',
+    'notifications'   : 'tab-notifications',
   };
 
   function showTab(tabId) {
@@ -1155,6 +1210,65 @@ function toggleAddrEdit(addrId) {
     view.classList.toggle('d-none', isHidden);
     edit.classList.toggle('d-none', !isHidden);
     if (isHidden) initAddrForm(addrId);
+}
+
+// Notifications mark as read manual logic for tab
+document.querySelectorAll('.mark-read-manual').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        const id = this.dataset.id;
+        if (!id) return;
+        
+        fetch('{{ url("/notifications") }}/' + id + '/mark-as-read', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        }).then(r => r.json()).then(data => {
+            if (data.status === 'success') {
+                // Find all elements for this notification in the tab and mark them as read
+                document.querySelectorAll(`.mark-read-manual[data-id="${id}"]`).forEach(el => {
+                    const row = el.closest('.notify-row');
+                    if (row) {
+                        row.classList.remove('bg-light');
+                        const badge = row.querySelector('.badge.bg-danger');
+                        if (badge) badge.remove();
+                    }
+                    const btnMark = el.closest('.mark-read-manual');
+                    if (btnMark && btnMark.tagName === 'BUTTON') btnMark.remove();
+                });
+                
+                // Update badge counts if they exist
+                const badgeCounts = document.querySelectorAll('.unread-badge-count, .notification-badge');
+                badgeCounts.forEach(bc => {
+                    let count = parseInt(bc.textContent);
+                    if (count > 0) {
+                        count--;
+                        if (count === 0) bc.remove();
+                        else bc.textContent = count;
+                    }
+                });
+            }
+        }).catch(console.error);
+    });
+});
+
+// Mark all as read within tab
+const markAllTabBtn = document.querySelector('.mark-all-read-tab');
+if (markAllTabBtn) {
+    markAllTabBtn.addEventListener('click', function() {
+        fetch('{{ route("notifications.mark_all_read") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        }).then(r => r.json()).then(data => {
+            if (data.status === 'success') {
+                window.location.reload(); // Refresh to update all badges and list
+            }
+        });
+    });
 }
 
 </script>

@@ -246,6 +246,19 @@
         }
         /* ----- ZARA STYLE OVERRIDES END ----- */
 
+        /* Sticky Header Global Styles */
+        .sticky-header.sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999 !important;
+            background: #fff !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: block !important;
+            animation: fadeInDown 0.5s ease;
+        }
+
         /* Remove underlines from header and breadcrumb links */
         .header_area a, 
         .breadcrumbs_area a, 
