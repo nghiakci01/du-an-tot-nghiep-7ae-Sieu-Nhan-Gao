@@ -54,14 +54,14 @@
             </div> 
             <div class="search_bar">
                 <form action="{{ route('search.index') }}" method="GET">
-                    <select class="select_option" name="category">
+                    <select class="select_option" name="category" aria-label="Select Category">
                         <option selected value="">{{ __('messages.all_products') }}</option>
                         @foreach($categories as $category) @php /** @var \App\Models\Category $category */ @endphp
                             <option value="{{ $category->slug }}">{{ $category->name }}</option>
                         @endforeach
                     </select>
-                    <input id="search-input-offcanvas" placeholder="{{ __('messages.search_placeholder') }}" type="text" name="q" autocomplete="off">
-                    <button type="submit"><i class="ion-ios-search-strong"></i></button>
+                    <input id="search-input-offcanvas" placeholder="{{ __('messages.search_placeholder') }}" type="text" name="q" autocomplete="off" aria-label="Search">
+                    <button type="submit" aria-label="Submit Search"><i class="ion-ios-search-strong"></i></button>
                 </form>
                 <div id="search-suggestions-offcanvas" class="search-suggestions-dropdown"></div>
             </div>
@@ -113,19 +113,20 @@
                                                 <a href="{{ route('shop') }}">{{ __('messages.shop') }} <i class="fa fa-angle-down"></i></a>
                                                 <style>
                                                     .custom-shop-mega {
-                                                        width: 800px !important;
+                                                        width: 900px !important;
                                                         padding: 30px !important;
                                                         background: #fff;
                                                         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
                                                         border-radius: 0 0 8px 8px;
                                                         /* Override theme's display block on hover slightly to allow flex */
                                                     }
-                                                    .mega_items:hover .custom-shop-mega {
+                                                    .header_area .mega_items:hover .custom-shop-mega,
+                                                    .sticky-header .mega_items:hover .custom-shop-mega {
                                                         display: flex !important;
                                                     }
                                                     .custom-shop-mega-left {
-                                                        flex: 0 0 25% !important;
-                                                        max-width: 25% !important;
+                                                        flex: 0 0 40% !important;
+                                                        max-width: 40% !important;
                                                         border-right: 1px solid #ebebeb;
                                                         padding-right: 15px;
                                                     }
@@ -133,25 +134,39 @@
                                                         list-style: none;
                                                         padding: 0;
                                                         margin: 0;
+                                                        display: grid;
+                                                        grid-template-columns: repeat(2, 1fr);
+                                                        gap: 15px 10px;
                                                     }
                                                     .custom-shop-mega-left li {
-                                                        margin-bottom: 20px !important;
+                                                        margin-bottom: 0 !important;
+                                                        float: none !important;
+                                                        width: auto !important;
+                                                        border: none !important;
+                                                        padding: 0 !important;
                                                     }
                                                     .custom-shop-mega-left a {
                                                         color: #333 !important;
-                                                        font-size: 15px !important;
-                                                        font-weight: 600 !important;
+                                                        font-size: 14px !important;
+                                                        font-weight: 400 !important;
                                                         text-decoration: none;
                                                         transition: color 0.3s;
                                                         display: block;
                                                         line-height: 1.4;
                                                     }
+                                                    .custom-shop-mega-left .parent-cat-link {
+                                                        font-weight: 700 !important;
+                                                        font-size: 15px !important;
+                                                        color:  !important;
+                                                        margin-bottom: 8px !important;
+                                                        text-transform: uppercase;
+                                                    }
                                                     .custom-shop-mega-left a:hover {
                                                         color: #ef233c !important;
                                                     }
                                                     .custom-shop-mega-right {
-                                                        flex: 0 0 75% !important;
-                                                        max-width: 75% !important;
+                                                        flex: 0 0 60% !important;
+                                                        max-width: 60% !important;
                                                         padding-left: 15px;
                                                         display: flex !important;
                                                         gap: 15px;
@@ -189,7 +204,20 @@
                                                     <li class="custom-shop-mega-left">
                                                         <ul>
                                                             @foreach($categories as $category) @php /** @var \App\Models\Category $category */ @endphp
-                                                                <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                                                <li>
+                                                                    <a href="{{ route('shop', ['category' => $category->slug]) }}" class="parent-cat-link">{{ $category->name }}</a>
+                                                                    @if($category->children->count() > 0)
+                                                                        <ul style="display: block; padding-left: 0; margin-bottom: 20px;">
+                                                                            @foreach($category->children as $child)
+                                                                                <li style="margin-bottom: 8px !important;">
+                                                                                    <a href="{{ route('shop', ['category' => $child->slug]) }}"><i class="fa fa-angle-right" style="margin-right: 5px; font-size: 12px; color: #999;"></i> {{ $child->name }}</a>
+                                                                                </li>
+                                                                            @endforeach
+                                                                        </ul>
+                                                                    @else
+                                                                        <div style="margin-bottom: 20px;"></div>
+                                                                    @endif
+                                                                </li>
                                                             @endforeach
                                                         </ul>
                                                     </li>
@@ -201,7 +229,7 @@
                                                         <div class="custom-shop-product">
                                                             <a href="{{ route('product.detail', $product->slug) }}">
                                                                 <div class="custom-shop-product-img">
-                                                                    <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('frontend-assets/img/product/product1.jpg') }}" alt="{{ $product->name }}">
+                                                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                                                 </div>
                                                                 <h5>{{ Str::limit($product->name, 25) }}</h5>
                                                             </a>
@@ -225,8 +253,8 @@
                             <div class="middel_right_info">
                                 <div class="search_bar" style="position: relative;">
                                     <form action="{{ route('search.index') }}" method="GET">                          
-                                        <input id="search-input-desktop" placeholder="{{ __('messages.search_placeholder') }}" type="text" name="q" autocomplete="off">
-                                        <button type="submit"><i class="ion-ios-search-strong"></i></button>
+                                        <input id="search-input-desktop" placeholder="{{ __('messages.search_placeholder') }}" type="text" name="q" autocomplete="off" aria-label="Search">
+                                        <button type="submit" aria-label="Submit Search"><i class="ion-ios-search-strong"></i></button>
                                     </form>
                                     <div id="search-suggestions-desktop" class="search-suggestions-dropdown"></div>
                                 </div>
@@ -267,6 +295,7 @@
                                         </li> 
                                     </ul>
                                 </div>   
+                                @include('frontend.partials.notification-bell')
                                 @include('frontend.partials.mini-cart')
                             </div>
                         </div>
@@ -293,7 +322,20 @@
                                                     <li class="custom-shop-mega-left">
                                                         <ul>
                                                             @foreach($categories as $category) @php /** @var \App\Models\Category $category */ @endphp
-                                                                <li><a href="{{ route('shop', ['category' => $category->slug]) }}">{{ $category->name }}</a></li>
+                                                                <li>
+                                                                    <a href="{{ route('shop', ['category' => $category->slug]) }}" class="parent-cat-link">{{ $category->name }}</a>
+                                                                    @if($category->children->count() > 0)
+                                                                        <ul style="display: block; padding-left: 0; margin-bottom: 20px;">
+                                                                            @foreach($category->children as $child)
+                                                                                <li style="margin-bottom: 8px !important;">
+                                                                                    <a href="{{ route('shop', ['category' => $child->slug]) }}"><i class="fa fa-angle-right" style="margin-right: 5px; font-size: 12px; color: #999;"></i> {{ $child->name }}</a>
+                                                                                </li>
+                                                                            @endforeach
+                                                                        </ul>
+                                                                    @else
+                                                                        <div style="margin-bottom: 20px;"></div>
+                                                                    @endif
+                                                                </li>
                                                             @endforeach
                                                         </ul>
                                                     </li>
@@ -305,7 +347,7 @@
                                                         <div class="custom-shop-product">
                                                             <a href="{{ route('product.detail', $product->slug) }}">
                                                                 <div class="custom-shop-product-img">
-                                                                    <img src="{{ $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('frontend-assets/img/product/product1.jpg') }}" alt="{{ $product->name }}">
+                                                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                                                 </div>
                                                                 <h5>{{ Str::limit($product->name, 25) }}</h5>
                                                             </a>

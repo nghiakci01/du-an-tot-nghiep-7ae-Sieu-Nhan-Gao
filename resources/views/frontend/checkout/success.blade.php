@@ -153,6 +153,7 @@
   $displayTotal = ($order->final_total > 0) ? $order->final_total : ($order->total_price + $shippingFee);
   $isBankTransfer = $order->payment_method == 'BANK_TRANSFER';
   $isVnpay = $order->payment_method == 'VNPAY';
+  $isPaymentPending = in_array($order->payment_status, ['pending', 'failed']);
 @endphp
 
 <div class="success-page-wrapper">
@@ -161,21 +162,26 @@
   {{-- ===== SUCCESS HEADER ===== --}}
   <div class="text-center mb-5">
     <div class="success-icon-animate d-inline-block mb-3">
-      <div style="width:90px;height:90px;background:linear-gradient(135deg,@if($isBankTransfer && $order->payment_status == 'pending') #ffc107, #ff9800 @else #28a745,#20c997 @endif);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 8px 24px rgba(@if($isBankTransfer && $order->payment_status == 'pending') 255,193,7,0.3 @else 40,167,69,0.3 @endif);">
-        <i class="bi @if($isBankTransfer && $order->payment_status == 'pending') bi-clock-history @else bi-check-lg @endif text-white" style="font-size:2.8rem;"></i>
+      <div style="width:90px;height:90px;background:linear-gradient(135deg,@if(($isBankTransfer && $order->payment_status == 'pending') || ($isVnpay && $order->payment_status == 'pending')) #ffc107, #ff9800 @elseif($isVnpay && $order->payment_status == 'failed') #dc3545, #c82333 @else #28a745,#20c997 @endif);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 8px 24px rgba(@if(($isBankTransfer && $order->payment_status == 'pending') || ($isVnpay && $order->payment_status == 'pending')) 255,193,7,0.3 @elseif($isVnpay && $order->payment_status == 'failed') 220,53,69,0.3 @else 40,167,69,0.3 @endif);">
+        <i class="bi @if(($isBankTransfer && $order->payment_status == 'pending') || ($isVnpay && $order->payment_status == 'pending')) bi-clock-history @elseif($isVnpay && $order->payment_status == 'failed') bi-x-lg @else bi-check-lg @endif text-white" style="font-size:2.8rem;"></i>
       </div>
     </div>
     <h2 class="fw-bold mb-1" style="font-size:2rem;">
       @if($isBankTransfer && $order->payment_status == 'pending')
         Chờ thanh toán
+      @elseif($isVnpay && $order->payment_status == 'failed')
+        Thanh toán thất bại
+      @elseif($isVnpay && $order->payment_status == 'pending')
+        Chờ thanh toán
       @else
         Đặt hàng thành công!
       @endif
     </h2>
-    <p class="text-muted mb-0">Cảm ơn bạn đã tin tưởng mua sắm tại <strong>{{ $settings['site_title'] ?? 'Elite' }}</strong></p>
+    <p class="text-muted mb-0">Cảm ơn bạn đã tin tưởng mua sắm tại <strong>Elite Shop</strong></p>
     <p class="text-muted">Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
 
     {{-- ORDER PROGRESS STEPS --}}
+    @if(!(($isBankTransfer && $order->payment_status == 'pending') || ($isVnpay && in_array($order->payment_status, ['pending', 'failed']))))
     <div class="step-bar">
       <div class="step-item">
         <div class="step-circle done"><i class="bi bi-clipboard-check" style="font-size:1rem;"></i></div>
@@ -194,6 +200,7 @@
         <span class="step-label">Đã giao hàng</span>
       </div>
     </div>
+    @endif
   </div>
 
   {{-- ===== MAIN CARD ===== --}}
@@ -212,14 +219,20 @@
             <div class="order-badge">
               @if($order->payment_method == 'COD') 💵 Thanh toán khi nhận hàng
               @elseif($order->payment_method == 'BANK_TRANSFER') 🏦 Chuyển khoản ngân hàng
-              @elseif($order->payment_method == 'VNPAY') 💳 Thanh toán VNPAY
+              @elseif($order->payment_method == 'VNPAY') 💳 Thanh toán VNPay
               @else {{ $order->payment_method }}
               @endif
             </div>
             <div class="mt-2">
-              <span class="badge" style="background:rgba(40,167,69,0.3);color:#a3f7bf;font-size:0.85rem;padding:6px 14px;border-radius:50px;">
-                ✅ {{ ucfirst($order->status ?? 'pending') }}
-              </span>
+              @if(($order->status ?? 'pending') == 'pending')
+                <span class="badge" style="background:rgba(255, 193, 7, 0.2);color:#d4860a;font-size:0.85rem;padding:6px 14px;border-radius:50px;">
+                  ⏳ {{ ucfirst($order->status ?? 'pending') }}
+                </span>
+              @else
+                <span class="badge" style="background:rgba(40, 167, 69, 0.2);color:#28a745;font-size:0.85rem;padding:6px 14px;border-radius:50px;">
+                  ✅ {{ ucfirst($order->status ?? 'pending') }}
+                </span>
+              @endif
             </div>
           </div>
         </div>
@@ -291,6 +304,16 @@
 
             {{-- BANK TRANSFER INFO --}}
             @if($isBankTransfer)
+            @php
+                $bank = $order->bankSetting;
+                if (!$bank) {
+                    $bank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first() ?: \App\Models\BankSetting::where('is_active', true)->first();
+                }
+                $bName = $bank?->bank_name ?? 'N/A';
+                $bAccount = $bank?->account_number ?? 'N/A';
+                $bOwner = $bank?->account_name ?? 'N/A';
+                $bId = $bank?->bank_id ?? '';
+            @endphp
             <div class="col-12">
               <div class="p-4 rounded-4 @if($order->payment_status == 'waiting_confirmation') bg-light-success @else bank-info-box @endif">
                 <div class="row align-items-center">
@@ -300,15 +323,15 @@
                       <p class="fw-bold mb-3" style="color:#d4860a;">⚠️ Vui lòng chuyển khoản và nhấn nút xác nhận bên dưới.</p>
                       <div class="bank-info-row">
                         <span class="text-muted">Ngân hàng</span>
-                        <span class="fw-semibold">{{ $bankName }}</span>
+                        <span class="fw-semibold">{{ $bName }}</span>
                       </div>
                       <div class="bank-info-row">
                         <span class="text-muted">Số tài khoản</span>
-                        <span class="fw-bold text-dark">{{ $bankAccount }}</span>
+                        <span class="fw-bold text-dark">{{ $bAccount }}</span>
                       </div>
                       <div class="bank-info-row">
                         <span class="text-muted">Chủ tài khoản</span>
-                        <span class="fw-semibold">{{ $bankOwner }}</span>
+                        <span class="fw-semibold">{{ $bOwner }}</span>
                       </div>
                       <div class="bank-info-row">
                         <span class="text-muted">Số tiền</span>
@@ -316,7 +339,7 @@
                       </div>
                       <div class="bank-info-row" style="border-bottom:none;">
                         <span class="text-muted">Nội dung CK</span>
-                        <span class="fw-bold text-danger">THANHTOAN DH{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
+                        <span class="fw-bold text-danger">THANHTOAN ELITE {{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
                       </div>
 
                       <div class="mt-4 d-flex gap-2">
@@ -354,7 +377,7 @@
                   <div class="col-md-5 text-center mt-4 mt-md-0">
                     <div class="qr-holder">
                       @php
-                        $qrUrl = "https://img.vietqr.io/image/{$bankId}-{$bankAccount}-compact2.png?amount={$displayTotal}&addInfo=THANHTOAN%20DH{$order->id}&accountName=" . urlencode($bankOwner);
+                        $qrUrl = "https://img.vietqr.io/image/{$bId}-{$bAccount}-compact2.png?amount={$displayTotal}&addInfo=THANHTOAN%20ELITE%20{$order->id}&accountName=" . urlencode($bOwner);
                       @endphp
                       <img src="{{ $qrUrl }}" alt="VietQR" class="img-fluid" style="max-width: 190px;">
                     </div>
@@ -365,27 +388,60 @@
             </div>
             @endif
 
-            {{-- VNPAY PAYMENT SUCCESS INFO --}}
+            {{-- VNPAY PAYMENT STATUS --}}
             @if($isVnpay)
             <div class="col-12">
-              <div class="p-4 rounded-3" style="background: linear-gradient(135deg,#e8f5e9,#f1f8e9); border: 1.5px solid #a5d6a7;">
-                <div class="d-flex align-items-center gap-3">
-                  <div style="width:52px;height:52px;background:#28a745;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i class="bi bi-shield-check text-white" style="font-size:1.4rem;"></i>
+              @if($order->payment_status == 'paid')
+              <div class="p-4 rounded-4" style="background: #e8f5e9; border: 1px solid #a5d6a7;">
+                <div class="text-center py-3">
+                  <div class="mb-3">
+                    <i class="bi bi-patch-check-fill text-success" style="font-size: 3rem;"></i>
                   </div>
-                  <div>
-                    <div class="fw-bold" style="color:#1b5e20;font-size:1.05rem;">Thanh toán VNPAY thành công! 🎉</div>
-                    <div class="text-muted small">Số tiền: <strong class="text-danger">{{ number_format($displayTotal) }}&thinsp;đ</strong>
-                      @if($order->transaction_id)
-                        &nbsp;&bull;&nbsp; Mã giao dịch: <code>{{ $order->transaction_id }}</code>
-                      @endif
+                  <h5 class="fw-bold">Thanh toán VNPay thành công</h5>
+                  <p class="text-muted mb-1">Mã giao dịch: <strong class="text-dark">{{ $order->transaction_id }}</strong></p>
+                  <p class="text-muted mb-0">Đơn hàng của bạn đang được chuẩn bị. Cảm ơn bạn đã mua hàng!</p>
+                </div>
+              </div>
+              @elseif($order->payment_status == 'failed')
+              <div class="p-4 rounded-4" style="background: #fef2f2; border: 1px solid #fca5a5;">
+                <div class="row align-items-center">
+                  <div class="col-md-7">
+                    <div class="mb-3">
+                      <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 2.5rem;"></i>
                     </div>
-                    <div class="text-muted small mt-1">Trạng thái đơn hàng đã được cập nhật. Chúng tôi sẽ xử lý ngay!</div>
+                    <h5 class="fw-bold text-danger">Thanh toán VNPay không thành công</h5>
+                    <p class="text-muted">Giao dịch thanh toán qua VNPay đã bị hủy hoặc gặp lỗi. Bạn có thể thử thanh toán lại bằng cách nhấn nút bên dưới.</p>
+                    <div class="d-flex gap-2 flex-wrap">
+                      <a href="{{ route('payment.vnpay.retry', $order->id) }}" class="btn btn-danger px-4 py-2 rounded-pill fw-bold shadow-sm">
+                        <i class="bi bi-arrow-repeat me-1"></i> Thanh toán lại qua VNPay
+                      </a>
+                      <form action="{{ route('checkout.cancel_order', $order->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-secondary py-2 px-4 rounded-pill fw-bold">
+                          Hủy đơn hàng
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="col-md-5 text-center mt-4 mt-md-0">
+                    <img src="https://cdn-icons-png.flaticon.com/512/6195/6195678.png" alt="Payment Failed" style="max-width: 140px; opacity: 0.7;">
                   </div>
                 </div>
               </div>
+              @elseif($order->payment_status == 'pending')
+              <div class="p-4 rounded-4" style="background: #fff9f0; border: 1px solid #ffd280;">
+                <div class="text-center py-3">
+                  <div class="mb-3">
+                    <i class="bi bi-clock-history text-warning" style="font-size: 3rem;"></i>
+                  </div>
+                  <h5 class="fw-bold">Đang chờ xác nhận thanh toán VNPay</h5>
+                  <p class="text-muted">Hệ thống đang xử lý giao dịch VNPay của bạn. Vui lòng chờ trong giây lát.</p>
+                </div>
+              </div>
+              @endif
             </div>
             @endif
+
 
           </div>
         </div>

@@ -20,6 +20,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "jquery-pjax": "^2.0.1",
         "openai": "^6.17.0"
     }
 }

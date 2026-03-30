@@ -31,6 +31,7 @@ class User extends Authenticatable
         'address',
         'role',
         'avatar',
+        'cart_data',
     ];
 
     /**
@@ -51,8 +52,9 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'email_verified_at'  => 'datetime',
+            'password'           => 'hashed',
+            'cart_data'          => 'array',
         ];
     }
 
@@ -86,6 +88,41 @@ class User extends Authenticatable
         return $this->hasMany(Wishlist::class);
     }
 
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class)->orderByDesc('is_default');
+    }
+
+    public function defaultAddress()
+    {
+        return $this->hasOne(UserAddress::class)->where('is_default', true);
+    }
+
+    public function bankAccounts()
+    {
+        return $this->hasMany(UserBankAccount::class)->orderByDesc('is_default');
+    }
+
+
+    public function orderReturnRequests()
+    {
+        return $this->hasMany(OrderReturnRequest::class)->latest();
+    }
+
+    public function walletTransactions()
+    {
+        return $this->hasMany(WalletTransaction::class)->latest();
+    }
+
+    public function walletTopupRequests()
+    {
+        return $this->hasMany(WalletTopupRequest::class)->latest();
+    }
+
+    public function walletWithdrawRequests()
+    {
+        return $this->hasMany(WalletWithdrawRequest::class)->latest();
+    }
 
     public function getAvatarUrlAttribute()
     {

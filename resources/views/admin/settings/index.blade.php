@@ -29,16 +29,6 @@
                                 <input type="number" class="form-control" name="shipping_fee"
                                     value="{{ $settings['shipping_fee'] ?? '30000' }}">
                             </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Ảnh Banner Trang Liên Hệ</label>
-                                @if(isset($settings['contact_banner']) && $settings['contact_banner'])
-                                    <div class="mb-2">
-                                        <img src="{{ asset('storage/' . $settings['contact_banner']) }}" alt="Contact Banner" style="max-height: 100px; display: block;">
-                                    </div>
-                                @endif
-                                <input type="file" class="form-control" name="contact_banner" accept="image/*">
-                                <small class="text-muted">Định dạng hỗ trợ: JPG, PNG, GIF. Kích thước khuyến nghị: 1920x400px.</small>
-                            </div>
                         </div>
 
                         <h6 class="mb-3 mt-3 text-primary"><i class="ti ti-phone"></i> Thông tin Liên hệ</h6>
@@ -61,7 +51,7 @@
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Google Map Iframe URL</label>
                                 <textarea class="form-control" name="store_map_iframe"
-                                    rows="3">{{ $settings['store_map_iframe'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.6575765790473!2d105.71077797584149!3d21.04638368717544!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3134546536093551%3A0x673199834278e993!2sNg.%2091%20Lai%20X%C3%A1%2C%20Kim%20Chung%2C%20Ho%C3%A0i%20%C4%90%E1%BB%A9c%2C%20H%C3%A0%20N%E1%BB%99i!5e0!3m2!1svi!2s!4v1710000000000!5m2!1svi!2s' }}</textarea>
+                                    rows="3">{{ $settings['store_map_iframe'] ?? 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.6575765790473!2d105.71077797584149!3d21.04638368717544!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3134546536093551%3A0x673199834278e993!2sNg.%2091%20Lai%20X%C3%A3%2C%20Kim%20Chung%2C%20Ho%C3%A0i%20%C4%90%E1%BB%A9c%2C%20H%C3%A0%20N%E1%BB%99i!5e0!3m2!1svi!2s!4v1710000000000!5m2!1svi!2s' }}</textarea>
                                 <small class="text-muted">Dán đoạn mã URL từ mã nhúng iframe của Google Maps (chỉ phần trong thuộc tính src).</small>
                             </div>
                         </div>
@@ -81,8 +71,7 @@
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy"></i> Lưu Cấu
-                                Hình</button>
+                            <button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy"></i> Lưu Cấu Hình</button>
                         </div>
                     </form>
                 </div>

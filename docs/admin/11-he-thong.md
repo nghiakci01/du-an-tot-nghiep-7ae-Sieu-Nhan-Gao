@@ -16,12 +16,11 @@ Module cấu hình toàn bộ hệ thống, bao gồm thông tin shop, banner qu
   | Thông tin shop | Tên, logo, địa chỉ, hotline, email |
   | Mạng xã hội | Facebook, Instagram, TikTok URLs |
   | Vận chuyển | Phí ship theo tỉnh/thành, miễn ship từ X VNĐ |
-  | Điểm tích lũy | Tỷ lệ tích điểm, tỷ giá quy đổi |
 - **Lưu trữ:** Bảng `settings` dạng key-value.
 
 ---
 
-### A11.2 Quản Lý Banner
+### A11.2 Banner
 - **Route:** `GET /admin/banners` (resource)
 - **Controller:** `Admin\BannerController`
 - **Thông tin:**
@@ -88,7 +87,7 @@ Module cấu hình toàn bộ hệ thống, bao gồm thông tin shop, banner qu
 | Hành động | Staff | Admin |
 |-----------|-------|-------|
 | Cài đặt hệ thống | ❌ | ✅ |
-| Quản lý Banner | ❌ | ✅ |
+| Banner | ❌ | ✅ |
 | Cài đặt ngân hàng | ❌ | ✅ |
 | Xem Audit Logs | ❌ | ✅ |
 | Xem Thông báo | ✅ | ✅ |
@@ -99,3 +98,4 @@ Module cấu hình toàn bộ hệ thống, bao gồm thông tin shop, banner qu
 - `Banner` — Bảng `banners`
 - `BankSetting` — Bảng `bank_settings`
 - `AuditLog` — Bảng `audit_logs`
+- `Notification` — Bảng `notifications`

@@ -8,9 +8,12 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Wishlist;
+use App\Models\Size;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
@@ -47,14 +50,46 @@ class ProductController extends Controller
             });
         }
 
-        // Filter by Price (using variants)
+        // Filter by Price (including promotional prices)
         if ($request->has('min_price') && $request->has('max_price')) {
-            $min = $request->min_price;
-            $max = $request->max_price;
+            $min = (float) $request->min_price;
+            $max = (float) $request->max_price;
 
-            // Check if product has ANY variant within the price range
-            $query->whereHas('variants', function ($q) use ($min, $max) {
-                $q->whereBetween('price', [$min, $max]);
+            $query->where(function ($q) use ($min, $max) {
+                // 1. Check if product has ANY variant with an active price in range
+                $q->whereHas('variants', function ($v_q) use ($min, $max) {
+                    $v_q->where(function ($sub) use ($min, $max) {
+                        // If sale price exists and > 0, check it
+                        $sub->where(function ($q1) use ($min, $max) {
+                            $q1->whereNotNull('sale_price')
+                                ->where('sale_price', '>', 0)
+                                ->whereBetween('sale_price', [$min, $max]);
+                        })
+                        // Otherwise check regular price
+                        ->orWhere(function ($q2) use ($min, $max) {
+                            $q2->where(function ($q_null) {
+                                $q_null->whereNull('sale_price')
+                                      ->orWhere('sale_price', '<=', 0);
+                            })->whereBetween('price', [$min, $max]);
+                        });
+                    });
+                })
+                // 2. OR if it has NO variants (or they are invalid), check the product's own price
+                ->orWhere(function ($p_q) use ($min, $max) {
+                    $p_q->doesntHave('variants')
+                        ->where(function ($sub) use ($min, $max) {
+                            $sub->where(function ($q1) use ($min, $max) {
+                                $q1->whereNotNull('sale_price')
+                                    ->where('sale_price', '>', 0)
+                                    ->whereBetween('sale_price', [$min, $max]);
+                            })->orWhere(function ($q2) use ($min, $max) {
+                                $q2->where(function ($q_null) {
+                                    $q_null->whereNull('sale_price')
+                                          ->orWhere('sale_price', '<=', 0);
+                                })->whereBetween('price', [$min, $max]);
+                            });
+                        });
+                });
             });
         }
 
@@ -74,6 +109,14 @@ class ProductController extends Controller
             });
         }
 
+        // Filter by Size
+        if ($request->has('size')) {
+            $sizeName = $request->size;
+            $query->whereHas('variants.sizeRelationship', function ($q) use ($sizeName) {
+                $q->where('name', $sizeName);
+            });
+        }
+
         // Filter by Tag
         if ($request->has('tag')) {
             $tagSlug = $request->tag;
@@ -86,6 +129,16 @@ class ProductController extends Controller
         // Sorting
         if ($request->has('sort')) {
             switch ($request->sort) {
+                case 'popularity':
+                    $query->withSum(['orderItems as total_sold_sum' => function ($q) {
+                        $q->whereHas('order', fn ($qo) => $qo->whereNotIn('status', ['cancelled', 'failed', 'returned']));
+                    }], 'quantity')
+                    ->orderByRaw('COALESCE(total_sold_sum, 0) DESC');
+                    break;
+                case 'rating':
+                    $query->withAvg('reviews', 'rating')
+                        ->orderByRaw('COALESCE(reviews_avg_rating, 0) DESC');
+                    break;
                 case 'price_asc':
                     $query->orderBy('price', 'asc');
                     break;
@@ -113,17 +166,21 @@ class ProductController extends Controller
         $products->appends($request->all());
 
         // Get sidebar data
-        $categories = Category::withCount([
-            'products' => function ($q) {
-                $q->where('products.is_active', true);
-            },
-        ])->get();
+        $categories = Cache::remember('shop_sidebar_categories', 3600, function () {
+            return Category::withCount([
+                'products' => function ($q) {
+                    $q->where('products.is_active', true);
+                },
+            ])->get();
+        });
 
-        $brands = Brand::where('is_active', true)->withCount([
-            'products' => function ($q) {
-                $q->where('products.is_active', true);
-            },
-        ])->get();
+        $brands = Cache::remember('shop_sidebar_brands', 3600, function () {
+            return Brand::where('is_active', true)->withCount([
+                'products' => function ($q) {
+                    $q->where('products.is_active', true);
+                },
+            ])->get();
+        });
 
         // Colors with product counts
         $colors = Color::whereHas('productVariants.product', function ($q) {
@@ -136,19 +193,35 @@ class ProductController extends Controller
             },
         ])->limit(10)->get();
 
-        $tags = Tag::withCount([
-            'products' => function ($q) {
-                $q->where('products.is_active', true);
+        // Sizes with product counts
+        $sizes = Size::where('is_active', true)->whereHas('productVariants.product', function ($q) {
+            $q->where('products.is_active', true);
+        })->withCount([
+            'productVariants as products_count' => function ($q) {
+                $q->whereHas('product', function ($pq) {
+                    $pq->where('products.is_active', true);
+                });
             },
-        ])->limit(15)->get();
+        ])->orderBy('display_order', 'asc')->get();
 
-        $totalActiveProducts = Product::where('is_active', true)->count();
+        $tags = Cache::remember('shop_sidebar_tags', 3600, function () {
+            return Tag::withCount([
+                'products' => function ($q) {
+                    $q->where('products.is_active', true);
+                },
+            ])->limit(15)->get();
+        });
+
+        $totalActiveProducts = Cache::remember('shop_total_active', 3600, function () {
+            return Product::where('is_active', true)->count();
+        });
 
         return view('frontend.products.index', compact(
             'products',
             'categories',
             'brands',
             'colors',
+            'sizes',
             'tags',
             'totalActiveProducts',
             'currentCategory'
@@ -171,14 +244,23 @@ class ProductController extends Controller
                 ->exists();
         }
 
+        // Get wishlist product IDs for current user
+        $wishlistProductIds = [];
+        if (Auth::check()) {
+            $wishlistProductIds = Wishlist::where('user_id', Auth::id())
+                ->pluck('product_id')
+                ->toArray();
+        }
+
         // Get related products (same category, excluding current)
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
             ->with(['images', 'variants', 'reviews'])
+            ->inRandomOrder()
             ->take(4)
             ->get();
 
-        return view('frontend.products.show', compact('product', 'relatedProducts', 'hasPurchased'));
+        return view('frontend.products.show', compact('product', 'relatedProducts', 'hasPurchased', 'wishlistProductIds'));
     }
 }

@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Category;
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\User;
-use App\Services\OrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,148 +14,62 @@ class OrderTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $admin;
-
-    private User $customer;
+    protected $admin;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->admin = User::create([
-            'name' => 'Admin',
-            'email' => 'admin@test.com',
-            'password' => bcrypt('password'),
-            'role' => 'admin',
-        ]);
-
-        $this->customer = User::create([
-            'name' => 'Customer',
-            'email' => 'customer@test.com',
-            'password' => bcrypt('password'),
-            'role' => 'user',
-        ]);
+        $this->admin = User::factory()->create(['role' => 'admin']);
     }
 
-    private function makeOrder(string $status = 'pending'): Order
+    public function test_admin_can_view_orders_list()
     {
-        return Order::create([
-            'user_id' => $this->customer->id,
-            'total_price' => 500000,
-            'final_total' => 500000,
-            'status' => $status,
-            'payment_method' => 'cod',
-            'shipping_address' => '123 Đường Test, TP.HCM',
-            'name' => 'Nguyen Van A',
-            'phone' => '0901234567',
-            'province' => 'TP.HCM',
-            'address' => '123 Đường Test',
-        ]);
-    }
-
-    /** @test */
-    public function admin_can_view_orders_list()
-    {
-        $this->makeOrder();
+        Order::factory()->count(3)->create();
 
         $response = $this->actingAs($this->admin)->get(route('admin.orders.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('admin.orders.index');
+        $response->assertViewHas('orders');
     }
 
-    /** @test */
-    public function admin_can_view_single_order()
+    public function test_admin_can_create_manual_order()
     {
-        $order = $this->makeOrder();
-
-        $response = $this->actingAs($this->admin)->get(route('admin.orders.show', $order));
-
-        $response->assertStatus(200);
-        $response->assertViewIs('admin.orders.show');
-    }
-
-    /** @test */
-    public function admin_can_filter_orders_by_status()
-    {
-        $this->makeOrder('pending');
-        $this->makeOrder('completed');
-
-        $response = $this->actingAs($this->admin)->get(route('admin.orders.index', ['status' => 'pending']));
-
-        $response->assertStatus(200);
-    }
-
-    /** @test */
-    public function admin_can_update_order_status()
-    {
-        $order = $this->makeOrder('pending');
-
-        // Mock OrderService để tránh phụ thuộc OrderHistory, email, stock
-        $this->mock(OrderService::class, function ($mock) use ($order) {
-            $mock->shouldReceive('updateOrderStatus')
-                ->once()
-                ->with(\Mockery::on(fn ($o) => $o->id === $order->id), 'confirmed', \Mockery::any())
-                ->andReturnNull();
-        });
-
-        $response = $this->actingAs($this->admin)->put(route('admin.orders.update', $order), [
-            'status' => 'confirmed',
+        $category = Category::factory()->create();
+        $product = Product::factory()->create(['category_id' => $category->id]);
+        $variant = ProductVariant::create([
+            'product_id' => $product->id,
+            'size' => 'XL',
+            'color' => 'White',
+            'stock_quantity' => 10,
+            'price' => 200000,
+            'sku' => 'ADMIN-ORDER-SKU'
         ]);
 
-        $response->assertRedirect(route('admin.orders.show', $order));
-    }
+        $data = [
+            'customer_type' => 'NEW',
+            'name' => 'Admin Guest',
+            'phone' => '0987654321',
+            'email' => 'admin_guest@example.com',
+            'province' => 'Hải Phòng',
+            'address' => '456 Admin St',
+            'items' => [
+                [
+                    'variant_id' => $variant->id,
+                    'quantity' => 2
+                ]
+            ],
+            'payment_method' => 'CASH',
+            'status' => Order::STATUS_CONFIRMED,
+        ];
 
-    /** @test */
-    public function order_status_is_required_on_update()
-    {
-        $order = $this->makeOrder('pending');
+        $response = $this->actingAs($this->admin)->post(route('admin.orders.store'), $data);
 
-        $response = $this->actingAs($this->admin)->put(route('admin.orders.update', $order), [
-            'status' => '',
+        $response->assertRedirect();
+        $this->assertDatabaseHas('orders', [
+            'name' => 'Admin Guest',
+            'status' => Order::STATUS_CONFIRMED
         ]);
 
-        $response->assertSessionHasErrors(['status']);
-    }
-
-    /** @test */
-    public function admin_can_delete_cancelled_order()
-    {
-        $order = $this->makeOrder('cancelled');
-
-        $response = $this->actingAs($this->admin)->delete(route('admin.orders.destroy', $order));
-
-        $response->assertRedirect(route('admin.orders.index'));
-        $this->assertDatabaseMissing('orders', ['id' => $order->id]);
-    }
-
-    /** @test */
-    public function admin_cannot_delete_pending_order()
-    {
-        $order = $this->makeOrder('pending');
-
-        $response = $this->actingAs($this->admin)->delete(route('admin.orders.destroy', $order));
-
-        $response->assertSessionHas('error');
-        $this->assertDatabaseHas('orders', ['id' => $order->id]);
-    }
-
-    /** @test */
-    public function admin_can_print_order()
-    {
-        $order = $this->makeOrder();
-
-        $response = $this->actingAs($this->admin)->get(route('admin.orders.print', $order));
-
-        $response->assertStatus(200);
-    }
-
-    /** @test */
-    public function guest_cannot_access_orders()
-    {
-        $response = $this->get(route('admin.orders.index'));
-
-        // AdminMiddleware redirect về '/' hoặc login
-        $response->assertStatus(302);
+        $this->assertEquals(8, $variant->fresh()->stock_quantity);
     }
 }

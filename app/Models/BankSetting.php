@@ -14,4 +14,8 @@ class BankSetting extends Model
         'is_active',
         'is_default'
     ];
+    public function walletTopupRequests()
+    {
+        return $this->hasMany(WalletTopupRequest::class);
+    }
 }

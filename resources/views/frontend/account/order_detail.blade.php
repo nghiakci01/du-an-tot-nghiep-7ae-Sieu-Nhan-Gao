@@ -160,9 +160,9 @@
 @php
   $shippingFee  = $order->shipping_fee ?? 0;
   $displayTotal = ($order->final_total > 0) ? $order->final_total : ($order->total_price + $shippingFee);
-  $statusSteps  = ['pending','confirmed','shipped','completed'];
+  $statusSteps  = ['pending','confirmed','shipped','completed','returned'];
   $statusIdx    = array_search(strtolower($order->status), $statusSteps);
-  $progressPct  = $statusIdx !== false && $order->status !== 'cancelled'
+  $progressPct  = $statusIdx !== false && $order->status !== 'cancelled' && $order->status !== 'failed'
                     ? ($statusIdx / (count($statusSteps)-1)) * 80
                     : 0;
 
@@ -207,13 +207,13 @@
     </div>
 
     {{-- Progress --}}
-    @if($order->status !== 'cancelled' && $order->status !== 'failed' && $order->status !== 'returned')
+    @if($order->status !== 'cancelled' && $order->status !== 'failed')
     <div class="mt-4">
       <div class="progress-steps">
         <div style="position:absolute;top:18px;left:10%;right:10%;height:2px;background:rgba(255,255,255,0.15);z-index:0;"></div>
         <div style="position:absolute;top:18px;left:10%;height:2px;background:rgba(255,255,255,0.8);z-index:1;width:{{ $progressPct }}%;"></div>
 
-        @foreach(['pending'=>'Chờ xác nhận','confirmed'=>'Đã xác nhận','shipped'=>'Đang giao','completed'=>'Hoàn thành'] as $s => $lbl)
+        @foreach(['pending'=>'Chờ xác nhận','confirmed'=>'Đã xác nhận','shipped'=>'Đang giao','completed'=>'Hoàn thành','returned'=>'Hoàn hàng'] as $s => $lbl)
         @php $idx = array_search($s, $statusSteps); $cur = array_search(strtolower($order->status), $statusSteps); @endphp
         <div class="step">
           <div class="step-dot {{ $idx < $cur ? 'done' : ($idx == $cur ? 'active' : 'pending') }}" style="{{ $idx < $cur ? '' : ($idx == $cur ? 'background:rgba(255,255,255,0.9);color:#1a1a2e;' : 'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);') }}">
@@ -221,7 +221,8 @@
             @elseif($s==='pending')<i class="bi bi-clipboard-check"></i>
             @elseif($s==='confirmed')<i class="bi bi-shield-check"></i>
             @elseif($s==='shipped')<i class="bi bi-truck"></i>
-            @else<i class="bi bi-house-check"></i>@endif
+            @elseif($s==='completed')<i class="bi bi-house-check"></i>
+            @else<i class="bi bi-arrow-return-left"></i>@endif
           </div>
           <span style="font-size:0.7rem;color:rgba(255,255,255,{{ $idx <= $cur ? '0.9' : '0.4' }});font-weight:{{ $idx <= $cur ? '600' : '400' }};text-align:center;">{{ $lbl }}</span>
         </div>
@@ -268,6 +269,32 @@
           @endforeach
         </div>
       </div>
+
+      {{-- Return Request Details (if any) --}}
+      @if($order->returnRequest)
+      <div class="detail-card" style="border: 2px solid #ffca2c;">
+        <div class="detail-card-header" style="background-color: #fff9e6;">
+          <h5 class="text-dark"><i class="bi bi-arrow-return-left me-2"></i>Chi tiết Yêu cầu Hoàn trả</h5>
+          <span class="badge {{ $order->returnRequest->status_badge }}">
+            {{ $order->returnRequest->status_text }}
+          </span>
+        </div>
+        <div class="detail-card-body">
+          <div class="mb-3">
+            <strong>Lý do:</strong> {{ $order->returnRequest->reason }}<br>
+            <strong>Ghi chú của bạn:</strong> {{ $order->returnRequest->note ?: 'Không có' }}<br>
+            <strong>Số tiền hoàn đề nghị:</strong> <span class="text-danger fw-bold">{{ number_format($order->returnRequest->refund_amount) }}đ</span><br>
+            <strong>Ngày yêu cầu:</strong> {{ $order->returnRequest->created_at->format('H:i - d/m/Y') }}
+          </div>
+          @if($order->returnRequest->admin_note)
+            <div class="alert alert-info mb-0">
+              <strong>Phản hồi từ Cửa hàng / Hướng dẫn gửi trả:</strong><br>
+              {!! nl2br(e($order->returnRequest->admin_note)) !!}
+            </div>
+          @endif
+        </div>
+      </div>
+      @endif
 
       {{-- Order History (if has) --}}
       @if(isset($order->histories) && $order->histories->count() > 0)
@@ -364,6 +391,11 @@
         <a href="{{ route('account.index') }}?tab=orders" class="btn btn-outline-dark rounded-pill py-2">
           <i class="bi bi-arrow-left me-1"></i> Quay lại đơn hàng
         </a>
+        @if(($order->status == 'completed' || $order->status == 'shipped') && !$order->returnRequest)
+          <a href="{{ route('account.orders.return_form', $order->id) }}" class="btn btn-outline-warning rounded-pill py-2 w-100">
+            <i class="bi bi-arrow-return-left me-1"></i> Yêu cầu Hoàn hàng
+          </a>
+        @endif
         @if(strtolower($order->status) == 'pending')
           <form action="{{ route('account.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?');">
             @csrf

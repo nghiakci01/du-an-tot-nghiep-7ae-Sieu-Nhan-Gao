@@ -279,6 +279,7 @@ $(document).ready(function() {
             url: "{{ route('admin.api.variants.search') }}",
             data: { q: q },
             success: function(data) {
+                console.log('Search Data:', data);
                 let html = '';
                 if (data.length === 0) {
                     html = '<div class="list-group-item text-muted">Không tìm thấy sản phẩm...</div>';
@@ -310,6 +311,10 @@ $(document).ready(function() {
                     });
                 }
                 $('#product_results').html(html).show();
+            },
+            error: function(xhr, status, error) {
+                console.error("Lỗi AJAX search sản phẩm:", xhr.responseText);
+                $('#product_results').html(`<div class="list-group-item text-danger">Lỗi tải dữ liệu. Chi tiết trong console.</div>`).show();
             }
         });
     });

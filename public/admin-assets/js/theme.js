@@ -39,7 +39,10 @@ function layout_change(mode) {
     _removeAutoListener();
 
     var body = document.getElementsByTagName("body")[0];
+    var html = document.documentElement;
+
     if (body) body.setAttribute("data-pc-theme", mode);
+    if (html) html.setAttribute("data-pc-theme", mode);
 
     // Ensure the auto button is not marked active
     var autoBtn = document.querySelector('.theme-layout .btn[data-value="default"]');
@@ -47,6 +50,7 @@ function layout_change(mode) {
 
     if ("dark" === mode) {
         dark_flag = !0;
+        if (html) html.classList.add('dark-mode');
         updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-white.svg");
         updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-white.svg");
         updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-white.svg");
@@ -54,6 +58,7 @@ function layout_change(mode) {
         updateActiveButton('.theme-layout .btn[data-value="false"]');
     } else {
         dark_flag = !1;
+        if (html) html.classList.remove('dark-mode');
         updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-dark.svg");
         updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-dark.svg");
         updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-dark.svg");
@@ -85,16 +90,21 @@ function layout_change_default() {
     var mq = window.matchMedia("(prefers-color-scheme: dark)");
     var isDark = mq.matches;
     var body = document.getElementsByTagName("body")[0];
+    var html = document.documentElement;
+
     if (body) body.setAttribute("data-pc-theme", isDark ? "dark" : "light");
+    if (html) html.setAttribute("data-pc-theme", isDark ? "dark" : "light");
 
     if (isDark) {
         dark_flag = !0;
+        if (html) html.classList.add('dark-mode');
         updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-white.svg");
         updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-white.svg");
         updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-white.svg");
         updateLogo(".footer-top .footer-logo", "/admin-assets/images/logo-white.svg");
     } else {
         dark_flag = !1;
+        if (html) html.classList.remove('dark-mode');
         updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-dark.svg");
         updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-dark.svg");
         updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-dark.svg");
@@ -105,15 +115,19 @@ function layout_change_default() {
     _autoThemeMediaQuery = mq;
     _autoThemeListener = function (e) {
         var body = document.getElementsByTagName("body")[0];
+        var html = document.documentElement;
         if (body) body.setAttribute("data-pc-theme", e.matches ? "dark" : "light");
+        if (html) html.setAttribute("data-pc-theme", e.matches ? "dark" : "light");
         if (e.matches) {
             dark_flag = !0;
+            if (html) html.classList.add('dark-mode');
             updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-white.svg");
             updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-white.svg");
             updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-white.svg");
             updateLogo(".footer-top .footer-logo", "/admin-assets/images/logo-white.svg");
         } else {
             dark_flag = !1;
+            if (html) html.classList.remove('dark-mode');
             updateLogo(".pc-sidebar .m-header .logo-lg", "/admin-assets/images/logo-dark.svg");
             updateLogo(".navbar-brand .logo-lg", "/admin-assets/images/logo-dark.svg");
             updateLogo(".auth-main.v1 .auth-sidefooter img", "/admin-assets/images/logo-dark.svg");
@@ -128,11 +142,25 @@ function layout_change_default() {
 // so this always runs last and correctly overrides the server-side default.
 document.addEventListener("DOMContentLoaded", function () {
     if ("undefined" !== typeof Storage) {
-        var saved = localStorage.getItem("theme");
-        if (saved === "default") {
+        var savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "default") {
             layout_change_default();
-        } else if (saved === "dark" || saved === "light") {
-            layout_change(saved);
+        } else if (savedTheme === "dark" || savedTheme === "light") {
+            layout_change(savedTheme);
+        }
+        
+        var savedLayout = localStorage.getItem("layout");
+        if (savedLayout) {
+            main_layout_change(savedLayout);
+            
+            // Sync active state in layout settings sidebar after a short delay
+            setTimeout(function() {
+                var activeLink = document.querySelector(".theme-main-layout [data-value='" + savedLayout + "']");
+                if (activeLink) {
+                    document.querySelectorAll(".theme-main-layout [data-value]").forEach(function(l) { l.classList.remove("active"); });
+                    activeLink.classList.add("active");
+                }
+            }, 200);
         }
         // If nothing is saved, keep the server-side default (already applied by inline script)
     } else {
@@ -242,9 +270,21 @@ function change_box_container(e) {
     }
 }
 
-function main_layout_change(e) {
+function main_layout_change(e, el) {
     var body = document.getElementsByTagName("body")[0];
     if (body) body.setAttribute("data-pc-layout", e);
+    if ("undefined" !== typeof Storage) {
+        localStorage.setItem("layout", e);
+    }
+    
+    // Update active class if element provided (clicked)
+    if (el) {
+        var parent = el.closest(".theme-main-layout");
+        if (parent) {
+            parent.querySelectorAll("[data-value]").forEach(function(l) { l.classList.remove("active"); });
+            el.classList.add("active");
+        }
+    }
 }
 
 // ── DOMContentLoaded: preset colors, SimpleBar, layout reset ─────────────────

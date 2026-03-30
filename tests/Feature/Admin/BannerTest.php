@@ -28,7 +28,7 @@ class BannerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_view_banners_list()
     {
         Banner::create([
@@ -44,7 +44,7 @@ class BannerTest extends TestCase
         $response->assertViewIs('admin.banners.index');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_view_create_banner_form()
     {
         $response = $this->actingAs($this->admin)->get(route('admin.banners.create'));
@@ -53,7 +53,7 @@ class BannerTest extends TestCase
         $response->assertViewIs('admin.banners.create');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_create_banner_with_image()
     {
         // Dùng create() thay vì image() để không cần GD extension
@@ -76,7 +76,7 @@ class BannerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function creating_banner_without_image_fails()
     {
         $response = $this->actingAs($this->admin)->post(route('admin.banners.store'), [
@@ -87,7 +87,7 @@ class BannerTest extends TestCase
         $response->assertSessionHasErrors(['image']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_edit_banner()
     {
         $banner = Banner::create([
@@ -103,7 +103,7 @@ class BannerTest extends TestCase
         $response->assertViewIs('admin.banners.edit');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_update_banner_without_new_image()
     {
         $banner = Banner::create([
@@ -127,7 +127,7 @@ class BannerTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_update_banner_with_new_image()
     {
         $banner = Banner::create([
@@ -150,7 +150,7 @@ class BannerTest extends TestCase
         $response->assertSessionHas('success');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_delete_banner()
     {
         $banner = Banner::create([
@@ -166,7 +166,7 @@ class BannerTest extends TestCase
         $this->assertDatabaseMissing('banners', ['id' => $banner->id]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function banner_image_must_be_valid_format()
     {
         // File PDF sẽ fail validation (mimes:jpeg,png,jpg,gif)
@@ -182,12 +182,12 @@ class BannerTest extends TestCase
         $response->assertSessionHasErrors(['image']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function banner_upload_with_invalid_file_does_not_trigger_500_error()
     {
         // Giả lập một file UploadedFile nhưng bị lỗi (ví dụ vượt quá kích thước PHP cho phép)
         // Khi đó isValid() sẽ trả về false và getRealPath() có thể là false/empty
-        $file = new \Illuminate\Http\UploadedFile(
+        $file = new UploadedFile(
             path: '',
             originalName: 'large_image.jpg',
             mimeType: 'image/jpeg',

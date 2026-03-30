@@ -15,6 +15,16 @@ class OrderTrackingController extends Controller
 
     public function search(Request $request)
     {
+        // Normalize inputs
+        $orderId = trim(str_replace('#', '', $request->input('order_id')));
+        $contact = trim($request->input('contact'));
+
+        // Merge back to request for validation if needed, though we can just validate the variables
+        $request->merge([
+            'order_id' => $orderId,
+            'contact' => $contact,
+        ]);
+
         $request->validate([
             'order_id' => 'required|string',
             'contact' => 'required|string', // Can be Email or Phone
@@ -23,10 +33,10 @@ class OrderTrackingController extends Controller
             'contact.required' => 'Vui lòng nhập Email hoặc Số điện thoại.',
         ]);
 
-        $order = Order::where('id', $request->order_id)
-            ->where(function ($query) use ($request) {
-                $query->where('email', $request->contact)
-                    ->orWhere('phone', $request->contact);
+        $order = Order::where('id', $orderId)
+            ->where(function ($query) use ($contact) {
+                $query->where('email', $contact)
+                    ->orWhere('phone', $contact);
             })
             ->with(['items.product', 'items.variant'])
             ->first();
@@ -37,10 +47,8 @@ class OrderTrackingController extends Controller
                 ->withInput();
         }
 
-        // Set session for guest verification if not logged in
-        if (!auth()->check()) {
-            session(['verified_order_id' => $order->id]);
-        }
+        // Set session for order verification regardless of login status
+        session(['verified_order_id' => $order->id]);
 
         return redirect()->route('guest.order.show', $order->id);
     }

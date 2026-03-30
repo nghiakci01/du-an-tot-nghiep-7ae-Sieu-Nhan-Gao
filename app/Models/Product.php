@@ -8,9 +8,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+<<<<<<< HEAD
+=======
+use App\Traits\Auditable;
+
+>>>>>>> 4f71d05400f644293ba8c22639b92de9ffe4e7e6
 class Product extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Auditable;
 
     protected $fillable = [
         'category_id',
@@ -47,7 +52,7 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
-    public function images(): HasMany
+    public function images()
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
@@ -67,6 +72,11 @@ class Product extends Model
     public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
+    }
+
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
     }
 
     public function wishlistedBy()
@@ -93,7 +103,7 @@ class Product extends Model
             return asset('storage/'.$this->image);
         }
 
-        return asset('frontend-assets/img/product/product21.jpg');
+        return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     }
 
     public function isOnFlashSale(): bool

@@ -5,9 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ProductVariant;
 use Illuminate\Http\Request;
+use App\Services\CartService;
 
 class InventoryCheckController extends Controller
 {
+    protected $cartService;
+
+    public function __construct(CartService $cartService)
+    {
+        $this->cartService = $cartService;
+    }
+
     /**
      * Kiểm tra tồn kho cho danh sách sản phẩm gửi từ frontend
      */
@@ -16,13 +24,30 @@ class InventoryCheckController extends Controller
         $items = $request->input('items', []);
         
         if (empty($items)) {
-            $cart = session()->get('cart', []);
+            $cart = $this->cartService->getCart();
             if (empty($cart)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Giỏ hàng của bạn đang trống.'
                 ], 400);
             }
+
+            // Lọc theo các item đã chọn trong session (giống CheckoutController)
+            $selectedIds = session('selected_checkout_ids');
+            if ($selectedIds && is_array($selectedIds)) {
+                $selectedIds = array_map('strval', $selectedIds);
+                $cart = array_filter($cart, function($key) use ($selectedIds) {
+                    return in_array(strval($key), $selectedIds);
+                }, ARRAY_FILTER_USE_KEY);
+            }
+
+            if (empty($cart)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vui lòng chọn sản phẩm trong giỏ hàng trước khi thanh toán.'
+                ], 400);
+            }
+
             $items = $cart;
         }
 

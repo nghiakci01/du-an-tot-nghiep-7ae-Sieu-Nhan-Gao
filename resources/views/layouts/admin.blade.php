@@ -9,6 +9,22 @@
   <meta charset="utf-8" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,minimal-ui" />
+  <meta name="color-scheme" content="light dark">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const html = document.documentElement;
+      html.setAttribute('data-pc-theme', savedTheme);
+      if (savedTheme === 'dark') {
+          html.classList.add('dark-mode');
+      }
+      
+      // Đồng bộ luôn cho body nếu nó đã có sẵn (dù script này thường chạy ở head)
+      document.addEventListener('DOMContentLoaded', () => {
+          document.body.setAttribute('data-pc-theme', savedTheme);
+      });
+    })();
+  </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="description"
     content="Able Pro is trending dashboard template made using Bootstrap 5 design framework. Able Pro is available in Bootstrap, React, CodeIgniter, Angular,  and .net Technologies." />
@@ -62,6 +78,71 @@
     a {
       text-decoration: none !important;
     }
+
+    /* Layout-Aware User Profile */
+    /* Ẩn Header Profile khi ở Vertical (mặc định) */
+    body:not([data-pc-layout="compact"]):not([data-pc-layout="tab"]) .pc-user-profile-header {
+        display: none !important;
+    }
+    
+    /* Ẩn Sidebar Profile khi ở Compact hoặc Tab */
+    body[data-pc-layout="compact"] .pc-user-profile-sidebar,
+    body[data-pc-layout="tab"] .pc-user-profile-sidebar {
+        display: none !important;
+    }
+
+    /* Dark Mode Improvements */
+    [data-pc-theme="dark"] .bg-light-primary {
+        background-color: rgba(70, 128, 255, 0.15) !important;
+        color: #72a1ff !important;
+    }
+    [data-pc-theme="dark"] .bg-light-success {
+        background-color: rgba(44, 168, 127, 0.15) !important;
+        color: #48d6a8 !important;
+    }
+    [data-pc-theme="dark"] .bg-light-warning {
+        background-color: rgba(255, 193, 7, 0.15) !important;
+        color: #ffd666 !important;
+    }
+    [data-pc-theme="dark"] .bg-light-danger {
+        background-color: rgba(220, 53, 69, 0.15) !important;
+        color: #ff8e99 !important;
+    }
+    [data-pc-theme="dark"] .bg-light-info {
+        background-color: rgba(61, 197, 255, 0.15) !important;
+        color: #7cd9ff !important;
+    }
+    [data-pc-theme="dark"] .bg-light-secondary {
+        background-color: rgba(108, 117, 125, 0.15) !important;
+        color: #aeb5bc !important;
+    }
+    [data-pc-theme="dark"] .text-dark {
+        color: var(--bs-body-color) !important;
+    }
+    /* Status Update Form Dark Mode Fix */
+    [data-pc-theme="dark"] .status-update-form {
+        background-color: rgba(0, 0, 0, 0.2) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    [data-pc-theme="dark"] .status-update-form .form-label {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    [data-pc-theme="dark"] .status-update-form .form-control,
+    [data-pc-theme="dark"] .status-update-form .form-select {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+    }
+    [data-pc-theme="dark"] .status-update-form .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.4) !important;
+    }
+    [data-pc-theme="dark"] .status-update-form .form-select option {
+        background-color: #1a1a1a !important;
+        color: #fff !important;
+    }
+    [data-pc-theme="dark"] {
+        --barcode-brightness: 0.85;
+    }
   </style>
 </head><!-- [Head] end --><!-- [Body] Start -->
 
@@ -73,6 +154,15 @@
       <div class="loader-fill"></div>
     </div>
   </div>
+  <script>
+      // Automatically hide loader on normal page load
+      document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(() => {
+              const loader = document.querySelector('.loader-bg');
+              if(loader) loader.style.display = 'none';
+          }, 200);
+      });
+  </script>
 
   {{-- Include Sidebar --}}
   @include('layouts.partials.admin.sidebar')
@@ -118,7 +208,7 @@
   <script src="{{ asset('admin-assets') }}/js/plugins/i18next.min.js"></script>
   <script src="{{ asset('admin-assets') }}/js/plugins/i18nextHttpBackend.min.js"></script> --}}
   <script src="{{ asset('admin-assets') }}/js/icon/custom-font.js"></script>
-  <script src="{{ asset('admin-assets') }}/js/script.js"></script>
+  <script src="{{ asset('admin-assets') }}/js/script.js?v=1.0.3"></script>
   <script src="{{ asset('admin-assets') }}/js/theme.js?v=1.0.1"></script>
   {{--
   <script src="{{ asset('admin-assets') }}/js/multi-lang.js"></script> --}}
@@ -126,24 +216,76 @@
   {{--
   <script defer="defer" src="https://fomo.codedthemes.com/pixel/CDkpF1sQ8Tt5wpMZgqRvKpQiUhpWE3bc"></script> --}}
 
+  <script src="{{ asset('admin-assets') }}/js/plugins/feather.min.js"></script>
+
+  <!-- jQuery (Cần có cho Pjax) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <!-- Pjax -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.pjax/2.0.1/jquery.pjax.min.js"></script>
   <script>
-    layout_change("light");
+      $(document).ready(function() {
+          // Khởi tạo pjax cho các link menu và nút bấm chuyển trang
+          $(document).pjax('a.pc-link:not([target="_blank"]):not([data-pjax="false"]), a.nav-link:not([data-bs-toggle]):not([target="_blank"]):not([data-pjax="false"]), .pagination a, a.btn:not([target="_blank"]):not([data-pjax="false"])', '.pc-content', {
+              fragment: '.pc-content', // Bắt buộc phải có để báo Pjax chỉ rút trích phần .pc-content
+              timeout: 10000,
+              scrollTo: 0 // Cuộn lên đầu
+          });
+
+          // Khởi tạo pjax form submit (loại trừ form logout và form upload file)
+          $(document).on('submit', 'form:not(#logout-form):not([enctype="multipart/form-data"]):not(.no-pjax)', function(event) {
+              $.pjax.submit(event, '.pc-content', {
+                  fragment: '.pc-content',
+                  timeout: 10000,
+                  scrollTo: 0
+              });
+          });
+
+          // Hiển thị loading
+          $(document).on('pjax:send', function() {
+              $('.loader-bg').show(); 
+          });
+
+          // Tắt loading
+          $(document).on('pjax:complete', function() {
+              console.log("Pjax complete triggered.");
+              $('.loader-bg').fadeOut('slow');
+
+              // Update sidebar active menu
+              if (window.update_active_menu) {
+                  console.log("Calling update_active_menu()...");
+                  window.update_active_menu();
+              } else {
+                  console.warn("window.update_active_menu is not defined!");
+              }
+
+              // Khởi tạo lại Feather icons và tooltip/popover nêú cần
+              if(window.feather) feather.replace();
+              
+              const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+              tooltipTriggerList.map(function (tooltipTriggerEl) {
+                  return new bootstrap.Tooltip(tooltipTriggerEl);
+              });
+
+              // the following block is commented out because jquery-pjax already executes scripts 
+              // within the fragment, and manual eval causes double execution (e.g., double event binding)
+              /*
+              $('.pc-content script').each(function() {
+                  if (this.src) {
+                      $.getScript(this.src);
+                  } else {
+                      eval($(this).text());
+                  }
+              });
+              */
+              
+              // Nếu có sử dụng DataTables, cần re-init lại bảng
+              if ($.fn.DataTable) {
+                  $('.table:not(.initialized)').addClass('initialized').DataTable();
+              }
+          });
+      });
   </script>
-  <script>
-    change_box_container("false");
-  </script>
-  <script>
-    layout_caption_change("true");
-  </script>
-  <script>
-    layout_rtl_change("false");
-  </script>
-  <script>
-    preset_change("preset-1");
-  </script>
-  <script>
-    main_layout_change("vertical");
-  </script>
+
   {{--
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015"
     integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ=="

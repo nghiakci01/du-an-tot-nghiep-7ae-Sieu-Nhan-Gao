@@ -360,6 +360,17 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show">
                     {{ session('success') }}
@@ -405,14 +416,13 @@
                     @endguest
 
                     <div class="user-actions">
-                        <h3>
+                        <h3 style="margin-bottom: 15px;">
                             <i class="fa fa-tag" aria-hidden="true"></i>
                             {{ __('messages.have_coupon') }}?
-                            <a class="Returning" href="#" data-bs-toggle="collapse" data-bs-target="#checkout_coupon"
-                                aria-expanded="false">{{ __('messages.click_here_enter_code') }}</a>
                         </h3>
-                        <div id="checkout_coupon" class="collapse" data-bs-parent="#accordion">
-                            <div class="checkout_info">
+                        <div id="checkout_coupon">
+                            <div class="checkout_info" style="border-top: 1px solid #dee2e6;">
+                                <div id="couponMessage"></div>
                                 @if($coupon)
                                     <div class="coupon-applied">
                                         <div>
@@ -427,9 +437,6 @@
                                     <div class="coupon-input-group">
                                         <input type="text" id="couponCode" placeholder="{{ __('messages.coupon_code') }}">
                                         <button type="button" id="applyCouponBtn">{{ __('messages.apply_coupon') }}</button>
-                                    </div>
-                                    <div class="text-end mt-2">
-                                        <a href="javascript:void(0)" onclick="$('#checkout_coupon').collapse('hide')" class="text-secondary" style="text-decoration: none;"><i class="fa fa-angle-up"></i> Thu gọn</a>
                                     </div>
                                 @endif
                             </div>
@@ -541,35 +548,55 @@
                                     <input type="hidden" name="shipping_service_name" id="hidden_shipping_service_name" value="">
                                 </div>
 
-                                <div class="payment_method">
-                                    <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #007bff;">Phương thức thanh toán</h3>
-                                    <div class="panel-default">
-                                        <input id="payment_cod" name="payment_method" type="radio" value="COD"
-                                            data-bs-target="#method_cod" checked required />
-                                        <label for="payment_cod" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_cod"
-                                            aria-controls="method_cod">
-                                            {{ __('messages.cash_on_delivery') }}
-                                        </label>
+                                    <div class="payment_method">
+                                        <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #007bff;">Phương thức thanh toán</h3>
 
-                                        <div id="method_cod" class="collapse show" data-bs-parent="#accordion">
+
+                                        <div class="panel-default">
+                                            <input id="payment_cod" name="payment_method" type="radio" value="COD"
+                                                data-bs-target="#method_cod" checked required />
+                                            <label for="payment_cod" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_cod"
+                                                aria-controls="method_cod">
+                                                {{ __('messages.cash_on_delivery') }}
+                                            </label>
+
+                                            <div id="method_cod" class="collapse show" data-bs-parent="#accordion">
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="panel-default mt-3">
-                                        <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY"
-                                            data-bs-target="#method_vnpay" required />
-                                        <label for="payment_vnpay" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_vnpay"
-                                            aria-controls="method_vnpay">
-                                            Thanh toán qua VNPAY (ATM / Internet Banking / QR Code)
-                                        </label>
-                                        <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
-                                            <div class="card-body1">
-                                                <p>Bạn sẽ được chuyển đến cổng thanh toán VNPAY để hoàn tất thanh toán an toàn.</p>
-                                                <p class="text-muted small">Hỗ trợ: Thẻ ATM nội địa, Visa/MasterCard, QR Code, Ví điện tử.</p>
+
+                                        <div class="panel-default mt-3">
+                                            <input id="payment_bank" name="payment_method" type="radio" value="BANK_TRANSFER"
+                                                data-bs-target="#method_bank" required />
+                                            <label for="payment_bank" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_bank"
+                                                aria-controls="method_bank">
+                                                Chuyển khoản ngân hàng trực tiếp (VietQR)
+                                            </label>
+                                            <div id="method_bank" class="collapse" data-bs-parent="#accordion">
+                                                <div class="card-body1 p-3 bg-light rounded mt-2">
+                                                    <div class="alert alert-info py-2 mb-0 small">
+                                                        <i class="fa fa-info-circle"></i> Bạn sẽ nhận được thông tin số tài khoản và mã QR để chuyển khoản sau khi nhấn "Đặt hàng".
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="panel-default mt-3">
+                                            <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY"
+                                                data-bs-target="#method_vnpay" required />
+                                            <label for="payment_vnpay" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_vnpay"
+                                                aria-controls="method_vnpay">
+                                                <i class="fa fa-credit-card"></i> VNPay (Thẻ ATM, Ví điện tử, QR Code)
+                                            </label>
+                                            <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
+                                                <div class="card-body1 p-3 bg-light rounded mt-2">
+                                                    <div class="alert alert-info py-2 mb-0 small">
+                                                        <i class="fa fa-info-circle"></i> Thanh toán an toàn qua VNPay. Bạn sẽ được chuyển hướng đến trang thanh toán VNPay sau khi nhấn "Đặt hàng".
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                             </div>
                             <div class="col-lg-5 col-md-6">
                                 <h3>Tóm tắt đơn hàng</h3>
@@ -667,7 +694,7 @@
                                         <tbody>
                                             @foreach($cart as $details)
                                             <tr>
-                                                <td>{{ $details['name'] }} 
+                                                <td>{{ $details['name'] }}
                                                     <strong>&times; {{ $details['quantity'] }}</strong>
                                                     <br>
                                                     <small class="text-muted">({{ $details['size'] }}/{{ $details['color'] }})</small>
@@ -683,6 +710,40 @@
                                             </tr>
                                         </tfoot>
                                     </table>
+                                </div>
+
+                                <!-- Bank Transfer Detail & QR Code -->
+                                <div id="bank-transfer-info" class="mt-4 p-4 border rounded bg-white shadow-sm" style="display: none;">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-6">
+                                            <h5 class="fw-bold mb-3 d-flex align-items-center">
+                                                <i class="fa fa-university me-2 text-primary"></i> Thông tin chuyển khoản
+                                            </h5>
+                                            <div class="mb-2">
+                                                <span class="text-muted">Ngân hàng:</span>
+                                                <div class="fw-bold">{{ $defaultBank->bank_name ?? 'N/A' }}</div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <span class="text-muted">Số tài khoản:</span>
+                                                <div class="fw-bold fs-5 text-primary">{{ $defaultBank->account_number ?? 'N/A' }}</div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <span class="text-muted">Chủ tài khoản:</span>
+                                                <div class="fw-bold">{{ $defaultBank->account_name ?? 'N/A' }}</div>
+                                            </div>
+                                            <div class="mb-0">
+                                                <span class="text-muted">Nội dung chuyển khoản:</span>
+                                                <div class="fw-bold text-danger">THANHTOAN ELITE</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 text-center border-start">
+                                            <h6 class="fw-bold mb-2">Quét mã QR để thanh toán nhanh</h6>
+                                            <div class="qr-container bg-light p-2 rounded d-inline-block border">
+                                                <img id="bank_qr_image" src="" alt="VietQR" style="max-width: 250px; height: auto;">
+                                            </div>
+                                            <p class="text-muted small mt-2 mb-0">Sử dụng ứng dụng Ngân hàng hoặc Ví điện tử để quét</p>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="order_button mt-4">
@@ -858,7 +919,21 @@
                     $('#confirm-email').text($('input[name="email"]').val());
                     $('#confirm-address').text($('input[name="address"]').val() + ', ' + $('select[name="province"]').val());
                     $('#confirm-shipping').text($('input[name="shipping_provider"]:checked').data('service-name'));
-                    $('#confirm-payment').text($('input[name="payment_method"]:checked').val() === 'COD' ? 'Tiền mặt khi nhận hàng' : 'VNPAY (ATM/Banking)');
+
+                    const pMethod = $('input[name="payment_method"]:checked').val();
+                    let pMethodText = 'Tiền mặt khi nhận hàng';
+                    if (pMethod === 'VNPAY') pMethodText = 'VNPAY (ATM/Banking)';
+                    if (pMethod === 'BANK_TRANSFER') pMethodText = 'Chuyển khoản ngân hàng';
+
+                    $('#confirm-payment').text(pMethodText);
+
+                    // Show/hide bank transfer info
+                    if (pMethod === 'BANK_TRANSFER') {
+                        $('#bank-transfer-info').show();
+                    } else {
+                        $('#bank-transfer-info').hide();
+                    }
+
                     $('#final_total_display_confirm').html($('#final_total_display').html());
 
                     $('#checkout-step-2').fadeOut(300, function() {
@@ -1005,9 +1080,9 @@
             $('input[name="phone"]').on('blur', function () { showValidation(this, validatePhone($(this).val())); });
             $('input[name="email"]').on('blur', function () { showValidation(this, validateEmail($(this).val())); });
             $('input[name="address"]').on('blur', function () { showValidation(this, validateAddress($(this).val())); });
-            
+
             // ============ SHIPPING FEES CALCULATION ============
-            let baseTotal = parseInt(config.baseTotal); 
+            let baseTotal = parseInt(config.baseTotal);
 
             function calculateShippingFees(province) {
                 if (!province) {
@@ -1036,7 +1111,7 @@
                                 let checked = index === 0 ? 'checked' : '';
                                 html += `
                                     <div class="panel-default mb-2 border rounded p-3" style="border: 1px solid #dee2e6; margin-bottom: 10px;">
-                                        <input id="shipping_${option.provider}" name="shipping_provider" type="radio" value="${option.provider}" 
+                                        <input id="shipping_${option.provider}" name="shipping_provider" type="radio" value="${option.provider}"
                                             data-fee="${option.fee}" data-service-name="${option.service_name}" ${checked} required style="margin-right: 10px;" />
                                         <label for="shipping_${option.provider}" class="mb-0" style="cursor: pointer; font-weight: 500; display: inline-block;">
                                             ${option.service_name} - <span class="text-primary fw-bold">${new Intl.NumberFormat('vi-VN').format(option.fee)} đ</span>
@@ -1046,7 +1121,7 @@
                                 `;
                             });
                             $('#shipping_options').html(html);
-                            
+
                             // Trigger selection for the first one
                             $('input[name="shipping_provider"]:checked').trigger('change');
                         } else {
@@ -1062,16 +1137,16 @@
             $(document).on('change', 'input[name="shipping_provider"]', function() {
                 let fee = $(this).data('fee');
                 let serviceName = $(this).data('service-name');
-                
+
                 $('#hidden_shipping_fee').val(fee);
                 $('#hidden_shipping_service_name').val(serviceName);
-                
+
                 updateTotals(fee);
             });
 
             function updateTotals(shippingFee) {
                 let finalTotal = baseTotal + parseInt(shippingFee);
-                
+
                 // Update shipping display
                 if (shippingFee > 0) {
                     $('#shipping_fee_display').html('<strong>' + new Intl.NumberFormat('vi-VN').format(shippingFee) + ' đ</strong>');
@@ -1081,13 +1156,13 @@
 
                 // Update final total display
                 $('#final_total_display').html('<strong>' + new Intl.NumberFormat('vi-VN').format(finalTotal) + ' VND</strong>');
-                
+
                 // Update QR code amount if banking selected
                 let bankAccount = config.bankAccount;
                 let bankId = config.bankId;
                 let bankName = config.bankName;
-                let qrUrl = `https://img.vietqr.io/image/${bankId}-${bankAccount}-compact.png?amount=${finalTotal}&addInfo=THANHTOAN%20DH&accountName=${bankName}`;
-                
+                let qrUrl = `https://img.vietqr.io/image/${bankId}-${bankAccount}-compact.png?amount=${finalTotal}&addInfo=THANHTOAN%20ELITE&accountName=${bankName}`;
+
                 if (bankAccount !== '0') {
                     $('#bank_qr_image').attr('src', qrUrl);
                 }
@@ -1098,17 +1173,17 @@
                 calculateShippingFees($('select[name="province"]').val());
             }
 
-            $('select[name="province"]').on('change', function () { 
-                showValidation(this, validateProvince($(this).val())); 
+            $('select[name="province"]').on('change', function () {
+                showValidation(this, validateProvince($(this).val()));
                 calculateShippingFees($(this).val());
             });
 
             $('input[name="payment_method"]').on('change', function() {
                 var targetId = $(this).attr('data-bs-target');
-                
+
                 // Ẩn tất cả các panel thanh toán
-                $('#method_cod, #method_bank').collapse('hide');
-                
+                $('#method_cod, #method_bank, #method_vnpay').collapse('hide');
+
                 // Hiện panel của phương thức được chọn
                 $(targetId).collapse('show');
             });

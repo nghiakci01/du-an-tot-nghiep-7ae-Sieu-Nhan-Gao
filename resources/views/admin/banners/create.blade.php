@@ -50,9 +50,9 @@
                                     <div class="mb-3">
                                         <label for="position" class="form-label">Vị trí hiển thị <span class="text-danger">*</span></label>
                                         <select class="form-select @error('position') is-invalid @enderror" id="position" name="position">
-                                            <option value="slider" selected>Slider Chính Trang Chủ</option>
-                                            <option value="about_us">Banner Trang Về Chúng Tôi</option>
-                                            <option value="home_middle">Banner Giữa Trang Chủ (Thay Instagram)</option>
+                                            <option value="slider" selected>Banner Slider</option>
+                                            <option value="home_middle">Banner Giữa Trang Chủ</option>
+                                            <option value="about_us">Banner Trang Giới Thiệu</option>
                                         </select>
                                         @error('position')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -73,6 +73,7 @@
 
                                     <div class="mb-3">
                                         <div class="form-check form-switch">
+                                            <input type="hidden" name="is_active" value="0">
                                             <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked value="1">
                                             <label class="form-check-label fw-bold" for="is_active">Trạng thái hiển thị</label>
                                         </div>

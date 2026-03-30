@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý Banner')
+@section('title', 'Banner')
 
 @section('content')
     <div class="container-fluid">
@@ -33,8 +33,10 @@
                                         <tr>
                                             <td><span class="badge bg-light-primary text-primary">{{ $banner->sort_order }}</span></td>
                                             <td>
-                                                <img src="{{ asset('storage/' . $banner->image) }}" alt="Banner"
-                                                    class="rounded" style="height: 60px; width: 120px; object-fit: cover; border: 1px solid #eee;">
+                                                @if($banner->image)
+                                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="Banner"
+                                                        class="rounded" style="height: 60px; width: 120px; object-fit: cover; border: 1px solid #eee;">
+                                                @endif
                                             </td>
                                             <td>
                                                 <div class="fw-bold">{{ $banner->title ?? 'Không có tiêu đề' }}</div>

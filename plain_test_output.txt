@@ -1,0 +1,2140 @@
+
+   PASS  Tests\Unit\ExampleTest
+  ✓ that true is true
+
+   FAIL  Tests\Feature\AccountTest
+  ⨯ account dashboar… 0.46s  
+
+   PASS  Tests\Feature\AdminBannerTest
+  ✓ admin banner man… 0.03s  
+
+   FAIL  Tests\Feature\AdminBrandTest
+  ⨯ admin brand mana… 0.03s  
+
+   FAIL  Tests\Feature\AdminDashboardTest
+  ⨯ admin dashboard…  0.03s  
+
+   PASS  Tests\Feature\AdminPostTest
+  ✓ admin post manag… 0.02s  
+
+   FAIL  Tests\Feature\AdminSettingTest
+  ⨯ admin setting ma… 0.03s  
+
+   PASS  Tests\Feature\AdminUserTest
+  ✓ admin user manag… 0.03s  
+
+   PASS  Tests\Feature\Admin\BannerTest
+  ✓ admin can view b… 0.05s  
+  ✓ admin can view c… 0.03s  
+  ✓ admin can create… 0.04s  
+  ✓ creating banner…  0.02s  
+  ✓ admin can edit b… 0.03s  
+  ✓ admin can update… 0.02s  
+  ✓ admin can update… 0.02s  
+  ✓ admin can delete… 0.03s  
+  ✓ banner image mus… 0.04s  
+  ✓ banner upload wi… 0.03s  
+
+   FAIL  Tests\Feature\Admin\CategoryTest
+  ✓ admin can view c… 0.04s  
+  ✓ admin can view c… 0.03s  
+  ✓ admin can create… 0.02s  
+  ✓ category image m… 0.02s  
+  ✓ category name is… 0.02s  
+  ✓ admin can update… 0.03s  
+  ✓ admin can delete… 0.02s  
+  ⨯ admin cannot del… 0.02s  
+  ✓ cannot set categ… 0.02s  
+
+   PASS  Tests\Feature\Admin\DashboardTest
+  ✓ admin can view d… 0.04s  
+  ✓ guest cannot acc… 0.02s  
+  ✓ customer cannot…  0.02s  
+
+   PASS  Tests\Feature\Admin\OrderTest
+  ✓ admin can view o… 0.04s  
+  ✓ admin can view s… 0.03s  
+  ✓ admin can filter… 0.03s  
+  ✓ admin can update… 0.03s  
+  ✓ order status is…  0.02s  
+  ✓ admin can delete… 0.02s  
+  ✓ admin cannot del… 0.02s  
+  ✓ admin can print…  0.03s  
+  ✓ admin cannot upd… 0.02s  
+  ✓ guest cannot acc… 0.03s  
+
+   PASS  Tests\Feature\Admin\ProductVariantTest
+  ✓ can create produ… 0.04s  
+  ✓ cannot create pr… 0.02s  
+  ✓ sale price must…  0.03s  
+  ✓ can update varia… 0.03s  
+
+   PASS  Tests\Feature\Admin\ReportTest
+  ✓ admin can view d… 0.04s  
+  ✓ admin can export… 0.02s  
+  ✓ admin can export… 0.21s  
+
+   PASS  Tests\Feature\Admin\UserTest
+  ✓ admin can view u… 0.03s  
+  ✓ admin can view u… 0.03s  
+  ✓ admin can filter… 0.03s  
+  ✓ admin cannot del… 0.02s  
+  ✓ admin cannot del… 0.02s  
+  ✓ admin can delete… 0.03s  
+  ✓ guest cannot acc… 0.02s  
+
+   PASS  Tests\Feature\AuditLogTest
+  ✓ creating product… 0.02s  
+  ✓ updating product… 0.02s  
+
+   PASS  Tests\Feature\AuthSecurityAuditTest
+  ✓ registration fai… 0.34s  
+  ✓ login is immune…  0.24s  
+  ✓ user input is es… 0.03s  
+  ✓ passwords are ha… 0.03s  
+
+   PASS  Tests\Feature\CartAuditTest
+  ✓ it requires vari… 0.03s  
+  ✓ it auto selects…  0.04s  
+  ✓ it prevents addi… 0.03s  
+  ✓ it prevents addi… 0.03s  
+  ✓ it accumulates q… 0.02s  
+  ✓ it can update ca… 0.02s  
+  ✓ it can remove it… 0.03s  
+
+   PASS  Tests\Feature\CartTest
+  ✓ user can view ca… 0.04s  
+
+   FAIL  Tests\Feature\CartValidationTest
+  ✓ it marks cart it… 0.04s  
+  ✓ it marks cart it… 0.04s  
+  ⨯ it prevents chec… 0.03s  
+
+   FAIL  Tests\Feature\CategoryTest
+  ⨯ admin can view categories
+  ⨯ admin can create category
+
+   FAIL  Tests\Feature\CheckoutAuditTest
+  ⨯ checkout page re… 0.03s  
+  ✓ checkout page re… 0.03s  
+  ⨯ it successfully…  0.02s  
+  ⨯ it calculates to… 0.02s  
+
+   PASS  Tests\Feature\CheckoutTest
+  ✓ user can access…  0.02s  
+
+   PASS  Tests\Feature\ContactTest
+  ✓ user can view co… 0.03s  
+
+   PASS  Tests\Feature\CouponTest
+  ✓ coupon api retur… 0.03s  
+
+   PASS  Tests\Feature\ExampleTest
+  ✓ the application…  0.03s  
+
+   PASS  Tests\Feature\FrontendHomeTest
+  ✓ frontend home pa… 0.03s  
+
+   PASS  Tests\Feature\GuestOrderTest
+  ✓ guest can access… 0.03s  
+
+   PASS  Tests\Feature\OrderTrackingTest
+  ✓ tracking page is… 0.03s  
+
+   PASS  Tests\Feature\PaymentTest
+  ✓ payment endpoint… 0.03s  
+
+   FAIL  Tests\Feature\ProductDetailAuditTest
+  ✓ it returns 404 w… 0.03s  
+  ✓ it renders produ… 0.04s  
+  ⨯ it renders produ… 0.03s  
+  ✓ it handles inval… 0.03s  
+  ✓ it shows out of…  0.04s  
+
+   FAIL  Tests\Feature\ProductTest
+  ⨯ user can view pr… 0.03s  
+
+   PASS  Tests\Feature\RemoveWarehouseTest
+  ✓ example           0.03s  
+
+   FAIL  Tests\Feature\ReviewTest
+  ⨯ user can submit…  0.03s  
+
+   PASS  Tests\Feature\SearchTest
+  ✓ search functiona… 0.03s  
+
+   PASS  Tests\Feature\UserAuthTest
+  ✓ user can login    0.03s  
+
+   PASS  Tests\Feature\WishlistTest
+  ✓ wishlist access   0.02s  
+  ─────────────────────────  
+   FAILED  Tests\Feature…   
+  Failed asserting that an array contains 404.
+
+  at tests\Feature\AccountTest.php:15
+     11▕ 
+     12▕     public function test_account_dashboard_requires_login()
+     13▕     {
+     14▕         $response = $this->get('/account');
+  ➜  15▕         $this->assertContains($response->status(), [302, 200]);
+     16▕     }
+     17▕ }
+     18▕
+
+  1   tests\Feature\AccountTest.php:15
+
+  ─────────────────────────  
+   FAILED  Tests\Feature…   
+  Failed asserting that an array contains 404.
+
+  at tests\Feature\AdminBrandTest.php:9
+      5▕ class AdminBrandTest extends TestCase {
+      6▕     use RefreshDatabase;
+      7▕     public function test_admin_brand_management() {
+      8▕         $response = $this->get('/admin/brands');
+  ➜   9▕         $this->assertContains($response->status(), [302]);
+     10▕     }
+     11▕ }
+     12▕
+
+  1   tests\Feature\AdminBrandTest.php:9
+
+  ─────────────────────────  
+   FAILED  Tests\Feature…   
+  Failed asserting that an array contains 404.
+
+  at tests\Feature\AdminDashboardTest.php:9
+      5▕ class AdminDashboardTest extends TestCase {
+      6▕     use RefreshDatabase;
+      7▕     public function test_admin_dashboard_is_protected() {
+      8▕         $response = $this->get('/admin');
+  ➜   9▕         $this->assertContains($response->status(), [302]);
+     10▕     }
+     11▕ }
+     12▕
+
+  1   tests\Feature\AdminDashboardTest.php:9
+
+  ─────────────────────────  
+   FAILED  Tests\Feature…   
+  Failed asserting that an array contains 404.
+
+  at tests\Feature\AdminSettingTest.php:9
+      5▕ class AdminSettingTest extends TestCase {
+      6▕     use RefreshDatabase;
+      7▕     public function test_admin_setting_management() {
+      8▕         $response = $this->get('/admin/settings');
+  ➜   9▕         $this->assertContains($response->status(), [302]);
+     10▕     }
+     11▕ }
+     12▕
+
+  1   tests\Feature\AdminSettingTest.php:9
+
+  ─────────────────────────  
+   FAILED  Tests\Feature…   
+  Session is missing expected key [error].
+Failed asserting that false is true.
+
+  at tests\Feature\Admin\CategoryTest.php:132
+    128▕         Category::create(['name' => 'Child', 'slug' => 'child', 'parent_id' => $parent->id]);
+    129▕ 
+    130▕         $response = $this->actingAs($this->admin)->delete(route('admin.categories.destroy', $parent));
+    131▕ 
+  ➜ 132▕         $response->assertSessionHas('error');
+    133▕         $this->assertDatabaseHas('categories', ['id' => $parent->id]);
+    134▕     }
+    135▕ 
+    136▕     #[\PHPUnit\Framework\Attributes\Test]
+
+  ─────────────────────────  
+   FAILED  Tests\Feature…   
+  Expected response status code [200] but received 404.
+Failed asserting that 404 is identical to 200.
+
+  at tests\Feature\CartValidationTest.php:117
+    113▕ 
+    114▕         // Try to validate cart for checkout
+    115▕         $response = $this->getJson('/checkout/validate?ids=' . $variant->id);
+    116▕         
+  ➜ 117▕         $response->assertStatus(200)
+    118▕                  ->assertJsonPath('valid', false);
+    119▕     }
+    120▕ }
+    121▕
+
+  ─────────────────────────  
+   FAILED…  QueryException   
+  SQLSTATE[23000]: Integrity constraint violation: 19 CHECK constraint failed: role (Connection: sqlite, Database: :memory:, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "role", "updated_at", "created_at") values (Britney Torp, kelsie.ullrich@example.org, 2026-03-25 18:00:05, $2y$04$wXVkQEwwcI5qhzqh4Ho2BerND.p5TYxzmNnWyuuNHM0EdRjazJaBu, lHsz6dMFpz, ADMIN, 2026-03-25 18:00:05, 2026-03-25 18:00:05))
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+    834▕             $exceptionType = $this->isUniqueConstraintError($e)
+    835▕                 ? UniqueConstraintViolationException::class
+    836▕                 : QueryException::class;
+    837▕ 
+  ➜ 838▕             throw new $exceptionType(
+    839▕                 $this->getNameWithReadWriteType(),
+    840▕                 $query,
+    841▕                 $this->prepareBindings($bindings),
+    842▕                 $e,
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:584
+      NunoMaduro\Collision\Exceptions\TestException::("SQLSTATE[23000]: Integrity constraint violation: 19 CHECK constraint failed: role")
+
+  ─────────────────────────  
+   FAILED…  QueryException   
+  SQLSTATE[23000]: Integrity constraint violation: 19 CHECK constraint failed: role (Connection: sqlite, Database: :memory:, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "role", "updated_at", "created_at") values (Mr. Rex Muller, mallory86@example.com, 2026-03-25 18:00:05, $2y$04$wXVkQEwwcI5qhzqh4Ho2BerND.p5TYxzmNnWyuuNHM0EdRjazJaBu, XKXBqQf32K, ADMIN, 2026-03-25 18:00:05, 2026-03-25 18:00:05))
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+    834▕             $exceptionType = $this->isUniqueConstraintError($e)
+    835▕                 ? UniqueConstraintViolationException::class
+    836▕                 : QueryException::class;
+    837▕ 
+  ➜ 838▕             throw new $exceptionType(
+    839▕                 $this->getNameWithReadWriteType(),
+    840▕                 $query,
+    841▕                 $this->prepareBindings($bindings),
+    842▕                 $e,
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:584
+      NunoMaduro\Collision\Exceptions\TestException::("SQLSTATE[23000]: Integrity constraint violation: 19 CHECK constraint failed: role")
+
+  ─────────────────────────  
+   FAILED  Tests\Feature…   
+  Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+-'Giỏ hàng của bạn đang trống.'
++'Vui lòng chọn sản phẩm trong giỏ hàng trước khi thanh toán.'
+
+  at tests\Feature\CheckoutAuditTest.php:68
+     64▕     {
+     65▕         $response = $this->get('/checkout');
+     66▕ 
+     67▕         $response->assertRedirect(route('cart.index'))
+  ➜  68▕                  ->assertSessionHas('error', 'Giỏ hàng của bạn đang trống.');
+     69▕     }
+     70▕ 
+     71▕     #[\PHPUnit\Framework\Attributes\Test]
+     72▕     public function checkout_page_redirects_to_cart_if_item_is_out_of_stock()
+
+  ─────────────────────────  
+   FAILED…  ErrorException   
+  Attempt to read property "id" on null
+
+  at tests\Feature\CheckoutAuditTest.php:126
+    122▕ 
+    123▕         $order = Order::latest()->first();
+    124▕ 
+    125▕         // 1. Should redirect to success
+  ➜ 126▕         $response->assertRedirect(route('checkout.success', $order->id));
+    127▕ 
+    128▕         // 2. Order created correctly
+    129▕         $this->assertNotNull($order);
+    130▕         $this->assertEquals('John Doe', $order->name);
+
+  ─────────────────────────  
+   FAILED  Tests\Feature…   
+  Failed asserting that null is not null.
+
+  at tests\Feature\CheckoutAuditTest.php:175
+    171▕         ]);
+    172▕ 
+    173▕         $order = Order::latest()->first();
+    174▕         
+  ➜ 175▕         $this->assertNotNull($order);
+    176▕         $this->assertEquals(170000, $order->final_total); // 200k - 50k + 20k
+    177▕         $this->assertEquals(50000, $order->discount_amount);
+    178▕         $this->assertEquals('TEST50', $order->coupon_code);
+    179▕     }
+
+  1   tests\Feature\CheckoutAuditTest.php:175
+
+  ─────────────────────────  
+   FAILED  Tests\Feature…   
+  Expected: <!doctype html>\n
+<html class="no-js" lang="vi">\n
+\n
+\n
+<!-- Mirrored from htmldemo.net/reid/reid/index-6.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 15 Jan 2026 03:35:37 GMT -->\n
+\n
+<head>\n
+    <meta charset="utf-8">\n
+    <meta http-equiv="x-ua-compatible" content="ie=edge">\n
+    <title>Free Product | Elite</title>\n
+    <meta name="description"\n
+        content="">\n
+    <meta name="viewport" content="width=device-width, initial-scale=1">\n
+    <meta name="csrf-token" content="gFkoKVTqkvGhjbNqY4AglEGqYnTBHdppupDoqNcf">\n
+    <!-- Favicon -->\n
+    <link rel="shortcut icon" type="image/x-icon" href="https://elite.test/frontend-assets/img/favicon.ico">\n
+\n
+    <!-- Google Fonts (Reid Theme: Libre Franklin + Playfair Display) -->\n
+    <link href="https://fonts.googleapis.com/css?family=Libre+Franklin:300,400,500,600,700|Playfair+Display:400,400i,700,700i,900,900i&display=swap" rel="stylesheet">\n
+\n
+    <!-- CSS \n
+    ========================= -->\n
+\n
+\n
+    <!-- Plugins CSS -->\n
+    <link rel="stylesheet" href="https://elite.test/frontend-assets/css/plugins.css">\n
+\n
+    <!-- Main Style CSS -->\n
+    <link rel="stylesheet" href="https://elite.test/frontend-assets/css/style.css?v=1774409221">\n
+\n
+    <!-- Custom Header CSS -->\n
+    <link rel="stylesheet" href="https://elite.test/frontend-assets/css/custom-header.css">\n
+\n
+    <!-- Search Autocomplete CSS -->\n
+    <link rel="stylesheet" href="https://elite.test/frontend-assets/css/search-autocomplete.css">\n
+\n
+    <link rel="preload" as="style" href="https://elite.test/build/assets/app-C9ilvGM5.css" /><link rel="modulepreload" as="script" href="https://elite.test/build/assets/app-DDOPS2Zk.js" /><link rel="stylesheet" href="https://elite.test/build/assets/app-C9ilvGM5.css" /><script type="module" src="https://elite.test/build/assets/app-DDOPS2Zk.js"></script>\n
+    <!-- SweetAlert2 -->\n
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>\n
+\n
+    <style>\n
+        /* Force Pure White Background & Remove Glow - OVERRIDE VITE/BOOTSTRAP */\n
+        :root, [data-bs-theme=light] {\n
+            --bs-body-bg: #ffffff !important;\n
+            --bs-body-bg-rgb: 255, 255, 255 !important;\n
+            --bs-tertiary-bg: #ffffff !important;\n
+            --bs-secondary-bg: #ffffff !important;\n
+        }\n
+\n
+        body, html, .main_wrapper, .main-wrapper, .header_area, .footer_section, .breadcrumbs_area, .atino-breadcrumb {\n
+            background-color: #ffffff !important;\n
+            background: #ffffff !important;\n
+            box-shadow: none !important;\n
+            border: none !important;\n
+        }\n
+\n
+        /* Smooth Scrolling */\n
+        html {\n
+            scroll-behavior: smooth;\n
+        }\n
+\n
+        /* Remove default link underlines */\n
+        a {\n
+            text-decoration: none !important;\n
+        }\n
+\n
+        /* Product Title Styling */\n
+        .product_content h3 a {\n
+            font-size: 14px !important;\n
+            font-weight: 300 !important;\n
+            color: #333 !important;\n
+            line-height: 1.4 !important;\n
+            transition: color 0.3s ease !important;\n
+        }\n
+\n
+        .product_content h3 a:hover {\n
+            color: #ef233c !important;\n
+        }\n
+\n
+        /* Product Price Styling */\n
+        .current_price {\n
+            font-weight: 700 !important;\n
+        }\n
+\n
+        /* Global Product Hover Effect & Consistent Sizing */\n
+        .single_product .product_thumb {\n
+            position: relative;\n
+            width: 100%;\n
+            aspect-ratio: 1 / 1; /* Force square ratio */\n
+            overflow: hidden !important;\n
+            background: #f9f9f9;\n
+        }\n
+\n
+        .single_product .product_thumb img {\n
+            width: 100% !important;\n
+            height: 100% !important;\n
+            object-fit: cover !important;\n
+            transition: transform 0.6s ease !important;\n
+        }\n
+\n
+        .single_product:hover .product_thumb img {\n
+            transform: scale(1.05) !important;\n
+        }\n
+\n
+        /* ----- ZARA STYLE OVERRIDES START ----- */\n
+        .single_product {\n
+            position: relative;\n
+            overflow: hidden;\n
+            border-radius: 0; \n
+            box-shadow: none !important;\n
+            border: 1px solid transparent;\n
+            transition: border 0.3s ease;\n
+        }\n
+\n
+        .single_product:hover .product_thumb a.secondary_img {\n
+            opacity: 1 !important;\n
+            visibility: visible !important;\n
+        }\n
+\n
+        /* Clean up action buttons (Hide default cluttered view) */\n
+        .single_product .hover_action > a {\n
+            display: none !important;\n
+        }\n
+\n
+        .single_product .product_action {\n
+            top: 10px;\n
+            right: 10px;\n
+            opacity: 1 !important;\n
+            visibility: visible !important;\n
+            transform: none;\n
+        }\n
+\n
+        .single_product .action_button {\n
+            opacity: 1 !important;\n
+            visibility: hidden;\n
+            transform: translateX(10px);\n
+            transition: all 0.3s ease;\n
+            position: relative;\n
+            max-height: none;\n
+        }\n
+\n
+        .single_product:hover .action_button {\n
+            visibility: visible;\n
+            transform: translateX(0);\n
+        }\n
+\n
+        .single_product .action_button ul {\n
+            display: flex;\n
+            flex-direction: column;\n
+            gap: 10px;\n
+        }\n
+\n
+        .single_product .action_button ul li a {\n
+            width: 38px;\n
+            height: 38px;\n
+            line-height: 38px;\n
+            border-radius: 50%;\n
+            background: rgba(255, 255, 255, 0.9);\n
+            color: #000;\n
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);\n
+            border: none;\n
+            font-size: 14px;\n
+            transition: all 0.2s;\n
+        }\n
+\n
+        .single_product .action_button ul li a:hover {\n
+            background: #000;\n
+            color: #fff;\n
+        }\n
+\n
+        .single_product .action_button ul li a::before {\n
+            display: none;\n
+        }\n
+\n
+        /* Redesign Quick view / Add to cart button to slide from bottom like Zara */\n
+        .single_product .quick_button {\n
+            bottom: -60px;\n
+            left: 0;\n
+            right: 0;\n
+            opacity: 0;\n
+            visibility: hidden;\n
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);\n
+            z-index: 5;\n
+            padding: 0;\n
+            margin: 0;\n
+            border-radius: 0;\n
+        }\n
+\n
+        .single_product:hover .quick_button {\n
+            bottom: 0;\n
+            opacity: 1;\n
+            visibility: visible;\n
+        }\n
+\n
+        .single_product .quick_button a {\n
+            line-height: 48px;\n
+            background: rgba(255, 255, 255, 0.95);\n
+            color: #000;\n
+            font-weight: 600;\n
+            font-size: 13px;\n
+            text-transform: uppercase;\n
+            letter-spacing: 0.5px;\n
+            border-radius: 0;\n
+            transition: background 0.3s, color 0.3s;\n
+            border-top: 1px solid #ebebeb;\n
+        }\n
+\n
+        .single_product .quick_button a:hover {\n
+            background: #000;\n
+            color: #fff;\n
+            border-top: 1px solid #000;\n
+        }\n
+\n
+        /* Content styling - align left, clean font */\n
+        .single_product .product_content {\n
+            text-align: left;\n
+            padding: 0 5px 15px 5px !important;\n
+        }\n
+\n
+        .single_product .product_content h3 {\n
+            font-size: 14px;\n
+            font-weight: 500;\n
+            margin-bottom: 6px;\n
+            line-height: 1.4;\n
+        }\n
+\n
+        .single_product .product_content h3 a {\n
+            color: #333;\n
+        }\n
+        .single_product .product_content h3 a:hover {\n
+            color: #000;\n
+            text-decoration: underline;\n
+        }\n
+\n
+        .single_product .product_content .price_box {\n
+            margin-top: 5px;\n
+        }\n
+\n
+        /* Hide rating on grid for Zara minimal look */\n
+        .single_product .product_ratting {\n
+            display: none !important;\n
+        }\n
+        /* ----- ZARA STYLE OVERRIDES END ----- */\n
+\n
+        /* Remove underlines from header and breadcrumb links */\n
+        .header_area a, \n
+        .breadcrumbs_area a, \n
+        .main_menu a, \n
+        .offcanvas_menu a {\n
+            text-decoration: none !important;\n
+        }\n
+\n
+        .header_area a:hover, \n
+        .breadcrumbs_area a:hover, \n
+        .main_menu a:hover, \n
+        .offcanvas_menu a:hover {\n
+            text-decoration: none !important;\n
+        }\n
+    </style>\n
+</head>\n
+\n
+<body>\n
+\n
+    <!-- Main Wrapper Start -->\n
+\n
+    <div class="off_canvars_overlay">\n
+                \n
+    </div>\n
+    <div class="offcanvas_menu offcanvas_six">\n
+        <div class="canvas_open">\n
+                        <a href="javascript:void(0)"><i class="ion-navicon"></i></a>\n
+                    </div>\n
+        <div class="offcanvas_menu_wrapper">\n
+            <div class="canvas_close">\n
+                <a href="javascript:void(0)"><i class="ion-android-close"></i></a>  \n
+            </div>\n
+            <div class="welcome_text">\n
+                <ul>\n
+                    <li><span>Liên hệ:</span> 0354869999</li>\n
+                    <li><span>Ưu đãi:</span> Miễn phí vận chuyển cho đơn từ 500k</li>\n
+                </ul>\n
+            </div>\n
+            \n
+            <div class="top_right">\n
+                <ul>\n
+                    <li class="top_links">\n
+                                                    <a href="https://elite.test/my-account" class="user-account-link">Tài khoản của tôi <i class="ion-chevron-down"></i></a>\n
+                            <ul class="dropdown_links">\n
+                                <li><a href="https://elite.test/wishlist">Danh sách yêu thích</a></li>\n
+                                <li><a href="https://elite.test/my-account">Tài khoản của tôi</a></li>\n
+                                <li><a href="https://elite.test/order-tracking">Tra cứu đơn hàng</a></li>\n
+                                <li><a href="https://elite.test/login">Đăng nhập</a></li>\n
+                            </ul>\n
+                                            </li> \n
+                </ul>\n
+            </div> \n
+            <div class="search_bar">\n
+                <form action="https://elite.test/search" method="GET">\n
+                    <select class="select_option" name="category" aria-label="Select Category">\n
+                        <option selected value="">Tất cả sản phẩm</option>\n
+                                                     <option value="test-category">Test Category</option>\n
+                                            </select>\n
+                    <input id="search-input-offcanvas" placeholder="Tìm kiếm sản phẩm..." type="text" name="q" autocomplete="off" aria-label="Search">\n
+                    <button type="submit" aria-label="Submit Search"><i class="ion-ios-search-strong"></i></button>\n
+                </form>\n
+                <div id="search-suggestions-offcanvas" class="search-suggestions-dropdown"></div>\n
+            </div>\n
+            <div class="cart_area">\n
+                <div class="middel_links">\n
+                    <ul>\n
+                                                    <li><a href="https://elite.test/login">Đăng nhập</a></li>\n
+                            <li>/</li>\n
+                            <li><a href="https://elite.test/register">Đăng ký</a></li>\n
+                                            </ul>\n
+                </div>\n
+                <div class="cart_link" id="mini-cart-container"\n
+     data-route-remove="https://elite.test/cart/remove"\n
+     data-csrf="gFkoKVTqkvGhjbNqY4AglEGqYnTBHdppupDoqNcf">\n
+    <a href="https://elite.test/cart">\n
+        <i class="fa fa-shopping-basket"></i>\n
+        <span class="cart-count">0</span> Sản phẩm\n
+    </a>\n
+    \n
+    <!--mini cart-->\n
+    <div class="mini_cart">\n
+                    <div class="cart_item">\n
+                <div class="cart_info text-center">\n
+                    <p class="text-muted">Giỏ hàng của bạn đang trống</p>\n
+                </div>\n
+            </div>\n
+            </div>\n
+    <!--mini cart end-->\n
+</div>\n
+\n
+            </div>\n
+            <div class="offcanvas_footer">\n
+                <span><a href="mailto:Elite@gmail.com"><i class="fa fa-envelope-o"></i> Elite@gmail.com</a></span>\n
+                <ul>\n
+                    <li class="facebook"><a href="https://www.facebook.com/profile.php?id=61577211110743" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook"></i></a></li>\n
+                    <li class="instagram"><a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a></li>\n
+                    <li class="twitter"><a href="https://twitter.com/" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a></li>\n
+                    <li class="youtube"><a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube"></i></a></li>\n
+                </ul>\n
+            </div>\n
+        </div>\n
+    </div>\n
+    <!--Offcanvas menu area end-->\n
+    \n
+    <!--header area start-->\n
+    <header class="header_area header_six ">\n
+        <!--header middel start-->\n
+        <div class="header_middel">\n
+            <div class="container-fluid">\n
+                <div class="middel_inner">\n
+                    <div class="row align-items-center">\n
+                        <!-- Logo + Menu Column -->\n
+                        <div class="col-lg-6 col-md-3">\n
+                            <div class="header_left d-flex align-items-center">\n
+                                <div class="logo">\n
+                                    <a href="https://elite.test"><img src="https://elite.test/frontend-assets/img/logo/logo-elite-new.png" alt=""></a>\n
+                                </div>\n
+                                \n
+                                <!-- Main Menu (Desktop) -->\n
+                                <div class="main_menu d-none d-lg-block">\n
+                                    <nav>\n
+                                        <ul>\n
+                                            <li class=""><a href="https://elite.test">Trang chủ</a></li>\n
+                                            <li class="mega_items ">\n
+                                                <a href="https://elite.test/shop">Cửa hàng <i class="fa fa-angle-down"></i></a>\n
+                                                <style>\n
+                                                    .custom-shop-mega {\n
+                                                        width: 900px !important;\n
+                                                        padding: 30px !important;\n
+                                                        background: #fff;\n
+                                                        box-shadow: 0 10px 30px rgba(0,0,0,0.1);\n
+                                                        border-radius: 0 0 8px 8px;\n
+                                                        /* Override theme's display block on hover slightly to allow flex */\n
+                                                    }\n
+                                                    .header_area .mega_items:hover .custom-shop-mega,\n
+                                                    .sticky-header .mega_items:hover .custom-shop-mega {\n
+                                                        display: flex !important;\n
+                                                    }\n
+                                                    .custom-shop-mega-left {\n
+                                                        flex: 0 0 40% !important;\n
+                                                        max-width: 40% !important;\n
+                                                        border-right: 1px solid #ebebeb;\n
+                                                        padding-right: 15px;\n
+                                                    }\n
+                                                    .custom-shop-mega-left ul {\n
+                                                        list-style: none;\n
+                                                        padding: 0;\n
+                                                        margin: 0;\n
+                                                        display: grid;\n
+                                                        grid-template-columns: repeat(2, 1fr);\n
+                                                        gap: 15px 10px;\n
+                                                    }\n
+                                                    .custom-shop-mega-left li {\n
+                                                        margin-bottom: 0 !important;\n
+                                                        float: none !important;\n
+                                                        width: auto !important;\n
+                                                        border: none !important;\n
+                                                        padding: 0 !important;\n
+                                                    }\n
+                                                    .custom-shop-mega-left a {\n
+                                                        color: #333 !important;\n
+                                                        font-size: 14px !important;\n
+                                                        font-weight: 400 !important;\n
+                                                        text-decoration: none;\n
+                                                        transition: color 0.3s;\n
+                                                        display: block;\n
+                                                        line-height: 1.4;\n
+                                                    }\n
+                                                    .custom-shop-mega-left .parent-cat-link {\n
+                                                        font-weight: 700 !important;\n
+                                                        font-size: 15px !important;\n
+                                                        color:  !important;\n
+                                                        margin-bottom: 8px !important;\n
+                                                        text-transform: uppercase;\n
+                                                    }\n
+                                                    .custom-shop-mega-left a:hover {\n
+                                                        color: #ef233c !important;\n
+                                                    }\n
+                                                    .custom-shop-mega-right {\n
+                                                        flex: 0 0 60% !important;\n
+                                                        max-width: 60% !important;\n
+                                                        padding-left: 15px;\n
+                                                        display: flex !important;\n
+                                                        gap: 15px;\n
+                                                    }\n
+                                                    .custom-shop-product {\n
+                                                        flex: 1;\n
+                                                        text-align: center;\n
+                                                    }\n
+                                                    .custom-shop-product-img {\n
+                                                        margin-left: 15px;\n
+                                                        margin-bottom: 15px;\n
+                                                        overflow: hidden;\n
+                                                        border-radius: 8px;\n
+                                                    }\n
+                                                    .custom-shop-product-img img {\n
+                                                        width: 100% !important;\n
+                                                        height: auto !important;\n
+                                                        aspect-ratio: 1 / 1;\n
+                                                        object-fit: cover !important;\n
+                                                        mix-blend-mode: multiply;\n
+                                                        transition: transform 0.5s;\n
+                                                    }\n
+                                                    .custom-shop-product:hover .custom-shop-product-img img {\n
+                                                        transform: scale(1.05);\n
+                                                    }\n
+                                                    .custom-shop-product h5 {\n
+                                                        font-size: 14px !important;\n
+                                                        color: #666 !important;\n
+                                                        font-weight: 500 !important;\n
+                                                        margin: 0;\n
+                                                        line-height: 1.4;\n
+                                                    }\n
+                                                </style>\n
+                                                <ul class="mega_menu custom-shop-mega">\n
+                                                    <li class="custom-shop-mega-left">\n
+                                                        <ul>\n
+                                                                                                                             <li>\n
+                                                                    <a href="https://elite.test/shop?category=test-category" class="parent-cat-link">Test Category</a>\n
+                                                                                                                                            <div style="margin-bottom: 20px;"></div>\n
+                                                                                                                                    </li>\n
+                                                                                                                    </ul>\n
+                                                    </li>\n
+                                                    <li class="custom-shop-mega-right">\n
+                                                                                                                                                                         <div class="custom-shop-product">\n
+                                                            <a href="https://elite.test/product/free-product">\n
+                                                                <div class="custom-shop-product-img">\n
+                                                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Free Product">\n
+                                                                </div>\n
+                                                                <h5>Free Product</h5>\n
+                                                            </a>\n
+                                                        </div>\n
+                                                                                                            </li>\n
+                                                </ul>\n
+                                            </li>\n
+                                            <li><a href="https://elite.test/news">Tin tức</a></li>\n
+                                            <li><a href="https://elite.test/about">Giới thiệu</a></li>\n
+                                            <li><a href="https://elite.test/contact">Liên hệ</a></li>\n
+                                            <!-- <li><a href="https://elite.test/order-tracking">Tra cứu đơn hàng</a></li> -->\n
+                                        </ul>\n
+                                    </nav>\n
+                                </div>\n
+                            </div>\n
+                        </div>\n
+                        \n
+                        <!-- Search/Account/Cart Column -->\n
+                        <div class="col-lg-6 col-md-9">\n
+                            <div class="middel_right_info">\n
+                                <div class="search_bar" style="position: relative;">\n
+                                    <form action="https://elite.test/search" method="GET">                          \n
+                                        <input id="search-input-desktop" placeholder="Tìm kiếm sản phẩm..." type="text" name="q" autocomplete="off" aria-label="Search">\n
+                                        <button type="submit" aria-label="Submit Search"><i class="ion-ios-search-strong"></i></button>\n
+                                    </form>\n
+                                    <div id="search-suggestions-desktop" class="search-suggestions-dropdown"></div>\n
+                                </div>\n
+                                <div class="top_right text-right">\n
+                                    <ul>\n
+                                        <li class="top_links">\n
+                                                                                            <a href="https://elite.test/my-account" class="user-account-link"><i class="ion-android-person"></i> Tài khoản của tôi <i class="ion-chevron-down"></i></a>\n
+                                                <ul class="dropdown_links">\n
+                                                    <!-- <li><a href="https://elite.test/wishlist">Danh sách yêu thích</a></li> -->\n
+                                                    <!-- <li><a href="https://elite.test/my-account">Tài khoản của tôi</a></li> -->\n
+                                                    <li><a href="https://elite.test/my-account#dashboard">Bảng điều khiển</a></li>\n
+                                                    <!-- <li><a href="https://elite.test/order-tracking">Tra cứu đơn hàng</a></li> -->\n
+                                                    <li><a href="https://elite.test/login">Đăng nhập</a></li>\n
+                                                </ul>\n
+                                                                                    </li> \n
+                                    </ul>\n
+                                </div>   \n
+                                <div class="cart_link" id="mini-cart-container"\n
+     data-route-remove="https://elite.test/cart/remove"\n
+     data-csrf="gFkoKVTqkvGhjbNqY4AglEGqYnTBHdppupDoqNcf">\n
+    <a href="https://elite.test/cart">\n
+        <i class="fa fa-shopping-basket"></i>\n
+        <span class="cart-count">0</span> Sản phẩm\n
+    </a>\n
+    \n
+    <!--mini cart-->\n
+    <div class="mini_cart">\n
+                    <div class="cart_item">\n
+                <div class="cart_info text-center">\n
+                    <p class="text-muted">Giỏ hàng của bạn đang trống</p>\n
+                </div>\n
+            </div>\n
+            </div>\n
+    <!--mini cart end-->\n
+</div>\n
+\n
+                            </div>\n
+                        </div>\n
+  \n
+                    </div>\n
+                </div>\n
+                \n
+\n
+    </header>\n
+    <!--header area end-->\n
+\n
+    <!--sticky header start-->\n
+    <div class="sticky-header header_six">\n
+        <div class="container-fluid">\n
+            <div class="row align-items-center">\n
+                <div class="col-12">\n
+                    <div class="main_menu_inner">\n
+                        <div class="main_menu"> \n
+                            <nav>  \n
+                                <ul>\n
+                                    <li class=""><a href="https://elite.test">Trang chủ</a></li>\n
+                                    <li class="mega_items "><a href="https://elite.test/shop">Cửa hàng <i class="fa fa-angle-down"></i></a>\n
+                                                <ul class="mega_menu custom-shop-mega">\n
+                                                    <li class="custom-shop-mega-left">\n
+                                                        <ul>\n
+                                                                                                                             <li>\n
+                                                                    <a href="https://elite.test/shop?category=test-category" class="parent-cat-link">Test Category</a>\n
+                                                                                                                                            <div style="margin-bottom: 20px;"></div>\n
+                                                                                                                                    </li>\n
+                                                                                                                    </ul>\n
+                                                    </li>\n
+                                                    <li class="custom-shop-mega-right">\n
+                                                                                                                                                                         <div class="custom-shop-product">\n
+                                                            <a href="https://elite.test/product/free-product">\n
+                                                                <div class="custom-shop-product-img">\n
+                                                                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Free Product">\n
+                                                                </div>\n
+                                                                <h5>Free Product</h5>\n
+                                                            </a>\n
+                                                        </div>\n
+                                                                                                            </li>\n
+                                                </ul>\n
+                                    </li>\n
+                                    <li><a href="https://elite.test/news">Tin tức</a></li>\n
+                                    <li><a href="https://elite.test/about">Giới thiệu</a></li>\n
+                                    <li><a href="https://elite.test/contact">Liên hệ</a></li>\n
+                                </ul>   \n
+                            </nav> \n
+                        </div>\n
+                    </div>\n
+                </div>\n
+            </div>\n
+        </div>\n
+    </div>\n
+    <!--sticky header end-->\n
+    </header>\n
+    <!--header area end-->\n
+\n
+        <style>\n
+        .product_variant.quantity .button {\n
+            height: 50px;\n
+            line-height: 50px;\n
+            padding: 0 35px;\n
+            background: #111;\n
+            border: 1px solid #111;\n
+            color: #fff;\n
+            font-weight: 700;\n
+            text-transform: uppercase;\n
+            letter-spacing: 1px;\n
+            transition: all 0.3s ease;\n
+        }\n
+\n
+        .product_variant.quantity .button:hover {\n
+            background: #ef233c;\n
+            border-color: #ef233c;\n
+        }\n
+\n
+        .product_variant.quantity .button.buy_now {\n
+            background: #ef233c;\n
+            border-color: #ef233c;\n
+            margin-left: 10px;\n
+        }\n
+\n
+        .product_variant.quantity .button.buy_now:hover {\n
+            background: #111;\n
+            border-color: #111;\n
+        }\n
+\n
+        .product_variant.quantity .button:disabled {\n
+            background: #ebebeb !important;\n
+            border-color: #ebebeb !important;\n
+            color: #999 !important;\n
+            cursor: not-allowed;\n
+        }\n
+\n
+        /* Highlight chưa chọn thuộc tính */\n
+        .nice-select[style*="border-color: rgb(239, 35, 60)"],\n
+        .nice-select[style*="border-color: #ef233c"] {\n
+            border: 2px solid #ef233c !important;\n
+            animation: shake 0.4s ease;\n
+        }\n
+\n
+        @keyframes shake {\n
+\n
+            0%,\n
+            100% {\n
+                transform: translateX(0);\n
+            }\n
+\n
+            25% {\n
+                transform: translateX(-5px);\n
+            }\n
+\n
+            75% {\n
+                transform: translateX(5px);\n
+            }\n
+        }\n
+\n
+        .star-rating {\n
+            display: inline-flex;\n
+            flex-direction: row-reverse;\n
+            justify-content: flex-end;\n
+            gap: 5px;\n
+        }\n
+\n
+        .star-rating input {\n
+            display: none;\n
+        }\n
+\n
+        .star-rating label {\n
+            font-size: 24px;\n
+            color: #ccc;\n
+            cursor: pointer;\n
+            transition: color 0.2s;\n
+            margin: 0;\n
+        }\n
+\n
+        .star-rating label:hover i,\n
+        .star-rating label:hover~label i,\n
+        .star-rating input:checked~label i {\n
+            color: #f39c12 !important;\n
+        }\n
+\n
+        .star-rating label i {\n
+            pointer-events: none;\n
+        }\n
+\n
+        /* Album thumbnails styling */\n
+        .single-zoom-thumb ul li img {\n
+\n
+            width: 64px !important;\n
+            height: 64px !important;\n
+            object-fit: cover;\n
+            padding: 3px;\n
+            border: 0.5px solid #ddd;\n
+            margin-right: 3px;\n
+        }\n
+\n
+        /* Swatch Styles */\n
+        .swatch-container {\n
+            display: flex;\n
+            flex-wrap: wrap;\n
+            gap: 10px;\n
+            margin-top: 10px;\n
+        }\n
+        .swatch-item {\n
+            min-width: 45px;\n
+            height: 45px;\n
+            padding: 0 10px;\n
+            border: 1px solid #ddd;\n
+            display: flex;\n
+            align-items: center;\n
+            justify-content: center;\n
+            cursor: pointer;\n
+            font-weight: 600;\n
+            transition: all 0.3s;\n
+            background: #fff;\n
+            user-select: none;\n
+        }\n
+        .swatch-item:hover {\n
+            border-color: #ef233c;\n
+            color: #ef233c;\n
+        }\n
+        .swatch-item.active {\n
+            border-color: #ef233c;\n
+            background: #fff;\n
+            color: #ef233c;\n
+            box-shadow: inset 0 0 0 1px #ef233c;\n
+        }\n
+        .swatch-item.disabled {\n
+            opacity: 0.4;\n
+            cursor: not-allowed;\n
+            background: #f5f5f5;\n
+        }\n
+\n
+        /* Hide legacy dropdowns and nice-select wrappers */\n
+        .product_variant select,\n
+        .product_variant .nice-select {\n
+            display: none !important;\n
+        }\n
+\n
+        /* Ensure variants stack vertically */\n
+        .product_variant.size, \n
+        .product_variant.color {\n
+            display: flex !important;\n
+            flex-direction: column !important;\n
+            align-items: flex-start !important;\n
+            margin-bottom: 20px;\n
+        }\n
+        .product_variant h3 {\n
+            margin-bottom: 5px !important;\n
+        }\n
+\n
+        /* Quantity Selector Styles */\n
+        .quantity-selector {\n
+            display: flex !important;\n
+            align-items: center;\n
+            border: 0.5px solid #ccc;\n
+            width: 140px !important;\n
+            height: 40px !important; /* Reverted to 40px */\n
+            margin-top: 10px;\n
+            overflow: hidden !important;\n
+            border-radius: 4px;\n
+            box-sizing: border-box !important;\n
+            background: #fff;\n
+        }\n
+        .quantity-selector * {\n
+            box-sizing: border-box !important;\n
+        }\n
+        .qty-btn {\n
+            flex: 0 0 40px !important;\n
+            width: 40px !important;\n
+            height: 40px !important; /* Reverted to 40px */\n
+            border: 0 !important;\n
+            background: #fff !important;\n
+            color: #333 !important;\n
+            font-size: 20px !important;\n
+            font-weight: bold !important;\n
+            cursor: pointer;\n
+            display: flex !important;\n
+            align-items: center;\n
+            justify-content: center;\n
+            transition: all 0.2s;\n
+            padding: 0 !important;\n
+            margin: 0 !important;\n
+        }\n
+        .qty-btn:hover {\n
+            background: #f8f8f8 !important;\n
+            color: #ef233c !important;\n
+        }\n
+        .qty-btn:active {\n
+            background: #d1d1d1 !important;\n
+        }\n
+        .quantity-selector input {\n
+            flex: 0 0 59px !important;\n
+            width: 59px !important;\n
+            height: 40px !important; /* Reverted to 40px */\n
+            border: 0 !important;\n
+            border-left: 0.5px solid #ccc !important;\n
+            border-right: 0.5px solid #ccc !important;\n
+            text-align: center;\n
+            font-weight: 500;\n
+            font-size: 14px;\n
+            -moz-appearance: textfield;\n
+            margin: 0 !important;\n
+            padding: 0 !important;\n
+            background: #fff;\n
+            color: #333;\n
+            outline: none !important;\n
+            font-family: 'Quicksand', sans-serif;\n
+        }\n
+        .quantity-selector input::-webkit-outer-spin-button,\n
+        .quantity-selector input::-webkit-inner-spin-button {\n
+            -webkit-appearance: none;\n
+            margin: 0;\n
+        }\n
+\n
+        /* Responsive adjustments for buttons */\n
+        .product_variant.quantity .button {\n
+            width: 175px !important; /* Fixed width as requested */\n
+            height: 50px !important; /* Fixed height as requested */\n
+            line-height: 50px !important;\n
+            padding: 0 !important; /* Padding removed due to fixed width */\n
+            font-weight: 600 !important;\n
+            font-size: 14px !important;\n
+            margin-top: 5px;\n
+            border-radius: 4px;\n
+            border: 0 !important;\n
+            text-transform: uppercase;\n
+            letter-spacing: 1px;\n
+            background: #1a1a1a !important; /* Solid black */\n
+            color: #fff !important;\n
+            display: inline-block;\n
+            text-align: center;\n
+        }\n
+        .product_variant.quantity .button.buy_now {\n
+            background: #1a1a1a !important; /* Change to black as requested */\n
+        }\n
+        .product_variant.quantity .button:hover {\n
+            background: #333 !important;\n
+        }\n
+\n
+        /* Align rating to left */\n
+        .product_ratting ul {\n
+            justify-content: flex-start !important;\n
+            margin-left: 0 !important;\n
+            padding-left: 0 !important;\n
+            display: flex !important;\n
+        }\n
+        .product_ratting ul li {\n
+            margin-right: 5px !important;\n
+        }\n
+\n
+        /* Product name bold */\n
+        .product_d_right h1 {\n
+            font-weight: 700;\n
+            color: black;\n
+            font-family: \n
+        }\n
+        \n
+    </style>\n
+    <!--breadcrumbs area start-->\n
+    <div class="breadcrumbs_area product_bread">\n
+        <div class="container">\n
+            <div class="row">\n
+                <div class="col-12">\n
+                    <div class="breadcrumb_content">\n
+                        <ul>\n
+                            <li><a href="https://elite.test">Trang chủ</a></li>\n
+                            <li>/</li>\n
+                            <li><a href="https://elite.test/shop">Cửa hàng</a></li>\n
+                            <li>/</li>\n
+                            <li>Chi tiết sản phẩm</li>\n
+                        </ul>\n
+                    </div>\n
+                </div>\n
+            </div>\n
+        </div>\n
+    </div>\n
+    <!--breadcrumbs area end-->\n
+\n
+    <!--product details start-->\n
+    <div class="product_details" id="product-details-container"\n
+        data-variants="[]"\n
+        data-has-variants="false"\n
+        data-route-wishlist-add="https://elite.test/wishlist/add"\n
+        data-route-cart-count="https://elite.test/cart/count"\n
+        data-route-login="https://elite.test/login"\n
+        data-msg-size="Kích thước"\n
+        data-msg-color="Màu sắc"\n
+        data-msg-variant-out-of-stock="Phiên bản này hiện đang hết hàng"\n
+        data-msg-combination-not-available="Sự kết hợp này không có sẵn">\n
+        <div class="container">\n
+            <div class="row">\n
+                <div class="col-lg-5 col-md-5">\n
+                    <div class="product-details-tab" style="position: relative;">\n
+\n
+                        <div id="img-1" class="zoomWrapper single-zoom">\n
+                            <a href="#">\n
+                                <img id="zoom1"\n
+                                    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"\n
+                                    data-zoom-image="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"\n
+                                    alt="Free Product">\n
+                            </a>\n
+                        </div>\n
+                        <div class="single-zoom-thumb">\n
+                            <ul class="s-tab-zoom owl-carousel single-product-active" id="gallery_01">\n
+                                <li>\n
+                                    <a href="#" class="elevatezoom-gallery active" data-update=""\n
+                                        data-image="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"\n
+                                        data-zoom-image="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">\n
+                                        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"\n
+                                            alt="Free Product" />\n
+                                    </a>\n
+                                </li>\n
+\n
+                                                            </ul>\n
+                        </div>\n
+\n
+                    </div>\n
+                </div>\n
+                <div class="col-lg-7 col-md-7">\n
+                    <div class="product_d_right">\n
+                        <form id="add-to-cart-form" action="https://elite.test/cart/add" method="POST">\n
+                            <input type="hidden" name="_token" value="gFkoKVTqkvGhjbNqY4AglEGqYnTBHdppupDoqNcf" autocomplete="off">                            <input type="hidden" name="product_id" value="1">\n
+\n
+                            <h1>Free Product</h1>\n
+                            <div class="product_price">\n
+                                <span class="current_price">\n
+            \n
+        <span class="contact_for_price" style="color: #ef233c; font-weight: 600;">Liên hệ</span>\n
+    </span>\n
+                            </div>\n
+                            <div class="product_ratting">\n
+                                <ul>\n
+                                                                                                                <li><a href="javascript:void(0)"><i\n
+                                                    class="fa fa-star-o"></i></a>\n
+                                        </li>\n
+                                                                            <li><a href="javascript:void(0)"><i\n
+                                                    class="fa fa-star-o"></i></a>\n
+                                        </li>\n
+                                                                            <li><a href="javascript:void(0)"><i\n
+                                                    class="fa fa-star-o"></i></a>\n
+                                        </li>\n
+                                                                            <li><a href="javascript:void(0)"><i\n
+                                                    class="fa fa-star-o"></i></a>\n
+                                        </li>\n
+                                                                            <li><a href="javascript:void(0)"><i\n
+                                                    class="fa fa-star-o"></i></a>\n
+                                        </li>\n
+                                                                        <li class="review">\n
+                                        <a href="#reviews" id="view-reviews-link">\n
+                                            (0 Đánh giá)\n
+                                        </a>\n
+                                    </li>\n
+                                </ul>\n
+                            </div>\n
+\n
+                            \n
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0;">\n
+                                                                                                                                                                                            </div>\n
+\n
+                            <div class="product_desc">\n
+                                <p></p>\n
+                            </div>\n
+\n
+                            \n
+                            <div class="product_variant quantity" style="display: flex; align-items: flex-start; flex-wrap: wrap; gap: 20px;">\n
+                                <div style="display: flex; flex-direction: column; gap: 5px;">\n
+                                    <label style="margin-bottom: 0; font-weight: 700;">Số lượng</label>\n
+                                    <div class="quantity-selector" style="margin-top: 0;">\n
+                                        <button type="button" class="qty-btn minus">-</button>\n
+                                        <input min="1" value="1" type="number" name="quantity" id="quantity_input">\n
+                                        <button type="button" class="qty-btn plus">+</button>\n
+                                    </div>\n
+                                    <span id="stock-info" style="display: none; font-size: 13px; color: #ef233c;"></span>\n
+                                </div>\n
+                                <div style="display: flex; gap: 10px; align-items: center; padding-top: 26px;">\n
+                                    <input type="hidden" name="action" id="action_input" value="add_to_cart">\n
+                                    <button class="button" type="button" style="margin: 0;"\n
+                                        id="btn-add-to-cart">Thêm vào giỏ</button>\n
+                                    <button class="button buy_now" type="button" style="margin: 0;"\n
+                                        id="btn-buy-now">Mua ngay</button>\n
+                                </div>\n
+                            </div>\n
+                            <div class="product_d_action">\n
+                                <ul>\n
+                                    <li>\n
+                                        <a href="#" class="add-to-wishlist" data-id="1"\n
+                                            title="Thêm vào yêu thích">\n
+                                            <i class="fa fa-heart-o" aria-hidden="true"></i>\n
+                                            Thêm vào yêu thích\n
+                                        </a>\n
+                                    </li>\n
+                                </ul>\n
+                            </div>\n
+\n
+                        </form>\n
+                        <div class="priduct_social">\n
+                            <h3>Chia sẻ qua:</h3>\n
+                            <ul>\n
+                                <li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Felite.test%2Fproduct%2Ffree-product"\n
+                                        target="_blank" rel="noopener noreferrer" title="Share on Facebook"><i class="fa fa-facebook"></i></a></li>\n
+                                <li><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Felite.test%2Fproduct%2Ffree-product&text=Free+Product"\n
+                                        target="_blank" rel="noopener noreferrer" title="Share on Twitter"><i class="fa fa-twitter"></i></a></li>\n
+                            </ul>\n
+                        </div>\n
+\n
+                        \n
+                    </div>\n
+                </div>\n
+            </div>\n
+        </div>\n
+    </div>\n
+    <!--product details end-->\n
+\n
+    <!--product info start-->\n
+    <div class="product_d_info">\n
+        <div class="container">\n
+            <div class="row">\n
+                <div class="col-12">\n
+                    <div class="product_d_inner">\n
+                        <div class="product_info_button">\n
+                            <ul class="nav" role="tablist">\n
+                                <li>\n
+                                    <a class="active" data-bs-toggle="tab" href="#info" role="tab"\n
+                                        aria-controls="info" aria-selected="false">Thông tin chi tiết</a>\n
+                                </li>\n
+                                <li>\n
+                                    <a data-bs-toggle="tab" href="#reviews" role="tab" aria-controls="reviews"\n
+                                        aria-selected="false">Đánh giá\n
+                                        (0)</a>\n
+                                </li>\n
+                            </ul>\n
+                        </div>\n
+                        <div class="tab-content">\n
+                            <div class="tab-pane fade show active" id="info" role="tabpanel">\n
+                                <div class="product_info_content" style="max-height: 400px; overflow-y: auto;">\n
+                                    <p></p>\n
+                                </div>\n
+                            </div>\n
+\n
+                            <div class="tab-pane fade" id="reviews" role="tabpanel">\n
+                                <div class="product_info_content">\n
+                                    <p>Đánh giá của khách hàng cho Free Product</p>\n
+                                </div>\n
+                                                                    <div class="alert alert-light text-center py-4"\n
+                                        style="border: 1px dashed #ddd; border-radius: 8px;">\n
+                                        <i class="fa fa-commenting-o mb-2"\n
+                                            style="font-size: 24px; color: #ccc; display: block;"></i>\n
+                                        <span class="text-muted">Sản phẩm chưa có đánh giá nào.</span>\n
+                                    </div>\n
+                                                                <div class="product_review_form">\n
+                                                                        \n
+                                                                            <p>Vui lòng <a href="https://elite.test/login" style="color: #ef233c; font-weight: bold;">Đăng nhập</a> để gửi đánh giá của bạn.</p>\n
+                                                                    </div>\n
+                            </div>\n
+                        </div>\n
+                    </div>\n
+                </div>\n
+            </div>\n
+        </div>\n
+    </div>\n
+    <!--product info end-->\n
+\n
+    <!--product section area start-->\n
+    <section class="product_section related_product">\n
+        <div class="container">\n
+            <div class="row">\n
+                <div class="col-12">\n
+                    <div class="section_title">\n
+                        <h2>Sản phẩm liên quan</h2>\n
+                    </div>\n
+                </div>\n
+            </div>\n
+            <div class="product_area">\n
+                <div class="product_carousel product_three_column4 owl-carousel">\n
+                                            </div>\n
+                    </div>\n
+                </div>\n
+            </div>\n
+        </div>\n
+    </section>\n
+\n
+    \n
+    <footer class="footer_widgets footer_six">\n
+    <div class="footer_support" style="border-top: 1px solid #ebebeb; padding: 40px 0; background: #fff;">\n
+        <div class="container-fluid">\n
+            <div class="row justify-content-center" style="gap: 20px;">\n
+                <div class="col-lg-auto col-md-12 mb-4 mb-lg-0 px-3 px-lg-4">\n
+                    <div class="support_block" style="text-align: left;">\n
+                        <p style="text-transform: uppercase; font-size: 14px; color: #333; margin-bottom: 15px; font-weight: 500;">GỌI MUA HÀNG ( 8:30 - 22:20 )</p>\n
+                        <div class="support_phone" style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">\n
+                            <i class="fa fa-phone" style="background: #df2d2d; color: #fff; width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 50%; font-size: 20px;"></i>\n
+                            <span style="font-size: 24px; font-weight: 300; color: #333; letter-spacing: 1px;">096728.4444</span>\n
+                        </div>\n
+                        <p style="color: #666; font-size: 13px; margin-bottom: 0;">Tất cả các ngày trong tuần</p>\n
+                    </div>\n
+                </div>\n
+                <div class="col-lg-auto col-md-12 mb-4 mb-lg-0 px-3 px-lg-4">\n
+                    <div class="support_block" style="text-align: left;">\n
+                        <p style="text-transform: uppercase; font-size: 14px; color: #333; margin-bottom: 15px; font-weight: 500;">GÓP Ý, KHIẾU NẠI ( 8:00 - 17:00 )</p>\n
+                        <div class="support_phone" style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">\n
+                            <i class="fa fa-phone" style="background: #df2d2d; color: #fff; width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 50%; font-size: 20px;"></i>\n
+                            <span style="font-size: 24px; font-weight: 300; color: #333; letter-spacing: 1px;">096.895.90.50</span>\n
+                        </div>\n
+                        <p style="color: #666; font-size: 13px; margin-bottom: 0;">Các ngày trong tuần ( trừ ngày lễ )</p>\n
+                    </div>\n
+                </div>\n
+                <div class="col-lg-auto col-md-12 px-3 px-lg-4">\n
+                    <div class="support_block" style="text-align: left;">\n
+                        <p style="text-transform: uppercase; font-size: 16px; color: #333; margin-bottom: 15px; font-weight: 500;">THEO DÕI CHÚNG TÔI</p>\n
+                        <div class="social_follow" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">\n
+                            <a href="https://www.facebook.com/profile.php?id=61577211110743" target="_blank" rel="noopener noreferrer" style="color: #333; font-size: 32px; transition: color 0.3s;"><i class="fa fa-facebook-square"></i></a>\n
+                            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" style="color: #333; font-size: 32px; transition: color 0.3s;"><i class="fa fa-instagram"></i></a>\n
+                            <a href="#" target="_blank" rel="noopener noreferrer" style="transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">\n
+                                <img src="https://icon-icons.com/download-file?file=https%3A%2F%2Fimages.icon-icons.com%2F3915%2FPNG%2F512%2Fshopee_logo_icon_249631.png&id=249631&pack_or_individual=pack  " alt="Shopee" style="width: 32px; height: 32px; object-fit: contain; margin-bottom: 8px;">\n
+                            </a>\n
+                            <a href="#" target="_blank" rel="noopener noreferrer" style="transition: opacity 0.3s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">\n
+                                <img src="https://www.citypng.com/public/uploads/preview/lazada-laz-square-white-icon-701751694968344ipp4hnbd4h.png?v=2026031223" alt="Lazada" style="width: 32px; height: 32px; object-fit: contain;">\n
+                            </a>\n
+                        </div>\n
+                    </div>\n
+                </div>\n
+            </div>\n
+        </div>\n
+    </div>\n
+    <div class="footer_top">\n
+        <div class="container-fluid">\n
+            <div class="row">\n
+                <div class="col-lg-2 col-md-6 col-sm-6 col-6">\n
+                    <div class="widgets_container">\n
+                        <h3>Thông tin</h3>\n
+                        <div class="footer_menu">\n
+                            <ul>\n
+                                <li><a href="https://elite.test/about">Giới thiệu</a></li>\n
+                                <li><a href="http://127.0.0.1:8000/news">Thông tin giao hàng</a></li>\n
+                                <li><a href="http://127.0.0.1:8000/news">    Chính sách bảo mật</a></li>\n
+                                <li><a href="http://127.0.0.1:8000/news">Điều khoản &amp; Điều kiện</a></li>\n
+                                <li><a href="https://elite.test/contact">Liên hệ</a></li>\n
+                                <li><a href="http://127.0.0.1:8000/news">Đổi trả</a></li>\n
+                            </ul>\n
+                        </div>\n
+                    </div>\n
+                </div>\n
+                <div class="col-lg-2 col-md-6 col-sm-6 col-6">\n
+                    <div class="widgets_container">\n
+                        <h3>Tiện ích mở rộng</h3>\n
+                        <div class="footer_menu">\n
+                            <ul>\n
+                                <li><a href="#">Thương hiệu</a></li>\n
+                                <li><a href="#">Phiếu quà tặng</a></li>\n
+                                <li><a href="#">Đại lý</a></li>\n
+                                <li><a href="#">Khuyến mãi đặc biệt</a></li>\n
+                                <li><a href="#">Sơ đồ trang web</a></li>\n
+                                <li><a href="https://elite.test/my-account">Tài khoản của tôi</a></li>\n
+                            </ul>\n
+                        </div>\n
+                    </div>\n
+                </div>\n
+                <div class="col-lg-4 col-md-6">\n
+                    <div class="widgets_container contact_us">\n
+                        <h3>Liên hệ</h3>\n
+                        <div class="footer_contact">\n
+                            <p>Địa chỉ: Số 7 Ngõ 91 Lai Xá - Hoài Đức - Thành Phố Hà Nội - Việt Nam</p>\n
+                            <p>Số điện thoại: <a href="tel:0354869999">0354869999</a> </p>\n
+                            <p>Email: Elite@gmail.com</p>\n
+                            <ul>\n
+                                <li><a href="https://twitter.com/" title="Twitter" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a></li>\n
+                                <li><a href="https://plus.google.com/" title="google-plus" target="_blank" rel="noopener noreferrer"><i class="fa fa-google-plus"></i></a></li>\n
+                                <li><a href="https://www.facebook.com/profile.php?id=61577211110743" title="facebook" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook"></i></a></li>\n
+                                <li><a href="https://www.instagram.com/" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a></li>\n
+                                <li><a href="https://www.youtube.com/" title="youtube" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube"></i></a></li>\n
+                            </ul>\n
+                            <div class="bocongthuong_logo" style="margin-top: 15px;">\n
+                                <a href="http://online.gov.vn/" target="_blank" rel="noopener noreferrer">\n
+                                    <img src="https://tenten.vn/tin-tuc/wp-content/uploads/2024/09/Dinh-nghia-Da-thong-bao-voi-Bo-Cong-Thuong-la-gi.png" alt="Đã thông báo Bộ Công Thương" style="max-width: 360px;">\n
+                                </a>\n
+                            </div>\n
+                        </div>\n
+                    </div>\n
+                </div>\n
+                <div class="col-lg-4 col-md-6">\n
+                    <div class="widgets_container newsletter">\n
+                        <h3>Đăng ký nhận bản tin</h3>\n
+                        <div class="newleter-content">\n
+                            <p>Chất lượng vượt trội. Nhà máy đạo đức. Đăng ký để được miễn phí vận chuyển và đổi trả cho đơn hàng đầu tiên của bạn.</p>\n
+                            <div class="subscribe_form">\n
+                                <form id="mc-form" class="mc-form footer-newsletter">\n
+                                    <input id="mc-email" name="mc-email" type="email" autocomplete="off"\n
+                                        placeholder="Nhập địa chỉ email của bạn..." aria-label="Email Address for newsletter" />\n
+                                    <button id="mc-submit" aria-label="Subscribe to newsletter">Đăng ký!</button>\n
+                                </form>\n
+                                <div class="mailchimp-alerts text-centre">\n
+                                    <div class="mailchimp-submitting"></div>\n
+                                    <div class="mailchimp-success"></div>\n
+                                    <div class="mailchimp-error"></div>\n
+                                </div>\n
+                            </div>\n
+                        </div>\n
+                    </div>\n
+                </div>\n
+            </div>\n
+        </div>\n
+    </div>\n
+    \n
+    <script>\n
+        document.addEventListener('DOMContentLoaded', function() {\n
+            const mcForm = document.getElementById('mc-form');\n
+            if (mcForm) {\n
+                // Prevent default submission to avoid navigating away or showing default errors built-in somewhere\n
+                $(mcForm).on('submit', function(e) {\n
+                    e.preventDefault();\n
+                    const mcEmail = document.getElementById('mc-email');\n
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;\n
+                    \n
+                    if(mcEmail && mcEmail.value && emailRegex.test(mcEmail.value)) {\n
+                        if (typeof Swal !== 'undefined') {\n
+                            Swal.fire({\n
+                                icon: 'success',\n
+                                title: 'Thành công!',\n
+                                text: 'Cảm ơn bạn đã đăng ký nhận bản tin!',\n
+                                confirmButtonColor: '#ef233c',\n
+                            });\n
+                        } else {\n
+                            alert('Cảm ơn bạn đã đăng ký nhận bản tin!');\n
+                        }\n
+                        mcForm.reset();\n
+                    } else {\n
+                        if (typeof Swal !== 'undefined') {\n
+                            Swal.fire({\n
+                                icon: 'error',\n
+                                title: 'Lỗi!',\n
+                                text: 'Vui lòng nhập địa chỉ email hợp lệ.',\n
+                                confirmButtonColor: '#ef233c',\n
+                            });\n
+                        } else {\n
+                            alert('Vui lòng nhập địa chỉ email hợp lệ.');\n
+                        }\n
+                    }\n
+                });\n
+            }\n
+        });\n
+    </script>\n
+</footer>\n
+    <!-- JS\n
+    ============================================ -->\n
+\n
+    <!-- Plugins JS -->\n
+    <script src="https://elite.test/frontend-assets/js/plugins.js"></script>\n
+\n
+    <!-- Main JS -->\n
+    <script src="https://elite.test/frontend-assets/js/main.js"></script>\n
+\n
+    <!-- Search Autocomplete JS -->\n
+    <script src="https://elite.test/frontend-assets/js/search-autocomplete.js"></script>\n
+\n
+    <!-- Global UX Fixes -->\n
+    <script src="https://elite.test/frontend-assets/js/ux-fixes.js"></script>\n
+\n
+        <script>\n
+$(document).ready(function() {\n
+    // Mini cart remove item\n
+    $('.mini-cart-remove').click(function(e) {\n
+        e.preventDefault();\n
+        var itemId = $(this).data('id');\n
+        var container = document.getElementById('mini-cart-container');\n
+        var config = container ? container.dataset : {};\n
+        \n
+            if(confirm('Remove this product from cart?')) {\n
+                $.ajax({\n
+                    url: config.routeRemove,\n
+                    method: 'POST',\n
+                    data: {\n
+                        _token: config.csrf,\n
+                        _method: 'DELETE',\n
+                        id: itemId\n
+                    },\n
+                success: function(response) {\n
+                    if(response.success) {\n
+                        location.reload();\n
+                    } else {\n
+                        alert(response.message || 'An error occurred.');\n
+                    }\n
+                },\n
+                error: function(xhr) {\n
+                    alert('An error occurred. Please try again.');\n
+                }\n
+            });\n
+        }\n
+    });\n
+});\n
+</script>\n
+<script>\n
+$(document).ready(function() {\n
+    // Mini cart remove item\n
+    $('.mini-cart-remove').click(function(e) {\n
+        e.preventDefault();\n
+        var itemId = $(this).data('id');\n
+        var container = document.getElementById('mini-cart-container');\n
+        var config = container ? container.dataset : {};\n
+        \n
+            if(confirm('Remove this product from cart?')) {\n
+                $.ajax({\n
+                    url: config.routeRemove,\n
+                    method: 'POST',\n
+                    data: {\n
+                        _token: config.csrf,\n
+                        _method: 'DELETE',\n
+                        id: itemId\n
+                    },\n
+                success: function(response) {\n
+                    if(response.success) {\n
+                        location.reload();\n
+                    } else {\n
+                        alert(response.message || 'An error occurred.');\n
+                    }\n
+                },\n
+                error: function(xhr) {\n
+                    alert('An error occurred. Please try again.');\n
+                }\n
+            });\n
+        }\n
+    });\n
+});\n
+</script>\n
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>\n
+    <script>\n
+        // Likert scale labels\n
+        var likertLabels = {\n
+            1: 'Rất không hài lòng',\n
+            2: 'Không hài lòng',\n
+            3: 'Bình thường',\n
+            4: 'Hài lòng',\n
+            5: 'Rất hài lòng'\n
+        };\n
+\n
+        $(document).ready(function() {\n
+            \n
+            \n
+\n
+            // Star hover - show likert label\n
+            $('.star-rating label').on('mouseenter', function() {\n
+                var val = $(this).prev('input').val();\n
+                if (val) {\n
+                    $('#likert-label').text(likertLabels[val]).show();\n
+                }\n
+            });\n
+\n
+            // Mouse leave star area - show selected or hide\n
+            $('.star-rating').on('mouseleave', function() {\n
+                var selected = $(this).find('input:checked').val();\n
+                if (selected) {\n
+                    $('#likert-label').text(likertLabels[selected]).show();\n
+                } else {\n
+                    $('#likert-label').hide();\n
+                }\n
+            });\n
+\n
+            // Star selected - keep label\n
+            $('.star-rating input').on('change', function() {\n
+                var val = $(this).val();\n
+                $('#likert-label').text(likertLabels[val]).show();\n
+                console.log('Rating selected: ' + val);\n
+            });\n
+\n
+            // Handle Review link click\n
+            $('#view-reviews-link').on('click', function(e) {\n
+                e.preventDefault();\n
+                var tab = new bootstrap.Tab($('a[href="#reviews"]')[0]);\n
+                tab.show();\n
+                $('html, body').animate({\n
+                    scrollTop: $(".product_d_info").offset().top - 100\n
+                }, 500);\n
+            });\n
+\n
+            $('.add-to-wishlist').click(function(e) {\n
+                e.preventDefault();\n
+                const config = document.getElementById('product-details-container').dataset;\n
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;\n
+                var productId = $(this).data('id');\n
+                var icon = $(this).find('i');\n
+\n
+                $.ajax({\n
+                    url: config.routeWishlistAdd,\n
+                    method: 'POST',\n
+                    data: {\n
+                        _token: csrfToken,\n
+                        product_id: productId\n
+                    },\n
+                    success: function(response) {\n
+                        if (response.status === 'success' || response.status === 'info') {\n
+                            // Change icon to filled heart\n
+                            icon.removeClass('fa-heart-o').addClass('fa-heart').css('color',\n
+                                'red');\n
+                            alert(response.message);\n
+                        } else {\n
+                            // This else block seems to be part of a different context in the provided snippet.\n
+                            // Reverting to original logic for wishlist success.\n
+                            alert(response.message);\n
+                        }\n
+                    },\n
+                    error: function(xhr) {\n
+                        // The provided snippet's error handling seems to be for a different context (AI/VTON).\n
+                        // Reverting to original logic for wishlist error.\n
+                        if (xhr.status === 401) {\n
+                            window.location.href = config.routeLogin;\n
+                        } else {\n
+                            alert('An error occurred, please try again!');\n
+                        }\n
+                    }\n
+                });\n
+            });\n
+\n
+            // AJAX Add to Cart\n
+            $('#btn-add-to-cart').on('click', function() {\n
+                $('#action_input').val('add_to_cart');\n
+                submitAddToCartForm(false);\n
+            });\n
+\n
+            $('#btn-buy-now').on('click', function() {\n
+                $('#action_input').val('buy_now');\n
+                submitAddToCartForm(true);\n
+            });\n
+\n
+            function submitAddToCartForm(isBuyNow) {\n
+                const config = document.getElementById('product-details-container').dataset;\n
+                var form = $('#add-to-cart-form');\n
+                var url = form.attr('action');\n
+                var allVariants = JSON.parse(config.variants);\n
+\n
+                // Kiểm tra thuộc tính bắt buộc\n
+                var hasVariants = config.hasVariants === 'true';\n
+\n
+                if (hasVariants) {\n
+\n
+                    var selectedSize = $('#select_size_nice').val();\n
+                    var selectedColor = $('#select_color_nice').val();\n
+\n
+                    // Validate: phải chọn đủ size và color\n
+                    if (!selectedSize || !selectedColor) {\n
+                        var missingFields = [];\n
+                        if (!selectedSize) {\n
+                            missingFields.push(config.msgSize);\n
+                            $('#select_size_nice').next('.nice-select').css('border-color', '#ef233c');\n
+                        }\n
+                        if (!selectedColor) {\n
+                            missingFields.push(config.msgColor);\n
+                            $('#select_color_nice').next('.nice-select').css('border-color', '#ef233c');\n
+                        }\n
+                        setTimeout(function() {\n
+                            $('.niceselect_option').next('.nice-select').css('border-color', '');\n
+                        }, 3000);\n
+\n
+                        var message = missingFields.length > 0 ?\n
+                            'Vui lòng chọn: <strong>' + missingFields.join(', ') + '</strong> trước khi tiếp tục!' :\n
+                            'Vui lòng chọn đầy đủ thuộc tính sản phẩm!';\n
+\n
+                        Swal.fire({\n
+                            icon: 'warning',\n
+                            title: 'Chưa chọn thuộc tính!',\n
+                            html: message,\n
+                            confirmButtonColor: '#ef233c',\n
+                            confirmButtonText: 'Chọn ngay',\n
+                            timer: 4000,\n
+                            timerProgressBar: true,\n
+                        });\n
+                        return;\n
+                    }\n
+\n
+                    // Tự tìm variant khớp với size + color đã chọn\n
+                    var matchedVariant = null;\n
+                    for (var i = 0; i < allVariants.length; i++) {\n
+                        var v = allVariants[i];\n
+                        if (String(v.size_id) === String(selectedSize) && String(v.color_id) === String(\n
+                                selectedColor)) {\n
+                            matchedVariant = v;\n
+                            break;\n
+                        }\n
+                    }\n
+\n
+                    if (!matchedVariant) {\n
+                        Swal.fire({\n
+                            icon: 'warning',\n
+                            title: 'Tổ hợp không có!',\n
+                            text: 'Không tìm thấy sản phẩm với size và màu sắc này.',\n
+                            confirmButtonColor: '#ef233c',\n
+                        });\n
+                        return;\n
+                    }\n
+\n
+                    if (matchedVariant.stock_quantity <= 0) {\n
+                        Swal.fire({\n
+                            icon: 'error',\n
+                            title: 'Hết hàng!',\n
+                            html: 'Sản phẩm với lựa chọn này hiện đã <strong>hết hàng</strong>.<br>Vui lòng chọn thuộc tính khác.',\n
+                            confirmButtonColor: '#ef233c',\n
+                            confirmButtonText: 'Chọn lại',\n
+                        });\n
+                        return;\n
+                    }\n
+\n
+                    // Kiểm tra số lượng yêu cầu vượt tồn kho\n
+                    var requestedQty = parseInt($('#quantity_input').val()) || 1;\n
+                    if (requestedQty > matchedVariant.stock_quantity) {\n
+                        Swal.fire({\n
+                            icon: 'warning',\n
+                            title: 'Vượt quá tồn kho!',\n
+                            html: `Chỉ còn <strong>${matchedVariant.stock_quantity}</strong> sản phẩm trong kho.<br>Số lượng đã được điều chỉnh về mức tối đa.`,\n
+                            confirmButtonColor: '#ef233c',\n
+                            confirmButtonText: 'Đồng ý',\n
+                        });\n
+                        $('#quantity_input').val(matchedVariant.stock_quantity);\n
+                        return;\n
+                    }\n
+\n
+                    // Gán variant_id vào form trước khi serialize\n
+                    $('#variant_select').val(matchedVariant.id);\n
+                }\n
+\n
+                var data = form.serialize();\n
+\n
+                if (isBuyNow) {\n
+                    $('#action_input').val('buy_now');\n
+                    data = form.serialize();\n
+                }\n
+\n
+                if (!isBuyNow) {\n
+                    Swal.fire({\n
+                        title: 'Đang thêm vào giỏ hàng...',\n
+                        allowOutsideClick: false,\n
+                        didOpen: () => {\n
+                            Swal.showLoading();\n
+                        }\n
+                    });\n
+                }\n
+\n
+                $.ajax({\n
+                    type: "POST",\n
+                    url: url,\n
+                    data: data,\n
+                    headers: {\n
+                        'Accept': 'application/json'\n
+                    },\n
+                    success: function(response) {\n
+                        if (response.redirect) {\n
+                            // buy_now → chuyển đến checkout\n
+                            window.location.href = response.redirect;\n
+                            return;\n
+                        }\n
+                        Swal.fire({\n
+                            title: 'Thành công!',\n
+                            text: 'Sản phẩm đã được thêm vào giỏ hàng.',\n
+                            icon: 'success',\n
+                            showConfirmButton: false,\n
+                            timer: 1500\n
+                        });\n
+                        // Cập nhật số lượng giỏ hàng trên header\n
+                        let cartCountElements = document.querySelectorAll('.cart-count');\n
+                        if (response.count !== undefined) {\n
+                            cartCountElements.forEach(el => {\n
+                                el.innerText = response.count;\n
+                                el.classList.remove('pulse-animation');\n
+                                void el.offsetWidth;\n
+                                el.classList.add('pulse-animation');\n
+                            });\n
+                        } else {\n
+                            const config = document.getElementById('product-details-container').dataset;\n
+                            $.get(config.routeCartCount, function(res) {\n
+                                if (res && res.count !== undefined) {\n
+                                    cartCountElements.forEach(el => {\n
+                                        el.innerText = res.count;\n
+                                        el.classList.remove('pulse-animation');\n
+                                        void el.offsetWidth;\n
+                                        el.classList.add('pulse-animation');\n
+                                    });\n
+                                }\n
+                            });\n
+                        }\n
+                    },\n
+                    error: function(xhr) {\n
+                        var msg = (xhr.responseJSON && xhr.responseJSON.message) ?\n
+                            xhr.responseJSON.message :\n
+                            'Vui lòng chọn đầy đủ thuộc tính sản phẩm.';\n
+                        if (xhr.status === 422) {\n
+                            $('.niceselect_option').next('.nice-select').css('border-color', '#ef233c');\n
+                            setTimeout(function() {\n
+                                $('.niceselect_option').next('.nice-select').css('border-color',\n
+                                    '');\n
+                            }, 3000);\n
+                        }\n
+                        Swal.fire({\n
+                            title: 'Không thể thêm',\n
+                            text: msg,\n
+                            icon: 'warning',\n
+                            confirmButtonColor: '#ef233c'\n
+                        });\n
+                    }\n
+                });\n
+            }\n
+\n
+            // Quantity increment/decrement buttons\n
+            $('.qty-btn.plus').on('click', function() {\n
+                var input = $('#quantity_input');\n
+                var val = parseInt(input.val()) || 1;\n
+                var max = parseInt(input.attr('max'));\n
+                if (!max || val < max) {\n
+                    input.val(val + 1).trigger('input');\n
+                } else {\n
+                    Swal.fire({\n
+                        toast: true,\n
+                        position: 'top-end',\n
+                        icon: 'warning',\n
+                        title: `Chỉ còn ${max} sản phẩm trong kho!`,\n
+                        showConfirmButton: false,\n
+                        timer: 2000\n
+                    });\n
+                }\n
+            });\n
+\n
+            $('.qty-btn.minus').on('click', function() {\n
+                var input = $('#quantity_input');\n
+                var val = parseInt(input.val()) || 1;\n
+                if (val > 1) {\n
+                    input.val(val - 1).trigger('input');\n
+                }\n
+            });\n
+        });\n
+    </script>\n
+\n
+        <div id="layout-config" style="display: none;"\n
+        data-session-error=""\n
+        data-session-success=""\n
+        data-session-warning=""\n
+        data-session-info=""\n
+        data-auth-check="false"\n
+        data-auth-id=""\n
+        data-session-id="6sbpaXrbvg2ZQaPkJ4JI9neBaRDoqMnP43t8VFxx"\n
+    ></div>\n
+\n
+    <script type="text/javascript">\n
+        $(document).ready(function () {\n
+            const config = document.getElementById('layout-config').dataset;\n
+\n
+            if (window.location.hash && window.location.hash == '#_=_') {\n
+                if (window.history && history.pushState) {\n
+                    window.history.pushState("", document.title, window.location.pathname + window.location.search);\n
+                } else {\n
+                    var scroll = { top: document.body.scrollTop, left: document.body.scrollLeft };\n
+                    window.location.hash = '';\n
+                    document.body.scrollTop = scroll.top;\n
+                    document.body.scrollLeft = scroll.left;\n
+                }\n
+            }\n
+\n
+            // Flash session messages → SweetAlert2\n
+            if (config.sessionError) {\n
+                Swal.fire({\n
+                    icon: 'error',\n
+                    title: 'Lỗi!',\n
+                    html: config.sessionError,\n
+                    confirmButtonColor: '#ef233c',\n
+                    confirmButtonText: 'Đóng',\n
+                });\n
+            }\n
+\n
+            if (config.sessionSuccess) {\n
+                Swal.fire({\n
+                    toast: true,\n
+                    position: 'top-end',\n
+                    icon: 'success',\n
+                    title: config.sessionSuccess,\n
+                    showConfirmButton: false,\n
+                    timer: 3000,\n
+                    timerProgressBar: true,\n
+                });\n
+            }\n
+\n
+            if (config.sessionWarning) {\n
+                Swal.fire({\n
+                    icon: 'warning',\n
+                    title: 'Cảnh báo',\n
+                    html: config.sessionWarning,\n
+                    confirmButtonColor: '#ef233c',\n
+                });\n
+            }\n
+\n
+            if (config.sessionInfo) {\n
+                Swal.fire({\n
+                    icon: 'info',\n
+                    title: 'Thông báo',\n
+                    html: config.sessionInfo,\n
+                    confirmButtonColor: '#333',\n
+                });\n
+            }\n
+        });\n
+    </script>\n
+\n
+    <script type="module">\n
+        const config = document.getElementById('layout-config').dataset;\n
+        if (window.Echo) {\n
+            let channel;\n
+            if (config.authCheck === 'true') {\n
+                channel = window.Echo.private('App.Models.User.' + config.authId);\n
+            } else {\n
+                channel = window.Echo.channel('cart.' + config.sessionId);\n
+            }\n
+\n
+            channel.listen('CartUpdatedEvent', (e) => {\n
+                // e.cartCount is from the CartUpdatedEvent constructor\n
+                let cartCountElements = document.querySelectorAll('.cart-count');\n
+                cartCountElements.forEach(el => {\n
+                    el.innerText = e.cartCount;\n
+                    \n
+                    // Thêm class nháy nhẹ (animation)\n
+                    el.classList.remove('pulse-animation');\n
+                    void el.offsetWidth; // trigger reflow\n
+                    el.classList.add('pulse-animation');\n
+                });\n
+            });\n
+        }\n
+    </script>\n
+\n
+    <style>\n
+        @keyframes cartPulse {\n
+            0% { transform: scale(1); }\n
+            50% { transform: scale(1.5); color: #ef233c; }\n
+            100% { transform: scale(1); }\n
+        }\n
+        .pulse-animation {\n
+            animation: cartPulse 0.5s ease-in-out;\n
+            display: inline-block;\n
+        }\n
+    </style>\n
+</body>\n
+\n
+\n
+<!-- Mirrored from htmldemo.net/reid/reid/index-6.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 15 Jan 2026 03:35:39 GMT -->\n
+\n
+</html>
+
+  To contain: 0 VND
+
+  at tests\Feature\ProductDetailAuditTest.php:70
+     66▕         $response = $this->get('/product/' . $product->slug);
+     67▕ 
+     68▕         $response->assertStatus(200);
+     69▕         $response->assertSee('Free Product');
+  ➜  70▕         $response->assertSee('0 VND'); 
+     71▕     }
+     72▕ 
+     73▕     #[\PHPUnit\Framework\Attributes\Test]
+     74▕     public function it_handles_invalid_pagination_or_filter_queries_gracefully()
+
+  ─────────────────────────  
+   FAILED  Tests\Feature…   
+  Expected response status code [200] but received 404.
+Failed asserting that 404 is identical to 200.
+
+  at tests\Feature\ProductTest.php:16
+     12▕ 
+     13▕     public function test_user_can_view_products()
+     14▕     {
+     15▕         $response = $this->get('/products');
+  ➜  16▕         $response->assertStatus(200);
+     17▕     }
+     18▕ }
+     19▕
+
+  ─────────────────────────  
+   FAILED  Tests\Feature…   
+  Failed asserting that an array contains 404.
+
+  at tests\Feature\ReviewTest.php:9
+      5▕ class ReviewTest extends TestCase {
+      6▕     use RefreshDatabase;
+      7▕     public function test_user_can_submit_review() {
+      8▕         $response = $this->post('/reviews', ['rating' => 5]);
+  ➜   9▕         $this->assertContains($response->status(), [302, 401, 422]);
+     10▕     }
+     11▕ }
+     12▕
+
+  1   tests\Feature\ReviewTest.php:9
+
+
+  Tests:    14 failed, 82 passed (177 assertions)
+  Duration: 4.09s
+

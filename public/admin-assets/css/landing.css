@@ -240,6 +240,12 @@ header .container {
   animation: move-bg 24s infinite linear;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .hero-text-gradient {
+    animation: none;
+  }
+}
+
 @keyframes move-bg {
   to {
     background-position: var(--bg-size) 0;

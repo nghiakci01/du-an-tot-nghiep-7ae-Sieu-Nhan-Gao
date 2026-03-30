@@ -29,13 +29,13 @@
                     $barcodeUrl = "https://barcode.tec-it.com/barcode.ashx?data=" . $order->id . "&code=Code128&translate-esc=true&dpi=96";
                 @endphp
                 <div class="d-flex justify-content-end align-items-center">
-                    <div class="me-3 text-center border p-1 bg-white rounded shadow-sm d-inline-block">
-                        <img src="{{ $barcodeUrl }}" alt="Mã Vạch Đơn Hàng" style="height: 50px; padding: 2px;">
-                        <div style="font-size: 10px; color: #555; margin-top: 2px;">Barcode</div>
+                    <div class="me-3 text-center border p-1 bg-body-secondary rounded shadow-sm d-inline-block">
+                        <img src="{{ $barcodeUrl }}" alt="Mã Vạch Đơn Hàng" style="height: 50px; padding: 2px; filter: brightness(var(--barcode-brightness, 1));">
+                        <div style="font-size: 10px; color: var(--bs-secondary-color); margin-top: 2px;">Barcode</div>
                     </div>
-                    <div class="me-3 text-center border p-1 bg-white rounded shadow-sm d-inline-block">
-                        <img src="{{ $qrCodeUrl }}" alt="Mã QR Đơn Hàng" style="width: 50px; height: 50px;">
-                        <div style="font-size: 10px; color: #555; margin-top: 2px;">QR Code</div>
+                    <div class="me-3 text-center border p-1 bg-body-secondary rounded shadow-sm d-inline-block">
+                        <img src="{{ $qrCodeUrl }}" alt="Mã QR Đơn Hàng" style="width: 50px; height: 50px; filter: brightness(var(--barcode-brightness, 1));">
+                        <div style="font-size: 10px; color: var(--bs-secondary-color); margin-top: 2px;">QR Code</div>
                     </div>
                     <a href="{{ route('admin.orders.print', $order->id) }}" target="_blank" class="btn btn-primary">
                         <i class="feather icon-printer"></i> In Hóa Đơn
@@ -50,13 +50,13 @@
     <!-- Left Column: Products -->
     <div class="col-md-8">
         <div class="card shadow-sm">
-            <div class="card-header bg-white border-bottom">
-                <h5 class="mb-0 text-dark"><i class="feather icon-shopping-cart text-primary me-2"></i>Sản phẩm trong đơn</h5>
+            <div class="card-header border-bottom">
+                <h5 class="mb-0"><i class="feather icon-shopping-cart text-primary me-2"></i>Sản phẩm trong đơn</h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
-                        <thead class="table-light">
+                        <thead class="table-active">
                             <tr>
                                 <th>Sản phẩm</th>
                                 <th class="text-end">Đơn giá</th>
@@ -86,7 +86,7 @@
                             </tr>
                             @endforeach
                         </tbody>
-                        <tfoot class="bg-light">
+                        <tfoot class="table-active">
                             <tr>
                                 <th colspan="3" class="text-end py-2">Tổng tiền hàng:</th>
                                 <th class="text-end py-2">{{ number_format($order->total_price, 0, ',', '.') }}đ</th>
@@ -119,24 +119,24 @@
 
         <!-- Order History -->
         <div class="card shadow-sm mt-4">
-            <div class="card-header bg-white border-bottom">
-                <h5 class="mb-0 text-dark"><i class="feather icon-clock text-info me-2"></i>Lịch sử trạng thái đơn hàng</h5>
+            <div class="card-header border-bottom">
+                <h5 class="mb-0"><i class="feather icon-clock text-info me-2"></i>Lịch sử trạng thái đơn hàng</h5>
             </div>
             <div class="card-body">
                 @if($order->histories->count() > 0)
                     <div class="timeline ml-2">
                         @foreach($order->histories as $history)
                             <div class="border-start border-2 border-primary ps-3 mb-4 position-relative">
-                                <span class="position-absolute top-0 start-0 translate-middle p-2 bg-primary border border-light rounded-circle"></span>
+                                <span class="position-absolute top-0 start-0 translate-middle p-2 bg-primary border border-2 border-body rounded-circle"></span>
                                 <div class="mb-1">
-                                    <strong class="text-dark">{{ $history->new_status }}</strong>
+                                    <strong class="text-body">{{ $history->new_status }}</strong>
                                     <small class="text-muted ms-2"><i class="feather icon-calendar"></i> {{ $history->created_at->format('d/m/Y H:i') }}</small>
                                 </div>
                                 <div class="text-muted small mb-1">
                                     <i class="feather icon-user"></i> Người cập nhật: <strong>{{ $history->user ? $history->user->name : 'Hệ thống tự động' }}</strong>
                                 </div>
                                 @if($history->note)
-                                    <div class="bg-light p-2 rounded small mt-2 border-start border-warning border-3">
+                                    <div class="bg-body-secondary p-2 rounded small mt-2 border-start border-warning border-3">
                                         <em>"{!! nl2br(e($history->note)) !!}"</em>
                                     </div>
                                 @endif
@@ -155,23 +155,50 @@
     <div class="col-md-4">
         <!-- Status Update Card -->
         <div class="card shadow-sm mb-4 border-top border-primary border-3">
-            <div class="card-header bg-white border-bottom">
-                <h5 class="mb-0 text-dark">Trạng thái hiện tại</h5>
+            <div class="card-header border-bottom">
+                <h5 class="mb-0">Trạng thái hiện tại</h5>
             </div>
             <div class="card-body text-center">
                 <h4 class="mb-3">
-                    <span class="badge {{ $order->status_badge }} px-3 py-2 fs-6">{{ $order->status_text }}</span>
+                    <span class="badge {{ $order->status_badge }} px-3 py-2 fs-6 shadow-sm">{{ $order->status_text }}</span>
                 </h4>
+
+                @if($order->returnRequest)
+                    <div class="alert alert-warning text-start mb-3">
+                        <h6 class="alert-heading fw-bold"><i class="feather icon-rotate-ccw me-1"></i> Đơn hàng có yêu cầu hoàn trả</h6>
+                        <hr class="my-2">
+                        <p class="mb-1 small">Trạng thái: 
+                            <span class="badge bg-{{ $order->returnRequest->status == 'completed' ? 'success' : ($order->returnRequest->status == 'rejected' ? 'danger' : 'warning text-dark') }}">
+                                {{ $order->returnRequest->status }}
+                            </span>
+                        </p>
+                        <p class="mb-2 small">Số tiền hoàn: <strong>{{ number_format($order->returnRequest->refund_amount) }}đ</strong></p>
+                        <a href="{{ route('admin.returns.index', ['order_id' => $order->id]) }}" class="btn btn-sm btn-info w-100 mb-2">
+                            <i class="feather icon-external-link"></i> Xem chi tiết yêu cầu
+                        </a>
+
+                        @if($order->returnRequest->videos && count($order->returnRequest->videos) > 0)
+                            <div class="mt-2 text-start">
+                                <h6 class="small fw-bold mb-1"><i class="bi bi-camera-reels me-1"></i>Video minh chứng:</h6>
+                                @foreach($order->returnRequest->videos as $vid)
+                                    <video controls style="width: 100%; max-height: 150px; border-radius: 4px; border: 1px solid #ddd;" class="mb-1">
+                                        <source src="{{ asset('storage/'.$vid) }}" type="video/mp4">
+                                    </video>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
                 
                 @if($order->canTransitionTo($order->status)) 
                 @php $allowed = $order->getAllowedTransitions(); @endphp
                 @if(count($allowed) > 0)
-                <form action="{{ route('admin.orders.update', $order) }}" method="POST" class="mt-4 text-start bg-light p-3 rounded">
+                <form action="{{ route('admin.orders.update', $order) }}" method="POST" class="mt-4 text-start p-3 rounded border status-update-form">
                     @csrf
                     @method('PUT')
                     <div class="mb-3">
                         <label class="form-label fw-bold">Chuyển sang trạng thái:</label>
-                        <select name="status" class="form-select border-primary">
+                        <select name="status" class="form-select">
                             <option value="">-- Chọn thao tác --</option>
                             @foreach($allowed as $status)
                                 <option value="{{ $status }}">
@@ -201,7 +228,7 @@
 
         <!-- Customer Card -->
         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-white border-bottom">
+            <div class="card-header border-bottom">
                 <h5 class="mb-0"><i class="feather icon-user text-success me-2"></i>Khách hàng</h5>
             </div>
             <div class="card-body">
@@ -215,7 +242,7 @@
 
         <!-- Shipping & Payment Card -->
         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-white border-bottom">
+            <div class="card-header border-bottom">
                 <h5 class="mb-0"><i class="feather icon-truck text-warning me-2"></i>Giao hàng & Thanh toán</h5>
             </div>
             <div class="card-body">
@@ -251,18 +278,6 @@
                         @endif
                     </p>
 
-                    @if($order->payment_method === 'VNPAY')
-                        <div class="d-grid gap-2 mt-3">
-                            <button type="button" class="btn btn-sm btn-outline-primary" id="btn-query-vnpay">
-                                <i class="feather icon-search"></i> Truy vấn trạng thái VNPAY
-                            </button>
-                            @if($order->payment_status === 'paid')
-                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#refundVnpayModal">
-                                    <i class="feather icon-rotate-ccw"></i> Yêu cầu hoàn tiền
-                                </button>
-                            @endif
-                        </div>
-                    @endif
 
                     @if($order->payment_method == 'BANK_TRANSFER' && $order->payment_status == 'waiting_confirmation')
                         <form action="{{ route('admin.orders.confirm-payment', $order->id) }}" method="POST" onsubmit="return confirm('Bạn đã chắc chắn nhận được tiền cho đơn hàng này?')">
@@ -285,10 +300,10 @@
         <!-- Note Card -->
         @if($order->note)
         <div class="card shadow-sm">
-            <div class="card-header bg-white border-bottom">
+            <div class="card-header border-bottom">
                 <h5 class="mb-0"><i class="feather icon-file-text text-secondary me-2"></i>Ghi chú của khách</h5>
             </div>
-            <div class="card-body bg-light text-danger">
+            <div class="card-body bg-body-secondary text-danger">
                 <em>"{{ $order->note }}"</em>
             </div>
         </div>
@@ -298,82 +313,11 @@
 </div>
 @endsection
 
-@if($order->payment_method === 'VNPAY' && $order->payment_status === 'paid')
-<!-- Refund Modal -->
-<div class="modal fade" id="refundVnpayModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <form action="{{ route('admin.orders.refund-payment', $order->id) }}" method="POST" class="modal-content">
-            @csrf
-            <div class="modal-header">
-                <h5 class="modal-title">Hoàn tiền VNPAY</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-info py-2">
-                    <p class="mb-0 small"><i class="feather icon-info me-1"></i> Số tiền tối đa có thể hoàn: <strong>{{ number_format($order->final_total) }}đ</strong></p>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Số tiền hoàn (VNĐ):</label>
-                    <input type="number" name="refund_amount" class="form-control" value="{{ (int)$order->final_total }}" min="1000" max="{{ (int)$order->final_total }}" required>
-                    <div class="form-text">Mặc định là hoàn toàn bộ đơn hàng.</div>
-                </div>
-                <div class="mb-0">
-                    <label class="form-label">Lý do hoàn tiền:</label>
-                    <textarea name="reason" class="form-control" rows="2" placeholder="VD: Khách hàng đổi trả sản phẩm..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="submit" class="btn btn-danger" onclick="return confirm('Xác nhận gửi yêu cầu hoàn tiền sang VNPAY?')">Xác nhận hoàn tiền</button>
-            </div>
-        </form>
-    </div>
-</div>
-@endif
 
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const btnQuery = document.getElementById('btn-query-vnpay');
-    if (btnQuery) {
-        btnQuery.addEventListener('click', function() {
-            const originalText = this.innerHTML;
-            this.disabled = true;
-            this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang kiểm tra...';
-
-            fetch("{{ route('admin.orders.query-payment', $order->id) }}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.innerHTML = originalText;
-                this.disabled = false;
-                
-                if (data.success) {
-                    let logMsg = `Kết quả từ VNPAY:\n- Trạng thái: ${data.message}\n- Mã phản hồi: ${data.data.vnp_ResponseCode}`;
-                    if (data.data.vnp_TransactionStatus) {
-                        logMsg += `\n- Tình trạng GD: ${data.data.vnp_TransactionStatus}`;
-                    }
-                    alert(logMsg);
-                    if (data.data.vnp_ResponseCode === '00' && "{{ $order->payment_status }}" !== 'paid') {
-                        location.reload();
-                    }
-                } else {
-                    alert('Lỗi: ' + data.message);
-                }
-            })
-            .catch(error => {
-                this.innerHTML = originalText;
-                this.disabled = false;
-                alert('Có lỗi xảy ra khi gọi API: ' + error.message);
-            });
-        });
-    }
+    // No VNPAY scripts needed
 });
 </script>
 @endsection

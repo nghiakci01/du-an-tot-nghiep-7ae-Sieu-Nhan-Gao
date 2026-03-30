@@ -155,15 +155,13 @@
 @php
   $shippingFee  = $order->shipping_fee ?? 0;
   $displayTotal = ($order->final_total > 0) ? $order->final_total : ($order->total_price + $shippingFee);
-  $statusSteps  = ['pending','confirmed','shipped','completed'];
+  $statusSteps  = ['pending','confirmed','shipped','completed','returned'];
   $curIdx       = array_search(strtolower($order->status), $statusSteps);
-  $isCancelled  = in_array(strtolower($order->status), ['cancelled','failed','returned']);
+  $isCancelled  = in_array(strtolower($order->status), ['cancelled','failed']);
   $progressW    = ($curIdx !== false && !$isCancelled) ? ($curIdx / (count($statusSteps)-1)) * 84 : 0;
   $pmLabel = match($order->payment_method) {
     'COD'           => '💵 Thanh toán khi nhận hàng (COD)',
     'BANK_TRANSFER' => '🏦 Chuyển khoản ngân hàng',
-    'VNPAY'         => '💳 VNPay',
-    'ZALOPAY'       => '💳 ZaloPay',
     default         => $order->payment_method,
   };
 @endphp
@@ -203,9 +201,6 @@
       </div>
       <div class="d-flex align-items-center gap-2">
         <span class="s-badge s-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
-        <a href="{{ route('order-tracking.index', ['order_id' => $order->id]) }}" class="btn btn-sm rounded-pill px-3" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);">
-          <i class="bi bi-truck me-1"></i>Theo dõi
-        </a>
       </div>
     </div>
 
@@ -213,10 +208,10 @@
     @if(!$isCancelled)
     <div class="status-track mt-4 pb-1">
       <div class="track-fill" style="--track-width: {{ $progressW }}%; width: var(--track-width);"></div>
-      @foreach(['pending'=>['Chờ xác nhận','bi-clipboard-check'],'confirmed'=>['Đã xác nhận','bi-shield-check'],'shipped'=>['Đang giao','bi-truck'],'completed'=>['Hoàn thành','bi-house-check']] as $s=>[$lbl,$icn])
+      @foreach(['pending'=>['Chờ xác nhận','bi-clipboard-check'],'confirmed'=>['Đã xác nhận','bi-shield-check'],'shipped'=>['Đang giao','bi-truck'],'completed'=>['Hoàn thành','bi-house-check'],'returned'=>['Hoàn hàng','bi-arrow-return-left']] as $s=>[$lbl,$icn])
         @php $idx = array_search($s, $statusSteps); $cls = $idx < $curIdx ? 'done' : ($idx == $curIdx ? 'active' : 'idle'); @endphp
         <div class="track-step">
-          <div class="track-dot {{ $cls }}"><i class="{{ $cls !== 'idle' && ($s==='completed'||$idx<$curIdx) ? 'bi bi-check-lg' : 'bi '.$icn }}"></i></div>
+          <div class="track-dot {{ $cls }}"><i class="{{ $cls !== 'idle' && ($s==='completed' || $s==='returned' || $idx<$curIdx) ? 'bi bi-check-lg' : 'bi '.$icn }}"></i></div>
           <span class="track-lbl {{ $cls }}">{{ $lbl }}</span>
         </div>
       @endforeach
@@ -227,6 +222,35 @@
   <div class="row g-4">
     {{-- LEFT --}}
     <div class="col-lg-8">
+
+      @if($order->returnRequest)
+      <div class="alert {{ $order->returnRequest->isRejected() ? 'alert-danger' : ($order->returnRequest->isCompleted() ? 'alert-success' : 'alert-warning') }} rounded-3 mb-4 shadow-sm border-0">
+        <h6 class="fw-bold mb-2">
+          <i class="bi bi-arrow-return-left me-2"></i>
+          Trạng thái Yêu cầu Hoàn hàng
+        </h6>
+        <div class="small">
+          <div class="mb-1"><strong>Trạng thái:</strong> 
+            @if($order->returnRequest->isPending())
+              <span class="badge bg-warning text-dark">Chờ xử lý</span>
+            @elseif($order->returnRequest->isApproved())
+              <span class="badge bg-info">Đã duyệt - Đang chờ gửi hàng</span>
+            @elseif($order->returnRequest->isCompleted())
+              <span class="badge bg-success">Hoàn thành - Đã hoàn tiền</span>
+            @elseif($order->returnRequest->isRejected())
+              <span class="badge bg-danger">Từ chối</span>
+            @endif
+          </div>
+          <div class="mb-1"><strong>Lý do:</strong> {{ $order->returnRequest->reason }}</div>
+          @if($order->returnRequest->admin_note)
+            <div class="mt-2 p-2 rounded" style="background:rgba(255,255,255,0.6);">
+              <strong>Ghi chú từ cửa hàng:</strong><br>
+              {!! nl2br(e($order->returnRequest->admin_note)) !!}
+            </div>
+          @endif
+        </div>
+      </div>
+      @endif
 
       {{-- Items --}}
       <div class="detail-card">
@@ -414,6 +438,32 @@
         </div>
       </div>
 
+      {{-- Return Shipping Action --}}
+      @if($order->returnRequest && $order->returnRequest->status === 'approved')
+      <div class="detail-card border-warning bg-light-warning mb-3">
+        <div class="detail-header bg-warning text-white">
+          <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Gửi hàng hoàn trả</h5>
+        </div>
+        <div class="detail-body">
+          <p class="small text-muted mb-3">Yêu cầu trả hàng của bạn đã được duyệt. Vui lòng gửi hàng về kho và nộp thông tin vận đơn tại đây.</p>
+          <form action="{{ route('account.orders.return.shipping', $order->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Thông tin vận chuyển</label>
+              <textarea name="shipping_info" class="form-control form-control-sm" rows="2" placeholder="VD: Giao hàng nhanh - Mã: 12345678" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Ảnh minh chứng gửi hàng</label>
+              <input type="file" name="shipping_proof" class="form-control form-control-sm" accept="image/*" required>
+            </div>
+            <button type="submit" class="btn btn-warning rounded-pill w-100 py-2">
+              <i class="bi bi-send me-1"></i> Xác nhận đã gửi hàng
+            </button>
+          </form>
+        </div>
+      </div>
+      @endif
+
       {{-- Actions --}}
       <div class="d-flex flex-column gap-2">
         <a href="{{ route('account.index') }}?tab=orders" class="btn btn-outline-dark rounded-pill py-2">
@@ -426,6 +476,13 @@
               <i class="bi bi-x-circle me-1"></i> Hủy đơn hàng
             </button>
           </form>
+        @endif
+        @if($user && in_array($order->status, [\App\Models\Order::STATUS_COMPLETED, \App\Models\Order::STATUS_SHIPPED]))
+          @if(!$order->returnRequest)
+          <a href="{{ route('account.orders.return_form', $order->id) }}" class="btn btn-outline-warning rounded-pill py-2 w-100 mt-2">
+            <i class="bi bi-arrow-return-left me-1"></i> Yêu cầu hoàn hàng
+          </a>
+          @endif
         @endif
       </div>
 

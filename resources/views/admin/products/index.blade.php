@@ -56,6 +56,9 @@
                         <table class="table table-striped table-bordered">
                             <thead>
                                 <tr>
+                                    <th style="width: 40px; text-align: center; vertical-align: middle;">
+                                        <input type="checkbox" id="selectAll" style="width: 18px; height: 18px; cursor: pointer;">
+                                    </th>
                                     <th>ID</th>
                                     <th>Hình ảnh</th>
                                     <th>Tên sản phẩm</th>
@@ -69,6 +72,9 @@
                             <tbody>
                                 @foreach($products as $product)
                                     <tr>
+                                        <td style="text-align: center; vertical-align: middle;">
+                                            <input class="product-checkbox" type="checkbox" name="ids[]" value="{{ $product->id }}" style="width: 18px; height: 18px; cursor: pointer;">
+                                        </td>
                                         <td>{{ $product->id }}</td>
                                         <td>
                                             @if($product->image)
@@ -130,6 +136,26 @@
                         {{ $products->links() }}
                     </div>
                 </div>
+            </div>
+            
+            <!-- Bulk Actions -->
+            <div class="mb-3 mt-3 d-flex gap-2">
+                <form id="bulk-delete-form" action="{{ route('admin.products.bulk-delete') }}" method="POST" class="bulk-action-form">
+                    @csrf
+                    @method('DELETE')
+                    <div id="bulk-delete-inputs"></div>
+                    <button type="button" class="btn btn-warning btn-sm btn-bulk-delete" disabled>
+                        <i class="ti ti-trash"></i> Xóa các mục đã chọn
+                    </button>
+                </form>
+
+                <form id="delete-all-form" action="{{ route('admin.products.delete-all') }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" class="btn btn-danger btn-sm btn-delete-all">
+                        <i class="ti ti-alert-triangle"></i> Xóa tất cả
+                    </button>
+                </form>
             </div>
         </div>
     </div>

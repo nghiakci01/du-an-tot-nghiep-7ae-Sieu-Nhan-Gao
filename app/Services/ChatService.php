@@ -16,9 +16,9 @@ class ChatService
     private function getSetting(string $key, $default = null)
     {
         return Cache::remember("chatbot_setting_{$key}", 3600, function () use ($key, $default) {
-            $setting = DB::table('chatbot_settings')->where('key', $key)->first();
+            $value = DB::table('chatbot_settings')->where('key', $key)->value('value');
 
-            return $setting ? $setting->value : $default;
+            return $value !== null ? $value : $default;
         });
     }
 
@@ -557,7 +557,7 @@ class ChatService
         $responseText = str_replace('{email}', $this->getSetting('email', 'support@example.com'), $responseText);
 
         if (str_contains($responseText, '{categories}')) {
-            $categories = \App\Models\Category::pluck('name')->toArray();
+            $categories = Category::pluck('name')->toArray();
             $responseText = str_replace('{categories}', implode(', ', $categories), $responseText);
         }
 

@@ -123,17 +123,9 @@ return [
             'handler' => NullHandler::class,
         ],
 
-        'emergency' => [
-            'path' => storage_path('logs/laravel.log'),
-        ],
-
-        'vton' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/vton.log'),
-            'level' => 'debug',
-            'replace_placeholders' => true,
-        ],
-
     ],
 
 ];
+
+
+

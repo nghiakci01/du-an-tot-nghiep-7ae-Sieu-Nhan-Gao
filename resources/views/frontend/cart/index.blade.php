@@ -3,6 +3,100 @@
 @section('title', __('messages.shopping_cart') . ' | Elite')
 
 @section('content')
+<style>
+    /* Quantity Selector Styles synced from detail page */
+    .quantity-selector {
+        display: flex !important;
+        align-items: center;
+        border: 0.5px solid #ccc;
+        width: 140px !important;
+        height: 40px !important;
+        margin: 0 auto;
+        overflow: hidden !important;
+        border-radius: 4px;
+        box-sizing: border-box !important;
+        background: #fff;
+    }
+    .quantity-selector * {
+        box-sizing: border-box !important;
+    }
+    .qty-btn {
+        flex: 0 0 40px !important;
+        width: 40px !important;
+        height: 40px !important;
+        border: 0 !important;
+        background: #fff !important;
+        color: #333 !important;
+        font-size: 20px !important;
+        font-weight: bold !important;
+        cursor: pointer;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .qty-btn:hover {
+        background: #f8f8f8 !important;
+        color: #ff6a28 !important; /* Elite theme color */
+    }
+    .qty-btn:active {
+        background: #d1d1d1 !important;
+    }
+    .quantity-selector input {
+        flex: 0 0 59px !important;
+        width: 59px !important;
+        height: 40px !important;
+        border: 0 !important;
+        border-left: 0.5px solid #ccc !important;
+        border-right: 0.5px solid #ccc !important;
+        text-align: center;
+        font-weight: 500;
+        font-size: 14px;
+        -moz-appearance: textfield;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff;
+        color: #333;
+        outline: none !important;
+    }
+    .quantity-selector input::-webkit-outer-spin-button,
+    .quantity-selector input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Cart Submit Buttons Styles */
+    .cart_submit {
+        margin-top: 20px;
+    }
+    .cart_submit .btn {
+        background: #333 !important;
+        color: #fff !important;
+        border: none !important;
+        padding: 5px 20px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .cart_submit .btn:hover {
+        background: #000 !important;
+        color: #fff !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .cart_submit .btn i {
+        font-size: 14px;
+    }
+</style>
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area other_bread">
         <div class="container">
@@ -63,66 +157,84 @@
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th class="product_check" style="width: 50px;"><input type="checkbox" id="check-all" style="width: 18px; height: 18px; cursor: pointer;"></th>
-                                                <!-- <th class="product_remove">{{ __('messages.remove') }}</th> -->
                                                 <th class="product_thumb">{{ __('messages.image') }}</th>
                                                 <th class="product_name">{{ __('messages.product') }}</th>
                                                 <th class="product-price">{{ __('messages.price') }}</th>
                                                 <th class="product_quantity">{{ __('messages.quantity') }}</th>
                                                 <th class="product_total">{{ __('messages.total') }}</th>
+                                                <th class="product_remove">{{ __('delete') ?? 'Action' }}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach($cart as $id => $details)
                                                 @php
-                                                    $isOutOfStock = isset($details['is_out_of_stock']) ? $details['is_out_of_stock'] : false;
+                                                    $isDeleted = isset($details['is_deleted']) && $details['is_deleted'];
+                                                    $isInactive = isset($details['is_inactive']) && $details['is_inactive'];
+                                                    $variantExists = isset($details['variant_exists']) ? $details['variant_exists'] : true;
+                                                    $isOutOfStock = isset($details['is_out_of_stock']) && $details['is_out_of_stock'];
+                                                    
+                                                    $isUnavailable = $isDeleted || $isInactive || !$variantExists || $isOutOfStock;
                                                 @endphp
-                                                <tr data-id="{{ $id }}" class="{{ $isOutOfStock ? 'opacity-50' : '' }}">
-                                                    <td class="product_check" style="vertical-align: middle;">
-                                                        <input type="checkbox" class="check-item" value="{{ $id }}" style="width: 18px; height: 18px; cursor: pointer;" {{ $isOutOfStock ? 'disabled' : '' }}>
-                                                    </td>
-                                                    <!-- <td class="product_remove">
-                                                        <a href="javascript:void(0)" class="remove-from-cart">
-                                                            <i class="fa fa-trash-o"></i>
-                                                        </a>
-                                                    </td> -->
+                                                <tr data-id="{{ $id }}" data-variants="{{ json_encode(isset($details['product_variants']) ? $details['product_variants'] : []) }}" class="cart-item-row {{ $isUnavailable ? 'cart-item-unavailable' : '' }}" style="{{ $isUnavailable ? 'filter: grayscale(1); opacity: 0.7;' : '' }}">
                                                     <td class="product_thumb" style="position: relative;">
-                                                        <a href="{{ route('product.detail', $details['slug']) }}">
+                                                        @if(!$isDeleted)
+                                                            <a href="{{ route('product.detail', $details['slug']) }}">
+                                                        @endif
                                                             <img src="{{ $details['image'] ? asset('storage/' . $details['image']) : asset('frontend-assets/img/s-product/product.jpg') }}"
                                                                 alt="{{ $details['name'] }}"
-                                                                style="width: 100px; height: 100px; object-fit: cover;">
-                                                            @if($isOutOfStock)
-                                                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.6); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 5px;">
-                                                                    <span class="badge bg-danger mb-1" style="font-size: 0.8rem; padding: 5px 10px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">{{ __('messages.out_of_stock') ?? 'Hết hàng' }}</span>
-                                                                    <a href="{{ isset($details['category_slug']) && $details['category_slug'] ? route('shop', ['category' => $details['category_slug']]) : route('shop') }}" class="btn btn-sm btn-dark" style="font-size: 0.65rem; padding: 2px 5px; white-space: nowrap; font-weight: normal;">Xem sản phẩm tương tự</a>
+                                                                style="width: 100px; height: 100px; object-fit: cover; {{ $isUnavailable ? 'filter: blur(1px);' : '' }}">
+                                                            @if($isUnavailable)
+                                                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2;">
+                                                                    @if($isDeleted)
+                                                                        <span class="badge bg-danger mb-1" style="font-size: 0.75rem;">Sản phẩm đã bị xóa</span>
+                                                                    @elseif($isInactive)
+                                                                        <span class="badge bg-warning text-dark mb-1" style="font-size: 0.75rem;">Ngừng kinh doanh</span>
+                                                                    @elseif(!$variantExists)
+                                                                        <span class="badge bg-secondary mb-1" style="font-size: 0.75rem;">Biến thể không tồn tại hoặc hết hàng</span>
+                                                                    @elseif($isOutOfStock)
+                                                                        <span class="badge bg-danger mb-1" style="font-size: 0.75rem;">{{ __('messages.out_of_stock') ?? 'Hết hàng' }}</span>
+                                                                    @endif
+                                                                    
+                                                                    @if(!$isDeleted)
+                                                                        <a href="{{ isset($details['category_slug']) && $details['category_slug'] ? route('shop', ['category' => $details['category_slug']]) : route('shop') }}" class="btn btn-sm btn-dark" style="font-size: 0.65rem; padding: 2px 5px; white-space: nowrap; font-weight: normal; margin-top: 5px;">Xem sản phẩm khác</a>
+                                                                    @endif
                                                                 </div>
                                                             @endif
-                                                        </a>
+                                                        @if(!$isDeleted)
+                                                            </a>
+                                                        @endif
                                                     </td>
                                                     <td class="product_name">
                                                         <a href="{{ route('product.detail', $details['slug']) }}" class="cart-product-link font-weight-bold" style="font-size: 16px;">{{ $details['name'] }}</a>
-                                                        <div class="cart-variant-info mt-2 text-center" style="display: flex; flex-direction: column; align-items: center;">
-                                                            <div class="text-muted small mb-1" style="font-size: 15px;">
-                                                                {{ __('messages.size') }}: <strong>{{ $details['size'] }}</strong> | 
-                                                                {{ __('messages.color') }}: <strong>{{ $details['color'] }}</strong>
-                                                            </div>
-                                                            <button type="button" class="btn btn-sm edit-variant-btn mt-2" 
-                                                                    style="font-size: 0.85rem; color: #ff6a28; border: 1px solid #ff6a28; background: transparent; padding: 3px 10px; border-radius: 4px;"
-                                                                    {{ $isOutOfStock ? 'disabled' : '' }}>
-                                                                <i class="fa fa-pencil-square-o"></i> {{ __('messages.edit') }}
-                                                            </button>
-                                                        </div>
-
-                                                        <div class="cart-variant-selectors mt-2" style="display: none;">
+                                                        <div class="cart-variant-selectors mt-2">
                                                             <!-- Product selection removed based on user request -->
                                                             
                                                             @if(isset($details['available_sizes_array']) && count($details['available_sizes_array']) > 0)
                                                                 <div class="d-inline-block me-2">
                                                                     <label class="small text-muted d-block">{{ __('messages.size') }}</label>
-                                                                    <select class="form-select form-select-sm variant-select size-select" data-type="size">
+                                                                    <select class="form-select form-select-sm variant-select size-select" data-type="size" {{ $isUnavailable ? 'disabled' : '' }}>
                                                                         @foreach($details['available_sizes_array'] as $key => $name)
-                                                                            <option value="{{ $key }}" {{ (isset($details['size_id']) && $details['size_id'] == $key) || (empty($details['size_id']) && isset($details['size']) && $details['size'] == $key) ? 'selected' : '' }}>
-                                                                                {{ $name }}
+                                                                            @php
+                                                                                $isSelected = (isset($details['size_id']) && $details['size_id'] == $key) || (empty($details['size_id']) && isset($details['size']) && $details['size'] == $key);
+                                                                                $isValid = false;
+                                                                                if(isset($details['product_variants'])) {
+                                                                                    foreach($details['product_variants'] as $v) {
+                                                                                        $matchSize = ($v->size_id == $key) || ($v->size == $key);
+                                                                                        $matchColor = true;
+                                                                                        if(isset($details['color_id'])) {
+                                                                                            $matchColor = ($v->color_id == $details['color_id']) || ($v->color == $details['color_id']);
+                                                                                        }
+                                                                                        if($matchSize && $matchColor && $v->stock_quantity > 0) {
+                                                                                            $isValid = true;
+                                                                                            break;
+                                                                                        }
+                                                                                    }
+                                                                                } else {
+                                                                                    $isValid = true; // Fallback if variants not loaded
+                                                                                }
+                                                                            @endphp
+                                                                            <option value="{{ $key }}" {{ $isSelected ? 'selected' : '' }} {{ !$isValid && !$isSelected ? 'disabled' : '' }} style="{{ !$isValid && !$isSelected ? 'color: #aaa; background: #eee;' : '' }}">
+                                                                                {{ $name }} {{ !$isValid && !$isSelected ? '(Hết)' : '' }}
                                                                             </option>
                                                                         @endforeach
                                                                     </select>
@@ -132,19 +244,34 @@
                                                             @if(isset($details['available_colors_array']) && count($details['available_colors_array']) > 0)
                                                                 <div class="d-inline-block">
                                                                     <label class="small text-muted d-block">{{ __('messages.color') }}</label>
-                                                                    <select class="form-select form-select-sm variant-select color-select" data-type="color">
+                                                                    <select class="form-select form-select-sm variant-select color-select" data-type="color" {{ $isUnavailable ? 'disabled' : '' }}>
                                                                         @foreach($details['available_colors_array'] as $key => $name)
-                                                                            <option value="{{ $key }}" {{ (isset($details['color_id']) && $details['color_id'] == $key) || (empty($details['color_id']) && isset($details['color']) && $details['color'] == $key) ? 'selected' : '' }}>
-                                                                                {{ $name }}
+                                                                            @php
+                                                                                $isSelected = (isset($details['color_id']) && $details['color_id'] == $key) || (empty($details['color_id']) && isset($details['color']) && $details['color'] == $key);
+                                                                                $isValid = false;
+                                                                                if(isset($details['product_variants'])) {
+                                                                                    foreach($details['product_variants'] as $v) {
+                                                                                        $matchColor = ($v->color_id == $key) || ($v->color == $key);
+                                                                                        $matchSize = true;
+                                                                                        if(isset($details['size_id'])) {
+                                                                                            $matchSize = ($v->size_id == $details['size_id']) || ($v->size == $details['size_id']);
+                                                                                        }
+                                                                                        if($matchSize && $matchColor && $v->stock_quantity > 0) {
+                                                                                            $isValid = true;
+                                                                                            break;
+                                                                                        }
+                                                                                    }
+                                                                                } else {
+                                                                                    $isValid = true; // Fallback
+                                                                                }
+                                                                            @endphp
+                                                                            <option value="{{ $key }}" {{ $isSelected ? 'selected' : '' }} {{ !$isValid && !$isSelected ? 'disabled' : '' }} style="{{ !$isValid && !$isSelected ? 'color: #aaa; background: #eee;' : '' }}">
+                                                                                {{ $name }} {{ !$isValid && !$isSelected ? '(Hết)' : '' }}
                                                                             </option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
                                                             @endif
-                        <div class="mt-2">
-                            <button type="button" class="btn btn-sm save-variant-btn" style="background-color: #ff6a28; color: #fff; border-color: #ff6a28;">Đổi biến thể</button>
-                            <button type="button" class="btn btn-sm btn-secondary cancel-variant-btn">Hủy</button>
-                        </div>
                     </div>
                                                         <input type="hidden" class="product-id" value="{{ $details['product_id'] }}">
                                                         <input type="hidden" class="current-variant-id" value="{{ $id }}">
@@ -152,37 +279,50 @@
                                                     <td class="product-price">{{ number_format($details['price']) }} VND</td>
                                                     <td class="product_quantity">
                                                         @php
-                                                            $stockQty = isset($details['stock_quantity']) ? $details['stock_quantity'] : (\App\Models\ProductVariant::find($id)?->stock_quantity ?? 100);
+                                                            $stockQty = isset($details['stock_quantity']) ? $details['stock_quantity'] : 0;
                                                         @endphp
-                                                        @if($isOutOfStock)
-                                                            <input type="text" value="0" class="quantity text-center text-muted" disabled style="background-color: #f8f9fa;">
-                                                            <small class="d-block text-danger mt-1" style="font-size:11px;">Hết hàng</small>
+                                                        @if($isUnavailable)
+                                                            <div class="quantity-selector disabled" style="background: #f8f9fa; border-color: #eee;">
+                                                                <button type="button" class="qty-btn" disabled>-</button>
+                                                                <input type="text" value="{{ $isDeleted || $isInactive || !$variantExists ? '0' : $details['quantity'] }}" disabled style="background: #f8f9fa;">
+                                                                <button type="button" class="qty-btn" disabled>+</button>
+                                                            </div>
+                                                            @if($isDeleted)
+                                                                <small class="d-block text-danger mt-1" style="font-size:11px;">Đã xóa</small>
+                                                            @elseif($isInactive)
+                                                                <small class="d-block text-warning mt-1" style="font-size:11px;">Ngừng kinh doanh</small>
+                                                            @elseif(!$variantExists)
+                                                                <small class="d-block text-danger mt-1" style="font-size:11px;">Hết phiên bản</small>
+                                                            @else
+                                                                <small class="d-block text-danger mt-1" style="font-size:11px;">Hết hàng</small>
+                                                            @endif
                                                         @else
-                                                            <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
-                                                                class="quantity update-cart item-quantity"
-                                                                data-stock="{{ $stockQty }}"
-                                                                title="Còn {{ $stockQty }} sản phẩm trong kho">
+                                                            <div class="quantity-selector">
+                                                                <button type="button" class="qty-btn minus">-</button>
+                                                                <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
+                                                                    class="quantity update-cart item-quantity"
+                                                                    data-stock="{{ $stockQty }}"
+                                                                    title="Còn {{ $stockQty }} sản phẩm trong kho">
+                                                                <button type="button" class="qty-btn plus">+</button>
+                                                            </div>
                                                             <small class="d-block text-muted mt-1" style="font-size:11px;"
                                                                 data-stock-label>Kho: {{ $stockQty }}</small>
                                                         @endif
                                                     </td>
                                                     <td class="product_total item-total-price" data-price="{{ $details['price'] }}">
                                                         {{ number_format($details['price'] * $details['quantity']) }} VND</td>
+                                                    <td class="product_remove" style="text-align: center;">
+                                                        <a href="#" class="remove-from-cart" style="color: #ff6a28; font-size: 18px; text-decoration: none;"><i class="fa fa-trash-o"></i></a>
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                 </div>
                                 <div class="cart_submit">
-                                    <a href="{{ route('shop') }}" class="btn btn-secondary">
+                                    <a href="{{ route('shop') }}" class="btn">
                                         <i class="fa fa-arrow-left"></i> {{ __('messages.continue_shopping') }}
                                     </a>
-                                    <button type="button" class="btn btn-warning" id="delete-selected" style="display: none; margin-left: 10px; color: #fff;">
-                                        <i class="fa fa-trash"></i> Xóa mục đã chọn
-                                    </button>
-                                    <button type="button" class="btn btn-danger" id="clear-cart">
-                                        <i class="fa fa-trash"></i> {{ __('messages.clear_cart') }}
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -246,8 +386,27 @@
                                             btn.style.opacity = '0.7';
                                             btn.style.pointerEvents = 'none';
 
+                                            var selectedIds = [];
+                                            document.querySelectorAll('table tbody tr:not(.cart-item-unavailable)').forEach(function(row) {
+                                                selectedIds.push(row.getAttribute('data-id'));
+                                            });
+
+                                            if (selectedIds.length === 0) {
+                                                Swal.fire({
+                                                    icon: 'info',
+                                                    title: 'Giỏ hàng trống!',
+                                                    text: 'Vui lòng thêm sản phẩm hợp lệ vào giỏ hàng trước khi thanh toán.',
+                                                    confirmButtonColor: '#333'
+                                                });
+                                                btn.style.opacity = '';
+                                                btn.style.pointerEvents = '';
+                                                return;
+                                            }
+
                                             var config = document.getElementById('cart-config').dataset;
-                                            fetch(config.routeValidate, {
+                                            var validateUrl = config.routeValidate + '?ids=' + selectedIds.join(',');
+
+                                            fetch(validateUrl, {
                                                 method: 'GET',
                                                 headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': config.csrf }
                                             })
@@ -275,6 +434,10 @@
                                                         showCancelButton: true,
                                                         cancelButtonText: 'Đóng',
                                                         cancelButtonColor: '#6c757d',
+                                                    }).then((result) => {
+                                                        if (result.isConfirmed) {
+                                                            location.reload();
+                                                        }
                                                     });
                                                 } else {
                                                     Swal.fire({ icon: 'error', title: 'Lỗi!', text: data.message || 'Không thể tiến hành thanh toán.', confirmButtonColor: '#ef233c' });
@@ -419,7 +582,6 @@
 
                         // Cập nhật giá trị html cho item
                         row.find('.product_total').text(response.item_total);
-                        calculateCartTotal(); // Tính toán lại theo các dòng được check
 
                         // Toast nhỏ xác nhận cập nhật
                         Swal.fire({
@@ -499,12 +661,12 @@
             });
         });
 
-        // Tính toán lại tổng tiền dựa trên các sản phẩm được check
+        // Tính toán lại tổng tiền dựa trên tất cả sản phẩm hợp lệ
         function calculateCartTotal() {
             let subtotal = 0;
             
-            $('.check-item:checked').each(function() {
-                var row = $(this).closest('tr');
+            $('table tbody tr:not(.cart-item-unavailable)').each(function() {
+                var row = $(this);
                 var price = parseFloat(row.find('.item-total-price').attr('data-price'));
                 var quantity = parseInt(row.find('.item-quantity').val());
                 if (!isNaN(price) && !isNaN(quantity)) {
@@ -527,12 +689,9 @@
                 $('#shipping-fee span').text('Miễn phí');
             }
 
-            // Tính discount nếu có mã (logic cơ bản hiển thị lại session discount)
-            let discountDoc = $('#cart-discount').text().replace(/[^\d]/g, '');
-            let discount = discountDoc ? parseInt(discountDoc) : 0;
-            if (!$("#discount-row").is(":visible")) {
-                discount = 0; 
-            }
+            // Tính discount nếu có mã (lấy từ dữ liệu hiển thị hiện tại)
+            let discountText = $('#cart-discount').text().replace(/[^-0-9]/g, '');
+            let discount = Math.abs(parseInt(discountText)) || 0;
             
             // Grand Total
             let grandTotal = subtotal + shippingFee - discount;
@@ -541,76 +700,11 @@
             $('#cart-grand-total').text(new Intl.NumberFormat('vi-VN').format(grandTotal) + ' đ');
         }
 
-        // Check All logic
-        $('#check-all').on('change', function() {
-            $('.check-item:not(:disabled)').prop('checked', $(this).prop('checked'));
-            toggleDeleteSelectedBtn();
-            calculateCartTotal();
-        });
+        // calculateCartTotal on page load
+        calculateCartTotal();
 
-        // Check Item logic
-        $(document).on('change', '.check-item', function() {
-            var totalItems = $('.check-item:not(:disabled)').length;
-            var checkedItems = $('.check-item:not(:disabled):checked').length;
-            $('#check-all').prop('checked', totalItems === checkedItems && totalItems > 0);
-            toggleDeleteSelectedBtn();
-            calculateCartTotal();
-        });
-
-        // Initialize total calculation on page load (nếu cần tự check sẵn hoặc không)
-        // Mặc định tick tất cả khi load file
-        $('#check-all').prop('checked', true).trigger('change');
-
-        function toggleDeleteSelectedBtn() {
-            if ($('.check-item:checked').length > 0) {
-                $('#delete-selected').fadeIn(200);
-            } else {
-                $('#delete-selected').fadeOut(200);
-            }
-        }
-
-        // Xóa các item đã chọn
-        $('#delete-selected').on('click', function() {
-            var selectedRows = $('.check-item:checked').closest('tr');
-            if (selectedRows.length === 0) return;
-
-            Swal.fire({
-                title: 'Xóa các sản phẩm đã chọn?',
-                text: `Bạn có chắc muốn xóa ${selectedRows.length} sản phẩm đã chọn khỏi giỏ hàng?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#ef233c',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Xóa',
-                cancelButtonText: 'Hủy',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Đang xóa...',
-                        allowOutsideClick: false,
-                        didOpen: () => { Swal.showLoading(); }
-                    });
-
-                    var promises = [];
-                    selectedRows.each(function() {
-                        var id = $(this).attr('data-id');
-                        promises.push(
-                            $.ajax({
-                                url: config.routeRemove,
-                                method: 'POST',
-                                data: { _token: config.csrf, _method: 'DELETE', id: id }
-                            })
-                        );
-                    });
-
-                    Promise.all(promises).then(function() {
-                        window.location.reload();
-                    }).catch(function() {
-                        window.location.reload();
-                    });
-                }
-            });
-        });
+        // Initialize total calculation on page load
+        calculateCartTotal();
 
         // Xóa toàn bộ giỏ hàng
         $("#clear-cart").on('click', function(e) {
@@ -638,30 +732,111 @@
                 }
             });
         });
-        // Toggle variant selectors
-        $(".edit-variant-btn").on('click', function() {
-            var row = $(this).parents("td");
-            row.find(".cart-variant-info").hide();
-            row.find(".cart-variant-selectors").fadeIn();
+        // Quantity Plus/Minus buttons in Cart
+        $(document).on('click', '.qty-btn', function() {
+            var $btn = $(this);
+            var $input = $btn.siblings('.item-quantity');
+            var val = parseInt($input.val()) || 1;
+            var max = parseInt($input.attr('max')) || 100;
+
+            if ($btn.hasClass('plus')) {
+                if (val < max) {
+                    $input.val(val + 1).trigger('change');
+                } else {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: 'Chỉ còn ' + max + ' sản phẩm trong kho!',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            } else if ($btn.hasClass('minus')) {
+                if (val > 1) {
+                    $input.val(val - 1).trigger('change');
+                }
+            }
         });
 
-        $(".cancel-variant-btn").on('click', function() {
-            var row = $(this).parents("td");
-            row.find(".cart-variant-selectors").hide();
-            row.find(".cart-variant-info").fadeIn();
-        });
-
-        // Change variant (Product/Size/Color) via Submit Button
-        $(".save-variant-btn").on('click', function() {
-            var ele = $(this);
-            var row = ele.parents("tr");
-            var productId = row.find(".product-id").val();
-            var newProductId = row.find(".product-select").val() || productId;
-            var oldVariantId = row.find(".current-variant-id").val();
-            var sizeId = row.find(".size-select").val();
-            var colorId = row.find(".color-select").val();
+        // Hiển thị nút Đổi khi thay đổi Select và Lọc thuộc tính
+        $(document).on('change', '.variant-select', function() {
+            var row = $(this).closest(".cart-item-row");
             
-            var changedType = (productId !== newProductId) ? 'product' : null;
+            // Xóa nút cũ nếu có
+            row.find('.btn-update-variant').remove();
+            
+            // Thêm nút Đổi bên dưới select box
+            var btnHtml = `<button type="button" class="btn btn-dark btn-sm mt-2 btn-update-variant" style="font-size: 11px; padding: 3px 8px;">Đổi thuộc tính</button>`;
+            row.find('.cart-variant-selectors').append(btnHtml);
+
+            // -- Logic lọc các options Hết hàng --
+            var variantsData = row.attr('data-variants');
+            if(variantsData) {
+                var variants = JSON.parse(variantsData);
+                var currentSizeId = row.find('.size-select').val();
+                var currentColorId = row.find('.color-select').val();
+
+                // Lọc Size options
+                row.find('.size-select option').each(function() {
+                    var option = $(this);
+                    var sizeVal = option.val();
+                    var match = variants.find(function(v) {
+                        var sizeMatch = (v.size_id == sizeVal) || (v.size == sizeVal);
+                        var colorMatch = currentColorId ? ((v.color_id == currentColorId) || (v.color == currentColorId)) : true;
+                        return sizeMatch && colorMatch && v.stock_quantity > 0;
+                    });
+                    
+                    if(!match && !option.is(':selected')) {
+                        option.prop('disabled', true);
+                        option.css({color: '#aaa', background: '#eee'});
+                        if(option.text().indexOf('(Hết)') === -1) {
+                            option.text(option.text().trim() + ' (Hết)');
+                        }
+                    } else {
+                        option.prop('disabled', false);
+                        option.css({color: '', background: ''});
+                        option.text(option.text().replace(' (Hết)', ''));
+                    }
+                });
+
+                // Lọc Color options
+                row.find('.color-select option').each(function() {
+                    var option = $(this);
+                    var colorVal = option.val();
+                    var match = variants.find(function(v) {
+                        var colorMatch = (v.color_id == colorVal) || (v.color == colorVal);
+                        var sizeMatch = currentSizeId ? ((v.size_id == currentSizeId) || (v.size == currentSizeId)) : true;
+                        return sizeMatch && colorMatch && v.stock_quantity > 0;
+                    });
+                    
+                    if(!match && !option.is(':selected')) {
+                        option.prop('disabled', true);
+                        option.css({color: '#aaa', background: '#eee'});
+                        if(option.text().indexOf('(Hết)') === -1) {
+                            option.text(option.text().trim() + ' (Hết)');
+                        }
+                    } else {
+                        option.prop('disabled', false);
+                        option.css({color: '', background: ''});
+                        option.text(option.text().replace(' (Hết)', ''));
+                    }
+                });
+            }
+        });
+
+        // Xử lý khi click nút Đổi
+        $(document).on('click', '.btn-update-variant', function() {
+            var btn = $(this);
+            var row = btn.closest("tr");
+            var productId = row.find(".product-id").val();
+            var newProductId = productId; // giữ nguyên, chỉ đổi variant
+            var oldVariantId = row.find(".current-variant-id").val();
+            var sizeId = row.find(".size-select").val() || null;
+            var colorId = row.find(".color-select").val() || null;
+            
+            // Xác định type thay đổi
+            var changedType = sizeId && colorId ? 'both' : (sizeId ? 'size' : 'color');
 
             $.ajax({
                 url: config.routeChangeVariant,
@@ -676,25 +851,52 @@
                     changed_type: changedType
                 },
                 beforeSend: function() {
+                    btn.text('Đang xử lý...').prop('disabled', true);
                     row.css('opacity', '0.5');
                 },
                 success: function(response) {
                     if (response.success) {
-                        if (response.redirect) {
+                        if (response.no_change) {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'info',
+                                title: response.message || 'Biến thể không thay đổi',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            row.css('opacity', '1');
+                            btn.remove();
+                        } else if (response.redirect) {
                             window.location.href = response.redirect;
+                        } else {
+                            window.location.reload();
                         }
                     } else {
-                        alert(response.message || config.msgError);
-                        window.location.reload();
+                        Swal.fire({ 
+                            icon: 'error', 
+                            title: 'Lỗi', 
+                            text: response.message || config.msgError,
+                            confirmButtonColor: '#ef233c'
+                        }).then(() => {
+                            window.location.reload();
+                        });
                     }
                 },
                 error: function(xhr) {
                     var errorMsg = xhr.responseJSON ? xhr.responseJSON.message : config.msgError;
-                    alert(errorMsg);
-                    window.location.reload();
+                    Swal.fire({ 
+                        icon: 'error', 
+                        title: 'Không thể cập nhật!', 
+                        text: errorMsg,
+                        confirmButtonColor: '#ef233c'
+                    }).then(() => {
+                        window.location.reload();
+                    });
                 }
             });
         });
+
 
         // Apply coupon
         $(document).on('click', '#apply-coupon', function() {

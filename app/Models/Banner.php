@@ -18,4 +18,23 @@ class Banner extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($banner) {
+            self::clearBannerCache();
+        });
+
+        static::deleted(function ($banner) {
+            self::clearBannerCache();
+        });
+    }
+
+    private static function clearBannerCache()
+    {
+        \Illuminate\Support\Facades\Cache::forget('home_sliders');
+        \Illuminate\Support\Facades\Cache::forget('home_midBanner');
+    }
 }

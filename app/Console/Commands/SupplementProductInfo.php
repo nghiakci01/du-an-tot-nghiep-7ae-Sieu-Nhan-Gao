@@ -29,13 +29,12 @@ class SupplementProductInfo extends Command
         $this->info('📝 Supplementing product information...');
 
         // Find products missing description or short_description
-        $products = Product::with('category')
-            ->where(function ($query) {
-                $query->whereNull('description')
-                    ->orWhere('description', '')
-                    ->orWhereNull('short_description')
-                    ->orWhere('short_description', '');
-            })
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = Product::with('category');
+        $products = $query->whereNull('description')
+            ->orWhere('description', '')
+            ->orWhereNull('short_description')
+            ->orWhere('short_description', '')
             ->get();
 
         if ($products->isEmpty()) {
@@ -50,6 +49,7 @@ class SupplementProductInfo extends Command
         $updated = 0;
 
         foreach ($products as $product) {
+            /** @var Product $product */
             $needsUpdate = false;
             $updates = [];
 

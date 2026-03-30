@@ -238,6 +238,27 @@
           </a>
         </li>
         <li>
+          <a href="#bank-accounts" data-tab="bank-accounts" class="nav-tab-link">
+            <i class="bi bi-bank"></i> Tài khoản ngân hàng
+          </a>
+        </li>
+        <li>
+          <a href="#addresses" data-tab="addresses" class="nav-tab-link">
+            <i class="bi bi-geo-alt"></i> Địa chỉ của tôi
+            @if(isset($addresses) && $addresses->count() > 0)
+              <span class="badge rounded-pill ms-auto" style="background:#f0f0f0;color:#555;font-size:0.65rem;">{{ $addresses->count() }}</span>
+            @endif
+          </a>
+        </li>
+        {{-- <li>
+          <a href="#wallet" data-tab="wallet" class="nav-tab-link">
+            <i class="bi bi-wallet2"></i> Ví của tôi
+            @if($user && $user->wallet_balance > 0)
+            <span class="badge ms-auto rounded-pill" style="background:#e8f5e9;color:#2e7d32;font-size:0.65rem;">{{ number_format($user->wallet_balance) }}đ</span>
+            @endif
+          </a>
+        </li> --}}
+        <li>
           <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-account').submit();" class="text-danger">
             <i class="bi bi-box-arrow-right"></i> Đăng xuất
           </a>
@@ -306,7 +327,14 @@
                     <div class="fw-bold">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</div>
                     <div class="text-muted small">{{ $order->created_at->format('d/m/Y') }}</div>
                   </div>
-                  <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
+                  <div class="d-flex flex-column align-items-end">
+                    <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
+                    @if($order->returnRequest)
+                      <span class="badge mt-1 {{ $order->returnRequest->status == 'completed' ? 'bg-success' : ($order->returnRequest->status == 'rejected' ? 'bg-danger' : 'bg-warning text-dark') }}" style="font-size: 0.65rem;">
+                        Hoàn: {{ $order->returnRequest->status == 'pending' ? 'Chờ duyệt' : ($order->returnRequest->status == 'approved' ? 'Đã duyệt' : ($order->returnRequest->status == 'completed' ? 'Đã hoàn tiền' : 'Từ chối')) }}
+                      </span>
+                    @endif
+                  </div>
                   <span class="fw-bold">{{ number_format($order->final_total ?: $order->total_price) }}đ</span>
                 </div>
             </a>
@@ -353,12 +381,22 @@
               </td>
               <td class="text-muted">{{ $order->created_at->format('d/m/Y') }}</td>
               <td>
-                <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
+                <div class="d-flex flex-column align-items-start">
+                  <span class="status-badge status-{{ strtolower($order->status) }}">{{ $order->status_text }}</span>
+                  @if($order->returnRequest)
+                    <span class="badge mt-1 {{ $order->returnRequest->status_badge }}" style="font-size: 0.7rem;">
+                      Hoàn tiền: {{ $order->returnRequest->status_text }}
+                    </span>
+                  @endif
+                </div>
               </td>
               <td class="fw-semibold">{{ number_format($order->final_total ?: $order->total_price) }}đ</td>
               <td style="padding-right:28px;">
                 <div class="d-flex gap-2">
                   <a href="{{ route('account.orders.show', $order->id) }}" class="btn btn-sm btn-dark px-3 rounded-pill">Xem</a>
+                  @if(($order->status == 'completed' || $order->status == 'shipped') && !$order->returnRequest)
+                    <a href="{{ route('account.orders.return_form', $order->id) }}" class="btn btn-sm btn-outline-warning rounded-pill px-3">Hoàn hàng</a>
+                  @endif
                   @if($order->status == 'pending')
                     <form action="{{ route('account.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn hủy đơn này?');">
                       @csrf
@@ -392,10 +430,13 @@
         <span class="text-muted small">{{ $wishCount }} sản phẩm</span>
       </div>
       <div class="tab-body">
+        @php $hasValidProduct = false; @endphp
         @if($wishlists->isNotEmpty())
         <div class="row g-3">
           @foreach($wishlists as $wish)
           @php $product = $wish->product; @endphp
+          @if($product)
+          @php $hasValidProduct = true; @endphp
           <div class="col-sm-6 col-lg-4">
             <div class="wish-card">
               <a href="{{ route('product.detail', $product->slug) }}">
@@ -418,9 +459,12 @@
               </div>
             </div>
           </div>
+          @endif
           @endforeach
         </div>
-        @else
+        @endif
+        
+        @if(!$hasValidProduct)
           <div class="text-center py-5 text-muted">
             <i class="bi bi-heart" style="font-size:3rem; color:#eee;"></i>
             <p class="mt-2">Danh sách yêu thích của bạn còn trống.</p>
@@ -465,7 +509,107 @@
       </div>
     </div>
 
+    {{-- =============== TAB: ADDRESSES =============== --}}
+    <div class="account-content tab-pane-block d-none" id="tab-addresses">
+      <div class="tab-head">
+        <h4><i class="bi bi-geo-alt me-2"></i>Địa chỉ của tôi</h4>
+        <a href="{{ route('account.addresses.create') }}" class="btn btn-sm btn-dark rounded-pill px-3">
+          <i class="bi bi-plus me-1"></i> Thêm địa chỉ
+        </a>
+      </div>
+      <div class="tab-body">
+        @if(isset($addresses) && $addresses->isNotEmpty())
+          <div class="row g-3" id="address-list">
+            @foreach($addresses as $addr)
+            <div class="col-md-6 address-card-wrap" id="addr-wrap-{{ $addr->id }}">
 
+              {{-- Card hiển thị --}}
+              <div class="addr-view" id="addr-view-{{ $addr->id }}">
+                <div class="p-3 rounded-3 h-100" style="border:1.5px solid #{{ $addr->is_default ? '1a1a2e' : 'e8e8e8' }};background:#fff;position:relative;">
+                  @if($addr->is_default)
+                    <span class="badge" style="background:#1a1a2e;color:#fff;font-size:0.65rem;position:absolute;top:12px;right:12px;">Mặc định</span>
+                  @endif
+                  <div class="fw-bold mb-1" style="font-size:0.95rem;">{{ $addr->receiver_name }}</div>
+                  <div class="text-muted small mb-1"><i class="bi bi-telephone me-1"></i>{{ $addr->phone }}</div>
+                  <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ $addr->address }}{{ $addr->commune ? ', ' . $addr->commune : '' }}, {{ $addr->province }}</div>
+                  <div class="d-flex gap-2 mt-3">
+                    <button class="btn btn-sm btn-outline-dark rounded-pill px-3" onclick="toggleAddrEdit({{ $addr->id }})">
+                      <i class="bi bi-pencil me-1"></i>Sửa
+                    </button>
+                    @if(!$addr->is_default)
+                    <form action="{{ route('account.addresses.default', $addr->id) }}" method="POST" class="d-inline">
+                      @csrf @method('PATCH')
+                      <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Đặt mặc định</button>
+                    </form>
+                    <form action="{{ route('account.addresses.destroy', $addr->id) }}" method="POST" class="d-inline"
+                          onsubmit="return confirm('Xoá địa chỉ này?')">
+                      @csrf @method('DELETE')
+                      <button class="btn btn-sm btn-outline-danger rounded-pill"><i class="bi bi-trash"></i></button>
+                    </form>
+                    @endif
+                  </div>
+                </div>
+              </div>
+
+              {{-- Inline Edit Form --}}
+              <div class="addr-edit d-none" id="addr-edit-{{ $addr->id }}">
+                <div class="p-3 rounded-3" style="border:1.5px solid #1a1a2e;background:#fafafa;">
+                  <div class="fw-semibold mb-3" style="font-size:0.9rem;">Chỉnh sửa địa chỉ</div>
+                  <form action="{{ route('account.addresses.update', $addr->id) }}" method="POST" class="addr-form" data-id="{{ $addr->id }}">
+                    @csrf @method('PUT')
+                    <div class="row g-2 mb-2">
+                      <div class="col-6">
+                        <input type="text" name="receiver_name" value="{{ $addr->receiver_name }}"
+                          class="form-control form-control-sm rounded-3" placeholder="Tên người nhận" required>
+                      </div>
+                      <div class="col-6">
+                        <input type="tel" name="phone" value="{{ $addr->phone }}"
+                          class="form-control form-control-sm rounded-3"
+                          placeholder="0901234567"
+                          pattern="^(03|05|07|08|09)\d{8}$"
+                          maxlength="10" minlength="10"
+                          title="10 chữ số, bắt đầu bằng 03, 05, 07, 08 hoặc 09"
+                          required>
+                      </div>
+                    </div>
+                    <div class="mb-2">
+                      <select name="province" class="form-select form-select-sm rounded-3 addr-province" data-selected="{{ $addr->province }}" required>
+                        <option value="">-- Đang tải tỉnh/thành... --</option>
+                      </select>
+                    </div>
+                    <div class="mb-2">
+                      <select name="commune" class="form-select form-select-sm rounded-3 addr-commune" data-selected="{{ $addr->commune }}" disabled required>
+                        <option value="">-- Chọn tỉnh trước --</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <input type="text" name="address" value="{{ $addr->address }}"
+                        class="form-control form-control-sm rounded-3" placeholder="Số nhà, tên đường..." required>
+                    </div>
+                    <div class="form-check mb-3">
+                      <input class="form-check-input" type="checkbox" name="is_default" value="1" id="def-{{ $addr->id }}" {{ $addr->is_default ? 'checked' : '' }}>
+                      <label class="form-check-label small" for="def-{{ $addr->id }}">Đặt làm địa chỉ mặc định</label>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <button type="submit" class="btn btn-sm btn-dark rounded-pill px-3"><i class="bi bi-check me-1"></i>Lưu</button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="toggleAddrEdit({{ $addr->id }})">Huỷ</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+            </div>
+            @endforeach
+          </div>
+        @else
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-geo-alt" style="font-size:3rem;color:#eee;"></i>
+            <p class="mt-2">Bạn chưa có địa chỉ nào.</p>
+            <a href="{{ route('account.addresses.create') }}" class="btn btn-dark rounded-pill px-4">Thêm địa chỉ mới</a>
+          </div>
+        @endif
+      </div>
+    </div>
     {{-- =============== TAB: ACCOUNT DETAILS =============== --}}
     <div class="account-content tab-pane-block d-none" id="tab-account-details">
       <div class="tab-head">
@@ -553,7 +697,161 @@
       </div>
     </div>
 
+    {{-- =============== TAB: BANK ACCOUNTS =============== --}}
+    <div class="account-content tab-pane-block d-none" id="tab-bank-accounts">
+      <div class="tab-head">
+        <h4><i class="bi bi-credit-card-2-back me-2"></i>Tài khoản ngân hàng của tôi</h4>
+        @if($user)
+        <button type="button" class="btn btn-dark btn-sm rounded-pill px-3" onclick="openAddBankModal()">
+          <i class="bi bi-plus-lg me-1"></i>Thêm tài khoản
+        </button>
+        @endif
+      </div>
+      <div class="tab-body">
+        @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
+          {{ session('success') }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @endif
+
+        @if($user)
+        <p class="text-muted small mb-4">Quản lý tài khoản ngân hàng cá nhân của bạn. Thông tin này chỉ dùng để nhận hoàn tiền hoặc thanh toán từ shop.</p>
+
+        <div class="table-responsive">
+          <table class="table align-middle" style="font-size:0.9rem;">
+            <thead style="background:#f5f5f7;">
+              <tr>
+                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">#</th>
+                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ngân hàng</th>
+                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Số tài khoản</th>
+                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Chủ tài khoản</th>
+                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;"></th>
+                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($userBankAccounts as $i => $ub)
+              <tr style="border-color:#f0f0f0;">
+                <td style="padding:14px 16px;">{{ $i + 1 }}</td>
+                <td style="padding:14px 16px;">
+                  <div class="d-flex align-items-center gap-2">
+                    <img src="https://api.vietqr.io/img/{{ $ub->bank_id }}.png"
+                         alt="{{ $ub->bank_name }}"
+                         style="height:24px;width:48px;object-fit:contain;"
+                         onerror="this.style.display='none'">
+                    <span class="fw-semibold">{{ $ub->bank_name }}</span>
+                  </div>
+                </td>
+                <td style="padding:14px 16px;"><code class="fw-bold text-dark">{{ $ub->account_number }}</code></td>
+                <td style="padding:14px 16px;">{{ Str::upper($ub->account_name) }}</td>
+                <td style="padding:14px 16px;">
+                  @if($ub->is_default)
+                  <span class="badge rounded-pill" style="background:#fff3cd;color:#856404;"><i class="bi bi-star-fill me-1" style="font-size:0.6rem;"></i>Mặc định</span>
+                  @endif
+                </td>
+                <td style="padding:14px 16px;">
+                  <form action="{{ route('account.bank-accounts.destroy', $ub->id) }}" method="POST"
+                        onsubmit="return confirm('Xóa tài khoản {{ $ub->bank_name }} - {{ $ub->account_number }}?')">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                      <i class="bi bi-trash me-1"></i>Xóa
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              @empty
+              <tr>
+                <td colspan="6" class="text-center py-5 text-muted">
+                  <i class="bi bi-credit-card-2-back" style="font-size:2.5rem;color:#ddd;display:block;margin-bottom:10px;"></i>
+                  Bạn chưa có tài khoản ngân hàng nào.
+                  <br>
+                  <button type="button" class="btn btn-dark btn-sm mt-3 rounded-pill px-4" onclick="openAddBankModal()">
+                    <i class="bi bi-plus-lg me-1"></i>Thêm ngay
+                  </button>
+                </td>
+              </tr>
+              @endforelse
+            </tbody>
+          </table>
+        </div>
+        @endif
+      </div>
+    </div>
+
+    {{-- ========== MODAL: ADD BANK ACCOUNT ========== --}}
+    <div class="modal fade" id="modalAddBank" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold"><i class="bi bi-bank me-2"></i>Thêm tài khoản ngân hàng</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <form action="{{ route('account.bank-accounts.store') }}" method="POST" id="formAddBank">
+            @csrf
+            <div class="modal-body pt-3">
+              <div class="mb-3">
+                <label class="form-label fw-semibold small">Ngân hàng <span class="text-danger">*</span></label>
+                <select name="bank_id" id="add-bank-id" class="form-select" required onchange="onBankSelectChange(this, 'add')">
+                  <option value="">-- Chọn ngân hàng --</option>
+                  <option value="970436" data-name="Vietcombank">970436 - Vietcombank</option>
+                  <option value="970418" data-name="BIDV">970418 - BIDV</option>
+                  <option value="970415" data-name="Vietinbank">970415 - Vietinbank</option>
+                  <option value="970422" data-name="MB Bank">970422 - MB Bank</option>
+                  <option value="970407" data-name="Techcombank">970407 - Techcombank</option>
+                  <option value="970405" data-name="Agribank">970405 - Agribank</option>
+                  <option value="970416" data-name="ACB">970416 - ACB</option>
+                  <option value="970432" data-name="VPBank">970432 - VPBank</option>
+                  <option value="796500" data-name="MSB">796500 - MSB</option>
+                  <option value="970426" data-name="TPBank">970426 - TPBank</option>
+                  <option value="970423" data-name="TPBank">970423 - TPBank</option>
+                  <option value="970441" data-name="VIB">970441 - VIB</option>
+                  <option value="970425" data-name="HDBank">970425 - HDBank</option>
+                  <option value="970443" data-name="SHB">970443 - SHB</option>
+                  <option value="970454" data-name="Viet Capital Bank">970454 - Viet Capital Bank</option>
+                  <option value="970448" data-name="OCB">970448 - OCB</option>
+                  <option value="970403" data-name="Sacombank">970403 - Sacombank</option>
+                  <option value="970431" data-name="Eximbank">970431 - Eximbank</option>
+                  <option value="970400" data-name="Saigonbank">970400 - Saigonbank</option>
+                  <option value="970449" data-name="LPBank">970449 - LPBank</option>
+                  <option value="MoMo" data-name="Ví MoMo">MoMo - Ví MoMo</option>
+                  <option value="ZaloPay" data-name="Ví ZaloPay">ZaloPay - Ví ZaloPay</option>
+                </select>
+                <input type="hidden" name="bank_name" id="add-bank-name">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold small">Số tài khoản / Số điện thoại <span class="text-danger">*</span></label>
+                <input type="text" name="account_number" class="form-control" placeholder="Nhập số tài khoản" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold small">Tên chủ tài khoản <span class="text-danger">*</span></label>
+                <input type="text" name="account_name" class="form-control" placeholder="NGUYEN VAN A" style="text-transform:uppercase;" required>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="is_default" value="1" id="add-is-default">
+                <label class="form-check-label small" for="add-is-default">Đặt làm tài khoản mặc định</label>
+              </div>
+            </div>
+            <div class="modal-footer border-0">
+              <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-dark rounded-pill px-5">Lưu</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    {{-- =============== TAB: WALLET =============== --}}
+    <div class="account-content tab-pane-block d-none" id="tab-wallet">
+      <div class="tab-head">
+        <h4><i class="bi bi-wallet2 me-2"></i>Ví của tôi</h4>
+      </div>
+      <div class="tab-body">
+      </div>{{-- tab-body --}}
+    </div>{{-- tab-wallet --}}
+
   </div>{{-- col-md-9 --}}
+
 </div>{{-- row --}}
 </div>{{-- container --}}
 </div>{{-- account-wrapper --}}
@@ -568,7 +866,10 @@ document.addEventListener('DOMContentLoaded', function() {
     'orders'          : 'tab-orders',
     'wishlist'        : 'tab-wishlist',
     'coupons'         : 'tab-coupons',
+    'addresses'       : 'tab-addresses',
     'account-details' : 'tab-account-details',
+    'bank-accounts'   : 'tab-bank-accounts',
+    'wallet'          : 'tab-wallet',
   };
 
   function showTab(tabId) {
@@ -608,17 +909,40 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.copy-coupon').forEach(btn => {
     btn.addEventListener('click', function() {
       const code = this.getAttribute('data-code');
-      navigator.clipboard?.writeText(code).then(() => {
-        this.innerHTML = '<i class="bi bi-check2 me-1"></i>Đã sao chép!';
-        setTimeout(() => { this.innerHTML = '<i class="bi bi-clipboard me-1"></i>Sao chép mã'; }, 2000);
-      }).catch(() => {
+      const button = this;
+
+      function onSuccess() {
+        button.innerHTML = '<i class="bi bi-check2 me-1"></i>Đã sao chép!';
+        button.classList.remove('btn-outline-dark');
+        button.classList.add('btn-success');
+        setTimeout(() => {
+          button.innerHTML = '<i class="bi bi-clipboard me-1"></i>Sao chép mã';
+          button.classList.remove('btn-success');
+          button.classList.add('btn-outline-dark');
+        }, 2000);
+      }
+
+      function fallbackCopy() {
         const ta = document.createElement('textarea');
         ta.value = code;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
         document.body.appendChild(ta);
         ta.select();
-        document.execCommand('copy');
+        try {
+          document.execCommand('copy');
+          onSuccess();
+        } catch(e) {
+          alert('Không thể sao chép. Vui lòng copy thủ công: ' + code);
+        }
         document.body.removeChild(ta);
-      });
+      }
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(onSuccess).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
     });
   });
 
@@ -638,5 +962,200 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+
+function copyBankAccount(number, btn) {
+  if (!navigator.clipboard) return;
+  navigator.clipboard.writeText(number).then(function() {
+    var orig = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check2"></i>';
+    setTimeout(function() { btn.innerHTML = orig; }, 2000);
+  });
+}
+
+function onBankSelectChange(sel, prefix) {
+  var opt = sel.options[sel.selectedIndex];
+  document.getElementById(prefix + '-bank-name').value = opt.getAttribute('data-name') || '';
+}
+
+function openAddBankModal() {
+  document.getElementById('add-bank-id').value = '';
+  document.getElementById('add-bank-name').value = '';
+  document.getElementById('add-is-default').checked = false;
+  document.getElementById('formAddBank').reset();
+  new bootstrap.Modal(document.getElementById('modalAddBank')).show();
+}
+
+function openEditBankModal(id, bankName, bankId, accountNumber, accountName, isDefault) {
+  var baseUrl = '{{ url("/my-account/bank-accounts") }}';
+  document.getElementById('formEditBank').action = baseUrl + '/' + id;
+
+  var sel = document.getElementById('edit-bank-id');
+  sel.value = bankId;
+  document.getElementById('edit-bank-name').value = bankName;
+  document.getElementById('edit-account-number').value = accountNumber;
+  document.getElementById('edit-account-name').value = accountName;
+  document.getElementById('edit-is-default').checked = isDefault;
+
+  new bootstrap.Modal(document.getElementById('modalEditBank')).show();
+}
+
+function updateDestBankInfo(select) {
+    const container = document.getElementById('dest-bank-info');
+    const accName = document.getElementById('dest-acc-name');
+    const accNumber = document.getElementById('dest-acc-number');
+    
+    if (select.value) {
+        const option = select.options[select.selectedIndex];
+        accName.textContent = option.dataset.accountName;
+        accNumber.textContent = option.dataset.accountNumber;
+        container.classList.remove('d-none');
+    } else {
+        container.classList.add('d-none');
+    }
+}
+
+
+// Track current bank
+var _currentBankId = '';
+var _currentAccount = document.getElementById('display-account-number')
+  ? document.getElementById('display-account-number').textContent.trim() : '';
+var _currentName = document.getElementById('display-account-name')
+  ? document.getElementById('display-account-name').textContent.trim() : '';
+
+// Init bank id from logo src
+(function(){
+  var logo = document.getElementById('bank-logo-display');
+  if (logo) {
+    var m = logo.src.match(/img\/([^.]+)\.png/);
+    if (m) _currentBankId = m[1];
+  }
+})();
+
+function _refreshQR(bankId, account, name, amount) {
+  var qrImg  = document.getElementById('qr-image');
+  var dlBtn  = document.getElementById('qr-download-btn');
+  if (!qrImg) return;
+  var url = 'https://img.vietqr.io/image/' + bankId + '-' + account + '-qr_only.png?accountName=' + encodeURIComponent(name);
+  if (amount && Number(amount) > 0) url += '&amount=' + amount;
+  qrImg.style.opacity = '0.4';
+  qrImg.onload = function() { qrImg.style.opacity = '1'; };
+  qrImg.src = url;
+  if (dlBtn) dlBtn.href = url;
+}
+
+document.querySelectorAll('.bank-select-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.bank-select-btn').forEach(function(b) {
+      b.classList.remove('btn-dark');
+      b.classList.add('btn-outline-secondary');
+    });
+    this.classList.remove('btn-outline-secondary');
+    this.classList.add('btn-dark');
+
+    var bankId   = this.dataset.bankId;
+    var account  = this.dataset.account;
+    var name     = this.dataset.name;
+    var bankName = this.dataset.bankname;
+
+    _currentBankId = bankId;
+    _currentAccount = account;
+    _currentName = name;
+
+    var logoEl = document.getElementById('bank-logo-display');
+    if (logoEl) logoEl.src = 'https://api.vietqr.io/img/' + bankId + '.png';
+    var nameEl = document.getElementById('display-bank-name');
+    if (nameEl) nameEl.textContent = bankName;
+    var accEl = document.getElementById('display-account-number');
+    if (accEl) accEl.textContent = account;
+    var ownerEl = document.getElementById('display-account-name');
+    if (ownerEl) ownerEl.textContent = name.toUpperCase();
+
+    var amount = document.getElementById('qr-amount-input') ? document.getElementById('qr-amount-input').value : '';
+    _refreshQR(bankId, account, name, amount);
+  });
+});
+
+function updateQRWithAmount() {
+  var amount = document.getElementById('qr-amount-input') ? document.getElementById('qr-amount-input').value : '';
+  _refreshQR(_currentBankId, _currentAccount, _currentName, amount);
+}
+
+var amtInput = document.getElementById('qr-amount-input');
+if (amtInput) amtInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') updateQRWithAmount();
+});
+
+// ===== ADDRESS INLINE EDIT =====
+let _vnProvincesCache = null;
+
+async function _loadVnProvinces() {
+    if (_vnProvincesCache) return _vnProvincesCache;
+    const res  = await fetch('{{ route("api.vn-address.provinces") }}');
+    _vnProvincesCache = await res.json();
+    return _vnProvincesCache;
+}
+
+async function initAddrForm(addrId) {
+    const form = document.querySelector(`.addr-form[data-id="${addrId}"]`);
+    if (!form) return;
+    const provinceEl = form.querySelector('.addr-province');
+    const communeEl  = form.querySelector('.addr-commune');
+    const selProvince = provinceEl.dataset.selected || '';
+    const selCommune  = communeEl.dataset.selected || '';
+
+    // Load provinces
+    const provinces = await _loadVnProvinces();
+    provinceEl.innerHTML = '<option value="">-- Chọn tỉnh/thành phố --</option>';
+    let selectedCode = '';
+    provinces.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.name; opt.dataset.code = p.code; opt.textContent = p.name;
+        if (p.name === selProvince) { opt.selected = true; selectedCode = p.code; }
+        provinceEl.appendChild(opt);
+    });
+
+    // Auto-load communes if province known
+    if (selectedCode) await loadAddrCommunes(communeEl, selectedCode, selCommune);
+
+    provinceEl.addEventListener('change', async function() {
+        const opt = this.options[this.selectedIndex];
+        communeEl.innerHTML = '<option value="">-- Đang tải... --</option>';
+        communeEl.disabled = true;
+        if (opt && opt.dataset.code) {
+            await loadAddrCommunes(communeEl, opt.dataset.code, '');
+        } else {
+            communeEl.innerHTML = '<option value="">-- Chọn tỉnh trước --</option>';
+        }
+    });
+}
+
+async function loadAddrCommunes(select, provinceCode, selectedCommune) {
+    try {
+        const res  = await fetch('{{ url("api/vn-address/communes") }}/' + provinceCode);
+        const data = await res.json();
+        select.innerHTML = '<option value="">-- Chọn xã/phường --</option>';
+        data.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.name; opt.textContent = c.name;
+            if (c.name === selectedCommune) opt.selected = true;
+            select.appendChild(opt);
+        });
+        select.disabled = false;
+    } catch(e) {
+        select.innerHTML = '<option value="">Lỗi tải xã/phường</option>';
+    }
+}
+
+function toggleAddrEdit(addrId) {
+    const view = document.getElementById('addr-view-' + addrId);
+    const edit = document.getElementById('addr-edit-' + addrId);
+    if (!view || !edit) return;
+    const isHidden = edit.classList.contains('d-none');
+    view.classList.toggle('d-none', isHidden);
+    edit.classList.toggle('d-none', !isHidden);
+    if (isHidden) initAddrForm(addrId);
+}
+
 </script>
 @endpush

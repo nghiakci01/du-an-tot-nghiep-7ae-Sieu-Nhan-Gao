@@ -30,7 +30,7 @@ class ReportService
             ->where('orders.status', Order::STATUS_COMPLETED)
             ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->select(DB::raw('SUM((order_items.price - order_items.cost_price) * order_items.quantity) as profit'))
-            ->first()->profit ?? 0;
+            ->value('profit') ?? 0;
 
         $totalOrders = Order::whereBetween('created_at', [$startDate, $endDate])->count();
 

@@ -54,7 +54,7 @@ class OrderController extends Controller
             'items' => 'required|array|min:1',
             'items.*.variant_id' => 'required|exists:product_variants,id',
             'items.*.quantity' => 'required|integer|min:1',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER,CASH',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER,CASH,VNPAY',
             'status' => 'required|string',
             'manual_discount' => 'nullable|numeric|min:0',
             'note' => 'nullable|string',
@@ -66,15 +66,15 @@ class OrderController extends Controller
             $totalPrice = 0;
             foreach ($request->items as $item) {
                 $variant = ProductVariant::where('id', $item['variant_id'])->lockForUpdate()->first();
-                
+
                 if (!$variant) {
                     throw new \Exception('Sản phẩm không tồn tại.');
                 }
 
                 if ($variant->stock_quantity < $item['quantity']) {
                     $productName = $variant->product->name;
-                    $variantInfo = ($variant->sizeRelationship ? $variant->sizeRelationship->name : ( $variant->size ?: '' )) . 
-                                   ' - ' . 
+                    $variantInfo = ($variant->sizeRelationship ? $variant->sizeRelationship->name : ( $variant->size ?: '' )) .
+                                   ' - ' .
                                    ($variant->colorRelationship ? $variant->colorRelationship->name : ( $variant->color ?: '' ));
                     throw new \Exception("Sản phẩm '{$productName}' ({$variantInfo}) chỉ còn {$variant->stock_quantity} trong kho.");
                 }
@@ -106,7 +106,7 @@ class OrderController extends Controller
 
             foreach ($request->items as $item) {
                 $variant = ProductVariant::find($item['variant_id']);
-                
+
                 // Deduct stock
                 $variant->decrement('stock_quantity', $item['quantity']);
 
@@ -217,7 +217,8 @@ class OrderController extends Controller
             \App\Models\OrderHistory::create([
                 'order_id' => $order->id,
                 'user_id' => auth()->id(),
-                'status' => Order::STATUS_CONFIRMED,
+                'previous_status' => 'waiting_confirmation',
+                'new_status' => Order::STATUS_CONFIRMED,
                 'note' => 'Admin xác nhận đã nhận tiền chuyển khoản. Đơn hàng chuyển sang trạng thái Đã xác nhận.',
             ]);
 
@@ -255,87 +256,5 @@ class OrderController extends Controller
             Order::STATUS_CANCELLED => 'Đã hủy',
             default => 'Không xác định',
         };
-    }
-
-    /**
-     * Kích hoạt ép buộc lệnh tự động hủy đơn ngay lập tức từ Admin Panel.
-     */
-    public function triggerAutoCancel(Request $request)
-    {
-        try {
-            // Lấy thời gian do admin vừa điền trên Form (nếu có, mặc định là 24)
-            $hours = $request->input('auto_cancel_unpaid_order_hours', 24);
-
-            // Lưu lại mức này vào CSDL để áp dụng cho cả hệ thống chạy ngầm
-            \App\Models\Setting::updateOrCreate(
-                ['key' => 'auto_cancel_unpaid_order_hours'],
-                ['value' => $hours]
-            );
-            
-            \Illuminate\Support\Facades\Cache::forget('global_settings');
-
-            // Gọi chạy ngay lệnh Artisan trong nền
-            \Illuminate\Support\Facades\Artisan::call('orders:cancel-unpaid', [
-                '--hours' => $hours
-            ]);
-
-            $output = \Illuminate\Support\Facades\Artisan::output();
-
-            return back()->with('success', 'Đã lưu cấu hình và đối chiếu xử lý: ' . $output);
-            
-        } catch (\Exception $e) {
-            return back()->with('error', 'Có lỗi xảy ra khi thực thi lệnh tự động hủy: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Query VNPAY payment status for an order (QueryDR).
-     */
-    public function queryPayment(Order $order, \App\Services\VnpayService $vnpayService)
-    {
-        if ($order->payment_method !== 'VNPAY') {
-            return response()->json(['success' => false, 'message' => 'Đơn hàng không thanh toán qua VNPAY.']);
-        }
-
-        $result = $vnpayService->queryTransaction($order);
-
-        return response()->json([
-            'success' => true,
-            'data' => $result,
-            'message' => \App\Services\VnpayService::getResponseMessage($result['vnp_ResponseCode'] ?? '99'),
-        ]);
-    }
-
-    /**
-     * Request refund via VNPAY for an order.
-     */
-    public function refundPayment(Request $request, Order $order, \App\Services\VnpayService $vnpayService)
-    {
-        if ($order->payment_method !== 'VNPAY' || $order->payment_status !== 'paid') {
-            return back()->with('error', 'Chỉ có thể hoàn tiền cho đơn VNPAY đã thanh toán.');
-        }
-
-        $amount = $request->input('refund_amount', $order->final_total);
-        $transactionType = $amount >= $order->final_total ? '02' : '03'; // 02 = full, 03 = partial
-
-        $result = $vnpayService->refundTransaction($order, (int) $amount, auth()->user()->email, $transactionType);
-
-        $responseCode = $result['vnp_ResponseCode'] ?? '99';
-        $message = \App\Services\VnpayService::getResponseMessage($responseCode);
-
-        if ($responseCode === '00') {
-            $order->update(['payment_status' => 'refunded']);
-
-            \App\Models\OrderHistory::create([
-                'order_id' => $order->id,
-                'user_id' => auth()->id(),
-                'new_status' => $order->status,
-                'note' => 'Hoàn tiền VNPAY thành công: ' . number_format($amount) . 'đ',
-            ]);
-
-            return back()->with('success', 'Hoàn tiền VNPAY thành công: ' . number_format($amount) . 'đ');
-        }
-
-        return back()->with('error', 'Hoàn tiền VNPAY thất bại: ' . $message);
     }
 }

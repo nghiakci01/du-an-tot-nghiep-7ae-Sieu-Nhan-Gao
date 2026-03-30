@@ -32,70 +32,71 @@ class AppServiceProvider extends ServiceProvider
 
         try {
             // Share categories globally for header menu
-            // Using View::composer to avoid query on console commands if DB not ready,
-            // but for simplicity in this context View::share or composer with closure is fine.
-        if (! app()->runningInConsole()) {
-            View::composer('*', function ($view) {
+            // Register view composer even in console so tests and queues can render views
+        View::composer('*', function ($view) {
+            static $sharedData = null;
+
+            if ($sharedData === null) {
+                $sharedData = [];
                 try {
-                // Check if categories is already set to avoid double query or overriding
-                if (! isset($view->getData()['categories'])) {
-                    $categories = Category::whereNull('parent_id')->get();
-                    $view->with('categories', $categories);
-                }
-
-                // Share chatbot settings
-                if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_settings')) {
-                    $chatbotEnabled = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_enabled', 3600, function () {
-                        return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_enabled')->first()?->value ?? '0';
-                    });
-                    $chatbotMode = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_mode', 3600, function () {
-                        return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_mode')->first()?->value ?? 'rules';
+                    // 1. Share categories
+                    $sharedData['categories'] = \Illuminate\Support\Facades\Cache::remember('global_navigation_categories', 3600, function () {
+                        return Category::whereNull('parent_id')->with('children')->get();
                     });
 
-                    $view->with('chatbot_enabled', $chatbotEnabled == '1');
-                    $view->with('chatbot_mode', $chatbotMode);
-                } else {
-                    $view->with('chatbot_enabled', false);
-                    $view->with('chatbot_mode', 'rules');
-                }
+                    // 2. Chatbot Settings (Gộp kiểm tra Schema)
+                    $hasChatbotTable = \Illuminate\Support\Facades\Schema::hasTable('chatbot_settings');
+                    if ($hasChatbotTable) {
+                        $sharedData['chatbot_enabled'] = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_enabled', 3600, function () {
+                            return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_enabled')->value('value') ?? '0';
+                        }) == '1';
+                        $sharedData['chatbot_mode'] = \Illuminate\Support\Facades\Cache::remember('chatbot_setting_chatbot_mode', 3600, function () {
+                            return \Illuminate\Support\Facades\DB::table('chatbot_settings')->where('key', 'chatbot_mode')->value('value') ?? 'rules';
+                        });
+                    } else {
+                        $sharedData['chatbot_enabled'] = false;
+                        $sharedData['chatbot_mode'] = 'rules';
+                    }
 
-                // Share chatbot suggested questions
-                if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_suggested_questions')) {
-                    $suggestedQuestions = \Illuminate\Support\Facades\Cache::remember('chatbot_suggested_questions', 3600, function () {
-                        return \Illuminate\Support\Facades\DB::table('chatbot_suggested_questions')->where('is_active', true)
-                            ->orderBy('order')
-                            ->pluck('question')
-                            ->toArray();
-                    });
-                    $view->with('chatbot_suggested_questions', $suggestedQuestions);
-                } else {
-                    $view->with('chatbot_suggested_questions', []);
-                }
+                    // 3. Suggested Questions
+                    if (\Illuminate\Support\Facades\Schema::hasTable('chatbot_suggested_questions')) {
+                        $sharedData['chatbot_suggested_questions'] = \Illuminate\Support\Facades\Cache::remember('chatbot_suggested_questions', 3600, function () {
+                            return \Illuminate\Support\Facades\DB::table('chatbot_suggested_questions')->where('is_active', true)
+                                ->orderBy('order')
+                                ->pluck('question')
+                                ->toArray();
+                        });
+                    } else {
+                        $sharedData['chatbot_suggested_questions'] = [];
+                    }
 
-                // Share Global Settings
-                if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
-                    $settings = \Illuminate\Support\Facades\Cache::remember('global_settings', 3600, function () {
-                        return \Illuminate\Support\Facades\DB::table('settings')->get()->pluck('value', 'key')->toArray();
-                    });
-                    $view->with('settings', $settings);
-                } else {
-                    $view->with('settings', []);
-                }
+                    // 4. Global Settings
+                    if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+                        $sharedData['settings'] = \Illuminate\Support\Facades\Cache::remember('global_settings', 3600, function () {
+                            return \Illuminate\Support\Facades\DB::table('settings')->get()->pluck('value', 'key')->toArray();
+                        });
+                    } else {
+                        $sharedData['settings'] = [];
+                    }
 
-                // Share notifications for Admin
-                /** @var \App\Models\User|null $user */
-                $user = Auth::user();
-                if ($user && $user->role === \App\Models\User::ROLE_ADMIN) {
-                    $notifications = $user->unreadNotifications()->latest()->limit(5)->get();
-                    $unreadCount = $user->unreadNotifications()->count();
-                    $view->with('admin_notifications', $notifications);
-                    $view->with('admin_unread_count', $unreadCount);
-                }
+                    // 5. Admin Notifications
+                    $user = Auth::user();
+                    if ($user && $user->role === \App\Models\User::ROLE_ADMIN) {
+                        $sharedData['admin_notifications'] = $user->unreadNotifications()->latest()->limit(5)->get();
+                        $sharedData['admin_unread_count'] = $user->unreadNotifications()->count();
+                    }
                 } catch (\Throwable $e) {
-                    \Illuminate\Support\Facades\Log::error('AppServiceProvider View Composer Error: ' . $e->getMessage());
+                    \Illuminate\Support\Facades\Log::error('AppServiceProvider Data Prep Error: ' . $e->getMessage());
                 }
-            });
-        }
+            }
+
+            // Bind all shared data to the view
+            foreach ($sharedData as $key => $value) {
+                if (!isset($view->getData()[$key])) {
+                    $view->with($key, $value);
+                }
+            }
+        });
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('AppServiceProvider Boot Error: ' . $e->getMessage());
         }

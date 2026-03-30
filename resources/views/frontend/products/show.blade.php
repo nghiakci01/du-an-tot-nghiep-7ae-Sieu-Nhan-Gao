@@ -93,183 +93,179 @@
             pointer-events: none;
         }
 
-        /* Smart AI Mirror Styles */
-        #smart-ai-mirror {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 100;
-            width: 100px;
-            height: 140px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(5px);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            border: 1px solid rgba(255,255,255,0.3);
-            overflow: hidden;
+        /* Album thumbnails styling */
+        .single-zoom-thumb ul li img {
+
+            width: 64px !important;
+            height: 64px !important;
+            object-fit: cover;
+            padding: 3px;
+            border: 0.5px solid #ddd;
+            margin-right: 3px;
+        }
+
+        /* Swatch Styles */
+        .swatch-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .swatch-item {
+            min-width: 45px;
+            height: 45px;
+            padding: 0 10px;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            display: none;
-            opacity: 0;
-            transform: translateX(20px);
-        }
-
-        #smart-ai-mirror.active {
-            display: block;
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        #smart-ai-mirror:hover {
-            width: 120px;
-            height: 165px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
-        }
-
-        .mirror-header {
-            font-size: 9px;
-            font-weight: 800;
-            text-align: center;
-            background: #ef233c;
-            color: white;
-            padding: 3px 0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .mirror-body {
-            height: 100%;
-            position: relative;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .mirror-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: filter 0.3s;
-        }
-
-        .mirror-loading {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.4);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .mirror-pulse {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #ef233c;
-            box-shadow: 0 0 0 0 rgba(239, 35, 60, 0.7);
-            animation: pulse-mirror 1.5s infinite;
-        }
-
-        @keyframes pulse-mirror {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 35, 60, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(239, 35, 60, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 35, 60, 0); }
-        }
-
-        .mirror-text {
-            font-size: 8px;
-            margin-top: 8px;
             font-weight: 600;
+            transition: all 0.3s;
+            background: #fff;
+            user-select: none;
+        }
+        .swatch-item:hover {
+            border-color: #ef233c;
+            color: #ef233c;
+        }
+        .swatch-item.active {
+            border-color: #ef233c;
+            background: #fff;
+            color: #ef233c;
+            box-shadow: inset 0 0 0 1px #ef233c;
+        }
+        .swatch-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f5f5f5;
         }
 
-        .mirror-success-badge {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background: #2ecc71;
-            color: white;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
+        /* Hide legacy dropdowns and nice-select wrappers */
+        .product_variant select,
+        .product_variant .nice-select {
+            display: none !important;
+        }
+
+        /* Ensure variants stack vertically */
+        .product_variant.size, 
+        .product_variant.color {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            margin-bottom: 20px;
+        }
+        .product_variant h3 {
+            margin-bottom: 5px !important;
+        }
+
+        /* Quantity Selector Styles */
+        .quantity-selector {
+            display: flex !important;
+            align-items: center;
+            border: 0.5px solid #ccc;
+            width: 140px !important;
+            height: 40px !important; /* Reverted to 40px */
+            margin-top: 10px;
+            overflow: hidden !important;
+            border-radius: 4px;
+            box-sizing: border-box !important;
+            background: #fff;
+        }
+        .quantity-selector * {
+            box-sizing: border-box !important;
+        }
+        .qty-btn {
+            flex: 0 0 40px !important;
+            width: 40px !important;
+            height: 40px !important; /* Reverted to 40px */
+            border: 0 !important;
+            background: #fff !important;
+            color: #333 !important;
+            font-size: 20px !important;
+            font-weight: bold !important;
+            cursor: pointer;
+            display: flex !important;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transition: all 0.2s;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .qty-btn:hover {
+            background: #f8f8f8 !important;
+            color: #ef233c !important;
+        }
+        .qty-btn:active {
+            background: #d1d1d1 !important;
+        }
+        .quantity-selector input {
+            flex: 0 0 59px !important;
+            width: 59px !important;
+            height: 40px !important; /* Reverted to 40px */
+            border: 0 !important;
+            border-left: 0.5px solid #ccc !important;
+            border-right: 0.5px solid #ccc !important;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+            -moz-appearance: textfield;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff;
+            color: #333;
+            outline: none !important;
+            font-family: 'Quicksand', sans-serif;
+        }
+        .quantity-selector input::-webkit-outer-spin-button,
+        .quantity-selector input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
-        @keyframes bounceIn {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
-        }
-        /* VTON Smart Mockup */
-        .smart-mockup-wrapper {
-            position: relative;
-            width: 260px;
-            height: 350px;
-            margin: 0 auto 25px;
-            background: #f0f0f0;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: 1px solid #eee;
-        }
-        .mockup-base {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.3s ease;
-        }
-        .mockup-item {
-            position: absolute;
-            top: 55%;
-            left: 50%;
-            width: 55%;
-            transform: translate(-50%, -50%) scale(0.9);
-            mix-blend-mode: multiply;
-            opacity: 0;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
-            transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-        .mockup-item.active {
-            opacity: 0.9;
-            transform: translate(-50%, -50%) scale(1);
-            top: 48%;
-        }
-        .mockup-scan-line {
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: rgba(239, 35, 60, 0.5);
-            box-shadow: 0 0 10px #ef233c;
-            z-index: 10;
-            animation: scan-move 2.5s infinite ease-in-out;
-        }
-        @keyframes scan-move {
-            0% { top: 0%; opacity: 0; }
-            50% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
-        }
-        .mockup-label {
-            position: absolute;
-            bottom: 10px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 10px;
+        /* Responsive adjustments for buttons */
+        .product_variant.quantity .button {
+            width: 175px !important; /* Fixed width as requested */
+            height: 50px !important; /* Fixed height as requested */
+            line-height: 50px !important;
+            padding: 0 !important; /* Padding removed due to fixed width */
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 0 !important;
             text-transform: uppercase;
-            font-weight: bold;
-            color: #ef233c;
-            letter-spacing: 2px;
-            background: rgba(255,255,255,0.8);
-            padding: 2px 0;
+            letter-spacing: 1px;
+            background: #1a1a1a !important; /* Solid black */
+            color: #fff !important;
+            display: inline-block;
+            text-align: center;
         }
+        .product_variant.quantity .button.buy_now {
+            background: #1a1a1a !important; /* Change to black as requested */
+        }
+        .product_variant.quantity .button:hover {
+            background: #333 !important;
+        }
+
+        /* Align rating to left */
+        .product_ratting ul {
+            justify-content: flex-start !important;
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            display: flex !important;
+        }
+        .product_ratting ul li {
+            margin-right: 5px !important;
+        }
+
+        /* Product name bold */
+        .product_d_right h1 {
+            font-weight: 700;
+            color: black;
+            font-family: 
+        }
+        
     </style>
     <!--breadcrumbs area start-->
     <div class="breadcrumbs_area product_bread">
@@ -310,8 +306,8 @@
                         <div id="img-1" class="zoomWrapper single-zoom">
                             <a href="#">
                                 <img id="zoom1"
-                                    src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}"
-                                    data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}"
+                                    src="{{ $product->image ? asset('storage/' . $product->image) : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' }}"
+                                    data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' }}"
                                     alt="{{ $product->name }}">
                             </a>
                         </div>
@@ -319,9 +315,9 @@
                             <ul class="s-tab-zoom owl-carousel single-product-active" id="gallery_01">
                                 <li>
                                     <a href="#" class="elevatezoom-gallery active" data-update=""
-                                        data-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}"
-                                        data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}">
-                                        <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('frontend-assets/img/product/product5.jpg') }}"
+                                        data-image="{{ $product->image ? asset('storage/' . $product->image) : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' }}"
+                                        data-zoom-image="{{ $product->image ? asset('storage/' . $product->image) : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' }}">
+                                        <img src="{{ $product->image ? asset('storage/' . $product->image) : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' }}"
                                             alt="{{ $product->name }}" />
                                     </a>
                                 </li>
@@ -409,8 +405,16 @@
                                 @endphp
 
                                 <div class="product_variant size">
-                                    <h3>{{ __('messages.size') }}</h3>
-                                    <select class="niceselect_option" id="select_size_nice" name="size_id">
+                                    <h3 style="display: flex; align-items: center; gap: 10px;">
+                                        {{ __('messages.size') }}
+                                        <a href="#" style="font-size: 12px; text-decoration: underline; color: #666; font-weight: normal;">Hướng Dẫn Chọn Size</a>
+                                    </h3>
+                                    <div class="swatch-container size-swatches">
+                                        @foreach ($uniqueSizes as $size)
+                                            <div class="swatch-item" data-value="{{ $size->id }}">{{ $size->name }}</div>
+                                        @endforeach
+                                    </div>
+                                    <select class="niceselect_option" id="select_size_nice" name="size_id" style="display: none;">
                                         <option selected value="">{{ __('messages.size') }}</option>
                                         @foreach ($uniqueSizes as $size)
                                             <option value="{{ $size->id }}">{{ $size->name }}</option>
@@ -421,7 +425,12 @@
 
                                 <div class="product_variant color">
                                     <h3>{{ __('messages.color') }}</h3>
-                                    <select class="niceselect_option" id="select_color_nice" name="color_id">
+                                    <div class="swatch-container color-swatches">
+                                        @foreach ($uniqueColors as $color)
+                                            <div class="swatch-item" data-value="{{ $color->id }}">{{ $color->name }}</div>
+                                        @endforeach
+                                    </div>
+                                    <select class="niceselect_option" id="select_color_nice" name="color_id" style="display: none;">
                                         <option selected value="">{{ __('messages.color') }}</option>
                                         @foreach ($uniqueColors as $color)
                                             <option value="{{ $color->id }}">{{ $color->name }}</option>
@@ -433,6 +442,30 @@
                                 <input type="hidden" id="variant_select" name="variant_id" required>
                                 <div id="variant-message" class="text-danger mt-2 mb-3"
                                     style="font-weight: bold; display: none;"></div>
+
+                                <style>
+                                    .swatch-item.active {
+                                        border: 2px solid #ef233c !important;
+                                        color: #ef233c;
+                                        position: relative;
+                                    }
+                                    .swatch-item.active::after {
+                                        content: '✓';
+                                        position: absolute;
+                                        bottom: 0px;
+                                        right: 2px;
+                                        font-size: 10px;
+                                        line-height: 1;
+                                    }
+                                    .swatch-item.disabled-swatch {
+                                        opacity: 0.4;
+                                        background-color: #f9f9f9;
+                                        color: #999;
+                                        border: 1px dashed #ccc;
+                                        position: relative;
+                                        cursor: not-allowed;
+                                    }
+                                </style>
 
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function() {
@@ -451,16 +484,150 @@
 
                                         const originalPriceHtml = priceContainer.innerHTML;
 
-                                        // Handle Nice Select changes
+                                        // Filter swatches based on current selection
+                                        function filterSwatches() {
+                                            const selectedSize = sizeInput.value;
+                                            const selectedColor = colorInput.value;
+
+                                            if (selectedSize && selectedColor) {
+                                                // BOTH selected: dim sizes unavailable for current color,
+                                                // dim colors unavailable for current size
+                                                const availableColorsForSize = variants
+                                                    .filter(v => v.size_id == selectedSize && v.stock_quantity > 0)
+                                                    .map(v => String(v.color_id));
+                                                $('.color-swatches .swatch-item').each(function() {
+                                                    availableColorsForSize.includes(String($(this).data('value')))
+                                                        ? $(this).removeClass('disabled-swatch')
+                                                        : $(this).addClass('disabled-swatch');
+                                                });
+
+                                                const availableSizesForColor = variants
+                                                    .filter(v => v.color_id == selectedColor && v.stock_quantity > 0)
+                                                    .map(v => String(v.size_id));
+                                                $('.size-swatches .swatch-item').each(function() {
+                                                    availableSizesForColor.includes(String($(this).data('value')))
+                                                        ? $(this).removeClass('disabled-swatch')
+                                                        : $(this).addClass('disabled-swatch');
+                                                });
+                                            } else if (selectedSize) {
+                                                // Only size selected: enable all sizes, disable colors for this size
+                                                $('.size-swatches .swatch-item').removeClass('disabled-swatch');
+                                                const availableColorIds = variants
+                                                    .filter(v => v.size_id == selectedSize && v.stock_quantity > 0)
+                                                    .map(v => String(v.color_id));
+                                                $('.color-swatches .swatch-item').each(function() {
+                                                    const colorId = String($(this).data('value'));
+                                                    if (availableColorIds.includes(colorId)) {
+                                                        $(this).removeClass('disabled-swatch');
+                                                    } else {
+                                                        $(this).addClass('disabled-swatch');
+                                                    }
+                                                });
+                                            } else if (selectedColor) {
+                                                // Only color selected: enable all colors, disable sizes for this color
+                                                $('.color-swatches .swatch-item').removeClass('disabled-swatch');
+                                                const availableSizeIds = variants
+                                                    .filter(v => v.color_id == selectedColor && v.stock_quantity > 0)
+                                                    .map(v => String(v.size_id));
+                                                $('.size-swatches .swatch-item').each(function() {
+                                                    const sizeId = String($(this).data('value'));
+                                                    if (availableSizeIds.includes(sizeId)) {
+                                                        $(this).removeClass('disabled-swatch');
+                                                    } else {
+                                                        $(this).addClass('disabled-swatch');
+                                                    }
+                                                });
+                                            } else {
+                                                // Nothing selected: enable ALL
+                                                $('.size-swatches .swatch-item').removeClass('disabled-swatch');
+                                                $('.color-swatches .swatch-item').removeClass('disabled-swatch');
+                                            }
+                                        }
+
+                                        // Handle Swatch changes
+                                        $('.size-swatches .swatch-item').on('click', function() {
+                                            // Disabled → không làm gì
+                                            if ($(this).hasClass('disabled-swatch')) return;
+
+                                            if ($(this).hasClass('active')) {
+                                                // Toggle off: bỏ chọn kích thước, reset bộ lọc màu
+                                                $(this).removeClass('active');
+                                                sizeInput.value = '';
+                                                $(niceSize).val('').trigger('change');
+                                                filterSwatches();
+                                                checkSelection();
+                                                return;
+                                            }
+
+                                            // Chọn size mới
+                                            $('.size-swatches .swatch-item').removeClass('active');
+                                            $(this).addClass('active');
+                                            const val = $(this).data('value');
+                                            sizeInput.value = val;
+                                            $(niceSize).val(val).trigger('change');
+
+                                            // Nếu màu đang chọn không có trong size này → bỏ chọn màu
+                                            if (colorInput.value) {
+                                                const availableColors = variants
+                                                    .filter(v => v.size_id == val && v.stock_quantity > 0)
+                                                    .map(v => String(v.color_id));
+                                                if (!availableColors.includes(String(colorInput.value))) {
+                                                    $('.color-swatches .swatch-item').removeClass('active');
+                                                    colorInput.value = '';
+                                                    $(niceColor).val('').trigger('change');
+                                                }
+                                            }
+
+                                            filterSwatches();
+                                            checkSelection();
+                                        });
+
+                                        $('.color-swatches .swatch-item').on('click', function() {
+                                            // Disabled → không làm gì
+                                            if ($(this).hasClass('disabled-swatch')) return;
+
+                                            if ($(this).hasClass('active')) {
+                                                // Toggle off: bỏ chọn màu, reset bộ lọc size
+                                                $(this).removeClass('active');
+                                                colorInput.value = '';
+                                                $(niceColor).val('').trigger('change');
+                                                filterSwatches();
+                                                checkSelection();
+                                                return;
+                                            }
+
+                                            // Chọn màu mới
+                                            $('.color-swatches .swatch-item').removeClass('active');
+                                            $(this).addClass('active');
+                                            const val = $(this).data('value');
+                                            colorInput.value = val;
+                                            $(niceColor).val(val).trigger('change');
+
+                                            // Nếu size đang chọn không có màu này → bỏ chọn size
+                                            if (sizeInput.value) {
+                                                const availableSizes = variants
+                                                    .filter(v => v.color_id == val && v.stock_quantity > 0)
+                                                    .map(v => String(v.size_id));
+                                                if (!availableSizes.includes(String(sizeInput.value))) {
+                                                    $('.size-swatches .swatch-item').removeClass('active');
+                                                    sizeInput.value = '';
+                                                    $(niceSize).val('').trigger('change');
+                                                }
+                                            }
+
+                                            filterSwatches();
+                                            checkSelection();
+                                        });
+
+                                        // Keep Nice Select and swatches in sync if needed (though we hidden Nice Select)
                                         $(niceSize).on('change', function() {
                                             sizeInput.value = this.value;
-                                            // Remove error highlight when user selects
-                                            $(this).closest('.product_variant').find('.nice-select').css('border-color', '');
+                                            $(`.size-swatches .swatch-item[data-value="${this.value}"]`).addClass('active').siblings().removeClass('active');
                                             checkSelection();
                                         });
                                         $(niceColor).on('change', function() {
                                             colorInput.value = this.value;
-                                            $(this).closest('.product_variant').find('.nice-select').css('border-color', '');
+                                            $(`.color-swatches .swatch-item[data-value="${this.value}"]`).addClass('active').siblings().removeClass('active');
                                             checkSelection();
                                         });
 
@@ -640,23 +807,34 @@
                                 </script>
                             @endif
 
-                            <div class="product_variant quantity">
-                                <label>{{ __('messages.quantity') }}</label>
-                                <input min="1" value="1" type="number" name="quantity" id="quantity_input">
-                                <div style="margin-top:10px;">
+                            <div class="product_variant quantity" style="display: flex; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+                                <div style="display: flex; flex-direction: column; gap: 5px;">
+                                    <label style="margin-bottom: 0; font-weight: 700;">{{ __('messages.quantity') }}</label>
+                                    <div class="quantity-selector" style="margin-top: 0;">
+                                        <button type="button" class="qty-btn minus">-</button>
+                                        <input min="1" value="1" type="number" name="quantity" id="quantity_input">
+                                        <button type="button" class="qty-btn plus">+</button>
+                                    </div>
+                                    <span id="stock-info" style="display: none; font-size: 13px; color: #ef233c;"></span>
+                                </div>
+                                <div style="display: flex; gap: 10px; align-items: center; padding-top: 26px;">
                                     <input type="hidden" name="action" id="action_input" value="add_to_cart">
-                                    <button class="button" type="button"
+                                    <button class="button" type="button" style="margin: 0;"
                                         id="btn-add-to-cart">{{ __('messages.add_to_cart') }}</button>
-                                    <button class="button buy_now" type="button"
+                                    <button class="button buy_now" type="button" style="margin: 0;"
                                         id="btn-buy-now">{{ __('messages.buy_now') }}</button>
                                 </div>
                             </div>
-                            <div class="product_d_action">
-                                <ul>
-                                    <li>
-                                        <a href="#" class="add-to-wishlist" data-id="{{ $product->id }}"
-                                            title="{{ __('messages.add_to_wishlist') }}">
-                                            <i class="fa fa-heart-o" aria-hidden="true"></i>
+                            <div class="product_d_action" style="padding: 0; margin: 8px 0 16px 0;">
+                                <ul style="padding: 0; margin: 0; list-style: none;">
+                                    <li style="padding: 0; margin: 0;">
+                                        @php $isWishlisted = in_array($product->id, $wishlistProductIds ?? []); @endphp
+                                        <a href="javascript:void(0)" class="add-to-wishlist" data-id="{{ $product->id }}"
+                                            title="{{ __('messages.add_to_wishlist') }}"
+                                            style="padding: 0; margin: 0;">
+                                            <i class="fa {{ $isWishlisted ? 'fa-heart' : 'fa-heart-o' }}"
+                                               aria-hidden="true"
+                                               style="{{ $isWishlisted ? 'color: red;' : '' }}"></i>
                                             {{ __('messages.add_to_wishlist') }}
                                         </a>
                                     </li>
@@ -736,20 +914,23 @@
                                 </div>
                                 @if(count($product->reviews) > 0)
                                     @foreach($product->reviews as $review)
-                                    <div class="product_info_inner">
-                                        <div class="product_ratting mb-10">
-                                            <ul>
+                                    <div class="product_info_inner" style="padding: 12px 0; display: flex; flex-direction: column; gap: 6px;">
+                                        {{-- Hàng 1: Tên + Ngày --}}
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <strong style="font-size: 14px; color: #222;">{{ $review->user->name ?? 'Guest' }}</strong>
+                                            <em style="font-size: 12px; color: #999;">{{ $review->created_at->format('d/m/Y') }}</em>
+                                        </div>
+                                        {{-- Hàng 2: Sao đánh giá --}}
+                                        <div class="product_ratting" style="display: block;">
+                                            <ul style="margin: 0; padding: 0; display: flex; flex-direction: row;">
                                                 @for ($i = 1; $i <= 5; $i++)
-                                                    <li><a href="javascript:void(0)"><i
-                                                                class="fa {{ $i <= $review->rating ? 'fa-star' : 'fa-star-o' }}"></i></a>
-                                                    </li>
+                                                    <li><a href="javascript:void(0)"><i class="fa {{ $i <= $review->rating ? 'fa-star' : 'fa-star-o' }}"></i></a></li>
                                                 @endfor
                                             </ul>
-                                            <strong>{{ $review->user->name ?? 'Guest' }}</strong>
-                                            <p>{{ $review->created_at->format('d/m/Y') }}</p>
                                         </div>
-                                        <div class="product_demo">
-                                            <p>{{ $review->comment }}</p>
+                                        {{-- Hàng 3: Nội dung bình luận --}}
+                                        <div class="product_demo" style="padding: 0; margin: 0;">
+                                            <p style="margin: 0; padding: 0; color: #444;">{{ $review->comment }}</p>
                                         </div>
                                     </div>
                                     <hr>
@@ -817,14 +998,6 @@
                                                 </div>
                                                 <button type="submit">{{ __('messages.submit') }}</button>
                                             </form>
-                                        @else
-                                            <div class="alert"
-                                                style="background:#fff8e1; border-left:4px solid #f39c12; padding:15px; border-radius:4px;">
-                                                <i class="fa fa-info-circle" style="color:#f39c12;"></i>
-                                                {{ __('messages.review_purchase_required') }}
-                                                <a href="{{ route('shop') }}" class="btn btn-sm"
-                                                    style="background:#ef233c; color:#fff; margin-left:10px; padding:4px 12px; border-radius:3px;">{{ __('messages.buy_to_review') }}</a>
-                                            </div>
                                         @endif
                                     @else
                                         <p>{!! __('messages.login_to_review', [
@@ -853,14 +1026,12 @@
                 </div>
             </div>
             <div class="product_area">
-                <div class="row">
-                    <div class="product_carousel product_three_column4 owl-carousel">
-                        @foreach ($relatedProducts as $related)
-                            <div class="col-lg-3">
+                <div class="product_carousel product_three_column4 owl-carousel">
+                    @foreach ($relatedProducts as $related)
                                 <div class="single_product">
                                     <div class="product_thumb">
                                         <a class="primary_img" href="{{ route('product.detail', $related->slug) }}">
-                                            <img src="{{ $related->image ? asset('storage/' . $related->image) : asset('frontend-assets/img/product/product21.jpg') }}"
+                                            <img src="{{ $related->image ? asset('storage/' . $related->image) : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' }}"
                                                 alt="{{ $related->name }}">
                                         </a>
                                         <div class="product_action">
@@ -891,30 +1062,15 @@
                                         ])
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!--product section area end-->
-
+                            @endforeach
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-
-            </div>
-        </div>
-    </div>
-
-    @include('frontend.partials.recently-viewed')
-
-@endsection
+    @endsection
 
 @section('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
@@ -967,44 +1123,6 @@
                 }, 500);
             });
 
-            $('.add-to-wishlist').click(function(e) {
-                e.preventDefault();
-                const config = document.getElementById('product-details-container').dataset;
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-                var productId = $(this).data('id');
-                var icon = $(this).find('i');
-
-                $.ajax({
-                    url: config.routeWishlistAdd,
-                    method: 'POST',
-                    data: {
-                        _token: csrfToken,
-                        product_id: productId
-                    },
-                    success: function(response) {
-                        if (response.status === 'success' || response.status === 'info') {
-                            // Change icon to filled heart
-                            icon.removeClass('fa-heart-o').addClass('fa-heart').css('color',
-                                'red');
-                            alert(response.message);
-                        } else {
-                            // This else block seems to be part of a different context in the provided snippet.
-                            // Reverting to original logic for wishlist success.
-                            alert(response.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        // The provided snippet's error handling seems to be for a different context (AI/VTON).
-                        // Reverting to original logic for wishlist error.
-                        if (xhr.status === 401) {
-                            window.location.href = config.routeLogin;
-                        } else {
-                            alert('An error occurred, please try again!');
-                        }
-                    }
-                });
-            });
-
             // AJAX Add to Cart
             $('#btn-add-to-cart').on('click', function() {
                 $('#action_input').val('add_to_cart');
@@ -1026,7 +1144,7 @@
                 var hasVariants = config.hasVariants === 'true';
 
                 if (hasVariants) {
-                    // Đọc giá trị size & color từ select gốc
+
                     var selectedSize = $('#select_size_nice').val();
                     var selectedColor = $('#select_color_nice').val();
 
@@ -1148,7 +1266,7 @@
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        // Cập nhật số lượng giá» hàng trên header
+                        // Cập nhật số lượng giỏ hàng trên header
                         let cartCountElements = document.querySelectorAll('.cart-count');
                         if (response.count !== undefined) {
                             cartCountElements.forEach(el => {
@@ -1191,6 +1309,33 @@
                     }
                 });
             }
+
+            // Quantity increment/decrement buttons
+            $('.qty-btn.plus').on('click', function() {
+                var input = $('#quantity_input');
+                var val = parseInt(input.val()) || 1;
+                var max = parseInt(input.attr('max'));
+                if (!max || val < max) {
+                    input.val(val + 1).trigger('input');
+                } else {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: `Chỉ còn ${max} sản phẩm trong kho!`,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            });
+
+            $('.qty-btn.minus').on('click', function() {
+                var input = $('#quantity_input');
+                var val = parseInt(input.val()) || 1;
+                if (val > 1) {
+                    input.val(val - 1).trigger('input');
+                }
+            });
         });
     </script>
 @endsection

@@ -13,14 +13,36 @@ use App\Notifications\NewOrderNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
 
+use App\Services\CartService;
+
 class CheckoutController extends Controller
 {
-    public function index()
+    protected $cartService;
+    public function __construct(CartService $cartService)
     {
-        $cart = session()->get('cart', []);
+        $this->cartService = $cartService;
+    }
+
+    public function index(Request $request)
+    {
+        $cart = $this->cartService->getCart();
+
+        // Lọc giỏ hàng theo các item đã chọn (nêu có trong session)
+        $selectedIds = session('selected_checkout_ids');
+        if ($selectedIds && is_array($selectedIds)) {
+            $selectedIds = array_map('strval', $selectedIds);
+            $cart = array_filter($cart, function($key) use ($selectedIds) {
+                return in_array(strval($key), $selectedIds);
+            }, ARRAY_FILTER_USE_KEY);
+        } else {
+            // Nếu không có selection trong session, redirect về giỏ hàng
+            return redirect()->route('cart.index')->with('error', 'Vui lòng chọn sản phẩm trong giỏ hàng trước khi thanh toán.');
+        }
+
         if (count($cart) == 0) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
         }
@@ -67,18 +89,43 @@ class CheckoutController extends Controller
 
         $provinces = config('vietnam_provinces');
 
-        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces'));
+        // Lấy thông tin các tài khoản ngân hàng đang hoạt động
+        $banks = \App\Models\BankSetting::where('is_active', true)->get();
+        $defaultBank = $banks->where('is_default', true)->first() ?: $banks->first();
+
+        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces', 'banks', 'defaultBank'));
     }
 
     /**
      * AJAX: Kiểm tra giỏ hàng trước khi chuyển sang checkout
      */
-    public function validateCart()
+    public function validateCart(Request $request)
     {
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
+
+        // Lọc các item được chọn
+        $selectedIds = $request->input('ids');
+        if ($selectedIds) {
+            if (is_string($selectedIds)) {
+                $selectedIds = array_filter(explode(',', $selectedIds));
+            }
+            // Chuyển tất cả về string để so khớp chính xác
+            $selectedIds = array_values(array_map('strval', (array)$selectedIds));
+
+            $cart = array_filter($cart, function($key) use ($selectedIds) {
+                return in_array(strval($key), $selectedIds);
+            }, ARRAY_FILTER_USE_KEY);
+
+            // Lưu vào session để trang checkout sử dụng
+            session(['selected_checkout_ids' => $selectedIds]);
+        } else {
+            // Nếu không gửi ids lên, ta không cho phép checkout (hoặc clear session cũ)
+            session()->forget('selected_checkout_ids');
+            return response()->json(['valid' => false, 'message' => 'Vui lòng chọn ít nhất một sản phẩm để thanh toán!']);
+        }
 
         if (empty($cart)) {
-            return response()->json(['valid' => false, 'message' => 'Giỏ hàng trống!']);
+            return response()->json(['valid' => false, 'message' => 'Vui lòng chọn ít nhất một sản phẩm để thanh toán!']);
         }
 
         $errors = [];
@@ -138,7 +185,6 @@ class CheckoutController extends Controller
             'email' => 'required|email:rfc,dns|max:255',
             'province' => 'required|string|in:'.implode(',', $provinces),
             'address' => 'required|string|max:500',
-            'note' => 'nullable|string|max:1000',
             'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
             'shipping_provider' => 'nullable|string',
             'shipping_service_name' => 'nullable|string',
@@ -152,14 +198,35 @@ class CheckoutController extends Controller
             'province.in' => 'Tỉnh thành không hợp lệ.',
         ]);
 
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
+
+        // Lọc giỏ hàng theo các item đã chọn
+        $selectedIds = session('selected_checkout_ids');
+        if ($selectedIds && is_array($selectedIds)) {
+            $selectedIds = array_map('strval', $selectedIds);
+            $cart = array_filter($cart, function($key) use ($selectedIds) {
+                return in_array(strval($key), $selectedIds);
+            }, ARRAY_FILTER_USE_KEY);
+        } else {
+            return redirect()->route('cart.index')->with('error', 'Vui lòng chọn sản phẩm trong giỏ hàng trước khi thanh toán.');
+        }
+
         if (count($cart) == 0) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
         $total = 0;
+        $totalQuantity = 0;
         foreach ($cart as $details) {
             $total += $details['price'] * $details['quantity'];
+            $totalQuantity += $details['quantity'];
+        }
+
+        // Giới hạn số lượng sản phẩm cho đơn COD
+        if ($request->payment_method === 'COD' && $totalQuantity > 10) {
+            return redirect()->back()
+                ->with('error', 'Đơn hàng COD chỉ được tối đa 10 sản phẩm. Bạn đang có ' . $totalQuantity . ' sản phẩm. Vui lòng giảm số lượng hoặc chọn phương thức thanh toán khác.')
+                ->withInput();
         }
 
         try {
@@ -196,6 +263,7 @@ class CheckoutController extends Controller
                 'shipping_service_name' => $shippingServiceName,
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
+                'payment_status' => 'pending',
                 'shipping_address' => $request->address.', '.$request->province.' - '.$request->phone.' - '.$request->name,
                 'note' => $request->note,
             ]);
@@ -207,6 +275,7 @@ class CheckoutController extends Controller
                     $coupon->increment('used_count');
                 }
             }
+
 
             foreach ($cart as $id => $details) {
                 // Trừ kho với lockForUpdate để tránh race condition
@@ -232,13 +301,13 @@ class CheckoutController extends Controller
             $admins = User::getAdmins();
             Notification::send($admins, new NewOrderNotification($order));
 
-            // Clear cart and coupon session
-            Session::forget(['cart', 'coupon_code', 'discount_amount']);
-
-            // Nếu chọn VNPAY -> redirect sang trang thanh toán VNPAY
-            if ($request->payment_method === 'VNPAY') {
-                return redirect()->route('vnpay.payment', $order->id);
+            // Clear selected items and session
+            if ($selectedIds && is_array($selectedIds)) {
+                $this->cartService->removeItems($selectedIds);
+            } else {
+                $this->cartService->clearCart();
             }
+            session()->forget(['coupon_code', 'discount_amount', 'selected_checkout_ids']);
 
             // Mark any abandoned carts as recovered for this user/session
             try {
@@ -247,14 +316,30 @@ class CheckoutController extends Controller
                     session()->getId()
                 );
             } catch (\Exception $e) {
-                \Log::warning('Cart abandonment recovery tracking failed: ' . $e->getMessage());
+                Log::warning('Cart abandonment recovery tracking failed: ' . $e->getMessage());
             }
 
-            // COD & BANK_TRANSFER: gửi email xác nhận và chuyển đến trang thành công
+            // Set session for guest verification if not logged in
+            if (!Auth::check()) {
+                session(['verified_order_id' => $order->id]);
+            }
+
+            // Nếu là VNPAY: redirect đến cổng thanh toán VNPay
+            if ($request->payment_method === 'VNPAY') {
+                $vnpayService = app(\App\Services\VnpayService::class);
+                $paymentUrl = $vnpayService->getPaymentUrl(
+                    $order->id,
+                    $finalTotal,
+                    $request->input('bank_code')
+                );
+                return redirect($paymentUrl);
+            }
+
+            // COD & BANK_TRANSFER: gửi email xác nhận ngay
             try {
                 \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
             } catch (\Exception $e) {
-                \Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: '.$e->getMessage());
+                Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: '.$e->getMessage());
             }
 
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');
@@ -272,7 +357,7 @@ class CheckoutController extends Controller
 
         // Lấy thông tin tài khoản ngân hàng mặc định
         $bank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first();
-        
+
         // Nếu không có mặc định, lấy cái đầu tiên đang hoạt động
         if (!$bank) {
             $bank = \App\Models\BankSetting::where('is_active', true)->first();
@@ -308,10 +393,11 @@ class CheckoutController extends Controller
         // Ghi lại lịch sử (nếu có hệ thống lịch sử đơn hàng)
         if (class_exists(\App\Models\OrderHistory::class)) {
             \App\Models\OrderHistory::create([
-                'order_id' => $order->id,
-                'status' => $order->status,
-                'note' => 'Khách hàng xác nhận đã chuyển khoản. Chờ Admin kiểm tra.',
-                'user_id' => Auth::id()
+                'order_id'        => $order->id,
+                'previous_status' => $order->status,
+                'new_status'      => 'waiting_confirmation',
+                'note'            => 'Khách hàng xác nhận đã chuyển khoản. Chờ Admin kiểm tra.',
+                'user_id'         => Auth::id()
             ]);
         }
 
@@ -332,7 +418,10 @@ class CheckoutController extends Controller
         try {
             $orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, Auth::user(), 'Khách hàng tự hủy đơn hàng từ trang thanh toán.');
 
-            return redirect()->route('shop')->with('success', 'Đơn hàng đã được hủy thành công.');
+            // Khôi phục lại giỏ hàng cho khách
+            app(\App\Services\CartService::class)->restoreOrderToCart($order);
+
+            return redirect()->route('shop')->with('success', 'Đơn hàng đã được hủy thành công. Các sản phẩm đã được hoàn lại vào giỏ hàng của bạn.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi hủy đơn hàng: ' . $e->getMessage());
         }
@@ -347,7 +436,7 @@ class CheckoutController extends Controller
             'coupon_code' => 'required|string|max:50',
         ]);
 
-        $cart = session()->get('cart', []);
+        $cart = $this->cartService->getCart();
         if (count($cart) == 0) {
             return response()->json([
                 'success' => false,

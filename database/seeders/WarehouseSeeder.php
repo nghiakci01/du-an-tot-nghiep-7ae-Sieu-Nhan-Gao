@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Warehouse;
+// use App\Models\Warehouse;
 use Illuminate\Database\Seeder;
 
 class WarehouseSeeder extends Seeder
@@ -18,8 +18,9 @@ class WarehouseSeeder extends Seeder
             ['name' => 'Kho Đà Nẵng', 'address' => 'Số 50 Nguyễn Văn Linh, Hải Châu, Đà Nẵng'],
         ];
 
-        foreach ($warehouses as $warehouse) {
-            Warehouse::firstOrCreate(['name' => $warehouse['name']], $warehouse);
-        }
+        // Warehouse model does not exist currently
+        // foreach ($warehouses as $warehouse) {
+        //     \App\Models\Warehouse::firstOrCreate(['name' => $warehouse['name']], $warehouse);
+        // }
     }
 }

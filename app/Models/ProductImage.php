@@ -31,6 +31,6 @@ class ProductImage extends Model
             return asset('storage/'.$this->image_path);
         }
 
-        return asset('frontend-assets/img/product/product21.jpg');
+        return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     }
 }

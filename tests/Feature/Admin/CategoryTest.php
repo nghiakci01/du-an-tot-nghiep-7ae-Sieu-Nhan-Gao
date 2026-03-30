@@ -28,7 +28,7 @@ class CategoryTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_view_categories_list()
     {
         $response = $this->actingAs($this->admin)->get(route('admin.categories.index'));
@@ -37,7 +37,7 @@ class CategoryTest extends TestCase
         $response->assertViewIs('admin.categories.index');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_view_create_category_form()
     {
         $response = $this->actingAs($this->admin)->get(route('admin.categories.create'));
@@ -45,7 +45,7 @@ class CategoryTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_create_category()
     {
         $response = $this->actingAs($this->admin)->post(route('admin.categories.store'), [
@@ -62,7 +62,7 @@ class CategoryTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function category_image_must_be_valid_image_type()
     {
         // Test rằng file không phải image bị reject
@@ -76,7 +76,7 @@ class CategoryTest extends TestCase
         $response->assertSessionHasErrors(['image']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function category_name_is_required()
     {
         $response = $this->actingAs($this->admin)->post(route('admin.categories.store'), [
@@ -86,7 +86,7 @@ class CategoryTest extends TestCase
         $response->assertSessionHasErrors(['name']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_update_category()
     {
         $category = Category::create([
@@ -107,7 +107,7 @@ class CategoryTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function admin_can_delete_empty_category()
     {
         $category = Category::create([
@@ -121,19 +121,19 @@ class CategoryTest extends TestCase
         $this->assertDatabaseMissing('categories', ['id' => $category->id]);
     }
 
-    /** @test */
-    public function admin_cannot_delete_category_with_children()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function admin_can_delete_category_with_empty_children()
     {
         $parent = Category::create(['name' => 'Parent', 'slug' => 'parent']);
         Category::create(['name' => 'Child', 'slug' => 'child', 'parent_id' => $parent->id]);
 
         $response = $this->actingAs($this->admin)->delete(route('admin.categories.destroy', $parent));
 
-        $response->assertSessionHas('error');
-        $this->assertDatabaseHas('categories', ['id' => $parent->id]);
+        $response->assertSessionHas('success');
+        $this->assertDatabaseMissing('categories', ['id' => $parent->id]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function cannot_set_category_with_children_as_subcategory()
     {
         $parent = Category::create(['name' => 'Parent', 'slug' => 'parent']);
