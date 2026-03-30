@@ -377,7 +377,7 @@ class CartController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Sản phẩm đã được thêm vào giỏ hàng!',
-                'count' => $cartCount,
+                'cart_count' => $cartCount,
                 'mini_cart_html' => view('frontend.partials.mini-cart')->render(),
             ]);
         }

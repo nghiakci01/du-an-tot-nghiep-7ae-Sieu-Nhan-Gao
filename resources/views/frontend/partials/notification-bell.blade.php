@@ -4,12 +4,12 @@
     $notifications = auth()->check() ? auth()->user()->notifications()->take(5)->get() : [];
 @endphp
 
-<div class="notification_link" style="position: relative; margin-right: 20px; display: flex; align-items: center; height: 100%;">
-    <a href="javascript:void(0)" id="notification-toggle" style="font-size: 22px; color: #333; position: relative; display: flex; align-items: center; height: 100%;">
+<div class="notification_link" style="position: relative; display: flex; align-items: center; height: 100%;">
+    <a href="javascript:void(0)" id="notification-toggle" style="font-size: 24px; color: #333; position: relative; display: flex; align-items: center; height: 100%;">
         <i class="ion-android-notifications-none"></i>
         @auth
             @if($unreadCount > 0)
-                <span class="notification-badge" style="position: absolute; top: 0px; right: -10px; background: #ef233c; color: white; border-radius: 50%; padding: 2px 5px; font-size: 10px; font-weight: bold; line-height: 1;">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
+                <span class="notification-badge" style="position: absolute; top: -2px; right: -8px; background: #ef233c; color: white; border-radius: 50%; padding: 2px 5px; font-size: 10px; font-weight: bold; line-height: 1;">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
             @endif
         @endauth
     </a>

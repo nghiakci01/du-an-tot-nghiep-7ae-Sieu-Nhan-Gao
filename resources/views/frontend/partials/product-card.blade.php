@@ -21,8 +21,21 @@
                 <div class="hover_action">
                     <a href="#"><i class="fa fa-plus"></i></a>
                     <div class="action_button">
-                            <li><a title="Add to cart" href="#"><i class="fa fa-shopping-basket" aria-hidden="true"></i></a></li>
-                            <li><a href="#" title="Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
+                        <ul>
+                            <li>
+                                <a title="add to cart" href="javascript:void(0);" class="btn-ajax-add-to-cart" data-form-id="add-to-cart-card-{{ $product->id }}">
+                                    <i class="fa fa-shopping-basket" aria-hidden="true"></i>
+                                </a>
+                                <form id="add-to-cart-card-{{ $product->id }}" class="ajax-add-to-cart-form" action="{{ route('cart.add') }}" method="POST" style="display: none;">
+                                    @csrf
+                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    @if($product->variants->count() === 1)
+                                        <input type="hidden" name="variant_id" value="{{ $product->variants->first()->id }}">
+                                    @endif
+                                </form>
+                            </li>
+                            <li><a href="javascript:void(0)" class="add-to-wishlist" data-id="{{ $product->id }}" title="Add to Wishlist"><i class="fa fa-heart-o" aria-hidden="true"></i></a></li>
                         </ul>
                     </div>
                 </div>
