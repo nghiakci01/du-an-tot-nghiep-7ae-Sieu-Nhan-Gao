@@ -298,8 +298,6 @@
 
 .header_six .middel_right_info .top_right {
     flex: 1 !important;
-    border-left: 1px solid #ebebeb !important;
-    border-right: 1px solid #ebebeb !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;

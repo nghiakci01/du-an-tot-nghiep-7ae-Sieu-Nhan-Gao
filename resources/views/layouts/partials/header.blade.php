@@ -127,7 +127,6 @@
                                                     .custom-shop-mega-left {
                                                         flex: 0 0 40% !important;
                                                         max-width: 40% !important;
-                                                        border-right: 1px solid #ebebeb;
                                                         padding-right: 15px;
                                                     }
                                                     .custom-shop-mega-left ul {
