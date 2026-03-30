@@ -33,16 +33,21 @@ class ReturnService
                 'processed_at' => now(),
             ]);
 
-            // Tự động chuyển order sang trạng thái "Khách trả hàng"
-            $order = $returnRequest->order;
-            $oldStatus = $order->status;
-            $order->update(['status' => Order::STATUS_RETURNED]);
+            // Determine if this is a full or partial return
+            $totalOrderedQty = $order->items->sum('quantity');
+            $totalReturnedQty = $returnRequest->items->sum('quantity');
+            
+            $newOrderStatus = ($totalReturnedQty >= $totalOrderedQty) 
+                ? Order::STATUS_RETURNED 
+                : Order::STATUS_PARTIALLY_RETURNED;
+
+            $order->update(['status' => $newOrderStatus]);
 
             \App\Models\OrderHistory::create([
                 'order_id'        => $order->id,
                 'user_id'         => $processor->id,
                 'previous_status' => $oldStatus,
-                'new_status'      => Order::STATUS_RETURNED,
+                'new_status'      => $newOrderStatus,
                 'note'            => 'Admin đã duyệt yêu cầu hoàn hàng: ' . $adminNote,
             ]);
 
@@ -133,7 +138,7 @@ class ReturnService
                 $order, 
                 $newOrderStatus, 
                 $processor, 
-                'Hàng đã được hoàn trả thành công (Số lượng: ' . $totalReturnedQty . '/' . $totalOrderedQty . ').',
+                'Hệ thống ghi nhận hàng đã được hoàn trả (Số lượng: ' . $totalReturnedQty . '/' . $totalOrderedQty . ').',
                 $returnRequest
             );
 

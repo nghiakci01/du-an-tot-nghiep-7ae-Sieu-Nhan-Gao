@@ -85,8 +85,8 @@ class Order extends Model
             self::STATUS_COMPLETED => 'Hoàn thành',
             self::STATUS_CANCELLED => 'Đã hủy',
             self::STATUS_FAILED => 'Thất bại',
-            self::STATUS_RETURNED => 'Đã trả hàng',
-            self::STATUS_PARTIALLY_RETURNED => 'Trả hàng một phần',
+            self::STATUS_RETURNED => 'Khách hoàn hàng',
+            self::STATUS_PARTIALLY_RETURNED => 'Hoàn hàng một phần',
             default => 'Không xác định',
         };
     }
