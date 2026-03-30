@@ -63,6 +63,9 @@ class CartService
 
                 // Lưu lại
                 $user->update(['cart_data' => $cart]);
+                
+                // Đồng bộ lại object Auth trong bộ nhớ để getCart() lấy đúng dữ liệu mới nhất trong cùng 1 request
+                auth()->user()->cart_data = $cart;
             });
         } else {
             // Đối với KHÁCH, tạm lưu qua Session
@@ -81,6 +84,7 @@ class CartService
             DB::transaction(function () {
                 $user = User::where('id', auth()->id())->lockForUpdate()->first();
                 $user->update(['cart_data' => []]);
+                auth()->user()->cart_data = [];
             });
         } else {
             session()->forget('cart');
