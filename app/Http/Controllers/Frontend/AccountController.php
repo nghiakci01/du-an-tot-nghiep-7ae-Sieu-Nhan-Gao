@@ -32,6 +32,7 @@ class AccountController extends Controller
         $totalOrders = 0;
         $totalSpent = 0;
         $wishCount = 0;
+        $notifications = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
 
         if ($user) {
             $orders = $user->orders()->latest()->paginate(10);

@@ -71,7 +71,11 @@ class OrderStatusNotification extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         // Generate a descriptive physical text
-        $message = "Đơn hàng #{$this->order->id} của bạn đã cập nhật trạng thái thành: {$this->order->status_text}.";
+        $message = match($this->newStatus) {
+            Order::STATUS_SHIPPED => "Đơn hàng #{$this->order->id} của bạn đang trên đường giao đến bạn! Hãy chú ý điện thoại nhé.",
+            Order::STATUS_COMPLETED => "Đơn hàng #{$this->order->id} đã giao thành công. Cảm ơn bạn đã tin tưởng mua sắm tại Elite!",
+            default => "Đơn hàng #{$this->order->id} của bạn đã cập nhật trạng thái thành: {$this->order->status_text}."
+        };
 
         return [
             'order_id' => $this->order->id,

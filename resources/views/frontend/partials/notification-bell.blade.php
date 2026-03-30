@@ -6,7 +6,7 @@
 @endphp
 
 <div class="notification_link" style="position: relative; margin-right: 15px; display: inline-block;">
-    <a href="javascript:void(0)" id="notification-toggle" style="font-size: 22px; color: #333; position: relative;">
+    <a href="javascript:void(0)" class="notification-toggle" style="font-size: 22px; color: #333; position: relative; display: inline-block; vertical-align: middle;">
         <i class="ion-android-notifications-none"></i>
         @if($unreadCount > 0)
             <span class="notification-badge" style="position: absolute; top: -5px; right: -10px; background: #ef233c; color: white; border-radius: 50%; padding: 2px 5px; font-size: 10px; font-weight: bold; line-height: 1;">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
@@ -14,7 +14,7 @@
     </a>
     
     <!-- dropdown -->
-    <div class="notification_dropdown" style="display: none; position: absolute; right: -10px; top: 150%; width: 320px; background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.15); border-radius: 8px; z-index: 9999; border: 1px solid #f0f0f0;">
+    <div class="notification_dropdown" style="display: none; position: absolute; right: -10px; top: 100%; margin-top: 10px; width: 320px; background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.15); border-radius: 8px; z-index: 9999; border: 1px solid #f0f0f0;">
         <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="background: #f8f9fa; border-radius: 8px 8px 0 0;">
             <strong style="font-size: 14px; margin: 0;">Thông báo</strong>
             @if($unreadCount > 0)
@@ -24,7 +24,7 @@
         
         <div class="notification-list" style="max-height: 350px; overflow-y: auto;">
             @forelse($notifications as $notify)
-                <a href="{{ isset($notify->data['url']) ? $notify->data['url'] : 'javascript:void(0)' }}" 
+                <a href="{{ isset($notify->data['url']) ? $notify->data['url'] : (isset($notify->data['link']) ? $notify->data['link'] : 'javascript:void(0)') }}" 
                    class="notify-item {{ is_null($notify->read_at) ? 'unread' : '' }}" 
                    data-id="{{ $notify->id }}"
                    style="display: block; padding: 12px 15px; border-bottom: 1px solid #f5f5f5; text-decoration: none; transition: background 0.2s; position: relative; {{ is_null($notify->read_at) ? 'background-color: #f4f8ff;' : 'background-color: white;' }}">
@@ -55,36 +55,43 @@
 
 <style>
 .notification_dropdown .notify-item:hover { background-color: #f9f9f9 !important; }
-.header_middel .middel_right_info { display: flex; align-items: center; justify-content: flex-end; gap: 15px; }
-/* Override default inline block issues */
-.notification_link { margin-top: 5px; }
+/* Ensure the bell area doesn't break layout */
+.notification_link { display: inline-flex !important; align-items: center; }
 </style>
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const toggleBtn = document.getElementById('notification-toggle');
-    const dropdown = document.querySelector('.notification_dropdown');
-    const badge = document.querySelector('.notification-badge');
-    const markAllBtn = document.querySelector('.mark-all-read');
-    
-    if(toggleBtn && dropdown) {
-        toggleBtn.addEventListener('click', function(e) {
+    // Handle all notification toggles (for desktop, sticky, and mobile)
+    document.querySelectorAll('.notification-toggle').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
             e.stopPropagation();
+            
+            const wrapper = this.closest('.notification_link');
+            const dropdown = wrapper.querySelector('.notification_dropdown');
+            
+            // Close other dropdowns first
+            document.querySelectorAll('.notification_dropdown').forEach(d => {
+                if(d !== dropdown) d.style.display = 'none';
+            });
+            
             dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
         });
+    });
 
-        document.addEventListener('click', function(e) {
-            if(!dropdown.contains(e.target) && e.target !== toggleBtn) {
+    // Close when clicking outside
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.notification_dropdown').forEach(dropdown => {
+            if(!dropdown.contains(e.target) && !e.target.closest('.notification-toggle')) {
                 dropdown.style.display = 'none';
             }
         });
-    }
+    });
 
     // Ajax Mark As Read single
     document.querySelectorAll('.notify-item.unread').forEach(function(item) {
         item.addEventListener('click', function(e) {
-            // Let the link navigation happen, but fire an ajax request first
             const notifyId = this.dataset.id;
             const url = '{{ url("/notifications") }}/' + notifyId + '/mark-as-read';
             
@@ -99,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Mark All As Read
-    if(markAllBtn) {
+    document.querySelectorAll('.mark-all-read').forEach(function(markAllBtn) {
         markAllBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             fetch('{{ route("notifications.mark_all_read") }}', {
@@ -110,18 +117,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }).then(r => r.json()).then(data => {
                 if(data.status === 'success') {
+                    // Update all badges and items across all bell instances
                     document.querySelectorAll('.notify-item.unread').forEach(item => {
                         item.classList.remove('unread');
                         item.style.backgroundColor = 'white';
                         const dot = item.querySelector('.unread-dot');
                         if(dot) dot.remove();
                     });
-                    if(badge) badge.style.display = 'none';
-                    this.style.display = 'none';
+                    document.querySelectorAll('.notification-badge').forEach(badge => {
+                        badge.style.display = 'none';
+                    });
+                    document.querySelectorAll('.mark-all-read').forEach(btn => {
+                        btn.style.display = 'none';
+                    });
                 }
             }).catch(console.error);
         });
-    }
+    });
 });
 </script>
 @endpush
