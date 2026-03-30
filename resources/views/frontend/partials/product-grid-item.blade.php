@@ -20,10 +20,10 @@
                     <div class="action_button">
                         <ul>
                             <li>
-                                <a title="add to cart" href="#" onclick="event.preventDefault(); document.getElementById('add-to-cart-{{ $product->id }}').submit();">
+                                <a title="add to cart" href="javascript:void(0);" class="btn-ajax-add-to-cart" data-form-id="add-to-cart-{{ $product->id }}">
                                     <i class="fa fa-shopping-basket" aria-hidden="true"></i>
                                 </a>
-                                <form id="add-to-cart-{{ $product->id }}" action="{{ route('cart.add') }}" method="POST" style="display: none;">
+                                <form id="add-to-cart-{{ $product->id }}" class="ajax-add-to-cart-form" action="{{ route('cart.add') }}" method="POST" style="display: none;">
                                     @csrf
                                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                                     <input type="hidden" name="quantity" value="1">
