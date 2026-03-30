@@ -310,6 +310,8 @@
     position: relative !important;
     top: auto !important;
     right: auto !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
 }
 
 .header_six .middel_right_info .cart_link {
@@ -317,6 +319,7 @@
     padding-left: 20px !important;
     flex: 0 0 auto !important;
     align-self: center !important;
+    border-left: 0 !important;
 }
 
 .header_six .middel_right_info .top_right>ul {
@@ -338,10 +341,41 @@
     position: relative !important;
 }
 
-.header_six .middel_right_info .top_right>ul>li::before {
-    display: none !important;
-    /* Block old separators */
+/* Aggressive Removal of ALL Vertical Separators in Header Right Side */
+.header_six .middel_right_info div,
+.header_six .middel_right_info ul,
+.header_six .middel_right_info li,
+.header_six .middel_right_info a,
+.header_six .middel_right_info button,
+.header_six .middel_right_info input,
+.header_six .middel_right_info .select_option {
+    border-left: 0 !important;
+    border-right: 0 !important;
 }
+
+/* Explicitly hide any common separator pseudo-elements in this area */
+.header_six .middel_right_info *::before,
+.header_six .middel_right_info *::after {
+    content: none !important;
+    display: none !important;
+    border: 0 !important;
+    width: 0 !important;
+}
+
+/* RESTORE outer pill shape for search bar form (only the main border) */
+.header_six .search_bar form {
+    border: 1px solid #ddd !important;
+    border-radius: 50px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* RESTORE outer pill shape for cart and account links if they use them */
+.header_six .cart_link > a {
+    border: 1px solid #ddd !important;
+    border-radius: 30px !important;
+}
+
 
 .header_six .user-account-link {
     display: flex !important;
