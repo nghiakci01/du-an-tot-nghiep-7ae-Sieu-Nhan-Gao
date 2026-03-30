@@ -98,9 +98,9 @@
                 <div class="middel_inner">
                     <div class="row align-items-center">
                         <!-- Logo + Menu Column -->
-                        <div class="col-lg-6 col-md-3">
+                        <div class="col-lg-7 col-md-3">
                             <div class="header_left d-flex align-items-center">
-                                <div class="logo">
+                                <div class="logo" style="flex-shrink: 0; padding-right: 20px;">
                                     <a href="{{ route('welcome') }}"><img src="{{ asset('frontend-assets/img/logo/logo-elite-new.png') }}" alt=""></a>
                                 </div>
                                 
@@ -248,8 +248,8 @@
                         </div>
                         
                         <!-- Search/Account/Cart Column -->
-                        <div class="col-lg-6 col-md-9">
-                            <div class="middel_right_info">
+                        <div class="col-lg-5 col-md-9">
+                            <div class="middel_right_info" style="gap: 20px;">
                                 <div class="search_bar" style="position: relative;">
                                     <form action="{{ route('search.index') }}" method="GET">                          
                                         <input id="search-input-desktop" placeholder="{{ __('messages.search_placeholder') }}" type="text" name="q" autocomplete="off" aria-label="Search">
