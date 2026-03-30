@@ -257,4 +257,25 @@ class OrderController extends Controller
             default => 'Không xác định',
         };
     }
+
+    public function triggerAutoCancel(Request $request)
+    {
+        $minutes = $request->input('auto_cancel_unpaid_order_minutes');
+        
+        if ($minutes && is_numeric($minutes) && $minutes >= 5) {
+            \App\Models\Setting::updateOrCreate(
+                ['key' => 'auto_cancel_unpaid_order_minutes'],
+                ['value' => $minutes]
+            );
+        }
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('app:check-payment-reminders');
+            $output = \Illuminate\Support\Facades\Artisan::output();
+            
+            return redirect()->back()->with('success', 'Đã lưu cấu hình (' . $minutes . ' phút) và chạy lệnh rà soát đơn hàng thành công!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Lỗi khi chạy rà soát đơn hàng: ' . $e->getMessage());
+        }
+    }
 }

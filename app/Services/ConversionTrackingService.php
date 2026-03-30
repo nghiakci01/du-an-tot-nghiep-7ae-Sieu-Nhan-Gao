@@ -16,6 +16,12 @@ class ConversionTrackingService
     public function trackAbandonment(?int $userId, ?string $sessionId, array $cartData): ?CartAbandonment
     {
         if (empty($cartData)) {
+            // Ngôn ngữ e-com: khách tự xóa hết giỏ hàng thì không cần nhắc nhở nữa
+            CartAbandonment::where(function ($q) use ($userId, $sessionId) {
+                if ($userId) $q->where('user_id', $userId);
+                elseif ($sessionId) $q->where('session_id', $sessionId);
+            })->where('status', 'abandoned')->delete();
+
             return null;
         }
 
@@ -26,15 +32,23 @@ class ConversionTrackingService
             $itemCount += $item['quantity'] ?? 1;
         }
 
-        return CartAbandonment::create([
-            'user_id' => $userId,
-            'session_id' => $sessionId,
-            'cart_data' => $cartData,
-            'cart_total' => $total,
-            'item_count' => $itemCount,
-            'status' => 'abandoned',
-            'abandoned_at' => now(),
-        ]);
+        $attributes = [];
+        if ($userId) {
+            $attributes['user_id'] = $userId;
+        } else {
+            $attributes['session_id'] = $sessionId;
+        }
+
+        return CartAbandonment::updateOrCreate(
+            $attributes,
+            [
+                'cart_data' => $cartData,
+                'cart_total' => $total,
+                'item_count' => $itemCount,
+                'status' => 'abandoned',
+                'abandoned_at' => now(),
+            ]
+        );
     }
 
     /**

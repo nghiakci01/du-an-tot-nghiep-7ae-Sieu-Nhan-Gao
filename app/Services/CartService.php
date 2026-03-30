@@ -61,17 +61,27 @@ class CartService
                 // Chạy logic sửa/xóa/thêm từ CartController
                 call_user_func_array($modifier, [&$cart]);
 
-                // Lưu lại
+                // Lưi lại
                 $user->update(['cart_data' => $cart]);
                 
                 // Đồng bộ lại object Auth trong bộ nhớ để getCart() lấy đúng dữ liệu mới nhất trong cùng 1 request
                 auth()->user()->cart_data = $cart;
+
+                // Theo dõi giỏ hàng bỏ quên
+                try {
+                    app(\App\Services\ConversionTrackingService::class)->trackAbandonment(auth()->id(), session()->getId(), $cart);
+                } catch (\Exception $e) {}
             });
         } else {
             // Đối với KHÁCH, tạm lưu qua Session
             $cart = session()->get('cart', []);
             call_user_func_array($modifier, [&$cart]);
             session()->put('cart', $cart);
+
+            // Theo dõi giỏ hàng bỏ quên (cho tracking cookie)
+            try {
+                app(\App\Services\ConversionTrackingService::class)->trackAbandonment(null, session()->getId(), $cart);
+            } catch (\Exception $e) {}
         }
     }
 
