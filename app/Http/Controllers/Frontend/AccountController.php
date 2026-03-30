@@ -58,12 +58,15 @@ class AccountController extends Controller
             $totalOrders = $orders->total();
             $totalSpent = $user->orders()->where('status', 'completed')->sum('final_total');
             $socialAccounts = $user->socialAccounts;
+            
+            // Notifications pagination
+            $notifications = $user->notifications()->latest()->paginate(20, ['*'], 'notifications_page');
         }
 
         return view('frontend.account.index', compact(
             'user', 'orders', 'coupons', 'wishlists', 'addresses',
             'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests',
-            'bankSettings', 'totalOrders', 'totalSpent', 'wishCount', 'socialAccounts'
+            'bankSettings', 'totalOrders', 'totalSpent', 'wishCount', 'socialAccounts', 'notifications'
         ));
     }
 
