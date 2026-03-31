@@ -13,18 +13,19 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="flex-shrink-0">
-                            <img src="{{ auth()->user()->avatar ? Storage::url(auth()->user()->avatar) : asset('admin-assets/images/user/avatar-1.jpg') }}"
+                            <img src="{{ (Auth::check() && auth()->user()->avatar) ? Storage::url(auth()->user()->avatar) : asset('admin-assets/images/user/avatar-1.jpg') }}"
                                 alt="user-image" class="user-avtar wid-45 rounded-circle" style="object-fit: cover;" />
                         </div>
                         <div class="flex-grow-1 ms-3 me-2">
-                            <h6 class="mb-0">{{ auth()->user()->name }}</h6>
-                            <small>{{ ucfirst(auth()->user()->role) }}</small>
+                            <h6 class="mb-0">{{ Auth::check() ? auth()->user()->name : 'Khách (Demo)' }}</h6>
+                            <small>{{ Auth::check() ? ucfirst(auth()->user()->role) : 'Guest' }}</small>
                         </div>
                         <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse"
                             href="#pc_sidebar_userlink"><svg class="pc-icon">
                                 <use xlink:href="#custom-sort-outline"></use>
                             </svg></a>
                     </div>
+                    @auth
                     <div class="collapse pc-user-links" id="pc_sidebar_userlink">
                         <div class="pt-3">
                             {{-- Âm thanh thông báo --}}
@@ -51,6 +52,13 @@
                                 <span data-i18n="Logout">Đăng xuất</span></a>
                         </div>
                     </div>
+                    @else
+                    <div class="pt-3 px-3">
+                        <a href="{{ route('login') }}" class="btn btn-primary w-100">
+                            <i class="ti ti-login me-2"></i> Đăng nhập Admin
+                        </a>
+                    </div>
+                    @endauth
                 </div>
             </div>
             <!-- End User Profile Admin Sidebar -->
@@ -85,7 +93,7 @@
                         <use xlink:href="#custom-presentation-chart"></use>
                     </svg>
                 </li>
-                @if (auth()->user()->isAdmin() || auth()->user()->isStaff())
+                @if (!Auth::check() || auth()->user()->isAdmin() || auth()->user()->isStaff())
                     <li class="pc-item">
                         <a href="{{ route('admin.categories.index') }}" class="pc-link">
                             <span class="pc-micon">
@@ -150,7 +158,7 @@
                         </ul>
                     </li>
                 @endif
-                @if (auth()->user()->isAdmin())
+                @if (!Auth::check() || auth()->user()->isAdmin())
                     <li class="pc-item">
                         <a href="{{ route('admin.payment-history.index') }}" class="pc-link">
                             <span class="pc-micon">
@@ -209,7 +217,7 @@
                         <span class="pc-mtext">Đánh giá sản phẩm</span>
                     </a>
                 </li>
-                @if (auth()->user()->isAdmin() || auth()->user()->isStaff())
+                @if (!Auth::check() || auth()->user()->isAdmin() || auth()->user()->isStaff())
                     <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link">
                             <span class="pc-micon">
@@ -234,7 +242,7 @@
                         </ul>
                     </li>
                 @endif
-                @if (auth()->user()->isAdmin())
+                @if (!Auth::check() || auth()->user()->isAdmin())
                     <li class="pc-item">
                         <a href="{{ route('admin.users.index') }}" class="pc-link">
                             <span class="pc-micon">

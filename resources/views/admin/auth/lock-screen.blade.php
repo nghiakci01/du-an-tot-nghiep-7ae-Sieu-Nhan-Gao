@@ -34,7 +34,7 @@
                 <div class="card my-5">
                     <div class="card-body">
                         <div class="text-center">
-                            @if(Auth::user()->avatar)
+                            @if(Auth::check() && Auth::user()->avatar)
                                 <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="user-image"
                                     class="img-radius mb-2 img-fluid wid-100"
                                     style="width: 100px; height: 100px; object-fit: cover;">
@@ -42,7 +42,7 @@
                                 <img src="{{ asset('admin-assets/images/user/avatar-1.jpg') }}" alt="user-image"
                                     class="img-radius mb-2 img-fluid wid-100">
                             @endif
-                            <h4 class="mb-0">{{ Auth::user()->name }}</h4>
+                            <h4 class="mb-0">{{ Auth::check() ? Auth::user()->name : 'Khách (Demo)' }}</h4>
                             <h5 class="text-muted fw-normal">Locked</h5>
                         </div>
 
