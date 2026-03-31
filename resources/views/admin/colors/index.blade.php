@@ -34,7 +34,7 @@
                                 <th width="50%">Name</th>
                                 <th width="12%">Display Order</th>
                                 <th width="10%">Status</th>
-                                <th width="15%">Actions</th>
+                                <th width="15%" class="sticky-action-column">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -49,7 +49,7 @@
                                         {{ $color->is_active ? 'Active' : 'Inactive' }}
                                     </span>
                                 </td>
-                                <td>
+                                <td class="sticky-action-column">
                                     <a href="{{ route('admin.colors.edit', $color) }}" class="btn btn-sm btn-info">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>

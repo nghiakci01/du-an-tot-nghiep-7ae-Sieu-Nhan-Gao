@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->string('image');
             $table->string('link')->nullable();
-            $table->string('position')->default('slider'); // slider, banner_top, banner_bottom
+            $table->string('position')->default('slider'); // slider, banner_bottom
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();

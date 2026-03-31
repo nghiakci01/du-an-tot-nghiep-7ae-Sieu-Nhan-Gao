@@ -44,7 +44,7 @@
                             <th>TIỀN HOÀN</th>
                             <th>NGÀY YC</th>
                             <th>TRẠNG THÁI</th>
-                            <th>THAO TÁC</th>
+                            <th class="sticky-action-column">THAO TÁC</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,7 +61,7 @@
                                 <td><span class="text-danger fw-bold">{{ number_format($req->refund_amount) }}đ</span></td>
                                 <td>{{ $req->created_at->format('d/m/Y H:i') }}</td>
                                 <td>{!! $req->status_badge !!}</td>
-                                <td>
+                                <td class="sticky-action-column">
                                     <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailModal{{ $req->id }}">
                                         <i class="fas fa-eye"></i> Xử lý
                                     </button>

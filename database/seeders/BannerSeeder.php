@@ -30,20 +30,19 @@ class BannerSeeder extends Seeder
             'sort_order' => 2,
             'is_active' => true,
         ]);
-
-        // Side Banners (if any, based on common layouts, but error mentioned slider)
         Banner::create([
-            'title' => 'Banner Top',
-            'image' => 'banners/banner-top.jpg',
+            'title' => 'Slider 3',
+            'image' => 'banners/slider3.jpg',
             'link' => '#',
-            'position' => 'banner_top',
-            'sort_order' => 1,
+            'position' => 'slider',
+            'sort_order' => 3,
             'is_active' => true,
         ]);
 
+
         Banner::create([
             'title' => 'Banner Bottom',
-            'image' => 'banners/banner-bottom.jpg',
+            'image' => 'banners/banner-bottom.jpeg',
             'link' => '#',
             'position' => 'banner_bottom',
             'sort_order' => 1,

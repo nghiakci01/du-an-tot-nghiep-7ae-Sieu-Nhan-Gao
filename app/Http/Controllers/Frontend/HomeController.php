@@ -37,6 +37,14 @@ class HomeController extends Controller
         });
 
 
+        $bannerBottom = Cache::remember('home_bannerBottom', 3600, function() {
+            return Banner::where('position', 'banner_bottom')
+                ->where('is_active', true)
+                ->orderBy('sort_order', 'asc')
+                ->first();
+        });
+
+
 
         // Sản phẩm nổi bật cho section "New Arrivals"
         $featuredProducts = Product::where('is_active', true)
@@ -66,7 +74,7 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
-        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders', 'midBanner', 'flashSaleProducts'));
+        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders', 'midBanner', 'flashSaleProducts', 'bannerBottom'));
     }
 
     public function about()

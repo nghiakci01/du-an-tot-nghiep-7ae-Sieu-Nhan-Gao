@@ -42,8 +42,7 @@
                                 <th>Tên danh mục</th>
                                 <th>Slug</th>
                                 <th>Danh mục cha</th>
-
-                                <th>Hành động</th>
+                                <th class="sticky-action-column">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -60,7 +59,7 @@
                                     @endif
                                 </td>
 
-                                <td>
+                                <td class="sticky-action-column">
                                     <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-warning btn-sm">Sửa</a>
                                     <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
                                         @csrf

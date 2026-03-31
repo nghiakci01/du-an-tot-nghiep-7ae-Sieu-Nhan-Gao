@@ -81,7 +81,7 @@
                                     <th>P.thức T.toán</th>
                                     <th>Trạng thái</th>
                                     <th>Ngày đặt</th>
-                                    <th>Hành động</th>
+                                    <th class="sticky-action-column">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -106,7 +106,7 @@
                                             </span>
                                         </td>
                                         <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                                        <td>
+                                        <td class="sticky-action-column">
                                             <a href="{{ route('admin.orders.show', $order) }}"
                                                 class="btn btn-info btn-sm">Xem</a>
                                             <a href="{{ route('admin.orders.edit', $order) }}"

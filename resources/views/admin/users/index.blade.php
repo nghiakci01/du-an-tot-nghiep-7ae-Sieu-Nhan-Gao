@@ -57,7 +57,7 @@
                                     <th>Vai trò</th>
                                     <th>Số đơn hàng</th>
                                     <th>Ngày tạo</th>
-                                    <th>Hành động</th>
+                                    <th class="sticky-action-column">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -84,7 +84,7 @@
                                             @endif
                                         </td>
                                         <td>{{ $user->created_at->format('d/m/Y') }}</td>
-                                        <td>
+                                        <td class="sticky-action-column">
                                             <a href="{{ route('admin.users.edit', $user) }}"
                                                 class="btn btn-warning btn-sm">Sửa</a>
                                             @if($user->id !== auth()->id())

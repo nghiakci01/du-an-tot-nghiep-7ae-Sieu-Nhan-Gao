@@ -49,7 +49,7 @@
                                 <th>Đánh giá</th>
                                 <th>Nội dung</th>
                                 <th>Ngày tạo</th>
-                                <th>Hạnh động</th>
+                                <th class="sticky-action-column">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,7 +82,7 @@
                                     {{ \Illuminate\Support\Str::limit($review->comment, 100) }}
                                 </td>
                                 <td>{{ $review->created_at->format('d/m/Y H:i') }}</td>
-                                <td>
+                                <td class="sticky-action-column">
                                     <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa đánh giá này?');">
                                         @csrf
                                         @method('DELETE')

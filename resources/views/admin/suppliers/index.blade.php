@@ -43,7 +43,7 @@
                                     <th>Số điện thoại</th>
                                     <th>Email</th>
                                     <th>Trạng thái</th>
-                                    <th>Hành động</th>
+                                    <th class="sticky-action-column">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,7 +61,7 @@
                                                 <span class="badge bg-danger">Ngừng hoạt động</span>
                                             @endif
                                         </td>
-                                        <td>
+                                        <td class="sticky-action-column">
                                             <a href="{{ route('admin.suppliers.edit', $supplier) }}"
                                                 class="btn btn-warning btn-sm">Sửa</a>
                                             <form action="{{ route('admin.suppliers.destroy', $supplier) }}" method="POST"
