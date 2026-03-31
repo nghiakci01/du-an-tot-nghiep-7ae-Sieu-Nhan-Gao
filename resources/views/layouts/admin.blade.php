@@ -175,6 +175,9 @@
     [data-pc-theme="dark"] tr:hover .sticky-action-column {
         background-color: #2b3035 !important;
     }
+
+    /* --- Global Header Adjustments --- */
+    /* Loại bỏ vách ngăn giữa các thẻ ở Header */    
   </style>
   @stack('css')
 </head><!-- [Head] end --><!-- [Body] Start -->

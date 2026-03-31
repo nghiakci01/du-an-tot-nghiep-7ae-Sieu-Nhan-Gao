@@ -24,7 +24,7 @@ class ChatbotSettingController extends Controller
         $request->validate([
             'chatbot_enabled' => 'nullable|in:1,0',
             'chatbot_mode' => 'required|in:rules,ai',
-            'ai_provider' => 'required_if:chatbot_mode,ai|in:gemini,openai',
+            'ai_provider' => 'required_if:chatbot_mode,ai|in:gemini',
             'greeting_message' => 'required|string',
             'fallback_message' => 'required|string',
             'hotline' => 'required|string',
@@ -67,8 +67,6 @@ class ChatbotSettingController extends Controller
 
         if ($provider === 'gemini') {
             return $this->testGemini($apiKey);
-        } elseif ($provider === 'openai') {
-            return $this->testOpenAI($apiKey);
         }
 
         return response()->json(['success' => false, 'message' => 'Nhà cung cấp không hợp lệ!']);
@@ -100,34 +98,4 @@ class ChatbotSettingController extends Controller
         }
     }
 
-    private function testOpenAI($apiKey)
-    {
-        try {
-            /** @var \Illuminate\Http\Client\Response $response */
-            $response = \Illuminate\Support\Facades\Http::withOptions([
-                'curl' => [
-                    CURLOPT_SSL_VERIFYPEER => true,
-                    CURLOPT_SSL_VERIFYHOST => 2,
-                ],
-                'timeout' => 30,
-            ])->withHeaders([
-                'Authorization' => "Bearer {$apiKey}",
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-3.5-turbo',
-                'messages' => [['role' => 'user', 'content' => 'Hello']],
-                'max_tokens' => 20,
-            ]);
-
-            if ($response->successful()) {
-                return response()->json(['success' => true, 'message' => 'Kết nối OpenAI thành công! ✅']);
-            }
-
-            $error = $response->json()['error']['message'] ?? 'Lỗi không xác định';
-
-            return response()->json(['success' => false, 'message' => "OpenAI: {$error} (Mã: {$response->status()})"]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Lỗi OpenAI: '.$e->getMessage()]);
-        }
-    }
 }
