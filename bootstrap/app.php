@@ -37,6 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'admin.only' => \App\Http\Middleware\AdminOnlyMiddleware::class,
             'admin.lock' => \App\Http\Middleware\AdminLockMiddleware::class,
+            'staff' => \App\Http\Middleware\StaffMiddleware::class,
             'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
         ]);
     })

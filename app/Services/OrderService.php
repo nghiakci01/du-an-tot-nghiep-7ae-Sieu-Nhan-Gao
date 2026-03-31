@@ -29,19 +29,24 @@ class OrderService
             }
         }
 
-        if (! $order->canTransitionTo($newStatus)) {
+        if (!$order->canTransitionTo($newStatus)) {
             throw new Exception("Không thể chuyển đổi trạng thái từ {$order->status} sang {$newStatus}");
         }
 
-        if ($order->status === $newStatus) {
+        // Allow re-submitting 'completed' status if the payment is not yet 'paid'
+        if ($order->status === $newStatus && ($newStatus !== Order::STATUS_COMPLETED || $order->payment_status === 'paid')) {
             return $order;
         }
 
         $oldStatus = $order->status;
 
         DB::transaction(function () use ($order, $newStatus, $oldStatus, $user, $note, $returnRequest) {
-            // update status
-            $order->update(['status' => $newStatus]);
+            // update status and payment status if completed
+            $updateData = ['status' => $newStatus];
+            if ($newStatus === Order::STATUS_COMPLETED) {
+                $updateData['payment_status'] = 'paid';
+            }
+            $order->update($updateData);
 
             // create history
             OrderHistory::create([
@@ -62,24 +67,12 @@ class OrderService
             if ($order->user) {
                 // If the order belongs to a registered user, send via Notification system (DB + Mail)
                 $order->user->notify(new \App\Notifications\OrderStatusNotification($order, $oldStatus, $newStatus));
-            } elseif ($order->email) {
-                // For guest orders, send direct email based on status
-                match ($newStatus) {
-                    Order::STATUS_SHIPPED => Mail::to($order->email)->send(new OrderShippedMail($order)),
-                    Order::STATUS_COMPLETED => Mail::to($order->email)->send(new \App\Mail\OrderCompletedMail($order)),
-                    default => null,
-                };
-            }
-
-            // Send cancellation email (for both registered & guest users)
-            if ($newStatus === Order::STATUS_CANCELLED) {
-                $email = $order->email ?? ($order->user ? $order->user->email : null);
-                if ($email) {
-                    Mail::to($email)->send(new \App\Mail\OrderCancelledMail($order, $note ?? ''));
-                }
+            } elseif ($newStatus === Order::STATUS_SHIPPED && $order->email) {
+                // For guest orders (no user registered), fallback to direct email on shipping
+                Mail::to($order->email)->send(new OrderShippedMail($order));
             }
         } catch (Exception $e) {
-            Log::error('Failed to send status notification for order '.$order->id.': '.$e->getMessage());
+            Log::error('Failed to send status notification for order ' . $order->id . ': ' . $e->getMessage());
         }
 
         return $order;
@@ -95,13 +88,13 @@ class OrderService
         $isCancelledState = in_array($newStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_PARTIALLY_RETURNED, Order::STATUS_FAILED]);
         $wasCancelledState = in_array($oldStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_PARTIALLY_RETURNED, Order::STATUS_FAILED]);
 
-        if ($isCancelledState && ! $wasCancelledState) {
+        if ($isCancelledState && !$wasCancelledState) {
             $this->restoreStock($order, $returnRequest);
         }
 
         // 2. If transition FROM Cancelled/Returned/Failed TO Processing statuses -> Deduct Stock again
         // (Just in case specific admin flow allows un-cancelling, though usually hard. But good to handle)
-        if (! $isCancelledState && $wasCancelledState) {
+        if (!$isCancelledState && $wasCancelledState) {
             foreach ($order->items as $item) {
                 if ($item->variant_id) {
                     // Sử dụng lockForUpdate để tránh Race Condition khi trừ kho lại

@@ -103,6 +103,14 @@
                         </a>
                     </li>
                     <li class="pc-item">
+                        <a href="{{ route('staff.orders.index') }}" class="pc-link">
+                            <span class="pc-micon">
+                                <i class="ti ti-truck"></i>
+                            </span>
+                            <span class="pc-mtext">Giao hàng của tôi</span>
+                        </a>
+                    </li>
+                    <li class="pc-item">
                         <a href="{{ route('admin.returns.index') }}" class="pc-link">
                             <span class="pc-micon">
                                 <i class="ti ti-arrow-back-up"></i>

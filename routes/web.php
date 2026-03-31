@@ -48,7 +48,7 @@ Route::get('/payment/vnpay/retry/{id}', [App\Http\Controllers\Frontend\PaymentCo
 // Guest Order Tracking Routes
 Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'index'])->name('order-tracking.index');
 Route::post('/order-tracking/search', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'search'])->name('order-tracking.search');
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 // Fallback GET /logout → redirect về trang chủ (tránh lỗi 405)
 Route::get('/logout', function () {
@@ -69,7 +69,7 @@ Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::clas
 Route::get('/view-order/{id}', [App\Http\Controllers\Frontend\GuestOrderController::class, 'show'])->name('guest.order.show');
 
 Route::group(['middleware' => 'auth'], function () {
-    Route::get('/my-account/orders', function() {
+    Route::get('/my-account/orders', function () {
         return redirect()->route('account.index', ['#orders']);
     })->name('account.orders');
     Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'showOrder'])->name('account.orders.show');
@@ -152,6 +152,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'a
         Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
         Route::get('orders/customers/search', [App\Http\Controllers\Admin\OrderController::class, 'customersSearch'])->name('orders.customers.search');
         Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
+        Route::post('orders/{order}/assign-shipper', [App\Http\Controllers\Admin\OrderController::class, 'assignShipper'])->name('orders.assign-shipper');
         Route::post('orders/{order}/confirm-payment', [App\Http\Controllers\Admin\OrderController::class, 'confirmPayment'])->name('orders.confirm-payment');
         Route::post('orders/{order}/query-payment', [App\Http\Controllers\Admin\OrderController::class, 'queryPayment'])->name('orders.query-payment');
         Route::post('orders/{order}/refund-payment', [App\Http\Controllers\Admin\OrderController::class, 'refundPayment'])->name('orders.refund-payment');
@@ -250,16 +251,22 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'a
         Route::get('/reports/orders/excel', [App\Http\Controllers\Admin\ReportController::class, 'exportOrdersExcel'])->name('reports.orders.excel');
         Route::get('/reports/revenue/pdf', [App\Http\Controllers\Admin\ReportController::class, 'exportRevenuePDF'])->name('reports.revenue.pdf');
 
-        // Audit Logs (Admin only)
-        Route::middleware(['admin.only'])->group(function () {
-
-            // Notifications
-            Route::get('notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
-            Route::post('notifications/mark-all-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
-            Route::get('notifications/{id}/mark-as-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
-            Route::get('notifications/unread-count', [App\Http\Controllers\Admin\NotificationController::class, 'unreadCount'])->name('notifications.unread_count');
-        });
+        // Notifications
+        Route::get('notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('notifications/mark-all-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
+        Route::get('notifications/{id}/mark-as-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+        Route::get('notifications/unread-count', [App\Http\Controllers\Admin\NotificationController::class, 'unreadCount'])->name('notifications.unread_count');
     });
+}); // End Admin Middleware Group
+
+
+// Staff/Shipper Routes
+Route::group(['prefix' => 'staff', 'as' => 'staff.', 'middleware' => ['auth', 'staff']], function () {
+    Route::get('/orders', [App\Http\Controllers\Staff\ShipperOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [App\Http\Controllers\Staff\ShipperOrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/accept', [App\Http\Controllers\Staff\ShipperOrderController::class, 'accept'])->name('orders.accept');
+    Route::post('/orders/{order}/complete', [App\Http\Controllers\Staff\ShipperOrderController::class, 'complete'])->name('orders.complete');
+    Route::post('/orders/{order}/fail', [App\Http\Controllers\Staff\ShipperOrderController::class, 'fail'])->name('orders.fail');
 });
 
 
