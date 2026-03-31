@@ -230,8 +230,8 @@
         <li>
           <a href="#notifications" data-tab="notifications" class="nav-tab-link">
             <i class="bi bi-bell"></i> Thông báo
-            @if(auth()->user()->unreadNotifications->count() > 0)
-              <span class="badge bg-danger ms-auto unread-badge-count">{{ auth()->user()->unreadNotifications->count() }}</span>
+            @if($user && $user->unreadNotifications->count() > 0)
+              <span class="badge bg-danger ms-auto unread-badge-count">{{ $user->unreadNotifications->count() }}</span>
             @endif
           </a>
         </li>
@@ -521,7 +521,7 @@
     <div class="account-content tab-pane-block d-none" id="tab-notifications">
       <div class="tab-head">
         <h4><i class="bi bi-bell me-2"></i>Thông báo của tôi</h4>
-        @if(auth()->user()->unreadNotifications->count() > 0)
+        @if($user && $user->unreadNotifications->count() > 0)
           <button class="btn btn-sm btn-outline-danger rounded-pill px-3 mark-all-read-tab">Đánh dấu tất cả đã đọc</button>
         @endif
       </div>

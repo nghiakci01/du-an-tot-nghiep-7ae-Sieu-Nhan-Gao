@@ -2,770 +2,568 @@
 
 @section('title', __('messages.checkout') . ' | Elite')
 
-@section('styles')
+@push('styles')
     <style>
-        /* Reid Template Checkout Styles */
-        .breadcrumbs_area {
-            background: #f5f5f5;
-            padding: 30px 0;
+        /* aristino-style checkout redesign */
+        .checkout-container {
+            max-width: 1100px !important;
+            margin: 0 auto !important;
+            padding: 40px 15px !important;
+            font-family: 'Inter', sans-serif !important;
+            color: #333 !important;
         }
 
-        .breadcrumb_content ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            align-items: center;
+        .checkout-title {
+            font-size: 24px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            margin-bottom: 5px !important;
+            color: #000 !important;
+            letter-spacing: 0.5px !important;
         }
 
-        .breadcrumb_content ul li {
-            margin-right: 10px;
-            color: #666;
+        .checkout-breadcrumbs {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            font-size: 13px !important;
+            color: #888 !important;
+            margin-bottom: 30px !important;
+            padding: 0 !important;
+            list-style: none !important;
         }
 
-        .breadcrumb_content ul li a {
-            color: #333;
-            text-decoration: none;
+        .checkout-breadcrumbs a {
+            color: #888 !important;
+            text-decoration: none !important;
         }
 
-        .breadcrumb_content ul li a:hover {
-            color: #007bff;
+        .checkout-breadcrumbs .active {
+            color: #333 !important;
+            font-weight: 500 !important;
         }
 
-        .Checkout_section {
-            padding: 60px 0;
+        /* login prompt box */
+        .login-prompt-box {
+            background: #fdfdfd !important;
+            border: 1px solid #eee !important;
+            padding: 20px !important;
+            margin-bottom: 30px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            border-radius: 4px !important;
         }
 
-        .user-actions {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 5px;
+        .login-prompt-text {
+            font-size: 14px !important;
+            line-height: 1.5 !important;
         }
 
-        .user-actions h3 {
-            font-size: 16px;
-            margin: 0;
-            font-weight: 600;
+        .btn-login-outline {
+            border: 1px solid #000 !important;
+            padding: 10px 25px !important;
+            background: transparent !important;
+            color: #000 !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            font-size: 12px !important;
+            text-decoration: none !important;
+            border-radius: 2px !important;
         }
 
-        .user-actions h3 i {
-            margin-right: 10px;
-            color: #007bff;
+        .user-profile-section {
+            background: #fdfdfd !important;
+            border: 1px solid #eee !important;
+            padding: 20px !important;
+            margin-bottom: 30px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            border-radius: 4px !important;
         }
 
-        .user-actions .Returning {
-            color: #007bff;
-            text-decoration: none;
-            margin-left: 10px;
+        /* grid layouts */
+        .field-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 15px !important;
+            margin-bottom: 20px !important;
         }
 
-        .user-actions .Returning:hover {
-            text-decoration: underline;
+        .address-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 15px !important;
+            margin-top: 15px !important;
         }
 
-        .checkout_info {
-            padding: 20px;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-top: none;
+        .form-section-title {
+            font-size: 13px !important;
+            color: #666 !important;
+            margin-bottom: 8px !important;
+            font-weight: 500 !important;
+            text-transform: none !important;
         }
 
-        .checkout_info p {
-            color: #666;
-            margin-bottom: 20px;
+        .modern-input {
+            width: 100% !important;
+            padding: 12px 15px !important;
+            border: 1px solid #e1e1e1 !important;
+            border-radius: 4px !important;
+            font-size: 14px !important;
+            color: #333 !important;
+            margin-bottom: 20px !important;
+            background: #fff !important;
         }
 
-        .form_group {
-            margin-bottom: 20px;
+        .modern-input:focus {
+            border-color: #000 !important;
+            outline: none !important;
         }
 
-        .form_group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #333;
+        .modern-select {
+            appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 15px center !important;
+            background-color: #fff !important;
         }
 
-        .form_group label span {
-            color: #dc3545;
+        /* delivery method toggle */
+        .delivery-method-box {
+            border: 1px solid #e1e1e1 !important;
+            border-radius: 4px !important;
+            margin-bottom: 20px !important;
+            overflow: hidden !important;
         }
 
-        .form_group input,
-        .form_group select,
-        .form_group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            font-size: 14px;
+        .delivery-option {
+            padding: 15px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 15px !important;
+            cursor: pointer !important;
+            border-bottom: 1px solid #eee !important;
         }
 
-        .form_group input:focus,
-        .form_group select:focus,
-        .form_group textarea:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        .delivery-option:last-child {
+            border-bottom: none !important;
         }
 
-        .checkout_form h3 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #007bff;
+        .delivery-option input[type="radio"] {
+            width: 18px !important;
+            height: 18px !important;
+            margin: 0 !important;
+            cursor: pointer !important;
+            accent-color: #000 !important;
         }
 
-        .order_table table {
-            width: 100%;
-            border: 1px solid #dee2e6;
+        .delivery-option label {
+            margin: 0 !important;
+            font-weight: 500 !important;
+            color: #000 !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
         }
 
-        .order_table table thead th {
-            background: #f8f9fa;
-            padding: 15px;
-            font-weight: 600;
-            border-bottom: 2px solid #dee2e6;
+        .delivery-content {
+            padding: 20px !important;
+            background: #fff !important;
+            border-top: 1px solid #eee !important;
         }
 
-        .order_table table tbody td {
-            padding: 15px;
-            border-bottom: 1px solid #dee2e6;
+        /* order summary refinement */
+        .summary-card {
+            background: #fff !important;
+            padding: 0 0 0 30px !important;
+            position: sticky !important;
+            top: 20px !important;
         }
 
-        .order_table table tfoot th,
-        .order_table table tfoot td {
-            padding: 15px;
-            font-weight: 600;
-            border-top: 2px solid #dee2e6;
+        .summary-title {
+            font-size: 15px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            margin-bottom: 25px !important;
+            color: #000 !important;
+            letter-spacing: 0.5px !important;
         }
 
-        .order_table table tfoot .order_total th,
-        .order_table table tfoot .order_total td {
-            background: #f8f9fa;
-            font-size: 18px;
-            color: #007bff;
+        .summary-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            margin-bottom: 12px !important;
+            font-size: 14px !important;
+            color: #333 !important;
         }
 
-        .payment_method {
-            margin-top: 30px;
+        .summary-row.total {
+            margin-top: 20px !important;
+            padding-top: 15px !important;
+            border-top: 1px dashed #ddd !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
         }
 
-        .payment_method .panel-default {
-            margin-bottom: 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
+        /* buttons with aristino style icon */
+        .btn-primary-black {
+            background: #222 !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 2px !important;
+            font-weight: 700 !important;
+            font-size: 13px !important;
+            text-transform: uppercase !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 15px !important;
+            height: 48px !important;
+            width: 100% !important;
+            transition: background 0.3s !important;
         }
 
-        .payment_method label {
-            display: block;
-            padding: 15px;
-            margin: 0;
-            cursor: pointer;
-            font-weight: 500;
+        .btn-primary-black .arrow-box {
+            width: 24px !important;
+            height: 24px !important;
+            background: #fff !important;
+            color: #222 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 2px !important;
+            font-size: 12px !important;
         }
 
-        .payment_method input[type="radio"] {
-            margin-right: 10px;
+        .btn-apply-coupon {
+            background: #222 !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 0 2px 2px 0 !important;
+            font-weight: 700 !important;
+            font-size: 11px !important;
+            padding: 0 15px !important;
+            height: 48px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
         }
 
-        .payment_method .card-body1 {
-            padding: 15px;
-            background: #f8f9fa;
-            border-top: 1px solid #dee2e6;
+        .coupon-group {
+            display: flex !important;
+            margin-top: 20px !important;
+            border: 1px solid #ddd !important;
+            border-radius: 2px !important;
         }
 
-        .order_button {
-            margin-top: 30px;
+        .coupon-group input {
+            border: none !important;
+            flex: 1 !important;
+            padding: 0 15px !important;
+            font-size: 13px !important;
+            height: 46px !important;
         }
 
-        .order_button button {
-            width: 100%;
-            padding: 15px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .order_button button:hover {
-            background: #0056b3;
-        }
-
-        .mb-20 {
-            margin-bottom: 20px;
-        }
-
-        .card-body1 {
-            padding: 15px;
-        }
-
-        /* Coupon Section Styles */
-        .coupon-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .coupon-applied {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            padding: 15px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .coupon-applied .coupon-code {
-            font-weight: 600;
-            color: #155724;
-        }
-
-        .coupon-input-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .coupon-input-group input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-        }
-
-        .coupon-input-group button {
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .coupon-input-group button:hover {
-            background: #0056b3;
-        }
-
-        .discount-row {
-            color: #28a745;
-            font-weight: 600;
-        }
-
-        /* Validation Styles */
-        .form_group input.is-invalid,
-        .form_group select.is-invalid,
-        .form_group textarea.is-invalid,
-        input.is-invalid,
-        select.is-invalid,
-        textarea.is-invalid {
-            border-color: #dc3545;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right calc(0.375em + 0.1875rem) center;
-            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-            padding-right: calc(1.5em + 0.75rem);
-        }
-
-        .form_group input.is-valid,
-        .form_group select.is-valid,
-        .form_group textarea.is-valid,
-        input.is-valid,
-        select.is-valid,
-        textarea.is-valid {
-            border-color: #28a745;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right calc(0.375em + 0.1875rem) center;
-            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-            padding-right: calc(1.5em + 0.75rem);
-        }
-
-        .invalid-feedback {
-            display: block;
-            margin-top: 0.25rem;
-            font-size: 0.875rem;
-            color: #dc3545;
-        }
-
-        .valid-feedback {
-            display: block;
-            margin-top: 0.25rem;
-            font-size: 0.875rem;
-            color: #28a745;
+        @media (max-width: 991px) {
+            .field-grid, .address-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .summary-card {
+                padding: 30px 0 0 0 !important;
+            }
         }
     </style>
-@endsection
+@endpush
 
 @section('content')
-    <!--breadcrumbs area start-->
-    <div class="breadcrumbs_area other_bread">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="breadcrumb_content">
-                        <ul>
-                            <li><a href="{{ route('welcome') }}">{{ __('messages.home') }}</a></li>
-                            <li>/</li>
-                            <li>{{ __('messages.checkout') }}</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+    <div class="checkout-container">
+        <h1 class="checkout-title">THÔNG TIN</h1>
+        <div class="checkout-breadcrumbs">
+            <a href="{{ route('cart.index') }}">Giỏ hàng</a>
+            <i class="fa fa-angle-right"></i>
+            <span id="breadcrumb-step-1" class="active">Thông tin giao hàng</span>
+            <i class="fa fa-angle-right"></i>
+            <span id="breadcrumb-step-2">Phương thức thanh toán</span>
         </div>
-    </div>
-    <!--breadcrumbs area end-->
-
-    <!--checkout progress bar start-->
-    <div class="container" style="padding: 30px 0 10px;">
-        <div class="d-flex justify-content-center align-items-center" style="gap: 0;">
-            <div class="text-center checkout-step-item active" id="step-item-1" style="flex: 1; max-width: 160px;">
-                <div class="step-icon" style="width: 40px; height: 40px; border-radius: 50%; background: #007bff; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: 700; transition: all 0.3s;">
-                    1
-                </div>
-                <div class="step-label" style="font-size: 12px; font-weight: 700; color: #007bff;">Giao hàng</div>
+         <!-- Checkout page section -->
+    <form action="{{ route('checkout.store') }}" method="POST">
+        @csrf
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-            <div class="step-line" id="step-line-1" style="flex: 1; max-width: 100px; height: 3px; background: #dee2e6; margin-bottom: 20px; transition: all 0.3s;"></div>
-            <div class="text-center checkout-step-item" id="step-item-2" style="flex: 1; max-width: 160px;">
-                <div class="step-icon" style="width: 40px; height: 40px; border-radius: 50%; background: #dee2e6; color: #999; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: 700; transition: all 0.3s;">
-                    2
-                </div>
-                <div class="step-label" style="font-size: 12px; color: #999;">Thanh toán</div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-            <div class="step-line" id="step-line-2" style="flex: 1; max-width: 100px; height: 3px; background: #dee2e6; margin-bottom: 20px; transition: all 0.3s;"></div>
-            <div class="text-center checkout-step-item" id="step-item-3" style="flex: 1; max-width: 160px;">
-                <div class="step-icon" style="width: 40px; height: 40px; border-radius: 50%; background: #dee2e6; color: #999; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: 700; transition: all 0.3s;">
-                    3
-                </div>
-                <div class="step-label" style="font-size: 12px; color: #999;">Xác nhận</div>
+        @endif
+
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-        </div>
-    </div>
-    <!--checkout progress bar end-->
+        @endif
 
-    <!--Checkout page section-->
-    <div class="Checkout_section" id="accordion">
-        <div class="container">
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
-            @if($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <ul class="mb-0">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
-            <div class="row">
-                <div class="col-12">
-                    @guest
-                        <div class="user-actions">
-                            <h3>
-                                <i class="fa fa-file-o" aria-hidden="true"></i>
-                                {{ __('messages.returning_customer') }}?
-                                <a class="Returning" href="#" data-bs-toggle="collapse" data-bs-target="#checkout_login"
-                                    aria-expanded="false">{{ __('messages.click_here_to_login') }}</a>
-                            </h3>
-                            <div id="checkout_login" class="collapse" data-bs-parent="#accordion">
-                                <div class="checkout_info">
-                                    <p>{{ __('messages.login_message') }}</p>
-                                    <div class="form_group">
-                                        <label>{{ __('messages.email') }} <span>*</span></label>
-                                        <input type="text" value="{{ old('email') }}">
-                                    </div>
-                                    <div class="form_group">
-                                        <label>{{ __('messages.password') }} <span>*</span></label>
-                                        <input type="password">
-                                    </div>
-                                    <div class="form_group group_3">
-                                        <a href="{{ route('login') }}" class="btn btn-primary">{{ __('messages.login') }}</a>
-                                        <label for="remember_box" style="margin-left: 15px;">
-                                            <input id="remember_box" type="checkbox">
-                                            <span> {{ __('messages.remember_me') }} </span>
-                                        </label>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <a href="{{ route('password.request') }}">{{ __('messages.lost_password') }}?</a>
-                                        <a href="javascript:void(0)" onclick="$('#checkout_login').collapse('hide')" class="text-secondary" style="text-decoration: none;"><i class="fa fa-angle-up"></i> Thu gọn</a>
-                                    </div>
-                                </div>
+        <div class="row">
+            <!-- Left Column: Form Steps -->
+            <div class="col-lg-7">
+                @if(Auth::check())
+                    <div class="user-profile-section">
+                        <div class="user-profile-info">
+                            <div class="user-profile-avatar">
+                                <i class="fa fa-user"></i>
+                            </div>
+                            <div class="user-profile-details">
+                                <span class="user-profile-name">{{ Auth::user()->name }}</span>
+                                <span class="user-profile-email">{{ Auth::user()->email }}</span>
                             </div>
                         </div>
-                    @endguest
-
-                    <div class="user-actions">
-                        <h3 style="margin-bottom: 15px;">
-                            <i class="fa fa-tag" aria-hidden="true"></i>
-                            {{ __('messages.have_coupon') }}?
-                        </h3>
-                        <div id="checkout_coupon">
-                            <div class="checkout_info" style="border-top: 1px solid #dee2e6;">
-                                <div id="couponMessage"></div>
-                                @if($coupon)
-                                    <div class="coupon-applied">
-                                        <div>
-                                            <i class="fa fa-check-circle"></i>
-                                            <span class="coupon-code">{{ $coupon->code }}</span> {{ __('messages.applied') }}
-                                        </div>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" id="removeCouponBtn">
-                                            <i class="fa fa-times"></i> {{ __('messages.remove') }}
-                                        </button>
-                                    </div>
-                                @else
-                                    <div class="coupon-input-group">
-                                        <input type="text" id="couponCode" placeholder="{{ __('messages.coupon_code') }}">
-                                        <button type="button" id="applyCouponBtn">{{ __('messages.apply_coupon') }}</button>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
+                        <a href="{{ route('logout') }}" class="btn-logout-small" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a>
                     </div>
-                </div>
-            </div>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+                @endif
 
-            <form action="{{ route('checkout.store') }}" method="POST">
-                @csrf
                 <div class="checkout_form">
                     <!-- STEP 1: SHIPPING DETAILS -->
                     <div id="checkout-step-1" class="checkout-step-content">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <h3>{{ __('messages.billing_details') }}</h3>
-                                <div class="row">
-                                <div class="col-lg-6 mb-20">
-                                    <label>{{ __('messages.full_name') }} <span>*</span></label>
-                                    <input type="text" name="name"
-                                        value="{{ old('name', Auth::check() ? Auth::user()->name : '') }}" required
-                                        class="@error('name') is-invalid @enderror">
-                                    @error('name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                        @if(!Auth::check())
+                            <div class="login-prompt-box">
+                                <div class="login-prompt-text">
+                                    <strong>Bạn đã có tài khoản?</strong><br>
+                                    <span class="text-muted small">Đăng nhập để có trải nghiệm thanh toán nhanh nhất</span>
                                 </div>
-                                <div class="col-12 mb-20">
-                                    <label>{{ __('messages.phone_number') }} <span>*</span></label>
-                                    <input type="tel" name="phone"
-                                        value="{{ old('phone', Auth::check() ? Auth::user()->phone : '') }}" required
-                                        pattern="^(03|05|07|08|09)\d{8}$" class="@error('phone') is-invalid @enderror">
-                                    @error('phone')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-12 mb-20">
-                                    <label>{{ __('messages.email') }} <span>*</span></label>
-                                    <input type="email" name="email"
-                                        value="{{ old('email', Auth::check() ? Auth::user()->email : '') }}" required
-                                        class="@error('email') is-invalid @enderror">
-                                    @error('email')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-12 mb-20">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="mb-0">{{ __('messages.province_city') }} <span>*</span></label>
-                                        <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-primary"
-                                            title="Sá»­ dá»¥ng vá»‹ tr­ hiá»‡n táº¡i cá»§a báº¡n">
-                                            <i class="fa fa-map-marker"></i> {{ __('messages.locate_me') }}
-                                        </button>
-                                    </div>
-                                    <select name="province" id="province" required
-                                        class="form-control @error('province') is-invalid @enderror">
-                                        <option value="">{{ __('messages.select_province') }}</option>
-                                        @foreach($provinces as $province)
-                                            <option value="{{ $province }}" {{ old('province') ? (old('province') == $province ? 'selected' : '') : (Auth::check() && str_contains(Auth::user()->address, $province) ? 'selected' : '') }}>
-                                                {{ $province }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('province')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-12 mb-20">
-                                    <label>{{ __('messages.shipping_address') }} <span>*</span></label>
-                                    <input placeholder="{{ __('messages.street_address') }}" type="text" name="address"
-                                        value="{{ old('address', Auth::check() ? Auth::user()->address : '') }}" required
-                                        minlength="5" class="@error('address') is-invalid @enderror">
-                                    @error('address')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-12">
-                                    <div class="order-notes">
-                                        <label for="order_note">{{ __('messages.order_notes') }}</label>
-                                        <textarea id="order_note" name="note"
-                                            placeholder="{{ __('messages.order_notes_placeholder') }}">{{ old('note') }}</textarea>
-                                    </div>
-                                </div>
+                                <a href="{{ route('login') }}" class="btn-login-outline">Đăng nhập</a>
                             </div>
-                                </div>
+                        @endif
+
+                        <div class="form-section-title">Họ và tên</div>
+                        <input type="text" name="name" value="{{ old('name', Auth::check() ? Auth::user()->name : '') }}" required class="modern-input @error('name') is-invalid @enderror" placeholder="Họ và tên">
+                        @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+
+                        <div class="field-grid">
+                            <div>
+                                <div class="form-section-title">Email</div>
+                                <input type="email" name="email" value="{{ old('email', Auth::check() ? Auth::user()->email : '') }}" required class="modern-input @error('email') is-invalid @enderror" placeholder="Email">
+                                @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div>
+                                <div class="form-section-title">Số điện thoại</div>
+                                <input type="tel" name="phone" value="{{ old('phone', Auth::check() ? Auth::user()->phone : '') }}" required pattern="^(03|05|07|08|09)\d{8}$" class="modern-input @error('phone') is-invalid @enderror" placeholder="Số điện thoại">
+                                @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                         </div>
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <button type="button" class="btn btn-primary btn-lg px-5 float-end" id="btn-next-step-1">
-                                    {{ __('messages.continue') }} <i class="fa fa-arrow-right ms-2"></i>
-                                </button>
+
+                        <div class="delivery-method-box">
+                            <div class="delivery-option active" onclick="$('#delivery_home_content').slideDown(); $(this).addClass('active').next().next().removeClass('active'); $('#delivery_home').prop('checked', true);">
+                                <input type="radio" name="delivery_type" id="delivery_home" value="home" checked>
+                                <label for="delivery_home">Giao tận nơi</label>
                             </div>
+                            <div id="delivery_home_content" class="delivery-content">
+                                <div class="form-section-title">Địa chỉ</div>
+                                <input type="text" name="address" value="{{ old('address', Auth::check() ? Auth::user()->address : '') }}" required minlength="5" class="modern-input @error('address') is-invalid @enderror" placeholder="Địa chỉ">
+                                @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
+
+                                <div class="address-grid">
+                                    <div>
+                                        <div class="form-section-title">Tỉnh / Thành</div>
+                                        <select name="province" id="province" required class="modern-input modern-select @error('province') is-invalid @enderror">
+                                            <option value="">Chọn tỉnh / thành</option>
+                                            @foreach($provinces as $province)
+                                                <option value="{{ $province }}" {{ old('province') == $province || (Auth::check() && str_contains(Auth::user()->address, $province)) ? 'selected' : '' }}>{{ $province }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <div class="form-section-title">Quận / huyện</div>
+                                        <select name="district" id="district" class="modern-input modern-select">
+                                            <option value="">Chọn quận / huyện</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <div class="form-section-title">Phường / xã</div>
+                                        <select name="ward" id="ward" class="modern-input modern-select">
+                                            <option value="">Chọn phường / xã</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-2 text-end">
+                                    <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-secondary border-0" style="font-size: 11px;">
+                                        <i class="fa fa-map-marker"></i> Sử dụng vị trí của tôi
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="delivery-option" onclick="$('#delivery_home_content').slideUp(); $(this).addClass('active').prev().prev().removeClass('active'); $('#delivery_store').prop('checked', true);">
+                                <input type="radio" name="delivery_type" id="delivery_store" value="store">
+                                <label for="delivery_store">Nhận tại cửa hàng</label>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-primary-black" id="btn-next-step-1">
+                            TIẾP TỤC ĐẾN PHƯƠNG THỨC THANH TOÁN
+                            <span class="arrow-box"><i class="fa fa-arrow-right"></i></span>
+                        </button>
+                        
+                        <div class="legal-text">
+                            Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo <a href="#">Điều khoản web</a>
                         </div>
                     </div>
 
-                    <!-- STEP 2: PAYMENT & SHIPPING METHOD -->
+                    <!-- STEP 2: PAYMENT & SHIPPING METHOD (Hidden initially) -->
                     <div id="checkout-step-2" class="checkout-step-content" style="display: none;">
-                        <div class="row">
-                            <div class="col-lg-7 col-md-6">
-                                <div class="shipping_method mb-4" id="shipping_method_container">
-                                    <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #007bff;">Phương thức vận chuyển</h3>
-                                    <div id="shipping_options">
-                                        <!-- Options will be loaded via AJAX -->
-                                        <p class="text-muted">Vui lòng hoàn tất thông tin địa chỉ ở bước trước.</p>
-                                    </div>
-                                    <input type="hidden" name="shipping_fee" id="hidden_shipping_fee" value="0">
-                                    <input type="hidden" name="shipping_service_name" id="hidden_shipping_service_name" value="">
-                                </div>
-
-                                    <div class="payment_method">
-                                        <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #007bff;">Phương thức thanh toán</h3>
-
-
-                                        <div class="panel-default">
-                                            <input id="payment_cod" name="payment_method" type="radio" value="COD"
-                                                data-bs-target="#method_cod" checked required />
-                                            <label for="payment_cod" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_cod"
-                                                aria-controls="method_cod">
-                                                {{ __('messages.cash_on_delivery') }}
-                                            </label>
-
-                                            <div id="method_cod" class="collapse show" data-bs-parent="#accordion">
-                                            </div>
-                                        </div>
-
-
-                                        <div class="panel-default mt-3">
-                                            <input id="payment_bank" name="payment_method" type="radio" value="BANK_TRANSFER"
-                                                data-bs-target="#method_bank" required />
-                                            <label for="payment_bank" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_bank"
-                                                aria-controls="method_bank">
-                                                Chuyển khoản ngân hàng trực tiếp (VietQR)
-                                            </label>
-                                            <div id="method_bank" class="collapse" data-bs-parent="#accordion">
-                                                <div class="card-body1 p-3 bg-light rounded mt-2">
-                                                    <div class="alert alert-info py-2 mb-0 small">
-                                                        <i class="fa fa-info-circle"></i> Bạn sẽ nhận được thông tin số tài khoản và mã QR để chuyển khoản sau khi nhấn "Đặt hàng".
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="panel-default mt-3">
-                                            <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY"
-                                                data-bs-target="#method_vnpay" required />
-                                            <label for="payment_vnpay" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_vnpay"
-                                                aria-controls="method_vnpay">
-                                                <i class="fa fa-credit-card"></i> VNPay (Thẻ ATM, Ví điện tử, QR Code)
-                                            </label>
-                                            <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
-                                                <div class="card-body1 p-3 bg-light rounded mt-2">
-                                                    <div class="alert alert-info py-2 mb-0 small">
-                                                        <i class="fa fa-info-circle"></i> Thanh toán an toàn qua VNPay. Bạn sẽ được chuyển hướng đến trang thanh toán VNPay sau khi nhấn "Đặt hàng".
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <h3 class="summary-title mb-4">Phương thức vận chuyển</h3>
+                        <div id="shipping_method_container">
+                            <div id="shipping_options">
+                                <p class="text-muted">Đang tải...</p>
                             </div>
-                            <div class="col-lg-5 col-md-6">
-                                <h3>Tóm tắt đơn hàng</h3>
-                                <div class="order_table table-responsive">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>{{ __('messages.product') }}</th>
-                                                <th>{{ __('messages.total') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($cart as $details)
-                                            <tr>
-                                                <td>{{ $details['name'] }} <strong>&times; {{ $details['quantity'] }}</strong></td>
-                                                <td>{{ number_format($details['price'] * $details['quantity']) }} đ</td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <th>{{ __('messages.subtotal') }}</th>
-                                                <td>{{ number_format($total) }} VND</td>
-                                            </tr>
-                                            @if($discount > 0)
-                                            <tr class="discount-row">
-                                                <th>{{ __('messages.discount') }}</th>
-                                                <td>-{{ number_format($discount) }} đ</td>
-                                            </tr>
-                                            @endif
-                                            <tr>
-                                                <th>{{ __('messages.shipping') }}</th>
-                                                <td id="shipping_fee_display"><strong>Chưa tính</strong></td>
-                                            </tr>
-                                            <tr class="order_total">
-                                                <th>{{ __('messages.order_total') }}</th>
-                                                <td id="final_total_display"><strong>{{ number_format($finalTotal) }} VND</strong></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
+                            <input type="hidden" name="shipping_fee" id="hidden_shipping_fee" value="0">
+                            <input type="hidden" name="shipping_service_name" id="hidden_shipping_service_name" value="">
+                        </div>
+
+                        <h3 class="summary-title mt-5 mb-4">Phương thức thanh toán</h3>
+                        <div class="payment_method">
+                            <div class="panel-default mb-3 border rounded overflow-hidden">
+                                <input id="payment_cod" name="payment_method" type="radio" value="COD" data-bs-target="#method_cod" checked required class="ms-3 mt-3" />
+                                <label for="payment_cod" class="p-3 w-100 d-inline-block" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_cod">
+                                    {{ __('messages.cash_on_delivery') }}
+                                </label>
+                                <div id="method_cod" class="collapse show" data-bs-parent="#accordion"></div>
+                            </div>
+
+                            <div class="panel-default mb-3 border rounded overflow-hidden">
+                                <input id="payment_bank" name="payment_method" type="radio" value="BANK_TRANSFER" data-bs-target="#method_bank" required class="ms-3 mt-3" />
+                                <label for="payment_bank" class="p-3 w-100 d-inline-block" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_bank">
+                                    Chuyển khoản ngân hàng trực tiếp (VietQR)
+                                </label>
+                                <div id="method_bank" class="collapse" data-bs-parent="#accordion">
+                                    <div class="p-3 bg-light border-top small">
+                                        <i class="fa fa-info-circle"></i> Bạn sẽ nhận được thông tin số tài khoản và mã QR để chuyển khoản sau khi nhấn "Đặt hàng".
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel-default mb-3 border rounded overflow-hidden">
+                                <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY" data-bs-target="#method_vnpay" required class="ms-3 mt-3" />
+                                <label for="payment_vnpay" class="p-3 w-100 d-inline-block" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_vnpay">
+                                    VNPay (Thẻ ATM, Ví điện tử, QR Code)
+                                </label>
+                                <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
+                                    <div class="p-3 bg-light border-top small">
+                                        <i class="fa fa-info-circle"></i> Thanh toán an toàn qua VNPay.
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row mt-4">
-                            <div class="col-12 d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-secondary btn-lg px-5" id="btn-prev-step-2">
-                                    <i class="fa fa-arrow-left me-2"></i> Quay lại
-                                </button>
-                                <button type="button" class="btn btn-primary btn-lg px-5" id="btn-next-step-2">
-                                    Tiếp tục <i class="fa fa-arrow-right ms-2"></i>
-                                </button>
-                            </div>
+
+                        <div class="d-flex justify-content-between mt-5 gap-3">
+                            <button type="button" class="btn btn-outline-secondary px-4" id="btn-prev-step-2" style="height: 54px; border-radius: 4px; font-weight: 600;">
+                                <i class="fa fa-arrow-left me-2"></i> QUAY LẠI
+                            </button>
+                            <button type="button" class="btn-primary-black mt-0" id="btn-next-step-2">
+                                TIẾP TỤC <span class="arrow-box"><i class="fa fa-arrow-right"></i></span>
+                            </button>
                         </div>
                     </div>
 
                     <!-- STEP 3: FINAL CONFIRMATION -->
                     <div id="checkout-step-3" class="checkout-step-content" style="display: none;">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <h3>{{ __('messages.your_order') }}</h3>
-                                <div class="alert alert-info mb-4">
-                                    <i class="fa fa-info-circle"></i> Vui lòng kiểm tra kỹ thông tin đơn hàng lần cuối trước khi đặt.
+                        <h3 class="summary-title mb-4">Xác nhận đơn hàng</h3>
+                        <div class="card border-0 bg-light p-3 mb-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="fw-bold">Thông tin nhận hàng</h6>
+                                    <p class="mb-1 small"><strong>Người nhận:</strong> <span id="confirm-name"></span></p>
+                                    <p class="mb-1 small"><strong>SĐT:</strong> <span id="confirm-phone"></span></p>
+                                    <p class="mb-1 small"><strong>Địa chỉ:</strong> <span id="confirm-address"></span></p>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="card border-0 bg-light mb-4">
-                                            <div class="card-body">
-                                                <h5 class="card-title fw-bold">Thông tin nhận hàng</h5>
-                                                <p class="mb-1"><strong>Người nhận:</strong> <span id="confirm-name"></span></p>
-                                                <p class="mb-1"><strong>SĐT:</strong> <span id="confirm-phone"></span></p>
-                                                <p class="mb-1"><strong>Email:</strong> <span id="confirm-email"></span></p>
-                                                <p class="mb-1"><strong>Địa chỉ:</strong> <span id="confirm-address"></span></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="card border-0 bg-light mb-4">
-                                            <div class="card-body">
-                                                <h5 class="card-title fw-bold">Thanh toán & Vận chuyển</h5>
-                                                <p class="mb-1"><strong>Vận chuyển:</strong> <span id="confirm-shipping"></span></p>
-                                                <p class="mb-1"><strong>Thanh toán:</strong> <span id="confirm-payment"></span></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="order_table table-responsive">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>{{ __('messages.product') }}</th>
-                                                <th>{{ __('messages.total') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($cart as $details)
-                                            <tr>
-                                                <td>{{ $details['name'] }}
-                                                    <strong>&times; {{ $details['quantity'] }}</strong>
-                                                    <br>
-                                                    <small class="text-muted">({{ $details['size'] }}/{{ $details['color'] }})</small>
-                                                </td>
-                                                <td>{{ number_format($details['price'] * $details['quantity']) }} đ</td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                        <tfoot>
-                                            <tr class="order_total">
-                                                <th>{{ __('messages.order_total') }}</th>
-                                                <td id="final_total_display_confirm"><strong>{{ number_format($finalTotal) }} VND</strong></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-
-                                <!-- Bank Transfer Detail & QR Code -->
-                                <div id="bank-transfer-info" class="mt-4 p-4 border rounded bg-white shadow-sm" style="display: none;">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-6">
-                                            <h5 class="fw-bold mb-3 d-flex align-items-center">
-                                                <i class="fa fa-university me-2 text-primary"></i> Thông tin chuyển khoản
-                                            </h5>
-                                            <div class="mb-2">
-                                                <span class="text-muted">Ngân hàng:</span>
-                                                <div class="fw-bold">{{ $defaultBank->bank_name ?? 'N/A' }}</div>
-                                            </div>
-                                            <div class="mb-2">
-                                                <span class="text-muted">Số tài khoản:</span>
-                                                <div class="fw-bold fs-5 text-primary">{{ $defaultBank->account_number ?? 'N/A' }}</div>
-                                            </div>
-                                            <div class="mb-2">
-                                                <span class="text-muted">Chủ tài khoản:</span>
-                                                <div class="fw-bold">{{ $defaultBank->account_name ?? 'N/A' }}</div>
-                                            </div>
-                                            <div class="mb-0">
-                                                <span class="text-muted">Nội dung chuyển khoản:</span>
-                                                <div class="fw-bold text-danger">THANHTOAN ELITE</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 text-center border-start">
-                                            <h6 class="fw-bold mb-2">Quét mã QR để thanh toán nhanh</h6>
-                                            <div class="qr-container bg-light p-2 rounded d-inline-block border">
-                                                <img id="bank_qr_image" src="" alt="VietQR" style="max-width: 250px; height: auto;">
-                                            </div>
-                                            <p class="text-muted small mt-2 mb-0">Sử dụng ứng dụng Ngân hàng hoặc Ví điện tử để quét</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="order_button mt-4">
-                                    <div class="d-flex justify-content-between">
-                                        <button type="button" class="btn btn-outline-secondary btn-lg px-5" id="btn-prev-step-3" style="width: auto;">
-                                            <i class="fa fa-arrow-left me-2"></i> Quay lại
-                                        </button>
-                                        <button type="submit" class="btn btn-success btn-lg px-5" style="width: auto; background: #28a745; border-color: #28a745;">
-                                            <i class="fa fa-check-circle me-2"></i> {{ __('messages.place_order') }}
-                                        </button>
-                                    </div>
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold">Thanh toán & Vận chuyển</h6>
+                                    <p class="mb-1 small"><strong>Vận chuyển:</strong> <span id="confirm-shipping"></span></p>
+                                    <p class="mb-1 small"><strong>Thanh toán:</strong> <span id="confirm-payment"></span></p>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Bank Transfer Info -->
+                        <div id="bank-transfer-info" class="mb-4 p-3 border rounded bg-white" style="display: none;">
+                            <h6 class="fw-bold mb-3">Thông tin chuyển khoản</h6>
+                            <p class="mb-1 small">Ngân hàng: <strong>{{ $defaultBank->bank_name ?? 'N/A' }}</strong></p>
+                            <p class="mb-1 small">Số tài khoản: <strong class="text-primary">{{ $defaultBank->account_number ?? 'N/A' }}</strong></p>
+                            <p class="mb-3 small">Chủ tài khoản: <strong>{{ $defaultBank->account_name ?? 'N/A' }}</strong></p>
+                            <div class="text-center">
+                                <img id="bank_qr_image" src="" alt="VietQR" class="img-fluid" style="max-width: 200px;">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-5 gap-3">
+                            <button type="button" class="btn btn-outline-secondary px-4" id="btn-prev-step-3" style="height: 54px; border-radius: 4px; font-weight: 600;">
+                                <i class="fa fa-arrow-left me-2"></i> QUAY LẠI
+                            </button>
+                            <button type="submit" class="btn-primary-black mt-0" id="btn-place-order">
+                                ĐẶT HÀNG <span class="arrow-box"><i class="fa fa-arrow-right"></i></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Right Column: Order Summary -->
+            <div class="col-lg-5">
+                <div class="summary-card">
+                    <h3 class="summary-title">THÔNG TIN ĐƠN HÀNG</h3>
+                    <div class="summary-row">
+                        <span>Tạm tính</span>
+                        <span class="text-dark fw-medium">{{ number_format($total) }}đ</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Phí vận chuyển</span>
+                        <span id="shipping_fee_display" class="text-dark fw-medium">—</span>
+                    </div>
+                    @if($discount > 0)
+                        <div class="summary-row text-success">
+                            <span>Mã giảm giá</span>
+                            <span class="fw-medium">-{{ number_format($discount) }}đ</span>
+                        </div>
+                    @endif
+                    <div class="summary-row total">
+                        <span>Tổng cộng</span>
+                        <span id="final_total_display" class="text-dark">{{ number_format($finalTotal) }}đ</span>
+                    </div>
+
+                    <div id="checkout_coupon" class="mt-4">
+                        @if($coupon)
+                            <div class="p-3 bg-light border rounded d-flex justify-content-between align-items-center">
+                                <div class="small">
+                                    <i class="fa fa-tag text-success me-2"></i>
+                                    Mã <strong class="text-dark">{{ $coupon->code }}</strong> đã áp dụng
+                                </div>
+                                <button type="button" class="btn btn-sm text-danger fw-bold" id="removeCouponBtn">XÓA</button>
+                            </div>
+                        @else
+                            <div class="coupon-group">
+                                <input type="text" id="couponCode" placeholder="Mã giảm giá">
+                                <button type="button" id="applyCouponBtn" class="btn-apply-coupon">
+                                    SỬ DỤNG
+                                    <span class="arrow-box"><i class="fa fa-arrow-right"></i></span>
+                                </button>
+                            </div>
+                            <div id="couponMessage" class="mt-2"></div>
+                        @endif
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
-    <!--Checkout page section end-->
+    </form>
+</div>
 @endsection
 
 
@@ -777,6 +575,8 @@
         data-route-coupon-remove="{{ route('checkout.removeCoupon') }}"
         data-route-cart="{{ route('cart.index') }}"
         data-route-shipping="{{ url('/api/checkout/shipping-fees') }}"
+        data-route-districts="{{ route('api.address.districts') }}"
+        data-route-wards="{{ route('api.address.wards') }}"
         data-base-total="{{ $total - $discount }}"
         data-bank-account="{{ isset($defaultBank) ? $defaultBank->account_number : '0' }}"
         data-bank-id="{{ isset($defaultBank) ? $defaultBank->bank_id : 'X' }}"
@@ -809,30 +609,14 @@
             }
 
             function updateProgressBar(step) {
-                $('.checkout-step-item').each(function(index) {
-                    const itemStep = index + 1;
-                    const $item = $(this);
-                    const $icon = $item.find('.step-icon');
-                    const $label = $item.find('.step-label');
-                    const $line = $(`#step-line-${itemStep}`);
-
-                    if (itemStep < step) {
-                        // Completed steps
-                        $icon.css({'background': '#28a745', 'color': 'white', 'box-shadow': 'none'}).html('<i class="fa fa-check"></i>');
-                        $label.css({'color': '#28a745', 'font-weight': '600'});
-                        $line.css('background', '#28a745');
-                    } else if (itemStep === step) {
-                        // Current step
-                        $icon.css({'background': '#007bff', 'color': 'white', 'box-shadow': '0 0 0 4px rgba(0,123,255,0.2)'}).html(itemStep);
-                        $label.css({'color': '#007bff', 'font-weight': '700'});
-                        $line.css('background', '#dee2e6');
-                    } else {
-                        // Future steps
-                        $icon.css({'background': '#dee2e6', 'color': '#999', 'box-shadow': 'none'}).html(itemStep);
-                        $label.css({'color': '#999', 'font-weight': 'normal'});
-                        $line.css('background', '#dee2e6');
-                    }
-                });
+                // Update breadcrumbs
+                if (step === 1) {
+                    $('#breadcrumb-step-1').addClass('active');
+                    $('#breadcrumb-step-2').removeClass('active');
+                } else if (step === 2 || step === 3) {
+                    $('#breadcrumb-step-1').removeClass('active');
+                    $('#breadcrumb-step-2').addClass('active');
+                }
             }
 
             function checkInventoryAsync() {
@@ -978,6 +762,117 @@
                     $('html, body').animate({ scrollTop: 0 }, 500);
                 });
             });
+
+            // ============ DYNAMIC ADDRESS SELECTION ============
+            const $province = $('#province');
+            const $district = $('#district');
+            const $ward = $('#ward');
+
+            $(document).on('change', '#province', function() {
+                const provinceName = $(this).val();
+                console.log('Province selected (delegated):', provinceName);
+                
+                $district.html('<option value="">Đang tải...</option>');
+                $ward.html('<option value="">Chọn phường / xã</option>');
+                if ($.fn.niceSelect) {
+                    $district.niceSelect('update');
+                    $ward.niceSelect('update');
+                }
+
+                if (!provinceName) {
+                    $district.html('<option value="">Chọn quận / huyện</option>');
+                    if ($.fn.niceSelect) $district.niceSelect('update');
+                    return;
+                }
+
+                const url = config.routeDistricts || '/api/address/districts';
+                $.ajax({
+                    url: url,
+                    data: { province_name: provinceName },
+                    headers: { 'X-CSRF-TOKEN': config.csrf },
+                    success: function(districts) {
+                        console.log('Districts received:', districts.length);
+                        let html = '<option value="">Chọn quận / huyện</option>';
+                        districts.forEach(d => {
+                            html += `<option value="${d.name}">${d.name_with_type}</option>`;
+                        });
+                        $district.html(html);
+                        
+                        // Try to update nice-select if it is being used
+                        if ($.fn.niceSelect) {
+                            $district.niceSelect('update');
+                        }
+                        
+                        // Recalculate shipping if province changes
+                        if (typeof calculateShippingFees === 'function') {
+                            calculateShippingFees(provinceName);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching districts:', status, error, xhr.responseText);
+                        $district.html('<option value="">Lỗi: ' + xhr.status + '</option>');
+                        if (xhr.status === 404) {
+                            $district.html('<option value="">Lỗi: Không tìm thấy API (404)</option>');
+                        } else if (xhr.status === 419) {
+                            $district.html('<option value="">Lỗi: Hết hạn phiên (419)</option>');
+                        }
+                        if ($.fn.niceSelect) {
+                            $district.niceSelect('update');
+                        }
+                    }
+                });
+            });
+
+            $(document).on('change', '#district', function() {
+                const districtName = $(this).val();
+                const provinceName = $('#province').val();
+                console.log('District selected (delegated):', districtName, 'in', provinceName);
+                $ward.html('<option value="">Đang tải...</option>');
+                if ($.fn.niceSelect) $ward.niceSelect('update');
+
+                if (!districtName) {
+                    $ward.html('<option value="">Chọn phường / xã</option>');
+                    if ($.fn.niceSelect) $ward.niceSelect('update');
+                    return;
+                }
+
+                const url = config.routeWards || '/api/address/wards';
+                $.ajax({
+                    url: url,
+                    data: { 
+                        district_name: districtName,
+                        province_name: provinceName
+                    },
+                    headers: { 'X-CSRF-TOKEN': config.csrf },
+                    success: function(wards) {
+                        console.log('Wards received:', wards.length);
+                        let html = '<option value="">Chọn phường / xã</option>';
+                        wards.forEach(w => {
+                            html += `<option value="${w.name}">${w.name_with_type}</option>`;
+                        });
+                        $ward.html(html);
+                        if ($.fn.niceSelect) {
+                            $ward.niceSelect('update');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error fetching wards:', xhr);
+                        $ward.html('<option value="">Lỗi tải dữ liệu</option>');
+                        if ($.fn.niceSelect) {
+                            $ward.niceSelect('update');
+                        }
+                    }
+                });
+            });
+
+            // Handle pre-selected values (e.g., from auth user or old input)
+            if ($province.val()) {
+                // If province is already selected, manually trigger load districts
+                const currentProvince = $province.val();
+                const currentDistrict = "{{ old('district', (Auth::check() && str_contains(Auth::user()->address, ' - ') ? explode(' - ', Auth::user()->address)[1] ?? '' : '')) }}"; 
+                // Note: The logic above for currentDistrict/Ward depends on how address is stored. 
+                // For now just handle the dropdown chains.
+            }
 
             // ============ COUPON ============
 

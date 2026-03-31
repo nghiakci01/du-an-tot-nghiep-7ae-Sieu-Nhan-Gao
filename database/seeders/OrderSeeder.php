@@ -23,6 +23,11 @@ class OrderSeeder extends Seeder
         }
 
         $shippers = User::where('role', User::ROLE_STAFF)->get();
+        
+        if ($users->isEmpty()) {
+            return;
+        }
+
         $variants = ProductVariant::with('product')->get();
 
         if ($variants->isEmpty()) {
