@@ -60,6 +60,7 @@ class CheckUnpaidOrders extends Command
         $reminder2At = max(10, intval($maxMinutes * 0.50));
 
         foreach ($orders as $order) {
+            /** @var Order $order */
             $minutesDiff = $order->created_at->diffInMinutes($now);
 
             // Xử lý hủy đơn sau $maxMinutes

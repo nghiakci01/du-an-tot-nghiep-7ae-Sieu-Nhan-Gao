@@ -261,17 +261,16 @@
                                 </div>
                                 <div class="top_right text-right">
                                     <ul>
-                                        <li class="top_links">
-                                            @guest
+                                        @guest
+                                            <li class="top_links">
                                                 <a href="{{ route('account.index') }}" class="user-account-link"><i class="ion-android-person"></i> {{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
                                                 <ul class="dropdown_links">
-                                                    <!-- <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li> -->
-                                                    <!-- <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li> -->
-                                                    <li><a href="{{ route('account.index') }}#dashboard">{{ __('messages.dashboard') }}</a></li>
-                                                    <!-- <li><a href="{{ route('order-tracking.index') }}">{{ __('messages.track_order') }}</a></li> -->
+                                                    <li><a href="{{ route('order-tracking.index') }}">{{ __('messages.track_order') }}</a></li>
                                                     <li><a href="{{ route('login') }}">{{ __('messages.login') }}</a></li>
                                                 </ul>
-                                            @else
+                                            </li>
+                                        @else
+                                            <li class="top_links">
                                                 <a href="#" class="user-account-link" style="display: flex; align-items: center; gap: 8px;">
                                                     @if(Auth::user()->avatar_url)
                                                         <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" style="width: 25px; height: 25px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
@@ -282,18 +281,15 @@
                                                     <i class="ion-chevron-down"></i>
                                                 </a>
                                                 <ul class="dropdown_links">
-                                                    <!-- <li><a href="{{ route('wishlist.index') }}">{{ __('messages.my_wishlist') }}</a></li> -->
-                                                    <!-- <li><a href="{{ route('account.index') }}">{{ __('messages.my_account') }}</a></li> -->
                                                     <li><a href="{{ route('account.index') }}#dashboard">{{ __('messages.dashboard') }}</a></li>
                                                     @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
                                                         <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? __('messages.admin') : __('messages.staff') }}</a></li>
                                                     @endif  
-                                                    <!-- <li><a href="{{ route('account.orders') }}">{{ __('messages.my_orders') }}</a></li> -->
                                                     <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('messages.logout') }}</a></li>
                                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                                                 </ul>
-                                            @endguest
-                                        </li> 
+                                            </li>
+                                        @endguest 
                                     </ul>
                                 </div>   
                                 @include('frontend.partials.notification-bell')

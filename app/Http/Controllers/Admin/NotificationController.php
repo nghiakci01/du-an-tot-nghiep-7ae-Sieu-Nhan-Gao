@@ -9,13 +9,19 @@ class NotificationController extends Controller
 {
     public function index()
     {
+        if (!auth()->check()) {
+            $notifications = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+            return view('admin.notifications.index', compact('notifications'));
+        }
         $notifications = auth()->user()->notifications()->paginate(20);
         return view('admin.notifications.index', compact('notifications'));
     }
 
     public function markAllRead()
     {
-        auth()->user()->unreadNotifications->markAsRead();
+        if (auth()->check()) {
+            auth()->user()->unreadNotifications->markAsRead();
+        }
         return back()->with('success', 'Đã đánh dấu tất cả thông báo là đã đọc.');
     }
 
@@ -32,7 +38,7 @@ class NotificationController extends Controller
     }
     public function unreadCount()
     {
-        $count = auth()->user()->unreadNotifications()->count();
+        $count = auth()->check() ? auth()->user()->unreadNotifications()->count() : 0;
         return response()->json(['count' => $count]);
     }
 }

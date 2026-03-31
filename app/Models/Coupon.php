@@ -184,7 +184,7 @@ class Coupon extends Model
             return $this->value.'%';
         }
 
-        return number_format($this->value, 0, ',', '.').' VNĐ';
+        return number_format((float) $this->value, 0, ',', '.').' VNĐ';
     }
 
     /**

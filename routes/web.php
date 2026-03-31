@@ -124,7 +124,7 @@ Route::get('/api/vn-address/communes/{provinceCode}', [App\Http\Controllers\Api\
 
 
 // Admin & Staff Routes
-Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'admin']], function () {
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']], function () {
 
     // Lock Screen Routes (No admin.lock)
     Route::get('/lock', [\App\Http\Controllers\Admin\LockScreenController::class, 'lock'])->name('lock');
