@@ -202,6 +202,12 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
+        // Require email verification for logged-in users
+        if (Auth::check() && !Auth::user()->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice')
+                ->with('error', 'Vui lòng xác thực email trước khi đặt hàng.');
+        }
+
         $provinces = config('vietnam_provinces');
         $request->validate([
             'name' => 'required|string|max:255',
