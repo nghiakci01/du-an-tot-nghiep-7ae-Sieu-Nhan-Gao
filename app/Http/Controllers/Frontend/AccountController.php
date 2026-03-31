@@ -18,30 +18,41 @@ class AccountController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $data = $this->getDashboardData($user);
 
-        $socialAccounts = collect();
-        $orders = collect();
-        $wishlists = collect();
-        $coupons = collect();
-        $addresses = collect();
-        $userBankAccounts = collect();
-        $walletTransactions = collect();
-        $walletTopupRequests = collect();
-        $walletWithdrawRequests = collect();
-        $bankSettings = BankSetting::where('is_active', true)->get();
-        $totalOrders = 0;
-        $totalSpent = 0;
-        $wishCount = 0;
-        $notifications = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+        return view('frontend.account.index', array_merge(['user' => $user], $data));
+    }
+
+    /**
+     * Gathers all necessary data for the account dashboard.
+     */
+    private function getDashboardData($user): array
+    {
+        $data = [
+            'socialAccounts' => collect(),
+            'orders' => collect(),
+            'wishlists' => collect(),
+            'coupons' => collect(),
+            'addresses' => collect(),
+            'userBankAccounts' => collect(),
+            'walletTransactions' => collect(),
+            'walletTopupRequests' => collect(),
+            'walletWithdrawRequests' => collect(),
+            'bankSettings' => BankSetting::where('is_active', true)->get(),
+            'totalOrders' => 0,
+            'totalSpent' => 0,
+            'wishCount' => 0,
+            'notifications' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20),
+        ];
 
         if ($user) {
-            $orders = $user->orders()->latest()->paginate(10);
-            $wishCount = $user->wishlists()->count();
-            $wishlists = $user->wishlists()->with('product')->get();
-            $userBankAccounts = $user->bankAccounts;
-            $addresses = $user->addresses()->get();
+            $data['orders'] = $user->orders()->latest()->paginate(10);
+            $data['wishCount'] = $user->wishlists()->count();
+            $data['wishlists'] = $user->wishlists()->with('product')->get();
+            $data['userBankAccounts'] = $user->bankAccounts;
+            $data['addresses'] = $user->addresses()->get();
             
-            $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
+            $data['coupons'] = \App\Models\Coupon::where(function ($q) use ($user) {
                 $q->whereNull('user_id')->orWhere('user_id', $user->id);
             })
                 ->where('is_active', true)
@@ -58,26 +69,22 @@ class AccountController extends Controller
                 $claimedCoupons = \App\Models\Coupon::whereIn('id', $claimedCouponIds)
                     ->where('is_active', true)
                     ->get();
-                $coupons = $coupons->merge($claimedCoupons)->unique('id');
+                $data['coupons'] = $data['coupons']->merge($claimedCoupons)->unique('id');
             }
             
-            $walletTransactions   = $user->walletTransactions()->take(20)->get();
-            $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();
-            $walletWithdrawRequests = $user->walletWithdrawRequests()->take(10)->get();
+            $data['walletTransactions']   = $user->walletTransactions()->take(20)->get();
+            $data['walletTopupRequests']  = $user->walletTopupRequests()->take(10)->get();
+            $data['walletWithdrawRequests'] = $user->walletWithdrawRequests()->take(10)->get();
 
-            $totalOrders = $orders->total();
-            $totalSpent = $user->orders()->where('status', 'completed')->sum('final_total');
-            $socialAccounts = $user->socialAccounts;
+            $data['totalOrders'] = $data['orders']->total();
+            $data['totalSpent'] = $user->orders()->where('status', 'completed')->sum('final_total');
+            $data['socialAccounts'] = $user->socialAccounts;
             
             // Notifications pagination
-            $notifications = $user->notifications()->latest()->paginate(20, ['*'], 'notifications_page');
+            $data['notifications'] = $user->notifications()->latest()->paginate(20, ['*'], 'notifications_page');
         }
 
-        return view('frontend.account.index', compact(
-            'user', 'orders', 'coupons', 'wishlists', 'addresses',
-            'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests',
-            'bankSettings', 'totalOrders', 'totalSpent', 'wishCount', 'socialAccounts', 'notifications'
-        ));
+        return $data;
     }
 
     public function showOrder($id)
