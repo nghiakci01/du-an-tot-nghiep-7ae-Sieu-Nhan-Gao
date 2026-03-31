@@ -261,6 +261,7 @@
             text-decoration: none !important;
         }
     </style>
+    @stack('styles')
 </head>
 
 <body>
@@ -288,7 +289,6 @@
     <!-- Global UX Fixes -->
     <script src="{{ asset('frontend-assets/js/ux-fixes.js') }}"></script>
 
-    @stack('styles')
     @stack('scripts')
     @yield('scripts')
 
