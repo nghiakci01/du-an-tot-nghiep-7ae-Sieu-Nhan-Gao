@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -133,8 +133,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getAvatarUrlAttribute()
     {
-        if (! $this->avatar) {
-            return null;
+        if (!$this->avatar) {
+            return asset('assets/images/default-avatar.png');
         }
 
         if (filter_var($this->avatar, FILTER_VALIDATE_URL)) {
@@ -142,21 +142,5 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return asset('storage/'.$this->avatar);
-    }
-
-    /**
-     * Send email verification notification (Vietnamese)
-     */
-    public function sendEmailVerificationNotification()
-    {
-        $this->notify(new \App\Notifications\CustomVerifyEmail);
-    }
-
-    /**
-     * Send password reset notification (Vietnamese)
-     */
-    public function sendPasswordResetNotification($token)
-    {
-        $this->notify(new \App\Notifications\CustomResetPassword($token));
     }
 }

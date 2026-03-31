@@ -48,7 +48,7 @@ Route::get('/payment/vnpay/retry/{id}', [App\Http\Controllers\Frontend\PaymentCo
 // Guest Order Tracking Routes
 Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'index'])->name('order-tracking.index');
 Route::post('/order-tracking/search', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'search'])->name('order-tracking.search');
-Auth::routes(['verify' => true]);
+Auth::routes();
 
 // Fallback GET /logout → redirect về trang chủ (tránh lỗi 405)
 Route::get('/logout', function () {
