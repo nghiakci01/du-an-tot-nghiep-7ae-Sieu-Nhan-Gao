@@ -279,7 +279,7 @@ class AccountController extends Controller
 
             // Thông báo cho các Admin
             $admins = \App\Models\User::getAdmins();
-            Notification::send($admins, new \App\Notifications\NewOrderReturnRequestNotification($returnRequest));
+            Notification::send($admins, new NewOrderReturnRequestNotification($returnRequest));
 
             return redirect()->route('account.orders.show', $order->id)
                 ->with('success', 'Yêu cầu hoàn trả của bạn đã được gửi và đang chờ xử lý.');
