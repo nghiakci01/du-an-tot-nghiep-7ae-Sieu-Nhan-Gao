@@ -68,6 +68,7 @@ class DashboardController extends Controller
 
         $stats = $this->reportService->getOverviewStats($startDate, $endDate);
         $revenueChart = $this->reportService->getRevenueChartData($startDate, $endDate);
+        $halfYearChart = $this->reportService->getHalfYearComparisonData(now()->year);
         $orderStatus = $this->reportService->getOrderStatusData($startDate, $endDate);
         $topProducts = $this->reportService->getTopProducts($startDate, $endDate);
 
@@ -97,6 +98,7 @@ class DashboardController extends Controller
             'revenueValues' => $revenueChart['values'],
             'statusLabels' => $orderStatus['labels'],
             'statusValues' => $orderStatus['values'],
+            'halfYearChart' => $halfYearChart,
             'topProducts' => $topProducts,
             'totalProductsSold' => $totalProductsSold > 0 ? $totalProductsSold : 1, // Tránh chia cho 0
             'startDate' => $startDate->format('Y-m-d'),
