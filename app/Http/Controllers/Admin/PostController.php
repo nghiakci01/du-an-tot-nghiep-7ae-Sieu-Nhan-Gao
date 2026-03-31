@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePostRequest;
 use App\Http\Requests\Admin\UpdatePostRequest;
+use App\Models\Coupon;
 use App\Models\Post;
 use App\Models\PostCategory;
 use Illuminate\Support\Facades\Storage;
@@ -30,8 +31,12 @@ class PostController extends Controller
     public function create()
     {
         $categories = PostCategory::where('is_active', true)->get();
+        $activeCoupons = Coupon::where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+            })->get();
 
-        return view('admin.posts.create', compact('categories'));
+        return view('admin.posts.create', compact('categories', 'activeCoupons'));
     }
 
     /**
@@ -52,6 +57,7 @@ class PostController extends Controller
 
         $data['slug'] = Str::slug($data['title']);
         $data['is_active'] = $request->boolean('is_active', true);
+        $data['coupon_id'] = $request->input('coupon_id') ?: null;
 
         Post::create($data);
 
@@ -65,8 +71,14 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($id);
         $categories = PostCategory::where('is_active', true)->get();
+        $activeCoupons = Coupon::where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+            })
+            ->orWhere('id', $post->coupon_id)
+            ->get();
 
-        return view('admin.posts.edit', compact('post', 'categories'));
+        return view('admin.posts.edit', compact('post', 'categories', 'activeCoupons'));
     }
 
     /**
@@ -91,6 +103,7 @@ class PostController extends Controller
 
         $data['slug'] = Str::slug($data['title']);
         $data['is_active'] = $request->boolean('is_active');
+        $data['coupon_id'] = $request->input('coupon_id') ?: null;
 
         $post->update($data);
 

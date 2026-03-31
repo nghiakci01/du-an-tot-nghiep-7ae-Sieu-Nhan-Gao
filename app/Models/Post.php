@@ -9,6 +9,7 @@ class Post extends Model
 {
     protected $fillable = [
         'post_category_id',
+        'coupon_id',
         'title',
         'slug',
         'summary',
@@ -26,5 +27,10 @@ class Post extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(PostCategory::class, 'post_category_id');
+    }
+
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
     }
 }

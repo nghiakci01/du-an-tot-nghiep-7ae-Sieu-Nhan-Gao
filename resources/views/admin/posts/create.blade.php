@@ -86,6 +86,22 @@
                                         <input type="date" name="published_at" class="form-control" value="{{ old('published_at') }}">
                                     </div>
 
+                                    <div class="form-group mb-3">
+                                        <label class="form-label"><i class="feather icon-gift"></i> Gắn mã giảm giá ẩn</label>
+                                        <select name="coupon_id" class="form-select">
+                                            <option value="">-- Không gắn mã --</option>
+                                            @if(isset($activeCoupons))
+                                            @foreach($activeCoupons as $coupon)
+                                                <option value="{{ $coupon->id }}" {{ old('coupon_id') == $coupon->id ? 'selected' : '' }}>
+                                                    {{ $coupon->code }} — {{ $coupon->getFormattedValue() }}
+                                                    @if($coupon->end_date) (HSD: {{ $coupon->end_date->format('d/m/Y') }}) @endif
+                                                </option>
+                                            @endforeach
+                                            @endif
+                                        </select>
+                                        <small class="form-text text-muted">Mã giảm giá sẽ hiển thị ẩn cuối bài viết để user khám phá.</small>
+                                    </div>
+
                                     <div class="mt-4 d-grid">
                                         <button type="submit" class="btn btn-primary">Lưu tin tức</button>
                                         <a href="{{ route('admin.posts.index') }}" class="btn btn-link-secondary mt-2">Hủy</a>

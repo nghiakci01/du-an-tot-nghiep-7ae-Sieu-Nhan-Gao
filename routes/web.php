@@ -103,6 +103,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('/my-account/addresses/{id}', [App\Http\Controllers\Frontend\AddressController::class, 'update'])->name('account.addresses.update');
     Route::delete('/my-account/addresses/{id}', [App\Http\Controllers\Frontend\AddressController::class, 'destroy'])->name('account.addresses.destroy');
     Route::patch('/my-account/addresses/{id}/default', [App\Http\Controllers\Frontend\AddressController::class, 'setDefault'])->name('account.addresses.default');
+
+    // Voucher Claim
+    Route::post('/voucher/claim', [App\Http\Controllers\Frontend\VoucherClaimController::class, 'claim'])->name('voucher.claim');
 });
 
 

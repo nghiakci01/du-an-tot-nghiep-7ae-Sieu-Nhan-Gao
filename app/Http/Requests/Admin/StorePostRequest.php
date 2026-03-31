@@ -33,6 +33,7 @@ class StorePostRequest extends BaseAdminFormRequest
             ],
             'is_active' => 'required|boolean',
             'published_at' => 'nullable|date',
+            'coupon_id' => 'nullable|exists:coupons,id',
         ];
     }
 }

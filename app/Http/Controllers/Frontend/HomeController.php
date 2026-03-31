@@ -90,25 +90,33 @@ class HomeController extends Controller
     public function news()
     {
         $posts = \App\Models\Post::where('is_active', true)
+            ->with('coupon')
             ->latest()
             ->paginate(9);
 
         return view('frontend.news', compact('posts'));
     }
+
     public function newsDetail($slug)
     {
         $post = \App\Models\Post::where('slug', $slug)
             ->where('is_active', true)
+            ->with('coupon')
             ->firstOrFail();
 
-        // Lấy các bài viết liên quan (cùng danh mục)
+        $hasClaimed = false;
+        if ($post->coupon && auth()->check()) {
+            $hasClaimed = $post->coupon->isClaimedBy(auth()->user());
+        }
+
         $relatedPosts = \App\Models\Post::where('post_category_id', $post->post_category_id)
             ->where('id', '!=', $post->id)
             ->where('is_active', true)
+            ->with('coupon')
             ->latest()
             ->take(3)
             ->get();
 
-        return view('frontend.news_detail', compact('post', 'relatedPosts'));
+        return view('frontend.news_detail', compact('post', 'relatedPosts', 'hasClaimed'));
     }
 }

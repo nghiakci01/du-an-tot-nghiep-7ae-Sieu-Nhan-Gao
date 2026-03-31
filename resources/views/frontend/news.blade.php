@@ -45,8 +45,11 @@
                 <div class="col-lg-4 col-md-6 mb-4">
                     <article class="single_blog">
                         <figure>
-                            <div class="blog_thumb">
+                            <div class="blog_thumb" style="position:relative;">
                                 <a href="{{ route('news.detail', $post->slug) }}"><img src="{{ $post->image ? asset('storage/'.$post->image) : asset('frontend-assets/img/blog/blog1.jpg') }}" alt="{{ $post->title }}"></a>
+                                @if($post->coupon && $post->coupon->is_active && !$post->coupon->hasReachedUsageLimit())
+                                <span style="position:absolute;top:12px;left:12px;background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:20px;z-index:2;"><i class="bi bi-gift-fill"></i> Có ưu đãi</span>
+                                @endif
                             </div>
                             <figcaption class="blog_content">
                                 <h4 class="post_title" style="min-height: 50px;"><a href="{{ route('news.detail', $post->slug) }}">{{ $post->title }}</a></h4>

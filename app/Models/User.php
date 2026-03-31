@@ -88,6 +88,13 @@ class User extends Authenticatable
         return $this->hasMany(Wishlist::class);
     }
 
+    public function claimedCoupons()
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_user')
+            ->withPivot('claimed_at', 'source', 'source_id')
+            ->withTimestamps();
+    }
+
     public function addresses()
     {
         return $this->hasMany(UserAddress::class)->orderByDesc('is_default');
