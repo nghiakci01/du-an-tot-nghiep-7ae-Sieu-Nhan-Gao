@@ -20,8 +20,20 @@ class OrderObserver
     public function updated(Order $order): void
     {
         if ($order->isDirty('payment_status') && $order->payment_status === 'paid') {
+            // Notify admins (database notification)
             $admins = \App\Models\User::getAdmins();
             \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\PaymentSuccessNotification($order));
+
+            // Send payment success email to customer
+            try {
+                $order->loadMissing('items.product');
+                $email = $order->email ?? ($order->user ? $order->user->email : null);
+                if ($email) {
+                    \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\PaymentSuccessMail($order));
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Failed to send payment success email for order #'.$order->id.': '.$e->getMessage());
+            }
         }
     }
 

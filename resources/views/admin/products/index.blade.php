@@ -66,7 +66,7 @@
                                     <th>Giá</th>
                                     <th>Biến thể</th>
                                     <th>Trạng thái</th>
-                                    <th>Hành động</th>
+                                    <th class="sticky-action-column">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -112,7 +112,7 @@
                                                 <span class="badge bg-danger">Inactive</span>
                                             @endif
                                         </td>
-                                        <td>
+                                        <td class="sticky-action-column">
                                             <a href="{{ route('admin.products.edit', $product) }}"
                                                 class="btn btn-warning btn-sm">Sửa</a>
                                             

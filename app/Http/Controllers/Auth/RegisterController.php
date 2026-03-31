@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeMail;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
@@ -92,9 +94,9 @@ class RegisterController extends Controller
      */
     protected function registered(\Illuminate\Http\Request $request, $user)
     {
-        \App\Models\Coupon::create([
+        $coupon = \App\Models\Coupon::create([
             'user_id' => $user->id,
-            'code' => 'WELCOME-'.strtoupper(\Illuminate\Support\Str::of(\Illuminate\Support\Str::random(8))->upper()),
+            'code' => 'WELCOME-'.strtoupper(\Illuminate\Support\Str::random(8)),
             'type' => 'fixed',
             'value' => 100000,
             'min_order_amount' => 1000000,
@@ -102,5 +104,11 @@ class RegisterController extends Controller
             'is_active' => true,
             'description' => 'Mã giảm giá chào mừng thành viên mới (Giảm 100k cho đơn hàng từ 1M)',
         ]);
+
+        try {
+            Mail::to($user->email)->send(new WelcomeMail($user, $coupon));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send welcome email: '.$e->getMessage());
+        }
     }
 }

@@ -258,14 +258,14 @@
             @endif
           </a>
         </li>
-        {{-- <li>
+        <li>
           <a href="#wallet" data-tab="wallet" class="nav-tab-link">
             <i class="bi bi-wallet2"></i> Ví của tôi
-            @if($user && $user->wallet_balance > 0)
+            @if($user && ($user->wallet_balance ?? 0) > 0)
             <span class="badge ms-auto rounded-pill" style="background:#e8f5e9;color:#2e7d32;font-size:0.65rem;">{{ number_format($user->wallet_balance) }}đ</span>
             @endif
           </a>
-        </li> --}}
+        </li>
         <li>
           <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-account').submit();" class="text-danger">
             <i class="bi bi-box-arrow-right"></i> Đăng xuất
@@ -901,6 +901,53 @@
         <h4><i class="bi bi-wallet2 me-2"></i>Ví của tôi</h4>
       </div>
       <div class="tab-body">
+        {{-- Wallet Balance Card --}}
+        <div class="p-4 rounded-4 mb-4 text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+            <div class="small opacity-80 mb-1">Số dư hiện tại</div>
+            <div class="h2 fw-bold mb-0">{{ number_format($user->wallet_balance ?? 0) }}đ</div>
+        </div>
+
+        {{-- Transaction History --}}
+        <h6 class="fw-bold mb-3">Lịch sử giao dịch</h6>
+        @if(isset($walletTransactions) && $walletTransactions->count() > 0)
+            <div class="table-responsive">
+                <table class="table align-middle" style="font-size: 0.9rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0">Ngày</th>
+                            <th class="border-0">Loại</th>
+                            <th class="border-0">Số tiền</th>
+                            <th class="border-0">Nội dung</th>
+                            <th class="border-0">Số dự sau</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($walletTransactions as $transaction)
+                            <tr>
+                                <td class="text-muted small">{{ $transaction->created_at->format('d/m/Y H:i') }}</td>
+                                <td>
+                                    @if($transaction->type === 'credit')
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3">Cộng tiền</span>
+                                    @else
+                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3">Trừ tiền</span>
+                                    @endif
+                                </td>
+                                <td class="fw-bold {{ $transaction->type === 'credit' ? 'text-success' : 'text-danger' }}">
+                                    {{ $transaction->type === 'credit' ? '+' : '-' }}{{ number_format($transaction->amount) }}đ
+                                </td>
+                                <td class="small">{{ $transaction->description }}</td>
+                                <td class="text-muted">{{ number_format($transaction->balance_after) }}đ</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="text-center py-5 bg-light rounded-3">
+                <i class="bi bi-journal-text opacity-20" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2 mb-0">Chưa có lịch sử giao dịch nào.</p>
+            </div>
+        @endif
       </div>{{-- tab-body --}}
     </div>{{-- tab-wallet --}}
 

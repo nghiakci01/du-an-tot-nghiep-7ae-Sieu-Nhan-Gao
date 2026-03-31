@@ -199,7 +199,7 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-header">
-            <h5>Doanh Thu 30 Ngày Gần Nhất</h5>
+            <h5>Kết quả kinh doanh 6 tháng đầu năm</h5>
           </div>
           <div class="card-body">
             <div id="revenue-chart"></div>
@@ -357,6 +357,7 @@
   <script id="revenue-labels-data" type="application/json">@json($revenueLabels)</script>
   <script id="status-values-data" type="application/json">@json($statusValues)</script>
   <script id="status-labels-data" type="application/json">@json($statusLabels)</script>
+  <script id="half-year-data" type="application/json">@json($halfYearChart)</script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -371,43 +372,89 @@
           }
       });
 
-      // Revenue Chart
+      // Business Results (Mixed Chart: Bar & Line)
+      const halfYearData = JSON.parse(document.getElementById('half-year-data').textContent);
+      
       var revenueOptions = {
         series: [{
-          name: 'Doanh Thu',
-          data: JSON.parse(document.getElementById('revenue-values-data').textContent)
+          name: 'Lượng hàng bán ra',
+          type: 'column',
+          data: halfYearData.quantities
+        }, {
+          name: 'Doanh thu',
+          type: 'line',
+          data: halfYearData.revenues
         }],
         chart: {
-          type: 'area', // or line, bar
           height: 350,
+          type: 'line',
+          stacked: false,
           toolbar: {
             show: false
           }
         },
-        dataLabels: {
-          enabled: false
-        },
         stroke: {
+          width: [0, 4],
           curve: 'smooth'
         },
+        plotOptions: {
+          bar: {
+            columnWidth: '50%'
+          }
+        },
+        fill: {
+          opacity: [0.85, 1],
+        },
+        labels: halfYearData.labels,
+        markers: {
+          size: 0
+        },
         xaxis: {
-          categories: JSON.parse(document.getElementById('revenue-labels-data').textContent),
+          type: 'category'
         },
-        yaxis: {
-          labels: {
-            formatter: function (value) {
-              return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+        yaxis: [
+          {
+            title: {
+              text: 'Lượng hàng bán ra',
+            },
+            labels: {
+                formatter: function (val) {
+                    return Math.floor(val);
+                }
+            }
+          },
+          {
+            opposite: true,
+            title: {
+              text: 'Doanh thu (VND)',
+            },
+            labels: {
+              formatter: function (val) {
+                return new Intl.NumberFormat('vi-VN', { 
+                  notation: "compact", 
+                  compactDisplay: "short" 
+                }).format(val) + "đ";
+              }
             }
           }
-        },
+        ],
         tooltip: {
+          shared: true,
+          intersect: false,
           y: {
-            formatter: function (value) {
-              return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+            formatter: function (y) {
+              if (typeof y !== "undefined") {
+                return new Intl.NumberFormat('vi-VN').format(y);
+              }
+              return y;
             }
           }
         },
-        colors: ['#4680ff']
+        legend: {
+            position: 'top',
+            horizontalAlign: 'left',
+        },
+        colors: ['#4680ff', '#f44336']
       };
 
       var revenueChart = new ApexCharts(document.querySelector("#revenue-chart"), revenueOptions);

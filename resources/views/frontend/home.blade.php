@@ -88,6 +88,7 @@
     </style>
     <!--slider area end-->
 
+
     <!--flash sale section start-->
     @if(isset($flashSaleProducts) && $flashSaleProducts->count() > 0)
     <section class="flash-sale-section" style="padding: 30px 0; background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);">
@@ -457,6 +458,27 @@
         }
     </style>
     <!--Middle Banner area end-->
+    @endif
+
+    @if($bannerBottom && $bannerBottom->image)
+    <!--Bottom Banner area start-->
+    <section class="bottom_banner_section mb-30 mt-10">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="banner_thumb">
+                        @if($bannerBottom->link)
+                            <a href="{{ $bannerBottom->link }}">
+                                <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title ?? 'Bottom Banner' }}" style="width: 100%; height: auto; border-radius: 8px;">
+                            </a>
+                        @else
+                            <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title ?? 'Bottom Banner' }}" style="width: 100%; height: auto; border-radius: 8px;">
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     @endif
 
     <!-- modal area start-->

@@ -26,7 +26,7 @@
                                     <th>Tên Chủ Tài Khoản</th>
                                     <th>Mặc định</th>
                                     <th>Trạng thái</th>
-                                    <th>Hành động</th>
+                                    <th class="sticky-action-column">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -50,7 +50,7 @@
                                                 <span class="badge badge-danger bg-danger">Tạm ẩn</span>
                                             @endif
                                         </td>
-                                        <td>
+                                        <td class="sticky-action-column">
                                             <a href="{{ route('admin.bank-settings.edit', $bank->id) }}" class="btn btn-warning btn-sm">Sửa</a>
                                             <form action="{{ route('admin.bank-settings.destroy', $bank->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
                                                 @csrf

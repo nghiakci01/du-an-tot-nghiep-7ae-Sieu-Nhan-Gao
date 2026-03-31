@@ -186,4 +186,46 @@ class Coupon extends Model
 
         return number_format($this->value, 0, ',', '.').' VNĐ';
     }
+
+    /**
+     * Users who have claimed this coupon from news/blog
+     */
+    public function claimedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'coupon_user')
+            ->withPivot('claimed_at', 'source', 'source_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Posts that have this coupon attached
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    /**
+     * Check if a specific user has claimed this coupon
+     */
+    public function isClaimedBy(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        return $this->claimedByUsers()->where('user_id', $user->id)->exists();
+    }
+
+    /**
+     * Get remaining claims available (null = unlimited)
+     */
+    public function remainingClaims(): ?int
+    {
+        if (!$this->usage_limit) {
+            return null;
+        }
+
+        return max(0, $this->usage_limit - $this->used_count);
+    }
 }

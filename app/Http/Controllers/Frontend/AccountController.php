@@ -51,6 +51,15 @@ class AccountController extends Controller
                 })
                 ->whereRaw('used_count < usage_limit')
                 ->get();
+
+            // Merge claimed coupons from news/blog
+            $claimedCouponIds = $user->claimedCoupons()->pluck('coupons.id');
+            if ($claimedCouponIds->isNotEmpty()) {
+                $claimedCoupons = \App\Models\Coupon::whereIn('id', $claimedCouponIds)
+                    ->where('is_active', true)
+                    ->get();
+                $coupons = $coupons->merge($claimedCoupons)->unique('id');
+            }
             
             $walletTransactions   = $user->walletTransactions()->take(20)->get();
             $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();

@@ -24,9 +24,21 @@ class OrderController extends Controller
             $query->where('status', request('status'));
         }
 
+        // Filter by Delivery Status
+        if (request()->has('delivery_status') && request()->delivery_status != '') {
+            match (request()->delivery_status) {
+                'unassigned' => $query->where('status', Order::STATUS_CONFIRMED)->whereNull('shipper_id'),
+                'delivering' => $query->whereIn('status', [Order::STATUS_SHIPPED]),
+                'completed'  => $query->where('status', Order::STATUS_COMPLETED),
+                default      => null
+            };
+        }
+
         $orders = $query->paginate(10)->appends(request()->all());
 
-        return view('admin.orders.index', compact('orders'));
+        $shippers = User::where('role', User::ROLE_STAFF)->get();
+
+        return view('admin.orders.index', compact('orders', 'shippers'));
     }
 
     /**
@@ -155,9 +167,49 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        $order->load(['user', 'items.product', 'items.variant', 'histories.user']);
+        $shippers = User::where('role', User::ROLE_STAFF)->get();
 
-        return view('admin.orders.show', compact('order'));
+        return view('admin.orders.show', compact('order', 'shippers'));
+    }
+
+    /**
+     * Assign a shipper to the order
+     */
+    public function assignShipper(Request $request, Order $order)
+    {
+        $request->validate([
+            'shipper_id' => 'required|exists:users,id',
+        ]);
+
+        $shipper = User::findOrFail($request->shipper_id);
+
+        if (!$shipper->isStaff()) {
+            return back()->with('error', 'Người dùng được chọn không phải là nhân viên giao hàng.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $order->update(['shipper_id' => $shipper->id]);
+
+            // Log history
+            \App\Models\OrderHistory::create([
+                'order_id' => $order->id,
+                'user_id' => auth()->id(),
+                'new_status' => $order->status,
+                'note' => 'Admin đã gán nhân viên giao hàng: ' . $shipper->name,
+            ]);
+
+            // Notify Shipper
+            $shipper->notify(new \App\Notifications\ShipperAssignedNotification($order));
+
+            DB::commit();
+
+            return back()->with('success', 'Đã gán nhân viên ' . $shipper->name . ' cho đơn hàng thành công.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
     }
 
     /**

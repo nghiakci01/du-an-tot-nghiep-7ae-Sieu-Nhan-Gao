@@ -29,19 +29,24 @@ class OrderService
             }
         }
 
-        if (! $order->canTransitionTo($newStatus)) {
+        if (!$order->canTransitionTo($newStatus)) {
             throw new Exception("Không thể chuyển đổi trạng thái từ {$order->status} sang {$newStatus}");
         }
 
-        if ($order->status === $newStatus) {
+        // Allow re-submitting 'completed' status if the payment is not yet 'paid'
+        if ($order->status === $newStatus && ($newStatus !== Order::STATUS_COMPLETED || $order->payment_status === 'paid')) {
             return $order;
         }
 
         $oldStatus = $order->status;
 
         DB::transaction(function () use ($order, $newStatus, $oldStatus, $user, $note, $returnRequest) {
-            // update status
-            $order->update(['status' => $newStatus]);
+            // update status and payment status if completed
+            $updateData = ['status' => $newStatus];
+            if ($newStatus === Order::STATUS_COMPLETED) {
+                $updateData['payment_status'] = 'paid';
+            }
+            $order->update($updateData);
 
             // create history
             OrderHistory::create([
@@ -67,7 +72,7 @@ class OrderService
                 Mail::to($order->email)->send(new OrderShippedMail($order));
             }
         } catch (Exception $e) {
-            Log::error('Failed to send status notification for order '.$order->id.': '.$e->getMessage());
+            Log::error('Failed to send status notification for order ' . $order->id . ': ' . $e->getMessage());
         }
 
         return $order;
@@ -83,13 +88,13 @@ class OrderService
         $isCancelledState = in_array($newStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_PARTIALLY_RETURNED, Order::STATUS_FAILED]);
         $wasCancelledState = in_array($oldStatus, [Order::STATUS_CANCELLED, Order::STATUS_RETURNED, Order::STATUS_PARTIALLY_RETURNED, Order::STATUS_FAILED]);
 
-        if ($isCancelledState && ! $wasCancelledState) {
+        if ($isCancelledState && !$wasCancelledState) {
             $this->restoreStock($order, $returnRequest);
         }
 
         // 2. If transition FROM Cancelled/Returned/Failed TO Processing statuses -> Deduct Stock again
         // (Just in case specific admin flow allows un-cancelling, though usually hard. But good to handle)
-        if (! $isCancelledState && $wasCancelledState) {
+        if (!$isCancelledState && $wasCancelledState) {
             foreach ($order->items as $item) {
                 if ($item->variant_id) {
                     // Sử dụng lockForUpdate để tránh Race Condition khi trừ kho lại

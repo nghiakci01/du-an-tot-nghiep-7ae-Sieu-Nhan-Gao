@@ -26,6 +26,9 @@ class ReturnService
     {
         Log::info("Đang duyệt hoàn trả cho đơn hàng #{$returnRequest->order_id} bởi user #{$processor->id}");
         return DB::transaction(function () use ($returnRequest, $processor, $adminNote) {
+            $order = $returnRequest->order;
+            $oldStatus = $order->status;
+
             $returnRequest->update([
                 'status'       => 'approved',
                 'admin_note'   => $adminNote,
@@ -53,7 +56,7 @@ class ReturnService
 
             Notification::send($returnRequest->user, new OrderReturnRequestStatusNotification($returnRequest, 'approved'));
 
-            Log::info("Hoàn trả #{$returnRequest->id} đã được duyệt, đơn hàng #{$order->id} chuyển sang returned.");
+            Log::info("Hoàn trả #{$returnRequest->id} đã được duyệt, đơn hàng #{$order->id} chuyển sang {$newOrderStatus}.");
 
             return $returnRequest;
         });
@@ -115,11 +118,17 @@ class ReturnService
         }
 
         return DB::transaction(function () use ($returnRequest, $processor) {
-            // 1. Update Return Request
+            // 1. Calculate Refund Amount from items
+            $refundAmount = $returnRequest->items->reduce(function ($carry, $item) {
+                return $carry + ($item->price * $item->quantity);
+            }, 0);
+
+            // 2. Update Return Request
             $returnRequest->update([
-                'status' => 'completed',
-                'processed_by' => $processor->id,
-                'processed_at' => now(),
+                'status'        => 'completed',
+                'refund_amount' => $refundAmount,
+                'processed_by'  => $processor->id,
+                'processed_at'  => now(),
             ]);
 
 
@@ -145,10 +154,28 @@ class ReturnService
             $paymentStatus = ($totalReturnedQty >= $totalOrderedQty) ? 'refunded' : 'partially_refunded';
             $order->update(['payment_status' => $paymentStatus]);
 
-            // 4. Notify User
+            // 4. Refund to User Wallet
+            $user = $returnRequest->user;
+            $oldBalance = $user->wallet_balance ?? 0;
+            $newBalance = $oldBalance + $refundAmount;
+            
+            $user->update(['wallet_balance' => $newBalance]);
+
+            // 5. Create Wallet Transaction
+            \App\Models\WalletTransaction::create([
+                'user_id'        => $user->id,
+                'type'           => 'credit',
+                'amount'         => $refundAmount,
+                'balance_after'  => $newBalance,
+                'description'    => "Hoàn tiền cho yêu cầu trả hàng #{$returnRequest->id} của đơn hàng #{$order->id}",
+                'reference_type' => OrderReturnRequest::class,
+                'reference_id'   => $returnRequest->id,
+            ]);
+
+            // 6. Notify User
             Notification::send($returnRequest->user, new OrderReturnRequestStatusNotification($returnRequest, 'completed'));
 
-            Log::info("Hoàn trả hoàn tất cho đơn hàng #{$returnRequest->order_id}. Số lượng: {$totalReturnedQty}/{$totalOrderedQty}");
+            Log::info("Hoàn trả hoàn tất cho đơn hàng #{$returnRequest->order_id}. Số tiền: " . number_format($refundAmount) . "đ. Số lượng: {$totalReturnedQty}/{$totalOrderedQty}");
 
             return $returnRequest;
         });

@@ -143,7 +143,43 @@
     [data-pc-theme="dark"] {
         --barcode-brightness: 0.85;
     }
+
+    /* --- Global Sticky Action Column --- */
+    .table-responsive {
+        position: relative;
+    }
+    .sticky-action-column {
+        position: sticky !important;
+        right: 0;
+        z-index: 10;
+        background-color: #fff !important;
+        box-shadow: -5px 0 10px rgba(0,0,0,0.05);
+        border-left: 1px solid #dee2e6 !important;
+        text-align: center;
+        vertical-align: middle;
+    }
+    .table-striped tbody tr:nth-of-type(odd) .sticky-action-column {
+        background-color: #f8f9fa !important;
+    }
+    tr:hover .sticky-action-column {
+        background-color: #f1f4f9 !important;
+    }
+    [data-pc-theme="dark"] .sticky-action-column {
+        background-color: #1a1c1e !important;
+        border-left: 1px solid #323539 !important;
+        box-shadow: -5px 0 10px rgba(0,0,0,0.2);
+    }
+    [data-pc-theme="dark"] .table-striped tbody tr:nth-of-type(odd) .sticky-action-column {
+        background-color: #212529 !important;
+    }
+    [data-pc-theme="dark"] tr:hover .sticky-action-column {
+        background-color: #2b3035 !important;
+    }
+
+    /* --- Global Header Adjustments --- */
+    /* Loại bỏ vách ngăn giữa các thẻ ở Header */    
   </style>
+  @stack('css')
 </head><!-- [Head] end --><!-- [Body] Start -->
 
 <body data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr"

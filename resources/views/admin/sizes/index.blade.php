@@ -34,7 +34,7 @@
                                 <th width="40%">Name</th>
                                 <th width="15%">Display Order</th>
                                 <th width="15%">Status</th>
-                                <th width="20%">Actions</th>
+                                <th width="20%" class="sticky-action-column">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -49,7 +49,7 @@
                                         {{ $size->is_active ? 'Active' : 'Inactive' }}
                                     </span>
                                 </td>
-                                <td>
+                                <td class="sticky-action-column">
                                     <a href="{{ route('admin.sizes.edit', $size) }}" class="btn btn-sm btn-info">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
