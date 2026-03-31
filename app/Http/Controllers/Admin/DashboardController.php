@@ -82,7 +82,7 @@ class DashboardController extends Controller
         $recentOrders = Order::with('user')->latest()->take(5)->get();
 
         // Conversion funnel stats
-        $funnelStats = $this->conversionService->getFunnelStats('30d');
+        $funnelStats = $this->conversionService->getFunnelStats($startDate, $endDate);
 
         return view('admin.dashboard', [
             'totalRevenue' => $stats['total_revenue'],

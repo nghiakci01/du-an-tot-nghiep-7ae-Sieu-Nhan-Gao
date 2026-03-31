@@ -224,50 +224,43 @@
     <div class="row">
       <div class="col-lg-12 mb-4">
         <div class="card h-100 shadow-sm border-0">
-          <div class="card-header bg-transparent border-bottom-0 pb-0">
-            <h5 class="mb-0 fw-bold"><i class="ti ti-chart-funnel me-2 text-warning"></i>Phễu Chuyển Đổi (30 ngày)</h5>
+          <div class="card-header bg-transparent border-bottom-0 pb-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="ti ti-chart-funnel me-2 text-warning"></i>Phễu Chuyển Đổi</h5>
+            <span class="badge bg-light-secondary text-muted">{{ $funnelStats['start_date'] }} - {{ $funnelStats['end_date'] }}</span>
           </div>
           <div class="card-body">
-            @if(isset($funnelStats))
-            <div class="row g-3 mb-3">
-              <div class="col-md-3 col-6">
-                <div class="p-3 rounded bg-light-danger text-center">
-                  <h3 class="mb-1 text-danger">{{ $funnelStats['abandoned_carts'] }}</h3>
-                  <small class="text-muted">Giỏ bị bỏ rơi</small>
-                </div>
+            @if(isset($funnelStats) && $funnelStats['funnel_steps']['step1_add_to_cart'] > 0)
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <div id="funnel-chart" style="min-height: 300px;"></div>
               </div>
-              <div class="col-md-3 col-6">
-                <div class="p-3 rounded bg-light-success text-center">
-                  <h3 class="mb-1 text-success">{{ $funnelStats['recovered_carts'] }}</h3>
-                  <small class="text-muted">Giỏ phục hồi</small>
+              <div class="col-md-4">
+                <div class="row g-3">
+                  <div class="col-12">
+                    <div class="p-3 rounded border-start border-primary border-4 bg-light-primary shadow-none mb-3">
+                      <small class="text-muted d-block mb-1">Tỷ lệ chuyển đổi</small>
+                      <h4 class="mb-0 text-primary fw-bold">{{ $funnelStats['cart_to_order_rate'] }}%</h4>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="p-3 rounded border-start border-danger border-4 bg-light-danger shadow-none mb-3">
+                      <small class="text-muted d-block mb-1">Doanh thu tiềm năng bị mất</small>
+                      <h4 class="mb-0 text-danger fw-bold">{{ number_format($funnelStats['abandoned_value']) }}đ</h4>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="p-3 rounded border-start border-warning border-4 bg-light-warning shadow-none">
+                      <small class="text-muted d-block mb-1">Giá trị trung bình / đơn</small>
+                      <h4 class="mb-0 text-warning fw-bold">{{ number_format($funnelStats['avg_order_value']) }}đ</h4>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="col-md-3 col-6">
-                <div class="p-3 rounded bg-light-primary text-center">
-                  <h3 class="mb-1 text-primary">{{ $funnelStats['cart_to_order_rate'] }}%</h3>
-                  <small class="text-muted">Tỷ lệ chuyển đổi</small>
-                </div>
-              </div>
-              <div class="col-md-3 col-6">
-                <div class="p-3 rounded bg-light-warning text-center">
-                  <h3 class="mb-1 text-warning">{{ number_format($funnelStats['avg_order_value']) }}đ</h3>
-                  <small class="text-muted">Giá trị TB / đơn</small>
-                </div>
-              </div>
-            </div>
-            <div class="p-3 rounded" style="background: #fff3e0;">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <small class="text-muted">Doanh thu tiềm năng bị mất</small>
-                  <h5 class="mb-0 text-danger fw-bold">{{ number_format($funnelStats['abandoned_value']) }}đ</h5>
-                </div>
-                <i class="ti ti-alert-triangle f-28 text-warning"></i>
               </div>
             </div>
             @else
-            <div class="text-center py-4 text-muted">
+            <div class="text-center py-5 text-muted">
               <i class="ti ti-chart-funnel f-40 opacity-50"></i>
-              <p class="mt-2 mb-0">Chưa có dữ liệu chuyển đổi.</p>
+              <p class="mt-2 mb-0">Chưa có đủ dữ liệu để tạo phễu chuyển đổi.</p>
             </div>
             @endif
           </div>
@@ -358,6 +351,7 @@
   <script id="status-values-data" type="application/json">@json($statusValues)</script>
   <script id="status-labels-data" type="application/json">@json($statusLabels)</script>
   <script id="half-year-data" type="application/json">@json($halfYearChart)</script>
+  <script id="funnel-data" type="application/json">@json($funnelStats['funnel_steps'])</script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -484,6 +478,61 @@
 
       var statusChart = new ApexCharts(document.querySelector("#order-status-chart"), statusOptions);
       statusChart.render();
+
+      // 3. Funnel Chart
+      const funnelData = JSON.parse(document.getElementById('funnel-data').textContent);
+      var funnelOptions = {
+        series: [
+          {
+            name: "Lượt người",
+            data: [
+              funnelData.step1_add_to_cart,
+              funnelData.step2_checkout,
+              funnelData.step3_purchase
+            ],
+          },
+        ],
+        chart: {
+          type: 'bar',
+          height: 300,
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 0,
+            horizontal: true,
+            distribute: true,
+            barHeight: '80%',
+            isFunnel: true,
+          },
+        },
+        colors: [
+          '#4680ff',
+          '#ffc107',
+          '#2ca87f',
+        ],
+        dataLabels: {
+          enabled: true,
+          formatter: function (val, opt) {
+            return opt.w.globals.labels[opt.dataPointIndex] + ': ' + val;
+          },
+          dropShadow: {
+            enabled: true,
+          },
+        },
+        title: {
+          text: '',
+          align: 'middle',
+        },
+        xaxis: {
+          categories: ['Thêm vào giỏ', 'Bắt đầu Checkout', 'Mua hàng xong'],
+        },
+        legend: {
+          show: false,
+        },
+      };
+
+      var funnelChart = new ApexCharts(document.querySelector("#funnel-chart"), funnelOptions);
+      funnelChart.render();
     });
   </script>
 @endsection
