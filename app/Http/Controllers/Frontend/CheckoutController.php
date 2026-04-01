@@ -40,7 +40,7 @@ class CheckoutController extends Controller
         $selectedIds = session('selected_checkout_ids');
         if ($selectedIds && is_array($selectedIds)) {
             $selectedIds = array_map('strval', $selectedIds);
-            $cart = array_filter($cart, function($key) use ($selectedIds) {
+            $cart = array_filter($cart, function ($key) use ($selectedIds) {
                 return in_array(strval($key), $selectedIds);
             }, ARRAY_FILTER_USE_KEY);
         } else {
@@ -124,9 +124,9 @@ class CheckoutController extends Controller
                 $selectedIds = array_filter(explode(',', $selectedIds));
             }
             // Chuyển tất cả về string để so khớp chính xác
-            $selectedIds = array_values(array_map('strval', (array)$selectedIds));
+            $selectedIds = array_values(array_map('strval', (array) $selectedIds));
 
-            $cart = array_filter($cart, function($key) use ($selectedIds) {
+            $cart = array_filter($cart, function ($key) use ($selectedIds) {
                 return in_array(strval($key), $selectedIds);
             }, ARRAY_FILTER_USE_KEY);
 
@@ -206,6 +206,13 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('Checkout process started', [
+            'user_id' => Auth::id(),
+            'ip' => $request->ip(),
+            'payment_method' => $request->input('payment_method'),
+            'cart_count' => count($this->cartService->getCart())
+        ]);
+
         $provinces = config('vietnam_provinces');
         $request->mergeIfMissing(['delivery_type' => 'home']);
         $deliveryType = $request->input('delivery_type', 'home');
@@ -214,7 +221,7 @@ class CheckoutController extends Controller
             'phone' => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
             'email' => 'required|email:rfc,dns|max:255',
             'delivery_type' => 'nullable|in:home,store',
-            'province' => 'nullable|required_if:delivery_type,home|string|in:'.implode(',', $provinces),
+            'province' => 'nullable|required_if:delivery_type,home|string|in:' . implode(',', $provinces),
             'district' => 'nullable|string|max:255',
             'ward' => 'nullable|string|max:255',
             'address' => 'nullable|required_if:delivery_type,home|string|max:500',
@@ -237,7 +244,7 @@ class CheckoutController extends Controller
         $selectedIds = session('selected_checkout_ids');
         if ($selectedIds && is_array($selectedIds)) {
             $selectedIds = array_map('strval', $selectedIds);
-            $cart = array_filter($cart, function($key) use ($selectedIds) {
+            $cart = array_filter($cart, function ($key) use ($selectedIds) {
                 return in_array(strval($key), $selectedIds);
             }, ARRAY_FILTER_USE_KEY);
         } else {
@@ -326,6 +333,12 @@ class CheckoutController extends Controller
                 'note' => $request->note,
             ]);
 
+            Log::info('Order created successfully', [
+                'order_id' => $order->id,
+                'total' => $order->final_total,
+                'status' => $order->status
+            ]);
+
             // Increment coupon used_count if coupon was applied
             if ($couponCode) {
                 $coupon = Coupon::where('code', $couponCode)->first();
@@ -402,7 +415,7 @@ class CheckoutController extends Controller
             try {
                 \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
             } catch (\Exception $e) {
-                Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: '.$e->getMessage());
+                Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: ' . $e->getMessage());
             }
 
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');
@@ -410,7 +423,13 @@ class CheckoutController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->back()->with('error', 'Order error: '.$e->getMessage())->withInput();
+            Log::error('Checkout failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->back()->with('error', 'Order error: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -456,11 +475,11 @@ class CheckoutController extends Controller
         // Ghi lại lịch sử (nếu có hệ thống lịch sử đơn hàng)
         if (class_exists(\App\Models\OrderHistory::class)) {
             \App\Models\OrderHistory::create([
-                'order_id'        => $order->id,
+                'order_id' => $order->id,
                 'previous_status' => $order->status,
-                'new_status'      => 'waiting_confirmation',
-                'note'            => 'Khách hàng xác nhận đã chuyển khoản. Chờ Admin kiểm tra.',
-                'user_id'         => Auth::id()
+                'new_status' => 'waiting_confirmation',
+                'note' => 'Khách hàng xác nhận đã chuyển khoản. Chờ Admin kiểm tra.',
+                'user_id' => Auth::id()
             ]);
         }
 
@@ -517,7 +536,7 @@ class CheckoutController extends Controller
         $couponCode = strtoupper(trim($request->coupon_code));
         $coupon = Coupon::where('code', $couponCode)->first();
 
-        if (! $coupon) {
+        if (!$coupon) {
             return response()->json([
                 'success' => false,
                 'message' => __('Mã giảm giá không tồn tại.'),
@@ -525,7 +544,7 @@ class CheckoutController extends Controller
         }
 
         // Validate coupon
-        if (! $coupon->is_active) {
+        if (!$coupon->is_active) {
             return response()->json([
                 'success' => false,
                 'message' => __('Mã giảm giá này hiện không còn hoạt động.'),
@@ -564,7 +583,7 @@ class CheckoutController extends Controller
         if ($coupon->min_order_amount && $total < $coupon->min_order_amount) {
             return response()->json([
                 'success' => false,
-                'message' => __('Đơn hàng tối thiểu :amount để sử dụng mã này.', ['amount' => number_format($coupon->min_order_amount).' đ']),
+                'message' => __('Đơn hàng tối thiểu :amount để sử dụng mã này.', ['amount' => number_format($coupon->min_order_amount) . ' đ']),
             ], 400);
         }
 
@@ -582,9 +601,9 @@ class CheckoutController extends Controller
             'data' => [
                 'coupon_code' => $coupon->code,
                 'discount' => $discount,
-                'discount_formatted' => number_format($discount).' đ',
+                'discount_formatted' => number_format($discount) . ' đ',
                 'final_total' => $finalTotal,
-                'final_total_formatted' => number_format($finalTotal).' đ',
+                'final_total_formatted' => number_format($finalTotal) . ' đ',
             ],
         ]);
     }
