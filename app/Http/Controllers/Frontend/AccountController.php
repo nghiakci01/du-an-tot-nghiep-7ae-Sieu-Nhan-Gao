@@ -72,9 +72,11 @@ class AccountController extends Controller
                 $data['coupons'] = $data['coupons']->merge($claimedCoupons)->unique('id');
             }
             
-            $data['walletTransactions']   = $user->walletTransactions()->take(20)->get();
-            $data['walletTopupRequests']  = $user->walletTopupRequests()->take(10)->get();
-            $data['walletWithdrawRequests'] = $user->walletWithdrawRequests()->take(10)->get();
+            if (config('features.wallet')) {
+                $data['walletTransactions'] = $user->walletTransactions()->take(20)->get();
+                $data['walletTopupRequests'] = $user->walletTopupRequests()->take(10)->get();
+                $data['walletWithdrawRequests'] = $user->walletWithdrawRequests()->take(10)->get();
+            }
 
             $data['totalOrders'] = $data['orders']->total();
             $data['totalSpent'] = $user->orders()->where('status', 'completed')->sum('final_total');

@@ -19,13 +19,17 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
 
 use App\Services\CartService;
+use App\Services\Shipping\ShippingService;
 
 class CheckoutController extends Controller
 {
     protected $cartService;
-    public function __construct(CartService $cartService)
+    protected $shippingService;
+
+    public function __construct(CartService $cartService, ShippingService $shippingService)
     {
         $this->cartService = $cartService;
+        $this->shippingService = $shippingService;
     }
 
     public function index(Request $request)
@@ -203,12 +207,17 @@ class CheckoutController extends Controller
     public function store(Request $request)
     {
         $provinces = config('vietnam_provinces');
+        $request->mergeIfMissing(['delivery_type' => 'home']);
+        $deliveryType = $request->input('delivery_type', 'home');
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
             'email' => 'required|email:rfc,dns|max:255',
-            'province' => 'required|string|in:'.implode(',', $provinces),
-            'address' => 'required|string|max:500',
+            'delivery_type' => 'nullable|in:home,store',
+            'province' => 'nullable|required_if:delivery_type,home|string|in:'.implode(',', $provinces),
+            'district' => 'nullable|string|max:255',
+            'ward' => 'nullable|string|max:255',
+            'address' => 'nullable|required_if:delivery_type,home|string|max:500',
             'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
             'shipping_provider' => 'nullable|string',
             'shipping_service_name' => 'nullable|string',
@@ -269,25 +278,40 @@ class CheckoutController extends Controller
             // Get coupon and shipping data
             $couponCode = session()->get('coupon_code');
             $discount = session()->get('discount_amount', 0);
-
-            // Calculate shipping fee (Get from request or default to old way)
-            $shippingFee = $request->input('shipping_fee');
-            if ($shippingFee === null) {
-                // Dự phòng nếu không có phí ship gửi lên
-                $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
+            $shippingSubtotal = max(0, $total - $discount);
+            $shippingOption = $this->shippingService->resolveSelectedOption(
+                $deliveryType,
+                $request->input('province'),
+                $request->input('district'),
+                $request->input('ward'),
+                $this->shippingService->estimateWeightFromCart($cart),
+                $shippingSubtotal,
+                $request->input('shipping_provider')
+            );
+            if ($shippingOption === null) {
+                return redirect()->back()
+                    ->with('error', 'Vui long chon phuong thuc van chuyen hop le.')
+                    ->withInput();
             }
-            $shippingProvider = $request->input('shipping_provider');
-            $shippingServiceName = $request->input('shipping_service_name');
-
+            $shippingFee = (float) ($shippingOption['fee'] ?? 0);
+            $shippingProvider = $shippingOption['provider'] ?? null;
+            $shippingServiceName = $shippingOption['service_name'] ?? null;
             $finalTotal = $total - $discount + $shippingFee;
-
+            $shippingAddress = $deliveryType === 'store'
+                ? 'Nhan tai cua hang - ' . $request->phone . ' - ' . $request->name
+                : trim(implode(', ', array_filter([
+                    $request->address,
+                    $request->input('ward'),
+                    $request->input('district'),
+                    $request->province,
+                ]))) . ' - ' . $request->phone . ' - ' . $request->name;
             $order = Order::create([
                 'user_id' => Auth::id(), // Nullable if guest
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'province' => $request->province,
-                'address' => $request->address,
+                'province' => $deliveryType === 'store' ? null : $request->province,
+                'address' => $deliveryType === 'store' ? 'Nhan tai cua hang' : $request->address,
                 'status' => 'pending',
                 'total_price' => $total,
                 'coupon_code' => $couponCode,
@@ -298,7 +322,7 @@ class CheckoutController extends Controller
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
                 'payment_status' => 'pending',
-                'shipping_address' => $request->address.', '.$request->province.' - '.$request->phone.' - '.$request->name,
+                'shipping_address' => $shippingAddress,
                 'note' => $request->note,
             ]);
 
@@ -578,3 +602,7 @@ class CheckoutController extends Controller
         ]);
     }
 }
+
+
+
+

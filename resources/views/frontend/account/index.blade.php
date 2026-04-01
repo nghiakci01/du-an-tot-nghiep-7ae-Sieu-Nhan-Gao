@@ -258,6 +258,7 @@
             @endif
           </a>
         </li>
+        @if(config('features.wallet'))
         <li>
           <a href="#wallet" data-tab="wallet" class="nav-tab-link">
             <i class="bi bi-wallet2"></i> Ví của tôi
@@ -266,6 +267,7 @@
             @endif
           </a>
         </li>
+        @endif
         <li>
           <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-account').submit();" class="text-danger">
             <i class="bi bi-box-arrow-right"></i> Đăng xuất
@@ -895,6 +897,7 @@
       </div>
     </div>
 
+    @if(config('features.wallet'))
     {{-- =============== TAB: WALLET =============== --}}
     <div class="account-content tab-pane-block d-none" id="tab-wallet">
       <div class="tab-head">
@@ -950,6 +953,7 @@
         @endif
       </div>{{-- tab-body --}}
     </div>{{-- tab-wallet --}}
+    @endif
 
   </div>{{-- col-md-9 --}}
 
@@ -970,7 +974,9 @@ document.addEventListener('DOMContentLoaded', function() {
     'addresses'       : 'tab-addresses',
     'account-details' : 'tab-account-details',
     'bank-accounts'   : 'tab-bank-accounts',
+    @if(config('features.wallet'))
     'wallet'          : 'tab-wallet',
+    @endif
     'notifications'   : 'tab-notifications',
   };
 
