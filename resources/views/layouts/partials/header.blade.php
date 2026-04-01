@@ -265,7 +265,7 @@
                                             <li class="top_links">
                                                 <a href="{{ route('account.index') }}" class="user-account-link"><i class="ion-android-person"></i> {{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
                                                 <ul class="dropdown_links">
-                                                    <li><a href="{{ route('order-tracking.index') }}">{{ __('messages.track_order') }}</a></li>
+                                                    <li><a  href="{{ route('order-tracking.index') }}">{{ __('messages.track_order') }}</a></li>
                                                     <li><a href="{{ route('login') }}">{{ __('messages.login') }}</a></li>
                                                 </ul>
                                             </li>

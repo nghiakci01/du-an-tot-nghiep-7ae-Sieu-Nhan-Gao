@@ -679,6 +679,10 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
             async initChat() {
                 console.log('Chatbot initialized (Enhanced Strategy)');
 
+                // Track consecutive failures to stop polling
+                this._pollFailures = 0;
+                this._pollIntervalId = null;
+
                 // Fetch initial history
                 await this.pollMessages();
 
@@ -706,7 +710,7 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
                         });
                 } else {
                     // Fallback to polling if Echo is not available
-                    setInterval(() => {
+                    this._pollIntervalId = setInterval(() => {
                         this.pollMessages();
                     }, 4000);
                 }
@@ -715,7 +719,16 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
             async pollMessages() {
                 try {
                     const response = await fetch('/api/chat/messages');
+                    if (response.status === 401) {
+                        if (this._pollIntervalId) {
+                            clearInterval(this._pollIntervalId);
+                            this._pollIntervalId = null;
+                        }
+                        return;
+                    }
                     if (response.ok) {
+                        // Reset failure counter on success
+                        this._pollFailures = 0;
                         const data = await response.json();
                         if (data.status === 'success') {
                             const currentCount = this.messages.filter(m => !m.isTemp).length;
@@ -740,7 +753,13 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
                         }
                     }
                 } catch (e) {
-                    console.warn('Polling failure', e);
+                    this._pollFailures++;
+                    // If more than 5 consecutive failures, stop the interval
+                    if (this._pollFailures > 5 && this._pollIntervalId) {
+                        console.warn('Chatbot polling stopped due to excessive network failures.');
+                        clearInterval(this._pollIntervalId);
+                        this._pollIntervalId = null;
+                    }
                 }
             },
 

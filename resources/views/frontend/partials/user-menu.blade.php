@@ -2,9 +2,9 @@
     <ul>
         <li class="top_links">
             @guest
-                <a href="{{ route('account.index') }}" class="user-account-link"><i class="ion-android-person"></i> {{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
+                <a  href="{{ route('account.index') }}" class="user-account-link"><i class="ion-android-person"></i> {{ __('messages.my_account') }} <i class="ion-chevron-down"></i></a>
                 <ul class="dropdown_links">
-                    <li><a href="{{ route('account.index') }}#dashboard">{{ __('messages.dashboard') }}</a></li>
+                    <li><a class="custom-dropdown-links" href="{{ route('account.index') }}#dashboard">{{ __('messages.dashboard') }}</a></li>
                     <li><a href="{{ route('login') }}">{{ __('messages.login') }}</a></li>
                 </ul>
             @else

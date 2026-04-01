@@ -404,12 +404,20 @@
       }
 
       // Poll for new notifications every 30 seconds
-      setInterval(function() {
+      var _adminNotifPollTimer = setInterval(function() {
         fetch('{{ route("admin.notifications.unread_count") }}', {
           headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
-        .then(r => r.json())
+        .then(r => {
+          if (r.status === 401) {
+            clearInterval(_adminNotifPollTimer);
+            if (badge) badge.classList.add('d-none');
+            return null;
+          }
+          return r.json();
+        })
         .then(data => {
+          if (!data) return;
           const count = data.count || 0;
           if (badge) {
             badge.textContent = count;

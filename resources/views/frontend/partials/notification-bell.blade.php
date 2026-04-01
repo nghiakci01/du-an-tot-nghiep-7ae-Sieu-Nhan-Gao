@@ -143,12 +143,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Auto Refresh Notifications every 15 seconds (Real-time imitation)
+    // Auto Refresh Notifications every 30 seconds (Real-time imitation)
     @auth
-    setInterval(function() {
+    var _notifPollTimer = setInterval(function() {
         fetch('{{ route("notifications.list") }}', { headers: { 'Accept': 'application/json' } })
-            .then(res => res.json())
+            .then(res => {
+                // Session expired — stop polling and hide badges
+                if (res.status === 401) {
+                    clearInterval(_notifPollTimer);
+                    document.querySelectorAll('.notification-badge').forEach(b => b.style.display = 'none');
+                    return null;
+                }
+                return res.json();
+            })
             .then(data => {
+                if (!data) return; // Stopped due to 401
+
                 const unreadCount = data.unread_count || 0;
                 const notifs = data.notifications || [];
 
@@ -220,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     'Content-Type': 'application/json',
                                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                 }
-                            }).catch(console.error);
+                            }).catch(function() {}); // Silently fail
                         });
                     });
                 });
@@ -266,8 +276,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         accountTabList.innerHTML = tabHtml;
                     }
                 }
-            }).catch(console.error);
-    }, 15000); 
+            }).catch(function() {}); // Silently handle network errors
+    }, 30000); 
     @endauth
 });
 </script>
