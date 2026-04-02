@@ -187,9 +187,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
 
             // Inventory Management
             Route::resource('suppliers', App\Http\Controllers\Admin\SupplierController::class);
-            Route::get('stock', function () {
-                return 'Stock Report Page (Coming Soon)';
-            })->name('stock.index');
+            if (config('features.stock_report')) {
+                Route::get('stock', function () {
+                    return 'Stock Report Page (Coming Soon)';
+                })->name('stock.index');
+            }
 
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
 
@@ -280,6 +282,7 @@ Route::get('lang/{locale}', function ($locale) {
 })->name('lang.switch');
 
 // ============ VNPAY TEST ROUTES (Development Only) ============
+if (config('features.dev_payment_routes')) {
 Route::name('test.payment.')->prefix('test-payment')->middleware('web')->group(function () {
     // Test: Create order and generate payment URL
     Route::get('/create-order', function () {
@@ -371,5 +374,5 @@ Route::name('test.payment.')->prefix('test-payment')->middleware('web')->group(f
         ]);
     })->name('check-order');
 });
-
+}
 

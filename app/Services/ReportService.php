@@ -13,6 +13,16 @@ use Illuminate\Support\Facades\DB;
 
 class ReportService
 {
+    protected function monthExpression(string $column = 'created_at'): string
+    {
+        $driver = DB::connection()->getDriverName();
+
+        return match ($driver) {
+            'sqlite' => "CAST(strftime('%m', {$column}) AS INTEGER)",
+            default => "MONTH({$column})",
+        };
+    }
+
     /**
      * Get overview statistics for a date range
      */
@@ -137,6 +147,8 @@ class ReportService
         $year = $year ?: now()->year;
         $startDate = Carbon::create($year, 1, 1)->startOfDay();
         $endDate = Carbon::create($year, 6, 30)->endOfDay();
+        $orderMonthExpression = $this->monthExpression('created_at');
+        $orderItemsMonthExpression = $this->monthExpression('orders.created_at');
 
         // Initialize arrays for all 6 months
         $months = [];
@@ -154,7 +166,7 @@ class ReportService
         $revenueData = Order::where('status', Order::STATUS_COMPLETED)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->select(
-                DB::raw('MONTH(created_at) as month'),
+                DB::raw("{$orderMonthExpression} as month"),
                 DB::raw('SUM(final_total) as total')
             )
             ->groupBy('month')
@@ -170,7 +182,7 @@ class ReportService
             ->where('orders.status', Order::STATUS_COMPLETED)
             ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->select(
-                DB::raw('MONTH(orders.created_at) as month'),
+                DB::raw("{$orderItemsMonthExpression} as month"),
                 DB::raw('SUM(order_items.quantity) as total_qty')
             )
             ->groupBy('month')

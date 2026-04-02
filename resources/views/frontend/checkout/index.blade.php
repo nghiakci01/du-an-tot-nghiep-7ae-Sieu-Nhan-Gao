@@ -422,6 +422,7 @@
                     <div id="checkout-step-2" class="checkout-step-content" style="display: none;">
                         <h3 class="summary-title mb-4">Phương thức vận chuyển</h3>
                         <div id="shipping_method_container">
+                            <p class="text-muted small mb-3">Phí ship sẽ cập nhật theo địa chỉ nhận hàng. Nếu chọn nhận tại cửa hàng, hệ thống sẽ chuyển về 0đ.</p>
                             <div id="shipping_options">
                                 <p class="text-muted">Đang tải...</p>
                             </div>
@@ -596,9 +597,7 @@
                 
                 // Trigger check inventory and shipping setup in background
                 checkInventoryAsync().then(response => {
-                    if ($('select[name="province"]').val()) {
-                        calculateShippingFees($('select[name="province"]').val());
-                    }
+                    calculateShippingFees();
                 }).catch(xhr => {
                     // if fails silently go back to step 1
                     $('#checkout-step-2').hide();
@@ -625,6 +624,53 @@
                     method: 'POST',
                     data: { _token: config.csrf }
                 });
+            }
+
+            function getDeliveryType() {
+                return $('input[name="delivery_type"]:checked').val() || 'home';
+            }
+
+            function requiresAddress() {
+                return getDeliveryType() === 'home';
+            }
+
+            function setShippingSelection(provider, serviceName, fee) {
+                $('#hidden_shipping_fee').val(fee);
+                $('#hidden_shipping_service_name').val(serviceName);
+                updateTotals(fee);
+            }
+
+            function renderShippingOptions(options) {
+                let html = '';
+
+                options.forEach((option, index) => {
+                    const checked = index === 0 ? 'checked' : '';
+                    html += `
+                        <div class="panel-default mb-2 border rounded p-3" style="border: 1px solid #dee2e6; margin-bottom: 10px;">
+                            <input id="shipping_${option.provider}" name="shipping_provider" type="radio" value="${option.provider}"
+                                data-fee="${option.fee}" data-service-name="${option.service_name}" ${checked} required style="margin-right: 10px;" />
+                            <label for="shipping_${option.provider}" class="mb-0" style="cursor: pointer; font-weight: 500; display: inline-block;">
+                                ${option.service_name} - <span class="text-primary fw-bold">${new Intl.NumberFormat('vi-VN').format(option.fee)} đ</span>
+                            </label>
+                            <small class="d-block text-muted" style="margin-left: 25px; margin-top: 5px;">Thời gian dự kiến: ${option.expected_delivery_time}</small>
+                        </div>
+                    `;
+                });
+
+                $('#shipping_options').html(html);
+                $('input[name="shipping_provider"]:checked').trigger('change');
+            }
+
+            function syncDeliveryModeUI() {
+                const isHomeDelivery = requiresAddress();
+
+                $('input[name="address"]').prop('required', isHomeDelivery);
+                $('select[name="province"]').prop('required', isHomeDelivery);
+
+                if (!isHomeDelivery) {
+                    showValidation('input[name="address"]', '');
+                    showValidation('select[name="province"]', '');
+                }
             }
 
             function handleInventoryErrors(errors) {
@@ -654,8 +700,8 @@
                 const nameError     = validateName($('input[name="name"]').val());
                 const phoneError    = validatePhone($('input[name="phone"]').val());
                 const emailError    = validateEmail($('input[name="email"]').val());
-                const provinceError = validateProvince($('select[name="province"]').val());
-                const addressError  = validateAddress($('input[name="address"]').val());
+                const provinceError = requiresAddress() ? validateProvince($('select[name="province"]').val()) : '';
+                const addressError  = requiresAddress() ? validateAddress($('input[name="address"]').val()) : '';
 
                 showValidation('input[name="name"]', nameError);
                 showValidation('input[name="phone"]', phoneError);
@@ -717,11 +763,19 @@
                 try {
                     await checkInventoryAsync();
                     // Update confirmation data
+                    const isHomeDelivery = requiresAddress();
+                    const addressParts = [
+                        $('input[name="address"]').val(),
+                        $('select[name="ward"]').val(),
+                        $('select[name="district"]').val(),
+                        $('select[name="province"]').val()
+                    ].filter(Boolean);
+
                     $('#confirm-name').text($('input[name="name"]').val());
                     $('#confirm-phone').text($('input[name="phone"]').val());
                     $('#confirm-email').text($('input[name="email"]').val());
-                    $('#confirm-address').text($('input[name="address"]').val() + ', ' + $('select[name="province"]').val());
-                    $('#confirm-shipping').text($('input[name="shipping_provider"]:checked').data('service-name'));
+                    $('#confirm-address').text(isHomeDelivery ? addressParts.join(', ') : 'Nhận tại cửa hàng');
+                    $('#confirm-shipping').text($('input[name="shipping_provider"]:checked').data('service-name') || $('#hidden_shipping_service_name').val());
 
                     const pMethod = $('input[name="payment_method"]:checked').val();
                     let pMethodText = 'Tiền mặt khi nhận hàng';
@@ -805,7 +859,7 @@
                         
                         // Recalculate shipping if province changes
                         if (typeof calculateShippingFees === 'function') {
-                            calculateShippingFees(provinceName);
+                            calculateShippingFees();
                         }
                     },
                     error: function(xhr, status, error) {
@@ -998,52 +1052,55 @@
             // ============ SHIPPING FEES CALCULATION ============
             let baseTotal = parseInt(config.baseTotal);
 
-            function calculateShippingFees(province) {
+            function calculateShippingFees() {
+                const deliveryType = getDeliveryType();
+                const province = $('select[name="province"]').val();
+                const district = $('select[name="district"]').val();
+                const ward = $('select[name="ward"]').val();
+
+                $('#shipping_method_container').show();
+
+                if (deliveryType === 'store') {
+                    renderShippingOptions([
+                        {
+                            provider: 'store_pickup',
+                            service_name: 'Nh?n t?i c?a h?ng',
+                            fee: 0,
+                            expected_delivery_time: 'Trong gi? h?nh ch?nh'
+                        }
+                    ]);
+                    return;
+                }
+
                 if (!province) {
-                    $('#shipping_method_container').hide();
+                    $('#shipping_options').html('<div class="alert alert-info">Vui l?ng ch?n t?nh/th?nh ?? xem ph? v?n chuy?n.</div>');
+                    $('#hidden_shipping_fee').val(0);
+                    $('#hidden_shipping_service_name').val('');
                     updateTotals(0);
                     return;
                 }
 
-                $('#shipping_method_container').show();
-                $('#shipping_options').html('<div class="text-center p-3"><span class="spinner-border spinner-border-sm text-primary"></span> Đang tính phí vận chuyển...</div>');
+                $('#shipping_options').html('<div class="text-center p-3"><span class="spinner-border spinner-border-sm text-primary"></span> ?ang t?nh ph? v?n chuy?n...</div>');
 
                 $.ajax({
                     url: config.routeShipping,
                     method: 'POST',
                     data: {
                         _token: config.csrf,
+                        delivery_type: deliveryType,
                         province: province,
-                        district: 'Quận/Huyện',
-                        ward: 'Phường/Xã',
-                        weight: 1000
+                        district: district,
+                        ward: ward
                     },
                     success: function (response) {
                         if (response.success && response.data && response.data.length > 0) {
-                            let html = '';
-                            response.data.forEach((option, index) => {
-                                let checked = index === 0 ? 'checked' : '';
-                                html += `
-                                    <div class="panel-default mb-2 border rounded p-3" style="border: 1px solid #dee2e6; margin-bottom: 10px;">
-                                        <input id="shipping_${option.provider}" name="shipping_provider" type="radio" value="${option.provider}"
-                                            data-fee="${option.fee}" data-service-name="${option.service_name}" ${checked} required style="margin-right: 10px;" />
-                                        <label for="shipping_${option.provider}" class="mb-0" style="cursor: pointer; font-weight: 500; display: inline-block;">
-                                            ${option.service_name} - <span class="text-primary fw-bold">${new Intl.NumberFormat('vi-VN').format(option.fee)} đ</span>
-                                        </label>
-                                        <small class="d-block text-muted" style="margin-left: 25px; margin-top: 5px;">Thời gian dự kiến: ${option.expected_delivery_time}</small>
-                                    </div>
-                                `;
-                            });
-                            $('#shipping_options').html(html);
-
-                            // Trigger selection for the first one
-                            $('input[name="shipping_provider"]:checked').trigger('change');
+                            renderShippingOptions(response.data);
                         } else {
-                            $('#shipping_options').html('<div class="alert alert-warning">Không thể tính phí vận chuyển lúc này.</div>');
+                            $('#shipping_options').html('<div class="alert alert-warning">Kh?ng th? t?nh ph? v?n chuy?n l?c n?y.</div>');
                         }
                     },
                     error: function () {
-                        $('#shipping_options').html('<div class="alert alert-danger">Lỗi kết nối khi tính phí vận chuyển.</div>');
+                        $('#shipping_options').html('<div class="alert alert-danger">L?i k?t n?i khi t?nh ph? v?n chuy?n.</div>');
                     }
                 });
             }
@@ -1052,10 +1109,7 @@
                 let fee = $(this).data('fee');
                 let serviceName = $(this).data('service-name');
 
-                $('#hidden_shipping_fee').val(fee);
-                $('#hidden_shipping_service_name').val(serviceName);
-
-                updateTotals(fee);
+                setShippingSelection($(this).val(), serviceName, fee);
             });
 
             function updateTotals(shippingFee) {
@@ -1082,14 +1136,17 @@
                 }
             }
 
-            // Trigger on load if province is already selected
-            if ($('select[name="province"]').val()) {
-                calculateShippingFees($('select[name="province"]').val());
-            }
+            syncDeliveryModeUI();
+            calculateShippingFees();
 
             $('select[name="province"]').on('change', function () {
                 showValidation(this, validateProvince($(this).val()));
-                calculateShippingFees($(this).val());
+                calculateShippingFees();
+            });
+
+            $('select[name="district"], select[name="ward"], input[name="delivery_type"]').on('change', function () {
+                syncDeliveryModeUI();
+                calculateShippingFees();
             });
 
             $('input[name="payment_method"]').on('change', function() {
