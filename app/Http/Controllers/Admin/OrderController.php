@@ -46,8 +46,7 @@ class OrderController extends Controller
      */
     public function create()
     {
-        $provinces = config('vietnam_provinces', []);
-        return view('admin.orders.create', compact('provinces'));
+        return view('admin.orders.create');
     }
 
     /**
@@ -58,11 +57,12 @@ class OrderController extends Controller
         $request->validate([
             'customer_type' => 'required|in:EXISTING,NEW',
             'user_id' => 'required_if:customer_type,EXISTING|nullable|exists:users,id',
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'email' => 'required|email|max:255',
-            'province' => 'required|string',
-            'address' => 'required|string|max:500',
+            'name'     => 'required|string|max:255',
+            'phone'    => 'required|string|max:20',
+            'email'    => 'required|email|max:255',
+            'province' => 'nullable|required_if:payment_method,COD|required_if:payment_method,BANK_TRANSFER|string|max:100',
+            'commune'  => 'nullable|string|max:100',
+            'address'  => 'nullable|required_if:payment_method,COD|required_if:payment_method,BANK_TRANSFER|string|max:500',
             'items' => 'required|array|min:1',
             'items.*.variant_id' => 'required|exists:product_variants,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -112,7 +112,10 @@ class OrderController extends Controller
                 'shipping_fee' => $shippingFee,
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
-                'shipping_address' => $request->address . ', ' . $request->province . ' - ' . $request->phone . ' - ' . $request->name,
+                'shipping_address' => $request->payment_method === 'CASH'
+                    ? 'Thanh to\u00e1n t\u1ea1i qu\u1ea7y - ' . $request->phone . ' - ' . $request->name
+                    : trim(implode(', ', array_filter([$request->address, $request->input('commune'), $request->province])))
+                      . ' - ' . $request->phone . ' - ' . $request->name,
                 'note' => $request->note,
             ]);
 
