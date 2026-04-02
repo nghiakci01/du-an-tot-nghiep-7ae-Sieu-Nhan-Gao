@@ -74,20 +74,28 @@
                                 <input type="email" name="email" id="email" class="form-control" required value="{{ old('email') }}">
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label class="form-label">Tỉnh / Thành phố <span class="text-danger">*</span></label>
-                                <select name="province" id="province" class="form-control" required>
-                                    <option value="">Chọn tỉnh thành</option>
-                                    @foreach($provinces as $p)
-                                        <option value="{{ $p }}" {{ old('province') == $p ? 'selected' : '' }}>{{ $p }}</option>
-                                    @endforeach
-                                </select>
+                            <div id="address-section" @if(!old('payment_method') || old('payment_method') === 'CASH') style="display:none" @endif>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Tỉnh / Thành phố <span class="text-danger">*</span></label>
+                                    <select name="province" id="province" class="form-control" required>
+                                        <option value="">-- Đang tải... --</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Xã / Phường</label>
+                                    <select name="commune" id="commune" class="form-control" disabled>
+                                        <option value="">-- Chọn tỉnh trước --</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Địa chỉ chi tiết <span class="text-danger">*</span></label>
+                                    <textarea name="address" id="address" class="form-control" rows="2" required>{{ old('address') }}</textarea>
+                                </div>
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label class="form-label">Địa chỉ chi tiết <span class="text-danger">*</span></label>
-                                <textarea name="address" id="address" class="form-control" rows="2" required>{{ old('address') }}</textarea>
-                            </div>
+
                         </div>
                     </div>
 
@@ -98,7 +106,7 @@
                         <div class="card-body">
                             <div class="form-group mb-3">
                                 <label class="form-label">Phương thức thanh toán</label>
-                                <select name="payment_method" class="form-control">
+                                <select name="payment_method" id="payment_method" class="form-control">
                                     <option value="CASH">Tiền mặt (tại quầy)</option>
                                     <option value="COD">Thu hộ (COD)</option>
                                     <option value="BANK_TRANSFER">Chuyển khoản</option>
@@ -188,32 +196,65 @@
         </form>
     </div>
 </div>
-@endsection
 
-@section('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
-    #product_results {
-        max-height: 400px;
-        overflow-y: auto;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        border: 1px solid #ddd;
-        border-top: none;
-        display: none;
-    }
-    .select-variant:hover {
-        background-color: #f8f9fa;
-    }
+    #product_results,
     #customer_results {
-        max-height: 300px;
+        max-height: 350px;
         overflow-y: auto;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--bs-border-color, #dee2e6);
+        border-radius: 6px;
+        background: var(--bs-body-bg, #fff);
+        color: var(--bs-body-color, #212529);
+        position: absolute;
+        z-index: 1050;
+        width: 90%;
         display: none;
     }
+    #product_results { width: 95%; }
+
+    #product_results .list-group-item,
+    #customer_results .list-group-item {
+        background: var(--bs-body-bg, #fff);
+        color: var(--bs-body-color, #212529);
+        border-color: var(--bs-border-color, #dee2e6);
+        padding: 10px 14px;
+        transition: background 0.15s;
+    }
+
+    #product_results .list-group-item:hover,
+    #customer_results .list-group-item:hover {
+        background: var(--bs-tertiary-bg, #f8f9fa);
+        color: var(--bs-emphasis-color, #000);
+    }
+
+    #product_results .list-group-item.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    #address-section { transition: opacity 0.2s; }
 </style>
+
 <script>
 $(document).ready(function() {
     let orderItems = [];
+
+    // --- Toggle address section based on payment method ---
+    function syncAddressSection() {
+        const isCash = $('#payment_method').val() === 'CASH';
+        if (isCash) {
+            $('#address-section').hide();
+            $('#address-section select, #address-section textarea').removeAttr('required');
+        } else {
+            $('#address-section').show();
+            $('#province').attr('required', true);
+            $('#address').attr('required', true);
+        }
+    }
+    syncAddressSection();
+    $('#payment_method').on('change', syncAddressSection);
 
     // --- Customer Selection Logic ---
     $('#customer_type').change(function() {
@@ -257,14 +298,44 @@ $(document).ready(function() {
         $('#phone').val($(this).data('phone'));
         $('#email').val($(this).data('email'));
         $('#address').val($(this).data('address'));
-        
+
         let province = $(this).data('province');
         if (province) {
-            $('#province').val(province);
+            // Set province after provinces are loaded
+            let trySet = setInterval(function() {
+                let $opt = $('#province option').filter(function() { return $(this).val() === province; });
+                if ($opt.length) {
+                    $('#province').val(province).trigger('change');
+                    clearInterval(trySet);
+                }
+            }, 100);
         }
 
         $('#customer_results').hide();
         $('#customer_search').val('');
+    });
+
+    // --- Address Cascade ---
+    $.getJSON('{{ route('api.vn-address.provinces') }}', function(provinces) {
+        let html = '<option value="">-- Chọn tỉnh/thành phố --</option>';
+        provinces.forEach(function(p) {
+            html += `<option value="${p.name}" data-code="${p.code}">${p.name}</option>`;
+        });
+        $('#province').html(html);
+    });
+
+    $(document).on('change', '#province', function() {
+        const code = this.options[this.selectedIndex]?.dataset.code || '';
+        $('#commune').html('<option value="">-- Đang tải... --</option>').prop('disabled', true);
+        if (!code) {
+            $('#commune').html('<option value="">-- Chọn tỉnh trước --</option>');
+            return;
+        }
+        $.getJSON('{{ url('api/vn-address/communes') }}/' + code, function(list) {
+            let html = '<option value="">-- Chọn xã/phường --</option>';
+            list.forEach(function(c) { html += `<option value="${c.name}">${c.name}</option>`; });
+            $('#commune').html(html).prop('disabled', false);
+        });
     });
 
     // --- Product Selection Logic ---

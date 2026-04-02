@@ -93,7 +93,7 @@
 
         .address-grid {
             display: grid !important;
-            grid-template-columns: repeat(3, 1fr) !important;
+            grid-template-columns: 1fr 1fr !important;
             gap: 15px !important;
             margin-top: 15px !important;
         }
@@ -375,31 +375,21 @@
 
                                 <div class="address-grid">
                                     <div>
-                                        <div class="form-section-title">Tỉnh / Thành</div>
-                                        <select name="province" id="province" required class="modern-input modern-select @error('province') is-invalid @enderror">
-                                            <option value="">Chọn tỉnh / thành</option>
-                                            @foreach($provinces as $province)
-                                                <option value="{{ $province }}" {{ old('province') == $province || (Auth::check() && str_contains(Auth::user()->address, $province)) ? 'selected' : '' }}>{{ $province }}</option>
-                                            @endforeach
+                                        <div class="form-section-title">Tỉnh / Thành phố</div>
+                                        <select name="province" id="province" required
+                                            class="modern-input modern-select @error('province') is-invalid @enderror">
+                                            <option value="">-- Đang tải... --</option>
                                         </select>
+                                        @error('province') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </div>
                                     <div>
-                                        <div class="form-section-title">Quận / huyện</div>
-                                        <select name="district" id="district" class="modern-input modern-select">
-                                            <option value="">Chọn quận / huyện</option>
+                                        <div class="form-section-title">Xã / Phường</div>
+                                        <select name="commune" id="commune" required disabled
+                                            class="modern-input modern-select @error('commune') is-invalid @enderror">
+                                            <option value="">-- Chọn tỉnh trước --</option>
                                         </select>
+                                        @error('commune') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </div>
-                                    <div>
-                                        <div class="form-section-title">Phường / xã</div>
-                                        <select name="ward" id="ward" class="modern-input modern-select">
-                                            <option value="">Chọn phường / xã</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="mt-2 text-end">
-                                    <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-secondary border-0" style="font-size: 11px;">
-                                        <i class="fa fa-map-marker"></i> Sử dụng vị trí của tôi
-                                    </button>
                                 </div>
                             </div>
                             <div class="delivery-option" onclick="$('#delivery_home_content').slideUp(); $(this).addClass('active').prev().prev().removeClass('active'); $('#delivery_store').prop('checked', true);">
@@ -576,8 +566,8 @@
         data-route-coupon-remove="{{ route('checkout.removeCoupon') }}"
         data-route-cart="{{ route('cart.index') }}"
         data-route-shipping="{{ url('/api/checkout/shipping-fees') }}"
-        data-route-districts="{{ route('api.address.districts') }}"
-        data-route-wards="{{ route('api.address.wards') }}"
+        data-route-provinces="{{ route('api.vn-address.provinces') }}"
+        data-route-communes="{{ url('api/vn-address/communes') }}"
         data-base-total="{{ $total - $discount }}"
         data-bank-account="{{ isset($defaultBank) ? $defaultBank->account_number : '0' }}"
         data-bank-id="{{ isset($defaultBank) ? $defaultBank->bank_id : 'X' }}"
@@ -766,8 +756,7 @@
                     const isHomeDelivery = requiresAddress();
                     const addressParts = [
                         $('input[name="address"]').val(),
-                        $('select[name="ward"]').val(),
-                        $('select[name="district"]').val(),
+                        $('select[name="commune"]').val(),
                         $('select[name="province"]').val()
                     ].filter(Boolean);
 
@@ -817,116 +806,39 @@
                 });
             });
 
-            // ============ DYNAMIC ADDRESS SELECTION ============
+            // ============ DYNAMIC ADDRESS CASCADE ============
             const $province = $('#province');
-            const $district = $('#district');
-            const $ward = $('#ward');
+            const $commune  = $('#commune');
 
-            $(document).on('change', '#province', function() {
-                const provinceName = $(this).val();
-                console.log('Province selected (delegated):', provinceName);
-                
-                $district.html('<option value="">Đang tải...</option>');
-                $ward.html('<option value="">Chọn phường / xã</option>');
-                if ($.fn.niceSelect) {
-                    $district.niceSelect('update');
-                    $ward.niceSelect('update');
-                }
-
-                if (!provinceName) {
-                    $district.html('<option value="">Chọn quận / huyện</option>');
-                    if ($.fn.niceSelect) $district.niceSelect('update');
-                    return;
-                }
-
-                const url = config.routeDistricts || '/api/address/districts';
-                $.ajax({
-                    url: url,
-                    data: { province_name: provinceName },
-                    headers: { 'X-CSRF-TOKEN': config.csrf },
-                    success: function(districts) {
-                        console.log('Districts received:', districts.length);
-                        let html = '<option value="">Chọn quận / huyện</option>';
-                        districts.forEach(d => {
-                            html += `<option value="${d.name}">${d.name_with_type}</option>`;
-                        });
-                        $district.html(html);
-                        
-                        // Try to update nice-select if it is being used
-                        if ($.fn.niceSelect) {
-                            $district.niceSelect('update');
-                        }
-                        
-                        // Recalculate shipping if province changes
-                        if (typeof calculateShippingFees === 'function') {
-                            calculateShippingFees();
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching districts:', status, error, xhr.responseText);
-                        $district.html('<option value="">Lỗi: ' + xhr.status + '</option>');
-                        if (xhr.status === 404) {
-                            $district.html('<option value="">Lỗi: Không tìm thấy API (404)</option>');
-                        } else if (xhr.status === 419) {
-                            $district.html('<option value="">Lỗi: Hết hạn phiên (419)</option>');
-                        }
-                        if ($.fn.niceSelect) {
-                            $district.niceSelect('update');
-                        }
-                    }
+            // Load provinces once on page load
+            $.getJSON(config.routeProvinces, function(provinces) {
+                let html = '<option value="">-- Chọn tỉnh/thành phố --</option>';
+                provinces.forEach(function(p) {
+                    const sel = (p.name === '{{ old('province') }}') ? 'selected' : '';
+                    html += `<option value="${p.name}" data-code="${p.code}" ${sel}>${p.name}</option>`;
                 });
+                $province.html(html);
+                if ($province.val()) $province.trigger('change');
             });
 
-            $(document).on('change', '#district', function() {
-                const districtName = $(this).val();
-                const provinceName = $('#province').val();
-                console.log('District selected (delegated):', districtName, 'in', provinceName);
-                $ward.html('<option value="">Đang tải...</option>');
-                if ($.fn.niceSelect) $ward.niceSelect('update');
-
-                if (!districtName) {
-                    $ward.html('<option value="">Chọn phường / xã</option>');
-                    if ($.fn.niceSelect) $ward.niceSelect('update');
+            $province.on('change', function() {
+                const code = this.options[this.selectedIndex]?.dataset.code || '';
+                $commune.html('<option value="">-- Đang tải... --</option>').prop('disabled', true);
+                if (!code) {
+                    $commune.html('<option value="">-- Chọn tỉnh trước --</option>');
                     return;
                 }
-
-                const url = config.routeWards || '/api/address/wards';
-                $.ajax({
-                    url: url,
-                    data: { 
-                        district_name: districtName,
-                        province_name: provinceName
-                    },
-                    headers: { 'X-CSRF-TOKEN': config.csrf },
-                    success: function(wards) {
-                        console.log('Wards received:', wards.length);
-                        let html = '<option value="">Chọn phường / xã</option>';
-                        wards.forEach(w => {
-                            html += `<option value="${w.name}">${w.name_with_type}</option>`;
-                        });
-                        $ward.html(html);
-                        if ($.fn.niceSelect) {
-                            $ward.niceSelect('update');
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error('Error fetching wards:', xhr);
-                        $ward.html('<option value="">Lỗi tải dữ liệu</option>');
-                        if ($.fn.niceSelect) {
-                            $ward.niceSelect('update');
-                        }
-                    }
+                $.getJSON(config.routeCommunes + '/' + code, function(list) {
+                    let html = '<option value="">-- Chọn xã/phường --</option>';
+                    list.forEach(function(c) {
+                        const sel = (c.name === '{{ old('commune') }}') ? 'selected' : '';
+                        html += `<option value="${c.name}" ${sel}>${c.name}</option>`;
+                    });
+                    $commune.html(html).prop('disabled', false);
+                    calculateShippingFees();
                 });
+                calculateShippingFees();
             });
-
-            // Handle pre-selected values (e.g., from auth user or old input)
-            if ($province.val()) {
-                // If province is already selected, manually trigger load districts
-                const currentProvince = $province.val();
-                const currentDistrict = "{{ old('district', (Auth::check() && str_contains(Auth::user()->address, ' - ') ? explode(' - ', Auth::user()->address)[1] ?? '' : '')) }}"; 
-                // Note: The logic above for currentDistrict/Ward depends on how address is stored. 
-                // For now just handle the dropdown chains.
-            }
 
             // ============ COUPON ============
 
@@ -1055,32 +967,29 @@
             function calculateShippingFees() {
                 const deliveryType = getDeliveryType();
                 const province = $('select[name="province"]').val();
-                const district = $('select[name="district"]').val();
-                const ward = $('select[name="ward"]').val();
+                const commune  = $('select[name="commune"]').val();
 
                 $('#shipping_method_container').show();
 
                 if (deliveryType === 'store') {
-                    renderShippingOptions([
-                        {
-                            provider: 'store_pickup',
-                            service_name: 'Nh?n t?i c?a h?ng',
-                            fee: 0,
-                            expected_delivery_time: 'Trong gi? h?nh ch?nh'
-                        }
-                    ]);
+                    renderShippingOptions([{
+                        provider: 'store_pickup',
+                        service_name: 'Nhận tại cửa hàng',
+                        fee: 0,
+                        expected_delivery_time: 'Trong giờ hành chính'
+                    }]);
                     return;
                 }
 
                 if (!province) {
-                    $('#shipping_options').html('<div class="alert alert-info">Vui l?ng ch?n t?nh/th?nh ?? xem ph? v?n chuy?n.</div>');
+                    $('#shipping_options').html('<div class="alert alert-info">Vui lòng chọn tỉnh/thành để xem phí vận chuyển.</div>');
                     $('#hidden_shipping_fee').val(0);
                     $('#hidden_shipping_service_name').val('');
                     updateTotals(0);
                     return;
                 }
 
-                $('#shipping_options').html('<div class="text-center p-3"><span class="spinner-border spinner-border-sm text-primary"></span> ?ang t?nh ph? v?n chuy?n...</div>');
+                $('#shipping_options').html('<div class="text-center p-3"><span class="spinner-border spinner-border-sm text-primary"></span> Đang tính phí vận chuyển...</div>');
 
                 $.ajax({
                     url: config.routeShipping,
@@ -1089,8 +998,8 @@
                         _token: config.csrf,
                         delivery_type: deliveryType,
                         province: province,
-                        district: district,
-                        ward: ward
+                        district: '',
+                        ward: $('select[name="commune"]').val()
                     },
                     success: function (response) {
                         if (response.success && response.data && response.data.length > 0) {
@@ -1100,7 +1009,7 @@
                         }
                     },
                     error: function () {
-                        $('#shipping_options').html('<div class="alert alert-danger">L?i k?t n?i khi t?nh ph? v?n chuy?n.</div>');
+                        $('#shipping_options').html('<div class="alert alert-danger">Lỗi kết nối khi tính phí vận chuyển.</div>');
                     }
                 });
             }
@@ -1144,7 +1053,7 @@
                 calculateShippingFees();
             });
 
-            $('select[name="district"], select[name="ward"], input[name="delivery_type"]').on('change', function () {
+            $('select[name="commune"], input[name="delivery_type"]').on('change', function () {
                 syncDeliveryModeUI();
                 calculateShippingFees();
             });
@@ -1167,14 +1076,16 @@
                 const nameError     = validateName($('input[name="name"]').val());
                 const phoneError    = validatePhone($('input[name="phone"]').val());
                 const emailError    = validateEmail($('input[name="email"]').val());
-                const provinceError = validateProvince($('select[name="province"]').val());
-                const addressError  = validateAddress($('input[name="address"]').val());
+                const provinceError = requiresAddress() ? validateProvince($('select[name="province"]').val()) : '';
+                const communeError  = requiresAddress() ? (($('select[name="commune"]').val() ? '' : 'Vui lòng chọn xã/phường')) : '';
+                const addressError  = requiresAddress() ? validateAddress($('input[name="address"]').val()) : '';
                 showValidation('input[name="name"]', nameError);
                 showValidation('input[name="phone"]', phoneError);
                 showValidation('input[name="email"]', emailError);
                 showValidation('select[name="province"]', provinceError);
+                showValidation('select[name="commune"]', communeError);
                 showValidation('input[name="address"]', addressError);
-                if (nameError || phoneError || emailError || provinceError || addressError) {
+                if (nameError || phoneError || emailError || provinceError || communeError || addressError) {
                     e.preventDefault();
                     const firstError = $('.is-invalid').first();
                     if (firstError.length) $('html, body').animate({ scrollTop: firstError.offset().top - 100 }, 500);
@@ -1188,61 +1099,6 @@
                 $(this).find('button[type="submit"]').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...');
             });
 
-            // ============ GEOLOCATION ============
-            $('#btn-locate-me').click(function () {
-                if (!navigator.geolocation) {
-                    Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Trình duyệt của bạn không hỗ trợ định vị.' });
-                    return;
-                }
-                const $btn = $(this);
-                const originalHtml = $btn.html();
-                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang định vị...');
-
-                navigator.geolocation.getCurrentPosition(
-                    function (position) {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        $.ajax({
-                            url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&accept-language=vi`,
-                            method: 'GET',
-                            success: function (data) {
-                                if (data && data.address) {
-                                    const address = data.address;
-                                    let provinceName = address.city || address.province || address.state || address.town;
-                                    if (provinceName) {
-                                        provinceName = provinceName.replace('Thành phố ', '').replace('Tỉnh ', '').trim();
-                                        if (provinceName.toLowerCase().includes('hồ chí minh')) provinceName = 'TP Hồ Chí Minh';
-                                        let matchedProvince = '';
-                                        $('#province option').each(function () {
-                                            const optionText = $(this).val();
-                                            if (provinceName.toLowerCase() === optionText.toLowerCase() || optionText.toLowerCase().includes(provinceName.toLowerCase())) {
-                                                matchedProvince = optionText; return false;
-                                            }
-                                        });
-                                        if (matchedProvince) $('#province').val(matchedProvince).trigger('change');
-                                    }
-                                    const road = address.road || '', suburb = address.suburb || address.neighbourhood || '',
-                                          quarter = address.quarter || '', district = address.district || address.city_district || '';
-                                    const streetAddress = [road, suburb, quarter, district].filter(Boolean).join(', ');
-                                    if (streetAddress) { $('input[name="address"]').val(streetAddress); showValidation($('input[name="address"]')[0], ''); }
-                                    Swal.fire({ icon: 'success', title: 'Thành công', text: 'Đ cập nhật địa chỉ từ vị trí của bạn.', timer: 2000, showConfirmButton: false });
-                                }
-                            },
-                            error: function () { Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể lấy thông tin địa chỉ từ tọa độ.' }); },
-                            complete: function () { $btn.prop('disabled', false).html(originalHtml); }
-                        });
-                    },
-                    function (error) {
-                        let message = 'Không thể lấy vị trí của bạn.';
-                        if (error.code === 1) message = 'Bạn đ từ chối quyền truy cập vị trí.';
-                        else if (error.code === 2) message = 'Không thể xác định vị trí.';
-                        else if (error.code === 3) message = 'Hết thời gian yêu cầu vị trí.';
-                        Swal.fire({ icon: 'warning', title: 'Thông báo', text: message });
-                        $btn.prop('disabled', false).html(originalHtml);
-                    },
-                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                );
-            });
         });
     </script>
 @endsection
