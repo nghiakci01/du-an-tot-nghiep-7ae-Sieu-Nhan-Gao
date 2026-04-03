@@ -42,7 +42,7 @@ class VnpayService
             "vnp_CurrCode" => "VND",
             "vnp_IpAddr" => $this->getClientIp(),
             "vnp_Locale" => "vn",
-            "vnp_OrderInfo" => "Thanh toán đơn hàng #" . $orderId,
+            "vnp_OrderInfo" => "Thanh toán đơn hàng #" . $orderId . " tại Elite Shop",
             "vnp_OrderType" => "other",
             "vnp_ReturnUrl" => $this->returnUrl,
             "vnp_TxnRef" => $vnp_TxnRef,

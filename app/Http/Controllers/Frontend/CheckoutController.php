@@ -278,6 +278,30 @@ class CheckoutController extends Controller
             // Get coupon and shipping data
             $couponCode = session()->get('coupon_code');
             $discount = session()->get('discount_amount', 0);
+
+            // [SECURITY CHECK] Final verification before order creation
+            if ($couponCode && Auth::check()) {
+                $coupon = \App\Models\Coupon::where('code', $couponCode)->first();
+                if ($coupon) {
+                    $alreadyUsed = \App\Models\Order::where('user_id', Auth::id())
+                        ->where('coupon_code', $couponCode)
+                        ->whereNotIn('status', ['cancelled', 'failed'])
+                        ->exists();
+
+                    $usedInPivot = \Illuminate\Support\Facades\DB::table('coupon_user')
+                        ->where('user_id', Auth::id())
+                        ->where('coupon_id', $coupon->id)
+                        ->whereNotNull('used_at')
+                        ->exists();
+
+                    if ($alreadyUsed || $usedInPivot) {
+                        // Clear session coupon data as it's invalid now
+                        session()->forget(['coupon_code', 'discount_amount']);
+                        throw new \Exception('Bạn đã sử dụng mã giảm giá này cho một đơn hàng khác. Vui lòng kiểm tra lại.');
+                    }
+                }
+            }
+
             $shippingSubtotal = max(0, $total - $discount);
             $shippingOption = $this->shippingService->resolveSelectedOption(
                 'home',
@@ -304,7 +328,7 @@ class CheckoutController extends Controller
                 $request->province,
             ]))) . ' - ' . $request->phone . ' - ' . $request->name;
             $order = Order::create([
-                'user_id' => Auth::id(), // Nullable if guest
+                'user_id' => Auth::id(),
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
@@ -330,11 +354,23 @@ class CheckoutController extends Controller
                 'status' => $order->status
             ]);
 
-            // Increment coupon used_count if coupon was applied
+            // Increment coupon used_count and mark as used for user
             if ($couponCode) {
                 $coupon = Coupon::where('code', $couponCode)->first();
                 if ($coupon) {
                     $coupon->increment('used_count');
+                    
+                    // Mark as used in coupon_user pivot
+                    if (Auth::check()) {
+                        DB::table('coupon_user')->updateOrInsert(
+                            ['user_id' => Auth::id(), 'coupon_id' => $coupon->id],
+                            [
+                                'used_at' => now(),
+                                'order_id' => $order->id,
+                                'updated_at' => now()
+                            ]
+                        );
+                    }
                 }
             }
 
@@ -363,12 +399,10 @@ class CheckoutController extends Controller
             $admins = User::getAdmins();
             Notification::send($admins, new NewOrderNotification($order));
 
-            // Notify User (if logged in)
-            if (Auth::check()) {
-                /** @var \App\Models\User $user */
-                $user = Auth::user();
-                $user->notify(new OrderPlacedNotification($order));
-            }
+            // Notify User
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            $user->notify(new OrderPlacedNotification($order));
 
             // Clear selected items and session
             if ($selectedIds && is_array($selectedIds)) {
@@ -386,11 +420,6 @@ class CheckoutController extends Controller
                 );
             } catch (\Exception $e) {
                 Log::warning('Cart abandonment recovery tracking failed: ' . $e->getMessage());
-            }
-
-            // Set session for guest verification if not logged in
-            if (!Auth::check()) {
-                session(['verified_order_id' => $order->id]);
             }
 
             // Nếu là VNPAY: redirect đến cổng thanh toán VNPay
@@ -552,6 +581,35 @@ class CheckoutController extends Controller
             ], 400);
         }
 
+        // Check if user already used this coupon
+        if (Auth::check()) {
+            $alreadyUsed = Order::where('user_id', Auth::id())
+                ->where('coupon_code', $coupon->code)
+                ->whereNotIn('status', ['cancelled', 'failed'])
+                ->exists();
+
+            if ($alreadyUsed) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('Bạn đã sử dụng mã giảm giá này cho một đơn hàng trước đó.'),
+                ], 400);
+            }
+
+            // Also check pivot table as backup/explicit tracking
+            $usedInPivot = DB::table('coupon_user')
+                ->where('user_id', Auth::id())
+                ->where('coupon_id', $coupon->id)
+                ->whereNotNull('used_at')
+                ->exists();
+
+            if ($usedInPivot) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('Bạn đã sử dụng mã giảm giá này rồi.'),
+                ], 400);
+            }
+        }
+
         // Check if coupon belongs to this user
         if ($coupon->user_id && $coupon->user_id != Auth::id()) {
             return response()->json([
@@ -599,6 +657,29 @@ class CheckoutController extends Controller
             'success' => true,
             'message' => 'Coupon removed.',
         ]);
+    }
+
+    /**
+     * Xóa sản phẩm hoàn toàn khỏi giỏ hàng từ trang checkout
+     */
+    public function removeItem($id)
+    {
+        // 1. Xóa khỏi giỏ hàng chính (DB hoặc Session tùy auth)
+        $this->cartService->removeItems([(string)$id]);
+
+        // 2. Xóa khỏi danh sách các item đang được chọn để checkout
+        $selectedIds = session('selected_checkout_ids', []);
+        if (is_array($selectedIds)) {
+            $selectedIds = array_diff(array_map('strval', $selectedIds), [(string)$id]);
+            session(['selected_checkout_ids' => array_values($selectedIds)]);
+        }
+
+        // 3. Nếu không còn sản phẩm nào để checkout, quay về giỏ hàng
+        if (empty(session('selected_checkout_ids'))) {
+            return redirect()->route('cart.index')->with('success', 'Sản phẩm đã được xóa. Danh sách thanh toán hiện đang trống.');
+        }
+
+        return redirect()->back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng.');
     }
 }
 

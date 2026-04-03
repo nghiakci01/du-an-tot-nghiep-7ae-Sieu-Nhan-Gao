@@ -52,9 +52,16 @@ class AccountController extends Controller
             $data['userBankAccounts'] = $user->bankAccounts;
             $data['addresses'] = $user->addresses()->get();
             
-            $data['coupons'] = \App\Models\Coupon::where(function ($q) use ($user) {
-                $q->whereNull('user_id')->orWhere('user_id', $user->id);
-            })
+            // 2. Mã đã nhận (claimed) hoặc được gán riêng (user_id) - bao gồm cả mã đã dùng
+            $personalCoupons = $user->claimedCoupons()
+                ->where('is_active', true)
+                ->get();
+            
+            $usedCouponIds = $personalCoupons->whereNotNull('pivot.used_at')->pluck('id')->toArray();
+
+            // 1. Mã công khai (không gán user_id) và chưa từng được user này sử dụng
+            $publicCoupons = \App\Models\Coupon::whereNull('user_id')
+                ->whereNotIn('id', $usedCouponIds)
                 ->where('is_active', true)
                 ->where('start_date', '<=', now())
                 ->where(function ($q) {
@@ -63,14 +70,8 @@ class AccountController extends Controller
                 ->whereRaw('used_count < usage_limit')
                 ->get();
 
-            // Merge claimed coupons from news/blog
-            $claimedCouponIds = $user->claimedCoupons()->pluck('coupons.id');
-            if ($claimedCouponIds->isNotEmpty()) {
-                $claimedCoupons = \App\Models\Coupon::whereIn('id', $claimedCouponIds)
-                    ->where('is_active', true)
-                    ->get();
-                $data['coupons'] = $data['coupons']->merge($claimedCoupons)->unique('id');
-            }
+            // Gộp lại và ưu tiên mã cá nhân (vì có dữ liệu pivot used_at)
+            $data['coupons'] = $personalCoupons->concat($publicCoupons)->unique('id');
             
             if (config('features.wallet')) {
                 $data['walletTransactions'] = $user->walletTransactions()->take(20)->get();

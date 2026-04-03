@@ -377,7 +377,14 @@
                                             <p class="cart_amount" id="cart-grand-total">{{ number_format($total + $shippingFee) }} đ</p>
                                         </div>
                                         <div class="checkout_btn">
-                                            <a href="#" id="btn-proceed-checkout">{{ __('messages.proceed_to_checkout') }}</a>
+                                            @auth
+                                                <a href="#" id="btn-proceed-checkout">{{ __('messages.proceed_to_checkout') }}</a>
+                                            @else
+                                                <a href="{{ route('login') }}" class="btn-login-to-checkout" style="background: #ff6a28 !important; color: #fff !important; display: block; text-align: center; padding: 10px; text-transform: uppercase; font-weight: 600; border-radius: 4px;">
+                                                    <i class="fa fa-sign-in"></i> Đăng nhập để thanh toán
+                                                </a>
+                                                <p class="text-muted small mt-2 text-center">Vui lòng đăng nhập để tiếp tục đơn hàng của bạn.</p>
+                                            @endauth
                                         </div>
 
                                         <script>

@@ -72,17 +72,6 @@
             border-radius: 2px !important;
         }
 
-        .user-profile-section {
-            background: #fdfdfd !important;
-            border: 1px solid #eee !important;
-            padding: 20px !important;
-            margin-bottom: 30px !important;
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            border-radius: 4px !important;
-        }
-
         /* grid layouts */
         .field-grid {
             display: grid !important;
@@ -234,6 +223,138 @@
                 padding: 30px 0 0 0 !important;
             }
         }
+
+        /* Product items in summary */
+        .summary-items-list {
+            margin-bottom: 25px !important;
+            max-height: 400px !important;
+            overflow-y: auto !important;
+            padding-right: 5px !important;
+            border-bottom: 1px solid #eee !important;
+            padding-bottom: 10px !important;
+        }
+        
+        .summary-items-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .summary-items-list::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 10px;
+        }
+        
+        .summary-item {
+            display: flex !important;
+            gap: 15px !important;
+            margin-bottom: 15px !important;
+            align-items: flex-start !important;
+        }
+        
+        .summary-item-image {
+            width: 60px !important;
+            height: 80px !important;
+            object-fit: cover !important;
+            border-radius: 2px !important;
+            background: #f5f5f5 !important;
+            flex-shrink: 0 !important;
+            border: 1px solid #eee !important;
+        }
+        
+        .summary-item-details {
+            flex: 1 !important;
+        }
+        
+        .summary-item-name {
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            margin-bottom: 4px !important;
+            line-height: 1.4 !important;
+            display: block !important;
+            color: #000 !important;
+            text-decoration: none !important;
+        }
+        
+        .summary-item-meta {
+            font-size: 11px !important;
+            color: #777 !important;
+            margin-bottom: 4px !important;
+            text-transform: uppercase !important;
+        }
+        
+        .summary-item-price-qty {
+            display: flex !important;
+            justify-content: space-between !important;
+            font-size: 13px !important;
+            margin-top: 5px !important;
+        }
+        
+        .summary-item-quantity {
+            color: #888 !important;
+        }
+        
+        .summary-item-total {
+            font-weight: 600 !important;
+            color: #000 !important;
+        }
+        
+        .btn-remove-item {
+            background: none !important;
+            border: none !important;
+            padding: 5px !important;
+            margin-left: 5px !important;
+            cursor: pointer !important;
+            color: #ccc !important;
+            transition: all 0.2s !important;
+            line-height: 1 !important;
+        }
+        .btn-remove-item:hover {
+            color: #ff3333 !important;
+            transform: scale(1.1) !important;
+        }
+
+        /* Applied Coupon Card Redesign */
+        .applied-coupon-card {
+            background: #fff !important;
+            border: 1px solid #eee !important;
+            padding: 15px !important;
+            border-radius: 4px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-top: 15px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+        }
+
+        .applied-coupon-info {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            font-size: 14px !important;
+            color: #333 !important;
+        }
+
+        .applied-coupon-icon {
+            color: #28a745 !important;
+            font-size: 16px !important;
+        }
+
+        .btn-remove-coupon-link {
+            background: none !important;
+            border: none !important;
+            color: #d93025 !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            padding: 5px 0 !important;
+            cursor: pointer !important;
+            text-decoration: none !important;
+            transition: all 0.2s !important;
+        }
+
+        .btn-remove-coupon-link:hover {
+            opacity: 0.7 !important;
+            text-decoration: underline !important;
+        }
     </style>
 @endpush
 
@@ -279,18 +400,6 @@
             <!-- Left Column: Form Steps -->
             <div class="col-lg-7">
                 @if(Auth::check())
-                    <div class="user-profile-section">
-                        <div class="user-profile-info">
-                            <div class="user-profile-avatar">
-                                <i class="fa fa-user"></i>
-                            </div>
-                            <div class="user-profile-details">
-                                <span class="user-profile-name">{{ Auth::user()->name }}</span>
-                                <span class="user-profile-email">{{ Auth::user()->email }}</span>
-                            </div>
-                        </div>
-                        <a href="{{ route('logout') }}" class="btn-logout-small" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a>
-                    </div>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                 @endif
 
@@ -336,7 +445,7 @@
                                     <select name="province" id="province" required class="modern-input modern-select @error('province') is-invalid @enderror">
                                         <option value="">Chọn tỉnh / thành</option>
                                         @foreach($provinces as $province)
-                                            <option value="{{ $province }}" {{ old('province') == $province || (Auth::check() && str_contains(Auth::user()->address, $province)) ? 'selected' : '' }}>{{ $province }}</option>
+                                            <option value="{{ $province }}" {{ old('province') == $province || (Auth::check() && str_contains(Auth::user()->address ?? '', $province)) ? 'selected' : '' }}>{{ $province }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -456,6 +565,35 @@
             <div class="col-lg-5">
                 <div class="summary-card">
                     <h3 class="summary-title">THÔNG TIN ĐƠN HÀNG</h3>
+                    
+                    <div class="summary-items-list">
+                        @foreach($cart as $id => $item)
+                            <div class="summary-item">
+                                <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : asset('frontend-assets/img/s-product/product.jpg') }}" 
+                                     alt="{{ $item['name'] }}" 
+                                     class="summary-item-image">
+                                <div class="summary-item-details">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <span class="summary-item-name">{{ $item['name'] }}</span>
+                                        <button type="button" class="btn-remove-item" data-id="{{ $id }}" title="Xóa sản phẩm">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                        <form id="remove-item-form-{{ $id }}" action="{{ route('checkout.remove-item', $id) }}" method="POST" style="display: none;">
+                                            @csrf
+                                        </form>
+                                    </div>
+                                    <div class="summary-item-meta">
+                                        Phân loại: {{ $item['color'] ?? 'N/A' }} / {{ $item['size'] ?? 'N/A' }}
+                                    </div>
+                                    <div class="summary-item-price-qty">
+                                        <span class="summary-item-quantity">x{{ $item['quantity'] }}</span>
+                                        <span class="summary-item-total">{{ number_format($item['price'] * $item['quantity']) }}đ</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
                     <div class="summary-row">
                         <span>Tạm tính</span>
                         <span class="text-dark fw-medium">{{ number_format($total) }}đ</span>
@@ -477,12 +615,14 @@
 
                     <div id="checkout_coupon" class="mt-4">
                         @if($coupon)
-                            <div class="p-3 bg-light border rounded d-flex justify-content-between align-items-center">
-                                <div class="small">
-                                    <i class="fa fa-tag text-success me-2"></i>
-                                    Mã <strong class="text-dark">{{ $coupon->code }}</strong> đã áp dụng
+                            <div class="applied-coupon-card">
+                                <div class="applied-coupon-info">
+                                    <i class="fa fa-tag applied-coupon-icon"></i>
+                                    <div>
+                                        Mã <strong class="text-dark">{{ $coupon->code }}</strong> đang được áp dụng
+                                    </div>
                                 </div>
-                                <button type="button" class="btn btn-sm text-danger fw-bold" id="removeCouponBtn">XÓA</button>
+                                <button type="button" class="btn-remove-coupon-link" id="removeCouponBtn">HỦY ÁP DỤNG</button>
                             </div>
                         @else
                             <div class="coupon-group">
@@ -521,6 +661,30 @@
             const config = document.getElementById('checkout-config').dataset;
             // ============ MULTI-STEP LOGIC ============
             let currentStep = {{ session('checkout_step', 1) }};
+            
+            // ============ REMOVE ITEM LOGIC ============
+            $('.btn-remove-item').click(function() {
+                const id = $(this).data('id');
+                Swal.fire({
+                    title: 'Xác nhận xóa?',
+                    text: 'Sản phẩm này sẽ bị xóa khỏi đơn hàng.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#222',
+                    cancelButtonColor: '#888',
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById(`remove-item-form-${id}`);
+                        if (form) {
+                            form.submit();
+                        } else {
+                            console.error(`Form not found: remove-item-form-${id}`);
+                        }
+                    }
+                });
+            });
 
             if (currentStep === 2) {
                 $('#checkout-step-1').hide();
@@ -934,7 +1098,7 @@
 
             $('#removeCouponBtn').click(function () {
                 Swal.fire({
-                    title: 'Xóa m giảm giá?',
+                    title: 'Hủy áp dụng mã giảm giá?',
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Xóa',
