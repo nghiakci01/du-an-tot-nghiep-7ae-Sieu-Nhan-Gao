@@ -1,1330 +1,953 @@
+{{-- ================================================================
+     CHECKOUT — Single Page · 2-Column · Premium Design
+     Guest: full address form | Auth: address cards + inline add
+================================================================ --}}
 @extends('layouts.public')
 
-@section('title', __('messages.checkout') . ' | Elite')
+@section('title', 'Thanh toán | ' . ($settings['site_title'] ?? 'Elite'))
 
 @push('styles')
-    <style>
-        /* aristino-style checkout redesign */
-        .checkout-container {
-            max-width: 1100px !important;
-            margin: 0 auto !important;
-            padding: 40px 15px !important;
-            font-family: 'Inter', sans-serif !important;
-            color: #333 !important;
-        }
+<style>
+:root {
+  --ck-black:  #0f0f0f; --ck-gray: #6b7280;
+  --ck-border: #e5e7eb; --ck-bg:   #f7f8fa;
+  --ck-green:  #16a34a; --ck-red:  #dc2626;
+  --ck-radius: 12px;
+  --ck-shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+}
+.ck-page { background: var(--ck-bg); min-height: 100vh; padding: 36px 0 80px; }
+.ck-breadcrumb { font-size:13px; color:var(--ck-gray); margin-bottom:24px; }
+.ck-breadcrumb a { color:var(--ck-gray); text-decoration:none; }
+.ck-breadcrumb a:hover { color:var(--ck-black); }
+.ck-card { background:#fff; border-radius:var(--ck-radius); box-shadow:var(--ck-shadow); padding:24px; margin-bottom:14px; }
+.ck-card-title { font-size:15px; font-weight:700; letter-spacing:-.2px; color:var(--ck-black); margin:0 0 20px; display:flex; align-items:center; gap:10px; text-wrap:balance; }
+.ck-step { width:26px; height:26px; border-radius:50%; background:var(--ck-black); color:#fff; font-size:12px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
 
-        .checkout-title {
-            font-size: 24px !important;
-            font-weight: 700 !important;
-            text-transform: uppercase !important;
-            margin-bottom: 5px !important;
-            color: #000 !important;
-            letter-spacing: 0.5px !important;
-        }
+/* fields */
+.ck-row2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media(max-width:576px){ .ck-row2 { grid-template-columns:1fr; } }
+.ck-field { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
+.ck-field:last-child { margin-bottom:0; }
+.ck-label { font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#374151; }
+.ck-label .req { color:var(--ck-red); margin-left:2px; }
+.ck-input {
+  padding:11px 14px; border:1.5px solid var(--ck-border); border-radius:9px;
+  font-size:14.5px; color:var(--ck-black); background:#fafafa; width:100%;
+  font-family:inherit; transition:border-color .18s, box-shadow .18s;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+}
+.ck-input:focus-visible { outline:none; border-color:var(--ck-black); background:#fff; box-shadow:0 0 0 3px rgba(0,0,0,.08); }
+.ck-input:disabled { background:#f0f0f0; color:#aaa; cursor:not-allowed; }
+.ck-input.is-invalid { border-color:var(--ck-red); }
+.ck-error { font-size:12px; color:var(--ck-red); }
 
-        .checkout-breadcrumbs {
-            display: flex !important;
-            align-items: center !important;
-            gap: 10px !important;
-            font-size: 13px !important;
-            color: #888 !important;
-            margin-bottom: 30px !important;
-            padding: 0 !important;
-            list-style: none !important;
-        }
+/* address cards */
+.addr-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px; margin-bottom:14px; }
+.addr-card {
+  position:relative; border:1.5px solid var(--ck-border); border-radius:var(--ck-radius);
+  padding:15px 15px 13px; cursor:pointer; user-select:none;
+  transition:border-color .18s, background .18s;
+  display:flex; flex-direction:column; gap:3px;
+  -webkit-tap-highlight-color:transparent;
+}
+.addr-card:hover { border-color:#9ca3af; }
+.addr-card.is-sel { border-color:var(--ck-black); background:#fafafa; }
+.addr-radio { position:absolute; opacity:0; width:0; height:0; }
+.addr-dot { position:absolute; top:13px; right:13px; width:18px; height:18px; border-radius:50%; border:2px solid var(--ck-border); display:flex; align-items:center; justify-content:center; transition:border-color .18s,background .18s; }
+.addr-card.is-sel .addr-dot { border-color:var(--ck-black); background:var(--ck-black); }
+.addr-dot::after { content:''; width:6px; height:6px; border-radius:50%; background:#fff; opacity:0; transition:opacity .15s; }
+.addr-card.is-sel .addr-dot::after { opacity:1; }
+.addr-name { font-weight:700; font-size:13.5px; color:var(--ck-black); padding-right:24px; }
+.addr-sub { font-size:12.5px; color:var(--ck-gray); line-height:1.4; }
+.addr-badge { display:inline-block; font-size:10px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; background:#f0fdf4; color:var(--ck-green); border:1px solid #bbf7d0; border-radius:4px; padding:2px 6px; margin-top:3px; width:fit-content; }
+.addr-add { border-style:dashed; align-items:center; justify-content:center; flex-direction:row; gap:8px; color:var(--ck-gray); font-size:13.5px; font-weight:500; min-height:90px; }
+.addr-add:hover { border-color:var(--ck-black); color:var(--ck-black); }
+.addr-add.is-sel { border-color:var(--ck-black); color:var(--ck-black); }
+.addr-empty { text-align:center; padding:16px 0 20px; color:var(--ck-gray); font-size:13.5px; }
+.addr-empty i { font-size:28px; opacity:.3; display:block; margin-bottom:8px; }
+.inline-form { border-top:1px solid var(--ck-border); padding-top:18px; margin-top:2px; }
 
-        .checkout-breadcrumbs a {
-            color: #888 !important;
-            text-decoration: none !important;
-        }
+/* shipping */
+.ship-row { display:flex; align-items:center; justify-content:space-between; padding:13px 15px; border-radius:9px; background:#f9fafb; border:1.5px solid var(--ck-border); }
+.ship-name { font-size:14px; font-weight:600; color:var(--ck-black); }
+.ship-sub { font-size:12px; color:var(--ck-gray); }
+.ship-fee { font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--ck-black); }
+.ship-fee.free { color:var(--ck-green); }
+.ship-note { font-size:12px; color:var(--ck-gray); margin:8px 0 0; }
 
-        .checkout-breadcrumbs .active {
-            color: #333 !important;
-            font-weight: 500 !important;
-        }
+/* payment */
+.pm-list { display:flex; flex-direction:column; gap:10px; }
+.pm-opt {
+  display:flex; align-items:center; gap:14px; padding:13px 15px;
+  border:1.5px solid var(--ck-border); border-radius:10px; cursor:pointer;
+  transition:border-color .18s, background .18s; touch-action:manipulation;
+}
+.pm-opt:hover { border-color:#9ca3af; }
+.pm-opt.is-sel { border-color:var(--ck-black); background:#fafafa; }
+.pm-opt input { display:none; }
+.pm-dot { width:20px; height:20px; border-radius:50%; border:2px solid var(--ck-border); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:border-color .18s,background .18s; }
+.pm-opt.is-sel .pm-dot { border-color:var(--ck-black); background:var(--ck-black); }
+.pm-dot::after { content:''; width:7px; height:7px; border-radius:50%; background:#fff; opacity:0; transition:opacity .15s; }
+.pm-opt.is-sel .pm-dot::after { opacity:1; }
+.pm-title { font-size:13.5px; font-weight:600; color:var(--ck-black); }
+.pm-desc { font-size:12px; color:var(--ck-gray); margin-top:2px; }
+.pm-icon { font-size:20px; margin-left:auto; }
+.bank-box { margin-top:14px; padding:14px; background:#f8fafc; border-radius:9px; border:1px solid #e0e7ef; font-size:13px; line-height:1.8; display:none; }
+.bank-box.show { display:block; }
 
-        /* login prompt box */
-        .login-prompt-box {
-            background: #fdfdfd !important;
-            border: 1px solid #eee !important;
-            padding: 20px !important;
-            margin-bottom: 30px !important;
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            border-radius: 4px !important;
-        }
+/* summary */
+.sum-sticky { position:sticky; top:24px; }
+.sum-title { font-size:15px; font-weight:700; color:var(--ck-black); margin-bottom:16px; }
+.sum-items { display:flex; flex-direction:column; gap:10px; max-height:260px; overflow-y:auto; margin-bottom:14px; }
+.sum-item { display:flex; align-items:center; gap:11px; }
+.sum-img { width:50px; height:50px; border-radius:8px; object-fit:cover; border:1px solid var(--ck-border); flex-shrink:0; }
+.sum-info { flex:1; min-width:0; }
+.sum-iname { font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sum-imeta { font-size:12px; color:var(--ck-gray); }
+.sum-iprice { font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap; }
+hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; }
+.sum-row { display:flex; justify-content:space-between; font-size:13.5px; color:#374151; margin-bottom:7px; font-variant-numeric:tabular-nums; }
+.sum-row.total { font-size:16px; font-weight:700; color:var(--ck-black); margin-top:4px; margin-bottom:0; }
+.sum-discount { color:var(--ck-green); }
 
-        .login-prompt-text {
-            font-size: 14px !important;
-            line-height: 1.5 !important;
-        }
+/* coupon */
+.cpn-applied { display:flex; align-items:center; justify-content:space-between; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:10px 13px; font-size:13px; margin-bottom:10px; }
+.cpn-row { display:flex; gap:8px; margin-bottom:10px; }
+.cpn-input { flex:1; padding:10px 12px; border:1.5px solid var(--ck-border); border-radius:8px; font-size:13px; text-transform:uppercase; letter-spacing:1px; font-family:inherit; }
+.cpn-input:focus-visible { outline:none; border-color:var(--ck-black); box-shadow:0 0 0 3px rgba(0,0,0,.07); }
+.btn-cpn { padding:10px 15px; background:var(--ck-black); color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; touch-action:manipulation; transition:background .15s; }
+.btn-cpn:hover { background:#333; }
+.btn-rm-cpn { font-size:12px; color:var(--ck-gray); background:none; border:none; cursor:pointer; text-decoration:underline; padding:0; }
 
-        .btn-login-outline {
-            border: 1px solid #000 !important;
-            padding: 10px 25px !important;
-            background: transparent !important;
-            color: #000 !important;
-            font-weight: 600 !important;
-            text-transform: uppercase !important;
-            font-size: 12px !important;
-            text-decoration: none !important;
-            border-radius: 2px !important;
-        }
+/* submit */
+.btn-order { width:100%; padding:15px; background:var(--ck-black); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:700; letter-spacing:.4px; cursor:pointer; touch-action:manipulation; transition:background .18s, transform .12s; }
+.btn-order:hover { background:#1c1c1e; }
+.btn-order:active { transform:scale(.985); }
+.btn-order:disabled { opacity:.6; cursor:not-allowed; transform:none; }
 
-        /* grid layouts */
-        .field-grid {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr !important;
-            gap: 15px !important;
-            margin-bottom: 20px !important;
-        }
+/* selected address display */
+.sel-addr-box {
+  display:flex; align-items:center; justify-content:space-between;
+  border:1.5px solid var(--ck-border); border-radius:var(--ck-radius);
+  padding:16px 18px; cursor:pointer; transition:border-color .18s,background .18s;
+  -webkit-tap-highlight-color:transparent; gap:12px;
+}
+.sel-addr-box:hover { border-color:#9ca3af; background:#fafafa; }
+.sel-addr-info { flex:1; min-width:0; }
+.sel-addr-name { font-size:14px; font-weight:700; color:var(--ck-black); }
+.sel-addr-phone { font-size:13px; color:var(--ck-gray); margin:2px 0; }
+.sel-addr-detail { font-size:12.5px; color:var(--ck-gray); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sel-addr-change { font-size:13px; font-weight:600; color:var(--ck-black); white-space:nowrap; flex-shrink:0; }
 
-        .address-grid {
-            display: grid !important;
-            grid-template-columns: repeat(3, 1fr) !important;
-            gap: 15px !important;
-            margin-top: 15px !important;
-        }
+/* no-address button */
+.addr-no-addr-btn {
+  width:100%; border:2px dashed var(--ck-border); border-radius:var(--ck-radius);
+  padding:28px 20px; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:6px; cursor:pointer; background:none;
+  color:var(--ck-gray); transition:border-color .18s,color .18s;
+  font-family:inherit;
+}
+.addr-no-addr-btn:hover { border-color:var(--ck-black); color:var(--ck-black); }
+.addr-no-addr-btn i { font-size:26px; opacity:.4; }
+.addr-no-addr-btn span { font-size:14px; font-weight:600; }
+.addr-no-addr-btn small { font-size:12px; }
 
-        .form-section-title {
-            font-size: 13px !important;
-            color: #666 !important;
-            margin-bottom: 8px !important;
-            font-weight: 500 !important;
-            text-transform: none !important;
-        }
-
-        .modern-input {
-            width: 100% !important;
-            padding: 12px 15px !important;
-            border: 1px solid #e1e1e1 !important;
-            border-radius: 4px !important;
-            font-size: 14px !important;
-            color: #333 !important;
-            margin-bottom: 20px !important;
-            background: #fff !important;
-        }
-
-        .modern-input:focus {
-            border-color: #000 !important;
-            outline: none !important;
-        }
-
-        .modern-select {
-            appearance: none !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 15px center !important;
-            background-color: #fff !important;
-        }
-
-        
-
-        /* order summary refinement */
-        .summary-card {
-            background: #fff !important;
-            padding: 0 0 0 30px !important;
-            position: sticky !important;
-            top: 20px !important;
-        }
-
-        .summary-title {
-            font-size: 15px !important;
-            font-weight: 700 !important;
-            text-transform: uppercase !important;
-            margin-bottom: 25px !important;
-            color: #000 !important;
-            letter-spacing: 0.5px !important;
-            background: none !important;
-            padding: 0 !important;
-        }
-
-        .summary-row {
-            display: flex !important;
-            justify-content: space-between !important;
-            margin-bottom: 12px !important;
-            font-size: 14px !important;
-            color: #333 !important;
-        }
-
-        .summary-row.total {
-            margin-top: 20px !important;
-            padding-top: 15px !important;
-            border-top: 1px dashed #ddd !important;
-            font-size: 16px !important;
-            font-weight: 700 !important;
-        }
-
-        /* buttons with aristino style icon */
-        .btn-primary-black {
-            background: #222 !important;
-            color: #fff !important;
-            border: none !important;
-            border-radius: 2px !important;
-            font-weight: 700 !important;
-            font-size: 13px !important;
-            text-transform: uppercase !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 15px !important;
-            height: 48px !important;
-            width: 100% !important;
-            transition: background 0.3s !important;
-        }
-
-        .btn-primary-black .arrow-box {
-            width: 24px !important;
-            height: 24px !important;
-            background: #fff !important;
-            color: #222 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            border-radius: 2px !important;
-            font-size: 12px !important;
-        }
-
-        .btn-apply-coupon {
-            background: #222 !important;
-            color: #fff !important;
-            border: none !important;
-            border-radius: 0 2px 2px 0 !important;
-            font-weight: 700 !important;
-            font-size: 11px !important;
-            padding: 0 15px !important;
-            height: 48px !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 10px !important;
-        }
-
-        .coupon-group {
-            display: flex !important;
-            margin-top: 20px !important;
-            border: 1px solid #ddd !important;
-            border-radius: 2px !important;
-        }
-
-        .coupon-group input {
-            border: none !important;
-            flex: 1 !important;
-            padding: 0 15px !important;
-            font-size: 13px !important;
-            height: 46px !important;
-        }
-
-        @media (max-width: 991px) {
-            .field-grid, .address-grid {
-                grid-template-columns: 1fr !important;
-            }
-            .summary-card {
-                padding: 30px 0 0 0 !important;
-            }
-        }
-
-        /* Product items in summary */
-        .summary-items-list {
-            margin-bottom: 25px !important;
-            max-height: 400px !important;
-            overflow-y: auto !important;
-            padding-right: 5px !important;
-            border-bottom: 1px solid #eee !important;
-            padding-bottom: 10px !important;
-        }
-        
-        .summary-items-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        .summary-items-list::-webkit-scrollbar-thumb {
-            background: #ddd;
-            border-radius: 10px;
-        }
-        
-        .summary-item {
-            display: flex !important;
-            gap: 15px !important;
-            margin-bottom: 15px !important;
-            align-items: flex-start !important;
-        }
-        
-        .summary-item-image {
-            width: 60px !important;
-            height: 80px !important;
-            object-fit: cover !important;
-            border-radius: 2px !important;
-            background: #f5f5f5 !important;
-            flex-shrink: 0 !important;
-            border: 1px solid #eee !important;
-        }
-        
-        .summary-item-details {
-            flex: 1 !important;
-        }
-        
-        .summary-item-name {
-            font-size: 13px !important;
-            font-weight: 600 !important;
-            margin-bottom: 4px !important;
-            line-height: 1.4 !important;
-            display: block !important;
-            color: #000 !important;
-            text-decoration: none !important;
-        }
-        
-        .summary-item-meta {
-            font-size: 11px !important;
-            color: #777 !important;
-            margin-bottom: 4px !important;
-            text-transform: uppercase !important;
-        }
-        
-        .summary-item-price-qty {
-            display: flex !important;
-            justify-content: space-between !important;
-            font-size: 13px !important;
-            margin-top: 5px !important;
-        }
-        
-        .summary-item-quantity {
-            color: #888 !important;
-        }
-        
-        .summary-item-total {
-            font-weight: 600 !important;
-            color: #000 !important;
-        }
-        
-        .btn-remove-item {
-            background: none !important;
-            border: none !important;
-            padding: 5px !important;
-            margin-left: 5px !important;
-            cursor: pointer !important;
-            color: #ccc !important;
-            transition: all 0.2s !important;
-            line-height: 1 !important;
-        }
-        .btn-remove-item:hover {
-            color: #ff3333 !important;
-            transform: scale(1.1) !important;
-        }
-
-        /* Applied Coupon Card Redesign */
-        .applied-coupon-card {
-            background: #fff !important;
-            border: 1px solid #eee !important;
-            padding: 15px !important;
-            border-radius: 4px !important;
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            margin-top: 15px !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
-        }
-
-        .applied-coupon-info {
-            display: flex !important;
-            align-items: center !important;
-            gap: 12px !important;
-            font-size: 14px !important;
-            color: #333 !important;
-        }
-
-        .applied-coupon-icon {
-            color: #28a745 !important;
-            font-size: 16px !important;
-        }
-
-        .btn-remove-coupon-link {
-            background: none !important;
-            border: none !important;
-            color: #d93025 !important;
-            font-size: 11px !important;
-            font-weight: 700 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-            padding: 5px 0 !important;
-            cursor: pointer !important;
-            text-decoration: none !important;
-            transition: all 0.2s !important;
-        }
-
-        .btn-remove-coupon-link:hover {
-            opacity: 0.7 !important;
-            text-decoration: underline !important;
-        }
-    </style>
+/* modal: address pick cards */
+.mpick-card {
+  border:1.5px solid var(--ck-border); border-radius:var(--ck-radius);
+  padding:14px 15px 12px; cursor:pointer; user-select:none; position:relative;
+  transition:border-color .18s,background .18s; display:flex; flex-direction:column; gap:3px;
+  height:100%;
+}
+/* Force all address cards to same height with CSS Grid */
+#modal-addr-grid {
+  display:grid !important;
+  grid-template-columns:1fr 1fr;
+  grid-auto-rows:1fr;
+  gap:12px;
+}
+#modal-addr-grid > .col-6 {
+  padding:0 !important;
+  width:auto !important;
+  max-width:none !important;
+}
+.mpick-card:hover   { border-color:#9ca3af; }
+.mpick-card.is-sel  { border-color:var(--ck-black); background:#fafafa; }
+.mpick-dot {
+  position:absolute; top:12px; right:12px; width:18px; height:18px; border-radius:50%;
+  border:2px solid var(--ck-border); display:flex; align-items:center; justify-content:center;
+  transition:border-color .18s,background .18s;
+}
+.mpick-card.is-sel .mpick-dot { border-color:var(--ck-black); background:var(--ck-black); }
+.mpick-dot::after { content:''; width:6px; height:6px; border-radius:50%; background:#fff; opacity:0; transition:opacity .15s; }
+.mpick-card.is-sel .mpick-dot::after { opacity:1; }
+.mpick-name { font-weight:700; font-size:13px; color:var(--ck-black); padding-right:26px; }
+.mpick-phone { font-size:12px; color:var(--ck-gray); }
+.mpick-addr  { font-size:11.5px; color:var(--ck-gray); line-height:1.4; }
+.mpick-add-btn {
+  width:100%; border:1.5px dashed var(--ck-border); border-radius:var(--ck-radius);
+  padding:12px; display:flex; align-items:center; justify-content:center;
+  gap:8px; cursor:pointer; background:none; font-size:13px; font-weight:600;
+  color:var(--ck-gray); transition:border-color .18s,color .18s; font-family:inherit;
+}
+.mpick-add-btn:hover { border-color:var(--ck-black); color:var(--ck-black); }
+.modal-addr-form { border-top:1px solid var(--ck-border); padding-top:20px; margin-top:6px; }
+.modal-addr-form .ck-label { font-size:11px; }
+</style>
 @endpush
 
 @section('content')
-    <div class="checkout-container">
-        <h1 class="checkout-title">THÔNG TIN</h1>
-        <div class="checkout-breadcrumbs">
-            <a href="{{ route('cart.index') }}">Giỏ hàng</a>
-            <i class="fa fa-angle-right"></i>
-            <span id="breadcrumb-step-1" class="active">Thông tin giao hàng</span>
-            <i class="fa fa-angle-right"></i>
-            <span id="breadcrumb-step-2">Phương thức thanh toán</span>
+<div class="ck-page">
+<div class="container">
+
+  {{-- Breadcrumb --}}
+  <nav class="ck-breadcrumb" aria-label="Điều hướng">
+    <a href="{{ route('welcome') }}">Trang chủ</a> <span aria-hidden="true"> › </span>
+    <a href="{{ route('cart.index') }}">Giỏ hàng</a> <span aria-hidden="true"> › </span>
+    <span>Thanh toán</span>
+  </nav>
+
+  {{-- Config --}}
+  <div id="ck-cfg" hidden
+    data-csrf="{{ csrf_token() }}"
+    data-shipping="{{ url('/api/checkout/shipping-fees') }}"
+    data-cpn-apply="{{ route('checkout.applyCoupon') }}"
+    data-cpn-remove="{{ route('checkout.removeCoupon') }}"
+    data-provinces="{{ route('api.vn-address.provinces') }}"
+    data-communes="{{ url('api/vn-address/communes') }}"
+    data-subtotal="{{ $total }}"
+    data-base="{{ $total - $discount }}"
+    data-discount="{{ $discount }}"
+    data-ship-init="{{ $shippingFee }}"
+  ></div>
+
+  @if($errors->any())
+  <div class="alert alert-danger mb-3" role="alert" aria-live="polite">
+    <strong>Vui lòng kiểm tra lại:</strong>
+    <ul class="mb-0 mt-1">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+  </div>
+  @endif
+
+  <form id="ck-form" action="{{ route('checkout.store') }}" method="POST" autocomplete="on" novalidate>
+  @csrf
+
+  <div class="row g-4">
+
+    {{-- ═══════════════ LEFT COLUMN ═══════════════ --}}
+    <div class="col-lg-7">
+
+      {{-- ── 1. SHIPPING INFO ── --}}
+      <div class="ck-card">
+        <h2 class="ck-card-title">
+          <span class="ck-step" aria-hidden="true">1</span>Thông tin giao hàng
+        </h2>
+
+        @auth
+          @php $defAddr = $userAddresses->firstWhere('is_default', true) ?? $userAddresses->first(); @endphp
+          {{-- Hidden selected address ID (updated by JS) --}}
+          <input type="hidden" name="user_address_id" id="sel-addr-id"
+                 value="{{ $defAddr?->id ?? '' }}">
+
+          @if($userAddresses->isNotEmpty())
+            {{-- Compact selected-address display --}}
+            <div class="sel-addr-box" id="sel-addr-display"
+                 data-bs-toggle="modal" data-bs-target="#addr-pick-modal"
+                 role="button" tabindex="0"
+                 aria-label="Thay đổi địa chỉ giao hàng">
+              <div class="sel-addr-info">
+                <div class="sel-addr-name" id="sel-display-name">{{ $defAddr->receiver_name }}</div>
+                <div class="sel-addr-phone" id="sel-display-phone">{{ $defAddr->phone }}</div>
+                <div class="sel-addr-detail" id="sel-display-detail">{{ $defAddr->address }}, {{ $defAddr->commune }}, {{ $defAddr->province }}</div>
+                @if($defAddr->is_default)<span class="addr-badge" id="sel-display-badge">Mặc định</span>@endif
+              </div>
+              <span class="sel-addr-change">Đổi <i class="fa fa-chevron-right" aria-hidden="true"></i></span>
+            </div>
+
+          @else
+            {{-- No addresses: full-width add button --}}
+            <button type="button" class="addr-no-addr-btn"
+                    data-bs-toggle="modal" data-bs-target="#addr-pick-modal">
+              <i class="fa fa-map-marker-alt" aria-hidden="true"></i>
+              <span>Địa chỉ nhận hàng</span>
+              <small>Chưa có — nhấn để thêm</small>
+            </button>
+          @endif
+
+          <input type="hidden" name="email" value="{{ Auth::user()->email }}">
+        @endauth
+
+
+
+        @guest
+          <div class="ck-row2">
+            <div class="ck-field">
+              <label class="ck-label" for="g_name">Họ và tên <span class="req">*</span></label>
+              <input class="ck-input {{ $errors->has('name') ? 'is-invalid' : '' }}" type="text"
+                     id="g_name" name="name" autocomplete="name" placeholder="Nguyễn Văn A…"
+                     value="{{ old('name') }}" required>
+              @error('name')<span class="ck-error">{{ $message }}</span>@enderror
+            </div>
+            <div class="ck-field">
+              <label class="ck-label" for="g_phone">Số điện thoại <span class="req">*</span></label>
+              <input class="ck-input {{ $errors->has('phone') ? 'is-invalid' : '' }}" type="tel"
+                     id="g_phone" name="phone" autocomplete="tel" inputmode="numeric"
+                     maxlength="10" pattern="^(03|05|07|08|09)\d{8}$"
+                     placeholder="0901234567…" value="{{ old('phone') }}" required>
+              @error('phone')<span class="ck-error">{{ $message }}</span>@enderror
+            </div>
+          </div>
+          <div class="ck-field">
+            <label class="ck-label" for="g_email">Email <span class="req">*</span></label>
+            <input class="ck-input {{ $errors->has('email') ? 'is-invalid' : '' }}" type="email"
+                   id="g_email" name="email" autocomplete="email" spellcheck="false"
+                   placeholder="example@gmail.com…" value="{{ old('email') }}" required>
+            @error('email')<span class="ck-error">{{ $message }}</span>@enderror
+          </div>
+          <div class="ck-row2">
+            <div class="ck-field">
+              <label class="ck-label" for="g_province">Tỉnh / Thành phố <span class="req">*</span></label>
+              <select class="ck-input {{ $errors->has('province') ? 'is-invalid' : '' }}"
+                      id="g_province" name="province" required>
+                <option value="">-- Đang tải… --</option>
+              </select>
+              @error('province')<span class="ck-error">{{ $message }}</span>@enderror
+            </div>
+            <div class="ck-field">
+              <label class="ck-label" for="g_commune">Xã / Phường <span class="req">*</span></label>
+              <select class="ck-input {{ $errors->has('commune') ? 'is-invalid' : '' }}"
+                      id="g_commune" name="commune" required disabled>
+                <option value="">-- Chọn tỉnh trước --</option>
+              </select>
+              @error('commune')<span class="ck-error">{{ $message }}</span>@enderror
+            </div>
+          </div>
+          <div class="ck-field">
+            <label class="ck-label" for="g_address">Địa chỉ chi tiết <span class="req">*</span></label>
+            <input class="ck-input {{ $errors->has('address') ? 'is-invalid' : '' }}" type="text"
+                   id="g_address" name="address" autocomplete="street-address"
+                   placeholder="Nhập địa chỉ chi tiết…" value="{{ old('address') }}" required>
+            @error('address')<span class="ck-error">{{ $message }}</span>@enderror
+          </div>
+        @endguest
+      </div>
+
+      {{-- ── 2. SHIPPING DISPLAY ── --}}
+      <div class="ck-card">
+        <h2 class="ck-card-title">
+          <span class="ck-step" aria-hidden="true">2</span>Vận chuyển
+        </h2>
+        <div class="ship-row">
+          <div>
+            <div class="ship-name">Viettel Post</div>
+            <div class="ship-sub">Giao hàng tiêu chuẩn 3–5 ngày</div>
+          </div>
+          <span id="ship-fee-badge" class="ship-fee {{ $shippingFee == 0 ? 'free' : '' }}" aria-live="polite">
+            {{ $shippingFee > 0 ? number_format($shippingFee,0,',','.') . 'đ' : 'Miễn phí' }}
+          </span>
         </div>
-         <!-- Checkout page section -->
-    <form action="{{ route('checkout.store') }}" method="POST">
-        @csrf
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <p id="ship-note" class="ship-note">
+          @if($shippingFee > 0) 💡 Phí vận chuyển thanh toán khi nhận hàng.
+          @else 🎉 Bạn được miễn phí vận chuyển! @endif
+        </p>
+      </div>
+
+      {{-- ── 3. PAYMENT ── --}}
+      <div class="ck-card">
+        <h2 class="ck-card-title">
+          <span class="ck-step" aria-hidden="true">3</span>Phương thức thanh toán
+        </h2>
+        <div class="pm-list" role="radiogroup" aria-label="Chọn phương thức thanh toán">
+          <label class="pm-opt {{ old('payment_method','COD')==='COD' ? 'is-sel' : '' }}" for="pm_cod">
+            <input type="radio" id="pm_cod" name="payment_method" value="COD"
+                   {{ old('payment_method','COD')==='COD' ? 'checked' : '' }}>
+            <div class="pm-dot" aria-hidden="true"></div>
+            <div class="flex-grow-1">
+              <div class="pm-title">Thanh toán khi nhận hàng (COD)</div>
+              <div class="pm-desc">Trả tiền mặt khi shipper giao tới</div>
             </div>
-        @endif
-
-        @if($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show">
-                <ul class="mb-0">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <span class="pm-icon" aria-hidden="true">💵</span>
+          </label>
+          <label class="pm-opt {{ old('payment_method')==='BANK_TRANSFER' ? 'is-sel' : '' }}" for="pm_bank">
+            <input type="radio" id="pm_bank" name="payment_method" value="BANK_TRANSFER"
+                   {{ old('payment_method')==='BANK_TRANSFER' ? 'checked' : '' }}>
+            <div class="pm-dot" aria-hidden="true"></div>
+            <div class="flex-grow-1">
+              <div class="pm-title">Chuyển khoản ngân hàng</div>
+              <div class="pm-desc">Xác nhận trong 24h sau khi chuyển</div>
             </div>
-        @endif
-
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <span class="pm-icon" aria-hidden="true">🏦</span>
+          </label>
+          <label class="pm-opt {{ old('payment_method')==='VNPAY' ? 'is-sel' : '' }}" for="pm_vnpay">
+            <input type="radio" id="pm_vnpay" name="payment_method" value="VNPAY"
+                   {{ old('payment_method')==='VNPAY' ? 'checked' : '' }}>
+            <div class="pm-dot" aria-hidden="true"></div>
+            <div class="flex-grow-1">
+              <div class="pm-title">Thanh toán VNPAY</div>
+              <div class="pm-desc">Thẻ ATM, Visa, QR Code qua cổng VNPAY</div>
             </div>
-        @endif
-
-        <div class="row">
-            <!-- Left Column: Form Steps -->
-            <div class="col-lg-7">
-                @if(Auth::check())
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-                @endif
-
-                <div class="checkout_form">
-                    <!-- STEP 1: SHIPPING DETAILS -->
-                    <div id="checkout-step-1" class="checkout-step-content">
-                        @if(!Auth::check())
-                            <div class="login-prompt-box">
-                                <div class="login-prompt-text">
-                                    <strong>Bạn đã có tài khoản?</strong><br>
-                                    <span class="text-muted small">Đăng nhập để có trải nghiệm thanh toán nhanh nhất</span>
-                                </div>
-                                <a href="{{ route('login') }}" class="btn-login-outline">Đăng nhập</a>
-                            </div>
-                        @endif
-
-                        <div class="form-section-title">Họ và tên</div>
-                        <input type="text" name="name" value="{{ old('name', Auth::check() ? Auth::user()->name : '') }}" required class="modern-input @error('name') is-invalid @enderror" placeholder="Họ và tên">
-                        @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-
-                        <div class="field-grid">
-                            <div>
-                                <div class="form-section-title">Email</div>
-                                <input type="email" name="email" value="{{ old('email', Auth::check() ? Auth::user()->email : '') }}" required class="modern-input @error('email') is-invalid @enderror" placeholder="Email">
-                                @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-                            <div>
-                                <div class="form-section-title">Số điện thoại</div>
-                                <input type="tel" name="phone" value="{{ old('phone', Auth::check() ? Auth::user()->phone : '') }}" required pattern="^(03|05|07|08|09)\d{8}$" class="modern-input @error('phone') is-invalid @enderror" placeholder="Số điện thoại">
-                                @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-                        </div>
-
-                        <div id="delivery_home_content" class="mt-3">
-                            <input type="hidden" name="delivery_type" value="home">
-                            <div class="form-section-title">Địa chỉ</div>
-                            <input type="text" name="address" value="{{ old('address', Auth::check() ? Auth::user()->address : '') }}" required minlength="5" class="modern-input @error('address') is-invalid @enderror" placeholder="Địa chỉ">
-                            @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
-
-                            <div class="address-grid">
-                                <div>
-                                    <div class="form-section-title">Tỉnh / Thành</div>
-                                    <select name="province" id="province" required class="modern-input modern-select @error('province') is-invalid @enderror">
-                                        <option value="">Chọn tỉnh / thành</option>
-                                        @foreach($provinces as $province)
-                                            <option value="{{ $province }}" {{ old('province') == $province || (Auth::check() && str_contains(Auth::user()->address ?? '', $province)) ? 'selected' : '' }}>{{ $province }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div>
-                                    <div class="form-section-title">Quận / huyện</div>
-                                    <select name="district" id="district" class="modern-input modern-select">
-                                        <option value="">Chọn quận / huyện</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <div class="form-section-title">Phường / xã</div>
-                                    <select name="ward" id="ward" class="modern-input modern-select">
-                                        <option value="">Chọn phường / xã</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="mt-2 text-end">
-                                <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-secondary border-0" style="font-size: 11px;">
-                                    <i class="fa fa-map-marker"></i> Sử dụng vị trí của tôi
-                                </button>
-                            </div>
-                        </div>
-
-                        <button type="button" class="btn-primary-black" id="btn-next-step-1">
-                            TIẾP TỤC ĐẾN PHƯƠNG THỨC THANH TOÁN
-                            <span class="arrow-box"><i class="fa fa-arrow-right"></i></span>
-                        </button>
-                        
-                        <div class="legal-text">
-                            Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo <a href="#">Điều khoản web</a>
-                        </div>
-                    </div>
-
-                    <!-- STEP 2: PAYMENT & SHIPPING METHOD (Hidden initially) -->
-                    <div id="checkout-step-2" class="checkout-step-content" style="display: none;">
-                        <h3 class="summary-title mb-4">Phương thức vận chuyển</h3>
-                        <div id="shipping_method_container">
-                            <div class="panel-default mb-2 border rounded p-3" style="border: 1px solid #dee2e6; margin-bottom: 10px;">
-                                <input id="shipping_default" name="shipping_provider" type="radio" value="default" data-fee="30000" data-service-name="Phí vận chuyển mặc định" checked required style="margin-right: 10px;">
-                                <label for="shipping_default" class="mb-0" style="cursor: pointer; font-weight: 500; display: inline-block;">
-                                    Phí vận chuyển mặc định - <span class="text-primary fw-bold">30.000 đ</span>
-                                </label>
-                            </div>
-                            <input type="hidden" name="shipping_fee" id="hidden_shipping_fee" value="30000">
-                            <input type="hidden" name="shipping_service_name" id="hidden_shipping_service_name" value="Phí vận chuyển mặc định">
-                        </div>
-
-                        <h3 class="summary-title mt-5 mb-4">Phương thức thanh toán</h3>
-                        <div class="payment_method">
-                            <div class="panel-default mb-3 border rounded overflow-hidden">
-                                <label for="payment_cod" class="p-3 w-100 d-flex align-items-center m-0" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_cod">
-                                    <input id="payment_cod" name="payment_method" type="radio" value="COD" data-bs-target="#method_cod" checked required class="me-3" />
-                                    <span>{{ __('messages.cash_on_delivery') }}</span>
-                                </label>
-                                <div id="method_cod" class="collapse show" data-bs-parent="#accordion"></div>
-                            </div>
-
-
-
-                            <div class="panel-default mb-3 border rounded overflow-hidden">
-                                <label for="payment_vnpay" class="p-3 w-100 d-flex align-items-center m-0" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_vnpay">
-                                    <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY" data-bs-target="#method_vnpay" required class="me-3" />
-                                    <span>VNPay (Thẻ ATM, Ví điện tử, QR Code)</span>
-                                </label>
-                                <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
-                                    <div class="p-3 bg-light border-top small">
-                                        <i class="fa fa-info-circle"></i> Thanh toán an toàn qua VNPay.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between mt-5 gap-3 align-items-center">
-                            <button type="button" class="btn btn-outline-secondary px-4 d-flex align-items-center justify-content-center" id="btn-prev-step-2" style="height: 54px; border-radius: 4px; font-weight: 600; min-width: 150px; white-space: nowrap;">
-                                <i class="fa fa-arrow-left me-2"></i> QUAY LẠI
-                            </button>
-                            <button type="button" class="btn-primary-black mt-0" id="btn-next-step-2">
-                                TIẾP TỤC <span class="arrow-box"><i class="fa fa-arrow-right"></i></span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- STEP 3: FINAL CONFIRMATION -->
-                    <div id="checkout-step-3" class="checkout-step-content" style="display: none;">
-                        <h3 class="summary-title mb-4">Xác nhận đơn hàng</h3>
-                        <div class="card border-0 bg-light p-3 mb-4">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <h6 class="fw-bold">Thông tin nhận hàng</h6>
-                                    <p class="mb-1 small"><strong>Người nhận:</strong> <span id="confirm-name"></span></p>
-                                    <p class="mb-1 small"><strong>SĐT:</strong> <span id="confirm-phone"></span></p>
-                                    <p class="mb-1 small"><strong>Địa chỉ:</strong> <span id="confirm-address"></span></p>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6 class="fw-bold">Thanh toán & Vận chuyển</h6>
-                                    <p class="mb-1 small"><strong>Vận chuyển:</strong> <span id="confirm-shipping"></span></p>
-                                    <p class="mb-1 small"><strong>Thanh toán:</strong> <span id="confirm-payment"></span></p>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                        <div class="d-flex justify-content-between mt-5 gap-3 align-items-center">
-                            <button type="button" class="btn btn-outline-secondary px-4 d-flex align-items-center justify-content-center" id="btn-prev-step-3" style="height: 54px; border-radius: 4px; font-weight: 600; min-width: 150px; white-space: nowrap;">
-                                <i class="fa fa-arrow-left me-2"></i> QUAY LẠI
-                            </button>
-                            <button type="submit" class="btn-primary-black mt-0" id="btn-place-order">
-                                ĐẶT HÀNG <span class="arrow-box"><i class="fa fa-arrow-right"></i></span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column: Order Summary -->
-            <div class="col-lg-5">
-                <div class="summary-card">
-                    <h3 class="summary-title">THÔNG TIN ĐƠN HÀNG</h3>
-                    
-                    <div class="summary-items-list">
-                        @foreach($cart as $id => $item)
-                            <div class="summary-item">
-                                <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : asset('frontend-assets/img/s-product/product.jpg') }}" 
-                                     alt="{{ $item['name'] }}" 
-                                     class="summary-item-image">
-                                <div class="summary-item-details">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <span class="summary-item-name">{{ $item['name'] }}</span>
-                                        <button type="button" class="btn-remove-item" data-id="{{ $id }}" title="Xóa sản phẩm">
-                                            <i class="fa fa-times"></i>
-                                        </button>
-                                        <form id="remove-item-form-{{ $id }}" action="{{ route('checkout.remove-item', $id) }}" method="POST" style="display: none;">
-                                            @csrf
-                                        </form>
-                                    </div>
-                                    <div class="summary-item-meta">
-                                        Phân loại: {{ $item['color'] ?? 'N/A' }} / {{ $item['size'] ?? 'N/A' }}
-                                    </div>
-                                    <div class="summary-item-price-qty">
-                                        <span class="summary-item-quantity">x{{ $item['quantity'] }}</span>
-                                        <span class="summary-item-total">{{ number_format($item['price'] * $item['quantity']) }}đ</span>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Tạm tính</span>
-                        <span class="text-dark fw-medium">{{ number_format($total) }}đ</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Phí vận chuyển</span>
-                        <span id="shipping_fee_display" class="text-dark fw-medium">—</span>
-                    </div>
-                    @if($discount > 0)
-                        <div class="summary-row text-success">
-                            <span>Mã giảm giá</span>
-                            <span class="fw-medium">-{{ number_format($discount) }}đ</span>
-                        </div>
-                    @endif
-                    <div class="summary-row total">
-                        <span>Tổng cộng</span>
-                        <span id="final_total_display" class="text-dark">{{ number_format($finalTotal) }}đ</span>
-                    </div>
-
-                    <div id="checkout_coupon" class="mt-4">
-                        @if($coupon)
-                            <div class="applied-coupon-card">
-                                <div class="applied-coupon-info">
-                                    <i class="fa fa-tag applied-coupon-icon"></i>
-                                    <div>
-                                        Mã <strong class="text-dark">{{ $coupon->code }}</strong> đang được áp dụng
-                                    </div>
-                                </div>
-                                <button type="button" class="btn-remove-coupon-link" id="removeCouponBtn">HỦY ÁP DỤNG</button>
-                            </div>
-                        @else
-                            <div class="coupon-group">
-                                <input type="text" id="couponCode" placeholder="Mã giảm giá">
-                                <button type="button" id="applyCouponBtn" class="btn-apply-coupon">
-                                    SỬ DỤNG
-                                    <span class="arrow-box"><i class="fa fa-arrow-right"></i></span>
-                                </button>
-                            </div>
-                            <div id="couponMessage" class="mt-2"></div>
-                        @endif
-                    </div>
-                </div>
-            </div>
+            <span class="pm-icon" aria-hidden="true">📱</span>
+          </label>
         </div>
-    </form>
+        @if(isset($defaultBank) && $defaultBank)
+        <div id="bank-box" class="bank-box {{ old('payment_method')==='BANK_TRANSFER' ? 'show' : '' }}">
+          <div><strong>Ngân hàng:</strong> {{ $defaultBank->bank_id ?? '—' }}</div>
+          <div><strong>Số tài khoản:</strong> <strong>{{ $defaultBank->account_number ?? '—' }}</strong></div>
+          <div><strong>Chủ tài khoản:</strong> {{ $defaultBank->account_name ?? '—' }}</div>
+          <div style="font-size:12px;color:#888;margin-top:4px;">Ghi nội dung chuyển khoản: Mã đơn hàng (nhận sau khi đặt)</div>
+        </div>
+        @endif
+      </div>
+
+      {{-- ── 4. NOTE ── --}}
+      <div class="ck-card">
+        <div class="ck-field" style="margin-bottom:0">
+          <label class="ck-label" for="ck_note">Ghi chú <span style="font-weight:400;text-transform:none;letter-spacing:0">(tuỳ chọn)</span></label>
+          <textarea class="ck-input" id="ck_note" name="note" rows="2"
+                    style="resize:vertical;min-height:68px"
+                    placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao…">{{ old('note') }}</textarea>
+        </div>
+      </div>
+
+    </div>
+
+    {{-- ═══════════════ RIGHT COLUMN ═══════════════ --}}
+    <div class="col-lg-5">
+      <div class="sum-sticky">
+        <div class="ck-card">
+          <h3 class="sum-title">Đơn hàng của bạn</h3>
+
+          <div class="sum-items" aria-label="Sản phẩm trong đơn">
+            @foreach($cart as $vId => $item)
+            <div class="sum-item">
+              <img class="sum-img" loading="lazy" width="50" height="50"
+                   src="{{ $item['image'] ? asset('storage/'.$item['image']) : asset('frontend-assets/img/s-product/product.jpg') }}"
+                   alt="{{ $item['name'] }}">
+              <div class="sum-info">
+                <p class="sum-iname mb-0">{{ $item['name'] }}</p>
+                <p class="sum-imeta mb-0">
+                  x{{ $item['quantity'] }}@if(!empty($item['size'])) · {{ $item['size'] }}@endif
+                  @if(!empty($item['color'])) · {{ $item['color'] }}@endif
+                </p>
+              </div>
+              <span class="sum-iprice">{{ number_format($item['price']*$item['quantity'],0,',','.') }}đ</span>
+            </div>
+            @endforeach
+          </div>
+
+          <hr class="sum-div">
+
+          {{-- Coupon: applied state (shown when coupon active) --}}
+          <div id="cpn-applied-state" class="{{ session('coupon_code') ? '' : 'd-none' }}">
+            <div class="cpn-applied">
+              <span>Mã <strong id="cpn-code-label">{{ session('coupon_code') }}</strong> đã áp dụng</span>
+              <button type="button" id="btn-rm-cpn" class="btn-rm-cpn" aria-label="Xóa mã giảm giá">Xóa</button>
+            </div>
+          </div>
+
+          {{-- Coupon: input state (shown when no coupon) --}}
+          <div id="cpn-input-state" class="{{ session('coupon_code') ? 'd-none' : '' }}">
+            <div class="cpn-row">
+              <input class="cpn-input" type="text" id="cpn-input" autocomplete="off" spellcheck="false"
+                     placeholder="Nhập mã giảm giá…" aria-label="Mã giảm giá">
+              <button class="btn-cpn" id="btn-cpn" type="button" aria-label="Áp dụng mã">Áp dụng</button>
+            </div>
+            <div id="cpn-msg" aria-live="polite" style="font-size:12px;margin-bottom:8px;min-height:16px;"></div>
+          </div>
+
+          <div class="sum-row"><span>Tạm tính</span><span>{{ number_format($total,0,',','.') }}đ</span></div>
+          <div class="sum-row">
+            <span>Phí vận chuyển</span>
+            <span id="sum-ship">{{ $shippingFee > 0 ? number_format($shippingFee,0,',','.') . 'đ' : 'Miễn phí' }}</span>
+          </div>
+          <div class="sum-row" id="sum-discount-row" @if(!$discount) style="display:none" @endif>
+            <span>Giảm giá</span>
+            <span class="sum-discount" id="sum-discount">
+              @if($discount > 0)−{{ number_format($discount,0,',','.') }}đ@endif
+            </span>
+          </div>
+          <hr class="sum-div">
+          <div class="sum-row total">
+            <span>Tổng cộng</span>
+            <span id="sum-total">{{ number_format($finalTotal,0,',','.') }}đ</span>
+          </div>
+
+          <button type="submit" form="ck-form" class="btn-order mt-4" aria-label="Đặt hàng">
+            Đặt Hàng
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>{{-- /row --}}
+  </form>
 </div>
-@endsection
-
-
-@section('scripts')
-    <div id="checkout-config" style="display: none;"
-        data-csrf="{{ csrf_token() }}"
-        data-route-inventory="{{ route('api.checkout.checkInventory') }}"
-        data-route-coupon-apply="{{ route('checkout.applyCoupon') }}"
-        data-route-coupon-remove="{{ route('checkout.removeCoupon') }}"
-        data-route-cart="{{ route('cart.index') }}"
-        data-route-shipping="{{ url('/api/checkout/shipping-fees') }}"
-        data-route-districts="{{ route('api.address.districts') }}"
-        data-route-wards="{{ route('api.address.wards') }}"
-        data-base-total="{{ $total - $discount }}"
-        data-msg-continue="{{ __('messages.continue') }}"
-    ></div>
-    <script>
-        $(document).ready(function () {
-            const config = document.getElementById('checkout-config').dataset;
-            // ============ MULTI-STEP LOGIC ============
-            let currentStep = {{ session('checkout_step', 1) }};
-            
-            // ============ REMOVE ITEM LOGIC ============
-            $('.btn-remove-item').click(function() {
-                const id = $(this).data('id');
-                Swal.fire({
-                    title: 'Xác nhận xóa?',
-                    text: 'Sản phẩm này sẽ bị xóa khỏi đơn hàng.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#222',
-                    cancelButtonColor: '#888',
-                    confirmButtonText: 'Đồng ý',
-                    cancelButtonText: 'Hủy'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.getElementById(`remove-item-form-${id}`);
-                        if (form) {
-                            form.submit();
-                        } else {
-                            console.error(`Form not found: remove-item-form-${id}`);
-                        }
-                    }
-                });
-            });
-
-            if (currentStep === 2) {
-                $('#checkout-step-1').hide();
-                $('#checkout-step-2').show();
-                updateProgressBar(2);
-                
-                // Trigger check inventory and shipping setup in background
-                checkInventoryAsync().then(response => {
-                    calculateShippingFees();
-                }).catch(xhr => {
-                    // if fails silently go back to step 1
-                    $('#checkout-step-2').hide();
-                    $('#checkout-step-1').show();
-                    currentStep = 1;
-                    updateProgressBar(1);
-                });
-            }
-
-            function updateProgressBar(step) {
-                // Update breadcrumbs
-                if (step === 1) {
-                    $('#breadcrumb-step-1').addClass('active');
-                    $('#breadcrumb-step-2').removeClass('active');
-                } else if (step === 2 || step === 3) {
-                    $('#breadcrumb-step-1').removeClass('active');
-                    $('#breadcrumb-step-2').addClass('active');
-                }
-            }
-
-            function checkInventoryAsync() {
-                return $.ajax({
-                    url: config.routeInventory,
-                    method: 'POST',
-                    data: { _token: config.csrf }
-                });
-            }
-
-            function getDeliveryType() {
-                return $('input[name="delivery_type"]').val() || 'home';
-            }
-
-            function requiresAddress() {
-                return true;
-            }
-
-            function setShippingSelection(provider, serviceName, fee) {
-                $('#hidden_shipping_fee').val(fee);
-                $('#hidden_shipping_service_name').val(serviceName);
-                updateTotals(fee);
-            }
-
-            function renderShippingOptions(options) {
-                let html = '';
-
-                options.forEach((option, index) => {
-                    const checked = index === 0 ? 'checked' : '';
-                    html += `
-                        <div class="panel-default mb-2 border rounded p-3" style="border: 1px solid #dee2e6; margin-bottom: 10px;">
-                            <input id="shipping_${option.provider}" name="shipping_provider" type="radio" value="${option.provider}"
-                                data-fee="${option.fee}" data-service-name="${option.service_name}" ${checked} required style="margin-right: 10px;" />
-                            <label for="shipping_${option.provider}" class="mb-0" style="cursor: pointer; font-weight: 500; display: inline-block;">
-                                ${option.service_name} - <span class="text-primary fw-bold">${new Intl.NumberFormat('vi-VN').format(option.fee)} đ</span>
-                            </label>
-                            <small class="d-block text-muted" style="margin-left: 25px; margin-top: 5px;">Thời gian dự kiến: ${option.expected_delivery_time}</small>
-                        </div>
-                    `;
-                });
-
-                $('#shipping_options').html(html);
-                $('input[name="shipping_provider"]:checked').trigger('change');
-            }
-
-            function syncDeliveryModeUI() {
-                // address is always required now
-            }
-
-            function handleInventoryErrors(errors) {
-                let errorHtml = '<ul class="text-start mb-0" style="list-style-type: disc; padding-left: 20px;">';
-                errors.forEach(err => {
-                    errorHtml += `<li class="mb-2"><strong>${err.name}</strong>: ${err.message}</li>`;
-                });
-                errorHtml += '</ul>';
-
-                Swal.fire({
-                    title: 'Lỗi tồn kho!',
-                    html: errorHtml,
-                    icon: 'error',
-                    confirmButtonText: 'Quay lại giỏ hàng',
-                    showCancelButton: true,
-                    cancelButtonText: 'Chỉnh sửa lại',
-                    confirmButtonColor: '#dc3545'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = config.routeCart;
-                    }
-                });
-            }
-
-            $('#btn-next-step-1').click(async function() {
-                // Validation Step 1
-                const nameError     = validateName($('input[name="name"]').val());
-                const phoneError    = validatePhone($('input[name="phone"]').val());
-                const emailError    = validateEmail($('input[name="email"]').val());
-                const provinceError = requiresAddress() ? validateProvince($('select[name="province"]').val()) : '';
-                const addressError  = requiresAddress() ? validateAddress($('input[name="address"]').val()) : '';
-
-                showValidation('input[name="name"]', nameError);
-                showValidation('input[name="phone"]', phoneError);
-                showValidation('input[name="email"]', emailError);
-                showValidation('select[name="province"]', provinceError);
-                showValidation('input[name="address"]', addressError);
-
-                if (nameError || phoneError || emailError || provinceError || addressError) return;
-
-                // Real-time Inventory Check
-                const $btn = $(this);
-                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang kiểm tra kho...');
-
-                try {
-                    const response = await checkInventoryAsync();
-                    if (response.success) {
-                        $('#checkout-step-1').fadeOut(300, function() {
-                            $('#checkout-step-2').fadeIn(300);
-                            currentStep = 2;
-                            updateProgressBar(2);
-                            $('html, body').animate({ scrollTop: 0 }, 500);
-                        });
-                    }
-                } catch (xhr) {
-                    if (xhr.status === 422 && xhr.responseJSON.errors) {
-                        handleInventoryErrors(xhr.responseJSON.errors);
-                    } else {
-                        Swal.fire('Lỗi!', 'Không thể kiểm tra tồn kho lúc này.', 'error');
-                    }
-                } finally {
-                    $btn.prop('disabled', false).html(config.msgContinue + ' <i class="fa fa-arrow-right ms-2"></i>');
-                }
-            });
-
-            $('#btn-prev-step-2').click(function() {
-                $('#checkout-step-2').fadeOut(300, function() {
-                    $('#checkout-step-1').fadeIn(300);
-                    currentStep = 1;
-                    updateProgressBar(1);
-                    $('html, body').animate({ scrollTop: 0 }, 500);
-                });
-            });
-
-            $('#btn-next-step-2').click(async function() {
-                if (!$('input[name="payment_method"]:checked').length) {
-                    Swal.fire({ icon: 'warning', title: 'Cảnh báo', text: 'Vui lòng chọn phương thức thanh toán.' });
-                    return;
-                }
-
-                if (!$('input[name="shipping_provider"]:checked').length) {
-                    Swal.fire({ icon: 'warning', title: 'Cảnh báo', text: 'Vui lòng chọn đơn vị vận chuyển.' });
-                    return;
-                }
-
-                // Inventory Check Again
-                const $btn = $(this);
-                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Kiểm tra kho lần 2...');
-
-                try {
-                    await checkInventoryAsync();
-                    // Update confirmation data
-                    const isHomeDelivery = requiresAddress();
-                    const addressParts = [
-                        $('input[name="address"]').val(),
-                        $('select[name="ward"]').val(),
-                        $('select[name="district"]').val(),
-                        $('select[name="province"]').val()
-                    ].filter(Boolean);
-
-                    $('#confirm-name').text($('input[name="name"]').val());
-                    $('#confirm-phone').text($('input[name="phone"]').val());
-                    $('#confirm-email').text($('input[name="email"]').val());
-                    $('#confirm-address').text(addressParts.join(', '));
-                    $('#confirm-shipping').text($('input[name="shipping_provider"]:checked').data('service-name') || $('#hidden_shipping_service_name').val());
-
-                    const pMethod = $('input[name="payment_method"]:checked').val();
-                    let pMethodText = 'Tiền mặt khi nhận hàng';
-                    if (pMethod === 'VNPAY') pMethodText = 'VNPAY (ATM/Banking)';
-
-                    $('#confirm-payment').text(pMethodText);
-
-                    $('#final_total_display_confirm').html($('#final_total_display').html());
-
-                    $('#checkout-step-2').fadeOut(300, function() {
-                        $('#checkout-step-3').fadeIn(300);
-                        currentStep = 3;
-                        updateProgressBar(3);
-                        $('html, body').animate({ scrollTop: 0 }, 500);
-                    });
-                } catch (xhr) {
-                    if (xhr.status === 422 && xhr.responseJSON.errors) {
-                        handleInventoryErrors(xhr.responseJSON.errors);
-                    }
-                } finally {
-                    $btn.prop('disabled', false).html('Tiếp tục <i class="fa fa-arrow-right ms-2"></i>');
-                }
-            });
-
-            $('#btn-prev-step-3').click(function() {
-                $('#checkout-step-3').fadeOut(300, function() {
-                    $('#checkout-step-2').fadeIn(300);
-                    currentStep = 2;
-                    updateProgressBar(2);
-                    $('html, body').animate({ scrollTop: 0 }, 500);
-                });
-            });
-
-            // ============ DYNAMIC ADDRESS SELECTION ============
-            const $province = $('#province');
-            const $district = $('#district');
-            const $ward = $('#ward');
-
-            $(document).on('change', '#province', function() {
-                const provinceName = $(this).val();
-                console.log('Province selected (delegated):', provinceName);
-                
-                $district.html('<option value="">Đang tải...</option>');
-                $ward.html('<option value="">Chọn phường / xã</option>');
-                if ($.fn.niceSelect) {
-                    $district.niceSelect('update');
-                    $ward.niceSelect('update');
-                }
-
-                if (!provinceName) {
-                    $district.html('<option value="">Chọn quận / huyện</option>');
-                    if ($.fn.niceSelect) $district.niceSelect('update');
-                    return;
-                }
-
-                const url = config.routeDistricts || '/api/address/districts';
-                $.ajax({
-                    url: url,
-                    data: { province_name: provinceName },
-                    headers: { 'X-CSRF-TOKEN': config.csrf },
-                    success: function(districts) {
-                        console.log('Districts received:', districts.length);
-                        let html = '<option value="">Chọn quận / huyện</option>';
-                        districts.forEach(d => {
-                            html += `<option value="${d.name}">${d.name_with_type}</option>`;
-                        });
-                        $district.html(html);
-                        
-                        // Try to update nice-select if it is being used
-                        if ($.fn.niceSelect) {
-                            $district.niceSelect('update');
-                        }
-                        
-                        // Recalculate shipping if province changes
-                        if (typeof calculateShippingFees === 'function') {
-                            calculateShippingFees();
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching districts:', status, error, xhr.responseText);
-                        $district.html('<option value="">Lỗi: ' + xhr.status + '</option>');
-                        if (xhr.status === 404) {
-                            $district.html('<option value="">Lỗi: Không tìm thấy API (404)</option>');
-                        } else if (xhr.status === 419) {
-                            $district.html('<option value="">Lỗi: Hết hạn phiên (419)</option>');
-                        }
-                        if ($.fn.niceSelect) {
-                            $district.niceSelect('update');
-                        }
-                    }
-                });
-            });
-
-            $(document).on('change', '#district', function() {
-                const districtName = $(this).val();
-                const provinceName = $('#province').val();
-                console.log('District selected (delegated):', districtName, 'in', provinceName);
-                $ward.html('<option value="">Đang tải...</option>');
-                if ($.fn.niceSelect) $ward.niceSelect('update');
-
-                if (!districtName) {
-                    $ward.html('<option value="">Chọn phường / xã</option>');
-                    if ($.fn.niceSelect) $ward.niceSelect('update');
-                    return;
-                }
-
-                const url = config.routeWards || '/api/address/wards';
-                $.ajax({
-                    url: url,
-                    data: { 
-                        district_name: districtName,
-                        province_name: provinceName
-                    },
-                    headers: { 'X-CSRF-TOKEN': config.csrf },
-                    success: function(wards) {
-                        console.log('Wards received:', wards.length);
-                        let html = '<option value="">Chọn phường / xã</option>';
-                        wards.forEach(w => {
-                            html += `<option value="${w.name}">${w.name_with_type}</option>`;
-                        });
-                        $ward.html(html);
-                        if ($.fn.niceSelect) {
-                            $ward.niceSelect('update');
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error('Error fetching wards:', xhr);
-                        $ward.html('<option value="">Lỗi tải dữ liệu</option>');
-                        if ($.fn.niceSelect) {
-                            $ward.niceSelect('update');
-                        }
-                    }
-                });
-            });
-
-            // Handle pre-selected values (e.g., from auth user or old input)
-            if ($province.val()) {
-                const currentProvince = $province.val();
-                
-                // Address is expected to be in format "Street, Ward, District, Province"
-                const userAddress = {!! Auth::check() ? json_encode(Auth::user()->address) : 'null' !!};
-                let savedDistrict = "{{ old('district') }}";
-                let savedWard = "{{ old('ward') }}";
-                
-                if (!savedDistrict && userAddress && userAddress.includes(',')) {
-                    let parts = userAddress.split(',').map(s => s.trim());
-                    // parts = [Street, Ward, District, Province]
-                    if (parts.length >= 3) {
-                        savedDistrict = parts[parts.length - 2];
-                        savedWard = parts[parts.length - 3];
-                    }
-                }
-                
-                // Fetch districts for pre-selected province
-                const urlDistricts = config.routeDistricts || '/api/address/districts';
-                $.ajax({
-                    url: urlDistricts,
-                    data: { province_name: currentProvince },
-                    headers: { 'X-CSRF-TOKEN': config.csrf },
-                    success: function(districts) {
-                        let html = '<option value="">Chọn quận / huyện</option>';
-                        districts.forEach(d => {
-                            let selected = (savedDistrict && savedDistrict === d.name) ? 'selected' : '';
-                            html += `<option value="${d.name}" ${selected}>${d.name_with_type}</option>`;
-                        });
-                        $district.html(html);
-                        if ($.fn.niceSelect) $district.niceSelect('update');
-                        
-                        // Fetch wards if district is selected
-                        if (savedDistrict) {
-                            const urlWards = config.routeWards || '/api/address/wards';
-                            $.ajax({
-                                url: urlWards,
-                                data: { province_name: currentProvince, district_name: savedDistrict },
-                                headers: { 'X-CSRF-TOKEN': config.csrf },
-                                success: function(wards) {
-                                    let htmlW = '<option value="">Chọn phường / xã</option>';
-                                    wards.forEach(w => {
-                                        let selected = (savedWard && savedWard === w.name) ? 'selected' : '';
-                                        htmlW += `<option value="${w.name}" ${selected}>${w.name_with_type}</option>`;
-                                    });
-                                    $ward.html(htmlW);
-                                    if ($.fn.niceSelect) $ward.niceSelect('update');
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-
-            // ============ COUPON ============
-
-            $('#applyCouponBtn').click(function () {
-                const couponCode = $('#couponCode').val().trim();
-                if (!couponCode) {
-                    showCouponMessage('Vui lòng nhập m giảm giá', 'danger');
-                    return;
-                }
-                const btn = $(this);
-                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...');
-
-                $.ajax({
-                    url: config.routeCouponApply,
-                    method: 'POST',
-                    data: {
-                        _token: config.csrf,
-                        coupon_code: couponCode
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                title: response.message,
-                                showConfirmButton: false,
-                                timer: 1500,
-                                timerProgressBar: true,
-                            }).then(function () { location.reload(); });
-                        } else {
-                            showCouponMessage(response.message, 'danger');
-                            btn.prop('disabled', false).html('Áp dụng');
-                        }
-                    },
-                    error: function (xhr) {
-                        const message = xhr.responseJSON?.message || 'Có lỗi xảy ra, vui lòng thử lại!';
-                        showCouponMessage(message, 'danger');
-                        btn.prop('disabled', false).html('Áp dụng');
-                    }
-                });
-            });
-
-            $('#removeCouponBtn').click(function () {
-                Swal.fire({
-                    title: 'Hủy áp dụng mã giảm giá?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Xóa',
-                    cancelButtonText: 'Hủy',
-                    confirmButtonColor: '#dc3545',
-                }).then(function (result) {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: config.routeCouponRemove,
-                            method: 'POST',
-                            data: { _token: config.csrf },
-                            success: function (response) {
-                                if (response.success) location.reload();
-                            },
-                            error: function () {
-                                Swal.fire({ icon: 'error', title: 'Lỗi!', text: 'Có lỗi xảy ra!' });
-                            }
-                        });
-                    }
-                });
-            });
-
-            $('#couponCode').keypress(function (e) {
-                if (e.which === 13) { e.preventDefault(); $('#applyCouponBtn').click(); }
-            });
-
-            function showCouponMessage(message, type) {
-                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-                $('#couponMessage').html(`<div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>`);
-            }
-
-            // ============ FORM VALIDATION ============
-            function validateName(value) {
-                if (!value || value.trim().length < 2) return 'Vui lòng nhập họ tên (ít nhất 2 ký tự)';
-                return '';
-            }
-            function validatePhone(value) {
-                if (!value) return 'Vui lòng nhập số điện thoại';
-                if (!/^(03|05|07|08|09)\d{8}$/.test(value)) return 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số';
-                return '';
-            }
-            function validateEmail(value) {
-                if (!value) return 'Vui lòng nhập email';
-                if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) return 'Email không hợp lệ';
-                return '';
-            }
-            function validateAddress(value) {
-                if (!value || value.trim().length < 5) return 'Vui lòng nhập địa chỉ cụ thể (số nhà, tên đường)';
-                return '';
-            }
-            function validateProvince(value) {
-                if (!value) return 'Vui lòng chọn tỉnh thành';
-                return '';
-            }
-
-            function showValidation(input, errorMessage) {
-                const $input = $(input);
-                const $feedback = $input.next('.invalid-feedback');
-                if (errorMessage) {
-                    $input.removeClass('is-valid').addClass('is-invalid');
-                    if ($feedback.length) $feedback.text(errorMessage);
-                    else $input.after(`<div class="invalid-feedback">${errorMessage}</div>`);
-                } else {
-                    $input.removeClass('is-invalid').addClass('is-valid');
-                    $feedback.remove();
-                }
-            }
-
-            $('input[name="name"]').on('blur', function () { showValidation(this, validateName($(this).val())); });
-            $('input[name="phone"]').on('blur', function () { showValidation(this, validatePhone($(this).val())); });
-            $('input[name="email"]').on('blur', function () { showValidation(this, validateEmail($(this).val())); });
-            $('input[name="address"]').on('blur', function () { showValidation(this, validateAddress($(this).val())); });
-
-            // ============ SHIPPING FEES CALCULATION ============
-            let baseTotal = parseInt(config.baseTotal);
-
-            function calculateShippingFees() {
-                const deliveryType = getDeliveryType();
-                $('#shipping_method_container').show();
-
-                if (deliveryType === 'store') {
-                    $('#shipping_method_container').hide();
-                    $('#hidden_shipping_fee').val(0);
-                    $('#hidden_shipping_service_name').val('Nhận tại cửa hàng');
-                    updateTotals(0);
-                    return;
-                }
-
-                // Luôn cập nhật phí vận chuyển mặc định là 30k
-                $('#hidden_shipping_fee').val(30000);
-                $('#hidden_shipping_service_name').val('Phí vận chuyển mặc định');
-                updateTotals(30000);
-            }
-
-            $(document).on('change', 'input[name="shipping_provider"]', function() {
-                let fee = $(this).data('fee');
-                let serviceName = $(this).data('service-name');
-
-                setShippingSelection($(this).val(), serviceName, fee);
-            });
-
-            function updateTotals(shippingFee) {
-                let finalTotal = baseTotal + parseInt(shippingFee);
-
-                // Update shipping display
-                if (shippingFee > 0) {
-                    $('#shipping_fee_display').html('<strong>' + new Intl.NumberFormat('vi-VN').format(shippingFee) + ' đ</strong>');
-                } else {
-                    $('#shipping_fee_display').html('<strong>Miễn phí</strong>');
-                }
-
-                // Update final total display
-                $('#final_total_display').html('<strong>' + new Intl.NumberFormat('vi-VN').format(finalTotal) + ' VND</strong>');
-            }
-
-            syncDeliveryModeUI();
-            calculateShippingFees();
-
-            $('select[name="province"]').on('change', function () {
-                showValidation(this, validateProvince($(this).val()));
-                calculateShippingFees();
-            });
-
-            $('select[name="district"], select[name="ward"], input[name="delivery_type"]').on('change', function () {
-                syncDeliveryModeUI();
-                calculateShippingFees();
-            });
-
-            $('input[name="payment_method"]').on('change', function() {
-                var targetId = $(this).attr('data-bs-target');
-
-                // Ẩn tất cả các panel thanh toán
-                $('#method_cod, #method_vnpay').collapse('hide');
-
-                // Hiện panel của phương thức được chọn
-                $(targetId).collapse('show');
-            });
-
-            $('input[name="name"],input[name="phone"],input[name="email"],input[name="address"],select[name="province"]').on('input change', function () {
-                if ($(this).hasClass('is-invalid')) { $(this).removeClass('is-invalid').next('.invalid-feedback').remove(); }
-            });
-
-            $('form').on('submit', function (e) {
-                const nameError     = validateName($('input[name="name"]').val());
-                const phoneError    = validatePhone($('input[name="phone"]').val());
-                const emailError    = validateEmail($('input[name="email"]').val());
-                const provinceError = validateProvince($('select[name="province"]').val());
-                const addressError  = validateAddress($('input[name="address"]').val());
-                showValidation('input[name="name"]', nameError);
-                showValidation('input[name="phone"]', phoneError);
-                showValidation('input[name="email"]', emailError);
-                showValidation('select[name="province"]', provinceError);
-                showValidation('input[name="address"]', addressError);
-                if (nameError || phoneError || emailError || provinceError || addressError) {
-                    e.preventDefault();
-                    const firstError = $('.is-invalid').first();
-                    if (firstError.length) $('html, body').animate({ scrollTop: firstError.offset().top - 100 }, 500);
-                    return false;
-                }
-                if (!$('input[name="payment_method"]:checked').length) {
-                    e.preventDefault();
-                    Swal.fire({ icon: 'warning', title: 'Chưa chọn thanh toán', text: 'Vui lòng chọn phương thức thanh toán.' });
-                    return false;
-                }
-                $(this).find('button[type="submit"]').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...');
-            });
-
-            // ============ GEOLOCATION ============
-            $('#btn-locate-me').click(function () {
-                if (!navigator.geolocation) {
-                    Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Trình duyệt của bạn không hỗ trợ định vị.' });
-                    return;
-                }
-                const $btn = $(this);
-                const originalHtml = $btn.html();
-                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang định vị...');
-
-                navigator.geolocation.getCurrentPosition(
-                    function (position) {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        $.ajax({
-                            url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&accept-language=vi`,
-                            method: 'GET',
-                            success: function (data) {
-                                if (data && data.address) {
-                                    const address = data.address;
-                                    let provinceName = address.city || address.province || address.state || address.town;
-                                    if (provinceName) {
-                                        provinceName = provinceName.replace('Thành phố ', '').replace('Tỉnh ', '').trim();
-                                        if (provinceName.toLowerCase().includes('hồ chí minh')) provinceName = 'TP Hồ Chí Minh';
-                                        let matchedProvince = '';
-                                        $('#province option').each(function () {
-                                            const optionText = $(this).val();
-                                            if (provinceName.toLowerCase() === optionText.toLowerCase() || optionText.toLowerCase().includes(provinceName.toLowerCase())) {
-                                                matchedProvince = optionText; return false;
-                                            }
-                                        });
-                                        if (matchedProvince) $('#province').val(matchedProvince).trigger('change');
-                                    }
-                                    const road = address.road || '', suburb = address.suburb || address.neighbourhood || '',
-                                          quarter = address.quarter || '', district = address.district || address.city_district || '';
-                                    const streetAddress = [road, suburb, quarter, district].filter(Boolean).join(', ');
-                                    if (streetAddress) { $('input[name="address"]').val(streetAddress); showValidation($('input[name="address"]')[0], ''); }
-                                    Swal.fire({ icon: 'success', title: 'Thành công', text: 'Đ cập nhật địa chỉ từ vị trí của bạn.', timer: 2000, showConfirmButton: false });
-                                }
-                            },
-                            error: function () { Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể lấy thông tin địa chỉ từ tọa độ.' }); },
-                            complete: function () { $btn.prop('disabled', false).html(originalHtml); }
-                        });
-                    },
-                    function (error) {
-                        let message = 'Không thể lấy vị trí của bạn.';
-                        if (error.code === 1) message = 'Bạn đ từ chối quyền truy cập vị trí.';
-                        else if (error.code === 2) message = 'Không thể xác định vị trí.';
-                        else if (error.code === 3) message = 'Hết thời gian yêu cầu vị trí.';
-                        Swal.fire({ icon: 'warning', title: 'Thông báo', text: message });
-                        $btn.prop('disabled', false).html(originalHtml);
-                    },
-                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                );
-            });
+</div>
+
+@auth
+{{-- ══════════ ADDRESS PICKER MODAL ══════════ --}}
+<div class="modal fade" id="addr-pick-modal" tabindex="-1" aria-labelledby="addr-modal-label" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+    <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 8px 40px rgba(0,0,0,.14);">
+      <div class="modal-header" style="border-bottom:1px solid #f0f0f0;padding:18px 24px;">
+        <h5 class="modal-title" id="addr-modal-label" style="font-size:16px;font-weight:700;">
+          <i class="fa fa-map-marker-alt me-2" aria-hidden="true"></i>Chọn địa chỉ giao hàng
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+
+      <div class="modal-body" style="padding:20px 24px;">
+        {{-- Hidden dismiss trigger (JS uses this to close modal safely) --}}
+        <button id="modal-dismiss-hidden" type="button" data-bs-dismiss="modal"
+                style="display:none;" aria-hidden="true"></button>
+
+        @if($userAddresses->isNotEmpty())
+        {{-- Address List Grid 2 Cols --}}
+        <div class="row g-3 mb-3" id="modal-addr-grid">
+          @php $defAddr2 = $userAddresses->firstWhere('is_default', true) ?? $userAddresses->first(); @endphp
+          @foreach($userAddresses as $addr)
+          <div class="col-6">
+            <div class="mpick-card {{ $addr->id === ($defAddr2?->id) ? 'is-sel' : '' }}"
+                 data-id="{{ $addr->id }}"
+                 data-name="{{ $addr->receiver_name }}"
+                 data-phone="{{ $addr->phone }}"
+                 data-province="{{ $addr->province }}"
+                 data-commune="{{ $addr->commune }}"
+                 data-address="{{ $addr->address }}">
+              <div class="mpick-dot" aria-hidden="true"></div>
+              <div class="mpick-name">{{ $addr->receiver_name }}</div>
+              <div class="mpick-phone">{{ $addr->phone }}</div>
+              <div class="mpick-addr">{{ $addr->address }}, {{ $addr->commune }}, {{ $addr->province }}</div>
+              @if($addr->is_default)<span class="addr-badge" style="margin-top:4px">Mặc định</span>@endif
+            </div>
+          </div>
+          @endforeach
+        </div>
+        <hr style="margin:16px 0;">
+        @else
+        <div id="modal-addr-grid" class="row g-3 mb-3"></div>
+        @endif
+
+        {{-- Add new address toggle --}}
+        <button type="button" id="modal-btn-add-addr" class="mpick-add-btn mb-3">
+          + Thêm địa chỉ mới
+        </button>
+
+        {{-- Add address form (hidden by default if addresses exist) --}}
+        <div id="modal-addr-new-form" class="{{ $userAddresses->isNotEmpty() ? 'd-none' : '' }}">
+          <form id="modal-new-addr-form-inner" novalidate>
+            @csrf
+            <div class="modal-addr-form">
+              <div id="modal-addr-err" class="ck-error mb-2" aria-live="polite"></div>
+              <div class="ck-row2">
+                <div class="ck-field">
+                  <label class="ck-label" for="modal_receiver_name">Tên người nhận <span class="req">*</span></label>
+                  <input class="ck-input" type="text" id="modal_receiver_name" name="receiver_name"
+                         autocomplete="name" placeholder="Nguyễn Văn A…" required>
+                </div>
+                <div class="ck-field">
+                  <label class="ck-label" for="modal_phone">Số điện thoại <span class="req">*</span></label>
+                  <input class="ck-input" type="tel" id="modal_phone" name="phone"
+                         autocomplete="tel" inputmode="numeric" maxlength="10"
+                         pattern="^(03|05|07|08|09)\d{8}$" placeholder="0901234567…" required>
+                </div>
+              </div>
+              <div class="ck-row2">
+                <div class="ck-field">
+                  <label class="ck-label" for="modal_province">Tỉnh / Thành phố <span class="req">*</span></label>
+                  <select class="ck-input" id="modal_province" name="province" required>
+                    <option value="">-- Đang tải… --</option>
+                  </select>
+                </div>
+                <div class="ck-field">
+                  <label class="ck-label" for="modal_commune">Xã / Phường <span class="req">*</span></label>
+                  <select class="ck-input" id="modal_commune" name="commune" required disabled>
+                    <option value="">-- Chọn tỉnh trước --</option>
+                  </select>
+                </div>
+              </div>
+              <div class="ck-field">
+                <label class="ck-label" for="modal_address">Địa chỉ chi tiết <span class="req">*</span></label>
+                <input class="ck-input" type="text" id="modal_address" name="address"
+                       autocomplete="street-address" placeholder="Số nhà, tên đường, ngõ/hẻm…" required>
+              </div>
+            </div>
+          </form>
+        </div>
+
+      </div>{{-- /modal-body --}}
+
+      {{-- Footer for selection mode --}}
+      <div class="modal-footer" id="modal-footer-sel"
+           style="border-top:1px solid #f0f0f0;padding:14px 24px;">
+        <button type="button" class="btn-order" style="max-width:200px;padding:12px;"
+                data-bs-dismiss="modal">Xác nhận địa chỉ</button>
+      </div>
+      {{-- Footer for add-address mode --}}
+      <div class="modal-footer" id="modal-footer-add" style="border-top:1px solid #f0f0f0;padding:14px 24px;display:none;">
+        <button type="button" id="modal-save-addr-btn" class="btn-order" style="max-width:200px;padding:12px;">
+          Thêm địa chỉ
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+@endauth
+
+<script>
+(function(){
+  'use strict';
+  const C = (function(){
+    const el = document.getElementById('ck-cfg');
+    if(!el) return {};
+    return {
+      csrf:      el.dataset.csrf,
+      shipping:  el.dataset.shipping,
+      cpnApply:  el.dataset.cpnApply,
+      cpnRemove: el.dataset.cpnRemove,
+      provinces: el.dataset.provinces,
+      communes:  el.dataset.communes,
+      subtotal:  parseFloat(el.dataset.subtotal)||0,
+      base:      parseFloat(el.dataset.base)||0,
+      discount:  parseFloat(el.dataset.discount)||0,
+      shipInit:  parseFloat(el.dataset.shipInit)||0,
+    };
+  })();
+
+  let currentShipFee = C.shipInit; // track latest shipping fee
+
+  const fmt = v => new Intl.NumberFormat('vi-VN').format(v)+'đ';
+  const qs  = s => document.querySelector(s);
+  const qsa = s => document.querySelectorAll(s);
+
+  // ───── Province/Commune cascade ─────
+  async function loadProvinces(pEl, cEl, oldProv, oldComm){
+    try {
+      const r = await fetch(C.provinces);
+      const d = await r.json();
+      let html = '<option value="">-- Chọn tỉnh/thành phố --</option>';
+      let selCode = '';
+      d.forEach(p=>{
+        const sel = p.name===oldProv ? 'selected' : '';
+        if(sel) selCode = p.code;
+        html += `<option value="${p.name}" data-code="${p.code}" ${sel}>${p.name}</option>`;
+      });
+      pEl.innerHTML = html;
+      if(selCode) loadCommunes(cEl, selCode, oldComm);
+    } catch(e){ pEl.innerHTML='<option value="">Lỗi tải dữ liệu</option>'; }
+  }
+  async function loadCommunes(cEl, code, oldComm){
+    cEl.innerHTML='<option value="">-- Đang tải… --</option>'; cEl.disabled=true;
+    try {
+      const r = await fetch(C.communes+'/'+code);
+      const d = await r.json();
+      let html='<option value="">-- Chọn xã/phường --</option>';
+      d.forEach(c=>{ html+=`<option value="${c.name}" ${c.name===oldComm?'selected':''}>${c.name}</option>`; });
+      cEl.innerHTML=html; cEl.disabled=false;
+    } catch(e){ cEl.innerHTML='<option value="">Lỗi tải dữ liệu</option>'; }
+  }
+  function bindCascade(pEl, cEl, oldP, oldC){
+    if(!pEl||!cEl) return;
+    loadProvinces(pEl, cEl, oldP, oldC);
+    pEl.addEventListener('change', function(){
+      const opt = this.options[this.selectedIndex];
+      const code = opt?.dataset?.code||'';
+      if(code){ loadCommunes(cEl,code,null); triggerShipping(this.value,''); }
+      else { cEl.innerHTML='<option value="">-- Chọn tỉnh trước --</option>'; cEl.disabled=true; }
+    });
+    cEl.addEventListener('change', function(){ triggerShipping(pEl.value, this.value); });
+  }
+
+  // ───── Shipping display ─────
+  let shipTimer = null;
+  function triggerShipping(province, commune){
+    clearTimeout(shipTimer);
+    if(!province) return;
+    shipTimer = setTimeout(()=>{
+      fetch(C.shipping, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':C.csrf},
+        body: JSON.stringify({delivery_type:'home', province, district:'', ward:commune}),
+      }).then(r=>r.json()).then(d=>{
+        if(d.success && d.data?.length) renderShip(d.data[0].fee);
+      }).catch(()=>{});
+    }, 350);
+  }
+  function renderShip(fee){
+    currentShipFee = fee;
+    const badge   = qs('#ship-fee-badge');
+    const note    = qs('#ship-note');
+    const sumShip = qs('#sum-ship');
+    const sumTotalEl = qs('#sum-total');
+    if(badge){ badge.textContent = fee>0 ? fmt(fee) : 'Miễn phí'; badge.className='ship-fee'+(fee===0?' free':''); }
+    if(note){ note.textContent = fee>0 ? '💡 Phí vận chuyển thanh toán khi nhận hàng.' : '🎉 Bạn được miễn phí vận chuyển!'; }
+    if(sumShip){ sumShip.textContent = fee>0 ? fmt(fee) : 'Miễn phí'; }
+    if(sumTotalEl){ sumTotalEl.textContent = fmt(C.base + fee); }
+  }
+
+  // ── Modal: address selection ──
+  // Init shipping from default address on load
+  (function(){
+    const defId = qs('#sel-addr-id')?.value;
+    const defCard = qs(`.mpick-card[data-id="${defId}"]`);
+    if(defCard && defCard.dataset.province) triggerShipping(defCard.dataset.province, defCard.dataset.commune||'');
+    // Also trigger from sel-addr-detail dataset (fallback)
+    const box = qs('#sel-addr-display');
+    if(!defCard && box && box.dataset.province) triggerShipping(box.dataset.province, box.dataset.commune||'');
+  })();
+
+  // ——— Utility: close addr modal via Bootstrap's own dismiss mechanism ———
+  function closeAddrModal(){
+    // Clicking a data-bs-dismiss button is the safest way to close a Bootstrap modal
+    // — avoids all race conditions with hide()/getInstance() during click events
+    document.getElementById('modal-dismiss-hidden')?.click();
+  }
+
+  // ——— Helper: update selected-address display in checkout card ———
+  function applyAddrSelection(card){
+    document.querySelectorAll('.mpick-card').forEach(c=>c.classList.remove('is-sel'));
+    card.classList.add('is-sel');
+    const sid = qs('#sel-addr-id');
+    if(sid) sid.value = card.dataset.id;
+    const n = qs('#sel-display-name');
+    const p = qs('#sel-display-phone');
+    const d = qs('#sel-display-detail');
+    if(n) n.textContent = card.dataset.name||'';
+    if(p) p.textContent = card.dataset.phone||'';
+    if(d) d.textContent = [card.dataset.address, card.dataset.commune, card.dataset.province].filter(Boolean).join(', ');
+    // Show selected-addr-box if it was hidden (no-address state)
+    const box = qs('#sel-addr-display');
+    const noBtn = qs('.addr-no-addr-btn');
+    if(!box){
+      // Create display box if didn't exist (first-time add for no-addr user)
+      const emailInp = qs('input[name="email"]');
+      const container = emailInp?.closest('.ck-card') || qs('.ck-card');
+      if(container){
+        const div = document.createElement('div');
+        div.id = 'sel-addr-display';
+        div.className = 'sel-addr-box';
+        div.setAttribute('data-bs-toggle','modal');
+        div.setAttribute('data-bs-target','#addr-pick-modal');
+        div.setAttribute('role','button');
+        div.setAttribute('tabindex','0');
+        div.innerHTML = `<div class="sel-addr-info">
+          <div class="sel-addr-name" id="sel-display-name">${card.dataset.name||''}</div>
+          <div class="sel-addr-phone" id="sel-display-phone">${card.dataset.phone||''}</div>
+          <div class="sel-addr-detail" id="sel-display-detail">${[card.dataset.address,card.dataset.commune,card.dataset.province].filter(Boolean).join(', ')}</div>
+        </div><span class="sel-addr-change">Đổi <i class="fa fa-chevron-right" aria-hidden="true"></i></span>`;
+        if(noBtn) noBtn.replaceWith(div);
+        else container.querySelector('h2')?.after(div);
+      }
+    }
+    if(noBtn) noBtn.style.display='none';
+    if(card.dataset.province) triggerShipping(card.dataset.province, card.dataset.commune||'');
+  }
+
+  // Modal address card click
+  document.addEventListener('click', function(e){
+    const card = e.target.closest('.mpick-card');
+    if(!card) return;
+    applyAddrSelection(card);
+    closeAddrModal();
+  });
+
+  // Toggle add-address form in modal
+  const btnAddToggle = qs('#modal-btn-add-addr');
+  const modalAddForm = qs('#modal-addr-new-form');
+  const modalFooterSel = qs('#modal-footer-sel');
+  if(btnAddToggle && modalAddForm){
+    btnAddToggle.addEventListener('click', ()=>{
+      const opening = modalAddForm.classList.toggle('d-none');
+      // opening = true means was open, now hidden (d-none added)
+      const isNowVisible = !opening;
+      btnAddToggle.textContent = isNowVisible ? '✕ Đóng' : '+ Thêm địa chỉ mới';
+      if(modalFooterSel) modalFooterSel.style.display = isNowVisible ? 'none' : '';
+      const modalFooterAdd = qs('#modal-footer-add');
+      if(modalFooterAdd) modalFooterAdd.style.display = isNowVisible ? '' : 'none';
+    });
+  }
+
+  // Load provinces for modal form
+  bindCascade(qs('#modal_province'), qs('#modal_commune'), '', '');
+
+  // AJAX save new address from modal
+  const modalSaveBtn = qs('#modal-save-addr-btn');
+  const modalErrBox = qs('#modal-addr-err');
+  if(modalSaveBtn){
+    modalSaveBtn.addEventListener('click', async ()=>{
+      const f = qs('#modal-new-addr-form-inner');
+      if(!f) return;
+      // Simple client-side check
+      const fields = f.querySelectorAll('input[required],select[required]');
+      let ok = true;
+      fields.forEach(el=>{ if(!el.value.trim()){ el.classList.add('is-invalid'); ok=false; } else el.classList.remove('is-invalid'); });
+      if(!ok){ if(modalErrBox) modalErrBox.textContent='Vui lòng điền đầy đủ thông tin.'; return; }
+      if(modalErrBox) modalErrBox.textContent='';
+
+      modalSaveBtn.disabled=true; modalSaveBtn.textContent='Đang lưu…';
+      try {
+        const fd = new FormData(f);
+        const res = await fetch('{{ route("account.addresses.store") }}', {
+          method:'POST',
+          headers:{'Accept':'application/json','X-CSRF-TOKEN':C.csrf},
+          body: fd,
         });
-    </script>
-@endsection
+        const data = await res.json();
+        if(data.success && data.address){
+          const a = data.address;
+          // Build new card HTML and prepend to grid
+          const grid = qs('#modal-addr-grid');
+          if(grid){
+            const col = document.createElement('div');
+            col.className = 'col-6 col-sm-6';
+            col.innerHTML = `<div class="mpick-card" data-id="${a.id}" data-name="${a.receiver_name}" data-phone="${a.phone}" data-province="${a.province}" data-commune="${a.commune||''}" data-address="${a.address}">
+              <div class="mpick-dot"></div>
+              <div class="mpick-name">${a.receiver_name}</div>
+              <div class="mpick-phone">${a.phone}</div>
+              <div class="mpick-addr">${a.address}, ${a.commune||''}, ${a.province}</div>
+            </div>`;
+            grid.prepend(col);
+          }
+          // Apply selection WITHOUT triggering click (avoids race with closeAddrModal)
+          const newCard = grid?.querySelector(`.mpick-card[data-id="${a.id}"]`);
+          if(newCard) applyAddrSelection(newCard);
+          // Reset form fields
+          f.reset();
+          const mProv = qs('#modal_province'); if(mProv) mProv.innerHTML='<option value="">-- Định tỉnh trước --</option>';
+          const mComm = qs('#modal_commune'); if(mComm){ mComm.innerHTML='<option value="">-- Chọn tỉnh trước --</option>'; mComm.disabled=true; }
+          // Close modal cleanly
+          closeAddrModal();
+        } else {
+          if(modalErrBox) modalErrBox.textContent = data.message || 'Có lỗi xảy ra.';
+        }
+      } catch(err){
+        if(modalErrBox) modalErrBox.textContent='Lỗi kết nối, vui lòng thử lại.';
+      } finally {
+        modalSaveBtn.disabled=false; modalSaveBtn.textContent='Thêm địa chỉ';
+      }
+    });
+  }
 
+  // Handle show.bs.modal: set correct initial state
+  document.getElementById('addr-pick-modal')?.addEventListener('show.bs.modal', ()=>{
+    const hasCards = qs('#modal-addr-grid')?.querySelector('.mpick-card');
+    if(!hasCards){
+      // No addresses: always show add-form + footer-add
+      if(modalAddForm) modalAddForm.classList.remove('d-none');
+      if(modalFooterSel) modalFooterSel.style.display = 'none';
+      const mfAdd = qs('#modal-footer-add');
+      if(mfAdd) mfAdd.style.display = '';
+      if(btnAddToggle) btnAddToggle.style.display = 'none'; // hide toggle btn when forced
+    } else {
+      // Has addresses: hide add-form, show selection footer
+      if(modalAddForm) modalAddForm.classList.add('d-none');
+      if(modalFooterSel) modalFooterSel.style.display = '';
+      const mfAdd = qs('#modal-footer-add');
+      if(mfAdd) mfAdd.style.display = 'none';
+      if(btnAddToggle){ btnAddToggle.style.display = ''; btnAddToggle.textContent = '+ Thêm địa chỉ mới'; }
+    }
+    // Ensure provinces loaded in modal form
+    const mProv = qs('#modal_province');
+    if(mProv && mProv.options.length <= 1) bindCascade(mProv, qs('#modal_commune'), '', '');
+  });
+
+  // Province/commune cascade — fires for whichever form exists in DOM
+  bindCascade(qs('#new_province'), qs('#new_commune'), '', '');
+  bindCascade(qs('#g_province'), qs('#g_commune'), '', '');
+
+  // ───── Payment method ─────
+  document.querySelectorAll('.pm-opt').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      document.querySelectorAll('.pm-opt').forEach(o=>o.classList.remove('is-sel'));
+      opt.classList.add('is-sel');
+      const radio = opt.querySelector('input[type="radio"]');
+      if(radio) radio.checked = true;
+      const bankBox = qs('#bank-box');
+      if(bankBox) bankBox.classList.toggle('show', radio?.value==='BANK_TRANSFER');
+    });
+  });
+
+  // ───── Coupon ─────
+  const btnCpn    = qs('#btn-cpn');
+  const cpnInput  = qs('#cpn-input');
+  const cpnMsg    = qs('#cpn-msg');
+
+  function applyCouponUI(code, discount){
+    // Update runtime totals
+    C.discount = discount;
+    C.base = C.subtotal - discount;
+    // Refresh total display
+    renderShip(currentShipFee);
+    // Show discount row
+    const dRow = qs('#sum-discount-row');
+    const dAmt  = qs('#sum-discount');
+    if(dRow) dRow.style.display = '';
+    if(dAmt) dAmt.textContent = '−' + fmt(discount);
+    // Toggle coupon UI
+    const label = qs('#cpn-code-label');
+    if(label) label.textContent = code;
+    qs('#cpn-applied-state')?.classList.remove('d-none');
+    qs('#cpn-input-state')?.classList.add('d-none');
+  }
+
+  function removeCouponUI(){
+    C.discount = 0;
+    C.base = C.subtotal;
+    renderShip(currentShipFee);
+    // Hide discount row
+    const dRow = qs('#sum-discount-row');
+    if(dRow) dRow.style.display = 'none';
+    // Toggle coupon UI
+    qs('#cpn-applied-state')?.classList.add('d-none');
+    qs('#cpn-input-state')?.classList.remove('d-none');
+    if(cpnInput) cpnInput.value = '';
+    if(cpnMsg)  cpnMsg.textContent = '';
+  }
+
+  // Apply coupon
+  if(btnCpn && cpnInput){
+    btnCpn.addEventListener('click', async ()=>{
+      const code = cpnInput.value.trim();
+      if(!code){ if(cpnMsg) cpnMsg.textContent='Vui lòng nhập mã giảm giá.'; return; }
+      btnCpn.disabled=true; btnCpn.textContent='Đang kiểm tra…';
+      if(cpnMsg) cpnMsg.textContent='';
+      try {
+        const res = await fetch(C.cpnApply, {
+          method:'POST',
+          headers:{'Content-Type':'application/json','X-CSRF-TOKEN':C.csrf},
+          body: JSON.stringify({coupon_code: code, total: C.subtotal}),
+        });
+        const d = await res.json();
+        if(d.success && d.data){
+          applyCouponUI(d.data.coupon_code, d.data.discount);
+        } else {
+          if(cpnMsg){ cpnMsg.textContent=d.message||'Mã không hợp lệ.'; cpnMsg.style.color='var(--ck-red)'; }
+        }
+      } catch(e){
+        if(cpnMsg) cpnMsg.textContent='Lỗi kết nối.';
+      } finally {
+        btnCpn.disabled=false; btnCpn.textContent='Áp dụng';
+      }
+    });
+    cpnInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); btnCpn.click(); } });
+  }
+
+  // Remove coupon
+  qs('#btn-rm-cpn')?.addEventListener('click', async ()=>{
+    try {
+      await fetch(C.cpnRemove, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':C.csrf},
+      });
+    } catch(e){}
+    removeCouponUI();
+  });
+
+  // ───── Submit guard ─────
+  qs('#ck-form')?.addEventListener('submit', function(e){
+    const btn1 = qs('.btn-order');
+    const btn2 = document.querySelectorAll('.btn-order')[1];
+    [btn1, btn2].forEach(b=>{ if(b){ b.disabled=true; b.textContent='Đang xử lý…'; } });
+  });
+})();
+</script>
+@endsection
