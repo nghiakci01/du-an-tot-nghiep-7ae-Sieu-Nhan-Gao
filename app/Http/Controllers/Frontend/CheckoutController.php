@@ -103,7 +103,18 @@ class CheckoutController extends Controller
 
         $provinces = config('vietnam_provinces');
 
-        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces'));
+        $userAddresses = collect();
+        if (auth()->check()) {
+            $userAddresses = auth()->user()->addresses()->orderByDesc('is_default')->get();
+        }
+
+        $defaultBank = \App\Models\BankSetting::where('is_default', true)->first()
+            ?? \App\Models\BankSetting::first();
+
+        return view('frontend.checkout.index', compact(
+            'cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal',
+            'provinces', 'userAddresses', 'defaultBank'
+        ));
     }
 
     /**
@@ -599,7 +610,7 @@ class CheckoutController extends Controller
             $usedInPivot = DB::table('coupon_user')
                 ->where('user_id', Auth::id())
                 ->where('coupon_id', $coupon->id)
-                ->whereNotNull('used_at')
+                ->whereNotNull('claimed_at')
                 ->exists();
 
             if ($usedInPivot) {

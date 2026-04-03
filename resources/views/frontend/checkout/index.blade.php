@@ -124,6 +124,14 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
 .btn-order:hover { background:#1c1c1e; }
 .btn-order:active { transform:scale(.985); }
 .btn-order:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+/* sum-item delete button */
+.sum-item-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.sum-item-rm {
+  border:none; background:none; color:#bbb; cursor:pointer;
+  font-size:14px; padding:2px 4px; line-height:1;
+  transition:color .15s;
+}
+.sum-item-rm:hover { color:#e53e3e; }
 
 /* selected address display */
 .sel-addr-box {
@@ -336,6 +344,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
         <h2 class="ck-card-title">
           <span class="ck-step" aria-hidden="true">2</span>Vận chuyển
         </h2>
+        {{-- TODO: Team phát triển sau -- Ẩn Viettel Post và phí vận chuyển
         <div class="ship-row">
           <div>
             <div class="ship-name">Viettel Post</div>
@@ -348,6 +357,10 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
         <p id="ship-note" class="ship-note">
           @if($shippingFee > 0) 💡 Phí vận chuyển thanh toán khi nhận hàng.
           @else 🎉 Bạn được miễn phí vận chuyển! @endif
+        </p>
+        --}}
+        <p class="text-muted small mb-0" style="padding:4px 0">
+          📦 Phương thức vận chuyển sẽ được cập nhật sớm.
         </p>
       </div>
 
@@ -367,6 +380,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
             </div>
             <span class="pm-icon" aria-hidden="true">💵</span>
           </label>
+          {{-- TODO: Team phát triển sau -- Ẩn chức năng Chuyển khoản ngân hàng
           <label class="pm-opt {{ old('payment_method')==='BANK_TRANSFER' ? 'is-sel' : '' }}" for="pm_bank">
             <input type="radio" id="pm_bank" name="payment_method" value="BANK_TRANSFER"
                    {{ old('payment_method')==='BANK_TRANSFER' ? 'checked' : '' }}>
@@ -377,6 +391,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
             </div>
             <span class="pm-icon" aria-hidden="true">🏦</span>
           </label>
+          --}}
           <label class="pm-opt {{ old('payment_method')==='VNPAY' ? 'is-sel' : '' }}" for="pm_vnpay">
             <input type="radio" id="pm_vnpay" name="payment_method" value="VNPAY"
                    {{ old('payment_method')==='VNPAY' ? 'checked' : '' }}>
@@ -388,6 +403,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
             <span class="pm-icon" aria-hidden="true">📱</span>
           </label>
         </div>
+        {{-- TODO: Team phát triển sau -- Ẩn bank-box
         @if(isset($defaultBank) && $defaultBank)
         <div id="bank-box" class="bank-box {{ old('payment_method')==='BANK_TRANSFER' ? 'show' : '' }}">
           <div><strong>Ngân hàng:</strong> {{ $defaultBank->bank_id ?? '—' }}</div>
@@ -396,6 +412,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
           <div style="font-size:12px;color:#888;margin-top:4px;">Ghi nội dung chuyển khoản: Mã đơn hàng (nhận sau khi đặt)</div>
         </div>
         @endif
+        --}}
       </div>
 
       {{-- ── 4. NOTE ── --}}
@@ -418,7 +435,9 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
 
           <div class="sum-items" aria-label="Sản phẩm trong đơn">
             @foreach($cart as $vId => $item)
-            <div class="sum-item">
+            @php $lineTotal = $item['price'] * $item['quantity']; @endphp
+            <div class="sum-item" id="sum-item-{{ $vId }}"
+                 data-vid="{{ $vId }}" data-amount="{{ $lineTotal }}">
               <img class="sum-img" loading="lazy" width="50" height="50"
                    src="{{ $item['image'] ? asset('storage/'.$item['image']) : asset('frontend-assets/img/s-product/product.jpg') }}"
                    alt="{{ $item['name'] }}">
@@ -429,7 +448,12 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
                   @if(!empty($item['color'])) · {{ $item['color'] }}@endif
                 </p>
               </div>
-              <span class="sum-iprice">{{ number_format($item['price']*$item['quantity'],0,',','.') }}đ</span>
+              <div class="sum-item-right">
+                <span class="sum-iprice">{{ number_format($lineTotal,0,',','.') }}đ</span>
+                <button type="button" class="sum-item-rm"
+                        aria-label="Xóa sản phẩm"
+                        data-url="{{ route('checkout.remove-item', $vId) }}">&#x2715;</button>
+              </div>
             </div>
             @endforeach
           </div>
@@ -455,10 +479,12 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
           </div>
 
           <div class="sum-row"><span>Tạm tính</span><span>{{ number_format($total,0,',','.') }}đ</span></div>
+          {{-- TODO: Team phát triển sau -- Ẩn phí vận chuyển
           <div class="sum-row">
             <span>Phí vận chuyển</span>
             <span id="sum-ship">{{ $shippingFee > 0 ? number_format($shippingFee,0,',','.') . 'đ' : 'Miễn phí' }}</span>
           </div>
+          --}}
           <div class="sum-row" id="sum-discount-row" @if(!$discount) style="display:none" @endif>
             <span>Giảm giá</span>
             <span class="sum-discount" id="sum-discount">
@@ -613,7 +639,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
     };
   })();
 
-  let currentShipFee = C.shipInit; // track latest shipping fee
+  let currentShipFee = 0; // C.shipInit; - Team phát triển sau: Force ship fee to 0
 
   const fmt = v => new Intl.NumberFormat('vi-VN').format(v)+'đ';
   const qs  = s => document.querySelector(s);
@@ -651,13 +677,19 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
     pEl.addEventListener('change', function(){
       const opt = this.options[this.selectedIndex];
       const code = opt?.dataset?.code||'';
-      if(code){ loadCommunes(cEl,code,null); triggerShipping(this.value,''); }
+      if(code){
+        loadCommunes(cEl,code,null);
+        // triggerShipping(this.value,''); // Team phát triển sau
+      }
       else { cEl.innerHTML='<option value="">-- Chọn tỉnh trước --</option>'; cEl.disabled=true; }
     });
-    cEl.addEventListener('change', function(){ triggerShipping(pEl.value, this.value); });
+    cEl.addEventListener('change', function(){
+      // triggerShipping(pEl.value, this.value); // Team phát triển sau
+    });
   }
 
   // ───── Shipping display ─────
+  /* ───── TODO: Team phát triển sau ─────
   let shipTimer = null;
   function triggerShipping(province, commune){
     clearTimeout(shipTimer);
@@ -672,27 +704,30 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       }).catch(()=>{});
     }, 350);
   }
+  */
   function renderShip(fee){
-    currentShipFee = fee;
+    currentShipFee = 0; // fee; - Force 0
     const badge   = qs('#ship-fee-badge');
     const note    = qs('#ship-note');
     const sumShip = qs('#sum-ship');
     const sumTotalEl = qs('#sum-total');
-    if(badge){ badge.textContent = fee>0 ? fmt(fee) : 'Miễn phí'; badge.className='ship-fee'+(fee===0?' free':''); }
-    if(note){ note.textContent = fee>0 ? '💡 Phí vận chuyển thanh toán khi nhận hàng.' : '🎉 Bạn được miễn phí vận chuyển!'; }
-    if(sumShip){ sumShip.textContent = fee>0 ? fmt(fee) : 'Miễn phí'; }
-    if(sumTotalEl){ sumTotalEl.textContent = fmt(C.base + fee); }
+    if(badge){ badge.textContent = 'Miễn phí'; badge.className='ship-fee free'; }
+    if(note){ note.textContent = '🎉 Bạn được miễn phí vận chuyển!'; }
+    if(sumShip){ sumShip.textContent = 'Miễn phí'; }
+    if(sumTotalEl){ sumTotalEl.textContent = fmt(C.base + 0); }
   }
 
   // ── Modal: address selection ──
   // Init shipping from default address on load
   (function(){
+    /* TODO: Team phát triển sau
     const defId = qs('#sel-addr-id')?.value;
     const defCard = qs(`.mpick-card[data-id="${defId}"]`);
     if(defCard && defCard.dataset.province) triggerShipping(defCard.dataset.province, defCard.dataset.commune||'');
-    // Also trigger from sel-addr-detail dataset (fallback)
     const box = qs('#sel-addr-display');
     if(!defCard && box && box.dataset.province) triggerShipping(box.dataset.province, box.dataset.commune||'');
+    */
+    renderShip(0);
   })();
 
   // ——— Utility: close addr modal via Bootstrap's own dismiss mechanism ———
@@ -739,7 +774,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       }
     }
     if(noBtn) noBtn.style.display='none';
-    if(card.dataset.province) triggerShipping(card.dataset.province, card.dataset.commune||'');
+    // if(card.dataset.province) triggerShipping(card.dataset.province, card.dataset.commune||''); // Team phát triển sau
   }
 
   // Modal address card click
@@ -862,7 +897,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       const radio = opt.querySelector('input[type="radio"]');
       if(radio) radio.checked = true;
       const bankBox = qs('#bank-box');
-      if(bankBox) bankBox.classList.toggle('show', radio?.value==='BANK_TRANSFER');
+      // if(bankBox) bankBox.classList.toggle('show', radio?.value==='BANK_TRANSFER'); // Team phát triển sau
     });
   });
 
@@ -913,7 +948,11 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       try {
         const res = await fetch(C.cpnApply, {
           method:'POST',
-          headers:{'Content-Type':'application/json','X-CSRF-TOKEN':C.csrf},
+          headers:{
+            'Content-Type':'application/json',
+            'Accept':'application/json',
+            'X-CSRF-TOKEN':C.csrf
+          },
           body: JSON.stringify({coupon_code: code, total: C.subtotal}),
         });
         const d = await res.json();
@@ -923,7 +962,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
           if(cpnMsg){ cpnMsg.textContent=d.message||'Mã không hợp lệ.'; cpnMsg.style.color='var(--ck-red)'; }
         }
       } catch(e){
-        if(cpnMsg) cpnMsg.textContent='Lỗi kết nối.';
+        if(cpnMsg){ cpnMsg.textContent='Có lỗi xảy ra, vui lòng thử lại.'; cpnMsg.style.color='var(--ck-red)'; }
       } finally {
         btnCpn.disabled=false; btnCpn.textContent='Áp dụng';
       }
@@ -936,10 +975,56 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
     try {
       await fetch(C.cpnRemove, {
         method:'POST',
-        headers:{'Content-Type':'application/json','X-CSRF-TOKEN':C.csrf},
+        headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':C.csrf},
       });
     } catch(e){}
     removeCouponUI();
+  });
+
+  // ───── Remove item from order summary ─────
+  document.querySelectorAll('.sum-item-rm').forEach(btn=>{
+    btn.addEventListener('click', async function(){
+      const itemEl = this.closest('.sum-item');
+      const amount = parseFloat(itemEl?.dataset.amount)||0;
+      const url    = this.dataset.url;
+      if(!url) return;
+      // Optimistic UI: fade + remove
+      this.disabled = true;
+      itemEl.style.opacity='0.4';
+      try {
+        const res = await fetch(url, {
+          method:'POST',
+          headers:{'Accept':'application/json','X-CSRF-TOKEN':C.csrf},
+        });
+        if(res.ok || res.redirected){
+          // Remove from DOM
+          itemEl.remove();
+          // Update subtotal
+          C.subtotal = Math.max(0, C.subtotal - amount);
+          C.base     = Math.max(0, C.subtotal - (C.discount||0));
+          // Update subtotal row display
+          const subEl = qs('.sum-row span:last-child');
+          // Find the subtotal row by looking for the Tạm tính row
+          document.querySelectorAll('.sum-row').forEach(row=>{
+            if(row.querySelector('span:first-child')?.textContent.trim()==='Tạm tính'){
+              row.querySelector('span:last-child').textContent = fmt(C.subtotal);
+            }
+          });
+          // Refresh total (shipping stays same)
+          renderShip(currentShipFee);
+          // If no items left, redirect to cart
+          if(!document.querySelector('.sum-item')){
+            window.location.href = '{{ route("cart.index") }}';
+          }
+        } else {
+          itemEl.style.opacity='1';
+          this.disabled=false;
+        }
+      } catch(e){
+        itemEl.style.opacity='1';
+        this.disabled=false;
+      }
+    });
   });
 
   // ───── Submit guard ─────
