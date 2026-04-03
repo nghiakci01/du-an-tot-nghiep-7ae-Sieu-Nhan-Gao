@@ -435,10 +435,6 @@
 
                         <div id="delivery_home_content" class="mt-3">
                             <input type="hidden" name="delivery_type" value="home">
-                            <div class="form-section-title">Địa chỉ</div>
-                            <input type="text" name="address" value="{{ old('address', Auth::check() ? Auth::user()->address : '') }}" required minlength="5" class="modern-input @error('address') is-invalid @enderror" placeholder="Địa chỉ">
-                            @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
-
                             <div class="address-grid">
                                 <div>
                                     <div class="form-section-title">Tỉnh / Thành</div>
@@ -462,12 +458,10 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="mt-2 text-end">
-                                <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-secondary border-0" style="font-size: 11px;">
-                                    <i class="fa fa-map-marker"></i> Sử dụng vị trí của tôi
-                                </button>
-                            </div>
                         </div>
+                        <div class="form-section-title">Địa chỉ cụ thể</div>
+                        <input type="text" name="address" value="{{ old('address', Auth::check() ? Auth::user()->address : '') }}" required minlength="5" class="modern-input @error('address') is-invalid @enderror" placeholder="Địa chỉ">
+                        @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
 
                         <button type="button" class="btn-primary-black" id="btn-next-step-1">
                             TIẾP TỤC ĐẾN PHƯƠNG THỨC THANH TOÁN
@@ -654,6 +648,7 @@
         data-route-districts="{{ route('api.address.districts') }}"
         data-route-wards="{{ route('api.address.wards') }}"
         data-base-total="{{ $total - $discount }}"
+        data-total-quantity="{{ $totalQuantity }}"
         data-msg-continue="{{ __('messages.continue') }}"
     ></div>
     <script>
@@ -1264,6 +1259,19 @@
                 if (!$('input[name="payment_method"]:checked').length) {
                     e.preventDefault();
                     Swal.fire({ icon: 'warning', title: 'Chưa chọn thanh toán', text: 'Vui lòng chọn phương thức thanh toán.' });
+                    return false;
+                }
+
+                const paymentMethod = $('input[name="payment_method"]:checked').val();
+                const totalQuantity = parseInt(config.totalQuantity) || 0;
+                if (paymentMethod === 'COD' && totalQuantity > 10) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Giới hạn COD',
+                        text: `Đơn hàng COD chỉ được tối đa 10 sản phẩm (hiện có ${totalQuantity}). Vui lòng giảm số lượng hoặc chọn Chuyển khoản/VNPAY.`,
+                        confirmButtonColor: '#222'
+                    });
                     return false;
                 }
                 $(this).find('button[type="submit"]').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...');
