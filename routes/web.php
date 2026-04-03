@@ -30,13 +30,7 @@ Route::get('/cart/count', [App\Http\Controllers\Frontend\CartController::class, 
 Route::get('/cart/validate', [App\Http\Controllers\Frontend\CheckoutController::class, 'validateCart'])->name('cart.validate');
 Route::post('/api/checkout/check-inventory', [App\Http\Controllers\Api\InventoryCheckController::class, 'checkInventory'])->name('api.checkout.checkInventory');
 
-Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'store'])->name('checkout.store');
-Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
-Route::post('/checkout/remove-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeCoupon'])->name('checkout.removeCoupon');
-Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
-Route::post('/checkout/order/{id}/confirm-transfer', [App\Http\Controllers\Frontend\CheckoutController::class, 'confirmTransfer'])->name('checkout.confirm_transfer');
-Route::post('/checkout/order/{id}/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancelOrder'])->name('checkout.cancel_order');
+// Checkout routes moved to auth group
 
 // VNPay Payment Routes
 Route::get('/payment/vnpay/return', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('payment.vnpay.return');
@@ -107,6 +101,16 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Voucher Claim
     Route::post('/voucher/claim', [App\Http\Controllers\Frontend\VoucherClaimController::class, 'claim'])->name('voucher.claim');
+
+    // Checkout Routes (Authenticated Only)
+    Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
+    Route::post('/checkout/remove-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeCoupon'])->name('checkout.removeCoupon');
+    Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
+    Route::post('/checkout/remove-item/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeItem'])->name('checkout.remove-item');
+    Route::post('/checkout/order/{id}/confirm-transfer', [App\Http\Controllers\Frontend\CheckoutController::class, 'confirmTransfer'])->name('checkout.confirm_transfer');
+    Route::post('/checkout/order/{id}/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancelOrder'])->name('checkout.cancel_order');
 });
 
 

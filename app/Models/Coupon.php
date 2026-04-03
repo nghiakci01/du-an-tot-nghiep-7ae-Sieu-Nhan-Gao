@@ -193,7 +193,7 @@ class Coupon extends Model
     public function claimedByUsers()
     {
         return $this->belongsToMany(User::class, 'coupon_user')
-            ->withPivot('claimed_at', 'source', 'source_id')
+            ->withPivot('claimed_at', 'source', 'source_id', 'used_at', 'order_id')
             ->withTimestamps();
     }
 

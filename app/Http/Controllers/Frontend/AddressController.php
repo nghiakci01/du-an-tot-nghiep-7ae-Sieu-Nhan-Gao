@@ -17,8 +17,8 @@ class AddressController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'receiver_name' => 'required|string|max:100',
-            'phone'         => ['required', 'regex:/^(03|05|07|08|09)\d{8}$/'],
+            'receiver_name' => 'nullable|string|max:100',
+            'phone'         => ['nullable', 'regex:/^(03|05|07|08|09)\d{8}$/'],
             'province'      => 'required|string|max:100',
             'commune'       => 'required|string|max:100',
             'address'       => 'required|string|max:255',
@@ -28,6 +28,10 @@ class AddressController extends Controller
         ]);
 
         $user = Auth::user();
+        
+        // Tự động lấy thông tin từ Profile nếu không nhập ở form địa chỉ
+        $validated['receiver_name'] = $request->input('receiver_name') ?: $user->name;
+        $validated['phone'] = $request->input('phone') ?: $user->phone;
         $isDefault = $request->boolean('is_default');
 
         // Bỏ default của các địa chỉ cũ nếu set default mới
@@ -42,7 +46,7 @@ class AddressController extends Controller
 
         UserAddress::create($validated);
 
-        return redirect()->route('account.index')
+        return redirect()->route('account.index', '#account-details')
             ->with('success', 'Đã thêm địa chỉ mới thành công!');
     }
 
@@ -57,8 +61,8 @@ class AddressController extends Controller
         $address = UserAddress::where('user_id', Auth::id())->findOrFail($id);
 
         $validated = $request->validate([
-            'receiver_name' => 'required|string|max:100',
-            'phone'         => ['required', 'regex:/^(03|05|07|08|09)\d{8}$/'],
+            'receiver_name' => 'nullable|string|max:100',
+            'phone'         => ['nullable', 'regex:/^(03|05|07|08|09)\d{8}$/'],
             'province'      => 'required|string|max:100',
             'commune'       => 'required|string|max:100',
             'address'       => 'required|string|max:255',
@@ -66,6 +70,12 @@ class AddressController extends Controller
         ], [
             'phone.regex' => 'Số điện thoại phải có 10 chữ số và bắt đầu bằng 03, 05, 07, 08 hoặc 09.',
         ]);
+
+        $user = Auth::user();
+        
+        // Tự động lấy thông tin từ Profile nếu không nhập ở form địa chỉ
+        $validated['receiver_name'] = $request->input('receiver_name') ?: $user->name;
+        $validated['phone'] = $request->input('phone') ?: $user->phone;
 
         if ($request->boolean('is_default')) {
             UserAddress::where('user_id', Auth::id())
@@ -76,7 +86,7 @@ class AddressController extends Controller
 
         $address->update($validated);
 
-        return redirect()->route('account.index')
+        return redirect()->route('account.index', '#account-details')
             ->with('success', 'Địa chỉ đã được cập nhật!');
     }
 
@@ -91,7 +101,7 @@ class AddressController extends Controller
             UserAddress::where('user_id', Auth::id())->oldest()->first()?->update(['is_default' => true]);
         }
 
-        return back()->with('success', 'Đã xoá địa chỉ!');
+        return redirect()->route('account.index', '#account-details')->with('success', 'Đã xoá địa chỉ!');
     }
 
     public function setDefault($id)
@@ -100,6 +110,6 @@ class AddressController extends Controller
         UserAddress::where('user_id', $user->id)->update(['is_default' => false]);
         UserAddress::where('user_id', $user->id)->findOrFail($id)->update(['is_default' => true]);
 
-        return back()->with('success', 'Đã đặt làm địa chỉ mặc định!');
+        return redirect()->route('account.index', '#account-details')->with('success', 'Đã đặt làm địa chỉ mặc định!');
     }
 }
