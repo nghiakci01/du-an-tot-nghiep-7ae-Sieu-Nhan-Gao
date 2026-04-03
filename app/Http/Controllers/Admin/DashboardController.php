@@ -73,7 +73,7 @@ class DashboardController extends Controller
         $topProducts = $this->reportService->getTopProducts($startDate, $endDate);
 
         // Tính tổng số lượng sản phẩm đã bán trong kỳ để làm thanh tiến trình
-        $totalProductsSold = \DB::table('order_items')
+        $totalProductsSold = DB::table('order_items')
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
             ->where('orders.status', Order::STATUS_COMPLETED)
             ->whereBetween('orders.created_at', [$startDate, $endDate])

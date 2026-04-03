@@ -12,9 +12,6 @@
                         <a href="{{ route('admin.banners.create') }}" class="btn btn-primary">Thêm Banner Mới</a>
                     </div>
                     <div class="card-body">
-                        @if(session('success'))
-                            <div class="alert alert-success">{{ session('success') }}</div>
-                        @endif
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead>

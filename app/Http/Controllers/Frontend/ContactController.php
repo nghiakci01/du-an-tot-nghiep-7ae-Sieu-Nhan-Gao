@@ -7,6 +7,7 @@ use App\Mail\ContactNotification;
 use App\Models\ContactMessage;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -27,8 +28,8 @@ class ContactController extends Controller
         ]);
 
         $data = $validated;
-        if (auth()->check()) {
-            $data['user_id'] = auth()->id();
+        if (Auth::check()) {
+            $data['user_id'] = Auth::id();
         }
 
         $contactMessage = ContactMessage::create($data);

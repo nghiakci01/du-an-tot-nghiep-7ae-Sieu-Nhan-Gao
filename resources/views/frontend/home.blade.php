@@ -44,7 +44,6 @@
             background-size: cover !important;
             background-position: center center !important;
             background-repeat: no-repeat !important;
-            border-radius: 8px;
             overflow: hidden;
             position: relative;
             width: 100%;
@@ -388,9 +387,6 @@
                                                     <span>{{ __('messages.sale') }}</span>
                                                 </div>
                                             @endif
-                                            <div class="label_product">
-                                                <span>Yêu Thích</span>
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="product_content">
@@ -469,10 +465,10 @@
                     <div class="banner_thumb">
                         @if($bannerBottom->link)
                             <a href="{{ $bannerBottom->link }}">
-                                <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title ?? 'Bottom Banner' }}" style="width: 100%; height: auto; border-radius: 8px;">
+                                <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title ?? 'Bottom Banner' }}" style="width: 100%; height: auto;">
                             </a>
                         @else
-                            <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title ?? 'Bottom Banner' }}" style="width: 100%; height: auto; border-radius: 8px;">
+                            <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title ?? 'Bottom Banner' }}" style="width: 100%; height: auto;">
                         @endif
                     </div>
                 </div>

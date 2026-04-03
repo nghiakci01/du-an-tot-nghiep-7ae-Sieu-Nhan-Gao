@@ -44,38 +44,12 @@ class ShippingService
             return [$this->storePickupOption()];
         }
 
-        if (blank($province)) {
-            return [];
-        }
-
-        $district = $district ?: $province;
-        $ward = $ward ?: $district;
-
-        $options = [];
-        foreach ($this->providers as $provider) {
-            $result = $provider->calculateFee($province, $district, $ward, $weight);
-
-            if ($result !== null) {
-                $options[] = $result;
-            }
-        }
-
-        if (empty($options)) {
-            $options[] = $this->fallbackOption($subtotal);
-        }
-
-        $configuredFee = Setting::getShippingFee($subtotal);
-        if ($configuredFee === 0.0) {
-            $options = array_map(function (array $option) {
-                $option['fee'] = 0;
-
-                return $option;
-            }, $options);
-        }
-
-        usort($options, fn (array $left, array $right) => $left['fee'] <=> $right['fee']);
-
-        return $options;
+        return [[
+            'provider' => 'default',
+            'service_name' => 'Phí vận chuyển',
+            'fee' => 30000,
+            'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
+        ]];
     }
 
     public function resolveSelectedOption(

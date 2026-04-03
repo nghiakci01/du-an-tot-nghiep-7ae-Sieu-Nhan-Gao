@@ -39,12 +39,6 @@
                         <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
                     </form>
 
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
-                    @if(session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
-                    @endif
 
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">

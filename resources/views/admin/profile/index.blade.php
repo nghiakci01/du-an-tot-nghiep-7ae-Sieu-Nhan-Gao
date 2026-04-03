@@ -10,9 +10,7 @@
                     <h5>Tài khoản & Cài đặt</h5>
                 </div>
                 <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
+
                     @if($errors->any())
                         <div class="alert alert-danger">
                             <ul>

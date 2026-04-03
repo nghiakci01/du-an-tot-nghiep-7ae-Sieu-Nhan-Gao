@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\ProductVariant;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -41,129 +42,6 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders', 'shippers'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('admin.orders.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'customer_type' => 'required|in:EXISTING,NEW',
-            'user_id' => 'required_if:customer_type,EXISTING|nullable|exists:users,id',
-            'name'     => 'required|string|max:255',
-            'phone'    => 'required|string|max:20',
-            'email'    => 'required|email|max:255',
-            'province' => 'nullable|required_if:payment_method,COD|required_if:payment_method,BANK_TRANSFER|string|max:100',
-            'commune'  => 'nullable|string|max:100',
-            'address'  => 'nullable|required_if:payment_method,COD|required_if:payment_method,BANK_TRANSFER|string|max:500',
-            'items' => 'required|array|min:1',
-            'items.*.variant_id' => 'required|exists:product_variants,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER,CASH,VNPAY',
-            'status' => 'required|string',
-            'manual_discount' => 'nullable|numeric|min:0',
-            'note' => 'nullable|string',
-        ]);
-
-        try {
-            DB::beginTransaction();
-
-            $totalPrice = 0;
-            foreach ($request->items as $item) {
-                $variant = ProductVariant::where('id', $item['variant_id'])->lockForUpdate()->first();
-
-                if (!$variant) {
-                    throw new \Exception('Sản phẩm không tồn tại.');
-                }
-
-                if ($variant->stock_quantity < $item['quantity']) {
-                    $productName = $variant->product->name;
-                    $variantInfo = ($variant->sizeRelationship ? $variant->sizeRelationship->name : ( $variant->size ?: '' )) .
-                                   ' - ' .
-                                   ($variant->colorRelationship ? $variant->colorRelationship->name : ( $variant->color ?: '' ));
-                    throw new \Exception("Sản phẩm '{$productName}' ({$variantInfo}) chỉ còn {$variant->stock_quantity} trong kho.");
-                }
-
-                $totalPrice += ($variant->price ?? $variant->product->price) * $item['quantity'];
-            }
-
-            $discount = $request->input('manual_discount', 0);
-            $finalTotal = $totalPrice - $discount;
-            $shippingFee = \App\Models\Setting::getShippingFee($finalTotal);
-            $finalTotal += $shippingFee;
-
-            $order = Order::create([
-                'user_id' => $request->customer_type === 'EXISTING' ? $request->user_id : null,
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'province' => $request->province,
-                'address' => $request->address,
-                'status' => $request->status,
-                'total_price' => $totalPrice,
-                'discount_amount' => $discount,
-                'shipping_fee' => $shippingFee,
-                'final_total' => $finalTotal,
-                'payment_method' => $request->payment_method,
-                'shipping_address' => $request->payment_method === 'CASH'
-                    ? 'Thanh to\u00e1n t\u1ea1i qu\u1ea7y - ' . $request->phone . ' - ' . $request->name
-                    : trim(implode(', ', array_filter([$request->address, $request->input('commune'), $request->province])))
-                      . ' - ' . $request->phone . ' - ' . $request->name,
-                'note' => $request->note,
-            ]);
-
-            foreach ($request->items as $item) {
-                $variant = ProductVariant::find($item['variant_id']);
-
-                // Deduct stock
-                $variant->decrement('stock_quantity', $item['quantity']);
-
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $variant->product_id,
-                    'variant_id' => $variant->id,
-                    'quantity' => $item['quantity'],
-                    'price' => $variant->price ?? $variant->product->price,
-                ]);
-            }
-
-            // Log history
-            \App\Models\OrderHistory::create([
-                'order_id' => $order->id,
-                'user_id' => auth()->id(),
-                'new_status' => $order->status,
-                'note' => 'Đơn hàng được tạo thủ công bởi ' . auth()->user()->name,
-            ]);
-
-            DB::commit();
-
-            return redirect()->route('admin.orders.show', $order)
-                ->with('success', 'Đơn hàng đã được tạo thành công.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage())->withInput();
-        }
-    }
-
-    public function customersSearch(Request $request)
-    {
-        $q = $request->q;
-        $users = User::where('name', 'like', "%$q%")
-            ->orWhere('email', 'like', "%$q%")
-            ->orWhere('phone', 'like', "%$q%")
-            ->limit(10)
-            ->get();
-
-        return response()->json($users);
-    }
 
     /**
      * Display the specified resource.
@@ -198,7 +76,7 @@ class OrderController extends Controller
             // Log history
             \App\Models\OrderHistory::create([
                 'order_id' => $order->id,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 'new_status' => $order->status,
                 'note' => 'Admin đã gán nhân viên giao hàng: ' . $shipper->name,
             ]);
@@ -235,7 +113,7 @@ class OrderController extends Controller
         $newStatus = $request->input('status');
 
         try {
-            $orderService->updateOrderStatus($order, $newStatus, auth()->user());
+            $orderService->updateOrderStatus($order, $newStatus, Auth::user());
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -271,7 +149,7 @@ class OrderController extends Controller
             // Log history
             \App\Models\OrderHistory::create([
                 'order_id' => $order->id,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 'previous_status' => 'waiting_confirmation',
                 'new_status' => Order::STATUS_CONFIRMED,
                 'note' => 'Admin xác nhận đã nhận tiền chuyển khoản. Đơn hàng chuyển sang trạng thái Đã xác nhận.',

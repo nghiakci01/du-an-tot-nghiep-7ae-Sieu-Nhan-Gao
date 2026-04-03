@@ -101,14 +101,9 @@ class CheckoutController extends Controller
         $shippingFee = \App\Models\Setting::getShippingFee($finalTotal);
         $finalTotal += $shippingFee;
 
-        $communesData = json_decode(file_get_contents(storage_path('app/vn_communes.json')), true) ?? [];
-        $provinces = collect($communesData)->unique('provinceCode')->sortBy('provinceName')->pluck('provinceName')->values()->toArray();
+        $provinces = config('vietnam_provinces');
 
-        // Lấy thông tin các tài khoản ngân hàng đang hoạt động
-        $banks = \App\Models\BankSetting::where('is_active', true)->get();
-        $defaultBank = $banks->where('is_default', true)->first() ?: $banks->first();
-
-        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces', 'banks', 'defaultBank'));
+        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces'));
     }
 
     /**
@@ -214,27 +209,26 @@ class CheckoutController extends Controller
             'cart_count' => count($this->cartService->getCart())
         ]);
 
-        $request->mergeIfMissing(['delivery_type' => 'home']);
-        $deliveryType = $request->input('delivery_type', 'home');
+        $provinces = config('vietnam_provinces');
         $request->validate([
-            'name'             => 'required|string|max:255',
-            'phone'            => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
-            'email'            => 'required|email:rfc,dns|max:255',
-            'delivery_type'    => 'nullable|in:home,store',
-            'province'         => 'nullable|required_if:delivery_type,home|string|max:100',
-            'commune'          => 'nullable|required_if:delivery_type,home|string|max:100',
-            'address'          => 'nullable|required_if:delivery_type,home|string|max:500',
-            'payment_method'   => 'required|in:COD,BANK_TRANSFER,VNPAY',
-            'shipping_provider'     => 'nullable|string',
+            'name' => 'required|string|max:255',
+            'phone' => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
+            'email' => 'required|email:rfc,dns|max:255',
+            'province' => 'required|string|in:' . implode(',', $provinces),
+            'district' => 'nullable|string|max:255',
+            'ward' => 'nullable|string|max:255',
+            'address' => 'required|string|max:500',
+            'payment_method' => 'required|in:COD,VNPAY',
+            'shipping_provider' => 'nullable|string',
             'shipping_service_name' => 'nullable|string',
-            'shipping_fee'          => 'nullable|numeric',
+            'shipping_fee' => 'nullable|numeric',
         ], [
-            'phone.required'    => 'Vui lòng nhập số điện thoại.',
-            'phone.regex'       => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
-            'email.required'    => 'Vui lòng nhập địa chỉ email.',
-            'email.email'       => 'Địa chỉ email không hợp lệ.',
-            'province.required' => 'Vui lòng chọn tỉnh/thành phố.',
-            'commune.required'  => 'Vui lòng chọn xã/phường.',
+            'phone.required' => 'Vui lòng nhập số điện thoại.',
+            'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
+            'email.required' => 'Vui lòng nhập địa chỉ email.',
+            'email.email' => 'Địa chỉ email không hợp lệ.',
+            'province.required' => 'Vui lòng chọn tỉnh thành.',
+            'province.in' => 'Tỉnh thành không hợp lệ.',
         ]);
 
         $cart = $this->cartService->getCart();
@@ -286,37 +280,36 @@ class CheckoutController extends Controller
             $discount = session()->get('discount_amount', 0);
             $shippingSubtotal = max(0, $total - $discount);
             $shippingOption = $this->shippingService->resolveSelectedOption(
-                $deliveryType,
+                'home',
                 $request->input('province'),
-                null, // district không còn dùng
-                $request->input('commune'),
+                $request->input('district'),
+                $request->input('ward'),
                 $this->shippingService->estimateWeightFromCart($cart),
                 $shippingSubtotal,
                 $request->input('shipping_provider')
             );
             if ($shippingOption === null) {
                 return redirect()->back()
-                    ->with('error', 'Vui lòng chọn phương thức vận chuyển hợp lệ.')
+                    ->with('error', 'Vui long chon phuong thuc van chuyen hop le.')
                     ->withInput();
             }
-            $shippingFee     = (float) ($shippingOption['fee'] ?? 0);
-            $shippingProvider    = $shippingOption['provider'] ?? null;
+            $shippingFee = (float) ($shippingOption['fee'] ?? 0);
+            $shippingProvider = $shippingOption['provider'] ?? null;
             $shippingServiceName = $shippingOption['service_name'] ?? null;
             $finalTotal = $total - $discount + $shippingFee;
-            $shippingAddress = $deliveryType === 'store'
-                ? 'Nhận tại cửa hàng - ' . $request->phone . ' - ' . $request->name
-                : trim(implode(', ', array_filter([
-                    $request->address,
-                    $request->input('commune'),
-                    $request->province,
-                ]))) . ' - ' . $request->phone . ' - ' . $request->name;
+            $shippingAddress = trim(implode(', ', array_filter([
+                $request->address,
+                $request->input('ward'),
+                $request->input('district'),
+                $request->province,
+            ]))) . ' - ' . $request->phone . ' - ' . $request->name;
             $order = Order::create([
                 'user_id' => Auth::id(), // Nullable if guest
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'province' => $deliveryType === 'store' ? null : $request->province,
-                'address' => $deliveryType === 'store' ? 'Nhan tai cua hang' : $request->address,
+                'province' => $request->province,
+                'address' => $request->address,
                 'status' => 'pending',
                 'total_price' => $total,
                 'coupon_code' => $couponCode,
@@ -372,7 +365,9 @@ class CheckoutController extends Controller
 
             // Notify User (if logged in)
             if (Auth::check()) {
-                Auth::user()->notify(new OrderPlacedNotification($order));
+                /** @var \App\Models\User $user */
+                $user = Auth::user();
+                $user->notify(new OrderPlacedNotification($order));
             }
 
             // Clear selected items and session
@@ -435,20 +430,7 @@ class CheckoutController extends Controller
     {
         $order = Order::with(['items.product', 'items.variant'])->findOrFail($id);
 
-        // Lấy thông tin tài khoản ngân hàng mặc định
-        $bank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first();
-
-        // Nếu không có mặc định, lấy cái đầu tiên đang hoạt động
-        if (!$bank) {
-            $bank = \App\Models\BankSetting::where('is_active', true)->first();
-        }
-
-        $bankName = $bank->bank_name ?? 'Vietcombank';
-        $bankAccount = $bank->account_number ?? '0071001234567';
-        $bankOwner = $bank->account_name ?? 'CÔNG TY TNHH SIÊU NHÂN GAO';
-        $bankId = $bank->bank_id ?? 'vcb';
-
-        return view('frontend.checkout.success', compact('order', 'bankName', 'bankAccount', 'bankOwner', 'bankId'));
+        return view('frontend.checkout.success', compact('order'));
     }
 
     /**

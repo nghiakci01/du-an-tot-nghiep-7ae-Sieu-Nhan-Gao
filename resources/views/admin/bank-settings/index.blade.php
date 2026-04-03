@@ -12,9 +12,6 @@
                     <a href="{{ route('admin.bank-settings.create') }}" class="btn btn-primary btn-sm">Thêm mới</a>
                 </div>
                 <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped text-center">
                             <thead>

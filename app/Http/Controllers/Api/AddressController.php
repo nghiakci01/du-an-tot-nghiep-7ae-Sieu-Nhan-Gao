@@ -63,7 +63,7 @@ class AddressController extends Controller
 
         $filtered = [];
         foreach ($districts as $code => $d) {
-            if ($d['parent_code'] === $provinceCode) {
+            if ((string)$d['parent_code'] === (string)$provinceCode) {
                 $filtered[] = [
                     'code' => $code,
                     'name' => $d['name'],
@@ -108,7 +108,7 @@ class AddressController extends Controller
         $normalizedDistrictInput = $this->normalize($districtName);
         foreach ($districts as $code => $d) {
             $normalizedName = $this->normalize($d['name']);
-            if (($normalizedName === $normalizedDistrictInput || str_contains($normalizedName, $normalizedDistrictInput) || str_contains($normalizedDistrictInput, $normalizedName)) && $d['parent_code'] === $provinceCode) {
+            if (($normalizedName === $normalizedDistrictInput || str_contains($normalizedName, $normalizedDistrictInput) || str_contains($normalizedDistrictInput, $normalizedName)) && (string)$d['parent_code'] === (string)$provinceCode) {
                 $districtCode = $code;
                 break;
             }
@@ -118,7 +118,7 @@ class AddressController extends Controller
 
         $filtered = [];
         foreach ($wards as $code => $w) {
-            if ($w['parent_code'] === $districtCode) {
+            if ((string)$w['parent_code'] === (string)$districtCode) {
                 $filtered[] = [
                     'code' => $code,
                     'name' => $w['name'],

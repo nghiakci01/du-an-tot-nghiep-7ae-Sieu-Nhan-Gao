@@ -84,27 +84,7 @@
     padding-top: 14px;
     font-size: 1.1rem;
   }
-  .bank-info-box {
-    background: #fff9f0;
-    border: 1px solid #ffd280;
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .bank-info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px dashed #ffe0b2;
-    font-size: 0.9rem;
-  }
-  .bank-info-row:last-child { border-bottom: none; }
-  .qr-holder {
-    background: white;
-    padding: 12px;
-    border-radius: 12px;
-    display: inline-block;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  }
+
 
 </style>
 @endpush
@@ -244,91 +224,7 @@
               </div>
             </div>
 
-            {{-- BANK TRANSFER INFO --}}
-            @if($isBankTransfer)
-            @php
-                $bank = $order->bankSetting;
-                if (!$bank) {
-                    $bank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first() ?: \App\Models\BankSetting::where('is_active', true)->first();
-                }
-                $bName = $bank?->bank_name ?? 'N/A';
-                $bAccount = $bank?->account_number ?? 'N/A';
-                $bOwner = $bank?->account_name ?? 'N/A';
-                $bId = $bank?->bank_id ?? '';
-            @endphp
-            <div class="col-12">
-              <div class="p-4 rounded-4 @if($order->payment_status == 'waiting_confirmation') bg-light-success @else bank-info-box @endif">
-                <div class="row align-items-center">
-                  <div class="col-md-7">
-                    @if($order->payment_status == 'pending')
-                      <p class="section-label mb-2">Thông tin chuyển khoản</p>
-                      <p class="fw-bold mb-3" style="color:#d4860a;">⚠️ Vui lòng chuyển khoản và nhấn nút xác nhận bên dưới.</p>
-                      <div class="bank-info-row">
-                        <span class="text-muted">Ngân hàng</span>
-                        <span class="fw-semibold">{{ $bName }}</span>
-                      </div>
-                      <div class="bank-info-row">
-                        <span class="text-muted">Số tài khoản</span>
-                        <span class="fw-bold text-dark">{{ $bAccount }}</span>
-                      </div>
-                      <div class="bank-info-row">
-                        <span class="text-muted">Chủ tài khoản</span>
-                        <span class="fw-semibold">{{ $bOwner }}</span>
-                      </div>
-                      <div class="bank-info-row">
-                        <span class="text-muted">Số tiền</span>
-                        <span class="fw-bold text-danger">{{ number_format($displayTotal) }}&thinsp;đ</span>
-                      </div>
-                      <div class="bank-info-row" style="border-bottom:none;">
-                        <span class="text-muted">Nội dung CK</span>
-                        <span class="fw-bold text-danger">THANHTOAN ELITE {{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
-                      </div>
 
-                      <div class="mt-4 d-flex gap-2">
-                        <form action="{{ route('checkout.confirm_transfer', $order->id) }}" method="POST" class="flex-grow-1">
-                          @csrf
-                          <button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow-sm">
-                            <i class="bi bi-send-check-fill me-2"></i> Xác nhận đã chuyển khoản
-                          </button>
-                        </form>
-                        <form action="{{ route('checkout.cancel_order', $order->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')">
-                          @csrf
-                          <button type="submit" class="btn btn-outline-danger py-3 px-4 rounded-pill fw-bold">
-                            Hủy đơn
-                          </button>
-                        </form>
-                      </div>
-                    @elseif($order->payment_status == 'waiting_confirmation')
-                      <div class="text-center py-4">
-                        <div class="mb-3">
-                          <i class="bi bi-clock-history text-warning" style="font-size: 3rem;"></i>
-                        </div>
-                        <h5 class="fw-bold">Đang chờ xác nhận thanh toán</h5>
-                        <p class="text-muted">Hệ thống đã ghi nhận thông báo chuyển khoản của bạn. Admin sẽ kiểm tra và xác nhận đơn hàng sớm nhất có thể.</p>
-                      </div>
-                    @elseif($order->payment_status == 'paid')
-                      <div class="text-center py-4">
-                        <div class="mb-3">
-                          <i class="bi bi-patch-check-fill text-success" style="font-size: 3rem;"></i>
-                        </div>
-                        <h5 class="fw-bold">Thanh toán đã được xác nhận</h5>
-                        <p class="text-muted">Cảm ơn bạn, chúng tôi đã nhận được thanh toán và đang chuẩn bị hàng.</p>
-                      </div>
-                    @endif
-                  </div>
-                  <div class="col-md-5 text-center mt-4 mt-md-0">
-                    <div class="qr-holder">
-                      @php
-                        $qrUrl = "https://img.vietqr.io/image/{$bId}-{$bAccount}-compact2.png?amount={$displayTotal}&addInfo=THANHTOAN%20ELITE%20{$order->id}&accountName=" . urlencode($bOwner);
-                      @endphp
-                      <img src="{{ $qrUrl }}" alt="VietQR" class="img-fluid" style="max-width: 190px;">
-                    </div>
-                    <p class="small text-muted mt-2 mb-0">📷 Quét mã QR để thanh toán nhanh</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            @endif
 
             {{-- VNPAY PAYMENT STATUS --}}
             @if($isVnpay)

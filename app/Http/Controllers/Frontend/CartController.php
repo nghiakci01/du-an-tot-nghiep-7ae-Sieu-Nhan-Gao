@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Events\CartUpdatedEvent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Services\CartService;
 
@@ -258,7 +259,7 @@ class CartController extends Controller
 
         // Fire event
         $cartCount = array_sum(array_column($this->cartService->getCart(), 'quantity'));
-        CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+        CartUpdatedEvent::dispatch($cartCount, session()->getId(), Auth::id());
 
         session()->flash('success', 'Đã cập nhật biến thể thành công');
 
@@ -395,7 +396,7 @@ class CartController extends Controller
         // Fire Event
         $cartAfterEdit = $this->cartService->getCart();
         $cartCount = array_sum(array_column($cartAfterEdit, 'quantity'));
-        CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+        CartUpdatedEvent::dispatch($cartCount, session()->getId(), Auth::id());
 
         if ($request->input('action') === 'buy_now') {
             // Set session for checkout
@@ -485,7 +486,7 @@ class CartController extends Controller
 
                 $grandTotal = $subtotal - $discount + $shippingFee;
 
-                CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+                CartUpdatedEvent::dispatch($cartCount, session()->getId(), Auth::id());
 
                 return response()->json([
                     'success' => true,
@@ -571,7 +572,7 @@ class CartController extends Controller
 
                 $grandTotal = $subtotal - $discount + $shippingFee;
 
-                CartUpdatedEvent::dispatch($cartCount, session()->getId(), auth()->id());
+                CartUpdatedEvent::dispatch($cartCount, session()->getId(), Auth::id());
 
                 return response()->json([
                     'success' => true,
@@ -599,7 +600,7 @@ class CartController extends Controller
         $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
         $grandTotal = $subtotal + $shippingFee;
 
-        CartUpdatedEvent::dispatch(0, session()->getId(), auth()->id());
+        CartUpdatedEvent::dispatch(0, session()->getId(), Auth::id());
 
         if ($request->ajax()) {
             return response()->json([
@@ -654,7 +655,7 @@ class CartController extends Controller
             return response()->json(['success' => false, 'message' => 'Mã giảm giá không hợp lệ hoặc đã hết hạn.'], 400);
         }
 
-        if ($coupon->user_id && $coupon->user_id != \Auth::id()) {
+        if ($coupon->user_id && $coupon->user_id != Auth::id()) {
             return response()->json(['success' => false, 'message' => 'Mã giảm giá này không dành cho bạn.'], 400);
         }
 

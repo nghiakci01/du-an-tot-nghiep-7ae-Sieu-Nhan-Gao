@@ -21,6 +21,10 @@ class OrderReturnRequest extends Model
         'status',
         'admin_note',
         'refund_amount',
+        'bank_name',
+        'bank_bin',
+        'account_number',
+        'account_name',
         'processed_by',
         'processed_at',
     ];

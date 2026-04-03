@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ChatManagementController extends Controller
 {
@@ -77,7 +79,7 @@ class ChatManagementController extends Controller
 
         $staffMessage = ChatMessage::create([
             'session_id' => $sessionId,
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'message' => $request->message,
             'sender_type' => 'staff',
             'is_read' => true,
@@ -108,7 +110,7 @@ class ChatManagementController extends Controller
 
         $conversations = ChatMessage::onlyTrashed()
             ->whereNotIn('session_id', $activeSessionIds)
-            ->select('session_id', 'user_id', \DB::raw('MAX(deleted_at) as deleted_at'))
+            ->select('session_id', 'user_id', DB::raw('MAX(deleted_at) as deleted_at'))
             ->with(['user'])
             ->groupBy('session_id', 'user_id')
             ->orderBy('deleted_at', 'desc')

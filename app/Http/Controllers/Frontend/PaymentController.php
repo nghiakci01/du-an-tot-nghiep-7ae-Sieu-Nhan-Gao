@@ -115,7 +115,7 @@ class PaymentController extends Controller
             if ($order->payment_status !== 'paid') {
                 try {
                     $orderService = app(\App\Services\OrderService::class);
-                    $orderService->updateOrderStatus($order, \App\Models\Order::STATUS_CANCELLED, null, 'Khách hàng hủy thanh toán VNPay.');
+                    $orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, null, 'Khách hàng hủy thanh toán VNPay.');
                     
                     // Khôi phục lại giỏ hàng cho khách
                     app(\App\Services\CartService::class)->restoreOrderToCart($order);
@@ -139,7 +139,7 @@ class PaymentController extends Controller
                     session()->flash('checkout_step', 2);
                     
                 } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error('Lỗi khi hủy đơn hàng VNPay (Return) #' . $order->id . ': ' . $e->getMessage());
+                    Log::error('Lỗi khi hủy đơn hàng VNPay (Return) #' . $order->id . ': ' . $e->getMessage());
                     $order->update(['payment_status' => 'failed']);
                 }
             }

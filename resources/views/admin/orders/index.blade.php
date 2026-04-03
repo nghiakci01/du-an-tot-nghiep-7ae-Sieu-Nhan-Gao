@@ -25,7 +25,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5>Danh sách Đơn hàng</h5>
-                    <a href="{{ route('admin.orders.create') }}" class="btn btn-primary btn-sm"><i class="feather icon-plus"></i> Thêm đơn hàng</a>
+
                 </div>
                 
                 <div class="card-body border-bottom bg-light bg-opacity-50">
@@ -68,12 +68,6 @@
                         </select>
                         <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
                     </form>
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
-                    @if(session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
-                    @endif
 
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered text-center">

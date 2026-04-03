@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Du an Tot nghiep - Sieu Nhan Gao
 
 Website thuong mai dien tu xay dung bang Laravel cho de tai tot nghiep.
@@ -26,23 +27,23 @@ copy .env.example .env
 php artisan key:generate
 ```
 
-2. Cap nhat `.env` cho dung database local.
+1. Cap nhat `.env` cho dung database local.
 
-3. Chay migrate va seed:
+1. Chay migrate va seed:
 
 ```bash
 php artisan migrate:fresh --seed
 php artisan storage:link
 ```
 
-4. Cai frontend assets:
+1. Cai frontend assets:
 
 ```bash
 npm install
 npm run build
 ```
 
-5. Chay local:
+1. Chay local:
 
 ```bash
 composer dev
@@ -87,5 +88,6 @@ SHIPPING_PICKUP_ADDRESS=Kho Elite
 ```
 
 Luu y:
+
 - Neu thieu token hoac dia chi lay hang, he thong se tu dong fallback ve bang phi ship noi bo de khong vo flow checkout.
 - Hien tai GHTK la provider da duoc noi san sang cho quote that; GHN va Viettel Post van dang o che do noi bo/mock.

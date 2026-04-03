@@ -93,7 +93,7 @@
 
         .address-grid {
             display: grid !important;
-            grid-template-columns: 1fr 1fr !important;
+            grid-template-columns: repeat(3, 1fr) !important;
             gap: 15px !important;
             margin-top: 15px !important;
         }
@@ -130,48 +130,7 @@
             background-color: #fff !important;
         }
 
-        /* delivery method toggle */
-        .delivery-method-box {
-            border: 1px solid #e1e1e1 !important;
-            border-radius: 4px !important;
-            margin-bottom: 20px !important;
-            overflow: hidden !important;
-        }
-
-        .delivery-option {
-            padding: 15px !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 15px !important;
-            cursor: pointer !important;
-            border-bottom: 1px solid #eee !important;
-        }
-
-        .delivery-option:last-child {
-            border-bottom: none !important;
-        }
-
-        .delivery-option input[type="radio"] {
-            width: 18px !important;
-            height: 18px !important;
-            margin: 0 !important;
-            cursor: pointer !important;
-            accent-color: #000 !important;
-        }
-
-        .delivery-option label {
-            margin: 0 !important;
-            font-weight: 500 !important;
-            color: #000 !important;
-            font-size: 14px !important;
-            cursor: pointer !important;
-        }
-
-        .delivery-content {
-            padding: 20px !important;
-            background: #fff !important;
-            border-top: 1px solid #eee !important;
-        }
+        
 
         /* order summary refinement */
         .summary-card {
@@ -188,6 +147,8 @@
             margin-bottom: 25px !important;
             color: #000 !important;
             letter-spacing: 0.5px !important;
+            background: none !important;
+            padding: 0 !important;
         }
 
         .summary-row {
@@ -363,38 +324,39 @@
                             </div>
                         </div>
 
-                        <div class="delivery-method-box">
-                            <div class="delivery-option active" onclick="$('#delivery_home_content').slideDown(); $(this).addClass('active').next().next().removeClass('active'); $('#delivery_home').prop('checked', true);">
-                                <input type="radio" name="delivery_type" id="delivery_home" value="home" checked>
-                                <label for="delivery_home">Giao tận nơi</label>
-                            </div>
-                            <div id="delivery_home_content" class="delivery-content">
-                                <div class="form-section-title">Địa chỉ</div>
-                                <input type="text" name="address" value="{{ old('address', Auth::check() ? Auth::user()->address : '') }}" required minlength="5" class="modern-input @error('address') is-invalid @enderror" placeholder="Địa chỉ">
-                                @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        <div id="delivery_home_content" class="mt-3">
+                            <input type="hidden" name="delivery_type" value="home">
+                            <div class="form-section-title">Địa chỉ</div>
+                            <input type="text" name="address" value="{{ old('address', Auth::check() ? Auth::user()->address : '') }}" required minlength="5" class="modern-input @error('address') is-invalid @enderror" placeholder="Địa chỉ">
+                            @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
 
-                                <div class="address-grid">
-                                    <div>
-                                        <div class="form-section-title">Tỉnh / Thành phố</div>
-                                        <select name="province" id="province" required
-                                            class="modern-input modern-select @error('province') is-invalid @enderror">
-                                            <option value="">-- Đang tải... --</option>
-                                        </select>
-                                        @error('province') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                    </div>
-                                    <div>
-                                        <div class="form-section-title">Xã / Phường</div>
-                                        <select name="commune" id="commune" required disabled
-                                            class="modern-input modern-select @error('commune') is-invalid @enderror">
-                                            <option value="">-- Chọn tỉnh trước --</option>
-                                        </select>
-                                        @error('commune') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                    </div>
+                            <div class="address-grid">
+                                <div>
+                                    <div class="form-section-title">Tỉnh / Thành</div>
+                                    <select name="province" id="province" required class="modern-input modern-select @error('province') is-invalid @enderror">
+                                        <option value="">Chọn tỉnh / thành</option>
+                                        @foreach($provinces as $province)
+                                            <option value="{{ $province }}" {{ old('province') == $province || (Auth::check() && str_contains(Auth::user()->address, $province)) ? 'selected' : '' }}>{{ $province }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <div class="form-section-title">Quận / huyện</div>
+                                    <select name="district" id="district" class="modern-input modern-select">
+                                        <option value="">Chọn quận / huyện</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <div class="form-section-title">Phường / xã</div>
+                                    <select name="ward" id="ward" class="modern-input modern-select">
+                                        <option value="">Chọn phường / xã</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="delivery-option" onclick="$('#delivery_home_content').slideUp(); $(this).addClass('active').prev().prev().removeClass('active'); $('#delivery_store').prop('checked', true);">
-                                <input type="radio" name="delivery_type" id="delivery_store" value="store">
-                                <label for="delivery_store">Nhận tại cửa hàng</label>
+                            <div class="mt-2 text-end">
+                                <button type="button" id="btn-locate-me" class="btn btn-sm btn-outline-secondary border-0" style="font-size: 11px;">
+                                    <i class="fa fa-map-marker"></i> Sử dụng vị trí của tôi
+                                </button>
                             </div>
                         </div>
 
@@ -412,40 +374,32 @@
                     <div id="checkout-step-2" class="checkout-step-content" style="display: none;">
                         <h3 class="summary-title mb-4">Phương thức vận chuyển</h3>
                         <div id="shipping_method_container">
-                            <p class="text-muted small mb-3">Phí ship sẽ cập nhật theo địa chỉ nhận hàng. Nếu chọn nhận tại cửa hàng, hệ thống sẽ chuyển về 0đ.</p>
-                            <div id="shipping_options">
-                                <p class="text-muted">Đang tải...</p>
+                            <div class="panel-default mb-2 border rounded p-3" style="border: 1px solid #dee2e6; margin-bottom: 10px;">
+                                <input id="shipping_default" name="shipping_provider" type="radio" value="default" data-fee="30000" data-service-name="Phí vận chuyển mặc định" checked required style="margin-right: 10px;">
+                                <label for="shipping_default" class="mb-0" style="cursor: pointer; font-weight: 500; display: inline-block;">
+                                    Phí vận chuyển mặc định - <span class="text-primary fw-bold">30.000 đ</span>
+                                </label>
                             </div>
-                            <input type="hidden" name="shipping_fee" id="hidden_shipping_fee" value="0">
-                            <input type="hidden" name="shipping_service_name" id="hidden_shipping_service_name" value="">
+                            <input type="hidden" name="shipping_fee" id="hidden_shipping_fee" value="30000">
+                            <input type="hidden" name="shipping_service_name" id="hidden_shipping_service_name" value="Phí vận chuyển mặc định">
                         </div>
 
                         <h3 class="summary-title mt-5 mb-4">Phương thức thanh toán</h3>
                         <div class="payment_method">
                             <div class="panel-default mb-3 border rounded overflow-hidden">
-                                <input id="payment_cod" name="payment_method" type="radio" value="COD" data-bs-target="#method_cod" checked required class="ms-3 mt-3" />
-                                <label for="payment_cod" class="p-3 w-100 d-inline-block" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_cod">
-                                    {{ __('messages.cash_on_delivery') }}
+                                <label for="payment_cod" class="p-3 w-100 d-flex align-items-center m-0" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_cod">
+                                    <input id="payment_cod" name="payment_method" type="radio" value="COD" data-bs-target="#method_cod" checked required class="me-3" />
+                                    <span>{{ __('messages.cash_on_delivery') }}</span>
                                 </label>
                                 <div id="method_cod" class="collapse show" data-bs-parent="#accordion"></div>
                             </div>
 
-                            <div class="panel-default mb-3 border rounded overflow-hidden">
-                                <input id="payment_bank" name="payment_method" type="radio" value="BANK_TRANSFER" data-bs-target="#method_bank" required class="ms-3 mt-3" />
-                                <label for="payment_bank" class="p-3 w-100 d-inline-block" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_bank">
-                                    Chuyển khoản ngân hàng trực tiếp (VietQR)
-                                </label>
-                                <div id="method_bank" class="collapse" data-bs-parent="#accordion">
-                                    <div class="p-3 bg-light border-top small">
-                                        <i class="fa fa-info-circle"></i> Bạn sẽ nhận được thông tin số tài khoản và mã QR để chuyển khoản sau khi nhấn "Đặt hàng".
-                                    </div>
-                                </div>
-                            </div>
+
 
                             <div class="panel-default mb-3 border rounded overflow-hidden">
-                                <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY" data-bs-target="#method_vnpay" required class="ms-3 mt-3" />
-                                <label for="payment_vnpay" class="p-3 w-100 d-inline-block" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_vnpay">
-                                    VNPay (Thẻ ATM, Ví điện tử, QR Code)
+                                <label for="payment_vnpay" class="p-3 w-100 d-flex align-items-center m-0" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#method_vnpay">
+                                    <input id="payment_vnpay" name="payment_method" type="radio" value="VNPAY" data-bs-target="#method_vnpay" required class="me-3" />
+                                    <span>VNPay (Thẻ ATM, Ví điện tử, QR Code)</span>
                                 </label>
                                 <div id="method_vnpay" class="collapse" data-bs-parent="#accordion">
                                     <div class="p-3 bg-light border-top small">
@@ -455,8 +409,8 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between mt-5 gap-3">
-                            <button type="button" class="btn btn-outline-secondary px-4" id="btn-prev-step-2" style="height: 54px; border-radius: 4px; font-weight: 600;">
+                        <div class="d-flex justify-content-between mt-5 gap-3 align-items-center">
+                            <button type="button" class="btn btn-outline-secondary px-4 d-flex align-items-center justify-content-center" id="btn-prev-step-2" style="height: 54px; border-radius: 4px; font-weight: 600; min-width: 150px; white-space: nowrap;">
                                 <i class="fa fa-arrow-left me-2"></i> QUAY LẠI
                             </button>
                             <button type="button" class="btn-primary-black mt-0" id="btn-next-step-2">
@@ -484,19 +438,10 @@
                             </div>
                         </div>
 
-                        <!-- Bank Transfer Info -->
-                        <div id="bank-transfer-info" class="mb-4 p-3 border rounded bg-white" style="display: none;">
-                            <h6 class="fw-bold mb-3">Thông tin chuyển khoản</h6>
-                            <p class="mb-1 small">Ngân hàng: <strong>{{ $defaultBank->bank_name ?? 'N/A' }}</strong></p>
-                            <p class="mb-1 small">Số tài khoản: <strong class="text-primary">{{ $defaultBank->account_number ?? 'N/A' }}</strong></p>
-                            <p class="mb-3 small">Chủ tài khoản: <strong>{{ $defaultBank->account_name ?? 'N/A' }}</strong></p>
-                            <div class="text-center">
-                                <img id="bank_qr_image" src="" alt="VietQR" class="img-fluid" style="max-width: 200px;">
-                            </div>
-                        </div>
 
-                        <div class="d-flex justify-content-between mt-5 gap-3">
-                            <button type="button" class="btn btn-outline-secondary px-4" id="btn-prev-step-3" style="height: 54px; border-radius: 4px; font-weight: 600;">
+
+                        <div class="d-flex justify-content-between mt-5 gap-3 align-items-center">
+                            <button type="button" class="btn btn-outline-secondary px-4 d-flex align-items-center justify-content-center" id="btn-prev-step-3" style="height: 54px; border-radius: 4px; font-weight: 600; min-width: 150px; white-space: nowrap;">
                                 <i class="fa fa-arrow-left me-2"></i> QUAY LẠI
                             </button>
                             <button type="submit" class="btn-primary-black mt-0" id="btn-place-order">
@@ -566,12 +511,9 @@
         data-route-coupon-remove="{{ route('checkout.removeCoupon') }}"
         data-route-cart="{{ route('cart.index') }}"
         data-route-shipping="{{ url('/api/checkout/shipping-fees') }}"
-        data-route-provinces="{{ route('api.vn-address.provinces') }}"
-        data-route-communes="{{ url('api/vn-address/communes') }}"
+        data-route-districts="{{ route('api.address.districts') }}"
+        data-route-wards="{{ route('api.address.wards') }}"
         data-base-total="{{ $total - $discount }}"
-        data-bank-account="{{ isset($defaultBank) ? $defaultBank->account_number : '0' }}"
-        data-bank-id="{{ isset($defaultBank) ? $defaultBank->bank_id : 'X' }}"
-        data-bank-name="{{ isset($defaultBank) ? urlencode($defaultBank->account_name) : 'X' }}"
         data-msg-continue="{{ __('messages.continue') }}"
     ></div>
     <script>
@@ -617,11 +559,11 @@
             }
 
             function getDeliveryType() {
-                return $('input[name="delivery_type"]:checked').val() || 'home';
+                return $('input[name="delivery_type"]').val() || 'home';
             }
 
             function requiresAddress() {
-                return getDeliveryType() === 'home';
+                return true;
             }
 
             function setShippingSelection(provider, serviceName, fee) {
@@ -652,15 +594,7 @@
             }
 
             function syncDeliveryModeUI() {
-                const isHomeDelivery = requiresAddress();
-
-                $('input[name="address"]').prop('required', isHomeDelivery);
-                $('select[name="province"]').prop('required', isHomeDelivery);
-
-                if (!isHomeDelivery) {
-                    showValidation('input[name="address"]', '');
-                    showValidation('select[name="province"]', '');
-                }
+                // address is always required now
             }
 
             function handleInventoryErrors(errors) {
@@ -756,29 +690,22 @@
                     const isHomeDelivery = requiresAddress();
                     const addressParts = [
                         $('input[name="address"]').val(),
-                        $('select[name="commune"]').val(),
+                        $('select[name="ward"]').val(),
+                        $('select[name="district"]').val(),
                         $('select[name="province"]').val()
                     ].filter(Boolean);
 
                     $('#confirm-name').text($('input[name="name"]').val());
                     $('#confirm-phone').text($('input[name="phone"]').val());
                     $('#confirm-email').text($('input[name="email"]').val());
-                    $('#confirm-address').text(isHomeDelivery ? addressParts.join(', ') : 'Nhận tại cửa hàng');
+                    $('#confirm-address').text(addressParts.join(', '));
                     $('#confirm-shipping').text($('input[name="shipping_provider"]:checked').data('service-name') || $('#hidden_shipping_service_name').val());
 
                     const pMethod = $('input[name="payment_method"]:checked').val();
                     let pMethodText = 'Tiền mặt khi nhận hàng';
                     if (pMethod === 'VNPAY') pMethodText = 'VNPAY (ATM/Banking)';
-                    if (pMethod === 'BANK_TRANSFER') pMethodText = 'Chuyển khoản ngân hàng';
 
                     $('#confirm-payment').text(pMethodText);
-
-                    // Show/hide bank transfer info
-                    if (pMethod === 'BANK_TRANSFER') {
-                        $('#bank-transfer-info').show();
-                    } else {
-                        $('#bank-transfer-info').hide();
-                    }
 
                     $('#final_total_display_confirm').html($('#final_total_display').html());
 
@@ -806,39 +733,162 @@
                 });
             });
 
-            // ============ DYNAMIC ADDRESS CASCADE ============
+            // ============ DYNAMIC ADDRESS SELECTION ============
             const $province = $('#province');
-            const $commune  = $('#commune');
+            const $district = $('#district');
+            const $ward = $('#ward');
 
-            // Load provinces once on page load
-            $.getJSON(config.routeProvinces, function(provinces) {
-                let html = '<option value="">-- Chọn tỉnh/thành phố --</option>';
-                provinces.forEach(function(p) {
-                    const sel = (p.name === '{{ old('province') }}') ? 'selected' : '';
-                    html += `<option value="${p.name}" data-code="${p.code}" ${sel}>${p.name}</option>`;
-                });
-                $province.html(html);
-                if ($province.val()) $province.trigger('change');
-            });
+            $(document).on('change', '#province', function() {
+                const provinceName = $(this).val();
+                console.log('Province selected (delegated):', provinceName);
+                
+                $district.html('<option value="">Đang tải...</option>');
+                $ward.html('<option value="">Chọn phường / xã</option>');
+                if ($.fn.niceSelect) {
+                    $district.niceSelect('update');
+                    $ward.niceSelect('update');
+                }
 
-            $province.on('change', function() {
-                const code = this.options[this.selectedIndex]?.dataset.code || '';
-                $commune.html('<option value="">-- Đang tải... --</option>').prop('disabled', true);
-                if (!code) {
-                    $commune.html('<option value="">-- Chọn tỉnh trước --</option>');
+                if (!provinceName) {
+                    $district.html('<option value="">Chọn quận / huyện</option>');
+                    if ($.fn.niceSelect) $district.niceSelect('update');
                     return;
                 }
-                $.getJSON(config.routeCommunes + '/' + code, function(list) {
-                    let html = '<option value="">-- Chọn xã/phường --</option>';
-                    list.forEach(function(c) {
-                        const sel = (c.name === '{{ old('commune') }}') ? 'selected' : '';
-                        html += `<option value="${c.name}" ${sel}>${c.name}</option>`;
-                    });
-                    $commune.html(html).prop('disabled', false);
-                    calculateShippingFees();
+
+                const url = config.routeDistricts || '/api/address/districts';
+                $.ajax({
+                    url: url,
+                    data: { province_name: provinceName },
+                    headers: { 'X-CSRF-TOKEN': config.csrf },
+                    success: function(districts) {
+                        console.log('Districts received:', districts.length);
+                        let html = '<option value="">Chọn quận / huyện</option>';
+                        districts.forEach(d => {
+                            html += `<option value="${d.name}">${d.name_with_type}</option>`;
+                        });
+                        $district.html(html);
+                        
+                        // Try to update nice-select if it is being used
+                        if ($.fn.niceSelect) {
+                            $district.niceSelect('update');
+                        }
+                        
+                        // Recalculate shipping if province changes
+                        if (typeof calculateShippingFees === 'function') {
+                            calculateShippingFees();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching districts:', status, error, xhr.responseText);
+                        $district.html('<option value="">Lỗi: ' + xhr.status + '</option>');
+                        if (xhr.status === 404) {
+                            $district.html('<option value="">Lỗi: Không tìm thấy API (404)</option>');
+                        } else if (xhr.status === 419) {
+                            $district.html('<option value="">Lỗi: Hết hạn phiên (419)</option>');
+                        }
+                        if ($.fn.niceSelect) {
+                            $district.niceSelect('update');
+                        }
+                    }
                 });
-                calculateShippingFees();
             });
+
+            $(document).on('change', '#district', function() {
+                const districtName = $(this).val();
+                const provinceName = $('#province').val();
+                console.log('District selected (delegated):', districtName, 'in', provinceName);
+                $ward.html('<option value="">Đang tải...</option>');
+                if ($.fn.niceSelect) $ward.niceSelect('update');
+
+                if (!districtName) {
+                    $ward.html('<option value="">Chọn phường / xã</option>');
+                    if ($.fn.niceSelect) $ward.niceSelect('update');
+                    return;
+                }
+
+                const url = config.routeWards || '/api/address/wards';
+                $.ajax({
+                    url: url,
+                    data: { 
+                        district_name: districtName,
+                        province_name: provinceName
+                    },
+                    headers: { 'X-CSRF-TOKEN': config.csrf },
+                    success: function(wards) {
+                        console.log('Wards received:', wards.length);
+                        let html = '<option value="">Chọn phường / xã</option>';
+                        wards.forEach(w => {
+                            html += `<option value="${w.name}">${w.name_with_type}</option>`;
+                        });
+                        $ward.html(html);
+                        if ($.fn.niceSelect) {
+                            $ward.niceSelect('update');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error fetching wards:', xhr);
+                        $ward.html('<option value="">Lỗi tải dữ liệu</option>');
+                        if ($.fn.niceSelect) {
+                            $ward.niceSelect('update');
+                        }
+                    }
+                });
+            });
+
+            // Handle pre-selected values (e.g., from auth user or old input)
+            if ($province.val()) {
+                const currentProvince = $province.val();
+                
+                // Address is expected to be in format "Street, Ward, District, Province"
+                const userAddress = {!! Auth::check() ? json_encode(Auth::user()->address) : 'null' !!};
+                let savedDistrict = "{{ old('district') }}";
+                let savedWard = "{{ old('ward') }}";
+                
+                if (!savedDistrict && userAddress && userAddress.includes(',')) {
+                    let parts = userAddress.split(',').map(s => s.trim());
+                    // parts = [Street, Ward, District, Province]
+                    if (parts.length >= 3) {
+                        savedDistrict = parts[parts.length - 2];
+                        savedWard = parts[parts.length - 3];
+                    }
+                }
+                
+                // Fetch districts for pre-selected province
+                const urlDistricts = config.routeDistricts || '/api/address/districts';
+                $.ajax({
+                    url: urlDistricts,
+                    data: { province_name: currentProvince },
+                    headers: { 'X-CSRF-TOKEN': config.csrf },
+                    success: function(districts) {
+                        let html = '<option value="">Chọn quận / huyện</option>';
+                        districts.forEach(d => {
+                            let selected = (savedDistrict && savedDistrict === d.name) ? 'selected' : '';
+                            html += `<option value="${d.name}" ${selected}>${d.name_with_type}</option>`;
+                        });
+                        $district.html(html);
+                        if ($.fn.niceSelect) $district.niceSelect('update');
+                        
+                        // Fetch wards if district is selected
+                        if (savedDistrict) {
+                            const urlWards = config.routeWards || '/api/address/wards';
+                            $.ajax({
+                                url: urlWards,
+                                data: { province_name: currentProvince, district_name: savedDistrict },
+                                headers: { 'X-CSRF-TOKEN': config.csrf },
+                                success: function(wards) {
+                                    let htmlW = '<option value="">Chọn phường / xã</option>';
+                                    wards.forEach(w => {
+                                        let selected = (savedWard && savedWard === w.name) ? 'selected' : '';
+                                        htmlW += `<option value="${w.name}" ${selected}>${w.name_with_type}</option>`;
+                                    });
+                                    $ward.html(htmlW);
+                                    if ($.fn.niceSelect) $ward.niceSelect('update');
+                                }
+                            });
+                        }
+                    }
+                });
+            }
 
             // ============ COUPON ============
 
@@ -966,52 +1016,20 @@
 
             function calculateShippingFees() {
                 const deliveryType = getDeliveryType();
-                const province = $('select[name="province"]').val();
-                const commune  = $('select[name="commune"]').val();
-
                 $('#shipping_method_container').show();
 
                 if (deliveryType === 'store') {
-                    renderShippingOptions([{
-                        provider: 'store_pickup',
-                        service_name: 'Nhận tại cửa hàng',
-                        fee: 0,
-                        expected_delivery_time: 'Trong giờ hành chính'
-                    }]);
-                    return;
-                }
-
-                if (!province) {
-                    $('#shipping_options').html('<div class="alert alert-info">Vui lòng chọn tỉnh/thành để xem phí vận chuyển.</div>');
+                    $('#shipping_method_container').hide();
                     $('#hidden_shipping_fee').val(0);
-                    $('#hidden_shipping_service_name').val('');
+                    $('#hidden_shipping_service_name').val('Nhận tại cửa hàng');
                     updateTotals(0);
                     return;
                 }
 
-                $('#shipping_options').html('<div class="text-center p-3"><span class="spinner-border spinner-border-sm text-primary"></span> Đang tính phí vận chuyển...</div>');
-
-                $.ajax({
-                    url: config.routeShipping,
-                    method: 'POST',
-                    data: {
-                        _token: config.csrf,
-                        delivery_type: deliveryType,
-                        province: province,
-                        district: '',
-                        ward: $('select[name="commune"]').val()
-                    },
-                    success: function (response) {
-                        if (response.success && response.data && response.data.length > 0) {
-                            renderShippingOptions(response.data);
-                        } else {
-                            $('#shipping_options').html('<div class="alert alert-warning">Kh?ng th? t?nh ph? v?n chuy?n l?c n?y.</div>');
-                        }
-                    },
-                    error: function () {
-                        $('#shipping_options').html('<div class="alert alert-danger">Lỗi kết nối khi tính phí vận chuyển.</div>');
-                    }
-                });
+                // Luôn cập nhật phí vận chuyển mặc định là 30k
+                $('#hidden_shipping_fee').val(30000);
+                $('#hidden_shipping_service_name').val('Phí vận chuyển mặc định');
+                updateTotals(30000);
             }
 
             $(document).on('change', 'input[name="shipping_provider"]', function() {
@@ -1033,16 +1051,6 @@
 
                 // Update final total display
                 $('#final_total_display').html('<strong>' + new Intl.NumberFormat('vi-VN').format(finalTotal) + ' VND</strong>');
-
-                // Update QR code amount if banking selected
-                let bankAccount = config.bankAccount;
-                let bankId = config.bankId;
-                let bankName = config.bankName;
-                let qrUrl = `https://img.vietqr.io/image/${bankId}-${bankAccount}-compact.png?amount=${finalTotal}&addInfo=THANHTOAN%20ELITE&accountName=${bankName}`;
-
-                if (bankAccount !== '0') {
-                    $('#bank_qr_image').attr('src', qrUrl);
-                }
             }
 
             syncDeliveryModeUI();
@@ -1053,7 +1061,7 @@
                 calculateShippingFees();
             });
 
-            $('select[name="commune"], input[name="delivery_type"]').on('change', function () {
+            $('select[name="district"], select[name="ward"], input[name="delivery_type"]').on('change', function () {
                 syncDeliveryModeUI();
                 calculateShippingFees();
             });
@@ -1062,7 +1070,7 @@
                 var targetId = $(this).attr('data-bs-target');
 
                 // Ẩn tất cả các panel thanh toán
-                $('#method_cod, #method_bank, #method_vnpay').collapse('hide');
+                $('#method_cod, #method_vnpay').collapse('hide');
 
                 // Hiện panel của phương thức được chọn
                 $(targetId).collapse('show');
@@ -1076,16 +1084,14 @@
                 const nameError     = validateName($('input[name="name"]').val());
                 const phoneError    = validatePhone($('input[name="phone"]').val());
                 const emailError    = validateEmail($('input[name="email"]').val());
-                const provinceError = requiresAddress() ? validateProvince($('select[name="province"]').val()) : '';
-                const communeError  = requiresAddress() ? (($('select[name="commune"]').val() ? '' : 'Vui lòng chọn xã/phường')) : '';
-                const addressError  = requiresAddress() ? validateAddress($('input[name="address"]').val()) : '';
+                const provinceError = validateProvince($('select[name="province"]').val());
+                const addressError  = validateAddress($('input[name="address"]').val());
                 showValidation('input[name="name"]', nameError);
                 showValidation('input[name="phone"]', phoneError);
                 showValidation('input[name="email"]', emailError);
                 showValidation('select[name="province"]', provinceError);
-                showValidation('select[name="commune"]', communeError);
                 showValidation('input[name="address"]', addressError);
-                if (nameError || phoneError || emailError || provinceError || communeError || addressError) {
+                if (nameError || phoneError || emailError || provinceError || addressError) {
                     e.preventDefault();
                     const firstError = $('.is-invalid').first();
                     if (firstError.length) $('html, body').animate({ scrollTop: firstError.offset().top - 100 }, 500);
@@ -1099,6 +1105,61 @@
                 $(this).find('button[type="submit"]').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...');
             });
 
+            // ============ GEOLOCATION ============
+            $('#btn-locate-me').click(function () {
+                if (!navigator.geolocation) {
+                    Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Trình duyệt của bạn không hỗ trợ định vị.' });
+                    return;
+                }
+                const $btn = $(this);
+                const originalHtml = $btn.html();
+                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Đang định vị...');
+
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        $.ajax({
+                            url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&accept-language=vi`,
+                            method: 'GET',
+                            success: function (data) {
+                                if (data && data.address) {
+                                    const address = data.address;
+                                    let provinceName = address.city || address.province || address.state || address.town;
+                                    if (provinceName) {
+                                        provinceName = provinceName.replace('Thành phố ', '').replace('Tỉnh ', '').trim();
+                                        if (provinceName.toLowerCase().includes('hồ chí minh')) provinceName = 'TP Hồ Chí Minh';
+                                        let matchedProvince = '';
+                                        $('#province option').each(function () {
+                                            const optionText = $(this).val();
+                                            if (provinceName.toLowerCase() === optionText.toLowerCase() || optionText.toLowerCase().includes(provinceName.toLowerCase())) {
+                                                matchedProvince = optionText; return false;
+                                            }
+                                        });
+                                        if (matchedProvince) $('#province').val(matchedProvince).trigger('change');
+                                    }
+                                    const road = address.road || '', suburb = address.suburb || address.neighbourhood || '',
+                                          quarter = address.quarter || '', district = address.district || address.city_district || '';
+                                    const streetAddress = [road, suburb, quarter, district].filter(Boolean).join(', ');
+                                    if (streetAddress) { $('input[name="address"]').val(streetAddress); showValidation($('input[name="address"]')[0], ''); }
+                                    Swal.fire({ icon: 'success', title: 'Thành công', text: 'Đ cập nhật địa chỉ từ vị trí của bạn.', timer: 2000, showConfirmButton: false });
+                                }
+                            },
+                            error: function () { Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể lấy thông tin địa chỉ từ tọa độ.' }); },
+                            complete: function () { $btn.prop('disabled', false).html(originalHtml); }
+                        });
+                    },
+                    function (error) {
+                        let message = 'Không thể lấy vị trí của bạn.';
+                        if (error.code === 1) message = 'Bạn đ từ chối quyền truy cập vị trí.';
+                        else if (error.code === 2) message = 'Không thể xác định vị trí.';
+                        else if (error.code === 3) message = 'Hết thời gian yêu cầu vị trí.';
+                        Swal.fire({ icon: 'warning', title: 'Thông báo', text: message });
+                        $btn.prop('disabled', false).html(originalHtml);
+                    },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            });
         });
     </script>
 @endsection

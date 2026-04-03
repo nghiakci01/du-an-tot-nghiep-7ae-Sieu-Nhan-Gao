@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
@@ -105,8 +106,8 @@ class HomeController extends Controller
             ->firstOrFail();
 
         $hasClaimed = false;
-        if ($post->coupon && auth()->check()) {
-            $hasClaimed = $post->coupon->isClaimedBy(auth()->user());
+        if ($post->coupon && Auth::check()) {
+            $hasClaimed = $post->coupon->isClaimedBy(Auth::user());
         }
 
         $relatedPosts = \App\Models\Post::where('post_category_id', $post->post_category_id)

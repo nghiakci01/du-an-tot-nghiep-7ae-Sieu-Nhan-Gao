@@ -197,7 +197,8 @@ class AccountController extends Controller
             return redirect()->route('account.orders.show', $order->id)->with('info', 'Đơn hàng này đã có yêu cầu hoàn trả.');
         }
 
-        return view('frontend.account.orders.return_form', compact('order'));
+        $userBankAccounts = $user->bankAccounts;
+        return view('frontend.account.orders.return_form', compact('order', 'userBankAccounts'));
     }
 
     public function submitReturnRequest(Request $request, $id)
@@ -222,6 +223,14 @@ class AccountController extends Controller
             'items' => 'required|array',
             'items.*.selected' => 'sometimes|boolean',
             'items.*.quantity' => 'sometimes|integer|min:1',
+            'bank_name' => 'required|string|max:255',
+            'bank_bin' => 'required|string|max:20',
+            'account_number' => 'required|string|max:50',
+            'account_name' => 'required|string|max:255',
+        ], [
+            'bank_name.required' => 'Vui lòng chọn ngân hàng nhận tiền hoàn.',
+            'account_number.required' => 'Vui lòng nhập số tài khoản ngân hàng.',
+            'account_name.required' => 'Vui lòng nhập tên chủ tài khoản.',
         ]);
 
         // Filter selected items and calculate refund amount
@@ -279,6 +288,10 @@ class AccountController extends Controller
                 'images' => $imagePaths,
                 'videos' => $videoPaths,
                 'refund_amount' => $totalRefund,
+                'bank_name' => $request->bank_name,
+                'bank_bin' => $request->bank_bin,
+                'account_number' => $request->account_number,
+                'account_name' => $request->account_name,
                 'status' => 'pending',
             ]);
 

@@ -65,9 +65,9 @@ class OrderSeeder extends Seeder
                     'user_id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'phone' => $user->phone ?? '09' . rand(10000000, 99999999),
+                    'phone' => $user->phone ?? '09' . fake()->numerify('########'),
                     'province' => $province,
-                    'address' => 'Số ' . rand(1, 200) . ' Đường ABC, Phường XYZ',
+                    'address' => 'Số ' . fake()->numberBetween(1, 200) . ' Đường ABC, Phường XYZ',
                     'status' => $status,
                     'total_price' => 0,
                     'discount_amount' => 0,
@@ -75,19 +75,19 @@ class OrderSeeder extends Seeder
                     'final_total' => 30000,
                     'payment_method' => $paymentMethod,
                     'payment_status' => $paymentStatus,
-                    'shipping_address' => 'Số ' . rand(1, 200) . ' Đường ABC, Phường XYZ, ' . $province,
+                    'shipping_address' => 'Số ' . fake()->numberBetween(1, 200) . ' Đường ABC, Phường XYZ, ' . $province,
                     'note' => $i % 5 === 0 ? 'Giao hàng giờ hành chính' : null,
                     'shipper_id' => in_array($status, [Order::STATUS_SHIPPED, Order::STATUS_COMPLETED, Order::STATUS_FAILED]) && $shippers->isNotEmpty() 
                                     ? $shippers->random()->id : null,
                 ]);
 
                 // Add 1-3 items
-                $numItems = rand(1, 3);
+                $numItems = fake()->numberBetween(1, 3);
                 $totalPrice = 0;
                 $orderVariants = $variants->random($numItems);
 
                 foreach ($orderVariants as $variant) {
-                    $qty = rand(1, 2);
+                    $qty = fake()->numberBetween(1, 2);
                     $price = $variant->price ?? ($variant->product->price ?? 100000);
                     
                     OrderItem::create([

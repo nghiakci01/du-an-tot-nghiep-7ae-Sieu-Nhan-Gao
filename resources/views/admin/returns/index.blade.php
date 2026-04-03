@@ -77,16 +77,51 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <h6>Thông tin khách hàng:</h6>
-                                                    <p>Họ tên: <strong>{{ $req->user->name }}</strong><br>Email: {{ $req->user->email }}</p>
+                                            <div class="row mb-3 bg-light p-3 border rounded shadow-sm mx-0">
+                                                <div class="col-md-6 border-end">
+                                                    <h6 class="fw-bold text-primary"><i class="fas fa-university me-1"></i> Thông tin khách hàng:</h6>
+                                                    <p class="mb-1">Họ tên: <strong>{{ $req->user->name }}</strong></p>
+                                                    <p class="mb-0">Email: {{ $req->user->email }}</p>
                                                 </div>
-                                                <div class="col-md-6 text-end">
-                                                    <h6>Thông tin hoàn trả:</h6>
-                                                    <p>Số tiền: <strong class="text-danger">{{ number_format($req->refund_amount) }}đ</strong><br>Lý do: {{ $req->reason_text }}</p>
+                                                <div class="col-md-6">
+                                                    <h6 class="fw-bold text-danger text-end"><i class="fas fa-money-bill-wave me-1"></i> Thông tin hoàn trả:</h6>
+                                                    <p class="mb-1 text-end">Số tiền: <strong class="fs-5 text-danger">{{ number_format($req->refund_amount) }}đ</strong></p>
+                                                    <p class="mb-0 text-end">Lý do: <span class="badge bg-white text-dark border">{{ $req->reason_text }}</span></p>
                                                 </div>
                                             </div>
+
+                                            {{-- Bank Info Section --}}
+                                            @if($req->bank_name || $req->account_number)
+                                            <div class="mb-3 p-3 border rounded border-info bg-light-info" style="background-color: #f0faff;">
+                                                <h6 class="text-info fw-bold mb-3 d-flex align-items-center">
+                                                    <i class="fas fa-piggy-bank me-2"></i> THÔNG TIN NHẬN TIỀN HOÀN (BANK TRANSFER)
+                                                </h6>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <small class="text-muted d-block">Ngân hàng:</small>
+                                                        <div class="d-flex align-items-center">
+                                                            @if($req->bank_bin)
+                                                                <img src="https://api.vietqr.io/img/{{ $req->bank_bin }}.png" style="height: 20px;" class="me-1" onerror="this.style.display='none'">
+                                                            @endif
+                                                            <strong class="text-uppercase">{{ $req->bank_name }}</strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <small class="text-muted d-block">Số tài khoản:</small>
+                                                        <div class="d-flex align-items-center">
+                                                            <strong class="fs-6">{{ $req->account_number }}</strong>
+                                                            <button type="button" class="btn btn-xs btn-outline-info ms-2" onclick="navigator.clipboard.writeText('{{ $req->account_number }}').then(() => alert('Đã chép STK!'))">
+                                                                <i class="fas fa-copy"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <small class="text-muted d-block">Chủ tài khoản:</small>
+                                                        <strong class="text-uppercase">{{ $req->account_name }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endif
 
                                             <div class="mb-3">
                                                 <h6>Mô tả chi tiết:</h6>

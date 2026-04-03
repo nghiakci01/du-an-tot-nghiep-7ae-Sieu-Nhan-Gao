@@ -3,6 +3,7 @@
 @section('title', 'Yêu cầu hoàn trả - Đơn #' . str_pad($order->id, 6, '0', STR_PAD_LEFT))
 
 @push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
 .return-form-wrapper {
   background: #f5f5f7;
@@ -22,6 +23,33 @@
 }
 .detail-header h5 { margin: 0; font-weight: 700; font-size: 1rem; }
 .detail-body { padding: 22px 24px; }
+
+/* Bank Selector Styling */
+.select2-container .select2-selection--single {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 48px;
+    padding-left: 12px;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 46px;
+}
+.bank-logo {
+    height: 24px;
+    width: auto;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+.bank-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+}
 
 /* Image Upload UI */
 .image-upload-wrap {
@@ -214,6 +242,8 @@
                   <input type="file" name="images[]" id="return-images" multiple accept="image/*">
                 </div>
                 <div id="preview-container"></div>
+              </div>
+
               {{-- Videos --}}
               <div class="mb-5">
                 <label class="form-label fw-bold"><i class="bi bi-camera-reels me-1"></i>Video minh chứng <span class="text-muted fw-normal">(Tùy chọn, tối đa 1 video, 50MB)</span></label>
@@ -225,6 +255,76 @@
                   <input type="file" name="videos[]" id="return-videos" accept="video/mp4,video/quicktime,video/x-msvideo,video/webm">
                 </div>
                 <div id="video-preview-container"></div>
+              </div>
+
+              {{-- Refund Bank Info --}}
+              <div class="mb-5 p-4 border rounded-3 bg-light shadow-sm">
+                <h6 class="fw-bold mb-3 d-flex align-items-center">
+                  <i class="bi bi-bank me-2 text-primary"></i> Thông tin nhận tiền hoàn (Bắt buộc)
+                </h6>
+                <div class="row g-3">
+                  <div class="col-md-12">
+                    <label class="form-label small fw-bold">Chọn tài khoản đã lưu (Nếu có)</label>
+                    <select id="saved-bank-select" class="form-select form-select-sm mb-3" style="border-radius:10px;">
+                      <option value="">-- Chọn tài khoản --</option>
+                      @foreach($userBankAccounts as $bank)
+                        <option value="{{ $bank->id }}" 
+                          data-name="{{ $bank->bank_name }}" 
+                          data-bin="{{ $bank->bank_id }}" 
+                          data-number="{{ $bank->account_number }}" 
+                          data-accname="{{ $bank->account_name }}">
+                          {{ $bank->bank_name }} - {{ $bank->account_number }} ({{ $bank->account_name }})
+                        </option>
+                      @endforeach
+                    </select>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Ngân hàng <span class="text-danger">*</span></label>
+                    <select name="bank_bin" id="bank_bin" class="form-select select2-bank" required>
+                      <option value="">-- Chọn Ngân Hàng --</option>
+                      <!-- Top Preferred Banks -->
+                      <option value="970436" data-logo="https://api.vietqr.io/img/VCB.png" data-name="Vietcombank">Vietcombank</option>
+                      <option value="970418" data-logo="https://api.vietqr.io/img/BIDV.png" data-name="BIDV">BIDV</option>
+                      <option value="970405" data-logo="https://api.vietqr.io/img/VBA.png" data-name="Agribank">Agribank</option>
+                      <option value="970415" data-logo="https://api.vietqr.io/img/CTG.png" data-name="VietinBank">VietinBank</option>
+                      <option value="970407" data-logo="https://api.vietqr.io/img/TCB.png" data-name="Techcombank">Techcombank</option>
+                      <option value="970422" data-logo="https://api.vietqr.io/img/MB.png" data-name="MBBank">MBBank</option>
+                      <option value="970416" data-logo="https://api.vietqr.io/img/ACB.png" data-name="ACB">ACB</option>
+                      <option value="970403" data-logo="https://api.vietqr.io/img/STB.png" data-name="Sacombank">Sacombank</option>
+                      <option value="970432" data-logo="https://api.vietqr.io/img/VPB.png" data-name="VPBank">VPBank</option>
+                      <option value="970423" data-logo="https://api.vietqr.io/img/TPB.png" data-name="TPBank">TPBank</option>
+                      <!-- Other Banks -->
+                      <option value="970437" data-logo="https://api.vietqr.io/img/HDB.png" data-name="HDBank">HDBBank</option>
+                      <option value="970441" data-logo="https://api.vietqr.io/img/VIB.png" data-name="VIB">VIB</option>
+                      <option value="970443" data-logo="https://api.vietqr.io/img/SHB.png" data-name="SHB">SHB</option>
+                      <option value="970426" data-logo="https://api.vietqr.io/img/MSB.png" data-name="MSB">MSB</option>
+                      <option value="970440" data-logo="https://api.vietqr.io/img/SEAB.png" data-name="SeABank">SeABank</option>
+                      <option value="970449" data-logo="https://api.vietqr.io/img/LPB.png" data-name="LPBank">LPBank</option>
+                      <option value="970428" data-logo="https://api.vietqr.io/img/NAB.png" data-name="NamABank">NamABank</option>
+                      <option value="970414" data-logo="https://api.vietqr.io/img/OCB.png" data-name="OCB">OCB</option>
+                      <option value="970431" data-logo="https://api.vietqr.io/img/EIB.png" data-name="Eximbank">Eximbank</option>
+                      <option value="970438" data-logo="https://api.vietqr.io/img/BVB.png" data-name="BVBank">BVBank</option>
+                    </select>
+                    <input type="hidden" name="bank_name" id="bank_name">
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Số tài khoản <span class="text-danger">*</span></label>
+                    <input type="text" name="account_number" id="account_number" class="form-control" placeholder="Nhập số tài khoản" required style="border-radius:10px; height:45px;">
+                  </div>
+
+                  <div class="col-md-12">
+                    <label class="form-label small fw-bold">Tên chủ tài khoản <span class="text-danger">*</span></label>
+                    <div class="position-relative">
+                      <input type="text" name="account_name" id="account_name" class="form-control text-uppercase" placeholder="Hệ thống sẽ tra cứu tự động..." required style="border-radius:10px; height:45px; background-color: #f8f9fa;">
+                      <div id="lookup-spinner" class="spinner-border spinner-border-sm text-primary position-absolute" role="status" style="right: 15px; top: 15px; display: none;">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                    <small id="lookup-msg" class="text-muted"></small>
+                  </div>
+                </div>
               </div>
 
               <div class="d-flex justify-content-end gap-2">
@@ -245,78 +345,161 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-// Item selection and refund calculation
-const itemCheckboxes = document.querySelectorAll('.item-checkbox');
-const itemQtys = document.querySelectorAll('.item-qty');
-const refundPreview = document.getElementById('total-refund-preview');
-
-function calculateTotalRefund() {
-  let total = 0;
-  document.querySelectorAll('.item-row').forEach(row => {
-    const checkbox = row.querySelector('.item-checkbox');
-    const qtyInput = row.querySelector('.item-qty');
-    const price = parseFloat(row.querySelector('.item-price').value);
-    
-    if (checkbox.checked) {
-      qtyInput.disabled = false;
-      const qty = parseInt(qtyInput.value) || 0;
-      total += qty * price;
-    } else {
-      qtyInput.disabled = true;
+$(document).ready(function() {
+    // 1. Initialize Select2 for Banks
+    function formatBank(bank) {
+        if (!bank.id) return bank.text;
+        var logoUrl = $(bank.element).data('logo');
+        if (logoUrl) {
+            return $('<div class="bank-item"><img src="' + logoUrl + '" class="bank-logo" /> <span>' + bank.text + '</span></div>');
+        }
+        return bank.text;
     }
-  });
-  refundPreview.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total).replace('₫', '') + '₫';
-}
 
-itemCheckboxes.forEach(cb => {
-  cb.addEventListener('change', calculateTotalRefund);
-});
+    $('.select2-bank').select2({
+        placeholder: '-- Chọn Ngân Hàng --',
+        allowClear: true,
+        templateResult: formatBank,
+        templateSelection: formatBank,
+        width: '100%'
+    });
 
-itemQtys.forEach(qty => {
-  qty.addEventListener('input', calculateTotalRefund);
-});
+    // 2. Pre-fill from Saved Accounts
+    $('#saved-bank-select').on('change', function() {
+        const option = $(this).find('option:selected');
+        if (option.val()) {
+            const bin = option.data('bin');
+            const number = option.data('number');
+            const accName = option.data('accname');
+            const bankName = option.data('name');
 
-// Image preview
-document.getElementById('return-images').addEventListener('change', function(e) {
-  const container = document.getElementById('preview-container');
-  container.innerHTML = '';
-  const files = Array.from(e.target.files).slice(0, 4);
-  files.forEach(file => {
-    if(file.type.startsWith('image/')) {
-      const img = document.createElement('img');
-      img.className = 'img-preview';
-      img.src = URL.createObjectURL(file);
-      container.appendChild(img);
+            $('#bank_bin').val(bin).trigger('change');
+            $('#account_number').val(number);
+            $('#account_name').val(accName);
+            $('#bank_name').val(bankName);
+        }
+    });
+
+    // 3. Update hidden bank_name when select changes
+    $('#bank_bin').on('change', function() {
+        const selected = $(this).find('option:selected');
+        $('#bank_name').val(selected.data('name') || '');
+        checkAccountName();
+    });
+
+    // 4. Real-time VietQR Lookup
+    let lookupTimer;
+    $('#account_number').on('input', function() {
+        clearTimeout(lookupTimer);
+        lookupTimer = setTimeout(checkAccountName, 800);
+    });
+
+    function checkAccountName() {
+        const bin = $('#bank_bin').val();
+        const accountNo = $('#account_number').val().trim();
+        const $accNameInput = $('#account_name');
+        const $spinner = $('#lookup-spinner');
+        const $msg = $('#lookup-msg');
+
+        if (bin && accountNo && accountNo.length >= 6) {
+            $spinner.show();
+            $msg.text('Đang xác thực tài khoản...');
+            $accNameInput.css('background-color', '#fff'); // Reset background
+
+            $.ajax({
+                url: 'https://api.vietqr.io/v2/lookup',
+                method: 'POST',
+                headers: {
+                    'x-client-id': 'b85a3c26-f831-4a5f-abaa-ae57d25e40e2', // From admin script
+                    'x-api-key': 'd102dc85-2eec-4752-9654-20a221f7e34a',
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify({ bin: bin, accountNumber: accountNo }),
+                success: function(res) {
+                    $spinner.hide();
+                    if (res.code == '00') {
+                        $accNameInput.val(res.data.accountName);
+                        $msg.html('<span class="text-success"><i class="bi bi-check-circle-fill"></i> Tài khoản hợp lệ</span>');
+                        $accNameInput.prop('readonly', true);
+                    } else {
+                        $msg.html('<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Không tìm thấy tài khoản. Vui lòng kiểm tra lại.</span>');
+                        $accNameInput.prop('readonly', false).val('');
+                    }
+                },
+                error: function() {
+                    $spinner.hide();
+                    $msg.text('Không thể tra cứu tự động. Vui lòng nhập tay.');
+                    $accNameInput.prop('readonly', false);
+                }
+            });
+        }
     }
-  });
-});
 
-// Video preview
-document.getElementById('return-videos').addEventListener('change', function(e) {
-  const container = document.getElementById('video-preview-container');
-  container.innerHTML = '';
-  const file = e.target.files[0];
-  if (!file) return;
+    // 5. Item selection and refund calculation
+    const itemCheckboxes = $('.item-checkbox');
+    const itemQtys = $('.item-qty');
+    const refundPreview = $('#total-refund-preview');
 
-  // Validate size (50MB)
-  if (file.size > 50 * 1024 * 1024) {
-    alert('Video không được vượt quá 50MB');
-    e.target.value = '';
-    return;
-  }
+    function calculateTotalRefund() {
+        let total = 0;
+        $('.item-row').each(function() {
+            const checkbox = $(this).find('.item-checkbox');
+            const qtyInput = $(this).find('.item-qty');
+            const price = parseFloat($(this).find('.item-price').val());
+            
+            if (checkbox.is(':checked')) {
+                qtyInput.prop('disabled', false);
+                const qty = parseInt(qtyInput.val()) || 0;
+                total += qty * price;
+            } else {
+                qtyInput.prop('disabled', true);
+            }
+        });
+        const formatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total).replace('₫', '') + '₫';
+        refundPreview.text(formatted);
+    }
 
-  if (file.type.startsWith('video/')) {
-    const video = document.createElement('video');
-    video.controls = true;
-    video.src = URL.createObjectURL(file);
-    container.appendChild(video);
+    itemCheckboxes.on('change', calculateTotalRefund);
+    itemQtys.on('input', calculateTotalRefund);
 
-    const info = document.createElement('p');
-    info.className = 'text-muted small mt-1';
-    info.textContent = file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + ' MB)';
-    container.appendChild(info);
-  }
+    // 6. Image preview
+    $('#return-images').on('change', function(e) {
+        const container = $('#preview-container');
+        container.empty();
+        const files = Array.from(e.target.files).slice(0, 4);
+        files.forEach(file => {
+            if(file.type.startsWith('image/')) {
+                const img = $('<img>').addClass('img-preview').attr('src', URL.createObjectURL(file));
+                container.append(img);
+            }
+        });
+    });
+
+    // 7. Video preview
+    $('#return-videos').on('change', function(e) {
+        const container = $('#video-preview-container');
+        container.empty();
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 50 * 1024 * 1024) {
+            Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Video không được vượt quá 50MB' });
+            $(this).val('');
+            return;
+        }
+
+        if (file.type.startsWith('video/')) {
+            const video = $('<video controls>').attr('src', URL.createObjectURL(file));
+            container.append(video);
+            const info = $('<p>').addClass('text-muted small mt-1').text(file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + ' MB)');
+            container.append(info);
+        }
+    });
+
+    // Trigger initial calculation
+    calculateTotalRefund();
 });
 </script>
 @endpush
