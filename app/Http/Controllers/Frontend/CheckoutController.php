@@ -101,7 +101,17 @@ class CheckoutController extends Controller
 
         $provinces = config('vietnam_provinces');
 
-        return view('frontend.checkout.index', compact('cart', 'total', 'totalQuantity', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces'));
+        $userAddresses = collect();
+        if (auth()->check()) {
+            $userAddresses = auth()->user()->addresses()->orderByDesc('is_default')->get();
+        }
+
+        $defaultBank = null;
+
+        return view('frontend.checkout.index', compact(
+            'cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal',
+            'provinces', 'userAddresses', 'defaultBank'
+        ));
     }
 
     /**
@@ -199,11 +209,30 @@ class CheckoutController extends Controller
         ]);
 
         $provinces = config('vietnam_provinces');
+
+        // Normalize province name (remove prefixes like "Tỉnh " or "Thành phố ")
+        if ($request->has('province')) {
+            $normalizedProv = preg_replace('/^(Tỉnh|Thành phố)\s+/u', '', $request->province);
+            $request->merge(['province' => $normalizedProv]);
+        }
+
+        if ($request->filled('user_address_id')) {
+            $userAddr = \App\Models\UserAddress::where('user_id', Auth::id())->find($request->user_address_id);
+            if ($userAddr) {
+                $request->merge([
+                    'name'     => $userAddr->receiver_name,
+                    'phone'    => $userAddr->phone,
+                    'province' => preg_replace('/^(Tỉnh|Thành phố)\s+/u', '', $userAddr->province),
+                    'address'  => $userAddr->address . ($userAddr->commune ? ', ' . $userAddr->commune : ''),
+                ]);
+            }
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
             'email' => 'required|email:rfc,dns|max:255',
-            'province' => 'required|string|in:' . implode(',', $provinces),
+            'province' => $request->filled('user_address_id') ? 'required|string' : 'required|string|in:' . implode(',', $provinces),
             'district' => 'nullable|string|max:255',
             'ward' => 'nullable|string|max:255',
             'address' => 'required|string|max:500',
@@ -561,7 +590,7 @@ class CheckoutController extends Controller
             $usedInPivot = DB::table('coupon_user')
                 ->where('user_id', Auth::id())
                 ->where('coupon_id', $coupon->id)
-                ->whereNotNull('used_at')
+                ->whereNotNull('claimed_at')
                 ->exists();
 
             if ($usedInPivot) {
