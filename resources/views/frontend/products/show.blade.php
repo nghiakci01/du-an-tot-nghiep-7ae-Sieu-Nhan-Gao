@@ -703,7 +703,7 @@
                                                             toast: true,
                                                             position: 'top-end',
                                                             icon: 'warning',
-                                                            title: `Số lượng tối đa là ${max} sản phẩm!`,
+                                                            title: `Số lượng tối đa còn lại là ${max} sản phẩm!`,
                                                             showConfirmButton: false,
                                                             timer: 2500,
                                                             timerProgressBar: true,
@@ -761,14 +761,14 @@
                                                         const qtyInput = document.getElementById('quantity_input');
                                                         const stockInfo = document.getElementById('stock-info');
                                                         if (qtyInput) {
-                                                            let limit = Math.min(matchedVariant.stock_quantity, 10);
+                                                            let limit = matchedVariant.stock_quantity;
                                                             qtyInput.max = limit;
                                                             if (parseInt(qtyInput.value) > limit) {
                                                                 qtyInput.value = limit;
                                                             }
                                                         }
                                                         if (stockInfo) {
-                                                            stockInfo.textContent = `(Còn ${matchedVariant.stock_quantity} trong kho, mua tối đa 10)`;
+                                                            stockInfo.textContent = `(Còn ${matchedVariant.stock_quantity} trong kho)`;
                                                             stockInfo.style.display = 'inline';
                                                             stockInfo.style.color = matchedVariant.stock_quantity <= 5 ? '#ef233c' : '#666';
                                                         }
@@ -813,7 +813,7 @@
                                     <label style="margin-bottom: 0; font-weight: 700;">{{ __('messages.quantity') }}</label>
                                     <div class="quantity-selector" style="margin-top: 0;">
                                         <button type="button" class="qty-btn minus">-</button>
-                                        <input min="1" max="10" value="1" type="number" name="quantity" id="quantity_input">
+                                        <input min="1" value="1" type="number" name="quantity" id="quantity_input">
                                         <button type="button" class="qty-btn plus">+</button>
                                     </div>
                                     <span id="stock-info" style="display: none; font-size: 13px; color: #ef233c;"></span>
@@ -1212,13 +1212,13 @@
                         return;
                     }
 
-                    // Kiểm tra số lượng yêu cầu vượt giới hạn
+                    // Kiểm tra số lượng yêu cầu vượt tồn kho
                     var requestedQty = parseInt($('#quantity_input').val()) || 1;
-                    var maxLimit = Math.min(matchedVariant.stock_quantity, 10);
+                    var maxLimit = matchedVariant.stock_quantity;
                     if (requestedQty > maxLimit) {
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Vượt quá giới hạn!',
+                            title: 'Vượt quá tồn kho!',
                             html: `Bạn chỉ có thể mua tối đa <strong>${maxLimit}</strong> sản phẩm này.<br>Số lượng đã được điều chỉnh.`,
                             confirmButtonColor: '#ef233c',
                             confirmButtonText: 'Đồng ý',
@@ -1319,7 +1319,7 @@
                         toast: true,
                         position: 'top-end',
                         icon: 'warning',
-                        title: `Giới hạn tối đa là ${max} sản phẩm!`,
+                        title: `Đã đạt giới hạn tồn kho: ${max}`,
                         showConfirmButton: false,
                         timer: 2000
                     });

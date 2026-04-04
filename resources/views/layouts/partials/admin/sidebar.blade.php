@@ -252,14 +252,6 @@
                         </a>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ route('admin.bank-settings.index') }}" class="pc-link">
-                            <span class="pc-micon">
-                                <i class="ti ti-credit-card"></i>
-                            </span>
-                            <span class="pc-mtext">Cấu hình Ngân hàng (QR)</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
                         <a href="{{ route('admin.settings.chatbot') }}" class="pc-link">
                             <span class="pc-micon">
                                 <i class="ti ti-settings"></i>

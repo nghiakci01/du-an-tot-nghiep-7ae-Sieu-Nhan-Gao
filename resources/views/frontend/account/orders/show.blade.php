@@ -161,7 +161,7 @@
   $progressW    = ($curIdx !== false && !$isCancelled) ? ($curIdx / (count($statusSteps)-1)) * 84 : 0;
   $pmLabel = match($order->payment_method) {
     'COD'           => '💵 Thanh toán khi nhận hàng (COD)',
-    'BANK_TRANSFER' => '🏦 Chuyển khoản ngân hàng',
+    'VNPAY'         => '💳 VNPay',
     default         => $order->payment_method,
   };
 @endphp

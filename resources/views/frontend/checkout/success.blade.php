@@ -93,8 +93,8 @@
 @php
   $shippingFee = $order->shipping_fee ?? 0;
   $displayTotal = ($order->final_total > 0) ? $order->final_total : ($order->total_price + $shippingFee);
-  $isBankTransfer = $order->payment_method == 'BANK_TRANSFER';
   $isVnpay = $order->payment_method == 'VNPAY';
+  $isBankTransfer = in_array($order->payment_method, ['BANK_TRANSFER', 'CASH']);
   $isPaymentPending = in_array($order->payment_status, ['pending', 'failed']);
 @endphp
 
@@ -109,9 +109,7 @@
       </div>
     </div>
     <h2 class="fw-bold mb-1" style="font-size:2rem;">
-      @if($isBankTransfer && $order->payment_status == 'pending')
-        Chờ thanh toán
-      @elseif($isVnpay && $order->payment_status == 'failed')
+      @if($isVnpay && $order->payment_status == 'failed')
         Thanh toán thất bại
       @elseif($isVnpay && $order->payment_status == 'pending')
         Chờ thanh toán
@@ -140,7 +138,6 @@
           <div class="text-end">
             <div class="order-badge">
               @if($order->payment_method == 'COD') 💵 Thanh toán khi nhận hàng
-              @elseif($order->payment_method == 'BANK_TRANSFER') 🏦 Chuyển khoản ngân hàng
               @elseif($order->payment_method == 'VNPAY') 💳 Thanh toán VNPay
               @else {{ $order->payment_method }}
               @endif
