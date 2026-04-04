@@ -83,6 +83,14 @@ class AddressController extends Controller
         }
 
         $address->update($validated);
+        $address->refresh();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'address' => $address,
+            ]);
+        }
 
         return redirect()->route('account.index')
             ->with('success', 'Địa chỉ đã được cập nhật!');
@@ -97,6 +105,13 @@ class AddressController extends Controller
         // Nếu xoá địa chỉ mặc định → set địa chỉ còn lại đầu tiên làm default
         if ($wasDefault) {
             UserAddress::where('user_id', Auth::id())->oldest()->first()?->update(['is_default' => true]);
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã xoá địa chỉ!',
+            ]);
         }
 
         return back()->with('success', 'Đã xoá địa chỉ!');

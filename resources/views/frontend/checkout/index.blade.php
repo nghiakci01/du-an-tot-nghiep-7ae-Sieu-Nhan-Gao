@@ -251,10 +251,17 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
         </h2>
 
         @auth
-          @php $defAddr = $userAddresses->firstWhere('is_default', true) ?? $userAddresses->first(); @endphp
+          @php
+            $defAddr = $userAddresses->firstWhere('is_default', true) ?? $userAddresses->first();
+          @endphp
           {{-- Hidden selected address ID (updated by JS) --}}
-          <input type="hidden" name="user_address_id" id="sel-addr-id"
-                 value="{{ $defAddr?->id ?? '' }}">
+          <input type="hidden" name="user_address_id" id="sel-addr-id" value="{{ $defAddr?->id ?? '' }}">
+          
+          {{-- Hidden fields required by CheckoutController validation --}}
+          <input type="hidden" name="name"     id="sel-addr-name-val"  value="{{ $defAddr?->receiver_name ?? '' }}">
+          <input type="hidden" name="phone"    id="sel-addr-phone-val" value="{{ $defAddr?->phone ?? '' }}">
+          <input type="hidden" name="province" id="sel-addr-prov-val"  value="{{ preg_replace('/^(Tỉnh|Thành phố)\s+/u', '', $defAddr?->province ?? '') }}">
+          <input type="hidden" name="address"  id="sel-addr-addr-val"  value="{{ ($defAddr?->address ?? '') . ($defAddr?->commune ? ', ' . $defAddr->commune : '') }}">
 
           @if($userAddresses->isNotEmpty())
             {{-- Compact selected-address display --}}
@@ -540,6 +547,9 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
                  data-commune="{{ $addr->commune }}"
                  data-address="{{ $addr->address }}">
               <div class="mpick-dot" aria-hidden="true"></div>
+              <div class="mpick-edit addr-edit-btn" title="Sửa địa chỉ" data-id="{{ $addr->id }}">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
               <div class="mpick-name">{{ $addr->receiver_name }}</div>
               <div class="mpick-phone">{{ $addr->phone }}</div>
               <div class="mpick-addr">{{ $addr->address }}, {{ $addr->commune }}, {{ $addr->province }}</div>
@@ -560,8 +570,10 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
 
         {{-- Add address form (hidden by default if addresses exist) --}}
         <div id="modal-addr-new-form" class="{{ $userAddresses->isNotEmpty() ? 'd-none' : '' }}">
+          <h5 id="modal-addr-form-title" class="mb-3" style="font-size:16px;font-weight:600;">Thêm địa chỉ giao hàng mới</h5>
           <form id="modal-new-addr-form-inner" novalidate>
             @csrf
+            <input type="hidden" id="modal_address_id" name="address_id">
             <div class="modal-addr-form">
               <div id="modal-addr-err" class="ck-error mb-2" aria-live="polite"></div>
               <div class="ck-row2">
@@ -609,7 +621,10 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
                 data-bs-dismiss="modal">Xác nhận địa chỉ</button>
       </div>
       {{-- Footer for add-address mode --}}
-      <div class="modal-footer" id="modal-footer-add" style="border-top:1px solid #f0f0f0;padding:14px 24px;display:none;">
+      <div class="modal-footer" id="modal-footer-add" style="border-top:1px solid #f0f0f0;padding:14px 24px;display:none;justify-content:space-between;">
+        <button type="button" id="modal-delete-addr-btn" class="btn btn-link text-danger d-none" style="text-decoration:none;font-weight:500;padding:0;">
+          <i class="fa fa-trash"></i> Xóa địa chỉ
+        </button>
         <button type="button" id="modal-save-addr-btn" class="btn-order" style="max-width:200px;padding:12px;">
           Thêm địa chỉ
         </button>
@@ -743,6 +758,18 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
     card.classList.add('is-sel');
     const sid = qs('#sel-addr-id');
     if(sid) sid.value = card.dataset.id;
+    
+    // Sync hidden fields for CheckoutController validation
+    const hN = qs('#sel-addr-name-val');
+    const hP = qs('#sel-addr-phone-val');
+    const hV = qs('#sel-addr-prov-val');
+    const hA = qs('#sel-addr-addr-val');
+    if(hN) hN.value = card.dataset.name||'';
+    if(hP) hP.value = card.dataset.phone||'';
+    // Normalize province name (remove prefixes like "Tỉnh " or "Thành phố ")
+    if(hV) hV.value = (card.dataset.province||'').replace(/^(Tỉnh|Thành phố)\s+/gu, '');
+    if(hA) hA.value = (card.dataset.address||'') + (card.dataset.commune ? ', ' + card.dataset.commune : '');
+
     const n = qs('#sel-display-name');
     const p = qs('#sel-display-phone');
     const d = qs('#sel-display-detail');
@@ -777,51 +804,102 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
     // if(card.dataset.province) triggerShipping(card.dataset.province, card.dataset.commune||''); // Team phát triển sau
   }
 
-  // Modal address card click
+  const modalFormTitle = qs('#modal-addr-form-title');
+  const modalAddrIdInp = qs('#modal_address_id');
+  const modalDeleteBtn = qs('#modal-delete-addr-btn');
+  const btnAddToggle   = qs('#modal-btn-add-addr');
+  const modalAddForm   = qs('#modal-addr-new-form');
+  const modalFooterSel = qs('#modal-footer-sel');
+  const modalFooterAdd = qs('#modal-footer-add');
+  const modalAddrGrid  = qs('#modal-addr-grid');
+  const modalAddrHr    = qs('#modal-addr-grid + hr'); // The hr after the grid
+
+  function toggleAddrList(show){
+    if(modalAddrGrid) modalAddrGrid.style.display = show ? '' : 'none';
+    if(modalAddrHr)   modalAddrHr.style.display   = show ? '' : 'none';
+  }
+
+  function resetModalForm(){
+    const f = qs('#modal-new-addr-form-inner');
+    if(f) f.reset();
+    if(modalAddrIdInp) modalAddrIdInp.value = '';
+    if(modalFormTitle) modalFormTitle.textContent = 'Thêm địa chỉ giao hàng mới';
+    if(modalSaveBtn)   modalSaveBtn.textContent = 'Thêm địa chỉ';
+    if(modalDeleteBtn) modalDeleteBtn.classList.add('d-none');
+    if(modalErrBox)    modalErrBox.textContent = '';
+    const mProv = qs('#modal_province'); if(mProv) mProv.innerHTML='<option value="">-- Định tỉnh trước --</option>';
+    const mComm = qs('#modal_commune'); if(mComm){ mComm.innerHTML='<option value="">-- Chọn tỉnh trước --</option>'; mComm.disabled=true; }
+    // Initialize provinces
+    bindCascade(mProv, mComm, '', '');
+  }
+
+  // Card selection OR Edit button click
   document.addEventListener('click', function(e){
+    // 1. Edit button
+    const editBtn = e.target.closest('.addr-edit-btn');
+    if(editBtn){
+      e.stopPropagation();
+      const card = editBtn.closest('.mpick-card');
+      if(!card) return;
+      // Show form & Hide List
+      toggleAddrList(false);
+      if(modalAddForm) modalAddForm.classList.remove('d-none');
+      if(modalFooterSel) modalFooterSel.style.display = 'none';
+      if(modalFooterAdd) modalFooterAdd.style.display = 'flex';
+      if(btnAddToggle) btnAddToggle.textContent = '✕ Hủy bỏ';
+      // Populate
+      if(modalAddrIdInp) modalAddrIdInp.value = card.dataset.id;
+      if(modalFormTitle) modalFormTitle.textContent = 'Chỉnh sửa địa chỉ';
+      if(modalSaveBtn)   modalSaveBtn.textContent = 'Lưu thay đổi';
+      if(modalDeleteBtn) modalDeleteBtn.classList.remove('d-none');
+      qs('#modal_receiver_name').value = card.dataset.name || '';
+      qs('#modal_phone').value         = card.dataset.phone || '';
+      qs('#modal_address').value       = card.dataset.address || '';
+      bindCascade(qs('#modal_province'), qs('#modal_commune'), card.dataset.province, card.dataset.commune);
+      return;
+    }
+
+    // 2. Card selection
     const card = e.target.closest('.mpick-card');
-    if(!card) return;
-    applyAddrSelection(card);
-    closeAddrModal();
+    if(card){
+      applyAddrSelection(card);
+      closeAddrModal();
+    }
   });
 
-  // Toggle add-address form in modal
-  const btnAddToggle = qs('#modal-btn-add-addr');
-  const modalAddForm = qs('#modal-addr-new-form');
-  const modalFooterSel = qs('#modal-footer-sel');
   if(btnAddToggle && modalAddForm){
     btnAddToggle.addEventListener('click', ()=>{
       const opening = modalAddForm.classList.toggle('d-none');
-      // opening = true means was open, now hidden (d-none added)
       const isNowVisible = !opening;
-      btnAddToggle.textContent = isNowVisible ? '✕ Đóng' : '+ Thêm địa chỉ mới';
+      if(isNowVisible) resetModalForm();
+      toggleAddrList(!isNowVisible);
+      btnAddToggle.textContent = isNowVisible ? '✕ Hủy bỏ' : '+ Thêm địa chỉ mới';
       if(modalFooterSel) modalFooterSel.style.display = isNowVisible ? 'none' : '';
-      const modalFooterAdd = qs('#modal-footer-add');
-      if(modalFooterAdd) modalFooterAdd.style.display = isNowVisible ? '' : 'none';
+      if(modalFooterAdd) modalFooterAdd.style.display = isNowVisible ? 'flex' : 'none';
     });
   }
 
-  // Load provinces for modal form
-  bindCascade(qs('#modal_province'), qs('#modal_commune'), '', '');
-
-  // AJAX save new address from modal
-  const modalSaveBtn = qs('#modal-save-addr-btn');
-  const modalErrBox = qs('#modal-addr-err');
+  // AJAX save/update
   if(modalSaveBtn){
     modalSaveBtn.addEventListener('click', async ()=>{
       const f = qs('#modal-new-addr-form-inner');
       if(!f) return;
-      // Simple client-side check
       const fields = f.querySelectorAll('input[required],select[required]');
       let ok = true;
       fields.forEach(el=>{ if(!el.value.trim()){ el.classList.add('is-invalid'); ok=false; } else el.classList.remove('is-invalid'); });
       if(!ok){ if(modalErrBox) modalErrBox.textContent='Vui lòng điền đầy đủ thông tin.'; return; }
       if(modalErrBox) modalErrBox.textContent='';
 
+      const addrId = modalAddrIdInp?.value;
       modalSaveBtn.disabled=true; modalSaveBtn.textContent='Đang lưu…';
       try {
         const fd = new FormData(f);
-        const res = await fetch('{{ route("account.addresses.store") }}', {
+        let url  = '{{ route("account.addresses.store") }}';
+        if(addrId){
+          url = '{{ route("account.addresses.update", ":id") }}'.replace(':id', addrId);
+          fd.append('_method', 'PUT');
+        }
+        const res = await fetch(url, {
           method:'POST',
           headers:{'Accept':'application/json','X-CSRF-TOKEN':C.csrf},
           body: fd,
@@ -829,27 +907,33 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
         const data = await res.json();
         if(data.success && data.address){
           const a = data.address;
-          // Build new card HTML and prepend to grid
           const grid = qs('#modal-addr-grid');
-          if(grid){
-            const col = document.createElement('div');
-            col.className = 'col-6 col-sm-6';
-            col.innerHTML = `<div class="mpick-card" data-id="${a.id}" data-name="${a.receiver_name}" data-phone="${a.phone}" data-province="${a.province}" data-commune="${a.commune||''}" data-address="${a.address}">
-              <div class="mpick-dot"></div>
+          const cardHtml = `<div class="mpick-dot" aria-hidden="true"></div>
+              <div class="mpick-edit addr-edit-btn" title="Sửa địa chỉ" data-id="${a.id}">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
               <div class="mpick-name">${a.receiver_name}</div>
               <div class="mpick-phone">${a.phone}</div>
-              <div class="mpick-addr">${a.address}, ${a.commune||''}, ${a.province}</div>
-            </div>`;
+              <div class="mpick-addr">${a.address}, ${a.commune||''}, ${a.province}</div>`;
+
+          if(addrId){
+            const existingCard = grid?.querySelector(`.mpick-card[data-id="${addrId}"]`);
+            if(existingCard){
+              existingCard.innerHTML = cardHtml;
+              existingCard.dataset.name=a.receiver_name; existingCard.dataset.phone=a.phone;
+              existingCard.dataset.province=a.province; existingCard.dataset.commune=a.commune||'';
+              existingCard.dataset.address=a.address;
+            }
+          } else {
+            const col = document.createElement('div');
+            col.className = 'col-6';
+            col.innerHTML = `<div class="mpick-card" data-id="${a.id}" data-name="${a.receiver_name}" data-phone="${a.phone}" data-province="${a.province}" data-commune="${a.commune||''}" data-address="${a.address}">${cardHtml}</div>`;
             grid.prepend(col);
           }
-          // Apply selection WITHOUT triggering click (avoids race with closeAddrModal)
-          const newCard = grid?.querySelector(`.mpick-card[data-id="${a.id}"]`);
-          if(newCard) applyAddrSelection(newCard);
-          // Reset form fields
-          f.reset();
-          const mProv = qs('#modal_province'); if(mProv) mProv.innerHTML='<option value="">-- Định tỉnh trước --</option>';
-          const mComm = qs('#modal_commune'); if(mComm){ mComm.innerHTML='<option value="">-- Chọn tỉnh trước --</option>'; mComm.disabled=true; }
-          // Close modal cleanly
+          const finalCard = grid?.querySelector(`.mpick-card[data-id="${a.id}"]`);
+          if(finalCard) applyAddrSelection(finalCard);
+          resetModalForm();
+          toggleAddrList(true); // Show list again
           closeAddrModal();
         } else {
           if(modalErrBox) modalErrBox.textContent = data.message || 'Có lỗi xảy ra.';
@@ -857,7 +941,53 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       } catch(err){
         if(modalErrBox) modalErrBox.textContent='Lỗi kết nối, vui lòng thử lại.';
       } finally {
-        modalSaveBtn.disabled=false; modalSaveBtn.textContent='Thêm địa chỉ';
+        modalSaveBtn.disabled=false;
+        modalSaveBtn.textContent = modalAddrIdInp?.value ? 'Lưu thay đổi' : 'Thêm địa chỉ';
+      }
+    });
+  }
+
+  // AJAX delete
+  if(modalDeleteBtn){
+    modalDeleteBtn.addEventListener('click', async ()=>{
+      const addrId = modalAddrIdInp?.value;
+      if(!addrId || !confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) return;
+      modalDeleteBtn.disabled = true;
+      modalDeleteBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Đang xóa…';
+      try {
+        const url = '{{ route("account.addresses.destroy", ":id") }}'.replace(':id', addrId);
+        const res = await fetch(url, {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':C.csrf},
+          body: JSON.stringify({_method:'DELETE'}),
+        });
+        const data = await res.json();
+        if(data.success){
+          const card = qs(`.mpick-card[data-id="${addrId}"]`);
+          card?.closest('.col-6')?.remove();
+          if(qs('#sel-addr-id')?.value == addrId){
+            const firstCard = qs('.mpick-card');
+            if(firstCard) applyAddrSelection(firstCard);
+            else {
+              qs('#sel-addr-display')?.remove();
+              qs('#sel-addr-id').value = '';
+              const container = qs('.ck-card');
+              container?.querySelector('h2')?.insertAdjacentHTML('afterend', '<button type="button" class="addr-no-addr-btn" data-bs-toggle="modal" data-bs-target="#addr-pick-modal">+ Thêm địa chỉ nhận hàng</button>');
+            }
+          }
+          resetModalForm();
+          const remaining = qs('.mpick-card');
+          if(remaining){
+            if(modalAddForm) modalAddForm.classList.add('d-none');
+            if(modalFooterSel) modalFooterSel.style.display = '';
+            if(modalFooterAdd) modalFooterAdd.style.display = 'none';
+            if(btnAddToggle) btnAddToggle.textContent = '+ Thêm địa chỉ mới';
+          }
+        } else { alert(data.message || 'Không thể xóa địa chỉ.'); }
+      } catch(err){ alert('Lỗi kết nối khi xóa địa chỉ.'); }
+      finally {
+        modalDeleteBtn.disabled = false;
+        modalDeleteBtn.innerHTML = '<i class="fa fa-trash"></i> Xóa địa chỉ';
       }
     });
   }
