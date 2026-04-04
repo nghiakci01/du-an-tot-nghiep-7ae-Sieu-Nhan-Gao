@@ -94,6 +94,7 @@
   $shippingFee = $order->shipping_fee ?? 0;
   $displayTotal = ($order->final_total > 0) ? $order->final_total : ($order->total_price + $shippingFee);
   $isVnpay = $order->payment_method == 'VNPAY';
+  $isBankTransfer = in_array($order->payment_method, ['BANK_TRANSFER', 'CASH']);
   $isPaymentPending = in_array($order->payment_status, ['pending', 'failed']);
 @endphp
 

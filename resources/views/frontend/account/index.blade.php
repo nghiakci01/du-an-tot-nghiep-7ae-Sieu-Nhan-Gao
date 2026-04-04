@@ -453,11 +453,7 @@
                 <a href="{{ route('product.detail', $product->slug) }}" class="fw-semibold text-dark d-block mb-1" style="font-size:.9rem; text-decoration:none;">{{ $product->name }}</a>
                 <div class="text-danger fw-bold mb-2">{{ number_format($product->sale_price ?: $product->price) }}đ</div>
                 <div class="d-flex gap-2">
-                  @if(isset($product->stock) && $product->stock > 0)
-                    <a href="javascript:void(0)" class="btn btn-sm btn-dark flex-grow-1 add-to-cart-btn" data-id="{{ $product->id }}"><i class="bi bi-bag-plus me-1"></i>Thêm giỏ</a>
-                  @else
-                    <button class="btn btn-sm btn-secondary flex-grow-1 disabled">Hết hàng</button>
-                  @endif
+                  <a href="{{ route('product.detail', $product->slug) }}" class="btn btn-sm btn-dark flex-grow-1">Xem chi tiết</a>
                   <form action="{{ route('wishlist.destroy', $wish->id) }}" method="POST" id="delete-wish-{{ $wish->id }}">
                     @csrf @method('DELETE')
                     <button type="button" onclick="if(confirm('Xóa khỏi yêu thích?')) document.getElementById('delete-wish-{{ $wish->id }}').submit();" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>

@@ -10,13 +10,13 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
 
     .chatbot-widget {
         font-family: 'Libre Franklin', sans-serif;
-        --primary-color: #7146ce;
-        /* Purple color from BizChatAI image */
-        --primary-gradient: linear-gradient(135deg, #7146ce 0%, #9063f2 100%);
-        --secondary-color: #242424;
+        --primary-color: #ef233c;
+        /* Brand Red from Elite */
+        --primary-gradient: linear-gradient(135deg, #ef233c 0%, #d90429 100%);
+        --secondary-color: #2b2d42;
         --bg-color: #ffffff;
         --light-grey: #f4f6f9;
-        --shadow-lg: 0 15px 50px -12px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 15px 50px -12px rgba(239, 35, 60, 0.15);
         --border-radius: 24px;
     }
 
@@ -79,7 +79,7 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
     }
 
     .chat-header .chat-avatar {
-        background: #f0ebff;
+        background: #fff5f6;
         color: var(--primary-color);
     }
 
@@ -171,6 +171,8 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
         flex-direction: column;
         gap: 16px;
         scroll-behavior: smooth;
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
     }
 
     .chat-messages::-webkit-scrollbar {
@@ -224,7 +226,7 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
         background: var(--primary-gradient);
         color: white;
         border-bottom-right-radius: 4px;
-        box-shadow: 0 4px 12px rgba(113, 70, 206, 0.2);
+        box-shadow: 0 4px 12px rgba(239, 35, 60, 0.2);
     }
 
     .message-wrapper.bot .message-box {
@@ -273,7 +275,7 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
 
     .chat-form:focus-within {
         border-color: var(--primary-color);
-        box-shadow: 0 4px 20px rgba(113, 70, 206, 0.1);
+        box-shadow: 0 4px 20px rgba(239, 35, 60, 0.1);
     }
 
     .chat-input {
@@ -298,7 +300,7 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
         align-items: center;
         justify-content: center;
         transition: transform 0.2s;
-        box-shadow: 0 4px 10px rgba(113, 70, 206, 0.3);
+        box-shadow: 0 4px 10px rgba(239, 35, 60, 0.3);
     }
 
     .chat-send-btn:hover {
@@ -402,7 +404,7 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 25px rgba(113, 70, 206, 0.3);
+        box-shadow: 0 8px 25px rgba(239, 35, 60, 0.3);
         cursor: pointer;
         transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border: none;
@@ -489,7 +491,7 @@ $chatbot_suggested_questions_json = json_encode($chatbot_suggested_questions ?? 
         background: var(--primary-gradient);
         color: white;
         transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(113, 70, 206, 0.2);
+        box-shadow: 0 4px 10px rgba(239, 35, 60, 0.2);
     }
 
     .chat-footer {

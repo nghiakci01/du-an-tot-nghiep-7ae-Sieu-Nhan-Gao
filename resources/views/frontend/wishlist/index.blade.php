@@ -35,12 +35,12 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th class="product_remove">DELETE</th>
-                                        <th class="product_thumb">IMAGE</th>
-                                        <th class="product_name">PRODUCT</th>
-                                        <th class="product-price">PRICE</th>
-                                        <th class="product_quantity">STOCK STATUS</th>
-                                        <th class="product_total">ADD TO CART</th>
+                                        <th class="product_remove">XÓA</th>
+                                        <th class="product_thumb">HÌNH ẢNH</th>
+                                        <th class="product_name">SẢN PHẨM</th>
+                                        <th class="product-price">GIÁ</th>
+                                        <th class="product_quantity">TÌNH TRẠNG</th>
+                                        <th class="product_total">HÀNH ĐỘNG</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white">
@@ -82,13 +82,9 @@
                                                 @endif
                                             </td>
                                             <td class="product_total">
-                                                @if($product->stock > 0)
-                                                    <a href="javascript:void(0)" class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ $product->id }}">
-                                                        ADD TO CART
-                                                    </a>
-                                                @else
-                                                    <button class="btn btn-secondary btn-sm disabled" disabled>OUT OF STOCK</button>
-                                                @endif
+                                                <a href="{{ route('product.detail', $product->slug) }}" class="btn btn-primary btn-sm rounded-pill px-3">
+                                                    XEM CHI TIẾT
+                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach
