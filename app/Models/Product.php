@@ -82,6 +82,14 @@ class Product extends Model
     }
 
     /**
+     * Accessor for total stock quantity across all variants
+     */
+    public function getStockAttribute(): int
+    {
+        return (int) $this->variants->sum('stock_quantity');
+    }
+
+    /**
      * Accessor for original_price (maps to price field)
      * Used for view compatibility
      */

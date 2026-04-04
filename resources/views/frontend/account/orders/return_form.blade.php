@@ -263,21 +263,6 @@
                   <i class="bi bi-bank me-2 text-primary"></i> Thông tin nhận tiền hoàn (Bắt buộc)
                 </h6>
                 <div class="row g-3">
-                  <div class="col-md-12">
-                    <label class="form-label small fw-bold">Chọn tài khoản đã lưu (Nếu có)</label>
-                    <select id="saved-bank-select" class="form-select form-select-sm mb-3" style="border-radius:10px;">
-                      <option value="">-- Chọn tài khoản --</option>
-                      @foreach($userBankAccounts as $bank)
-                        <option value="{{ $bank->id }}" 
-                          data-name="{{ $bank->bank_name }}" 
-                          data-bin="{{ $bank->bank_id }}" 
-                          data-number="{{ $bank->account_number }}" 
-                          data-accname="{{ $bank->account_name }}">
-                          {{ $bank->bank_name }} - {{ $bank->account_number }} ({{ $bank->account_name }})
-                        </option>
-                      @endforeach
-                    </select>
-                  </div>
 
                   <div class="col-md-6">
                     <label class="form-label small fw-bold">Ngân hàng <span class="text-danger">*</span></label>

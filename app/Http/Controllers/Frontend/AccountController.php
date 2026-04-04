@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Review;
-use App\Models\UserBankAccount;
-use App\Models\BankSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -34,11 +32,10 @@ class AccountController extends Controller
             'wishlists' => collect(),
             'coupons' => collect(),
             'addresses' => collect(),
-            'userBankAccounts' => collect(),
             'walletTransactions' => collect(),
             'walletTopupRequests' => collect(),
             'walletWithdrawRequests' => collect(),
-            'bankSettings' => BankSetting::where('is_active', true)->get(),
+            'bankSettings' => collect(),
             'totalOrders' => 0,
             'totalSpent' => 0,
             'wishCount' => 0,
@@ -49,7 +46,6 @@ class AccountController extends Controller
             $data['orders'] = $user->orders()->latest()->paginate(10);
             $data['wishCount'] = $user->wishlists()->count();
             $data['wishlists'] = $user->wishlists()->with('product')->get();
-            $data['userBankAccounts'] = $user->bankAccounts;
             $data['addresses'] = $user->addresses()->get();
             
             // 2. Mã đã nhận (claimed) hoặc được gán riêng (user_id) - bao gồm cả mã đã dùng
@@ -198,8 +194,7 @@ class AccountController extends Controller
             return redirect()->route('account.orders.show', $order->id)->with('info', 'Đơn hàng này đã có yêu cầu hoàn trả.');
         }
 
-        $userBankAccounts = $user->bankAccounts;
-        return view('frontend.account.orders.return_form', compact('order', 'userBankAccounts'));
+        return view('frontend.account.orders.return_form', compact('order'));
     }
 
     public function submitReturnRequest(Request $request, $id)
@@ -359,69 +354,4 @@ class AccountController extends Controller
         return redirect()->back()->with('success', 'Gửi thông tin vận chuyển thành công. Chúng tôi sẽ thông báo khi nhận được hàng.');
     }
 
-    // ===== USER BANK ACCOUNTS =====
-
-    public function storeBankAccount(Request $request)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-
-        $request->validate([
-            'bank_name'      => 'required|string|max:100',
-            'bank_id'        => 'required|string|max:50',
-            'account_number' => 'required|string|max:100',
-            'account_name'   => 'required|string|max:255',
-        ]);
-
-        if ($request->boolean('is_default')) {
-            $user->bankAccounts()->update(['is_default' => false]);
-        }
-
-        $user->bankAccounts()->create([
-            'bank_name'      => $request->bank_name,
-            'bank_id'        => $request->bank_id,
-            'account_number' => $request->account_number,
-            'account_name'   => $request->account_name,
-            'is_default'     => $request->boolean('is_default'),
-        ]);
-
-        return redirect()->back()->with('success', 'Thêm tài khoản ngân hàng thành công!');
-    }
-
-    public function updateBankAccount(Request $request, $id)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $bank = $user->bankAccounts()->findOrFail($id);
-
-        $request->validate([
-            'bank_name'      => 'required|string|max:100',
-            'bank_id'        => 'required|string|max:50',
-            'account_number' => 'required|string|max:100',
-            'account_name'   => 'required|string|max:255',
-        ]);
-
-        if ($request->boolean('is_default')) {
-            $user->bankAccounts()->where('id', '!=', $id)->update(['is_default' => false]);
-        }
-
-        $bank->update([
-            'bank_name'      => $request->bank_name,
-            'bank_id'        => $request->bank_id,
-            'account_number' => $request->account_number,
-            'account_name'   => $request->account_name,
-            'is_default'     => $request->boolean('is_default'),
-        ]);
-
-        return redirect()->back()->with('success', 'Cập nhật tài khoản ngân hàng thành công!');
-    }
-
-    public function destroyBankAccount($id)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $user->bankAccounts()->findOrFail($id)->delete();
-
-        return redirect()->back()->with('success', 'Đã xóa tài khoản ngân hàng.');
-    }
 }
