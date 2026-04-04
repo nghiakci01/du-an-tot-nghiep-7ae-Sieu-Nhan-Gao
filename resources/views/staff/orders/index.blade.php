@@ -7,7 +7,7 @@
     <div class="container-fluid">
         <div class="row align-items-center">
             <div class="col-8">
-                <h5 class="text-white mb-0"><i class="feather icon-truck me-2"></i>Chuyến hàng của tôi</h5>
+                <h5 class="text-white mb-0"><i class="feather icon-truck me-2" aria-hidden="true"></i>Chuyến hàng của tôi</h5>
             </div>
             <div class="col-4 text-end">
                 <span class="badge bg-white text-primary rounded-pill">{{ $orders->total() }} Đơn</span>
@@ -45,14 +45,14 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-3 d-flex align-items-start">
-                            <i class="feather icon-user text-muted me-3 mt-1 fs-5"></i>
+                            <i class="feather icon-user text-muted me-3 mt-1 fs-5" aria-hidden="true"></i>
                             <div>
                                 <h6 class="mb-1 fw-bold">{{ $order->user ? $order->user->name : ($order->name ?? 'Khách vãng lai') }}</h6>
-                                <p class="text-primary mb-0"><i class="feather icon-phone me-1"></i> {{ $order->user ? ($order->user->phone ?? 'N/A') : ($order->phone ?? 'N/A') }}</p>
+                                <p class="text-primary mb-0"><i class="feather icon-phone me-1" aria-hidden="true"></i> {{ $order->user ? ($order->user->phone ?? 'N/A') : ($order->phone ?? 'N/A') }}</p>
                             </div>
                         </div>
                         <div class="mb-3 d-flex align-items-start">
-                            <i class="feather icon-map-pin text-danger me-3 mt-1 fs-5"></i>
+                            <i class="feather icon-map-pin text-danger me-3 mt-1 fs-5" aria-hidden="true"></i>
                             <div class="small">
                                 {{ $order->shipping_address }}
                             </div>
@@ -67,7 +67,7 @@
                         <div class="row g-2">
                             <div class="col-6">
                                 <a href="{{ route('staff.orders.show', $order->id) }}" class="btn btn-outline-info btn-sm w-100 py-2">
-                                    <i class="feather icon-eye me-1"></i> Chi tiết
+                                    <i class="feather icon-eye me-1" aria-hidden="true"></i> Chi tiết
                                 </a>
                             </div>
                             <div class="col-6">
@@ -75,22 +75,19 @@
                                     <form action="{{ route('staff.orders.accept', $order->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-primary btn-sm w-100 py-2">
-                                            <i class="feather icon-check me-1"></i> Nhận đơn
+                                            <i class="feather icon-check me-1" aria-hidden="true"></i> Nhận đơn
                                         </button>
                                     </form>
                                 @elseif($order->status === \App\Models\Order::STATUS_SHIPPED)
-                                    <form action="{{ route('staff.orders.complete', $order->id) }}" method="POST" class="mb-2">
-                                        @csrf
-                                        <button type="submit" class="btn btn-success btn-sm w-100 py-2" onclick="return confirm('Xác nhận đã giao hàng thành công?')">
-                                            <i class="feather icon-check-circle me-1"></i> Hoàn thành
-                                        </button>
-                                    </form>
+                                    <a href="{{ route('staff.orders.show', $order->id) }}" class="btn btn-success btn-sm w-100 py-2">
+                                        <i class="feather icon-check-circle me-1" aria-hidden="true"></i> Báo Hoàn thành
+                                    </a>
                                 @endif
                             </div>
                             @if($order->status === \App\Models\Order::STATUS_SHIPPED)
                                 <div class="col-12">
                                     <button type="button" class="btn btn-danger btn-sm w-100 py-2" data-bs-toggle="modal" data-bs-target="#failModal{{ $order->id }}">
-                                        <i class="feather icon-x-circle me-1"></i> Báo giao hàng thất bại
+                                        <i class="feather icon-x-circle me-1" aria-hidden="true"></i> Báo giao hàng thất bại
                                     </button>
                                 </div>
                             @endif
@@ -100,19 +97,19 @@
             </div>
 
             <!-- Fail Modal -->
-            <div class="modal fade" id="failModal{{ $order->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal fade" id="failModal{{ $order->id }}" tabindex="-1" aria-labelledby="failModalLabel{{ $order->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-0 shadow">
                         <form action="{{ route('staff.orders.fail', $order->id) }}" method="POST">
                             @csrf
                             <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title text-white">Lý do giao hàng thất bại</h5>
+                                <h5 class="modal-title text-white" id="failModalLabel{{ $order->id }}">Lý do giao hàng thất bại</h5>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="mb-3">
-                                    <label class="form-label">Ghi chú lý do:</label>
-                                    <textarea name="delivery_note" class="form-control" rows="4" placeholder="VD: Khách hàng không nghe máy, Sai địa chỉ..." required></textarea>
+                                    <label for="delivery_note{{ $order->id }}" class="form-label fw-bold">Ghi chú lý do:</label>
+                                    <textarea name="delivery_note" id="delivery_note{{ $order->id }}" class="form-control" rows="4" placeholder="VD: Khách hàng không nghe máy, Sai địa chỉ…" required></textarea>
                                 </div>
                             </div>
                             <div class="modal-footer">

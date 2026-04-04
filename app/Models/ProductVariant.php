@@ -32,16 +32,6 @@ class ProductVariant extends Model
         'sale_price' => 'decimal:2',
     ];
 
-    public function voucherDetails()
-    {
-        return $this->hasMany(InventoryVoucherDetail::class, 'product_variant_id');
-    }
-
-    public function warehouseStocks()
-    {
-        return $this->hasMany(WarehouseStock::class, 'product_variant_id');
-    }
-
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

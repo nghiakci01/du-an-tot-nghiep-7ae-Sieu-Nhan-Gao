@@ -278,6 +278,39 @@
             </div>
         </div>
 
+        <!-- Delivery Proofs Card -->
+        @if($order->deliveryProofs->count() > 0)
+        <div class="card shadow-sm mb-4 border-top border-success border-3">
+            <div class="card-header border-bottom">
+                <h5 class="mb-0"><i class="feather icon-image text-success me-2"></i>Bằng chứng giao hàng</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    @foreach($order->deliveryProofs as $proof)
+                        <div class="col-12">
+                            @if($proof->file_type === 'image')
+                                <div class="mb-2">
+                                    <label class="small text-muted mb-1 d-block"><i class="feather icon-image"></i> Hình ảnh:</label>
+                                    <a href="{{ asset('storage/' . $proof->file_path) }}" target="_blank">
+                                        <img src="{{ asset('storage/' . $proof->file_path) }}" class="img-fluid rounded border shadow-sm" style="max-height: 200px; width: 100%; object-fit: cover;" alt="Delivery Proof Image">
+                                    </a>
+                                </div>
+                            @elseif($proof->file_type === 'video')
+                                <div class="mb-2">
+                                    <label class="small text-muted mb-1 d-block"><i class="feather icon-video"></i> Video:</label>
+                                    <video controls class="w-100 rounded border shadow-sm" style="max-height: 250px;">
+                                        <source src="{{ asset('storage/' . $proof->file_path) }}" type="video/mp4">
+                                        Trình duyệt của bạn không hỗ trợ video.
+                                    </video>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Customer Card -->
         <div class="card shadow-sm mb-4">
             <div class="card-header border-bottom">

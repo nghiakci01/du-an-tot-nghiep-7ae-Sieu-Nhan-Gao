@@ -75,6 +75,11 @@ class Order extends Model
         return $this->hasOne(OrderReturnRequest::class);
     }
 
+    public function deliveryProofs()
+    {
+        return $this->hasMany(OrderDeliveryProof::class);
+    }
+
 
     public function getSubtotalAttribute()
     {
