@@ -132,37 +132,6 @@ class OrderController extends Controller
         return view('admin.orders.print', compact('order'));
     }
 
-    public function confirmPayment(Order $order)
-    {
-        if ($order->payment_method !== 'BANK_TRANSFER' || $order->payment_status !== 'waiting_confirmation') {
-            return back()->with('error', 'Đơn hàng không ở trạng thái chờ xác nhận thanh toán.');
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $order->update([
-                'payment_status' => 'paid',
-                'status' => Order::STATUS_CONFIRMED
-            ]);
-
-            // Log history
-            \App\Models\OrderHistory::create([
-                'order_id' => $order->id,
-                'user_id' => Auth::id(),
-                'previous_status' => 'waiting_confirmation',
-                'new_status' => Order::STATUS_CONFIRMED,
-                'note' => 'Admin xác nhận đã nhận tiền chuyển khoản. Đơn hàng chuyển sang trạng thái Đã xác nhận.',
-            ]);
-
-            DB::commit();
-
-            return back()->with('success', 'Đã xác nhận thanh toán cho đơn hàng #' . $order->id);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
-        }
-    }
 
     /**
      * Remove the specified resource from storage.

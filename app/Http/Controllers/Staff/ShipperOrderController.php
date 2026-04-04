@@ -70,9 +70,14 @@ class ShipperOrderController extends Controller
     /**
      * Shipper marks the order as completed (delivered successfully).
      */
-    public function complete(Order $order)
+    public function complete(Request $request, Order $order)
     {
         $this->authorizeShipper($order);
+
+        if ($request->isMethod('get')) {
+            return redirect()->route('staff.orders.show', $order->id)
+                ->with('info', 'Để hoàn thành đơn hàng, vui lòng sử dụng nút "Hoàn thành" trong trang chi tiết đơn hàng.');
+        }
 
         if ($order->status !== Order::STATUS_SHIPPED) {
             return back()->with('error', 'Vui lòng xác nhận đi giao đơn hàng này trước khi báo Hoàn thành.');

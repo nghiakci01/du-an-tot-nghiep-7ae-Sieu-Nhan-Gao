@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
 
@@ -376,14 +377,25 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            // Notify Admins
-            $admins = User::getAdmins();
-            Notification::send($admins, new NewOrderNotification($order));
+            // Notify Admins & Users (Wrap in individual try-catch to not block success response)
+            try {
+                $admins = User::getAdmins();
+                if ($admins->isNotEmpty()) {
+                    Notification::send($admins, new NewOrderNotification($order));
+                }
+            } catch (\Exception $e) {
+                Log::error('Admin Notification failed: ' . $e->getMessage());
+            }
 
-            // Notify User
-            /** @var \App\Models\User $user */
-            $user = Auth::user();
-            $user->notify(new OrderPlacedNotification($order));
+            try {
+                if (Auth::check()) {
+                    /** @var \App\Models\User $user */
+                    $user = Auth::user();
+                    $user->notify(new OrderPlacedNotification($order));
+                }
+            } catch (\Exception $e) {
+                Log::error('User Notification failed: ' . $e->getMessage());
+            }
 
             // Clear selected items and session
             if ($selectedIds && is_array($selectedIds)) {
@@ -414,9 +426,10 @@ class CheckoutController extends Controller
                 return redirect($paymentUrl);
             }
 
-            // COD & BANK_TRANSFER: gửi email xác nhận ngay
+            // COD: gửi email xác nhận ngay
             try {
-                \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
+                Mail::to($order->email)->send(new \App\Mail\OrderConfirmationMail($order));
+                Log::info('Order Confirmation Mail sent to: ' . $order->email . ' for Order #' . $order->id);
             } catch (\Exception $e) {
                 Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: ' . $e->getMessage());
             }
@@ -443,38 +456,6 @@ class CheckoutController extends Controller
         return view('frontend.checkout.success', compact('order'));
     }
 
-    /**
-     * Xác nhận đã chuyển khoản
-     */
-    public function confirmTransfer($id)
-    {
-        $order = Order::findOrFail($id);
-
-        if ($order->payment_method !== 'BANK_TRANSFER') {
-            return redirect()->back()->with('error', 'Phương thức thanh toán không hợp lệ.');
-        }
-
-        if ($order->payment_status !== 'pending') {
-            return redirect()->back()->with('error', 'Trạng thái thanh toán không hợp lệ.');
-        }
-
-        $order->update([
-            'payment_status' => 'waiting_confirmation'
-        ]);
-
-        // Ghi lại lịch sử (nếu có hệ thống lịch sử đơn hàng)
-        if (class_exists(\App\Models\OrderHistory::class)) {
-            \App\Models\OrderHistory::create([
-                'order_id' => $order->id,
-                'previous_status' => $order->status,
-                'new_status' => 'waiting_confirmation',
-                'note' => 'Khách hàng xác nhận đã chuyển khoản. Chờ Admin kiểm tra.',
-                'user_id' => Auth::id()
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Thông báo đã được gửi. Vui lòng chờ chúng tôi xác nhận giao dịch.');
-    }
 
     /**
      * Hủy đơn hàng khi đang chờ thanh toán

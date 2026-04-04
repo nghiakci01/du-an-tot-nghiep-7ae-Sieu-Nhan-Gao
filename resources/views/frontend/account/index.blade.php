@@ -254,11 +254,6 @@
             <i class="bi bi-person-gear"></i> Thông tin tài khoản
           </a>
         </li>
-        <li>
-          <a href="#bank-accounts" data-tab="bank-accounts" class="nav-tab-link">
-            <i class="bi bi-bank"></i> Tài khoản ngân hàng
-          </a>
-        </li>
         {{-- Địa chỉ được gộp vào Thông tin tài khoản --}}
         @if(config('features.wallet'))
         <li>
@@ -768,149 +763,7 @@
       </div>
     </div>
 
-    {{-- =============== TAB: BANK ACCOUNTS =============== --}}
-    <div class="account-content tab-pane-block d-none" id="tab-bank-accounts">
-      <div class="tab-head">
-        <h4><i class="bi bi-credit-card-2-back me-2"></i>Tài khoản ngân hàng của tôi</h4>
-        @if($user)
-        <button type="button" class="btn btn-dark btn-sm rounded-pill px-3" onclick="openAddBankModal()">
-          <i class="bi bi-plus-lg me-1"></i>Thêm tài khoản
-        </button>
-        @endif
-      </div>
-      <div class="tab-body">
-        @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
-          {{ session('success') }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        @endif
 
-        @if($user)
-        <p class="text-muted small mb-4">Quản lý tài khoản ngân hàng cá nhân của bạn. Thông tin này chỉ dùng để nhận hoàn tiền hoặc thanh toán từ shop.</p>
-
-        <div class="table-responsive">
-          <table class="table align-middle" style="font-size:0.9rem;">
-            <thead style="background:#f5f5f7;">
-              <tr>
-                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">#</th>
-                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Ngân hàng</th>
-                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Số tài khoản</th>
-                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Chủ tài khoản</th>
-                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;"></th>
-                <th style="padding:12px 16px;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:#888;border:none;">Hành động</th>
-              </tr>
-            </thead>
-            <tbody>
-              @forelse($userBankAccounts as $i => $ub)
-              <tr style="border-color:#f0f0f0;">
-                <td style="padding:14px 16px;">{{ $i + 1 }}</td>
-                <td style="padding:14px 16px;">
-                  <div class="d-flex align-items-center gap-2">
-                    <img src="https://api.vietqr.io/img/{{ $ub->bank_id }}.png"
-                         alt="{{ $ub->bank_name }}"
-                         style="height:24px;width:48px;object-fit:contain;"
-                         onerror="this.style.display='none'">
-                    <span class="fw-semibold">{{ $ub->bank_name }}</span>
-                  </div>
-                </td>
-                <td style="padding:14px 16px;"><code class="fw-bold text-dark">{{ $ub->account_number }}</code></td>
-                <td style="padding:14px 16px;">{{ Str::upper($ub->account_name) }}</td>
-                <td style="padding:14px 16px;">
-                  @if($ub->is_default)
-                  <span class="badge rounded-pill" style="background:#fff3cd;color:#856404;"><i class="bi bi-star-fill me-1" style="font-size:0.6rem;"></i>Mặc định</span>
-                  @endif
-                </td>
-                <td style="padding:14px 16px;">
-                  <form action="{{ route('account.bank-accounts.destroy', $ub->id) }}" method="POST"
-                        onsubmit="return confirm('Xóa tài khoản {{ $ub->bank_name }} - {{ $ub->account_number }}?')">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                      <i class="bi bi-trash me-1"></i>Xóa
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              @empty
-              <tr>
-                <td colspan="6" class="text-center py-5 text-muted">
-                  <i class="bi bi-credit-card-2-back" style="font-size:2.5rem;color:#ddd;display:block;margin-bottom:10px;"></i>
-                  Bạn chưa có tài khoản ngân hàng nào.
-                  <br>
-                  <button type="button" class="btn btn-dark btn-sm mt-3 rounded-pill px-4" onclick="openAddBankModal()">
-                    <i class="bi bi-plus-lg me-1"></i>Thêm ngay
-                  </button>
-                </td>
-              </tr>
-              @endforelse
-            </tbody>
-          </table>
-        </div>
-        @endif
-      </div>
-    </div>
-
-    {{-- ========== MODAL: ADD BANK ACCOUNT ========== --}}
-    <div class="modal fade" id="modalAddBank" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-          <div class="modal-header border-0 pb-0">
-            <h5 class="modal-title fw-bold"><i class="bi bi-bank me-2"></i>Thêm tài khoản ngân hàng</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <form action="{{ route('account.bank-accounts.store') }}" method="POST" id="formAddBank">
-            @csrf
-            <div class="modal-body pt-3">
-              <div class="mb-3">
-                <label class="form-label fw-semibold small">Ngân hàng <span class="text-danger">*</span></label>
-                <select name="bank_id" id="add-bank-id" class="form-select" required onchange="onBankSelectChange(this, 'add')">
-                  <option value="">-- Chọn ngân hàng --</option>
-                  <option value="970436" data-name="Vietcombank">970436 - Vietcombank</option>
-                  <option value="970418" data-name="BIDV">970418 - BIDV</option>
-                  <option value="970415" data-name="Vietinbank">970415 - Vietinbank</option>
-                  <option value="970422" data-name="MB Bank">970422 - MB Bank</option>
-                  <option value="970407" data-name="Techcombank">970407 - Techcombank</option>
-                  <option value="970405" data-name="Agribank">970405 - Agribank</option>
-                  <option value="970416" data-name="ACB">970416 - ACB</option>
-                  <option value="970432" data-name="VPBank">970432 - VPBank</option>
-                  <option value="796500" data-name="MSB">796500 - MSB</option>
-                  <option value="970426" data-name="TPBank">970426 - TPBank</option>
-                  <option value="970423" data-name="TPBank">970423 - TPBank</option>
-                  <option value="970441" data-name="VIB">970441 - VIB</option>
-                  <option value="970425" data-name="HDBank">970425 - HDBank</option>
-                  <option value="970443" data-name="SHB">970443 - SHB</option>
-                  <option value="970454" data-name="Viet Capital Bank">970454 - Viet Capital Bank</option>
-                  <option value="970448" data-name="OCB">970448 - OCB</option>
-                  <option value="970403" data-name="Sacombank">970403 - Sacombank</option>
-                  <option value="970431" data-name="Eximbank">970431 - Eximbank</option>
-                  <option value="970400" data-name="Saigonbank">970400 - Saigonbank</option>
-                  <option value="970449" data-name="LPBank">970449 - LPBank</option>
-                  <option value="MoMo" data-name="Ví MoMo">MoMo - Ví MoMo</option>
-                  <option value="ZaloPay" data-name="Ví ZaloPay">ZaloPay - Ví ZaloPay</option>
-                </select>
-                <input type="hidden" name="bank_name" id="add-bank-name">
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-semibold small">Số tài khoản / Số điện thoại <span class="text-danger">*</span></label>
-                <input type="text" name="account_number" class="form-control" placeholder="Nhập số tài khoản" required>
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-semibold small">Tên chủ tài khoản <span class="text-danger">*</span></label>
-                <input type="text" name="account_name" class="form-control" placeholder="NGUYEN VAN A" style="text-transform:uppercase;" required>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="is_default" value="1" id="add-is-default">
-                <label class="form-check-label small" for="add-is-default">Đặt làm tài khoản mặc định</label>
-              </div>
-            </div>
-            <div class="modal-footer border-0">
-              <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
-              <button type="submit" class="btn btn-dark rounded-pill px-5">Lưu</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
 
     @if(config('features.wallet'))
     {{-- =============== TAB: WALLET =============== --}}
@@ -988,7 +841,6 @@ document.addEventListener('DOMContentLoaded', function() {
     'coupons'         : 'tab-coupons',
     'addresses'       : 'tab-account-details',
     'account-details' : 'tab-account-details',
-    'bank-accounts'   : 'tab-bank-accounts',
     @if(config('features.wallet'))
     'wallet'          : 'tab-wallet',
     @endif
@@ -1205,32 +1057,6 @@ function copyBankAccount(number, btn) {
   });
 }
 
-function onBankSelectChange(sel, prefix) {
-  var opt = sel.options[sel.selectedIndex];
-  document.getElementById(prefix + '-bank-name').value = opt.getAttribute('data-name') || '';
-}
-
-function openAddBankModal() {
-  document.getElementById('add-bank-id').value = '';
-  document.getElementById('add-bank-name').value = '';
-  document.getElementById('add-is-default').checked = false;
-  document.getElementById('formAddBank').reset();
-  new bootstrap.Modal(document.getElementById('modalAddBank')).show();
-}
-
-function openEditBankModal(id, bankName, bankId, accountNumber, accountName, isDefault) {
-  var baseUrl = '{{ url("/my-account/bank-accounts") }}';
-  document.getElementById('formEditBank').action = baseUrl + '/' + id;
-
-  var sel = document.getElementById('edit-bank-id');
-  sel.value = bankId;
-  document.getElementById('edit-bank-name').value = bankName;
-  document.getElementById('edit-account-number').value = accountNumber;
-  document.getElementById('edit-account-name').value = accountName;
-  document.getElementById('edit-is-default').checked = isDefault;
-
-  new bootstrap.Modal(document.getElementById('modalEditBank')).show();
-}
 
 function updateDestBankInfo(select) {
     const container = document.getElementById('dest-bank-info');

@@ -42,10 +42,6 @@ class WalletTopupRequest extends Model
         return $this->belongsTo(User::class, 'processed_by');
     }
 
-    public function bankSetting(): BelongsTo
-    {
-        return $this->belongsTo(BankSetting::class);
-    }
 
     public function isPending(): bool  { return $this->status === self::STATUS_PENDING; }
     public function isApproved(): bool { return $this->status === self::STATUS_APPROVED; }
