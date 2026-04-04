@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\Order;
+use App\Models\OrderDeliveryProof;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ShipperOrderController extends Controller
 {
@@ -83,7 +85,40 @@ class ShipperOrderController extends Controller
             return back()->with('error', 'Vui lòng xác nhận đi giao đơn hàng này trước khi báo Hoàn thành.');
         }
 
+        $request->validate([
+            'delivery_image' => 'required|image|max:10240', // 10MB max
+        ], [
+            'delivery_image.required' => 'Vui lòng cung cấp hình ảnh xác nhận đã giao hàng.',
+            'delivery_image.image' => 'File tải lên phải là định dạng hình ảnh.',
+        ]);
+
         try {
+            // Store Image
+            if ($request->hasFile('delivery_image')) {
+                $file = $request->file('delivery_image');
+                
+                if (!$file->isValid()) {
+                    throw new \Exception('File tải lên không hợp lệ hoặc bị lỗi: ' . $file->getErrorMessage());
+                }
+
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $targetDir = storage_path('app/public/delivery_proofs/images');
+                
+                if (!file_exists($targetDir)) {
+                    mkdir($targetDir, 0777, true);
+                }
+
+                // Di chuyển file thủ công để tránh lỗi "Path cannot be empty" từ FilesystemAdapter
+                $file->move($targetDir, $filename);
+                $imagePath = 'delivery_proofs/images/' . $filename;
+                
+                OrderDeliveryProof::create([
+                    'order_id' => $order->id,
+                    'file_path' => $imagePath,
+                    'file_type' => 'image'
+                ]);
+            }
+
             $this->orderService->updateOrderStatus($order, Order::STATUS_COMPLETED, Auth::user(), 'Shipper báo giao hàng thành công.');
             return redirect()->route('staff.orders.index')->with('success', 'Đơn hàng đã được giao thành công. Giỏi quá!');
         } catch (\Exception $e) {
