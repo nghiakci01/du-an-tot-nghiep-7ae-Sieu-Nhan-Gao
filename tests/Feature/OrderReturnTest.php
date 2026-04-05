@@ -70,7 +70,11 @@ class OrderReturnTest extends TestCase
                     'selected' => '1',
                     'quantity' => '1'
                 ]
-            ]
+            ],
+            'bank_name' => 'Vietcombank',
+            'bank_bin' => '970436',
+            'account_number' => '1234567890',
+            'account_name' => 'TEST USER'
         ]);
 
         $response->assertRedirect();

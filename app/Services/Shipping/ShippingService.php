@@ -44,12 +44,20 @@ class ShippingService
             return [$this->storePickupOption()];
         }
 
-        return [[
-            'provider' => 'default',
-            'service_name' => 'Phí vận chuyển',
-            'fee' => 30000,
-            'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
-        ]];
+        return [
+            [
+                'provider' => 'ghtk',
+                'service_name' => 'Giao hàng nhanh GHTK',
+                'fee' => 35000,
+                'expected_delivery_time' => now()->addDays(2)->format('d/m/Y'),
+            ],
+            [
+                'provider' => 'default',
+                'service_name' => 'Phí vận chuyển',
+                'fee' => 30000,
+                'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
+            ]
+        ];
     }
 
     public function resolveSelectedOption(

@@ -151,7 +151,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
         // Admin & Staff Routes
         Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
         Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
-        Route::resource('orders', App\Http\Controllers\Admin\OrderController::class)->except(['create', 'store']);
+        Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
         Route::post('orders/{order}/assign-shipper', [App\Http\Controllers\Admin\OrderController::class, 'assignShipper'])->name('orders.assign-shipper');
         Route::get('orders/{order}/assign-shipper', function ($order) {
             return redirect()->route('admin.orders.show', $order);
