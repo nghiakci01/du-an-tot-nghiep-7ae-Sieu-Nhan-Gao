@@ -1,0 +1,3 @@
+# Allow all storage files to be pushed to Git
+!*
+!.gitignore
