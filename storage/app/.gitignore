@@ -1,5 +1,5 @@
 *
-private/
-public/
-.gitignore
-vn_communes.json
+!.gitignore
+!private/
+!public/
+!vn_communes.json
