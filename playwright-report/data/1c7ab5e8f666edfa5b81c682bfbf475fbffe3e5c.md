@@ -1,0 +1,1578 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: checkout.spec.ts >> Checkout and Voucher Flow >> User can apply a voucher and place a COD order
+- Location: tests\e2e\checkout.spec.ts:12:3
+
+# Error details
+
+```
+Test timeout of 30000ms exceeded.
+```
+
+```
+Error: locator.click: Test timeout of 30000ms exceeded.
+Call log:
+  - waiting for locator('.product-card, .item, a[href*="/product/"]').first()
+    - locator resolved to <a href="http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b">…</a>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+      - waiting 100ms
+    40 × waiting for element to be visible, enabled and stable
+       - element is not visible
+     - retrying click action
+       - waiting 500ms
+    - waiting for element to be visible, enabled and stable
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - text:          
+  - banner [ref=e2]:
+    - generic [ref=e6]:
+      - generic [ref=e8]:
+        - link [ref=e10] [cursor=pointer]:
+          - /url: http://elite.test
+        - navigation [ref=e12]:
+          - list [ref=e13]:
+            - listitem [ref=e14]:
+              - link "Trang chủ" [ref=e15] [cursor=pointer]:
+                - /url: http://elite.test
+            - listitem [ref=e16]:
+              - link "Cửa hàng " [ref=e17] [cursor=pointer]:
+                - /url: http://elite.test/shop
+                - text: Cửa hàng
+                - generic [ref=e18]: 
+            - listitem [ref=e19]:
+              - link "Tin tức" [ref=e20] [cursor=pointer]:
+                - /url: http://elite.test/news
+            - listitem [ref=e21]:
+              - link "Giới thiệu" [ref=e22] [cursor=pointer]:
+                - /url: http://elite.test/about
+            - listitem [ref=e23]:
+              - link "Liên hệ" [ref=e24] [cursor=pointer]:
+                - /url: http://elite.test/contact
+      - generic [ref=e26]:
+        - generic [ref=e28]:
+          - textbox "Search" [ref=e29]:
+            - /placeholder: Tìm kiếm sản phẩm...
+          - button "Submit Search" [ref=e30] [cursor=pointer]:
+            - generic [ref=e31]: 
+        - list [ref=e33]:
+          - listitem [ref=e34]:
+            - link "Mr. Davonte Schumm III Mr. Davonte Schumm III " [ref=e35] [cursor=pointer]:
+              - /url: "#"
+              - img "Mr. Davonte Schumm III" [ref=e36]
+              - generic [ref=e37]: Mr. Davonte Schumm III
+              - generic: 
+            - list:
+              - listitem [ref=e38]:
+                - link "Bảng điều khiển" [ref=e39] [cursor=pointer]:
+                  - /url: http://elite.test/my-account#dashboard
+              - listitem [ref=e40]:
+                - link "Đăng xuất" [ref=e41] [cursor=pointer]:
+                  - /url: http://elite.test/logout
+        - generic [ref=e42]:
+          - link "Xem thông báo" [ref=e43] [cursor=pointer]:
+            - /url: javascript:void(0)
+            - generic [ref=e44]: 
+          - text: 
+        - link " 2 Sản phẩm" [ref=e46] [cursor=pointer]:
+          - /url: http://elite.test/cart
+          - generic [ref=e47]: 
+          - text: 2 Sản phẩm
+  - navigation [ref=e54]:
+    - list [ref=e55]:
+      - listitem [ref=e56]:
+        - link "Trang chủ" [ref=e57] [cursor=pointer]:
+          - /url: http://elite.test
+      - listitem [ref=e58]:
+        - link "Cửa hàng " [ref=e59] [cursor=pointer]:
+          - /url: http://elite.test/shop
+          - text: Cửa hàng
+          - generic [ref=e60]: 
+      - listitem [ref=e61]:
+        - link "Tin tức" [ref=e62] [cursor=pointer]:
+          - /url: http://elite.test/news
+      - listitem [ref=e63]:
+        - link "Giới thiệu" [ref=e64] [cursor=pointer]:
+          - /url: http://elite.test/about
+      - listitem [ref=e65]:
+        - link "Liên hệ" [ref=e66] [cursor=pointer]:
+          - /url: http://elite.test/contact
+  - generic [ref=e67]:
+    - heading "Elite - E-commerce Fashion Store" [level=1] [ref=e68]
+    - generic [ref=e74]:
+      - generic [ref=e76]:
+        - link [ref=e77] [cursor=pointer]:
+          - /url: "#"
+        - heading "Slider 2" [level=2] [ref=e80]
+      - generic [ref=e82]:
+        - link [ref=e83] [cursor=pointer]:
+          - /url: "#"
+        - heading "Slider 3" [level=2] [ref=e86]
+      - generic [ref=e88]:
+        - link [ref=e89] [cursor=pointer]:
+          - /url: "#"
+        - heading "Slider 1" [level=2] [ref=e92]
+      - generic [ref=e94]:
+        - link [ref=e95] [cursor=pointer]:
+          - /url: "#"
+        - heading "Slider 2" [level=2] [ref=e98]
+      - generic [ref=e100]:
+        - link [ref=e101] [cursor=pointer]:
+          - /url: "#"
+        - heading "Slider 3" [level=2] [ref=e104]
+      - generic [ref=e106]:
+        - link [ref=e107] [cursor=pointer]:
+          - /url: "#"
+        - heading "Slider 1" [level=2] [ref=e110]
+      - generic [ref=e112]:
+        - link [ref=e113] [cursor=pointer]:
+          - /url: "#"
+        - heading "Slider 2" [level=2] [ref=e116]
+  - generic [ref=e122]:
+    - generic [ref=e125]:
+      - heading "Sản Phẩm Nổi Bật" [level=2] [ref=e126]
+      - paragraph [ref=e127]: Thiết kế hiện đại, tối giản, mang lại ấn tượng tinh tế và thời thượng.
+    - generic [ref=e132]:
+      - generic [ref=e133]:
+        - generic [ref=e136]:
+          - generic [ref=e137]:
+            - link [ref=e138] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+              - img [ref=e139]
+            - generic [ref=e141]: 
+          - generic [ref=e142]:
+            - heading [level=3] [ref=e143]:
+              - link [ref=e144] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+                - text: Áo Nỉ Fitted L.2.7812
+            - text: 89,000 VND     
+        - generic [ref=e147]:
+          - generic [ref=e148]:
+            - link [ref=e149] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+              - img [ref=e150]
+            - generic [ref=e152]: 
+          - generic [ref=e153]:
+            - heading [level=3] [ref=e154]:
+              - link [ref=e155] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+                - text: Áo Jacket XL.2.8931
+            - text: 749,000 VND     
+      - generic [ref=e156]:
+        - generic [ref=e159]:
+          - generic [ref=e160]:
+            - link [ref=e161] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+              - img [ref=e162]
+            - generic [ref=e164]: 
+          - generic [ref=e165]:
+            - heading [level=3] [ref=e166]:
+              - link [ref=e167] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+                - text: Áo Phao M.2.8561
+            - text: 599,000 VND     
+        - generic [ref=e170]:
+          - generic [ref=e171]:
+            - link [ref=e172] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+              - img [ref=e173]
+            - generic [ref=e175]: 
+          - generic [ref=e176]:
+            - heading [level=3] [ref=e177]:
+              - link [ref=e178] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+                - text: Áo Jacket L.2.8893
+            - text: 669,000 VND     
+      - generic [ref=e179]:
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - link [ref=e184] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+              - img [ref=e185]
+            - generic [ref=e187]: 
+          - generic [ref=e188]:
+            - heading [level=3] [ref=e189]:
+              - link [ref=e190] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+                - text: Áo Cardigan Regular L.4.5214
+            - text: 159,000 VND     
+        - generic [ref=e193]:
+          - generic [ref=e194]:
+            - link [ref=e195] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+              - img [ref=e196]
+            - generic [ref=e198]: 
+          - generic [ref=e199]:
+            - heading [level=3] [ref=e200]:
+              - link [ref=e201] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+                - text: Áo Hoodie Loose L.3.6982
+            - text: 349,000 VND     
+      - generic [ref=e202]:
+        - generic [ref=e205]:
+          - generic [ref=e206]:
+            - link [ref=e207] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+              - img [ref=e208]
+            - generic [ref=e210]: 
+          - generic [ref=e211]:
+            - heading [level=3] [ref=e212]:
+              - link [ref=e213] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+                - text: Áo Nỉ Fitted L.4.7862
+            - text: 129,000 VND     
+        - generic [ref=e216]:
+          - generic [ref=e217]:
+            - link [ref=e218] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+              - img [ref=e219]
+            - generic [ref=e221]: 
+          - generic [ref=e222]:
+            - heading [level=3] [ref=e223]:
+              - link [ref=e224] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+                - text: Áo Khoác XL.2.8310
+            - text: 479,000 VND     
+      - generic [ref=e225]:
+        - generic [ref=e228]:
+          - generic [ref=e229]:
+            - link "Áo Phao AKP 2XL.2.8560" [ref=e230] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+              - img "Áo Phao AKP 2XL.2.8560" [ref=e231]
+            - generic [ref=e233]: 
+          - generic [ref=e234]:
+            - heading "Áo Phao AKP 2XL.2.8560" [level=3] [ref=e235]:
+              - link "Áo Phao AKP 2XL.2.8560" [ref=e236] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+            - text: 749,000 VND     
+        - generic [ref=e239]:
+          - generic [ref=e240]:
+            - link "Áo Cardigan L.3.5211" [ref=e241] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a94075e8
+              - img "Áo Cardigan L.3.5211" [ref=e242]
+            - generic [ref=e244]: 
+          - generic [ref=e245]:
+            - heading "Áo Cardigan L.3.5211" [level=3] [ref=e246]:
+              - link "Áo Cardigan L.3.5211" [ref=e247] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a94075e8
+            - text: 349,000 VND     
+      - generic [ref=e248]:
+        - generic [ref=e251]:
+          - generic [ref=e252]:
+            - link "Áo Cardigan L.3.5211" [ref=e253] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+              - img "Áo Cardigan L.3.5211" [ref=e254]
+            - generic [ref=e256]: 
+          - generic [ref=e257]:
+            - heading "Áo Cardigan L.3.5211" [level=3] [ref=e258]:
+              - link "Áo Cardigan L.3.5211" [ref=e259] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+            - text: 349,000 VND     
+        - generic [ref=e262]:
+          - generic [ref=e263]:
+            - link "Áo Len Cổ Lọ L.6.5081" [ref=e264] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-len-co-lo-l65081-69cb6a9410db6
+              - img "Áo Len Cổ Lọ L.6.5081" [ref=e265]
+            - generic [ref=e267]: 
+          - generic [ref=e268]:
+            - heading "Áo Len Cổ Lọ L.6.5081" [level=3] [ref=e269]:
+              - link "Áo Len Cổ Lọ L.6.5081" [ref=e270] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-len-co-lo-l65081-69cb6a9410db6
+            - text: 199,000 VND     
+      - generic [ref=e271]:
+        - generic [ref=e274]:
+          - generic [ref=e275]:
+            - link "Áo Nỉ Fitted L.2.7812" [ref=e276] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+              - img "Áo Nỉ Fitted L.2.7812" [ref=e277]
+            - generic [ref=e279]: 
+          - generic [ref=e280]:
+            - heading "Áo Nỉ Fitted L.2.7812" [level=3] [ref=e281]:
+              - link "Áo Nỉ Fitted L.2.7812" [ref=e282] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+            - text: 89,000 VND     
+        - generic [ref=e285]:
+          - generic [ref=e286]:
+            - link "Áo Jacket XL.2.8931" [ref=e287] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+              - img "Áo Jacket XL.2.8931" [ref=e288]
+            - generic [ref=e290]: 
+          - generic [ref=e291]:
+            - heading "Áo Jacket XL.2.8931" [level=3] [ref=e292]:
+              - link "Áo Jacket XL.2.8931" [ref=e293] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+            - text: 749,000 VND     
+      - generic [ref=e294]:
+        - generic [ref=e297]:
+          - generic [ref=e298]:
+            - link "Áo Phao M.2.8561" [ref=e299] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+              - img "Áo Phao M.2.8561" [ref=e300]
+            - generic [ref=e302]: 
+          - generic [ref=e303]:
+            - heading "Áo Phao M.2.8561" [level=3] [ref=e304]:
+              - link "Áo Phao M.2.8561" [ref=e305] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+            - text: 599,000 VND     
+        - generic [ref=e308]:
+          - generic [ref=e309]:
+            - link "Áo Jacket L.2.8893" [ref=e310] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+              - img "Áo Jacket L.2.8893" [ref=e311]
+            - generic [ref=e313]: 
+          - generic [ref=e314]:
+            - heading "Áo Jacket L.2.8893" [level=3] [ref=e315]:
+              - link "Áo Jacket L.2.8893" [ref=e316] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+            - text: 669,000 VND     
+      - generic [ref=e317]:
+        - generic [ref=e320]:
+          - generic [ref=e321]:
+            - link "Áo Cardigan Regular L.4.5214" [ref=e322] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+              - img "Áo Cardigan Regular L.4.5214" [ref=e323]
+            - generic [ref=e325]: 
+          - generic [ref=e326]:
+            - heading "Áo Cardigan Regular L.4.5214" [level=3] [ref=e327]:
+              - link "Áo Cardigan Regular L.4.5214" [ref=e328] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+            - text: 159,000 VND     
+        - generic [ref=e331]:
+          - generic [ref=e332]:
+            - link "Áo Hoodie Loose L.3.6982" [ref=e333] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+              - img "Áo Hoodie Loose L.3.6982" [ref=e334]
+            - generic [ref=e336]: 
+          - generic [ref=e337]:
+            - heading "Áo Hoodie Loose L.3.6982" [level=3] [ref=e338]:
+              - link "Áo Hoodie Loose L.3.6982" [ref=e339] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+            - text: 349,000 VND     
+      - generic [ref=e340]:
+        - generic [ref=e343]:
+          - generic [ref=e344]:
+            - link [ref=e345] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+              - img [ref=e346]
+            - generic [ref=e348]: 
+          - generic [ref=e349]:
+            - heading [level=3] [ref=e350]:
+              - link [ref=e351] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+                - text: Áo Nỉ Fitted L.4.7862
+            - text: 129,000 VND     
+        - generic [ref=e354]:
+          - generic [ref=e355]:
+            - link [ref=e356] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+              - img [ref=e357]
+            - generic [ref=e359]: 
+          - generic [ref=e360]:
+            - heading [level=3] [ref=e361]:
+              - link [ref=e362] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+                - text: Áo Khoác XL.2.8310
+            - text: 479,000 VND     
+      - generic [ref=e363]:
+        - generic [ref=e366]:
+          - generic [ref=e367]:
+            - link [ref=e368] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+              - img [ref=e369]
+            - generic [ref=e371]: 
+          - generic [ref=e372]:
+            - heading [level=3] [ref=e373]:
+              - link [ref=e374] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+                - text: Áo Phao AKP 2XL.2.8560
+            - text: 749,000 VND     
+        - generic [ref=e377]:
+          - generic [ref=e378]:
+            - link [ref=e379] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a94075e8
+              - img [ref=e380]
+            - generic [ref=e382]: 
+          - generic [ref=e383]:
+            - heading [level=3] [ref=e384]:
+              - link [ref=e385] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a94075e8
+                - text: Áo Cardigan L.3.5211
+            - text: 349,000 VND     
+      - generic [ref=e386]:
+        - generic [ref=e389]:
+          - generic [ref=e390]:
+            - link [ref=e391] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+              - img [ref=e392]
+            - generic [ref=e394]: 
+          - generic [ref=e395]:
+            - heading [level=3] [ref=e396]:
+              - link [ref=e397] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+                - text: Áo Cardigan L.3.5211
+            - text: 349,000 VND     
+        - generic [ref=e400]:
+          - generic [ref=e401]:
+            - link [ref=e402] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-len-co-lo-l65081-69cb6a9410db6
+              - img [ref=e403]
+            - generic [ref=e405]: 
+          - generic [ref=e406]:
+            - heading [level=3] [ref=e407]:
+              - link [ref=e408] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-len-co-lo-l65081-69cb6a9410db6
+                - text: Áo Len Cổ Lọ L.6.5081
+            - text: 199,000 VND     
+      - generic [ref=e409]:
+        - generic [ref=e412]:
+          - generic [ref=e413]:
+            - link [ref=e414] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+              - img [ref=e415]
+            - generic [ref=e417]: 
+          - generic [ref=e418]:
+            - heading [level=3] [ref=e419]:
+              - link [ref=e420] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+                - text: Áo Nỉ Fitted L.2.7812
+            - text: 89,000 VND     
+        - generic [ref=e423]:
+          - generic [ref=e424]:
+            - link [ref=e425] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+              - img [ref=e426]
+            - generic [ref=e428]: 
+          - generic [ref=e429]:
+            - heading [level=3] [ref=e430]:
+              - link [ref=e431] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+                - text: Áo Jacket XL.2.8931
+            - text: 749,000 VND     
+      - generic [ref=e432]:
+        - generic [ref=e435]:
+          - generic [ref=e436]:
+            - link [ref=e437] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+              - img [ref=e438]
+            - generic [ref=e440]: 
+          - generic [ref=e441]:
+            - heading [level=3] [ref=e442]:
+              - link [ref=e443] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+                - text: Áo Phao M.2.8561
+            - text: 599,000 VND     
+        - generic [ref=e446]:
+          - generic [ref=e447]:
+            - link [ref=e448] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+              - img [ref=e449]
+            - generic [ref=e451]: 
+          - generic [ref=e452]:
+            - heading [level=3] [ref=e453]:
+              - link [ref=e454] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+                - text: Áo Jacket L.2.8893
+            - text: 669,000 VND     
+      - generic [ref=e455]:
+        - generic [ref=e458]:
+          - generic [ref=e459]:
+            - link [ref=e460] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+              - img [ref=e461]
+            - generic [ref=e463]: 
+          - generic [ref=e464]:
+            - heading [level=3] [ref=e465]:
+              - link [ref=e466] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+                - text: Áo Cardigan Regular L.4.5214
+            - text: 159,000 VND     
+        - generic [ref=e469]:
+          - generic [ref=e470]:
+            - link [ref=e471] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+              - img [ref=e472]
+            - generic [ref=e474]: 
+          - generic [ref=e475]:
+            - heading [level=3] [ref=e476]:
+              - link [ref=e477] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+                - text: Áo Hoodie Loose L.3.6982
+            - text: 349,000 VND     
+      - generic [ref=e478]:
+        - generic [ref=e481]:
+          - generic [ref=e482]:
+            - link [ref=e483] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+              - img [ref=e484]
+            - generic [ref=e486]: 
+          - generic [ref=e487]:
+            - heading [level=3] [ref=e488]:
+              - link [ref=e489] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+                - text: Áo Nỉ Fitted L.4.7862
+            - text: 129,000 VND     
+        - generic [ref=e492]:
+          - generic [ref=e493]:
+            - link [ref=e494] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+              - img [ref=e495]
+            - generic [ref=e497]: 
+          - generic [ref=e498]:
+            - heading [level=3] [ref=e499]:
+              - link [ref=e500] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+                - text: Áo Khoác XL.2.8310
+            - text: 479,000 VND     
+      - generic [ref=e501]:
+        - generic [ref=e504]:
+          - generic [ref=e505]:
+            - link [ref=e506] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+              - img [ref=e507]
+            - generic [ref=e509]: 
+          - generic [ref=e510]:
+            - heading [level=3] [ref=e511]:
+              - link [ref=e512] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+                - text: Áo Phao AKP 2XL.2.8560
+            - text: 749,000 VND     
+        - generic [ref=e515]:
+          - generic [ref=e516]:
+            - link [ref=e517] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a94075e8
+              - img [ref=e518]
+            - generic [ref=e520]: 
+          - generic [ref=e521]:
+            - heading [level=3] [ref=e522]:
+              - link [ref=e523] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a94075e8
+                - text: Áo Cardigan L.3.5211
+            - text: 349,000 VND     
+      - generic [ref=e524]:
+        - generic [ref=e527]:
+          - generic [ref=e528]:
+            - link [ref=e529] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+              - img [ref=e530]
+            - generic [ref=e532]: 
+          - generic [ref=e533]:
+            - heading [level=3] [ref=e534]:
+              - link [ref=e535] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+                - text: Áo Cardigan L.3.5211
+            - text: 349,000 VND     
+        - generic [ref=e538]:
+          - generic [ref=e539]:
+            - link [ref=e540] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-len-co-lo-l65081-69cb6a9410db6
+              - img [ref=e541]
+            - generic [ref=e543]: 
+          - generic [ref=e544]:
+            - heading [level=3] [ref=e545]:
+              - link [ref=e546] [cursor=pointer]:
+                - /url: http://elite.test/product/ao-len-co-lo-l65081-69cb6a9410db6
+                - text: Áo Len Cổ Lọ L.6.5081
+            - text: 199,000 VND     
+  - generic [ref=e548]:
+    - generic [ref=e551]:
+      - heading "Sản Phẩm Mới" [level=2] [ref=e552]
+      - paragraph [ref=e553]: Sản phẩm mới với thiết kế hiện đại, tối giản và đầy quyến rũ.
+    - generic [ref=e558]:
+      - generic [ref=e560]:
+        - generic [ref=e561]:
+          - link [ref=e562] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+            - img [ref=e563]
+          - generic [ref=e565]: 
+          - generic [ref=e566]: Mới
+        - generic [ref=e567]:
+          - heading [level=3] [ref=e568]:
+            - link [ref=e569] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+              - text: Áo Phao M.2.8561
+          - text: 599,000 VND     
+      - generic [ref=e571]:
+        - generic [ref=e572]:
+          - link [ref=e573] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+            - img [ref=e574]
+          - generic [ref=e576]: 
+          - generic [ref=e577]: Mới
+        - generic [ref=e578]:
+          - heading [level=3] [ref=e579]:
+            - link [ref=e580] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+              - text: Áo Jacket L.2.8893
+          - text: 669,000 VND     
+      - generic [ref=e582]:
+        - generic [ref=e583]:
+          - link [ref=e584] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+            - img [ref=e585]
+          - generic [ref=e587]: 
+          - generic [ref=e588]: Mới
+        - generic [ref=e589]:
+          - heading [level=3] [ref=e590]:
+            - link [ref=e591] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+              - text: Áo Cardigan Regular L.4.5214
+          - text: 159,000 VND     
+      - generic [ref=e593]:
+        - generic [ref=e594]:
+          - link [ref=e595] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+            - img [ref=e596]
+          - generic [ref=e598]: 
+          - generic [ref=e599]: Mới
+        - generic [ref=e600]:
+          - heading [level=3] [ref=e601]:
+            - link [ref=e602] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+              - text: Áo Hoodie Loose L.3.6982
+          - text: 349,000 VND     
+      - generic [ref=e604]:
+        - generic [ref=e605]:
+          - link "Áo Nỉ Fitted L.4.7862" [ref=e606] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+            - img "Áo Nỉ Fitted L.4.7862" [ref=e607]
+          - generic [ref=e609]: 
+          - generic [ref=e610]: Mới
+        - generic [ref=e611]:
+          - heading "Áo Nỉ Fitted L.4.7862" [level=3] [ref=e612]:
+            - link "Áo Nỉ Fitted L.4.7862" [ref=e613] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+          - text: 129,000 VND     
+      - generic [ref=e615]:
+        - generic [ref=e616]:
+          - link "Áo Khoác XL.2.8310" [ref=e617] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+            - img "Áo Khoác XL.2.8310" [ref=e618]
+          - generic [ref=e620]: 
+          - generic [ref=e621]: Mới
+        - generic [ref=e622]:
+          - heading "Áo Khoác XL.2.8310" [level=3] [ref=e623]:
+            - link "Áo Khoác XL.2.8310" [ref=e624] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+          - text: 479,000 VND     
+      - generic [ref=e626]:
+        - generic [ref=e627]:
+          - link "Áo Phao AKP 2XL.2.8560" [ref=e628] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+            - img "Áo Phao AKP 2XL.2.8560" [ref=e629]
+          - generic [ref=e631]: 
+          - generic [ref=e632]: Mới
+        - generic [ref=e633]:
+          - heading "Áo Phao AKP 2XL.2.8560" [level=3] [ref=e634]:
+            - link "Áo Phao AKP 2XL.2.8560" [ref=e635] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+          - text: 749,000 VND     
+      - generic [ref=e637]:
+        - generic [ref=e638]:
+          - link "Áo Cardigan L.3.5211" [ref=e639] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a94075e8
+            - img "Áo Cardigan L.3.5211" [ref=e640]
+          - generic [ref=e642]: 
+          - generic [ref=e643]: Mới
+        - generic [ref=e644]:
+          - heading "Áo Cardigan L.3.5211" [level=3] [ref=e645]:
+            - link "Áo Cardigan L.3.5211" [ref=e646] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a94075e8
+          - text: 349,000 VND     
+      - generic [ref=e648]:
+        - generic [ref=e649]:
+          - link "Áo Cardigan L.3.5211" [ref=e650] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+            - img "Áo Cardigan L.3.5211" [ref=e651]
+          - generic [ref=e653]: 
+          - generic [ref=e654]: Mới
+        - generic [ref=e655]:
+          - heading "Áo Cardigan L.3.5211" [level=3] [ref=e656]:
+            - link "Áo Cardigan L.3.5211" [ref=e657] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+          - text: 349,000 VND     
+      - generic [ref=e659]:
+        - generic [ref=e660]:
+          - link [ref=e661] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-len-co-lo-l65081-69cb6a9410db6
+            - img [ref=e662]
+          - generic [ref=e664]: 
+          - generic [ref=e665]: Mới
+        - generic [ref=e666]:
+          - heading [level=3] [ref=e667]:
+            - link [ref=e668] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-len-co-lo-l65081-69cb6a9410db6
+              - text: Áo Len Cổ Lọ L.6.5081
+          - text: 199,000 VND     
+      - generic [ref=e670]:
+        - generic [ref=e671]:
+          - link [ref=e672] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+            - img [ref=e673]
+          - generic [ref=e675]: 
+          - generic [ref=e676]: Mới
+        - generic [ref=e677]:
+          - heading [level=3] [ref=e678]:
+            - link [ref=e679] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+              - text: Áo Nỉ Fitted L.2.7812
+          - text: 89,000 VND     
+      - generic [ref=e681]:
+        - generic [ref=e682]:
+          - link [ref=e683] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+            - img [ref=e684]
+          - generic [ref=e686]: 
+          - generic [ref=e687]: Mới
+        - generic [ref=e688]:
+          - heading [level=3] [ref=e689]:
+            - link [ref=e690] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+              - text: Áo Jacket XL.2.8931
+          - text: 749,000 VND     
+      - generic [ref=e692]:
+        - generic [ref=e693]:
+          - link [ref=e694] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+            - img [ref=e695]
+          - generic [ref=e697]: 
+          - generic [ref=e698]: Mới
+        - generic [ref=e699]:
+          - heading [level=3] [ref=e700]:
+            - link [ref=e701] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+              - text: Áo Phao M.2.8561
+          - text: 599,000 VND     
+      - generic [ref=e703]:
+        - generic [ref=e704]:
+          - link [ref=e705] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+            - img [ref=e706]
+          - generic [ref=e708]: 
+          - generic [ref=e709]: Mới
+        - generic [ref=e710]:
+          - heading [level=3] [ref=e711]:
+            - link [ref=e712] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+              - text: Áo Jacket L.2.8893
+          - text: 669,000 VND     
+      - generic [ref=e714]:
+        - generic [ref=e715]:
+          - link [ref=e716] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+            - img [ref=e717]
+          - generic [ref=e719]: 
+          - generic [ref=e720]: Mới
+        - generic [ref=e721]:
+          - heading [level=3] [ref=e722]:
+            - link [ref=e723] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+              - text: Áo Cardigan Regular L.4.5214
+          - text: 159,000 VND     
+      - generic [ref=e725]:
+        - generic [ref=e726]:
+          - link [ref=e727] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+            - img [ref=e728]
+          - generic [ref=e730]: 
+          - generic [ref=e731]: Mới
+        - generic [ref=e732]:
+          - heading [level=3] [ref=e733]:
+            - link [ref=e734] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+              - text: Áo Hoodie Loose L.3.6982
+          - text: 349,000 VND     
+      - generic [ref=e736]:
+        - generic [ref=e737]:
+          - link [ref=e738] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+            - img [ref=e739]
+          - generic [ref=e741]: 
+          - generic [ref=e742]: Mới
+        - generic [ref=e743]:
+          - heading [level=3] [ref=e744]:
+            - link [ref=e745] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+              - text: Áo Nỉ Fitted L.4.7862
+          - text: 129,000 VND     
+      - generic [ref=e747]:
+        - generic [ref=e748]:
+          - link [ref=e749] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+            - img [ref=e750]
+          - generic [ref=e752]: 
+          - generic [ref=e753]: Mới
+        - generic [ref=e754]:
+          - heading [level=3] [ref=e755]:
+            - link [ref=e756] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+              - text: Áo Khoác XL.2.8310
+          - text: 479,000 VND     
+      - generic [ref=e758]:
+        - generic [ref=e759]:
+          - link [ref=e760] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+            - img [ref=e761]
+          - generic [ref=e763]: 
+          - generic [ref=e764]: Mới
+        - generic [ref=e765]:
+          - heading [level=3] [ref=e766]:
+            - link [ref=e767] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+              - text: Áo Phao AKP 2XL.2.8560
+          - text: 749,000 VND     
+      - generic [ref=e769]:
+        - generic [ref=e770]:
+          - link [ref=e771] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a94075e8
+            - img [ref=e772]
+          - generic [ref=e774]: 
+          - generic [ref=e775]: Mới
+        - generic [ref=e776]:
+          - heading [level=3] [ref=e777]:
+            - link [ref=e778] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a94075e8
+              - text: Áo Cardigan L.3.5211
+          - text: 349,000 VND     
+      - generic [ref=e780]:
+        - generic [ref=e781]:
+          - link [ref=e782] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+            - img [ref=e783]
+          - generic [ref=e785]: 
+          - generic [ref=e786]: Mới
+        - generic [ref=e787]:
+          - heading [level=3] [ref=e788]:
+            - link [ref=e789] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+              - text: Áo Cardigan L.3.5211
+          - text: 349,000 VND     
+      - generic [ref=e791]:
+        - generic [ref=e792]:
+          - link [ref=e793] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-len-co-lo-l65081-69cb6a9410db6
+            - img [ref=e794]
+          - generic [ref=e796]: 
+          - generic [ref=e797]: Mới
+        - generic [ref=e798]:
+          - heading [level=3] [ref=e799]:
+            - link [ref=e800] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-len-co-lo-l65081-69cb6a9410db6
+              - text: Áo Len Cổ Lọ L.6.5081
+          - text: 199,000 VND     
+      - generic [ref=e802]:
+        - generic [ref=e803]:
+          - link [ref=e804] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+            - img [ref=e805]
+          - generic [ref=e807]: 
+          - generic [ref=e808]: Mới
+        - generic [ref=e809]:
+          - heading [level=3] [ref=e810]:
+            - link [ref=e811] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+              - text: Áo Nỉ Fitted L.2.7812
+          - text: 89,000 VND     
+      - generic [ref=e813]:
+        - generic [ref=e814]:
+          - link [ref=e815] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+            - img [ref=e816]
+          - generic [ref=e818]: 
+          - generic [ref=e819]: Mới
+        - generic [ref=e820]:
+          - heading [level=3] [ref=e821]:
+            - link [ref=e822] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+              - text: Áo Jacket XL.2.8931
+          - text: 749,000 VND     
+      - generic [ref=e824]:
+        - generic [ref=e825]:
+          - link [ref=e826] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+            - img [ref=e827]
+          - generic [ref=e829]: 
+          - generic [ref=e830]: Mới
+        - generic [ref=e831]:
+          - heading [level=3] [ref=e832]:
+            - link [ref=e833] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+              - text: Áo Phao M.2.8561
+          - text: 599,000 VND     
+      - generic [ref=e835]:
+        - generic [ref=e836]:
+          - link [ref=e837] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+            - img [ref=e838]
+          - generic [ref=e840]: 
+          - generic [ref=e841]: Mới
+        - generic [ref=e842]:
+          - heading [level=3] [ref=e843]:
+            - link [ref=e844] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+              - text: Áo Jacket L.2.8893
+          - text: 669,000 VND     
+      - generic [ref=e846]:
+        - generic [ref=e847]:
+          - link [ref=e848] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+            - img [ref=e849]
+          - generic [ref=e851]: 
+          - generic [ref=e852]: Mới
+        - generic [ref=e853]:
+          - heading [level=3] [ref=e854]:
+            - link [ref=e855] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+              - text: Áo Cardigan Regular L.4.5214
+          - text: 159,000 VND     
+      - generic [ref=e857]:
+        - generic [ref=e858]:
+          - link [ref=e859] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+            - img [ref=e860]
+          - generic [ref=e862]: 
+          - generic [ref=e863]: Mới
+        - generic [ref=e864]:
+          - heading [level=3] [ref=e865]:
+            - link [ref=e866] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+              - text: Áo Hoodie Loose L.3.6982
+          - text: 349,000 VND     
+      - generic [ref=e868]:
+        - generic [ref=e869]:
+          - link [ref=e870] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+            - img [ref=e871]
+          - generic [ref=e873]: 
+          - generic [ref=e874]: Mới
+        - generic [ref=e875]:
+          - heading [level=3] [ref=e876]:
+            - link [ref=e877] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+              - text: Áo Nỉ Fitted L.4.7862
+          - text: 129,000 VND     
+      - generic [ref=e879]:
+        - generic [ref=e880]:
+          - link [ref=e881] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+            - img [ref=e882]
+          - generic [ref=e884]: 
+          - generic [ref=e885]: Mới
+        - generic [ref=e886]:
+          - heading [level=3] [ref=e887]:
+            - link [ref=e888] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+              - text: Áo Khoác XL.2.8310
+          - text: 479,000 VND     
+  - generic [ref=e890]:
+    - generic [ref=e893]:
+      - heading "Sản Phẩm Được Yêu Thích Nhất" [level=2] [ref=e894]
+      - paragraph [ref=e895]: Những sản phẩm được khách hàng quan tâm và yêu thích nhiều nhất.
+    - generic [ref=e900]:
+      - generic [ref=e902]:
+        - generic [ref=e903]:
+          - link [ref=e904] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+            - img [ref=e905]
+          - generic [ref=e907]: 
+        - generic [ref=e908]:
+          - heading [level=3] [ref=e909]:
+            - link [ref=e910] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+              - text: Áo Phao M.2.8561
+          - text: 599,000 VND     
+          - generic [ref=e911]:
+            - generic [ref=e912]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e914]:
+        - generic [ref=e915]:
+          - link [ref=e916] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+            - img [ref=e917]
+          - generic [ref=e919]: 
+        - generic [ref=e920]:
+          - heading [level=3] [ref=e921]:
+            - link [ref=e922] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+              - text: Áo Jacket L.2.8893
+          - text: 669,000 VND     
+          - generic [ref=e923]:
+            - generic [ref=e924]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e926]:
+        - generic [ref=e927]:
+          - link [ref=e928] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+            - img [ref=e929]
+          - generic [ref=e931]: 
+        - generic [ref=e932]:
+          - heading [level=3] [ref=e933]:
+            - link [ref=e934] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+              - text: Áo Cardigan Regular L.4.5214
+          - text: 159,000 VND     
+          - generic [ref=e935]:
+            - generic [ref=e936]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e938]:
+        - generic [ref=e939]:
+          - link [ref=e940] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+            - img [ref=e941]
+          - generic [ref=e943]: 
+        - generic [ref=e944]:
+          - heading [level=3] [ref=e945]:
+            - link [ref=e946] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+              - text: Áo Hoodie Loose L.3.6982
+          - text: 349,000 VND     
+          - generic [ref=e947]:
+            - generic [ref=e948]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e950]:
+        - generic [ref=e951]:
+          - link "Áo Nỉ Fitted L.4.7862" [ref=e952] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+            - img "Áo Nỉ Fitted L.4.7862" [ref=e953]
+          - generic [ref=e955]: 
+        - generic [ref=e956]:
+          - heading "Áo Nỉ Fitted L.4.7862" [level=3] [ref=e957]:
+            - link "Áo Nỉ Fitted L.4.7862" [ref=e958] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+          - text: 129,000 VND     
+          - generic [ref=e959]:
+            - generic [ref=e960]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e962]:
+        - generic [ref=e963]:
+          - link "Áo Khoác XL.2.8310" [ref=e964] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+            - img "Áo Khoác XL.2.8310" [ref=e965]
+          - generic [ref=e967]: 
+        - generic [ref=e968]:
+          - heading "Áo Khoác XL.2.8310" [level=3] [ref=e969]:
+            - link "Áo Khoác XL.2.8310" [ref=e970] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+          - text: 479,000 VND     
+          - generic [ref=e971]:
+            - generic [ref=e972]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e974]:
+        - generic [ref=e975]:
+          - link "Áo Phao AKP 2XL.2.8560" [ref=e976] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+            - img "Áo Phao AKP 2XL.2.8560" [ref=e977]
+          - generic [ref=e979]: 
+        - generic [ref=e980]:
+          - heading "Áo Phao AKP 2XL.2.8560" [level=3] [ref=e981]:
+            - link "Áo Phao AKP 2XL.2.8560" [ref=e982] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+          - text: 749,000 VND     
+          - generic [ref=e983]:
+            - generic [ref=e984]: 
+            - text: 1 lượt yêu thích
+      - generic [ref=e986]:
+        - generic [ref=e987]:
+          - link "Áo Cardigan L.3.5211" [ref=e988] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+            - img "Áo Cardigan L.3.5211" [ref=e989]
+          - generic [ref=e991]: 
+        - generic [ref=e992]:
+          - heading "Áo Cardigan L.3.5211" [level=3] [ref=e993]:
+            - link "Áo Cardigan L.3.5211" [ref=e994] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+          - text: 349,000 VND     
+          - generic [ref=e995]:
+            - generic [ref=e996]: 
+            - text: 1 lượt yêu thích
+      - generic [ref=e998]:
+        - generic [ref=e999]:
+          - link "Áo Nỉ Fitted L.2.7812" [ref=e1000] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+            - img "Áo Nỉ Fitted L.2.7812" [ref=e1001]
+          - generic [ref=e1003]: 
+        - generic [ref=e1004]:
+          - heading "Áo Nỉ Fitted L.2.7812" [level=3] [ref=e1005]:
+            - link "Áo Nỉ Fitted L.2.7812" [ref=e1006] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+          - text: 89,000 VND     
+          - generic [ref=e1007]:
+            - generic [ref=e1008]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1010]:
+        - generic [ref=e1011]:
+          - link [ref=e1012] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+            - img [ref=e1013]
+          - generic [ref=e1015]: 
+        - generic [ref=e1016]:
+          - heading [level=3] [ref=e1017]:
+            - link [ref=e1018] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+              - text: Áo Jacket XL.2.8931
+          - text: 749,000 VND     
+          - generic [ref=e1019]:
+            - generic [ref=e1020]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1022]:
+        - generic [ref=e1023]:
+          - link [ref=e1024] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+            - img [ref=e1025]
+          - generic [ref=e1027]: 
+        - generic [ref=e1028]:
+          - heading [level=3] [ref=e1029]:
+            - link [ref=e1030] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+              - text: Áo Phao M.2.8561
+          - text: 599,000 VND     
+          - generic [ref=e1031]:
+            - generic [ref=e1032]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1034]:
+        - generic [ref=e1035]:
+          - link [ref=e1036] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+            - img [ref=e1037]
+          - generic [ref=e1039]: 
+        - generic [ref=e1040]:
+          - heading [level=3] [ref=e1041]:
+            - link [ref=e1042] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+              - text: Áo Jacket L.2.8893
+          - text: 669,000 VND     
+          - generic [ref=e1043]:
+            - generic [ref=e1044]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1046]:
+        - generic [ref=e1047]:
+          - link [ref=e1048] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+            - img [ref=e1049]
+          - generic [ref=e1051]: 
+        - generic [ref=e1052]:
+          - heading [level=3] [ref=e1053]:
+            - link [ref=e1054] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+              - text: Áo Cardigan Regular L.4.5214
+          - text: 159,000 VND     
+          - generic [ref=e1055]:
+            - generic [ref=e1056]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1058]:
+        - generic [ref=e1059]:
+          - link [ref=e1060] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+            - img [ref=e1061]
+          - generic [ref=e1063]: 
+        - generic [ref=e1064]:
+          - heading [level=3] [ref=e1065]:
+            - link [ref=e1066] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+              - text: Áo Hoodie Loose L.3.6982
+          - text: 349,000 VND     
+          - generic [ref=e1067]:
+            - generic [ref=e1068]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1070]:
+        - generic [ref=e1071]:
+          - link [ref=e1072] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+            - img [ref=e1073]
+          - generic [ref=e1075]: 
+        - generic [ref=e1076]:
+          - heading [level=3] [ref=e1077]:
+            - link [ref=e1078] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+              - text: Áo Nỉ Fitted L.4.7862
+          - text: 129,000 VND     
+          - generic [ref=e1079]:
+            - generic [ref=e1080]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1082]:
+        - generic [ref=e1083]:
+          - link [ref=e1084] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+            - img [ref=e1085]
+          - generic [ref=e1087]: 
+        - generic [ref=e1088]:
+          - heading [level=3] [ref=e1089]:
+            - link [ref=e1090] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+              - text: Áo Khoác XL.2.8310
+          - text: 479,000 VND     
+          - generic [ref=e1091]:
+            - generic [ref=e1092]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1094]:
+        - generic [ref=e1095]:
+          - link [ref=e1096] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+            - img [ref=e1097]
+          - generic [ref=e1099]: 
+        - generic [ref=e1100]:
+          - heading [level=3] [ref=e1101]:
+            - link [ref=e1102] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-akp-2xl28560-69cb6a940225b
+              - text: Áo Phao AKP 2XL.2.8560
+          - text: 749,000 VND     
+          - generic [ref=e1103]:
+            - generic [ref=e1104]: 
+            - text: 1 lượt yêu thích
+      - generic [ref=e1106]:
+        - generic [ref=e1107]:
+          - link [ref=e1108] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+            - img [ref=e1109]
+          - generic [ref=e1111]: 
+        - generic [ref=e1112]:
+          - heading [level=3] [ref=e1113]:
+            - link [ref=e1114] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-l35211-69cb6a940be92
+              - text: Áo Cardigan L.3.5211
+          - text: 349,000 VND     
+          - generic [ref=e1115]:
+            - generic [ref=e1116]: 
+            - text: 1 lượt yêu thích
+      - generic [ref=e1118]:
+        - generic [ref=e1119]:
+          - link [ref=e1120] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+            - img [ref=e1121]
+          - generic [ref=e1123]: 
+        - generic [ref=e1124]:
+          - heading [level=3] [ref=e1125]:
+            - link [ref=e1126] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l27812-69cb6a93c74a1
+              - text: Áo Nỉ Fitted L.2.7812
+          - text: 89,000 VND     
+          - generic [ref=e1127]:
+            - generic [ref=e1128]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1130]:
+        - generic [ref=e1131]:
+          - link [ref=e1132] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+            - img [ref=e1133]
+          - generic [ref=e1135]: 
+        - generic [ref=e1136]:
+          - heading [level=3] [ref=e1137]:
+            - link [ref=e1138] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-xl28931-69cb6a93d127b
+              - text: Áo Jacket XL.2.8931
+          - text: 749,000 VND     
+          - generic [ref=e1139]:
+            - generic [ref=e1140]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1142]:
+        - generic [ref=e1143]:
+          - link [ref=e1144] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+            - img [ref=e1145]
+          - generic [ref=e1147]: 
+        - generic [ref=e1148]:
+          - heading [level=3] [ref=e1149]:
+            - link [ref=e1150] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-phao-m28561-69cb6a93d5026
+              - text: Áo Phao M.2.8561
+          - text: 599,000 VND     
+          - generic [ref=e1151]:
+            - generic [ref=e1152]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1154]:
+        - generic [ref=e1155]:
+          - link [ref=e1156] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+            - img [ref=e1157]
+          - generic [ref=e1159]: 
+        - generic [ref=e1160]:
+          - heading [level=3] [ref=e1161]:
+            - link [ref=e1162] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-jacket-l28893-69cb6a93d9891
+              - text: Áo Jacket L.2.8893
+          - text: 669,000 VND     
+          - generic [ref=e1163]:
+            - generic [ref=e1164]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1166]:
+        - generic [ref=e1167]:
+          - link [ref=e1168] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+            - img [ref=e1169]
+          - generic [ref=e1171]: 
+        - generic [ref=e1172]:
+          - heading [level=3] [ref=e1173]:
+            - link [ref=e1174] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-cardigan-regular-l45214-69cb6a93df681
+              - text: Áo Cardigan Regular L.4.5214
+          - text: 159,000 VND     
+          - generic [ref=e1175]:
+            - generic [ref=e1176]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1178]:
+        - generic [ref=e1179]:
+          - link [ref=e1180] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+            - img [ref=e1181]
+          - generic [ref=e1183]: 
+        - generic [ref=e1184]:
+          - heading [level=3] [ref=e1185]:
+            - link [ref=e1186] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-hoodie-loose-l36982-69cb6a93e5ba5
+              - text: Áo Hoodie Loose L.3.6982
+          - text: 349,000 VND     
+          - generic [ref=e1187]:
+            - generic [ref=e1188]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1190]:
+        - generic [ref=e1191]:
+          - link [ref=e1192] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+            - img [ref=e1193]
+          - generic [ref=e1195]: 
+        - generic [ref=e1196]:
+          - heading [level=3] [ref=e1197]:
+            - link [ref=e1198] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-ni-fitted-l47862-69cb6a93eae8c
+              - text: Áo Nỉ Fitted L.4.7862
+          - text: 129,000 VND     
+          - generic [ref=e1199]:
+            - generic [ref=e1200]: 
+            - text: 0 lượt yêu thích
+      - generic [ref=e1202]:
+        - generic [ref=e1203]:
+          - link [ref=e1204] [cursor=pointer]:
+            - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+            - img [ref=e1205]
+          - generic [ref=e1207]: 
+        - generic [ref=e1208]:
+          - heading [level=3] [ref=e1209]:
+            - link [ref=e1210] [cursor=pointer]:
+              - /url: http://elite.test/product/ao-khoac-xl28310-69cb6a93f287a
+              - text: Áo Khoác XL.2.8310
+          - text: 479,000 VND     
+          - generic [ref=e1211]:
+            - generic [ref=e1212]: 
+            - text: 0 lượt yêu thích
+  - link "Banner Bottom" [ref=e1218] [cursor=pointer]:
+    - /url: "#"
+    - img "Banner Bottom" [ref=e1219]
+  - text:       
+  - contentinfo [ref=e1220]:
+    - generic [ref=e1223]:
+      - generic [ref=e1225]:
+        - paragraph [ref=e1226]: GỌI MUA HÀNG ( 8:30 - 22:20 )
+        - generic [ref=e1227]:
+          - generic [ref=e1228]: 
+          - generic [ref=e1229]: 0372.844.577
+        - paragraph [ref=e1230]: Tất cả các ngày trong tuần
+      - generic [ref=e1232]:
+        - paragraph [ref=e1233]: GÓP Ý, KHIẾU NẠI ( 8:00 - 17:00 )
+        - generic [ref=e1234]:
+          - generic [ref=e1235]: 
+          - generic [ref=e1236]: 0372.844.577
+        - paragraph [ref=e1237]: Các ngày trong tuần ( trừ ngày lễ )
+      - generic [ref=e1239]:
+        - paragraph [ref=e1240]: THEO DÕI CHÚNG TÔI
+        - generic [ref=e1241]:
+          - link "" [ref=e1242] [cursor=pointer]:
+            - /url: https://www.facebook.com/profile.php?id=61573335712428
+            - generic [ref=e1243]: 
+          - link "" [ref=e1244] [cursor=pointer]:
+            - /url: https://www.instagram.com/elite_22326/
+            - generic [ref=e1245]: 
+          - link "Shopee" [ref=e1246] [cursor=pointer]:
+            - /url: "#"
+            - img "Shopee" [ref=e1247]
+          - link "Lazada" [ref=e1248] [cursor=pointer]:
+            - /url: "#"
+            - img "Lazada" [ref=e1249]
+    - generic [ref=e1252]:
+      - generic [ref=e1254]:
+        - heading "Thông tin" [level=3] [ref=e1255]
+        - list [ref=e1257]:
+          - listitem [ref=e1258]:
+            - link "Giới thiệu" [ref=e1259] [cursor=pointer]:
+              - /url: http://elite.test/about
+          - listitem [ref=e1260]:
+            - link "Thông tin giao hàng" [ref=e1261] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/news
+          - listitem [ref=e1262]:
+            - link "Chính sách bảo mật" [ref=e1263] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/news
+          - listitem [ref=e1264]:
+            - link "Điều khoản & Điều kiện" [ref=e1265] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/news
+          - listitem [ref=e1266]:
+            - link "Liên hệ" [ref=e1267] [cursor=pointer]:
+              - /url: http://elite.test/contact
+          - listitem [ref=e1268]:
+            - link "Đổi trả" [ref=e1269] [cursor=pointer]:
+              - /url: http://127.0.0.1:8000/news
+      - generic [ref=e1271]:
+        - heading "Tiện ích mở rộng" [level=3] [ref=e1272]
+        - list [ref=e1274]:
+          - listitem [ref=e1275]:
+            - link "Thương hiệu" [ref=e1276] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e1277]:
+            - link "Phiếu quà tặng" [ref=e1278] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e1279]:
+            - link "Đại lý" [ref=e1280] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e1281]:
+            - link "Khuyến mãi đặc biệt" [ref=e1282] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e1283]:
+            - link "Sơ đồ trang web" [ref=e1284] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e1285]:
+            - link "Tài khoản của tôi" [ref=e1286] [cursor=pointer]:
+              - /url: http://elite.test/my-account
+      - generic [ref=e1288]:
+        - heading "Liên hệ" [level=3] [ref=e1289]
+        - generic [ref=e1290]:
+          - paragraph [ref=e1291]: "Địa chỉ: Số 7 Ngõ 91 Lai Xá - Hoài Đức - Thành Phố Hà Nội - Việt Nam"
+          - paragraph [ref=e1292]:
+            - text: "Số điện thoại:"
+            - link "0372844577" [ref=e1293] [cursor=pointer]:
+              - /url: tel:0372844577
+          - paragraph [ref=e1294]: "Email: elite22326@gmail.com"
+          - list [ref=e1295]:
+            - listitem [ref=e1296]:
+              - link "" [ref=e1297] [cursor=pointer]:
+                - /url: https://www.facebook.com/profile.php?id=61573335712428
+                - generic [ref=e1298]: 
+            - listitem [ref=e1299]:
+              - link "" [ref=e1300] [cursor=pointer]:
+                - /url: https://www.instagram.com/elite_22326/
+                - generic [ref=e1301]: 
+          - link "Đã thông báo Bộ Công Thương" [ref=e1303] [cursor=pointer]:
+            - /url: http://online.gov.vn/
+            - img "Đã thông báo Bộ Công Thương" [ref=e1304]
+      - generic [ref=e1306]:
+        - heading "Đăng ký nhận bản tin" [level=3] [ref=e1307]
+        - generic [ref=e1308]:
+          - paragraph [ref=e1309]: Chất lượng vượt trội. Nhà máy đạo đức. Đăng ký để được miễn phí vận chuyển và đổi trả cho đơn hàng đầu tiên của bạn.
+          - generic [ref=e1311]:
+            - textbox "Email Address for newsletter" [ref=e1312]:
+              - /placeholder: Nhập địa chỉ email của bạn...
+            - button "Subscribe to newsletter" [ref=e1313] [cursor=pointer]: Đăng ký!
+  - text: 
+  - button [ref=e1315] [cursor=pointer]:
+    - img [ref=e1316]
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect } from '@playwright/test';
+  2  | 
+  3  | test.describe('Checkout and Voucher Flow', () => {
+  4  |   // Use pre-authenticated session
+  5  |   test.use({ storageState: 'playwright/.auth/user.json' });
+  6  | 
+  7  |   test.beforeEach(async ({ page }) => {
+  8  |     // Navigate to home page
+  9  |     await page.goto('/');
+  10 |   });
+  11 | 
+  12 |   test('User can apply a voucher and place a COD order', async ({ page }) => {
+  13 |     // 1. Select the first product from the home page
+  14 |     const productCard = page.locator('.product-card, .item, a[href*="/product/"]').first();
+> 15 |     await productCard.click();
+     |                       ^ Error: locator.click: Test timeout of 30000ms exceeded.
+  16 | 
+  17 |     // 2. Select variants if present (Size/Color)
+  18 |     const variantOptions = page.locator('.variant-option');
+  19 |     const variantCount = await variantOptions.count();
+  20 |     if (variantCount > 0) {
+  21 |       // Select first available size
+  22 |       await variantOptions.first().click();
+  23 |       // Select first available color (if it's a different group, usually nth(1) or similar)
+  24 |       const secondVariantGroup = page.locator('.variant-group').nth(1).locator('.variant-option');
+  25 |       if (await secondVariantGroup.count() > 0) {
+  26 |           await secondVariantGroup.first().click();
+  27 |       }
+  28 |     }
+  29 | 
+  30 |     // 3. Add to cart
+  31 |     await page.locator('#btn-add-to-cart').click();
+  32 |     
+  33 |     // 4. Wait for cart update and navigate to cart
+  34 |     await page.waitForSelector('.cart-count');
+  35 |     await page.goto('/cart');
+  36 |     
+  37 |     // 5. Click checkout button
+  38 |     // The selector might be .btn-checkout or similar based on logged in state
+  39 |     await page.locator('a.btn-checkout, a.btn-login-to-checkout, button.btn-checkout').first().click();
+  40 |     
+  41 |     // 6. If redirected to login, login (though auth.setup should handle this if configured correctly)
+  42 |     if (page.url().includes('/login')) {
+  43 |         await page.locator('input.auth-input[placeholder*="Email"]').fill('randal.conroy@example.org');
+  44 |         await page.locator('input.auth-input[placeholder="Mật khẩu"]').fill('password');
+  45 |         await page.locator('button.auth-btn-login').click();
+  46 |         await page.waitForURL('**/checkout');
+  47 |     }
+  48 | 
+  49 |     // 7. Step 1: Shipping Info
+  50 |     await page.locator('input[name="name"]').fill('E2E Test User');
+  51 |     await page.locator('input[name="phone"]').fill('0912345678');
+  52 |     await page.locator('textarea[name="address"]').fill('123 E2E Test Street');
+  53 |     
+  54 |     // Select Province/District/Ward (Handle custom dropdowns or selects)
+  55 |     // Based on exploration, these might be custom. We'll try to click and select.
+  56 |     // If they are <select>, we use .selectOption()
+  57 |     const provinceSelect = page.locator('select[name="province_id"], select[name="province"], #province');
+  58 |     if (await provinceSelect.count() > 0) {
+  59 |         await provinceSelect.selectOption({ index: 1 });
+  60 |         await page.waitForTimeout(500); // Wait for dependency fields to load
+  61 |         await page.locator('select[name="district_id"], #district').selectOption({ index: 1 });
+  62 |         await page.waitForTimeout(500);
+  63 |         await page.locator('select[name="ward_id"], #ward').selectOption({ index: 1 });
+  64 |     }
+  65 | 
+  66 |     // 8. Apply Voucher
+  67 |     await page.locator('#couponCode').fill('WELCOME50');
+  68 |     await page.locator('#applyCouponBtn').click();
+  69 |     
+  70 |     // Verify voucher feedback
+  71 |     await expect(page.locator('.text-success, #coupon-feedback')).toBeVisible();
+  72 | 
+  73 |     // 9. Move to Step 2
+  74 |     await page.locator('#btn-next-step-1').click();
+  75 |     
+  76 |     // 10. Step 2: Shipping & Payment
+  77 |     // Select default shipping
+  78 |     await page.locator('input#shipping_default, input[name="shipping_method"]').first().check();
+  79 |     
+  80 |     // Select COD payment
+  81 |     await page.locator('input#payment_cod, input[value="COD"]').check();
+  82 |     
+  83 |     // 11. Complete Order
+  84 |     await page.locator('#btn-next-step-2, button[type="submit"]').click();
+  85 |     
+  86 |     // 12. Verify Success Page
+  87 |     await page.waitForURL('**/checkout/success/**');
+  88 |     await expect(page.locator('h2, .success-title')).toContainText(['thành công', 'Success']);
+  89 |   });
+  90 | });
+  91 | 
+```

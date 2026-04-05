@@ -30,10 +30,13 @@ setup('authenticate as admin', async ({ page }) => {
   await page.locator('input.auth-input[placeholder*="khẩu"]').first().fill('password');
   
   // Use Promise.all to handle navigation after click better
-  await page.locator('button.auth-btn-login').click();
-  await page.waitForLoadState('networkidle');
+  await Promise.all([
+    page.waitForURL(/.*(\/admin|\/)/, { timeout: 30000 }).catch(() => page.waitForURL('**/')),
+    page.locator('button.auth-btn-login').click(),
+  ]);
 
-  // Verify login success
+  // If we are in admin panel, the URL should contain /admin
+  // If we were redirected back to home, we check for account link
   if (page.url().includes('/admin')) {
     await expect(page).toHaveURL(/.*\/admin.*/);
   } else {
@@ -42,6 +45,7 @@ setup('authenticate as admin', async ({ page }) => {
 
   await page.context().storageState({ path: adminAuthFile });
 });
+
 
 
 
