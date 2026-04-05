@@ -904,45 +904,4 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
   });
 })();
 </script>
--TOKEN':C.csrf},
-        });
-        if(res.ok || res.redirected){
-          // Remove from DOM
-          itemEl.remove();
-          // Update subtotal
-          C.subtotal = Math.max(0, C.subtotal - amount);
-          C.base     = Math.max(0, C.subtotal - (C.discount||0));
-          // Update subtotal row display
-          const subEl = qs('.sum-row span:last-child');
-          // Find the subtotal row by looking for the Tạm tính row
-          document.querySelectorAll('.sum-row').forEach(row=>{
-            if(row.querySelector('span:first-child')?.textContent.trim()==='Tạm tính'){
-              row.querySelector('span:last-child').textContent = fmt(C.subtotal);
-            }
-          });
-          // Refresh total (shipping stays same)
-          renderShip(currentShipFee);
-          // If no items left, redirect to cart
-          if(!document.querySelector('.sum-item')){
-            window.location.href = '{{ route("cart.index") }}';
-          }
-        } else {
-          itemEl.style.opacity='1';
-          this.disabled=false;
-        }
-      } catch(e){
-        itemEl.style.opacity='1';
-        this.disabled=false;
-      }
-    });
-  });
-
-  // ───── Submit guard ─────
-  qs('#ck-form')?.addEventListener('submit', function(e){
-    const btn1 = qs('.btn-order');
-    const btn2 = document.querySelectorAll('.btn-order')[1];
-    [btn1, btn2].forEach(b=>{ if(b){ b.disabled=true; b.textContent='Đang xử lý…'; } });
-  });
-})();
-</script>
 @endsection
