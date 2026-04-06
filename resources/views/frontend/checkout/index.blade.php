@@ -789,15 +789,19 @@
                 const phoneError    = validatePhone($('input[name="phone"]').val());
                 const emailError    = validateEmail($('input[name="email"]').val());
                 const provinceError = requiresAddress() ? validateProvince($('select[name="province"]').val()) : '';
+                const districtError = requiresAddress() ? validateDistrict($('select[name="district"]').val()) : '';
+                const wardError     = requiresAddress() ? validateWard($('select[name="ward"]').val()) : '';
                 const addressError  = requiresAddress() ? validateAddress($('input[name="address"]').val()) : '';
 
                 showValidation('input[name="name"]', nameError);
                 showValidation('input[name="phone"]', phoneError);
                 showValidation('input[name="email"]', emailError);
                 showValidation('select[name="province"]', provinceError);
+                showValidation('select[name="district"]', districtError);
+                showValidation('select[name="ward"]', wardError);
                 showValidation('input[name="address"]', addressError);
 
-                if (nameError || phoneError || emailError || provinceError || addressError) return;
+                if (nameError || phoneError || emailError || provinceError || districtError || wardError || addressError) return;
 
                 // Real-time Inventory Check
                 const $btn = $(this);
@@ -1156,6 +1160,14 @@
                 if (!value) return 'Vui lòng chọn tỉnh thành';
                 return '';
             }
+            function validateDistrict(value) {
+                if (!value) return 'Vui lòng chọn quận / huyện';
+                return '';
+            }
+            function validateWard(value) {
+                if (!value) return 'Vui lòng chọn phường / xã';
+                return '';
+            }
 
             function showValidation(input, errorMessage) {
                 const $input = $(input);
@@ -1174,6 +1186,9 @@
             $('input[name="phone"]').on('blur', function () { showValidation(this, validatePhone($(this).val())); });
             $('input[name="email"]').on('blur', function () { showValidation(this, validateEmail($(this).val())); });
             $('input[name="address"]').on('blur', function () { showValidation(this, validateAddress($(this).val())); });
+            $('select[name="province"]').on('change', function () { showValidation(this, validateProvince($(this).val())); });
+            $('select[name="district"]').on('change', function () { showValidation(this, validateDistrict($(this).val())); });
+            $('select[name="ward"]').on('change', function () { showValidation(this, validateWard($(this).val())); });
 
             // ============ SHIPPING FEES CALCULATION ============
             let baseTotal = parseInt(config.baseTotal);
@@ -1249,13 +1264,17 @@
                 const phoneError    = validatePhone($('input[name="phone"]').val());
                 const emailError    = validateEmail($('input[name="email"]').val());
                 const provinceError = validateProvince($('select[name="province"]').val());
+                const districtError = validateDistrict($('select[name="district"]').val());
+                const wardError     = validateWard($('select[name="ward"]').val());
                 const addressError  = validateAddress($('input[name="address"]').val());
                 showValidation('input[name="name"]', nameError);
                 showValidation('input[name="phone"]', phoneError);
                 showValidation('input[name="email"]', emailError);
                 showValidation('select[name="province"]', provinceError);
+                showValidation('select[name="district"]', districtError);
+                showValidation('select[name="ward"]', wardError);
                 showValidation('input[name="address"]', addressError);
-                if (nameError || phoneError || emailError || provinceError || addressError) {
+                if (nameError || phoneError || emailError || provinceError || districtError || wardError || addressError) {
                     e.preventDefault();
                     const firstError = $('.is-invalid').first();
                     if (firstError.length) $('html, body').animate({ scrollTop: firstError.offset().top - 100 }, 500);

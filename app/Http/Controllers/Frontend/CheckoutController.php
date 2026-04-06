@@ -215,8 +215,8 @@ class CheckoutController extends Controller
             'phone' => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
             'email' => 'required|email:rfc,dns|max:255',
             'province' => 'required|string|in:' . implode(',', $provinces),
-            'district' => 'nullable|string|max:255',
-            'ward' => 'nullable|string|max:255',
+            'district' => 'required|string|max:255',
+            'ward' => 'required|string|max:255',
             'address' => 'required|string|max:500',
             'payment_method' => 'required|in:COD,VNPAY',
             'shipping_provider' => 'nullable|string',
@@ -229,6 +229,8 @@ class CheckoutController extends Controller
             'email.email' => 'Địa chỉ email không hợp lệ.',
             'province.required' => 'Vui lòng chọn tỉnh thành.',
             'province.in' => 'Tỉnh thành không hợp lệ.',
+            'district.required' => 'Vui lòng chọn quận / huyện.',
+            'ward.required' => 'Vui lòng chọn phường / xã.',
         ]);
 
         $cart = $this->cartService->getCart();
