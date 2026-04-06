@@ -16,7 +16,6 @@ class Product extends Model
 
     protected $fillable = [
         'category_id',
-        'brand_id',
         'name',
         'slug',
         'short_description',
@@ -58,13 +57,6 @@ class Product extends Model
     {
         return $this->hasMany(Review::class);
     }
-
-    public function brand(): BelongsTo
-    {
-        return $this->belongsTo(Brand::class);
-    }
-
-
 
     public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {

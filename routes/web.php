@@ -188,7 +188,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
             Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
 
             // Inventory Management
-            Route::resource('suppliers', App\Http\Controllers\Admin\SupplierController::class);
             if (config('features.stock_report')) {
                 Route::get('stock', function () {
                     return 'Stock Report Page (Coming Soon)';

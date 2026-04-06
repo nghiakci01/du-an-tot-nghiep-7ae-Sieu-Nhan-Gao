@@ -120,9 +120,6 @@ class CategoryController extends Controller
             $trashedVariants = \App\Models\ProductVariant::withTrashed()->whereIn('product_id', $trashedProductIds);
             $trashedVariantIds = $trashedVariants->pluck('id')->toArray();
             
-            \Illuminate\Support\Facades\DB::table('warehouse_stocks')->whereIn('product_variant_id', $trashedVariantIds)->delete();
-            \Illuminate\Support\Facades\DB::table('inventory_voucher_details')->whereIn('product_variant_id', $trashedVariantIds)->delete();
-
             // Xóa biến thể (variants) của những sản phẩm đang ở trong thùng rác
             $trashedVariants->forceDelete(); 
             

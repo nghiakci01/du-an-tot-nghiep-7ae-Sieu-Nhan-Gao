@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\Order;
@@ -93,14 +92,6 @@ class ProductController extends Controller
             });
         }
 
-        // Filter by Brand
-        if ($request->has('brand')) {
-            $brandSlug = $request->brand;
-            $query->whereHas('brand', function ($q) use ($brandSlug) {
-                $q->where('slug', $brandSlug);
-            });
-        }
-
         // Filter by Color
         if ($request->has('color')) {
             $colorSlug = $request->color;
@@ -174,14 +165,6 @@ class ProductController extends Controller
             ])->get();
         });
 
-        $brands = Cache::remember('shop_sidebar_brands', 3600, function () {
-            return Brand::where('is_active', true)->withCount([
-                'products' => function ($q) {
-                    $q->where('products.is_active', true);
-                },
-            ])->get();
-        });
-
         // Colors with product counts
         $colors = Color::whereHas('productVariants.product', function ($q) {
             $q->where('products.is_active', true);
@@ -219,7 +202,6 @@ class ProductController extends Controller
         return view('frontend.products.index', compact(
             'products',
             'categories',
-            'brands',
             'colors',
             'sizes',
             'tags',
