@@ -42,7 +42,7 @@ class BannerSeeder extends Seeder
 
         Banner::create([
             'title' => 'Banner Bottom',
-            'image' => 'banners/banner-bottom.jpeg',
+            'image' => 'banners/banner_bottom.jpeg',
             'link' => '#',
             'position' => 'banner_bottom',
             'sort_order' => 1,

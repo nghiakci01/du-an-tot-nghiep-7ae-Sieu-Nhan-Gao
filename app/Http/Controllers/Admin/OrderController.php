@@ -42,6 +42,78 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders', 'shippers'));
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'province' => 'required|string',
+            'address' => 'required|string',
+            'payment_method' => 'required|string',
+            'status' => 'required|string',
+            'items' => 'required|array|min:1',
+            'items.*.variant_id' => 'required|exists:product_variants,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $totalPrice = 0;
+            $itemsData = [];
+
+            foreach ($request->items as $item) {
+                $variant = ProductVariant::lockForUpdate()->findOrFail($item['variant_id']);
+                
+                if ($variant->stock_quantity < $item['quantity']) {
+                    throw new \Exception("Sản phẩm {$variant->sku} không đủ tồn kho.");
+                }
+
+                $totalPrice += $variant->price * $item['quantity'];
+                $itemsData[] = [
+                    'product_id' => $variant->product_id,
+                    'variant_id' => $variant->id,
+                    'quantity' => $item['quantity'],
+                    'price' => $variant->price,
+                    'cost_price' => $variant->price, // Simplified for admin order
+                ];
+                
+                $variant->decrement('stock_quantity', $item['quantity']);
+            }
+
+            $order = Order::create([
+                'user_id' => $request->user_id ?? null,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'province' => $request->province,
+                'address' => $request->address,
+                'status' => $request->status,
+                'total_price' => $totalPrice,
+                'final_total' => $totalPrice, // No discount/shipping for manual admin order in this basic impl
+                'payment_method' => $request->payment_method,
+                'payment_status' => $request->status === Order::STATUS_COMPLETED ? 'paid' : 'pending',
+                'shipping_address' => $request->address . ', ' . $request->province,
+            ]);
+
+            foreach ($itemsData as $itemData) {
+                $itemData['order_id'] = $order->id;
+                OrderItem::create($itemData);
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.orders.index')->with('success', 'Đơn hàng đã được tạo thành công.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Lỗi khi tạo đơn hàng: ' . $e->getMessage())->withInput();
+        }
+    }
+
 
     /**
      * Display the specified resource.

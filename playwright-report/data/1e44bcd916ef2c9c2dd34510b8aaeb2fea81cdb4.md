@@ -1,0 +1,499 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: admin-shipping.spec.ts >> Admin Shipping and Order Management >> Admin can assign a shipper
+- Location: tests\e2e\admin-shipping.spec.ts:33:3
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: locator('a.btn-outline-primary:has-text("Xem")').first()
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for locator('a.btn-outline-primary:has-text("Xem")').first()
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Elite Admin" [ref=e5] [cursor=pointer]:
+        - /url: http://elite.test/admin/dashboard
+        - heading "Elite Admin" [level=3] [ref=e6]
+      - region "scrollable content" [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e14]:
+            - generic [ref=e15]:
+              - img "user-image" [ref=e17]
+              - generic [ref=e18]:
+                - heading "hehe" [level=6] [ref=e19]
+                - text: Admin
+              - link [ref=e20] [cursor=pointer]:
+                - /url: "#pc_sidebar_userlink"
+                - img [ref=e21]
+            - text:    
+          - list [ref=e23]:
+            - listitem [ref=e24]:
+              - generic [ref=e25]: Điều hướng
+            - listitem [ref=e26]:
+              - link "Bảng điều khiển" [ref=e27] [cursor=pointer]:
+                - /url: http://elite.test/admin/dashboard
+                - img [ref=e29]
+                - text: Bảng điều khiển
+            - listitem [ref=e31]:
+              - link " Xem Website" [ref=e32] [cursor=pointer]:
+                - /url: http://elite.test
+                - generic [ref=e34]: 
+                - text: Xem Website
+            - listitem [ref=e35]:
+              - generic [ref=e36]: Quản lý
+            - listitem [ref=e37]:
+              - link " Danh mục" [ref=e38] [cursor=pointer]:
+                - /url: http://elite.test/admin/categories
+                - generic [ref=e40]: 
+                - text: Danh mục
+            - listitem [ref=e41]:
+              - link " Đơn hàng" [ref=e42] [cursor=pointer]:
+                - /url: http://elite.test/admin/orders
+                - generic [ref=e44]: 
+                - text: Đơn hàng
+            - listitem [ref=e45]:
+              - link " Giao hàng của tôi" [ref=e46] [cursor=pointer]:
+                - /url: http://elite.test/staff/orders
+                - generic [ref=e48]: 
+                - text: Giao hàng của tôi
+            - listitem [ref=e49]:
+              - link " Yêu cầu hoàn trả" [ref=e50] [cursor=pointer]:
+                - /url: http://elite.test/admin/returns
+                - generic [ref=e52]: 
+                - text: Yêu cầu hoàn trả
+            - listitem [ref=e53]:
+              - link " Sản phẩm" [ref=e54] [cursor=pointer]:
+                - /url: http://elite.test/admin/products
+                - generic [ref=e56]: 
+                - text: Sản phẩm
+            - listitem [ref=e57]:
+              - link " Thuộc tính" [ref=e58] [cursor=pointer]:
+                - /url: "#!"
+                - generic [ref=e60]: 
+                - text: Thuộc tính
+                - img [ref=e62]
+            - listitem [ref=e64]:
+              - link " Lịch sử thanh toán" [ref=e65] [cursor=pointer]:
+                - /url: http://elite.test/admin/payment-history
+                - generic [ref=e67]: 
+                - text: Lịch sử thanh toán
+            - listitem [ref=e68]:
+              - link " Banner" [ref=e69] [cursor=pointer]:
+                - /url: http://elite.test/admin/banners
+                - generic [ref=e71]: 
+                - text: Banner
+            - listitem [ref=e72]:
+              - link " Mã Giảm Giá" [ref=e73] [cursor=pointer]:
+                - /url: http://elite.test/admin/coupons
+                - generic [ref=e75]: 
+                - text: Mã Giảm Giá
+            - listitem [ref=e76]:
+              - link " Hỗ trợ khách hàng" [ref=e77] [cursor=pointer]:
+                - /url: http://elite.test/admin/chat
+                - generic [ref=e79]: 
+                - text: Hỗ trợ khách hàng
+            - listitem [ref=e80]:
+              - link " Tin nhắn liên hệ" [ref=e81] [cursor=pointer]:
+                - /url: http://elite.test/admin/contact-messages
+                - generic [ref=e83]: 
+                - text: Tin nhắn liên hệ
+            - listitem [ref=e84]:
+              - link " Đánh giá sản phẩm" [ref=e85] [cursor=pointer]:
+                - /url: http://elite.test/admin/reviews
+                - generic [ref=e87]: 
+                - text: Đánh giá sản phẩm
+            - listitem [ref=e88]:
+              - link " Quản lý Tin tức" [ref=e89] [cursor=pointer]:
+                - /url: "#!"
+                - generic [ref=e91]: 
+                - text: Quản lý Tin tức
+                - img [ref=e93]
+            - listitem [ref=e95]:
+              - link " Người dùng" [ref=e96] [cursor=pointer]:
+                - /url: http://elite.test/admin/users
+                - generic [ref=e98]: 
+                - text: Người dùng
+            - listitem [ref=e99]:
+              - link " Cấu hình Chatbot" [ref=e100] [cursor=pointer]:
+                - /url: http://elite.test/admin/settings/chatbot
+                - generic [ref=e102]: 
+                - text: Cấu hình Chatbot
+  - banner [ref=e103]:
+    - generic [ref=e104]:
+      - list [ref=e106]:
+        - listitem [ref=e107]:
+          - link "" [ref=e108] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e109]: 
+        - text: 
+      - list [ref=e111]:
+        - listitem [ref=e112]:
+          - button [ref=e113] [cursor=pointer]:
+            - img [ref=e114]
+          - text: 
+        - listitem [ref=e116]:
+          - link "" [ref=e117] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e118]: 
+        - listitem [ref=e119]:
+          - button "33" [ref=e120] [cursor=pointer]:
+            - img [ref=e121]
+            - generic [ref=e123]: "33"
+        - text:     
+  - generic [ref=e125]:
+    - generic [ref=e129]:
+      - heading "Quản lý Đơn hàng" [level=5] [ref=e131]
+      - list [ref=e132]:
+        - listitem [ref=e133]:
+          - link "" [ref=e134] [cursor=pointer]:
+            - /url: http://elite.test/admin/dashboard
+            - generic [ref=e135]: 
+        - listitem [ref=e136]:
+          - link "Đơn hàng" [ref=e137] [cursor=pointer]:
+            - /url: "#!"
+    - generic [ref=e140]:
+      - heading "Danh sách Đơn hàng" [level=5] [ref=e142]
+      - generic [ref=e144]:
+        - generic [ref=e145]:
+          - generic [ref=e146]:
+            - generic [ref=e147]: 
+            - text: "Tự động Hủy đơn chưa thanh toán sau (Phút):"
+          - spinbutton " Tự động Hủy đơn chưa thanh toán sau (Phút):" [ref=e148]: "60"
+        - button "Lưu cấu hình & Chạy kiểm tra hủy đơn ngay" [ref=e149] [cursor=pointer]
+      - generic [ref=e150]:
+        - generic [ref=e151]:
+          - generic [ref=e152]: "Trạng thái:"
+          - combobox "Trạng thái:" [ref=e153]:
+            - option "-- Trạng thái đơn --" [selected]
+            - option "Chờ xác nhận"
+            - option "Đã xác nhận"
+            - option "Đang giao hàng"
+            - option "Hoàn thành"
+          - generic [ref=e154]: "Giao hàng:"
+          - combobox "Giao hàng:" [ref=e155]:
+            - option "Tất cả" [selected]
+            - option "Chưa giao (Cần gán Shipper)"
+            - option "Đang đi giao"
+            - option "Giao thành công"
+          - button "Lọc" [ref=e156] [cursor=pointer]
+        - table [ref=e158]:
+          - rowgroup [ref=e159]:
+            - row "Mã ĐH Khách hàng Tổng tiền P.thức T.toán Trạng thái Shipper Ngày đặt Hành động" [ref=e160]:
+              - columnheader "Mã ĐH" [ref=e161]
+              - columnheader "Khách hàng" [ref=e162]
+              - columnheader "Tổng tiền" [ref=e163]
+              - columnheader "P.thức T.toán" [ref=e164]
+              - columnheader "Trạng thái" [ref=e165]
+              - columnheader "Shipper" [ref=e166]
+              - columnheader "Ngày đặt" [ref=e167]
+              - columnheader "Hành động" [ref=e168]
+          - rowgroup [ref=e169]:
+            - row "#40 Mr. Davonte Schumm III randal.conroy@example.org 89.000đ COD Hoàn thành Chưa gán 05/04/2026 10:44 Xem Sửa" [ref=e170]:
+              - cell "#40" [ref=e171]
+              - cell "Mr. Davonte Schumm III randal.conroy@example.org" [ref=e172]:
+                - strong [ref=e173]: Mr. Davonte Schumm III
+                - text: randal.conroy@example.org
+              - cell "89.000đ" [ref=e174]
+              - cell "COD" [ref=e175]
+              - cell "Hoàn thành" [ref=e176]:
+                - generic [ref=e177]: Hoàn thành
+              - cell "Chưa gán" [ref=e178]:
+                - emphasis [ref=e180]: Chưa gán
+              - cell "05/04/2026 10:44" [ref=e181]
+              - cell "Xem Sửa" [ref=e182]:
+                - link "Xem" [ref=e183] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/40
+                - link "Sửa" [ref=e184] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/40/edit
+            - row "#39 hehe admin@gmail.com 159.000đ COD Hoàn thành  nghia nguyen 04/04/2026 22:43 Xem Sửa" [ref=e185]:
+              - cell "#39" [ref=e186]
+              - cell "hehe admin@gmail.com" [ref=e187]:
+                - strong [ref=e188]: hehe
+                - text: admin@gmail.com
+              - cell "159.000đ" [ref=e189]
+              - cell "COD" [ref=e190]
+              - cell "Hoàn thành" [ref=e191]:
+                - generic [ref=e192]: Hoàn thành
+              - cell " nghia nguyen" [ref=e193]:
+                - generic [ref=e194]:
+                  - generic [ref=e195]: 
+                  - text: nghia nguyen
+              - cell "04/04/2026 22:43" [ref=e196]
+              - cell "Xem Sửa" [ref=e197]:
+                - link "Xem" [ref=e198] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/39
+                - link "Sửa" [ref=e199] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/39/edit
+            - row "#38 hehe admin@gmail.com 749.000đ COD Thất bại  nghia nguyen 04/04/2026 22:28 Xem Sửa" [ref=e200]:
+              - cell "#38" [ref=e201]
+              - cell "hehe admin@gmail.com" [ref=e202]:
+                - strong [ref=e203]: hehe
+                - text: admin@gmail.com
+              - cell "749.000đ" [ref=e204]
+              - cell "COD" [ref=e205]
+              - cell "Thất bại" [ref=e206]:
+                - generic [ref=e207]: Thất bại
+              - cell " nghia nguyen" [ref=e208]:
+                - generic [ref=e209]:
+                  - generic [ref=e210]: 
+                  - text: nghia nguyen
+              - cell "04/04/2026 22:28" [ref=e211]
+              - cell "Xem Sửa" [ref=e212]:
+                - link "Xem" [ref=e213] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/38
+                - link "Sửa" [ref=e214] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/38/edit
+            - row "#37 hehe admin@gmail.com 698.000đ COD Hoàn thành  nghia nguyen 04/04/2026 22:23 Xem Sửa" [ref=e215]:
+              - cell "#37" [ref=e216]
+              - cell "hehe admin@gmail.com" [ref=e217]:
+                - strong [ref=e218]: hehe
+                - text: admin@gmail.com
+              - cell "698.000đ" [ref=e219]
+              - cell "COD" [ref=e220]
+              - cell "Hoàn thành" [ref=e221]:
+                - generic [ref=e222]: Hoàn thành
+              - cell " nghia nguyen" [ref=e223]:
+                - generic [ref=e224]:
+                  - generic [ref=e225]: 
+                  - text: nghia nguyen
+              - cell "04/04/2026 22:23" [ref=e226]
+              - cell "Xem Sửa" [ref=e227]:
+                - link "Xem" [ref=e228] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/37
+                - link "Sửa" [ref=e229] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/37/edit
+            - row "#36 hehe admin@gmail.com 749.000đ COD Hoàn thành Chưa gán 04/04/2026 22:02 Xem Sửa" [ref=e230]:
+              - cell "#36" [ref=e231]
+              - cell "hehe admin@gmail.com" [ref=e232]:
+                - strong [ref=e233]: hehe
+                - text: admin@gmail.com
+              - cell "749.000đ" [ref=e234]
+              - cell "COD" [ref=e235]
+              - cell "Hoàn thành" [ref=e236]:
+                - generic [ref=e237]: Hoàn thành
+              - cell "Chưa gán" [ref=e238]:
+                - emphasis [ref=e240]: Chưa gán
+              - cell "04/04/2026 22:02" [ref=e241]
+              - cell "Xem Sửa" [ref=e242]:
+                - link "Xem" [ref=e243] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/36
+                - link "Sửa" [ref=e244] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/36/edit
+            - row "#35 nghia nguyen nghia08092005@gmail.com 599.000đ COD Hoàn thành  nghia nguyen 03/04/2026 23:32 Xem Sửa" [ref=e245]:
+              - cell "#35" [ref=e246]
+              - cell "nghia nguyen nghia08092005@gmail.com" [ref=e247]:
+                - strong [ref=e248]: nghia nguyen
+                - text: nghia08092005@gmail.com
+              - cell "599.000đ" [ref=e249]
+              - cell "COD" [ref=e250]
+              - cell "Hoàn thành" [ref=e251]:
+                - generic [ref=e252]: Hoàn thành
+              - cell " nghia nguyen" [ref=e253]:
+                - generic [ref=e254]:
+                  - generic [ref=e255]: 
+                  - text: nghia nguyen
+              - cell "03/04/2026 23:32" [ref=e256]
+              - cell "Xem Sửa" [ref=e257]:
+                - link "Xem" [ref=e258] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/35
+                - link "Sửa" [ref=e259] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/35/edit
+            - row "#34 hehe admin@gmail.com 749.000đ COD Đang giao hàng Chưa gán 03/04/2026 23:30 Xem Sửa" [ref=e260]:
+              - cell "#34" [ref=e261]
+              - cell "hehe admin@gmail.com" [ref=e262]:
+                - strong [ref=e263]: hehe
+                - text: admin@gmail.com
+              - cell "749.000đ" [ref=e264]
+              - cell "COD" [ref=e265]
+              - cell "Đang giao hàng" [ref=e266]:
+                - generic [ref=e267]: Đang giao hàng
+              - cell "Chưa gán" [ref=e268]:
+                - emphasis [ref=e270]: Chưa gán
+              - cell "03/04/2026 23:30" [ref=e271]
+              - cell "Xem Sửa" [ref=e272]:
+                - link "Xem" [ref=e273] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/34
+                - link "Sửa" [ref=e274] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/34/edit
+            - row "#33 hehe admin@gmail.com 178.000đ COD Chờ xác nhận Chưa gán 03/04/2026 23:26 Xem Sửa" [ref=e275]:
+              - cell "#33" [ref=e276]
+              - cell "hehe admin@gmail.com" [ref=e277]:
+                - strong [ref=e278]: hehe
+                - text: admin@gmail.com
+              - cell "178.000đ" [ref=e279]
+              - cell "COD" [ref=e280]
+              - cell "Chờ xác nhận" [ref=e281]:
+                - generic [ref=e282]: Chờ xác nhận
+              - cell "Chưa gán" [ref=e283]:
+                - emphasis [ref=e285]: Chưa gán
+              - cell "03/04/2026 23:26" [ref=e286]
+              - cell "Xem Sửa" [ref=e287]:
+                - link "Xem" [ref=e288] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/33
+                - link "Sửa" [ref=e289] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/33/edit
+            - row "#32 hehe admin@gmail.com 979.000đ COD Chờ xác nhận Chưa gán 03/04/2026 23:18 Xem Sửa" [ref=e290]:
+              - cell "#32" [ref=e291]
+              - cell "hehe admin@gmail.com" [ref=e292]:
+                - strong [ref=e293]: hehe
+                - text: admin@gmail.com
+              - cell "979.000đ" [ref=e294]
+              - cell "COD" [ref=e295]
+              - cell "Chờ xác nhận" [ref=e296]:
+                - generic [ref=e297]: Chờ xác nhận
+              - cell "Chưa gán" [ref=e298]:
+                - emphasis [ref=e300]: Chưa gán
+              - cell "03/04/2026 23:18" [ref=e301]
+              - cell "Xem Sửa" [ref=e302]:
+                - link "Xem" [ref=e303] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/32
+                - link "Sửa" [ref=e304] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/32/edit
+            - row "#31 hehe admin@gmail.com 749.000đ VNPAY Chờ xác nhận Chưa gán 03/04/2026 10:30 Xem Sửa" [ref=e305]:
+              - cell "#31" [ref=e306]
+              - cell "hehe admin@gmail.com" [ref=e307]:
+                - strong [ref=e308]: hehe
+                - text: admin@gmail.com
+              - cell "749.000đ" [ref=e309]
+              - cell "VNPAY" [ref=e310]
+              - cell "Chờ xác nhận" [ref=e311]:
+                - generic [ref=e312]: Chờ xác nhận
+              - cell "Chưa gán" [ref=e313]:
+                - emphasis [ref=e315]: Chưa gán
+              - cell "03/04/2026 10:30" [ref=e316]
+              - cell "Xem Sửa" [ref=e317]:
+                - link "Xem" [ref=e318] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/31
+                - link "Sửa" [ref=e319] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders/31/edit
+        - navigation [ref=e321]:
+          - generic [ref=e322]:
+            - paragraph [ref=e324]: Showing 1 to 10 of 40 results
+            - list [ref=e326]:
+              - listitem "« Trước" [ref=e327]:
+                - generic: ‹
+              - listitem [ref=e328]:
+                - generic [ref=e329]: "1"
+              - listitem [ref=e330]:
+                - link "2" [ref=e331] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders?page=2
+              - listitem [ref=e332]:
+                - link "3" [ref=e333] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders?page=3
+              - listitem [ref=e334]:
+                - link "4" [ref=e335] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders?page=4
+              - listitem [ref=e336]:
+                - link "Tiếp »" [ref=e337] [cursor=pointer]:
+                  - /url: http://elite.test/admin/orders?page=2
+                  - text: ›
+  - contentinfo [ref=e338]:
+    - generic [ref=e340]:
+      - paragraph [ref=e342]: ©Elite Fashion by Team
+      - list [ref=e344]:
+        - listitem [ref=e345]:
+          - link "Home" [ref=e346] [cursor=pointer]:
+            - /url: http://elite.test/admin/dashboard
+        - listitem [ref=e347]:
+          - link "Documentation" [ref=e348] [cursor=pointer]:
+            - /url: ""
+  - link "" [ref=e350] [cursor=pointer]:
+    - /url: "#"
+    - generic [ref=e351]: 
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect } from '@playwright/test';
+  2  | 
+  3  | test.describe('Admin Shipping and Order Management', () => {
+  4  |   test.use({ storageState: 'playwright/.auth/admin.json' });
+  5  | 
+  6  |   test.beforeEach(async ({ page }) => {
+  7  |     // Navigate to Admin Orders
+  8  |     await page.goto('/admin/orders');
+  9  |   });
+  10 | 
+  11 |   test('Admin can update order status', async ({ page }) => {
+  12 |     // 1. Click on the first order detail link
+  13 |     const orderDetailLink = page.locator('a.btn-outline-primary:has-text("Xem")').first();
+  14 |     await expect(orderDetailLink).toBeVisible();
+  15 |     await orderDetailLink.click();
+  16 | 
+  17 |     // 2. Update Order Status
+  18 |     const statusSelect = page.locator('select.form-select').first();
+  19 |     if (await statusSelect.isVisible()) {
+  20 |         await statusSelect.selectOption({ index: 1 });
+  21 |         await page.waitForTimeout(1000); // Small delay for UI stability
+  22 |         
+  23 |         const updateStatusBtn = page.locator('button.btn-primary:has-text("Cập nhật ngay")');
+  24 |         await updateStatusBtn.click();
+  25 |         
+  26 |         // Wait for page load or toast
+  27 |         await page.waitForLoadState('networkidle');
+  28 |         // Success indicator: usually a toast or alert contains 'thành công' or 'Cập nhật'
+  29 |         await expect(page.locator('body')).toContainText(/thành công|cập nhật/i, { timeout: 15000 });
+  30 |     }
+  31 |   });
+  32 | 
+  33 |   test('Admin can assign a shipper', async ({ page }) => {
+  34 |     // 1. Click on the first order detail link
+  35 |     const orderDetailLink = page.locator('a.btn-outline-primary:has-text("Xem")').first();
+> 36 |     await expect(orderDetailLink).toBeVisible();
+     |                                   ^ Error: expect(locator).toBeVisible() failed
+  37 |     await orderDetailLink.click();
+  38 | 
+  39 |     // 2. Assign a Shipper
+  40 |     const shipperSelect = page.locator('select.form-select').nth(1);
+  41 |     const assignBtn = page.locator('button.btn-info:has-text("Gán Shipper")');
+  42 |     
+  43 |     if (await shipperSelect.isVisible()) {
+  44 |         const optionCount = await shipperSelect.locator('option').count();
+  45 |         if (optionCount > 1) {
+  46 |             await shipperSelect.selectOption({ index: 1 });
+  47 |             await page.waitForTimeout(1000);
+  48 |             await assignBtn.click();
+  49 |             await page.waitForLoadState('networkidle');
+  50 |             await expect(page.locator('body')).toContainText(/thành công|giao hàng/i, { timeout: 15000 });
+  51 |         }
+  52 |     }
+  53 |   });
+  54 | 
+  55 |   test('Admin can filter orders by status', async ({ page }) => {
+  56 |     await page.goto('/admin/orders');
+  57 |     
+  58 |     // Open status filter
+  59 |     const filterSelect = page.locator('select[name="status"]').first();
+  60 |     if (await filterSelect.isVisible()) {
+  61 |         await filterSelect.selectOption('pending');
+  62 |         await page.locator('button[type="submit"]').first().click();
+  63 |         
+  64 |         // Wait for page load and verify URL
+  65 |         await page.waitForURL(/.*status=pending.*/);
+  66 |         expect(page.url()).toContain('status=pending');
+  67 |     }
+  68 |   });
+  69 | });
+  70 | 
+```
