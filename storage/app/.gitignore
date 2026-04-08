@@ -2,4 +2,6 @@
 !.gitignore
 !private/
 !public/
+public/*
+!public/.gitignore
 !vn_communes.json
