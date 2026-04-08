@@ -41,7 +41,7 @@
                                     <a href="{{ route('admin.sizes.edit', $size) }}" class="btn btn-sm btn-info">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
-                                    <form action="{{ route('admin.sizes.destroy', $size) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this size?');">
+                                    <form action="{{ route('admin.sizes.destroy', $size) }}" method="POST" class="d-inline no-pjax" onsubmit="return confirm('Are you sure you want to delete this size?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger">

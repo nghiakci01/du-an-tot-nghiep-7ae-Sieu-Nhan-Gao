@@ -109,12 +109,12 @@
                                         <td class="sticky-action-column">
                                             <a href="{{ route('admin.products.edit', $product) }}"
                                                 class="btn btn-warning btn-sm">Sửa</a>
-                                            
+
 
 
                                             <form id="delete-form-prod-{{ $product->id }}"
                                                 action="{{ route('admin.products.destroy', $product) }}" method="POST"
-                                                class="d-inline">
+                                                class="d-inline no-pjax">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" class="btn btn-danger btn-sm"
@@ -131,7 +131,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Bulk Actions -->
             <div class="mb-3 mt-3 d-flex gap-2">
                 <form id="bulk-delete-form" action="{{ route('admin.products.bulk-delete') }}" method="POST" class="bulk-action-form">

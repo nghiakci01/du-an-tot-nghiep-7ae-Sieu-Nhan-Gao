@@ -61,7 +61,7 @@
                                                 class="btn btn-warning btn-sm">Sửa</a>
                                             <form id="delete-form-{{ $category->id }}"
                                                 action="{{ route('admin.post-categories.destroy', $category) }}" method="POST"
-                                                class="d-inline">
+                                                class="d-inline no-pjax">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" class="btn btn-danger btn-sm"
