@@ -44,20 +44,26 @@ class ShippingService
             return [$this->storePickupOption()];
         }
 
-        return [
-            [
-                'provider' => 'ghtk',
-                'service_name' => 'Giao hàng nhanh GHTK',
-                'fee' => 35000,
-                'expected_delivery_time' => now()->addDays(2)->format('d/m/Y'),
-            ],
-            [
-                'provider' => 'default',
-                'service_name' => 'Phí vận chuyển',
-                'fee' => 30000,
-                'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
-            ]
-        ];
+        $options = [];
+
+        foreach ($this->providers as $provider) {
+            $quote = $provider->calculateFee(
+                $province ?? '',
+                $district ?? '',
+                $ward ?? '',
+                $weight
+            );
+
+            if ($quote !== null) {
+                $options[] = $quote;
+            }
+        }
+
+        if (empty($options)) {
+            $options[] = $this->fallbackOption($subtotal);
+        }
+
+        return $options;
     }
 
     public function resolveSelectedOption(
@@ -75,8 +81,12 @@ class ShippingService
             return null;
         }
 
-        if (blank($selectedProvider)) {
-            return $deliveryType === 'store' ? $options[0] : null;
+        if ($deliveryType === 'store') {
+            return $options[0];
+        }
+
+        if (blank($selectedProvider) || in_array($selectedProvider, ['default', 'flat_rate'], true)) {
+            return $options[0];
         }
 
         foreach ($options as $option) {
@@ -91,7 +101,7 @@ class ShippingService
     protected function fallbackOption(float $subtotal): array
     {
         return [
-            'provider' => 'flat_rate',
+            'provider' => 'default',
             'service_name' => 'Giao hang tieu chuan',
             'fee' => (int) Setting::getShippingFee($subtotal),
             'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),

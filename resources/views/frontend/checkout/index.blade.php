@@ -227,6 +227,10 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
     data-base="{{ $total - $discount }}"
     data-discount="{{ $discount }}"
     data-ship-init="{{ $shippingFee }}"
+    data-ship-base-fee="{{ (float) \App\Models\Setting::get('shipping_fee', 30000) }}"
+    data-ship-free-threshold="799000"
+    data-ship-provider="{{ $shippingProviderName ?? '' }}"
+    data-ship-eta="{{ $shippingExpectedDeliveryTime ?? '' }}"
   ></div>
 
   @if(session('error'))
@@ -268,7 +272,8 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
           <input type="hidden" name="name"     id="sel-addr-name-val"  value="{{ $defAddr?->receiver_name ?? '' }}">
           <input type="hidden" name="phone"    id="sel-addr-phone-val" value="{{ $defAddr?->phone ?? '' }}">
           <input type="hidden" name="province" id="sel-addr-prov-val"  value="{{ preg_replace('/^(Tỉnh|Thành phố)\s+/u', '', $defAddr?->province ?? '') }}">
-          <input type="hidden" name="address"  id="sel-addr-addr-val"  value="{{ ($defAddr?->address ?? '') . ($defAddr?->commune ? ', ' . $defAddr->commune : '') }}">
+          <input type="hidden" name="ward"     id="sel-addr-ward-val"  value="{{ $defAddr?->commune ?? '' }}">
+          <input type="hidden" name="address"  id="sel-addr-addr-val"  value="{{ $defAddr?->address ?? '' }}">
 
           @if($userAddresses->isNotEmpty())
             {{-- Compact selected-address display --}}
@@ -358,23 +363,24 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
         <h2 class="ck-card-title">
           <span class="ck-step" aria-hidden="true">2</span>Vận chuyển
         </h2>
-        {{-- TODO: Team phát triển sau -- Ẩn Viettel Post và phí vận chuyển
         <div class="ship-row">
           <div>
-            <div class="ship-name">Viettel Post</div>
-            <div class="ship-sub">Giao hàng tiêu chuẩn 3–5 ngày</div>
+            <div class="ship-name" id="ship-provider-name">{{ $shippingProviderName ?? 'Giao hàng tiêu chuẩn' }}</div>
+            <div class="ship-sub" id="ship-provider-sub">
+              @if(!empty($shippingExpectedDeliveryTime))
+                Dự kiến giao {{ $shippingExpectedDeliveryTime }}
+              @else
+                Phí sẽ được cập nhật theo địa chỉ giao hàng
+              @endif
+            </div>
           </div>
           <span id="ship-fee-badge" class="ship-fee {{ $shippingFee == 0 ? 'free' : '' }}" aria-live="polite">
             {{ $shippingFee > 0 ? number_format($shippingFee,0,',','.') . 'đ' : 'Miễn phí' }}
           </span>
         </div>
         <p id="ship-note" class="ship-note">
-          @if($shippingFee > 0) 💡 Phí vận chuyển thanh toán khi nhận hàng.
+          @if($shippingFee > 0) 💡 Phí vận chuyển sẽ được cộng vào đơn hàng.
           @else 🎉 Bạn được miễn phí vận chuyển! @endif
-        </p>
-        --}}
-        <p class="text-muted small mb-0" style="padding:4px 0">
-          📦 Phương thức vận chuyển sẽ được cập nhật sớm.
         </p>
       </div>
 
@@ -390,7 +396,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
             <div class="pm-dot" aria-hidden="true"></div>
             <div class="flex-grow-1">
               <div class="pm-title">Thanh toán khi nhận hàng (COD)</div>
-              <div class="pm-desc">Trả tiền mặt khi shipper giao tới</div>
+              <div class="pm-desc">Trả tiền mặt khi người giao hàng giao tới</div>
             </div>
             <span class="pm-icon" aria-hidden="true">💵</span>
           </label>
@@ -494,7 +500,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
           </div>
 
           <div class="sum-row"><span>Tạm tính</span><span>{{ number_format($total,0,',','.') }}đ</span></div>
-          {{-- TODO: Team phát triển sau -- Ẩn phí vận chuyển --}}
+          <div class="sum-row"><span>Phí vận chuyển</span><span id="sum-ship">{{ $shippingFee > 0 ? number_format($shippingFee,0,',','.') . 'đ' : 'Miễn phí' }}</span></div>
           <div class="sum-row" id="sum-discount-row" @if(!$discount) style="display:none" @endif>
             <span>Giảm giá</span>
             <span class="sum-discount" id="sum-discount">
@@ -655,14 +661,108 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       base:      parseFloat(el.dataset.base)||0,
       discount:  parseFloat(el.dataset.discount)||0,
       shipInit:  parseFloat(el.dataset.shipInit)||0,
+      shipBaseFee: parseFloat(el.dataset.shipBaseFee)||0,
+      shipFreeThreshold: parseFloat(el.dataset.shipFreeThreshold)||0,
+      shipProvider: el.dataset.shipProvider || '',
+      shipEta: el.dataset.shipEta || '',
     };
   })();
 
-  let currentShipFee = 0;
+  let currentShipFee = C.shipInit || 0;
   const fmt = v => new Intl.NumberFormat('vi-VN').format(v)+'đ';
   const qs  = s => document.querySelector(s);
   const qsa = s => document.querySelectorAll(s);
   const syncNS = el => { if(window.jQuery && typeof jQuery.fn.niceSelect === 'function') jQuery(el).niceSelect('update'); };
+
+  function getFallbackShippingFee(){
+    return C.base >= C.shipFreeThreshold ? 0 : C.shipBaseFee;
+  }
+
+  function getShippingPayload(){
+    const provider = qs('input[name="shipping_provider"]')?.value || '';
+    const deliveryType = provider === 'store_pickup' ? 'store' : 'home';
+
+    if (deliveryType === 'store') {
+      return { delivery_type: 'store' };
+    }
+
+    const province = (qs('#sel-addr-prov-val')?.value || qs('#g_province')?.value || '').trim();
+    const ward = (qs('#sel-addr-ward-val')?.value || qs('#g_commune')?.value || '').trim();
+
+    return {
+      delivery_type: 'home',
+      province,
+      ward,
+      commune: ward,
+    };
+  }
+
+  function renderShip(fee, option = null, isFallback = false){
+    const safeFee = Number.isFinite(Number(fee)) ? Math.max(0, Number(fee)) : 0;
+    currentShipFee = safeFee;
+
+    const badge = qs('#ship-fee-badge');
+    const note = qs('#ship-note');
+    const sumTotalEl = qs('#sum-total');
+    const providerEl = qs('#ship-provider-name');
+    const subEl = qs('#ship-provider-sub');
+    const sumShipEl = qs('#sum-ship');
+    const providerName = option?.service_name || C.shipProvider || 'Giao hàng tiêu chuẩn';
+    const eta = option?.expected_delivery_time || C.shipEta || '';
+
+    if (providerEl) providerEl.textContent = providerName;
+    if (subEl) {
+      if (eta) {
+        subEl.textContent = 'Dự kiến giao ' + eta;
+      } else if (isFallback) {
+        subEl.textContent = 'Phụ thuộc vào địa chỉ giao hàng';
+      } else {
+        subEl.textContent = 'Phí sẽ được cập nhật theo địa chỉ giao hàng';
+      }
+    }
+    if (badge) {
+      badge.textContent = currentShipFee > 0 ? fmt(currentShipFee) : 'Miễn phí';
+      badge.className = 'ship-fee' + (currentShipFee === 0 ? ' free' : '');
+    }
+    if (note) {
+      note.textContent = currentShipFee > 0
+        ? '💡 Phí vận chuyển sẽ được cộng vào đơn hàng.'
+        : '🎉 Bạn được miễn phí vận chuyển!';
+    }
+    if (sumShipEl) {
+      sumShipEl.textContent = currentShipFee > 0 ? fmt(currentShipFee) : 'Miễn phí';
+    }
+    if (sumTotalEl) sumTotalEl.textContent = fmt(C.base + currentShipFee);
+  }
+
+  async function refreshShippingQuote(){
+    const payload = getShippingPayload();
+    if (payload.delivery_type !== 'store' && (!payload.province || !payload.ward)) {
+      renderShip(getFallbackShippingFee(), null, true);
+      return;
+    }
+
+    try {
+      const res = await fetch(C.shipping, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': C.csrf,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+        const option = data.data[0] || {};
+        renderShip(option.fee ?? 0, option, false);
+        return;
+      }
+    } catch (e) {}
+
+    renderShip(getFallbackShippingFee(), null, true);
+  }
 
   async function loadProvinces(pEl, cEl, oldProv, oldComm){
     try {
@@ -677,7 +777,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       });
       pEl.innerHTML = html;
       syncNS(pEl);
-      if(selCode) loadCommunes(cEl, selCode, oldComm);
+      if(selCode) await loadCommunes(cEl, selCode, oldComm);
     } catch(e){ pEl.innerHTML='<option value="">Lỗi tải dữ liệu</option>'; syncNS(pEl); }
   }
   async function loadCommunes(cEl, code, oldComm){
@@ -693,25 +793,23 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
   }
   function bindCascade(pEl, cEl, oldP, oldC){
     if(!pEl||!cEl) return;
-    loadProvinces(pEl, cEl, oldP, oldC);
+    loadProvinces(pEl, cEl, oldP, oldC).then(refreshShippingQuote);
     pEl.addEventListener('change', function(){
       const opt = this.options[this.selectedIndex];
       const code = opt?.dataset?.code||'';
       if(code) loadCommunes(cEl,code,null);
       else { cEl.innerHTML='<option value="">-- Chọn tỉnh trước --</option>'; cEl.disabled=true; }
       syncNS(cEl);
+      refreshShippingQuote();
     });
+    cEl.addEventListener('change', refreshShippingQuote);
   }
 
-  function renderShip(fee){
-    currentShipFee = 0;
-    const badge = qs('#ship-fee-badge'), note = qs('#ship-note'), sumTotalEl = qs('#sum-total');
-    if(badge){ badge.textContent = 'Miễn phí'; badge.className='ship-fee free'; }
-    if(note) note.textContent = '🎉 Bạn được miễn phí vận chuyển!';
-    if(qs('#sum-ship')) qs('#sum-ship').textContent = 'Miễn phí';
-    if(sumTotalEl) sumTotalEl.textContent = fmt(C.base + 0);
-  }
-  renderShip(0);
+  renderShip(C.shipInit, {
+    service_name: C.shipProvider,
+    expected_delivery_time: C.shipEta,
+  }, false);
+  refreshShippingQuote();
 
   function closeAddrModal(){ document.getElementById('modal-dismiss-hidden')?.click(); }
 
@@ -720,14 +818,16 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
     card.classList.add('is-sel');
     const sid = qs('#sel-addr-id'); if(sid) sid.value = card.dataset.id;
     
-    const hN = qs('#sel-addr-name-val'), hP = qs('#sel-addr-phone-val'), hV = qs('#sel-addr-prov-val'), hA = qs('#sel-addr-addr-val');
+    const hN = qs('#sel-addr-name-val'), hP = qs('#sel-addr-phone-val'), hV = qs('#sel-addr-prov-val'), hW = qs('#sel-addr-ward-val'), hA = qs('#sel-addr-addr-val');
     if(hN) hN.value = card.dataset.name||''; if(hP) hP.value = card.dataset.phone||'';
     if(hV) hV.value = (card.dataset.province||'').replace(/^(Tỉnh|Thành phố)\s+/gu, '');
-    if(hA) hA.value = (card.dataset.address||'') + (card.dataset.commune ? ', ' + card.dataset.commune : '');
+    if(hW) hW.value = card.dataset.commune||'';
+    if(hA) hA.value = card.dataset.address||'';
 
     if(qs('#sel-display-name')) qs('#sel-display-name').textContent = card.dataset.name||'';
     if(qs('#sel-display-phone')) qs('#sel-display-phone').textContent = card.dataset.phone||'';
     if(qs('#sel-display-detail')) qs('#sel-display-detail').textContent = [card.dataset.address, card.dataset.commune, card.dataset.province].filter(Boolean).join(', ');
+    refreshShippingQuote();
   }
 
   const modalFormTitle = qs('#modal-addr-form-title'), modalAddrIdInp = qs('#modal_address_id');
@@ -813,7 +913,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       });
       const d = await res.json();
       if(d.success && d.data){ 
-        C.discount = d.data.discount; C.base = C.subtotal - C.discount; renderShip(0);
+        C.discount = d.data.discount; C.base = C.subtotal - C.discount; refreshShippingQuote();
         if(qs('#sum-discount-row')) qs('#sum-discount-row').style.display = '';
         if(qs('#sum-discount')) qs('#sum-discount').textContent = '−' + fmt(C.discount);
         if(qs('#cpn-code-label')) qs('#cpn-code-label').textContent = d.data.coupon_code;
@@ -825,7 +925,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
 
   async function handleRemoveCoupon(){
     try { await fetch(C.cpnRemove, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':C.csrf} }); } catch(e){}
-    C.discount = 0; C.base = C.subtotal; renderShip(0);
+    C.discount = 0; C.base = C.subtotal; refreshShippingQuote();
     if(qs('#sum-discount-row')) qs('#sum-discount-row').style.display = 'none';
     qs('#cpn-applied-state')?.classList.add('d-none'); qs('#cpn-input-state')?.classList.remove('d-none');
     if(qs('#cpn-input')) qs('#cpn-input').value = ''; if(cpnMsg) cpnMsg.textContent = '';
@@ -839,7 +939,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       if(res.ok || res.redirected){
         itemEl.remove(); C.subtotal = Math.max(0, C.subtotal - amount); C.base = Math.max(0, C.subtotal - (C.discount||0));
         qsa('.sum-row').forEach(row=>{ if(row.querySelector('span:first-child')?.textContent.trim()==='Tạm tính') row.querySelector('span:last-child').textContent = fmt(C.subtotal); });
-        renderShip(0); if(!qs('.sum-item')) window.location.href = '{{ route("cart.index") }}';
+        await refreshShippingQuote(); if(!qs('.sum-item')) window.location.href = '{{ route("cart.index") }}';
       }
     } catch(e){ itemEl.style.opacity='1'; btn.disabled=false; }
   }

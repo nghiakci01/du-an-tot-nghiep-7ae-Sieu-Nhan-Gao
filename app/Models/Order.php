@@ -30,8 +30,6 @@ class Order extends Model
         'transaction_id',
         'shipping_address',
         'note',
-        'shipper_id',
-        'delivery_note',
     ];
 
     const STATUS_PENDING = 'pending';
@@ -65,19 +63,9 @@ class Order extends Model
         return $this->hasMany(OrderHistory::class)->orderBy('created_at', 'desc');
     }
 
-    public function shipper()
-    {
-        return $this->belongsTo(User::class, 'shipper_id');
-    }
-
     public function returnRequest()
     {
         return $this->hasOne(OrderReturnRequest::class);
-    }
-
-    public function deliveryProofs()
-    {
-        return $this->hasMany(OrderDeliveryProof::class);
     }
 
 

@@ -152,10 +152,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
         Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
         Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
         Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
-        Route::post('orders/{order}/assign-shipper', [App\Http\Controllers\Admin\OrderController::class, 'assignShipper'])->name('orders.assign-shipper');
-        Route::get('orders/{order}/assign-shipper', function ($order) {
-            return redirect()->route('admin.orders.show', $order);
-        });
         Route::post('orders/{order}/query-payment', [App\Http\Controllers\Admin\OrderController::class, 'queryPayment'])->name('orders.query-payment');
         Route::post('orders/{order}/refund-payment', [App\Http\Controllers\Admin\OrderController::class, 'refundPayment'])->name('orders.refund-payment');
         Route::any('orders-trigger-auto-cancel', [App\Http\Controllers\Admin\OrderController::class, 'triggerAutoCancel'])->name('orders.trigger-auto-cancel');
@@ -261,21 +257,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
 }); // End Admin Middleware Group
 
 
-// Staff/Shipper Routes
-Route::group(['prefix' => 'staff', 'as' => 'staff.', 'middleware' => ['auth', 'staff']], function () {
-    Route::get('/orders', [App\Http\Controllers\Staff\ShipperOrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [App\Http\Controllers\Staff\ShipperOrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{order}/accept', [App\Http\Controllers\Staff\ShipperOrderController::class, 'accept'])->name('orders.accept');
-    Route::get('/orders/{order}/accept', [App\Http\Controllers\Staff\ShipperOrderController::class, 'accept'])->name('orders.accept.get');
-    Route::post('/orders/{order}/complete', [App\Http\Controllers\Staff\ShipperOrderController::class, 'complete'])->name('orders.complete');
-    Route::get('/orders/{order}/complete', [App\Http\Controllers\Staff\ShipperOrderController::class, 'complete'])->name('orders.complete.get');
-    Route::post('/orders/{order}/fail', [App\Http\Controllers\Staff\ShipperOrderController::class, 'fail'])->name('orders.fail');
-    Route::get('/orders/{order}/fail', function ($order) {
-        return redirect()->route('staff.orders.show', $order);
-    });
-});
-
-
 // Quick Test Route
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'vi'])) {
@@ -378,4 +359,3 @@ Route::name('test.payment.')->prefix('test-payment')->middleware('web')->group(f
     })->name('check-order');
 });
 }
-
