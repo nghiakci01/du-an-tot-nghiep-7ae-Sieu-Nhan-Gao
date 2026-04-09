@@ -5,19 +5,24 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Setting;
+use App\Models\UserAddress;
 use App\Events\CartUpdatedEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Services\CartService;
+use App\Services\Shipping\ShippingService;
 
 class CartController extends Controller
 {
     protected $cartService;
+    protected $shippingService;
 
-    public function __construct(CartService $cartService)
+    public function __construct(CartService $cartService, ShippingService $shippingService)
     {
         $this->cartService = $cartService;
+        $this->shippingService = $shippingService;
     }
 
     public function index()
@@ -133,6 +138,9 @@ class CartController extends Controller
             }
         }
 
+        $shippingState = $this->resolveShippingState($cart, $total, $discount);
+        $shippingFee = (float) ($shippingState['fee'] ?? 0);
+
         // Cross-sell: products from same categories, excluding items already in cart
         $cartProductIds = collect($cart)->pluck('product_id')->unique()->toArray();
         $cartCategoryIds = Product::whereIn('id', $cartProductIds)->pluck('category_id')->unique()->toArray();
@@ -144,7 +152,7 @@ class CartController extends Controller
             ->take(8)
             ->get();
 
-        return view('frontend.cart.index', compact('cart', 'total', 'coupon', 'discount', 'crossSellProducts'));
+        return view('frontend.cart.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'crossSellProducts'));
     }
 
     public function changeVariant(Request $request)
@@ -411,8 +419,6 @@ class CartController extends Controller
                     $cartCount += $item['quantity'];
                 }
 
-                $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
-
                 // Recalculate discount if coupon applied
                 $discount = 0;
                 $couponCode = session()->get('coupon_code');
@@ -429,6 +435,8 @@ class CartController extends Controller
                     }
                 }
 
+                $shippingState = $this->resolveShippingState($cart, $subtotal, $discount);
+                $shippingFee = (float) ($shippingState['fee'] ?? 0);
                 $grandTotal = $subtotal - $discount + $shippingFee;
 
                 CartUpdatedEvent::dispatch($cartCount, session()->getId(), Auth::id());
@@ -497,8 +505,6 @@ class CartController extends Controller
                     $cartCount += $item['quantity'];
                 }
 
-                $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
-
                 // Recalculate discount if coupon applied
                 $discount = 0;
                 $couponCode = session()->get('coupon_code');
@@ -515,6 +521,8 @@ class CartController extends Controller
                     }
                 }
 
+                $shippingState = $this->resolveShippingState($cart, $subtotal, $discount);
+                $shippingFee = (float) ($shippingState['fee'] ?? 0);
                 $grandTotal = $subtotal - $discount + $shippingFee;
 
                 CartUpdatedEvent::dispatch($cartCount, session()->getId(), Auth::id());
@@ -542,7 +550,8 @@ class CartController extends Controller
 
         // Recalculate totals for an empty cart
         $subtotal = 0;
-        $shippingFee = \App\Models\Setting::getShippingFee($subtotal);
+        $shippingState = $this->resolveShippingState([], $subtotal, 0);
+        $shippingFee = (float) ($shippingState['fee'] ?? 0);
         $grandTotal = $subtotal + $shippingFee;
 
         CartUpdatedEvent::dispatch(0, session()->getId(), Auth::id());
@@ -615,7 +624,8 @@ class CartController extends Controller
         session()->put('coupon_code', $coupon->code);
         session()->put('discount_amount', $discount);
 
-        $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
+        $shippingState = $this->resolveShippingState($cart, $total, $discount);
+        $shippingFee = (float) ($shippingState['fee'] ?? 0);
         $grandTotal = $total - $discount + $shippingFee;
 
         return response()->json([
@@ -641,7 +651,8 @@ class CartController extends Controller
             $total += $details['price'] * $details['quantity'];
         }
 
-        $shippingFee = \App\Models\Setting::getShippingFee($total);
+        $shippingState = $this->resolveShippingState($cart, $total, 0);
+        $shippingFee = (float) ($shippingState['fee'] ?? 0);
         $grandTotal = $total + $shippingFee;
 
         return response()->json([
@@ -653,5 +664,52 @@ class CartController extends Controller
                 'grand_total' => number_format($grandTotal) . ' đ',
             ],
         ]);
+    }
+
+    protected function resolveShippingState(array $cart, float $subtotal, float $discount = 0): array
+    {
+        $shippingSubtotal = max(0, $subtotal - $discount);
+
+        if ($shippingSubtotal <= 0 || empty($cart)) {
+            return [
+                'provider' => 'default',
+                'service_name' => 'Giao hàng tiêu chuẩn',
+                'fee' => 0,
+                'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
+            ];
+        }
+
+        $defaultAddress = $this->getDefaultShippingAddress();
+        if ($defaultAddress && filled($defaultAddress->province) && filled($defaultAddress->commune)) {
+            $quote = $this->shippingService->resolveSelectedOption(
+                'home',
+                (string) $defaultAddress->province,
+                null,
+                (string) $defaultAddress->commune,
+                $this->shippingService->estimateWeightFromCart($cart),
+                $shippingSubtotal,
+                null
+            );
+
+            if ($quote !== null) {
+                return $quote;
+            }
+        }
+
+        return [
+            'provider' => 'default',
+            'service_name' => 'Giao hàng tiêu chuẩn',
+            'fee' => (float) Setting::getShippingFee($shippingSubtotal),
+            'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
+        ];
+    }
+
+    protected function getDefaultShippingAddress(): ?UserAddress
+    {
+        if (!Auth::check()) {
+            return null;
+        }
+
+        return Auth::user()->addresses()->orderByDesc('is_default')->first();
     }
 }

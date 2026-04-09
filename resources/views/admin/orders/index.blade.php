@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'Quản lý Đơn hàng')
 
@@ -58,14 +58,6 @@
                             </option>
                             <option value="{{ \App\Models\Order::STATUS_COMPLETED }}" {{ request('status') == \App\Models\Order::STATUS_COMPLETED ? 'selected' : '' }}>Hoàn thành</option>
                         </select>
-
-                        <label for="delivery_status" class="form-label mb-0 me-2 text-nowrap ms-3">Giao hàng:</label>
-                        <select name="delivery_status" id="delivery_status" class="form-select form-select-sm w-auto me-2">
-                            <option value="">Tất cả</option>
-                            <option value="unassigned" {{ request('delivery_status') == 'unassigned' ? 'selected' : '' }}>Chưa giao (Cần gán Shipper)</option>
-                            <option value="delivering" {{ request('delivery_status') == 'delivering' ? 'selected' : '' }}>Đang đi giao</option>
-                            <option value="completed" {{ request('delivery_status') == 'completed' ? 'selected' : '' }}>Giao thành công</option>
-                        </select>
                         <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
                     </form>
 
@@ -78,7 +70,6 @@
                                     <th>Tổng tiền</th>
                                     <th>P.thức T.toán</th>
                                     <th>Trạng thái</th>
-                                    <th>Shipper</th>
                                     <th>Ngày đặt</th>
                                     <th class="sticky-action-column">Hành động</th>
                                 </tr>
@@ -103,13 +94,6 @@
                                             <span class="badge {{ $order->status_badge }}">
                                                 {{ $order->status_text }}
                                             </span>
-                                        </td>
-                                        <td>
-                                            @if($order->shipper)
-                                                <span class="text-primary font-weight-bold"><i class="feather icon-truck"></i> {{ $order->shipper->name }}</span>
-                                            @else
-                                                <span class="text-muted small"><em>Chưa gán</em></span>
-                                            @endif
                                         </td>
                                         <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                         <td class="sticky-action-column">

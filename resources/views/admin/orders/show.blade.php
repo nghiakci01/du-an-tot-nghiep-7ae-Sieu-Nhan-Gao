@@ -227,90 +227,6 @@
                 @endif
             </div>
         </div>
-
-        <!-- Shipper Assignment Card -->
-        <div class="card shadow-sm mb-4 border-top border-info border-3">
-            <div class="card-header border-bottom">
-                <h5 class="mb-0"><i class="feather icon-truck text-info me-2"></i>Nhân viên giao hàng</h5>
-            </div>
-            <div class="card-body">
-                @if($order->shipper)
-                    <div class="d-flex align-items-center mb-3 p-2 bg-light rounded border">
-                        <div class="avatar me-3">
-                            <img src="{{ $order->shipper->avatar_url }}" class="rounded-circle" width="40" height="40" alt="Shipper">
-                        </div>
-                        <div>
-                            <h6 class="mb-0 fw-bold">{{ $order->shipper->name }}</h6>
-                            <p class="mb-0 small text-muted">{{ $order->shipper->phone ?? 'Chưa có SĐT' }}</p>
-                        </div>
-                    </div>
-                    @if($order->delivery_note)
-                        <div class="alert alert-secondary small p-2 mb-3">
-                            <strong>Ghi chú giao hàng:</strong><br>
-                            {{ $order->delivery_note }}
-                        </div>
-                    @endif
-                @else
-                    <div class="alert alert-light border small text-center mb-3">
-                        <i class="feather icon-alert-circle me-1"></i> Chưa có nhân viên nhận đơn này.
-                    </div>
-                @endif
-
-                @if(!in_array($order->status, [\App\Models\Order::STATUS_COMPLETED, \App\Models\Order::STATUS_CANCELLED]))
-                    <form action="{{ route('admin.orders.assign-shipper', $order->id) }}" method="POST" class="mt-2">
-                        @csrf
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Gán / Đổi Shipper:</label>
-                            <select name="shipper_id" class="form-select form-select-sm" required>
-                                <option value="">-- Chọn Shipper --</option>
-                                @foreach($shippers as $shipper)
-                                    <option value="{{ $shipper->id }}" {{ $order->shipper_id == $shipper->id ? 'selected' : '' }}>
-                                        {{ $shipper->name }} ({{ $shipper->email }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-info btn-sm w-100">
-                            <i class="feather icon-user-plus"></i> {{ $order->shipper_id ? 'Đổi Shipper' : 'Gán Shipper' }}
-                        </button>
-                    </form>
-                @endif
-            </div>
-        </div>
-
-        <!-- Delivery Proofs Card -->
-        @if($order->deliveryProofs->count() > 0)
-        <div class="card shadow-sm mb-4 border-top border-success border-3">
-            <div class="card-header border-bottom">
-                <h5 class="mb-0"><i class="feather icon-image text-success me-2"></i>Bằng chứng giao hàng</h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-2">
-                    @foreach($order->deliveryProofs as $proof)
-                        <div class="col-12">
-                            @if($proof->file_type === 'image')
-                                <div class="mb-2">
-                                    <label class="small text-muted mb-1 d-block"><i class="feather icon-image"></i> Hình ảnh:</label>
-                                    <a href="{{ asset('storage/' . $proof->file_path) }}" target="_blank">
-                                        <img src="{{ asset('storage/' . $proof->file_path) }}" class="img-fluid rounded border shadow-sm" style="max-height: 200px; width: 100%; object-fit: cover;" alt="Delivery Proof Image">
-                                    </a>
-                                </div>
-                            @elseif($proof->file_type === 'video')
-                                <div class="mb-2">
-                                    <label class="small text-muted mb-1 d-block"><i class="feather icon-video"></i> Video:</label>
-                                    <video controls class="w-100 rounded border shadow-sm" style="max-height: 250px;">
-                                        <source src="{{ asset('storage/' . $proof->file_path) }}" type="video/mp4">
-                                        Trình duyệt của bạn không hỗ trợ video.
-                                    </video>
-                                </div>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        @endif
-
         <!-- Customer Card -->
         <div class="card shadow-sm mb-4">
             <div class="card-header border-bottom">
@@ -397,8 +313,6 @@
     </div>
 </div>
 @endsection
-
-
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {

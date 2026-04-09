@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
+use App\Models\UserAddress;
 use App\Notifications\NewOrderNotification;
 use App\Notifications\OrderPlacedNotification;
 use Illuminate\Http\Request;
@@ -95,21 +96,25 @@ class CheckoutController extends Controller
             $coupon = Coupon::where('code', $couponCode)->first();
         }
 
-        $finalTotal = $total - $discount;
-        $shippingFee = \App\Models\Setting::getShippingFee($finalTotal);
-        $finalTotal += $shippingFee;
-
-        $provinces = config('vietnam_provinces');
-
         $userAddresses = collect();
         if (auth()->check()) {
             $userAddresses = auth()->user()->addresses()->orderByDesc('is_default')->get();
         }
 
+        $defaultAddress = $userAddresses->firstWhere('is_default', true) ?? $userAddresses->first();
+        $shippingState = $this->resolveShippingState($cart, $total, $discount, $defaultAddress);
+        $shippingFee = (float) ($shippingState['fee'] ?? 0);
+        $shippingProviderName = $shippingState['service_name'] ?? 'Giao hàng tiêu chuẩn';
+        $shippingExpectedDeliveryTime = $shippingState['expected_delivery_time'] ?? null;
+
+        $finalTotal = $total - $discount + $shippingFee;
+
+        $provinces = config('vietnam_provinces');
+
         $defaultBank = null;
 
         return view('frontend.checkout.index', compact(
-            'cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal',
+            'cart', 'total', 'coupon', 'discount', 'shippingFee', 'shippingProviderName', 'shippingExpectedDeliveryTime', 'finalTotal',
             'provinces', 'userAddresses', 'defaultBank'
         ));
     }
@@ -216,6 +221,12 @@ class CheckoutController extends Controller
             $request->merge(['province' => $normalizedProv]);
         }
 
+        $deliveryType = $request->input('delivery_type');
+        if (!in_array($deliveryType, ['home', 'store'], true)) {
+            $deliveryType = $request->input('shipping_provider') === 'store_pickup' ? 'store' : 'home';
+        }
+        $request->merge(['delivery_type' => $deliveryType]);
+
         if ($request->filled('user_address_id')) {
             $userAddr = \App\Models\UserAddress::where('user_id', Auth::id())->find($request->user_address_id);
             if ($userAddr) {
@@ -223,24 +234,39 @@ class CheckoutController extends Controller
                     'name'     => $userAddr->receiver_name,
                     'phone'    => $userAddr->phone,
                     'province' => preg_replace('/^(Tỉnh|Thành phố)\s+/u', '', $userAddr->province),
-                    'address'  => $userAddr->address . ($userAddr->commune ? ', ' . $userAddr->commune : ''),
+                    'ward'     => $userAddr->commune,
+                    'address'  => $userAddr->address,
                 ]);
             }
         }
 
-        $request->validate([
+        if ($request->filled('commune') && !$request->filled('ward')) {
+            $request->merge(['ward' => $request->input('commune')]);
+        }
+
+        $rules = [
             'name' => 'required|string|max:255',
             'phone' => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
             'email' => 'required|email:rfc,dns|max:255',
-            'province' => $request->filled('user_address_id') ? 'required|string' : 'required|string|in:' . implode(',', $provinces),
+            'delivery_type' => 'nullable|in:home,store',
             'district' => 'nullable|string|max:255',
+            'commune' => 'nullable|string|max:255',
             'ward' => 'nullable|string|max:255',
-            'address' => 'required|string|max:500',
             'payment_method' => 'required|in:COD,VNPAY',
             'shipping_provider' => 'nullable|string',
             'shipping_service_name' => 'nullable|string',
             'shipping_fee' => 'nullable|numeric',
-        ], [
+        ];
+
+        if ($deliveryType === 'store') {
+            $rules['province'] = 'nullable|string|max:255';
+            $rules['address'] = 'nullable|string|max:500';
+        } else {
+            $rules['province'] = $request->filled('user_address_id') ? 'required|string' : 'required|string|in:' . implode(',', $provinces);
+            $rules['address'] = 'required|string|max:500';
+        }
+
+        $request->validate($rules, [
             'phone.required' => 'Vui lòng nhập số điện thoại.',
             'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
             'email.required' => 'Vui lòng nhập địa chỉ email.',
@@ -314,14 +340,19 @@ class CheckoutController extends Controller
             }
 
             $shippingSubtotal = max(0, $total - $discount);
+            $shippingProviderInput = $request->input('shipping_provider');
+            if ($deliveryType === 'store') {
+                $shippingProviderInput = 'store_pickup';
+            }
+
             $shippingOption = $this->shippingService->resolveSelectedOption(
-                'home',
-                $request->input('province'),
-                $request->input('district'),
-                $request->input('ward'),
+                $deliveryType,
+                $deliveryType === 'store' ? null : $request->input('province'),
+                $deliveryType === 'store' ? null : $request->input('district'),
+                $deliveryType === 'store' ? null : $request->input('ward'),
                 $this->shippingService->estimateWeightFromCart($cart),
                 $shippingSubtotal,
-                $request->input('shipping_provider')
+                $shippingProviderInput
             );
             if ($shippingOption === null) {
                 return redirect()->back()
@@ -332,19 +363,27 @@ class CheckoutController extends Controller
             $shippingProvider = $shippingOption['provider'] ?? null;
             $shippingServiceName = $shippingOption['service_name'] ?? null;
             $finalTotal = $total - $discount + $shippingFee;
-            $shippingAddress = trim(implode(', ', array_filter([
-                $request->address,
-                $request->input('ward'),
-                $request->input('district'),
-                $request->province,
-            ]))) . ' - ' . $request->phone . ' - ' . $request->name;
+            if ($deliveryType === 'store') {
+                $orderProvince = null;
+                $orderAddress = 'Nhan tai cua hang';
+                $shippingAddress = 'Nhan tai cua hang';
+            } else {
+                $orderProvince = $request->province;
+                $orderAddress = $request->address;
+                $shippingAddress = trim(implode(', ', array_filter([
+                    $request->address,
+                    $request->input('ward'),
+                    $request->input('district'),
+                    $request->province,
+                ]))) . ' - ' . $request->phone . ' - ' . $request->name;
+            }
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'province' => $request->province,
-                'address' => $request->address,
+                'province' => $orderProvince,
+                'address' => $orderAddress,
                 'status' => 'pending',
                 'total_price' => $total,
                 'coupon_code' => $couponCode,
@@ -672,8 +711,41 @@ class CheckoutController extends Controller
 
         return redirect()->back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng.');
     }
+
+    protected function resolveShippingState(array $cart, float $subtotal, float $discount = 0, ?UserAddress $defaultAddress = null): array
+    {
+        $shippingSubtotal = max(0, $subtotal - $discount);
+
+        if ($shippingSubtotal <= 0 || empty($cart)) {
+            return [
+                'provider' => 'default',
+                'service_name' => 'Giao hàng tiêu chuẩn',
+                'fee' => 0,
+                'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
+            ];
+        }
+
+        if ($defaultAddress && filled($defaultAddress->province) && filled($defaultAddress->commune)) {
+            $quote = $this->shippingService->resolveSelectedOption(
+                'home',
+                (string) $defaultAddress->province,
+                null,
+                (string) $defaultAddress->commune,
+                $this->shippingService->estimateWeightFromCart($cart),
+                $shippingSubtotal,
+                null
+            );
+
+            if ($quote !== null) {
+                return $quote;
+            }
+        }
+
+        return [
+            'provider' => 'default',
+            'service_name' => 'Giao hàng tiêu chuẩn',
+            'fee' => (float) \App\Models\Setting::getShippingFee($shippingSubtotal),
+            'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
+        ];
+    }
 }
-
-
-
-

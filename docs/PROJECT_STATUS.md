@@ -23,12 +23,12 @@ Tai lieu nay tong hop nhanh cac muc da on, cac muc can canh bao khi demo, va cac
 
 ## Chua hoan thien hoac can canh bao
 
-1. Shipping provider thuc te moi hoan thanh 1 phan.
+1. Shipping provider da co GHN tich hop va co co che fallback.
 Chi tiet: [GhnShippingProvider.php](/C:/laragon/www/du-an-tot-nghiep-7ae-Sieu-Nhan-Gao/app/Services/Shipping/GhnShippingProvider.php), [GhtkShippingProvider.php](/C:/laragon/www/du-an-tot-nghiep-7ae-Sieu-Nhan-Gao/app/Services/Shipping/GhtkShippingProvider.php), [ViettelPostShippingProvider.php](/C:/laragon/www/du-an-tot-nghiep-7ae-Sieu-Nhan-Gao/app/Services/Shipping/ViettelPostShippingProvider.php), [ShippingService.php](/C:/laragon/www/du-an-tot-nghiep-7ae-Sieu-Nhan-Gao/app/Services/Shipping/ShippingService.php)
 Trang thai:
-- GHTK da co the thu quote that neu `.env` co token + pickup address hop le.
+- GHN la provider uu tien dau tien; co the goi live quote neu `.env` co token, shop id, va dia chi kho hop le.
 - Neu cau hinh thieu hoac API loi, he thong tu fallback ve bang phi noi bo.
-- GHN va Viettel Post van la provider noi bo/mock.
+- GHTK va Viettel Post van giu vai tro provider noi bo/mock du phong.
 
 2. Kho / stock report chua co man hinh that.
 Chi tiet: [web.php](/C:/laragon/www/du-an-tot-nghiep-7ae-Sieu-Nhan-Gao/routes/web.php):191
@@ -61,4 +61,4 @@ Anh huong: mail, VNPAY, social login, chatbot AI se khong demo on dinh neu chua 
 1. Khoa route `test-payment` theo `app()->environment('local')`.
 2. An hoan toan menu wallet neu route da tat.
 3. Chuyen stock report tu placeholder sang trang thong bao ro rang hoac tam an menu.
-4. Neu muon demo ship that, uu tien hoan thien tiep GHN hoac chot GHTK sandbox/production token cho nhom.
+4. Neu muon demo ship that, uu tien kiem tra GHN sandbox/production token va dia chi kho hang.
