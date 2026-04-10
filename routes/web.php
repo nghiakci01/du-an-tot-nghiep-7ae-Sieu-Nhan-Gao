@@ -70,6 +70,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'showOrder'])->name('account.orders.show');
     Route::post('/my-account/update', [App\Http\Controllers\Frontend\AccountController::class, 'update'])->name('account.update');
     Route::post('/my-account/orders/{id}/cancel', [App\Http\Controllers\Frontend\AccountController::class, 'cancelOrder'])->name('account.orders.cancel');
+    Route::post('/my-account/orders/{id}/confirm-received', [App\Http\Controllers\Frontend\AccountController::class, 'confirmReceived'])->name('account.orders.confirm_received');
     Route::get('/my-account/orders/{id}/return', [App\Http\Controllers\Frontend\AccountController::class, 'returnOrderForm'])->name('account.orders.return_form');
     Route::post('/my-account/orders/{id}/return', [App\Http\Controllers\Frontend\AccountController::class, 'submitReturnRequest'])->name('account.orders.return_submit');
     Route::post('/my-account/orders/{id}/return/shipping', [App\Http\Controllers\Frontend\AccountController::class, 'submitShipping'])->name('account.orders.return.shipping');

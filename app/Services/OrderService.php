@@ -67,6 +67,11 @@ class OrderService
             if ($order->user) {
                 // If the order belongs to a registered user, send via Notification system (DB + Mail)
                 $order->user->notify(new \App\Notifications\OrderStatusNotification($order, $oldStatus, $newStatus));
+
+                // IF completed, also send a dedicated review request
+                if ($newStatus === Order::STATUS_COMPLETED) {
+                    $order->user->notify(new \App\Notifications\OrderReviewRequestNotification($order));
+                }
             } elseif ($newStatus === Order::STATUS_SHIPPED && $order->email) {
                 // For guest orders (no user registered), fallback to direct email on shipping
                 Mail::to($order->email)->send(new OrderShippedMail($order));

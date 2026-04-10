@@ -51,17 +51,29 @@ class OrderStatusNotification extends Notification
         }
 
         if ($this->newStatus === Order::STATUS_COMPLETED) {
-            return (new OrderCompletedMail($this->order))->to($notifiable->email);
+            $mail = (new OrderCompletedMail($this->order))->to($notifiable->email);
+            // Optionally add custom content or use a different mailable if needed
+            // For now, we assume OrderCompletedMail handles it.
+            return $mail;
         }
 
         // For processing status, use MailMessage
-        return (new MailMessage)
+        $mailMessage = (new MailMessage)
             ->subject($this->getSubject())
-            ->greeting('Xin chào '.$notifiable->name.'!')
-            ->line($this->getStatusMessage())
-            ->action('Xem đơn hàng', route('account.orders.show', $this->order->id))
-            ->line('Cảm ơn bạn đã mua sắm tại '.config('app.name').'!')
-            ->salutation('Trân trọng, Đội ngũ '.config('app.name'));
+            ->greeting('Xin chào '.$notifiable->name.'!');
+
+        if ($this->newStatus === Order::STATUS_COMPLETED) {
+            $mailMessage->line("Đơn hàng #{$this->order->id} của bạn đã giao hàng thành công.")
+                ->line("Chúng tôi hy vọng bạn hài lòng với các sản phẩm vừa nhận được. Bạn hãy dành chút thời gian đánh giá sản phẩm để nhận ưu đãi cho các đơn hàng sau nhé!")
+                ->action('Đánh giá sản phẩm', route('account.orders.show', $this->order->id) . '#tab-reviews')
+                ->line('Cảm ơn bạn đã mua sắm tại '.config('app.name').'!');
+        } else {
+            $mailMessage->line($this->getStatusMessage())
+                ->action('Xem đơn hàng', route('account.orders.show', $this->order->id))
+                ->line('Cảm ơn bạn đã mua sắm tại '.config('app.name').'!');
+        }
+
+        return $mailMessage->salutation('Trân trọng, Đội ngũ '.config('app.name'));
     }
 
     public function toArray($notifiable)
@@ -71,7 +83,7 @@ class OrderStatusNotification extends Notification
             'status' => $this->order->status,
             'message' => $this->getStatusMessage(),
             'type' => 'order_status_update',
-            'url' => route('account.orders.show', $this->order->id),
+            'url' => route('account.orders.show', $this->order->id) . ($this->newStatus === Order::STATUS_COMPLETED ? '#tab-reviews' : ''),
         ];
     }
 
@@ -90,7 +102,7 @@ class OrderStatusNotification extends Notification
         return match ($this->newStatus) {
             Order::STATUS_CONFIRMED => "Đơn hàng #{$this->order->id} đã được xác nhận và đang chuẩn bị giao cho đơn vị vận chuyển.",
             Order::STATUS_SHIPPED => "Đơn hàng #{$this->order->id} đã được giao cho đơn vị vận chuyển.",
-            Order::STATUS_COMPLETED => "Đơn hàng #{$this->order->id} đã giao thành công. Cảm ơn bạn đã tin tưởng mua sắm tại ".config('app.name')."!",
+            Order::STATUS_COMPLETED => "Đơn hàng #{$this->order->id} đã giao thành công. Bạn hãy dành chút thời gian đánh giá sản phẩm để giúp cửa hàng cải thiện nhé!",
             default => "Đơn hàng #{$this->order->id} đã cập nhật trạng thái thành: {$this->order->status_text}.",
         };
     }

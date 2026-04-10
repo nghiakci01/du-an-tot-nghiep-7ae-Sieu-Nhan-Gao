@@ -184,6 +184,25 @@ class AccountController extends Controller
         return redirect()->back()->with('success', 'Đơn hàng đã được hủy thành công. Các sản phẩm đã được hoàn lại vào giỏ hàng của bạn.');
     }
 
+    public function confirmReceived($id, \App\Services\OrderService $orderService)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $order = $user->orders()->findOrFail($id);
+
+        if ($order->status !== Order::STATUS_SHIPPED) {
+            return redirect()->back()->with('error', 'Chỉ có thể xác nhận đã nhận hàng cho đơn hàng đang được giao.');
+        }
+
+        try {
+            $orderService->updateOrderStatus($order, Order::STATUS_COMPLETED, $user, 'Khách hàng đã xác nhận đã nhận hàng.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Cảm ơn bạn đã xác nhận! Bạn có thể để lại đánh giá cho sản phẩm ngay bây giờ.');
+    }
+
     public function returnOrderForm($id)
     {
         /** @var \App\Models\User $user */

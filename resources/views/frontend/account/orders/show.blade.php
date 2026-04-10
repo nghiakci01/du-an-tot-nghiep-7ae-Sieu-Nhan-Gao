@@ -314,7 +314,7 @@
 
       {{-- ===== REVIEW SECTION ===== --}}
       @if($user && $order->status === \App\Models\Order::STATUS_COMPLETED)
-      <div class="detail-card">
+      <div class="detail-card" id="tab-reviews">
         <div class="detail-header">
           <h5><i class="bi bi-star me-2"></i>Đánh giá sản phẩm</h5>
         </div>
@@ -469,6 +469,14 @@
         <a href="{{ route('account.index') }}?tab=orders" class="btn btn-outline-dark rounded-pill py-2">
           <i class="bi bi-arrow-left me-1"></i> Quay lại đơn hàng
         </a>
+        @if($user && $order->status === \App\Models\Order::STATUS_SHIPPED)
+          <form action="{{ route('account.orders.confirm_received', $order->id) }}" method="POST" onsubmit="return confirm('Bạn xác nhận đã nhận được hàng và hài lòng với sản phẩm?');">
+            @csrf
+            <button type="submit" class="btn btn-primary-dark rounded-pill py-2 w-100">
+              <i class="bi bi-patch-check me-1"></i> Đã nhận được hàng
+            </button>
+          </form>
+        @endif
         @if($user && $order->status === \App\Models\Order::STATUS_PENDING)
           <form action="{{ route('account.orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?');">
             @csrf

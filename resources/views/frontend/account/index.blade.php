@@ -406,6 +406,12 @@
               <td style="padding-right:28px;">
                 <div class="d-flex gap-2">
                   <a href="{{ route('account.orders.show', $order->id) }}" class="btn btn-sm btn-dark px-3 rounded-pill">Xem</a>
+                  @if($order->status == 'shipped')
+                    <form action="{{ route('account.orders.confirm_received', $order->id) }}" method="POST" onsubmit="return confirm('Bạn xác nhận đã nhận được hàng?');" class="d-inline">
+                      @csrf
+                      <button type="submit" class="btn btn-sm btn-dark rounded-pill px-3">Đã nhận hàng</button>
+                    </form>
+                  @endif
                   @if(($order->status == 'completed' || $order->status == 'shipped') && !$order->returnRequest)
                     <a href="{{ route('account.orders.return_form', $order->id) }}" class="btn btn-sm btn-outline-warning rounded-pill px-3">Hoàn hàng</a>
                   @endif
