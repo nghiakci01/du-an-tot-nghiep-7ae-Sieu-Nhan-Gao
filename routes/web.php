@@ -151,6 +151,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
         // Admin & Staff Routes
         Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
         Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
+        Route::post('orders/{order}/push-to-ghn', [App\Http\Controllers\Admin\OrderController::class, 'pushToGhn'])->name('orders.push-to-ghn');
         Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
         Route::post('orders/{order}/query-payment', [App\Http\Controllers\Admin\OrderController::class, 'queryPayment'])->name('orders.query-payment');
         Route::post('orders/{order}/refund-payment', [App\Http\Controllers\Admin\OrderController::class, 'refundPayment'])->name('orders.refund-payment');

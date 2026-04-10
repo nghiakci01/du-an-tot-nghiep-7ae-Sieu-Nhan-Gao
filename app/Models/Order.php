@@ -24,6 +24,7 @@ class Order extends Model
         'shipping_fee',
         'shipping_provider',
         'shipping_service_name',
+        'tracking_code',
         'final_total',
         'payment_method',
         'payment_status',

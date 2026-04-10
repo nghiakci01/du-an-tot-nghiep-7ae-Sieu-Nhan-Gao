@@ -359,4 +359,98 @@ class GhnShippingProvider implements ShippingProviderInterface
             'expected_delivery_time' => now()->addDays(2)->format('d/m/Y'),
         ];
     }
+
+    public function createShippingOrder(\App\Models\Order $order): array
+    {
+        $config = config('shipping.ghn', []);
+
+        if (!$this->canUseLiveApi($config)) {
+            throw new \Exception('Chưa cấu hình API GHN hoặc chưa bật (enabled).');
+        }
+
+        // Parse address to get province, district, ward
+        // Format of shipping_address: "Address, Ward, District, Province - Phone - Name"
+        $addressFull = $order->shipping_address;
+        $addressPart = explode(' - ', $addressFull)[0] ?? '';
+        $parts = array_map('trim', explode(',', $addressPart));
+        
+        $province = $order->province ?? '';
+        $district = '';
+        $ward = '';
+        
+        $count = count($parts);
+        if ($count >= 4) {
+             $province = $parts[$count - 1];
+             $district = $parts[$count - 2];
+             $ward = $parts[$count - 3];
+        } elseif ($count === 3) {
+             $province = $parts[2];
+             $district = $parts[1];
+             $ward = $parts[0];
+        }
+        
+        $destination = $this->resolveDestination($province, $district, $ward, $config);
+        
+        if (!$destination) {
+             throw new \Exception("Không thể nhận diện Quận/Huyện hoặc Phường/Xã từ địa chỉ: $addressPart. Đảm bảo địa chỉ có định dạng 'Số nhà, Phường, Quận, Tỉnh'.");
+        }
+        
+        $weight = 500;
+        $totalQuantity = $order->items->sum('quantity');
+        if ($totalQuantity > 0) {
+             $weight = max(500, 200 + ($totalQuantity * 300));
+        }
+        
+        $items = [];
+        foreach ($order->items as $item) {
+             $items[] = [
+                 'name' => $item->product->name ?? 'Sản phẩm',
+                 'quantity' => (int) $item->quantity,
+                 'price' => (int) $item->price,
+                 'weight' => 300,
+             ];
+        }
+
+        $codAmount = ($order->payment_method === 'COD' && $order->payment_status === 'pending') ? $order->final_total : 0;
+
+        $payload = [
+            'payment_type_id' => 1, // 1: Shop trả phí, 2: Khách trả
+            'required_note' => 'CHOXEMHANGKHONGTHU',
+            'to_name' => $order->name,
+            'to_phone' => $order->phone,
+            'to_address' => $addressPart,
+            'to_ward_code' => $destination['ward_code'],
+            'to_district_id' => $destination['district_id'],
+            'cod_amount' => (int) $codAmount,
+            'weight' => $weight,
+            'length' => 20,
+            'width' => 20,
+            'height' => 10,
+            'service_type_id' => (int) ($config['service_type_id'] ?? 2),
+            'items' => $items,
+        ];
+        
+        $response = Http::timeout(10)
+            ->acceptJson()
+            ->withHeaders(array_filter([
+                'Token' => $config['token'] ?? null,
+                'ShopId' => $config['shop_id'] ?? null,
+            ]))
+            ->post(rtrim($config['api_url'], '/') . '/shiip/public-api/v2/shipping-order/create', $payload);
+
+        if (!$response->successful()) {
+            throw new \Exception('Lỗi từ GHN: ' . $response->body());
+        }
+
+        $data = $response->json();
+        $orderCode = data_get($data, 'data.order_code');
+        
+        if (!$orderCode) {
+            throw new \Exception('GHN API thành công nhưng không trả về mã vận đơn.');
+        }
+
+        $order->update(['tracking_code' => $orderCode]);
+        
+        return $data;
+    }
 }

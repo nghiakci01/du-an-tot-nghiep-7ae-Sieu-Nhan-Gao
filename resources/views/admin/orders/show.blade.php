@@ -289,10 +289,29 @@
                         </form>
                     @endif
                 </div>
-                @if($order->shipping_service_name)
+                @if($order->shipping_service_name || $order->tracking_code)
                 <div class="mb-0">
                     <p class="mb-1 text-muted small">ĐƠN VỊ VẬN CHUYỂN</p>
-                    <p class="mb-0 fw-bold">{{ $order->shipping_service_name }}</p>
+                    @if($order->shipping_service_name)
+                        <p class="mb-1 fw-bold">{{ $order->shipping_service_name }}</p>
+                    @endif
+                    
+                    @if($order->tracking_code)
+                        <p class="mb-0 mt-2">
+                            Mã Vận Đơn: <span class="badge bg-primary fs-6">{{ $order->tracking_code }}</span>
+                        </p>
+                    @endif
+                </div>
+                @endif
+
+                @if(!$order->tracking_code && in_array($order->status, [\App\Models\Order::STATUS_PENDING, \App\Models\Order::STATUS_CONFIRMED, \App\Models\Order::STATUS_SHIPPED]))
+                <div class="mb-0 border-top pt-3 mt-3">
+                    <form action="{{ route('admin.orders.push-to-ghn', $order) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn phát sinh Mã Vận Đơn trực tiếp qua hệ thống Giao Hàng Nhanh (GHN) cho đơn hàng này?')">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-outline-primary w-100 fw-bold shadow-sm">
+                            <i class="feather icon-navigation me-1"></i> Tạo đơn sang Giao Hàng Nhanh
+                        </button>
+                    </form>
                 </div>
                 @endif
             </div>
