@@ -11,6 +11,50 @@
             </div>
             <div class="card-body">
                 <!-- Tab điều hướng trạng thái -->
+                @php
+                    $returnReceiverName = $settings['return_receiver_name'] ?? ($settings['site_title'] ?? 'Elite');
+                    $returnReceiverPhone = $settings['return_receiver_phone'] ?? ($settings['site_phone'] ?? '');
+                    $returnReceiverAddress = $settings['return_receiver_address'] ?? ($settings['site_address'] ?? '');
+                    $returnReceiverNote = $settings['return_receiver_note'] ?? 'Vui lòng ghi rõ mã đơn hàng và giữ lại biên nhận khi gửi trả hàng.';
+                @endphp
+
+                <div class="card border-info mb-4 shadow-sm">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0 text-info">
+                                <i class="bi bi-truck me-2"></i>Thông tin nhận hàng hoàn trả
+                            </h5>
+                            <small class="text-muted">Thông tin này sẽ hiển thị cho khách khi yêu cầu hoàn trả được duyệt.</small>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('admin.settings.update') }}" method="POST" class="row g-3">
+                            @csrf
+                            <div class="col-md-6">
+                                <label class="form-label">Người nhận</label>
+                                <input type="text" name="return_receiver_name" class="form-control" value="{{ old('return_receiver_name', $returnReceiverName) }}" placeholder="Nhập tên người nhận hoàn trả">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Số điện thoại nhận hàng</label>
+                                <input type="text" name="return_receiver_phone" class="form-control" value="{{ old('return_receiver_phone', $returnReceiverPhone) }}" placeholder="Nhập số điện thoại nhận hàng">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Địa chỉ nhận hàng hoàn trả</label>
+                                <textarea name="return_receiver_address" class="form-control" rows="3" placeholder="Nhập địa chỉ chi tiết để khách gửi hàng trả lại">{{ old('return_receiver_address', $returnReceiverAddress) }}</textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Ghi chú cho khách</label>
+                                <textarea name="return_receiver_note" class="form-control" rows="2" placeholder="Nhập hướng dẫn thêm cho khách">{{ old('return_receiver_note', $returnReceiverNote) }}</textarea>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-info text-white">
+                                    <i class="bi bi-save me-1"></i> Lưu thông tin hoàn trả
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link {{ !request('status') ? 'active' : '' }}" href="{{ route('admin.returns.index') }}">Tất cả</a>

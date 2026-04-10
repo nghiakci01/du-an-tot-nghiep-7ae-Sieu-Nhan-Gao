@@ -85,7 +85,6 @@ docs/
 |---------|-------|
 | **Guest** | Khách vãng lai — xem sản phẩm, mua hàng, tra cứu đơn hàng |
 | **User** | Khách hàng đã đăng ký — đầy đủ tính năng mua hàng, wishlist, ví điện tử |
-| **Staff** | Nhân viên — quản lý sản phẩm, đơn hàng, blog, chat |
 | **Admin** | Quản trị viên — toàn quyền hệ thống |
 
 ---

@@ -19,18 +19,23 @@ class ShippingController extends Controller
     public function calculateFees(Request $request)
     {
         try {
+            $deliveryType = $request->input('delivery_type');
+            if (!in_array($deliveryType, ['home', 'store'], true)) {
+                $deliveryType = 'home';
+            }
+
             $request->validate([
                 'delivery_type' => 'nullable|in:home,store',
-                'province' => 'required|string',
+                'province' => $deliveryType === 'store' ? 'nullable|string' : 'required|string',
                 'district' => 'nullable|string',
+                'commune' => 'nullable|string',
                 'ward' => 'nullable|string',
                 'weight' => 'nullable|integer',
             ]);
 
-            $deliveryType = $request->input('delivery_type', 'home');
             $province = $request->input('province');
             $district = $request->input('district');
-            $ward = $request->input('ward');
+            $ward = $request->filled('ward') ? $request->input('ward') : $request->input('commune');
 
             $cart = $this->getSelectedCheckoutCart();
             $subtotal = collect($cart)->sum(fn ($item) => (float) ($item['price'] ?? 0) * (int) ($item['quantity'] ?? 0));

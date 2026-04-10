@@ -357,9 +357,6 @@
                                         </div>
                                         <div class="cart_subtotal">
                                             <p>{{ __('messages.shipping') }}</p>
-                                            @php
-                                                $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
-                                            @endphp
                                             <p class="cart_amount" id="shipping-fee">
                                                 <span>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : __('messages.free') }}</span>
                                             </p>
@@ -682,6 +679,10 @@
         });
 
         // Tính toán lại tổng tiền dựa trên tất cả sản phẩm hợp lệ
+        function parseMoney(text) {
+            return parseInt(String(text || '').replace(/[^0-9-]/g, ''), 10) || 0;
+        }
+
         function calculateCartTotal() {
             let subtotal = 0;
             
@@ -698,20 +699,11 @@
             $('#cart-subtotal').text(new Intl.NumberFormat('vi-VN').format(subtotal) + ' đ');
 
             // Phí ship (Giả lập logic: > 500k free ship, dưới thì 30k)
-            let shippingFee = 0;
-            if (subtotal > 0 && subtotal < 500000) {
-                shippingFee = 30000;
-            }
-            
-            if (shippingFee > 0) {
-                $('#shipping-fee span').text(new Intl.NumberFormat('vi-VN').format(shippingFee) + ' đ');
-            } else {
-                $('#shipping-fee span').text('Miễn phí');
-            }
+            let shippingFee = parseMoney($('#shipping-fee span').text());
 
             // Tính discount nếu có mã (lấy từ dữ liệu hiển thị hiện tại)
             let discountText = $('#cart-discount').text().replace(/[^-0-9]/g, '');
-            let discount = Math.abs(parseInt(discountText)) || 0;
+            let discount = Math.abs(parseInt(discountText, 10)) || 0;
             
             // Grand Total
             let grandTotal = subtotal + shippingFee - discount;

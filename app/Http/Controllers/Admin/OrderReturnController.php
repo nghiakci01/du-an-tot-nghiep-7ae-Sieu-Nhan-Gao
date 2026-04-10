@@ -7,6 +7,7 @@ use App\Models\OrderReturnRequest;
 use App\Models\User;
 use App\Services\ReturnService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
@@ -44,7 +45,7 @@ class OrderReturnController extends Controller
             ]);
             
             /** @var \App\Models\User $user */
-            $user = auth()->user();
+            $user = Auth::user();
             
             $returnReq = OrderReturnRequest::findOrFail($id);
             $this->returnService->approve($returnReq, $user, $request->admin_note);
@@ -64,7 +65,7 @@ class OrderReturnController extends Controller
             ]);
             
             /** @var \App\Models\User $user */
-            $user = auth()->user();
+            $user = Auth::user();
             
             $returnReq = OrderReturnRequest::findOrFail($id);
             $this->returnService->reject($returnReq, $user, $request->admin_note);
@@ -80,7 +81,7 @@ class OrderReturnController extends Controller
     {
         try {
             /** @var \App\Models\User $user */
-            $user = auth()->user();
+            $user = Auth::user();
             
             $returnReq = OrderReturnRequest::findOrFail($id);
             $this->returnService->markAsShipping($returnReq, $user);
@@ -113,7 +114,7 @@ class OrderReturnController extends Controller
             // }
 
             /** @var \App\Models\User $user */
-            $user = auth()->user();
+            $user = Auth::user();
             $this->returnService->complete($returnReq, $user);
             
             return redirect()->back()->with('success', 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.');

@@ -57,7 +57,7 @@ class ShippingApiTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.0.provider', 'ghtk');
+            ->assertJsonPath('data.0.provider', 'ghn');
     }
 
     public function test_shipping_api_returns_store_pickup_option(): void

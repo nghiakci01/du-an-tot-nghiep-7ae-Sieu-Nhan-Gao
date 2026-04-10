@@ -13,7 +13,7 @@ Xóa tất cả các nút bấm, file giao diện (blade), route API và logic x
 - Tính bảo mật cao nhất (chặn tuyệt đối việc truy cập thông qua URL ẩn).
 
 ❌ **Cons:**
-- Tốn công khôi phục nếu trong quá trình kinh doanh sau này lại muốn có chức năng "Tạo đơn tại quầy" cho nhân viên.
+- Tốn công khôi phục nếu trong quá trình kinh doanh sau này lại muốn có chức năng "Tạo đơn tại quầy" cho người vận hành.
 
 📊 **Effort:** Medium
 
@@ -27,7 +27,7 @@ Chỉ tiến hành xóa nút bấm "Thêm đơn hàng" ở giao diện trang ch�
 - Rất dễ khôi phục khi cần thiết.
 
 ❌ **Cons:**
-- Lỗ hổng bảo mật nhỏ: Nếu nhân viên nhớ URL `admin/orders/create`, họ vẫn có thể truy cập và tạo đơn trái phép.
+- Lỗ hổng bảo mật nhỏ: Nếu người vận hành nhớ URL `admin/orders/create`, họ vẫn có thể truy cập và tạo đơn trái phép.
 - Để lại dead code phình to hệ thống.
 
 📊 **Effort:** Low

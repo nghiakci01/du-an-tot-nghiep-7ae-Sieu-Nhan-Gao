@@ -7,12 +7,12 @@ Dựa trên tài liệu [read.md](file:///c:/laragon/www/du-an-tot-nghiep-7ae-Si
 | Actor | Vai trò trong hệ thống | Quyền hạn chính (Dựa trên read.md) |
 |-------|-----------------------|------------------------------------|
 | **Admin** | Quản trị viên (`admin`) | Toàn quyền (Quản lý hệ thống, User, Sản phẩm, Danh mục, Thống kê). |
-| **Nhân viên** | Nhân viên vận hành (`staff`) | Quản lý kho, Xử lý đơn hàng (Cập nhật trạng thái đơn). |
+| **Vận hành nội bộ** | Vai trò hậu trường | Quản lý kho, xử lý đơn hàng, cập nhật trạng thái đơn. |
 | **Khách hàng** | Người dùng đã đăng ký (`user`) | Quản lý thông tin cá nhân, Đặt hàng, Theo dõi đơn, Đánh giá sản phẩm. |
 | **Guest** | Khách vãng lai | Xem sản phẩm, Tìm kiếm. (Chưa có tài khoản). |
 
 > [!NOTE]
-> Vai trò **Shipper** đã được loại bỏ khỏi hệ thống tài khoản theo yêu cầu.
+> Vai trò giao nhận chuyên trách đã được loại bỏ khỏi hệ thống tài khoản theo yêu cầu.
 
 ## 2. Thay đổi Cấu trúc Dữ liệu
 
@@ -23,10 +23,10 @@ Cập nhật migration `users` để hỗ trợ vai trò `staff`:
 
 ### Giao diện Danh sách Người dùng
 - Hiển thị bảng: ID, Tên, Email, Số điện thoại, Vai trò, Ngày tạo.
-- Bộ lọc theo Vai trò (Admin/Staff/User).
+- Bộ lọc theo Vai trò (Admin/Vận hành nội bộ/User).
 
 ### CRUD Hành động
-- **Thêm mới**: Cho phép Admin tạo tài khoản cho Nhân viên (Staff).
+- **Thêm mới**: Cho phép Admin tạo tài khoản cho tài khoản vận hành nội bộ.
 - **Chỉnh sửa**: Cập nhật thông tin cá nhân và thay đổi Vai trò.
 - **Xóa/Khóa**: 
     - Chặn Admin tự xóa chính mình.
