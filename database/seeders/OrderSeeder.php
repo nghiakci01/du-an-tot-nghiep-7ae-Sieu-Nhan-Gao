@@ -77,8 +77,6 @@ class OrderSeeder extends Seeder
                     'payment_status' => $paymentStatus,
                     'shipping_address' => 'Số ' . fake()->numberBetween(1, 200) . ' Đường ABC, Phường XYZ, ' . $province,
                     'note' => $i % 5 === 0 ? 'Giao hàng giờ hành chính' : null,
-                    'shipper_id' => in_array($status, [Order::STATUS_SHIPPED, Order::STATUS_COMPLETED, Order::STATUS_FAILED]) && $shippers->isNotEmpty() 
-                                    ? $shippers->random()->id : null,
                 ]);
 
                 // Add 1-3 items

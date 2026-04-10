@@ -529,6 +529,30 @@
             });
         });
     </script>
+    
+    @if(isset($unreviewedPromptItem) && $unreviewedPromptItem && !request()->routeIs('account.orders.show') && !request()->routeIs('product.detail'))
+    <div class="toast-container position-fixed bottom-0 start-0 p-3" style="z-index: 1080;">
+        <div id="reviewPromptToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false" style="border-radius:10px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); border:none;">
+            <div class="toast-header bg-dark text-white" style="border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                <i class="bi bi-star-fill text-warning me-2 pb-1"></i>
+                <strong class="me-auto">Đánh giá sản phẩm</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body bg-white" style="border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+                <p class="mb-2" style="font-size: 14px;">Bạn đã nhận được <strong>{{ $unreviewedPromptItem->product->name ?? 'sản phẩm' }}</strong>? Hãy đánh giá để giúp những người mua sau nhé!</p>
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{{ $unreviewedPromptItem->product->image_url ?? '' }}" alt="{{ $unreviewedPromptItem->product->name ?? '' }}" class="img-fluid rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                    <div class="ms-2 text-warning">
+                        <i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <a href="{{ route('account.orders.show', $unreviewedPromptItem->order_id) }}?review={{ $unreviewedPromptItem->product_id }}" class="btn btn-sm btn-dark w-100" style="border-radius: 5px;">Đánh giá ngay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </body>
 
 

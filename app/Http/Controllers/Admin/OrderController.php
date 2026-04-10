@@ -53,7 +53,7 @@ class OrderController extends Controller
 
             foreach ($request->items as $item) {
                 $variant = ProductVariant::lockForUpdate()->findOrFail($item['variant_id']);
-                
+
                 if ($variant->stock_quantity < $item['quantity']) {
                     throw new \Exception("Sản phẩm {$variant->sku} không đủ tồn kho.");
                 }
@@ -66,7 +66,7 @@ class OrderController extends Controller
                     'price' => $variant->price,
                     'cost_price' => $variant->price, // Simplified for admin order
                 ];
-                
+
                 $variant->decrement('stock_quantity', $item['quantity']);
             }
 
@@ -129,6 +129,25 @@ class OrderController extends Controller
 
         try {
             $orderService->updateOrderStatus($order, $newStatus, Auth::user());
+            
+            // Tự động tạo mã vận đơn nếu Admin chuyển sang "Đã xác nhận" (Confirmed)
+            if ($newStatus === \App\Models\Order::STATUS_CONFIRMED && empty($order->tracking_code)) {
+                try {
+                    $ghnProvider = app(\App\Services\Shipping\GhnShippingProvider::class);
+                    $ghnProvider->createShippingOrder($order);
+                    $order->update([
+                        'shipping_provider' => 'ghn',
+                        'shipping_service_name' => 'Giao Hàng Nhanh',
+                    ]);
+                    
+                    return redirect()->route('admin.orders.show', $order)
+                        ->with('success', 'Trạng thái đơn hàng đã được cập nhật & Đã tự động tạo mã vận đơn GHN thành công!');
+                } catch (\Exception $ghnEx) {
+                    return redirect()->route('admin.orders.show', $order)
+                        ->with('warning', 'Trạng thái đã cập nhật nhưng không thể tạo mã lệnh GHN tự động: ' . $ghnEx->getMessage());
+                }
+            }
+
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -178,7 +197,7 @@ class OrderController extends Controller
     public function triggerAutoCancel(Request $request)
     {
         $minutes = $request->input('auto_cancel_unpaid_order_minutes');
-        
+
         if ($minutes && is_numeric($minutes) && $minutes >= 5) {
             \App\Models\Setting::updateOrCreate(
                 ['key' => 'auto_cancel_unpaid_order_minutes'],
@@ -189,10 +208,32 @@ class OrderController extends Controller
         try {
             \Illuminate\Support\Facades\Artisan::call('app:check-payment-reminders');
             $output = \Illuminate\Support\Facades\Artisan::output();
-            
+
             return redirect()->back()->with('success', 'Đã lưu cấu hình (' . $minutes . ' phút) và chạy lệnh rà soát đơn hàng thành công!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Lỗi khi chạy rà soát đơn hàng: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Push order to GHN API to get tracking code
+     */
+    public function pushToGhn(Order $order, \App\Services\Shipping\GhnShippingProvider $ghnProvider)
+    {
+        if ($order->tracking_code) {
+            return back()->with('error', 'Đơn hàng này đã có mã vận đơn GHN rồi.');
+        }
+
+        try {
+            $ghnProvider->createShippingOrder($order);
+            // Cập nhật nhà cung cấp vận chuyển là GHN
+            $order->update([
+                'shipping_provider' => 'ghn',
+                'shipping_service_name' => 'Giao Hàng Nhanh',
+            ]);
+            return back()->with('success', 'Đã tạo vận đơn GHN thành công! Mã vận đơn: ' . $order->tracking_code);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Lỗi khi tạo vận đơn GHN: ' . $e->getMessage());
         }
     }
 }
