@@ -10,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (DB::getDriverName() !== 'sqlite') {
+        if (DB::connection()->getDriverName() !== 'sqlite') {
             DB::statement("ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'confirmed', 'shipped', 'completed', 'cancelled', 'failed', 'returned', 'partially_returned') NOT NULL DEFAULT 'pending'");
         }
     }
@@ -20,7 +20,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (DB::getDriverName() !== 'sqlite') {
+        if (DB::connection()->getDriverName() !== 'sqlite') {
             DB::statement("ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'confirmed', 'shipped', 'completed', 'cancelled', 'failed', 'returned') NOT NULL DEFAULT 'pending'");
         }
     }

@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE cart_abandonments MODIFY COLUMN status ENUM('abandoned', 'recovered', 'converted', 'pending_notification', 'notified') DEFAULT 'abandoned'");
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE cart_abandonments MODIFY COLUMN status ENUM('abandoned', 'recovered', 'converted', 'pending_notification', 'notified') DEFAULT 'abandoned'");
+        }
     }
 
     /**
@@ -20,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE cart_abandonments MODIFY COLUMN status ENUM('abandoned', 'recovered', 'converted') DEFAULT 'abandoned'");
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE cart_abandonments MODIFY COLUMN status ENUM('abandoned', 'recovered', 'converted') DEFAULT 'abandoned'");
+        }
     }
 };

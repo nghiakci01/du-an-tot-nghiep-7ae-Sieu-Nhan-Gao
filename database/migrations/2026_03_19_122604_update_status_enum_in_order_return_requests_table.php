@@ -13,7 +13,7 @@ return new class extends Migration
     {
         // MySQL doesn't support direct enum modification easily with Schema::table and change() 
         // without Doctrine DBAL or using raw SQL. Let's use raw SQL for MySQL enum.
-        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {
+        if (\Illuminate\Support\Facades\DB::connection()->getDriverName() !== 'sqlite') {
             \Illuminate\Support\Facades\DB::statement("ALTER TABLE order_return_requests MODIFY COLUMN status ENUM('pending', 'approved', 'shipping', 'received', 'completed', 'rejected') DEFAULT 'pending'");
         }
     }
@@ -23,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {
+        if (\Illuminate\Support\Facades\DB::connection()->getDriverName() !== 'sqlite') {
             \Illuminate\Support\Facades\DB::statement("ALTER TABLE order_return_requests MODIFY COLUMN status ENUM('pending', 'approved', 'completed', 'rejected') DEFAULT 'pending'");
         }
     }
