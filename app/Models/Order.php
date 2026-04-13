@@ -31,6 +31,7 @@ class Order extends Model
         'transaction_id',
         'shipping_address',
         'note',
+        'reminder_step',
     ];
 
     const STATUS_PENDING = 'pending';
