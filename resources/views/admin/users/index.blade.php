@@ -33,8 +33,7 @@
                         <select name="role" id="role" class="form-select form-select-sm w-auto me-2">
                             <option value="">Tất cả</option>
                             <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Quản trị viên</option>
-                            <option value="staff" {{ request('role') == 'staff' ? 'selected' : '' }}>Nhân viên</option>
-                            <option value="customer" {{ request('role') == 'customer' ? 'selected' : '' }}>Khách hàng</option>
+                            <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>Khách hàng</option>
                         </select>
                         <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
                     </form>
@@ -64,8 +63,6 @@
                                         <td>
                                             @if($user->isAdmin())
                                                 <span class="badge bg-danger">Quản trị viên</span>
-                                            @elseif($user->isStaff())
-                                                <span class="badge bg-warning text-dark">Nhân viên</span>
                                             @else
                                                 <span class="badge bg-primary">Khách hàng</span>
                                             @endif

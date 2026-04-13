@@ -14,8 +14,6 @@ class User extends Authenticatable
 
     const ROLE_ADMIN = 'admin';
 
-    const ROLE_STAFF = 'staff';
-
     const ROLE_USER = 'user';
 
     /**
@@ -68,10 +66,7 @@ class User extends Authenticatable
         return $this->role === self::ROLE_ADMIN;
     }
 
-    public function isStaff(): bool
-    {
-        return $this->role === self::ROLE_STAFF;
-    }
+
 
     public function socialAccounts()
     {

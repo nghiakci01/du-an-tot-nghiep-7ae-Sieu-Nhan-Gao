@@ -523,7 +523,7 @@ class CartController extends Controller
 
                 $shippingState = $this->resolveShippingState($cart, $subtotal, $discount);
                 $shippingFee = (float) ($shippingState['fee'] ?? 0);
-                $grandTotal = $subtotal - $discount + $shippingFee;
+                $grandTotal = max(0, $subtotal - $discount + $shippingFee);
 
                 CartUpdatedEvent::dispatch($cartCount, session()->getId(), Auth::id());
 
@@ -626,7 +626,7 @@ class CartController extends Controller
 
         $shippingState = $this->resolveShippingState($cart, $total, $discount);
         $shippingFee = (float) ($shippingState['fee'] ?? 0);
-        $grandTotal = $total - $discount + $shippingFee;
+        $grandTotal = max(0, $total - $discount + $shippingFee);
 
         return response()->json([
             'success' => true,

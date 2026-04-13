@@ -220,49 +220,136 @@
       </div>
     </div>
 
-    <!-- Recent Notifications & Funnel Trends Row -->
+    <!-- Product Lists Row -->
     <div class="row">
-      <div class="col-lg-12 mb-4">
+      <!-- Top Wishlisted -->
+      <div class="col-lg-4 mb-4">
         <div class="card h-100 shadow-sm border-0">
           <div class="card-header bg-transparent border-bottom-0 pb-0 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold"><i class="ti ti-chart-funnel me-2 text-warning"></i>Phễu Chuyển Đổi</h5>
-            <span class="badge bg-light-secondary text-muted">{{ $funnelStats['start_date'] }} - {{ $funnelStats['end_date'] }}</span>
+            <h5 class="mb-0 fw-bold"><i class="ti ti-heart me-2 text-danger"></i>Yêu thích nhất</h5>
+            <span class="badge bg-light-danger text-danger">{{ $topWishlisted->count() }} sản phẩm</span>
           </div>
           <div class="card-body">
-            @if(isset($funnelStats) && $funnelStats['funnel_steps']['step1_add_to_cart'] > 0)
-            <div class="row align-items-center">
-              <div class="col-md-8">
-                <div id="funnel-chart" style="min-height: 300px;"></div>
-              </div>
-              <div class="col-md-4">
-                <div class="row g-3">
-                  <div class="col-12">
-                    <div class="p-3 rounded border-start border-primary border-4 bg-light-primary shadow-none mb-3">
-                      <small class="text-muted d-block mb-1">Tỷ lệ chuyển đổi</small>
-                      <h4 class="mb-0 text-primary fw-bold">{{ $funnelStats['cart_to_order_rate'] }}%</h4>
-                    </div>
-                  </div>
-                  <div class="col-12">
-                    <div class="p-3 rounded border-start border-danger border-4 bg-light-danger shadow-none mb-3">
-                      <small class="text-muted d-block mb-1">Doanh thu tiềm năng bị mất</small>
-                      <h4 class="mb-0 text-danger fw-bold">{{ number_format($funnelStats['abandoned_value']) }}đ</h4>
-                    </div>
-                  </div>
-                  <div class="col-12">
-                    <div class="p-3 rounded border-start border-warning border-4 bg-light-warning shadow-none">
-                      <small class="text-muted d-block mb-1">Giá trị trung bình / đơn</small>
-                      <h4 class="mb-0 text-warning fw-bold">{{ number_format($funnelStats['avg_order_value']) }}đ</h4>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr class="small text-muted text-uppercase">
+                    <th>Sản phẩm</th>
+                    <th class="text-end">Lượt thích</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @forelse($topWishlisted as $product)
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <img src="{{ $product->image_url }}" alt="" class="rounded me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                        <div class="text-truncate" style="max-width: 150px;">
+                          <h6 class="mb-0 small fw-bold">{{ $product->name }}</h6>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <span class="fw-bold">{{ $product->wishlisted_by_count }}</span>
+                    </td>
+                  </tr>
+                  @empty
+                  <tr>
+                    <td colspan="2" class="text-center py-4 text-muted small">Chưa có dữ liệu</td>
+                  </tr>
+                  @endforelse
+                </tbody>
+              </table>
             </div>
-            @else
-            <div class="text-center py-5 text-muted">
-              <i class="ti ti-chart-funnel f-40 opacity-50"></i>
-              <p class="mt-2 mb-0">Chưa có đủ dữ liệu để tạo phễu chuyển đổi.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Best Sellers -->
+      <div class="col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-header bg-transparent border-bottom-0 pb-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="ti ti-shopping-cart me-2 text-primary"></i>Bán chạy nhất</h5>
+            <span class="badge bg-light-primary text-primary">{{ $startDate }} - {{ $endDate }}</span>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr class="small text-muted text-uppercase">
+                    <th>Sản phẩm</th>
+                    <th class="text-end">Đã bán</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @forelse($bestSellers as $product)
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <img src="{{ asset('storage/' . $product->image) }}" alt="" class="rounded me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                        <div class="text-truncate" style="max-width: 150px;">
+                          <h6 class="mb-0 small fw-bold">{{ $product->name }}</h6>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <span class="fw-bold">{{ $product->total_sold }}</span>
+                    </td>
+                  </tr>
+                  @empty
+                  <tr>
+                    <td colspan="2" class="text-center py-4 text-muted small">Chưa có dữ liệu</td>
+                  </tr>
+                  @endforelse
+                </tbody>
+              </table>
             </div>
-            @endif
+          </div>
+        </div>
+      </div>
+
+      <!-- Low Stock -->
+      <div class="col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-header bg-transparent border-bottom-0 pb-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="ti ti-alert-triangle me-2 text-warning"></i>Sắp hết hàng</h5>
+            <span class="badge bg-light-warning text-warning">{{ $lowStockList->count() }} biến thể</span>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr class="small text-muted text-uppercase">
+                    <th>Sản phẩm</th>
+                    <th class="text-end">Tồn kho</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @forelse($lowStockList as $variant)
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <img src="{{ asset('storage/' . $variant->product->image) }}" alt="" class="rounded me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                        <div class="text-truncate" style="max-width: 150px;">
+                          <h6 class="mb-0 small fw-bold">{{ $variant->product->name }}</h6>
+                          <small class="text-muted">{{ $variant->size->name }} - {{ $variant->color->name }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <span class="badge {{ $variant->stock_quantity <= 0 ? 'bg-light-danger text-danger' : 'bg-light-warning text-warning' }}">
+                        {{ $variant->stock_quantity }}
+                      </span>
+                    </td>
+                  </tr>
+                  @empty
+                  <tr>
+                    <td colspan="2" class="text-center py-4 text-muted small">Tất cả sản phẩm đều đủ hàng</td>
+                  </tr>
+                  @endforelse
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -351,7 +438,7 @@
   <script id="status-values-data" type="application/json">@json($statusValues)</script>
   <script id="status-labels-data" type="application/json">@json($statusLabels)</script>
   <script id="half-year-data" type="application/json">@json($halfYearChart)</script>
-  <script id="funnel-data" type="application/json">@json($funnelStats['funnel_steps'])</script>
+
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -479,60 +566,7 @@
       var statusChart = new ApexCharts(document.querySelector("#order-status-chart"), statusOptions);
       statusChart.render();
 
-      // 3. Funnel Chart
-      const funnelData = JSON.parse(document.getElementById('funnel-data').textContent);
-      var funnelOptions = {
-        series: [
-          {
-            name: "Lượt người",
-            data: [
-              funnelData.step1_add_to_cart,
-              funnelData.step2_checkout,
-              funnelData.step3_purchase
-            ],
-          },
-        ],
-        chart: {
-          type: 'bar',
-          height: 300,
-        },
-        plotOptions: {
-          bar: {
-            borderRadius: 0,
-            horizontal: true,
-            distribute: true,
-            barHeight: '80%',
-            isFunnel: true,
-          },
-        },
-        colors: [
-          '#4680ff',
-          '#ffc107',
-          '#2ca87f',
-        ],
-        dataLabels: {
-          enabled: true,
-          formatter: function (val, opt) {
-            return opt.w.globals.labels[opt.dataPointIndex] + ': ' + val;
-          },
-          dropShadow: {
-            enabled: true,
-          },
-        },
-        title: {
-          text: '',
-          align: 'middle',
-        },
-        xaxis: {
-          categories: ['Thêm vào giỏ', 'Bắt đầu Checkout', 'Mua hàng xong'],
-        },
-        legend: {
-          show: false,
-        },
-      };
 
-      var funnelChart = new ApexCharts(document.querySelector("#funnel-chart"), funnelOptions);
-      funnelChart.render();
     });
   </script>
 @endsection

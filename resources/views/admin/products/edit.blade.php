@@ -108,8 +108,8 @@
                         <div id="gallery-preview" class="mt-3 d-flex gap-2 flex-wrap"></div>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="short_description" class="form-label">Mô tả ngắn <small class="text-muted">(Tối đa 2000 ký tự)</small></label>
-                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="short_description" name="short_description" rows="4" maxlength="2000">{{ old('short_description', $product->short_description) }}</textarea>
+                        <label for="short_description" class="form-label">Mô tả ngắn <small class="text-muted">(Tối đa 500 ký tự)</small></label>
+                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="short_description" name="short_description" rows="4" maxlength="500">{{ old('short_description', $product->short_description) }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('short_description')
@@ -117,13 +117,13 @@
                                 @enderror
                             </div>
                             <small class="text-muted">
-                                <span id="short-char-count">0</span> / 2000 ký tự
+                                <span id="short-char-count">0</span> / 500 ký tự
                             </small>
                         </div>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="description" class="form-label">Mô tả <small class="text-muted">(Tối đa 10000 ký tự)</small></label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="10000">{{ old('description', $product->description) }}</textarea>
+                        <label for="description" class="form-label">Mô tả <small class="text-muted">(Tối đa 5000 ký tự)</small></label>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="5000">{{ old('description', $product->description) }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('description')
@@ -131,7 +131,7 @@
                                 @enderror
                             </div>
                             <small class="text-muted">
-                                <span id="char-count">0</span> / 10000 ký tự
+                                <span id="char-count">0</span> / 5000 ký tự
                             </small>
                         </div>
                     </div>
