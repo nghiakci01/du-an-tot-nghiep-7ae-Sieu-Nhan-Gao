@@ -233,26 +233,26 @@
 
               {{-- Images --}}
               <div class="mb-4">
-                <label class="form-label fw-bold">Ảnh minh chứng <span class="text-muted fw-normal">(Tùy chọn, tối đa 4 ảnh)</span></label>
+                <label class="form-label fw-bold">Ảnh minh chứng <span class="text-danger">*</span> <span class="text-muted fw-normal">(Tối đa 4 ảnh)</span></label>
                 <div class="image-upload-wrap">
                   <div class="text-center">
                     <i class="bi bi-cloud-arrow-up"></i>
-                    <p class="mb-0 text-muted">Nhấn vào đây để tải ảnh lên</p>
+                    <p class="mb-0 text-muted">Nhấn vào đây để tải ảnh lên (Bắt buộc)</p>
                   </div>
-                  <input type="file" name="images[]" id="return-images" multiple accept="image/*">
+                  <input type="file" name="images[]" id="return-images" multiple accept="image/*" required>
                 </div>
                 <div id="preview-container"></div>
               </div>
 
               {{-- Videos --}}
               <div class="mb-5">
-                <label class="form-label fw-bold"><i class="bi bi-camera-reels me-1"></i>Video minh chứng <span class="text-muted fw-normal">(Tùy chọn, tối đa 1 video, 50MB)</span></label>
+                <label class="form-label fw-bold"><i class="bi bi-camera-reels me-1"></i>Video minh chứng <span class="text-danger">*</span> <span class="text-muted fw-normal">(Tối đa 1 video, 50MB)</span></label>
                 <div class="video-upload-wrap">
                   <div class="text-center">
                     <i class="bi bi-film"></i>
-                    <p class="mb-0 text-muted">Nhấn vào đây để tải video lên (MP4, MOV, AVI, WebM)</p>
+                    <p class="mb-0 text-muted">Nhấn vào đây để tải video lên (Bắt buộc - MP4, MOV, AVI, WebM)</p>
                   </div>
-                  <input type="file" name="videos[]" id="return-videos" accept="video/mp4,video/quicktime,video/x-msvideo,video/webm">
+                  <input type="file" name="videos[]" id="return-videos" accept="video/mp4,video/quicktime,video/x-msvideo,video/webm" required>
                 </div>
                 <div id="video-preview-container"></div>
               </div>
