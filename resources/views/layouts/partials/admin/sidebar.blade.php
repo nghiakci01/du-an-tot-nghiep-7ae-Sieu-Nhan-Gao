@@ -93,7 +93,7 @@
                         <use xlink:href="#custom-presentation-chart"></use>
                     </svg>
                 </li>
-                @if (!Auth::check() || auth()->user()->isAdmin() || auth()->user()->isStaff())
+                @if (!Auth::check() || auth()->user()->isAdmin())
                     <li class="pc-item">
                         <a href="{{ route('admin.categories.index') }}" class="pc-link">
                             <span class="pc-micon">
@@ -209,7 +209,7 @@
                         <span class="pc-mtext">Đánh giá sản phẩm</span>
                     </a>
                 </li>
-                @if (!Auth::check() || auth()->user()->isAdmin() || auth()->user()->isStaff())
+                @if (!Auth::check() || auth()->user()->isAdmin())
                     <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link">
                             <span class="pc-micon">

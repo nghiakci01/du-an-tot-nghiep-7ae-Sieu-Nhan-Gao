@@ -210,11 +210,11 @@
                                     </td>
 
                                     <td>
-                                        <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.price') is-invalid @enderror" name="variants[{{ $index }}][price]" value="{{ $variant['price'] ?? '' }}" min="0" step="0.01" placeholder="Giá">
+                                        <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.price') is-invalid @enderror" name="variants[{{ $index }}][price]" value="{{ $variant['price'] ?? '' }}" min="0" max="99999999" step="0.01" placeholder="Giá">
                                         @error('variants.'.$index.'.price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.sale_price') is-invalid @enderror" name="variants[{{ $index }}][sale_price]" value="{{ $variant['sale_price'] ?? '' }}" min="0" step="0.01" placeholder="Giá KM">
+                                        <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.sale_price') is-invalid @enderror" name="variants[{{ $index }}][sale_price]" value="{{ $variant['sale_price'] ?? '' }}" min="0" max="99999999" step="0.01" placeholder="Giá KM">
                                         @error('variants.'.$index.'.sale_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
@@ -253,11 +253,11 @@
                                     </td>
 
                                     <td>
-                                        <input type="number" class="form-control form-control-sm @error('variants.0.price') is-invalid @enderror" name="variants[0][price]" min="0" step="0.01" placeholder="Giá">
+                                        <input type="number" class="form-control form-control-sm @error('variants.0.price') is-invalid @enderror" name="variants[0][price]" min="0" max="99999999" step="0.01" placeholder="Giá">
                                         @error('variants.0.price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm @error('variants.0.sale_price') is-invalid @enderror" name="variants[0][sale_price]" min="0" step="0.01" placeholder="Giá KM">
+                                        <input type="number" class="form-control form-control-sm @error('variants.0.sale_price') is-invalid @enderror" name="variants[0][sale_price]" min="0" max="99999999" step="0.01" placeholder="Giá KM">
                                         @error('variants.0.sale_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
@@ -320,10 +320,10 @@
                         </select>
                     </td>
                     <td>
-                        <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][price]" min="0" step="0.01" placeholder="Giá">
+                        <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][price]" min="0" max="99999999" step="0.01" placeholder="Giá">
                     </td>
                     <td>
-                        <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][sale_price]" min="0" step="0.01" placeholder="Giá KM">
+                        <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][sale_price]" min="0" max="99999999" step="0.01" placeholder="Giá KM">
                     </td>
                     <td>
                         <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][stock_quantity]" value="0" min="0" required>

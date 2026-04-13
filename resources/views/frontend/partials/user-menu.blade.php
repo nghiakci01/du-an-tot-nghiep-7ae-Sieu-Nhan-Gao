@@ -19,8 +19,8 @@
                 </a>
                 <ul class="dropdown_links">
                     <li><a href="{{ route('account.index') }}#dashboard">{{ __('messages.dashboard') }}</a></li>
-                    @if(Auth::user()->isAdmin() || Auth::user()->isStaff())
-                        <li><a href="{{ route('admin.dashboard') }}">{{ Auth::user()->isAdmin() ? __('messages.admin') : __('messages.staff') }}</a></li>
+                    @if(Auth::user()->isAdmin())
+                        <li><a href="{{ route('admin.dashboard') }}">{{ __('messages.admin') }}</a></li>
                     @endif  
                     <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); this.parentElement.nextElementSibling.submit();">{{ __('messages.logout') }}</a></li>
                     <form action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>

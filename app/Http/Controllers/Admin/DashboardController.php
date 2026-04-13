@@ -89,7 +89,7 @@ class DashboardController extends Controller
         $bestSellers = $this->reportService->getTopProducts($startDate, $endDate, 10);
 
         // Get Low Stock List
-        $lowStockList = \App\Models\ProductVariant::with(['product', 'size', 'color'])
+        $lowStockList = \App\Models\ProductVariant::with(['product', 'sizeRelationship', 'colorRelationship'])
             ->whereColumn('stock_quantity', '<=', 'alert_threshold')
             ->orderBy('stock_quantity', 'asc')
             ->take(10)

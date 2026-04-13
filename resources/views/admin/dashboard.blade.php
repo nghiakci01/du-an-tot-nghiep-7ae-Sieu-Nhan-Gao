@@ -332,7 +332,7 @@
                         <img src="{{ asset('storage/' . $variant->product->image) }}" alt="" class="rounded me-2" style="width: 32px; height: 32px; object-fit: cover;">
                         <div class="text-truncate" style="max-width: 150px;">
                           <h6 class="mb-0 small fw-bold">{{ $variant->product->name }}</h6>
-                          <small class="text-muted">{{ $variant->size->name }} - {{ $variant->color->name }}</small>
+                          <small class="text-muted">{{ $variant->sizeRelationship ? $variant->sizeRelationship->name : $variant->size }} - {{ $variant->colorRelationship ? $variant->colorRelationship->name : $variant->color }}</small>
                         </div>
                       </div>
                     </td>
