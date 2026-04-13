@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('content')
-    <!--slider area start-->
+    <!--slider area start
     <div class="slider_section slider_section_six mb-30" style="background: #fff;">
         <h1 class="visually-hidden">Elite - E-commerce Fashion Store</h1>
         <div style="padding: 0; width: 1521px; max-width: 100%; margin: 0 auto;">
