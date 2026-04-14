@@ -27,3 +27,6 @@ auth.json
 
 Homestead.yaml
 Homestead.json
+
+/public/storage
+/storage/app/public
