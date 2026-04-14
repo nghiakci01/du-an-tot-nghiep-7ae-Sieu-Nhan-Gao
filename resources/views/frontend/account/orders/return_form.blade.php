@@ -102,12 +102,37 @@
 #video-preview-container {
   margin-top: 15px;
 }
-#video-preview-container video {
+  #video-preview-container video {
   max-width: 100%;
   max-height: 240px;
   border-radius: 10px;
   border: 1px solid #ddd;
 }
+
+/* Method Card Styling */
+.method-card:hover {
+    border-color: #1a1a2e !important;
+    background-color: #f8f9fa;
+}
+.method-card.active {
+    border-color: #1a1a2e !important;
+    border-width: 2px !important;
+    background-color: #f0f7ff;
+}
+.method-card.active h6 {
+    color: #1a1a2e;
+}
+.avtar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+.bg-light-primary { background: #e0e7ff; color: #4338ca; }
+.bg-light-success { background: #dcfce7; color: #15803d; }
+.bg-light-info { background: #e0f2fe; color: #0369a1; }
 </style>
 @endpush
 
@@ -212,23 +237,87 @@
                 </div>
               </div>
 
-              {{-- Reason --}}
+              {{-- Return Type --}}
+              <div class="mb-5">
+                <label class="form-label fw-bold mb-3">Bạn muốn Đổi hàng hay Hoàn tiền? <span class="text-danger">*</span></label>
+                <div class="d-flex gap-4">
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" name="type" id="type_refund" value="refund" checked>
+                    <label class="form-check-label fw-600" for="type_refund">
+                      <i class="bi bi-cash-stack me-1"></i> Trả hàng & Hoàn tiền
+                    </label>
+                  </div>
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" name="type" id="type_exchange" value="exchange">
+                    <label class="form-check-label fw-600" for="type_exchange">
+                      <i class="bi bi-arrow-left-right me-1"></i> Đổi size / Phân loại khác
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {{-- Reason Type --}}
               <div class="mb-4">
-                <label class="form-label fw-bold">Lý do hoàn trả <span class="text-danger">*</span></label>
-                <select name="reason" class="form-select form-select-lg" required style="border-radius:10px; font-size:15px;">
+                <label class="form-label fw-bold">Lý do cụ thể <span class="text-danger">*</span></label>
+                <select name="reason_type" id="reason_type" class="form-select form-select-lg" required style="border-radius:10px; font-size:15px;">
                   <option value="" disabled selected>-- Chọn lý do --</option>
-                  <option value="Hàng lỗi / Hỏng hóc">Hàng lỗi / Hỏng hóc</option>
-                  <option value="Đổi kích cỡ (Size)">Đổi kích cỡ (Size)</option>
-                  <option value="Sản phẩm không giống mô tả">Sản phẩm không giống mô tả</option>
-                  <option value="Đóng gói lộn xộn, thiếu hàng">Thiếu hàng / Mất hàng</option>
-                  <option value="Khác">Lý do khác</option>
+                  <option value="defective">Hàng lỗi / Hư hỏng do vận chuyển hoặc NSX</option>
+                  <option value="wrong_size">Đổi kích cỡ (Size) / Màu sắc</option>
+                  <option value="disliked">Sản phẩm không giống mô tả / Không ưng ý</option>
+                  <option value="other">Lý do khác</option>
                 </select>
+                <input type="hidden" name="reason" id="reason_text">
               </div>
 
               {{-- Note --}}
               <div class="mb-4">
-                <label class="form-label fw-bold">Chi tiết lỗi / Yêu cầu thêm</label>
-                <textarea name="note" class="form-control" rows="4" placeholder="Vui lòng mô tả chi tiết tình trạng sản phẩm..." style="border-radius:10px;"></textarea>
+                <label class="form-label fw-bold">Chi tiết lỗi / Yêu cầu thêm <span class="text-danger">*</span></label>
+                <textarea name="note" class="form-control" rows="4" placeholder="Vui lòng mô tả chi tiết tình trạng sản phẩm..." style="border-radius:10px;" required></textarea>
+              </div>
+
+              {{-- Return Method --}}
+              <div class="mb-5">
+                  <label class="form-label fw-bold mb-3">Phương thức gửi hàng hoàn trả <span class="text-danger">*</span></label>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="method-card p-3 border rounded-3 h-100 position-relative" data-value="at_home" style="cursor:pointer; transition: all 0.2s;">
+                        <div class="d-flex align-items-center">
+                          <div class="avtar bg-light-primary me-3">
+                            <i class="bi bi-house-door fs-4"></i>
+                          </div>
+                          <div>
+                            <h6 class="mb-0 fw-bold">Shipper đến lấy hàng</h6>
+                            <small class="text-muted" style="font-size: 0.8rem;">Nhân viên sẽ đến tận nhà lấy hàng</small>
+                          </div>
+                        </div>
+                        <input type="radio" name="return_method" value="at_home" class="d-none" required>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="method-card p-3 border rounded-3 h-100 position-relative" data-value="at_post_office" style="cursor:pointer; transition: all 0.2s;">
+                        <div class="d-flex align-items-center">
+                          <div class="avtar bg-light-success me-3">
+                            <i class="bi bi-building fs-4"></i>
+                          </div>
+                          <div>
+                            <h6 class="mb-0 fw-bold">Tự mang đến bưu cục</h6>
+                            <small class="text-muted" style="font-size: 0.8rem;">Gửi hàng tại bưu cục gần nhất</small>
+                          </div>
+                        </div>
+                        <input type="radio" name="return_method" value="at_post_office" class="d-none">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div id="ghtk-map-link" class="mt-3 p-3 rounded-3 border border-success d-none" style="background-color: #f0fdf4;">
+                    <div class="d-flex align-items-center mb-2">
+                        <img src="https://giaohangtietkiem.vn/wp-content/uploads/2015/10/logo-ghtk.png" style="height: 18px;" class="me-2">
+                        <span class="small fw-bold text-success">Bạn có thể gửi hàng hoàn trả tại bất kỳ bưu cục Giao Hàng Tiết Kiệm nào.</span>
+                    </div>
+                    <a href="https://www.google.com/maps/search/Giao+hàng+tiết+kiệm/" target="_blank" class="btn btn-success btn-sm w-100 rounded-pill py-2">
+                      <i class="bi bi-geo-alt-fill me-1"></i>🌏 Tìm bưu cục GHTK gần nhất trên Google Maps
+                    </a>
+                  </div>
               </div>
 
               {{-- Images --}}
@@ -480,6 +569,27 @@ $(document).ready(function() {
             container.append(video);
             const info = $('<p>').addClass('text-muted small mt-1').text(file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + ' MB)');
             container.append(info);
+        }
+    });
+
+    // 8. Return Method Selection
+    $('.method-card').on('click', function() {
+        const value = $(this).data('value');
+        
+        // Update selection UI
+        $('.method-card').removeClass('active');
+        $(this).addClass('active');
+        
+        // Update radio input
+        $(this).find('input[type="radio"]').prop('checked', true);
+        
+        // Show/Hide GHTK link
+        if (value === 'at_post_office') {
+            $('#ghtk-map-link').removeClass('d-none').hide().fadeIn(300);
+        } else {
+            $('#ghtk-map-link').fadeOut(200, function() {
+                $(this).addClass('d-none');
+            });
         }
     });
 

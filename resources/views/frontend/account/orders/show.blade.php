@@ -233,24 +233,54 @@
       <div class="alert {{ $order->returnRequest->isRejected() ? 'alert-danger' : ($order->returnRequest->isCompleted() ? 'alert-success' : 'alert-warning') }} rounded-3 mb-4 shadow-sm border-0">
         <h6 class="fw-bold mb-2">
           <i class="bi bi-arrow-return-left me-2"></i>
-          Trạng thái Yêu cầu Hoàn hàng
+          Yêu cầu {{ $order->returnRequest->type_text }}
         </h6>
         <div class="small">
           <div class="mb-1"><strong>Trạng thái:</strong> 
-            @if($order->returnRequest->isPending())
-              <span class="badge bg-warning text-dark">Chờ xử lý</span>
-            @elseif($order->returnRequest->isApproved())
-              <span class="badge bg-info">Đã duyệt - Đang chờ gửi hàng</span>
-            @elseif($order->returnRequest->isCompleted())
-              <span class="badge bg-success">Hoàn thành - Đã hoàn tiền</span>
-            @elseif($order->returnRequest->isRejected())
-              <span class="badge bg-danger">Từ chối</span>
-            @endif
+            <span class="badge {{ $order->returnRequest->status_badge }}">{{ $order->returnRequest->status_text }}</span>
           </div>
           <div class="mb-1"><strong>Lý do:</strong> {{ $order->returnRequest->reason }}</div>
+          
+          @if($order->returnRequest->return_method)
+            <div class="mb-1 d-flex align-items-center">
+                <strong>Phương thức gửi trả:</strong> 
+                <span class="ms-1">{{ $order->returnRequest->return_method_text }}</span>
+                @if($order->returnRequest->isApproved())
+                    <a href="javascript:void(0)" onclick="document.getElementById('change-return-method').classList.toggle('d-none')" class="ms-2 badge bg-secondary text-decoration-none" style="font-size: 0.65rem; cursor:pointer;">Thay đổi</a>
+                @endif
+            </div>
+          @endif
+
+          {{-- UI Chọn/Đổi phương thức --}}
+          @if($order->returnRequest->isApproved())
+            <div id="change-return-method" class="mt-3 p-3 rounded-3 bg-white border border-warning shadow-sm {{ $order->returnRequest->return_method ? 'd-none' : '' }}">
+                <p class="mb-2 small fw-bold text-danger"><i class="bi bi-info-circle me-1"></i> {{ $order->returnRequest->return_method ? 'Thay đổi phương thức gửi hàng:' : 'Chọn phương thức gửi hàng:' }}</p>
+                <form action="{{ route('account.orders.return.update_method', $order->id) }}" method="POST">
+                    @csrf
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="return_method" value="at_home" class="btn {{ $order->returnRequest->return_method === 'at_home' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm rounded-pill flex-grow-1">
+                            <i class="bi bi-house-door me-1"></i> Shipper lấy hàng
+                        </button>
+                        <button type="submit" name="return_method" value="at_post_office" class="btn {{ $order->returnRequest->return_method === 'at_post_office' ? 'btn-success' : 'btn-outline-success' }} btn-sm rounded-pill flex-grow-1">
+                            <i class="bi bi-building me-1"></i> Tự mang đến bưu cục
+                        </button>
+                    </div>
+                </form>
+            </div>
+          @endif
+
+          @if($order->returnRequest->return_method === 'at_post_office' && $order->returnRequest->isApproved())
+            <div class="mt-2 text-center p-3 rounded-3" style="background: #fff; border: 1px solid #198754; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <p class="mb-2 small fw-bold text-success">📍 Bạn đã chọn tự mang ra bưu cục:</p>
+                <a href="https://www.google.com/maps/search/Giao+hàng+tiết+kiệm/" target="_blank" class="btn btn-success btn-sm w-100 rounded-pill py-2">
+                    <i class="bi bi-geo-alt-fill me-1"></i>🌏 Tìm bưu cục GHTK gần nhất (Google Maps)
+                </a>
+            </div>
+          @endif
+
           @if($order->returnRequest->admin_note)
             <div class="mt-2 p-2 rounded" style="background:rgba(255,255,255,0.6);">
-              <strong>Ghi chú từ cửa hàng:</strong><br>
+              <strong>Phản hồi từ cửa hàng:</strong><br>
               {!! nl2br(e($order->returnRequest->admin_note)) !!}
             </div>
           @endif
@@ -477,7 +507,7 @@
       </div>
 
       {{-- Return Shipping Action --}}
-      @if($order->returnRequest && $order->returnRequest->status === 'approved')
+      @if($order->returnRequest && $order->returnRequest->isApproved())
       <div class="detail-card border-warning bg-light-warning mb-3">
         <div class="detail-header bg-warning text-white">
           <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Gửi hàng hoàn trả</h5>
