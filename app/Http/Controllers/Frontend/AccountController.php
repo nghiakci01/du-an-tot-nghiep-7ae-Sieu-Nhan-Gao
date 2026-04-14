@@ -186,8 +186,8 @@ class AccountController extends Controller
         $user = Auth::user();
         $order = $user->orders()->findOrFail($id);
 
-        if (!in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_SHIPPED])) {
-            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã giao hoặc hoàn thành.');
+        if (!\App\Models\OrderReturnRequest::canBeReturned($order)) {
+            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã hoàn thành và trong vòng 7 ngày kể từ lúc nhận hàng.');
         }
 
         if ($order->returnRequest) {
@@ -203,8 +203,8 @@ class AccountController extends Controller
         $user = Auth::user();
         $order = $user->orders()->findOrFail($id);
 
-        if (!in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_SHIPPED])) {
-            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã giao hoặc hoàn thành.');
+        if (!\App\Models\OrderReturnRequest::canBeReturned($order)) {
+            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã hoàn thành và trong vòng 7 ngày kể từ lúc nhận hàng.');
         }
 
         if ($order->returnRequest) {
@@ -212,6 +212,8 @@ class AccountController extends Controller
         }
 
         $request->validate([
+            'type' => 'required|in:refund,exchange',
+            'reason_type' => 'required|in:wrong_size,disliked,defective,other',
             'reason' => 'required|string|max:255',
             'note' => 'nullable|string|max:1000',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -219,15 +221,27 @@ class AccountController extends Controller
             'items' => 'required|array',
             'items.*.selected' => 'sometimes|boolean',
             'items.*.quantity' => 'sometimes|integer|min:1',
-            'bank_name' => 'required|string|max:255',
-            'bank_bin' => 'required|string|max:20',
-            'account_number' => 'required|string|max:50',
-            'account_name' => 'required|string|max:255',
+            'bank_name' => 'required_if:type,refund|nullable|string|max:255',
+            'bank_bin' => 'required_if:type,refund|nullable|string|max:20',
+            'account_number' => 'required_if:type,refund|nullable|string|max:50',
+            'account_name' => 'required_if:type,refund|nullable|string|max:255',
         ], [
-            'bank_name.required' => 'Vui lòng chọn ngân hàng nhận tiền hoàn.',
-            'account_number.required' => 'Vui lòng nhập số tài khoản ngân hàng.',
-            'account_name.required' => 'Vui lòng nhập tên chủ tài khoản.',
+            'type.required' => 'Vui lòng chọn loại yêu cầu (Hoàn tiền hoặc Đổi hàng).',
+            'reason_type.required' => 'Vui lòng chọn lý do cụ thể.',
+            'bank_name.required_if' => 'Vui lòng chọn ngân hàng nhận tiền hoàn.',
+            'account_number.required_if' => 'Vui lòng nhập số tài khoản ngân hàng.',
+            'account_name.required_if' => 'Vui lòng nhập tên chủ tài khoản.',
         ]);
+
+        // Kiểm tra bắt buộc minh chứng cho hàng lỗi
+        if ($request->reason_type === 'defective') {
+            if (!$request->hasFile('images')) {
+                return redirect()->back()->with('error', 'Với lý do hàng lỗi, bạn bắt buộc phải tải lên ảnh minh chứng.')->withInput();
+            }
+            if (!$request->hasFile('videos')) {
+                return redirect()->back()->with('error', 'Với lý do hàng lỗi, bạn bắt buộc phải tải lên video minh chứng tình trạng lỗi.')->withInput();
+            }
+        }
 
         // Filter selected items and calculate refund amount
         $selectedItems = [];
@@ -279,6 +293,8 @@ class AccountController extends Controller
             $returnRequest = \App\Models\OrderReturnRequest::create([
                 'user_id' => $user->id,
                 'order_id' => $order->id,
+                'type' => $request->type,
+                'reason_type' => $request->reason_type,
                 'reason' => $request->reason,
                 'note' => $request->note,
                 'images' => $imagePaths,
@@ -288,7 +304,7 @@ class AccountController extends Controller
                 'bank_bin' => $request->bank_bin,
                 'account_number' => $request->account_number,
                 'account_name' => $request->account_name,
-                'status' => 'pending',
+                'status' => \App\Models\OrderReturnRequest::STATUS_PENDING,
             ]);
 
             foreach ($selectedItems as $itemData) {
@@ -313,7 +329,7 @@ class AccountController extends Controller
         $order = Order::where('user_id', Auth::id())->findOrFail($id);
         $returnRequest = $order->returnRequest;
 
-        if (!$returnRequest || $returnRequest->status !== 'approved') {
+        if (!$returnRequest || !$returnRequest->isApproved()) {
             return redirect()->back()->with('error', 'Yêu cầu trả hàng không ở trạng thái được phép gửi hàng.');
         }
 
@@ -327,7 +343,7 @@ class AccountController extends Controller
 
         $data = [
             'shipping_info' => $request->shipping_info,
-            'status' => 'shipping', // Chuyển sang trạng thái Đang gửi hàng
+            'status' => \App\Models\OrderReturnRequest::STATUS_SHIPPING_BACK, // Chuyển sang trạng thái Đang gửi hàng về
         ];
 
         if ($request->hasFile('shipping_proof')) {

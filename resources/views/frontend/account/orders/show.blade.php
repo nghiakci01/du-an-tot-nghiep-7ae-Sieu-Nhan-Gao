@@ -233,24 +233,17 @@
       <div class="alert {{ $order->returnRequest->isRejected() ? 'alert-danger' : ($order->returnRequest->isCompleted() ? 'alert-success' : 'alert-warning') }} rounded-3 mb-4 shadow-sm border-0">
         <h6 class="fw-bold mb-2">
           <i class="bi bi-arrow-return-left me-2"></i>
-          Trạng thái Yêu cầu Hoàn hàng
+          Yêu cầu {{ $order->returnRequest->type_text }}
         </h6>
         <div class="small">
           <div class="mb-1"><strong>Trạng thái:</strong> 
-            @if($order->returnRequest->isPending())
-              <span class="badge bg-warning text-dark">Chờ xử lý</span>
-            @elseif($order->returnRequest->isApproved())
-              <span class="badge bg-info">Đã duyệt - Đang chờ gửi hàng</span>
-            @elseif($order->returnRequest->isCompleted())
-              <span class="badge bg-success">Hoàn thành - Đã hoàn tiền</span>
-            @elseif($order->returnRequest->isRejected())
-              <span class="badge bg-danger">Từ chối</span>
-            @endif
+            <span class="badge {{ $order->returnRequest->status_badge }}">{{ $order->returnRequest->status_text }}</span>
           </div>
-          <div class="mb-1"><strong>Lý do:</strong> {{ $order->returnRequest->reason }}</div>
+          <div class="mb-1"><strong>Phân loại lý do:</strong> {{ $order->returnRequest->reason_type_text }}</div>
+          <div class="mb-1"><strong>Mô tả lý do:</strong> {{ $order->returnRequest->reason }}</div>
           @if($order->returnRequest->admin_note)
             <div class="mt-2 p-2 rounded" style="background:rgba(255,255,255,0.6);">
-              <strong>Ghi chú từ cửa hàng:</strong><br>
+              <strong>Phản hồi từ cửa hàng:</strong><br>
               {!! nl2br(e($order->returnRequest->admin_note)) !!}
             </div>
           @endif
@@ -477,7 +470,7 @@
       </div>
 
       {{-- Return Shipping Action --}}
-      @if($order->returnRequest && $order->returnRequest->status === 'approved')
+      @if($order->returnRequest && $order->returnRequest->isApproved())
       <div class="detail-card border-warning bg-light-warning mb-3">
         <div class="detail-header bg-warning text-white">
           <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Gửi hàng hoàn trả</h5>

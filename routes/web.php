@@ -163,7 +163,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
         Route::post('returns/{id}/shipping', [App\Http\Controllers\Admin\OrderReturnController::class, 'markAsShipping'])->name('returns.shipping');
         Route::post('returns/{id}/received', [App\Http\Controllers\Admin\OrderReturnController::class, 'markAsReceived'])->name('returns.received');
         Route::post('returns/{id}/reject', [App\Http\Controllers\Admin\OrderReturnController::class, 'reject'])->name('returns.reject');
-        Route::post('returns/{id}/complete', [App\Http\Controllers\Admin\OrderReturnController::class, 'completeRefund'])->name('returns.complete');
+        Route::post('returns/{id}/complete', [App\Http\Controllers\Admin\OrderReturnController::class, 'complete'])->name('returns.complete');
 
         Route::delete('products/bulk-delete', [App\Http\Controllers\Admin\ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
         Route::delete('products/delete-all', [App\Http\Controllers\Admin\ProductController::class, 'deleteAll'])->name('products.delete-all');

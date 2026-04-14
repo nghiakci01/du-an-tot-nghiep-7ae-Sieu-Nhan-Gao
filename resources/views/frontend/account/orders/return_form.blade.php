@@ -212,17 +212,36 @@
                 </div>
               </div>
 
-              {{-- Reason --}}
+              {{-- Return Type --}}
+              <div class="mb-5">
+                <label class="form-label fw-bold mb-3">Bạn muốn Đổi hàng hay Hoàn tiền? <span class="text-danger">*</span></label>
+                <div class="d-flex gap-4">
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" name="type" id="type_refund" value="refund" checked>
+                    <label class="form-check-label fw-600" for="type_refund">
+                      <i class="bi bi-cash-stack me-1"></i> Trả hàng & Hoàn tiền
+                    </label>
+                  </div>
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" name="type" id="type_exchange" value="exchange">
+                    <label class="form-check-label fw-600" for="type_exchange">
+                      <i class="bi bi-arrow-left-right me-1"></i> Đổi size / Phân loại khác
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {{-- Reason Type --}}
               <div class="mb-4">
-                <label class="form-label fw-bold">Lý do hoàn trả <span class="text-danger">*</span></label>
-                <select name="reason" class="form-select form-select-lg" required style="border-radius:10px; font-size:15px;">
+                <label class="form-label fw-bold">Lý do cụ thể <span class="text-danger">*</span></label>
+                <select name="reason_type" id="reason_type" class="form-select form-select-lg" required style="border-radius:10px; font-size:15px;">
                   <option value="" disabled selected>-- Chọn lý do --</option>
-                  <option value="Hàng lỗi / Hỏng hóc">Hàng lỗi / Hỏng hóc</option>
-                  <option value="Đổi kích cỡ (Size)">Đổi kích cỡ (Size)</option>
-                  <option value="Sản phẩm không giống mô tả">Sản phẩm không giống mô tả</option>
-                  <option value="Đóng gói lộn xộn, thiếu hàng">Thiếu hàng / Mất hàng</option>
-                  <option value="Khác">Lý do khác</option>
+                  <option value="defective">Hàng lỗi / Hư hỏng do vận chuyển hoặc NSX</option>
+                  <option value="wrong_size">Đổi kích cỡ (Size) / Màu sắc</option>
+                  <option value="disliked">Sản phẩm không giống mô tả / Không ưng ý</option>
+                  <option value="other">Lý do khác</option>
                 </select>
+                <input type="hidden" name="reason" id="reason_text">
               </div>
 
               {{-- Note --}}
@@ -481,6 +500,48 @@ $(document).ready(function() {
             const info = $('<p>').addClass('text-muted small mt-1').text(file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + ' MB)');
             container.append(info);
         }
+    });
+
+    // 8. Custom Sync reason text and validation logic
+    $('#reason_type').on('change', function() {
+        const text = $(this).find('option:selected').text();
+        $('#reason_text').val(text);
+        
+        // Show/hide info about mandatory files
+        if ($(this).val() === 'defective') {
+            $('.image-upload-wrap, .video-upload-wrap').css('border-color', '#ffc107');
+        } else {
+            $('.image-upload-wrap, .video-upload-wrap').css('border-color', '#ddd');
+        }
+    });
+
+    // 9. Prevent submission if defective but missing files
+    $('form').on('submit', function(e) {
+        const reasonType = $('#reason_type').val();
+        const images = $('#return-images')[0].files;
+        const videos = $('#return-videos')[0].files;
+
+        if (reasonType === 'defective') {
+            if (images.length === 0 || videos.length === 0) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Thiếu minh chứng',
+                    text: 'Với lý do "Hàng lỗi", bạn bắt buộc phải tải lên ít nhất 1 ảnh và 1 video minh chứng lỗi sản phẩm.',
+                    confirmButtonColor: '#1a1a2e'
+                });
+                return false;
+            }
+        }
+        
+        // Final check for selected items
+        if ($('.item-checkbox:checked').length === 0) {
+            e.preventDefault();
+            Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Vui lòng chọn ít nhất một sản phẩm.' });
+            return false;
+        }
+
+        return true;
     });
 
     // Trigger initial calculation
