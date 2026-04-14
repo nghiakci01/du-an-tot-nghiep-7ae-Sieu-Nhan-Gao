@@ -111,7 +111,7 @@
                                 </td>
                                 <td><span class="text-danger fw-bold">{{ number_format($req->refund_amount) }}đ</span></td>
                                 <td>{{ $req->created_at->format('d/m/Y H:i') }}</td>
-                                <td>{!! $req->status_badge !!}</td>
+                                <td><span class="badge {{ $req->status_badge }}">{{ $req->status_text }}</span></td>
                                 <td class="sticky-action-column">
                                     <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailModal{{ $req->id }}">
                                         <i class="fas fa-eye"></i> Xử lý
@@ -137,8 +137,8 @@
                                                 <div class="col-md-6">
                                                     <h6 class="fw-bold text-danger text-end"><i class="fas fa-money-bill-wave me-1"></i> Thông tin hoàn trả:</h6>
                                                     <p class="mb-1 text-end">Số tiền: <strong class="fs-5 text-danger">{{ number_format($req->refund_amount) }}đ</strong></p>
-                                                    <p class="mb-0 text-end">Loại: <span class="badge {{ $req->type === 'exchange' ? 'bg-info' : 'bg-primary' }}">{{ $req->type_text }}</span></p>
-                                                    <p class="mb-0 text-end">Lý do: <span class="badge bg-white text-dark border">{{ $req->reason_type_text }}</span></p>
+                                                    <p class="mb-1 text-end">Lý do: <span class="badge bg-white text-dark border">{{ $req->reason_text }}</span></p>
+                                                    <p class="mb-0 text-end">Phương thức: <span class="badge bg-info text-white">{{ $req->return_method_text }}</span></p>
                                                 </div>
                                             </div>
 
@@ -177,7 +177,7 @@
 
                                             <div class="mb-3">
                                                 <h6>Mô tả chi tiết:</h6>
-                                                <div class="p-2 bg-light border rounded">{{ $req->description ?: 'Không có mô tả' }}</div>
+                                                <div class="p-2 bg-light border rounded">{{ $req->note ?: 'Không có mô tả' }}</div>
                                             </div>
 
                                             @if($req->images)

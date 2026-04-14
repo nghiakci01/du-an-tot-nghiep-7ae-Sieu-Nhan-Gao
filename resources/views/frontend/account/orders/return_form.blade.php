@@ -102,12 +102,37 @@
 #video-preview-container {
   margin-top: 15px;
 }
-#video-preview-container video {
+  #video-preview-container video {
   max-width: 100%;
   max-height: 240px;
   border-radius: 10px;
   border: 1px solid #ddd;
 }
+
+/* Method Card Styling */
+.method-card:hover {
+    border-color: #1a1a2e !important;
+    background-color: #f8f9fa;
+}
+.method-card.active {
+    border-color: #1a1a2e !important;
+    border-width: 2px !important;
+    background-color: #f0f7ff;
+}
+.method-card.active h6 {
+    color: #1a1a2e;
+}
+.avtar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+.bg-light-primary { background: #e0e7ff; color: #4338ca; }
+.bg-light-success { background: #dcfce7; color: #15803d; }
+.bg-light-info { background: #e0f2fe; color: #0369a1; }
 </style>
 @endpush
 
@@ -246,8 +271,53 @@
 
               {{-- Note --}}
               <div class="mb-4">
-                <label class="form-label fw-bold">Chi tiết lỗi / Yêu cầu thêm</label>
-                <textarea name="note" class="form-control" rows="4" placeholder="Vui lòng mô tả chi tiết tình trạng sản phẩm..." style="border-radius:10px;"></textarea>
+                <label class="form-label fw-bold">Chi tiết lỗi / Yêu cầu thêm <span class="text-danger">*</span></label>
+                <textarea name="note" class="form-control" rows="4" placeholder="Vui lòng mô tả chi tiết tình trạng sản phẩm..." style="border-radius:10px;" required></textarea>
+              </div>
+
+              {{-- Return Method --}}
+              <div class="mb-5">
+                  <label class="form-label fw-bold mb-3">Phương thức gửi hàng hoàn trả <span class="text-danger">*</span></label>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="method-card p-3 border rounded-3 h-100 position-relative" data-value="at_home" style="cursor:pointer; transition: all 0.2s;">
+                        <div class="d-flex align-items-center">
+                          <div class="avtar bg-light-primary me-3">
+                            <i class="bi bi-house-door fs-4"></i>
+                          </div>
+                          <div>
+                            <h6 class="mb-0 fw-bold">Shipper đến lấy hàng</h6>
+                            <small class="text-muted" style="font-size: 0.8rem;">Nhân viên sẽ đến tận nhà lấy hàng</small>
+                          </div>
+                        </div>
+                        <input type="radio" name="return_method" value="at_home" class="d-none" required>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="method-card p-3 border rounded-3 h-100 position-relative" data-value="at_post_office" style="cursor:pointer; transition: all 0.2s;">
+                        <div class="d-flex align-items-center">
+                          <div class="avtar bg-light-success me-3">
+                            <i class="bi bi-building fs-4"></i>
+                          </div>
+                          <div>
+                            <h6 class="mb-0 fw-bold">Tự mang đến bưu cục</h6>
+                            <small class="text-muted" style="font-size: 0.8rem;">Gửi hàng tại bưu cục gần nhất</small>
+                          </div>
+                        </div>
+                        <input type="radio" name="return_method" value="at_post_office" class="d-none">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div id="ghtk-map-link" class="mt-3 p-3 rounded-3 border border-success d-none" style="background-color: #f0fdf4;">
+                    <div class="d-flex align-items-center mb-2">
+                        <img src="https://giaohangtietkiem.vn/wp-content/uploads/2015/10/logo-ghtk.png" style="height: 18px;" class="me-2">
+                        <span class="small fw-bold text-success">Bạn có thể gửi hàng hoàn trả tại bất kỳ bưu cục Giao Hàng Tiết Kiệm nào.</span>
+                    </div>
+                    <a href="https://www.google.com/maps/search/Giao+hàng+tiết+kiệm/" target="_blank" class="btn btn-success btn-sm w-100 rounded-pill py-2">
+                      <i class="bi bi-geo-alt-fill me-1"></i>🌏 Tìm bưu cục GHTK gần nhất trên Google Maps
+                    </a>
+                  </div>
               </div>
 
               {{-- Images --}}
@@ -502,46 +572,25 @@ $(document).ready(function() {
         }
     });
 
-    // 8. Custom Sync reason text and validation logic
-    $('#reason_type').on('change', function() {
-        const text = $(this).find('option:selected').text();
-        $('#reason_text').val(text);
+    // 8. Return Method Selection
+    $('.method-card').on('click', function() {
+        const value = $(this).data('value');
         
-        // Show/hide info about mandatory files
-        if ($(this).val() === 'defective') {
-            $('.image-upload-wrap, .video-upload-wrap').css('border-color', '#ffc107');
+        // Update selection UI
+        $('.method-card').removeClass('active');
+        $(this).addClass('active');
+        
+        // Update radio input
+        $(this).find('input[type="radio"]').prop('checked', true);
+        
+        // Show/Hide GHTK link
+        if (value === 'at_post_office') {
+            $('#ghtk-map-link').removeClass('d-none').hide().fadeIn(300);
         } else {
-            $('.image-upload-wrap, .video-upload-wrap').css('border-color', '#ddd');
+            $('#ghtk-map-link').fadeOut(200, function() {
+                $(this).addClass('d-none');
+            });
         }
-    });
-
-    // 9. Prevent submission if defective but missing files
-    $('form').on('submit', function(e) {
-        const reasonType = $('#reason_type').val();
-        const images = $('#return-images')[0].files;
-        const videos = $('#return-videos')[0].files;
-
-        if (reasonType === 'defective') {
-            if (images.length === 0 || videos.length === 0) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Thiếu minh chứng',
-                    text: 'Với lý do "Hàng lỗi", bạn bắt buộc phải tải lên ít nhất 1 ảnh và 1 video minh chứng lỗi sản phẩm.',
-                    confirmButtonColor: '#1a1a2e'
-                });
-                return false;
-            }
-        }
-        
-        // Final check for selected items
-        if ($('.item-checkbox:checked').length === 0) {
-            e.preventDefault();
-            Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Vui lòng chọn ít nhất một sản phẩm.' });
-            return false;
-        }
-
-        return true;
     });
 
     // Trigger initial calculation

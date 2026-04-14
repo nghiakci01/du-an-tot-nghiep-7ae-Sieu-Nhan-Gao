@@ -31,6 +31,7 @@ class OrderReturnRequest extends Model
         'type',
         'reason_type',
         'reason',
+        'return_method',
         'note',
         'images',
         'videos',
@@ -177,6 +178,15 @@ class OrderReturnRequest extends Model
             self::STATUS_REFUNDED => 'bg-success',
             self::STATUS_EXCHANGED => 'bg-success',
             default => 'bg-secondary'
+        };
+    }
+    
+    public function getReturnMethodTextAttribute()
+    {
+        return match($this->return_method) {
+            'at_home' => 'Shipper đến lấy hàng',
+            'at_post_office' => 'Tự mang đến bưu cục',
+            default => 'Chưa chọn'
         };
     }
 }
