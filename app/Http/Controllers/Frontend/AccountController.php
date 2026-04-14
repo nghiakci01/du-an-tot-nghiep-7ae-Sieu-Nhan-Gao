@@ -214,8 +214,10 @@ class AccountController extends Controller
         $request->validate([
             'reason' => 'required|string|max:255',
             'note' => 'nullable|string|max:1000',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'videos.*' => 'nullable|file|mimes:mp4,mov,avi,webm|max:51200',
+            'images' => 'required|array|min:1',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'videos' => 'required|array|min:1',
+            'videos.*' => 'required|file|mimes:mp4,mov,avi,webm|max:51200',
             'items' => 'required|array',
             'items.*.selected' => 'sometimes|boolean',
             'items.*.quantity' => 'sometimes|integer|min:1',
@@ -224,6 +226,10 @@ class AccountController extends Controller
             'account_number' => 'required|string|max:50',
             'account_name' => 'required|string|max:255',
         ], [
+            'images.required' => 'Vui lòng cung cấp ít nhất một hình ảnh minh chứng.',
+            'images.*.image' => 'File tải lên phải là hình ảnh.',
+            'videos.required' => 'Vui lòng cung cấp ít nhất một video minh chứng.',
+            'videos.*.mimes' => 'Video phải có định dạng mp4, mov, avi hoặc webm.',
             'bank_name.required' => 'Vui lòng chọn ngân hàng nhận tiền hoàn.',
             'account_number.required' => 'Vui lòng nhập số tài khoản ngân hàng.',
             'account_name.required' => 'Vui lòng nhập tên chủ tài khoản.',
