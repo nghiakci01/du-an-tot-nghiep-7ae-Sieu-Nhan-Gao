@@ -52,7 +52,7 @@ class ProductController extends Controller
             if (empty($data['price'])) {
                 $data['price'] = 0;
             }
-            $data['slug'] = Str::slug($data['name']).'-'.uniqid(); // Ensure unique slug
+            $data['slug'] = Str::slug($data['name']) . '-' . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
             $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
             $data['image'] = null; // Default to null
@@ -182,7 +182,7 @@ class ProductController extends Controller
             if (empty($data['price'])) {
                 $data['price'] = 0;
             }
-            $data['slug'] = Str::slug($data['name']).'-'.$product->id;
+            $data['slug'] = Str::slug($data['name']) . '-' . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
             $data['is_active'] = $request->has('is_active') ? 1 : 0;
             $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
