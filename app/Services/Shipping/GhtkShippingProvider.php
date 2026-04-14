@@ -24,7 +24,7 @@ class GhtkShippingProvider implements ShippingProviderInterface
             return $this->buildMockQuote($toProvince, $weight);
         } catch (\Exception $e) {
             Log::error('GHTK Shipping Error: ' . $e->getMessage());
-            return null;
+            return $this->buildMockQuote($toProvince, $weight);
         }
     }
 

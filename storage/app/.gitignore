@@ -1,5 +1,7 @@
 *
+!.gitignore
 !private/
 !public/
-!.gitignore
+public/*
+!public/.gitignore
 !vn_communes.json

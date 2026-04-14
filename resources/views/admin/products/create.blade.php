@@ -84,8 +84,8 @@
                         <div id="gallery-preview" class="mt-3 d-flex gap-2 flex-wrap"></div>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <label for="short_description" class="form-label">Mô tả ngắn <small class="text-muted">(Tối đa 1000 ký tự)</small></label>
-                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="short_description" name="short_description" rows="4" maxlength="2000">{{ old('short_description') }}</textarea>
+                        <label for="short_description" class="form-label">Mô tả ngắn <small class="text-muted"></small></label>
+                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="short_description" name="short_description" rows="4" maxlength="500">{{ old('short_description') }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('short_description')
@@ -93,12 +93,13 @@
                                 @enderror
                             </div>
                             <small class="text-muted">
-                                <span id="short-char-count">0</span> / 2000 ký tự
+                                <span id="short-char-count">0</span> / 500 ký tự
                             </small>
                         </div>
                     </div>
                     <div class="col-md-12 mb-3">
-                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="10000">{{ old('description') }}</textarea>
+                        <label for="description" class="form-label">Mô tả chi tiết <small class="text-muted"></small></label>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="5000">{{ old('description') }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('description')
@@ -106,7 +107,7 @@
                                 @enderror
                             </div>
                             <small class="text-muted">
-                                <span id="char-count">0</span> / 10000 ký tự
+                                <span id="char-count">0</span> / 5000 ký tự
                             </small>
                         </div>
                     </div>
@@ -174,11 +175,11 @@
                                         </td>
 
                                         <td>
-                                            <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.price') is-invalid @enderror" name="variants[{{ $index }}][price]" value="{{ $variant['price'] ?? '' }}" min="0" step="0.01" placeholder="Giá">
+                                            <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.price') is-invalid @enderror" name="variants[{{ $index }}][price]" value="{{ $variant['price'] ?? '' }}" min="0" max="99999999" step="0.01" placeholder="Giá">
                                             @error('variants.'.$index.'.price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.sale_price') is-invalid @enderror" name="variants[{{ $index }}][sale_price]" value="{{ $variant['sale_price'] ?? '' }}" min="0" step="0.01" placeholder="Giá KM">
+                                            <input type="number" class="form-control form-control-sm @error('variants.'.$index.'.sale_price') is-invalid @enderror" name="variants[{{ $index }}][sale_price]" value="{{ $variant['sale_price'] ?? '' }}" min="0" max="99999999" step="0.01" placeholder="Giá KM">
                                             @error('variants.'.$index.'.sale_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </td>
                                         <td>
@@ -216,11 +217,11 @@
                                     </td>
 
                                     <td>
-                                        <input type="number" class="form-control form-control-sm @error('variants.0.price') is-invalid @enderror" name="variants[0][price]" min="0" step="0.01" placeholder="Giá">
+                                        <input type="number" class="form-control form-control-sm @error('variants.0.price') is-invalid @enderror" name="variants[0][price]" min="0" max="99999999" step="0.01" placeholder="Giá">
                                         @error('variants.0.price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control form-control-sm @error('variants.0.sale_price') is-invalid @enderror" name="variants[0][sale_price]" min="0" step="0.01" placeholder="Giá KM">
+                                        <input type="number" class="form-control form-control-sm @error('variants.0.sale_price') is-invalid @enderror" name="variants[0][sale_price]" min="0" max="99999999" step="0.01" placeholder="Giá KM">
                                         @error('variants.0.sale_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </td>
                                     <td>
@@ -283,10 +284,10 @@
                         </select>
                     </td>
                     <td>
-                        <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][price]" min="0" step="0.01" placeholder="Giá">
+                        <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][price]" min="0" max="99999999" step="0.01" placeholder="Giá">
                     </td>
                     <td>
-                        <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][sale_price]" min="0" step="0.01" placeholder="Giá KM">
+                        <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][sale_price]" min="0" max="99999999" step="0.01" placeholder="Giá KM">
                     </td>
                     <td>
                         <input type="number" class="form-control form-control-sm" name="variants[${variantIndex}][stock_quantity]" value="0" min="0" required>
@@ -341,15 +342,23 @@
         });
 
 
+        // Character counter for short description
+        const shortDescTextarea = document.getElementById('short_description');
+        const shortCharCount = document.getElementById('short-char-count');
+        
+        if (shortDescTextarea && shortCharCount) {
+            shortCharCount.textContent = shortDescTextarea.value.length;
+            shortDescTextarea.addEventListener('input', function() {
+                shortCharCount.textContent = this.value.length;
+            });
+        }
+
         // Character counter for description
         const descTextarea = document.getElementById('description');
         const charCount = document.getElementById('char-count');
         
         if (descTextarea && charCount) {
-            // Update on load
             charCount.textContent = descTextarea.value.length;
-            
-            // Update on input
             descTextarea.addEventListener('input', function() {
                 charCount.textContent = this.value.length;
             });

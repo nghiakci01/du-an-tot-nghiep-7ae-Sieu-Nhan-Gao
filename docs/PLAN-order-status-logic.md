@@ -47,7 +47,7 @@ Nếu Admin có quyền, admin được bypass mọi check.
 
 **Khuyên dùng: Option A kết hợp Option B.**
 1. Nới lỏng logic: Cho phép đơn hàng chưa thanh toán được quyền chuyển sang Trạng thái `confirmed` (để in hóa đơn, chuẩn bị hàng...).
-2. Bỏ chặn đối với phương thức `CASH`: Vì `CASH` là trả bằng tiền mặt, nó có tính chất tương tự như thu hộ (`COD`), nhân viên có quyền kiểm soát linh hoạt.
+2. Bỏ chặn đối với phương thức `CASH`: Vì `CASH` là trả bằng tiền mặt, nó có tính chất tương tự như thu hộ (`COD`), người vận hành có quyền kiểm soát linh hoạt.
 
 ---
 

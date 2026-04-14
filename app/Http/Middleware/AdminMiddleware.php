@@ -20,7 +20,7 @@ class AdminMiddleware
             return redirect()->guest('/login');
         }
 
-        if (Auth::user()->isAdmin() || Auth::user()->isStaff()) {
+        if (Auth::user()->isAdmin()) {
             return $next($request);
         }
 

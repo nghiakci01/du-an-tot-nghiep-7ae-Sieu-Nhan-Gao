@@ -79,9 +79,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/notifications/{id}/mark-as-read', [App\Http\Controllers\Frontend\NotificationController::class, 'markAsRead'])->name('notifications.mark_as_read');
     Route::post('/notifications/mark-all-read', [App\Http\Controllers\Frontend\NotificationController::class, 'markAllAsRead'])->name('notifications.mark_all_read');
 
-    // User Bank Accounts
-    Route::post('/my-account/bank-accounts', [App\Http\Controllers\Frontend\AccountController::class, 'storeBankAccount'])->name('account.bank-accounts.store');
-    Route::delete('/my-account/bank-accounts/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'destroyBankAccount'])->name('account.bank-accounts.destroy');
 
     // Wallet (Disabled per user request)
     // Route::post('/my-account/wallet/topup', [App\Http\Controllers\Frontend\WalletController::class, 'requestTopup'])->name('wallet.topup.request');
@@ -109,7 +106,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/checkout/remove-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeCoupon'])->name('checkout.removeCoupon');
     Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
     Route::post('/checkout/remove-item/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeItem'])->name('checkout.remove-item');
-    Route::post('/checkout/order/{id}/confirm-transfer', [App\Http\Controllers\Frontend\CheckoutController::class, 'confirmTransfer'])->name('checkout.confirm_transfer');
     Route::post('/checkout/order/{id}/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancelOrder'])->name('checkout.cancel_order');
 });
 
@@ -155,9 +151,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
         // Admin & Staff Routes
         Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
         Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
-        Route::resource('orders', App\Http\Controllers\Admin\OrderController::class)->except(['create', 'store']);
-        Route::post('orders/{order}/assign-shipper', [App\Http\Controllers\Admin\OrderController::class, 'assignShipper'])->name('orders.assign-shipper');
-        Route::post('orders/{order}/confirm-payment', [App\Http\Controllers\Admin\OrderController::class, 'confirmPayment'])->name('orders.confirm-payment');
+        Route::post('orders/{order}/push-to-ghn', [App\Http\Controllers\Admin\OrderController::class, 'pushToGhn'])->name('orders.push-to-ghn');
+        Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
         Route::post('orders/{order}/query-payment', [App\Http\Controllers\Admin\OrderController::class, 'queryPayment'])->name('orders.query-payment');
         Route::post('orders/{order}/refund-payment', [App\Http\Controllers\Admin\OrderController::class, 'refundPayment'])->name('orders.refund-payment');
         Route::any('orders-trigger-auto-cancel', [App\Http\Controllers\Admin\OrderController::class, 'triggerAutoCancel'])->name('orders.trigger-auto-cancel');
@@ -188,7 +183,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
             Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
 
             // Inventory Management
-            Route::resource('suppliers', App\Http\Controllers\Admin\SupplierController::class);
             if (config('features.stock_report')) {
                 Route::get('stock', function () {
                     return 'Stock Report Page (Coming Soon)';
@@ -198,8 +192,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
 
 
-            // Cài đặt ngân hàng thanh toán (QR Bank Settings)
-            Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
 
             // Wallet Management (Disabled per user request)
             // Route::get('wallet', [App\Http\Controllers\Admin\WalletController::class, 'index'])->name('wallet.index');
@@ -263,16 +255,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
         Route::get('notifications/unread-count', [App\Http\Controllers\Admin\NotificationController::class, 'unreadCount'])->name('notifications.unread_count');
     });
 }); // End Admin Middleware Group
-
-
-// Staff/Shipper Routes
-Route::group(['prefix' => 'staff', 'as' => 'staff.', 'middleware' => ['auth', 'staff']], function () {
-    Route::get('/orders', [App\Http\Controllers\Staff\ShipperOrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [App\Http\Controllers\Staff\ShipperOrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{order}/accept', [App\Http\Controllers\Staff\ShipperOrderController::class, 'accept'])->name('orders.accept');
-    Route::post('/orders/{order}/complete', [App\Http\Controllers\Staff\ShipperOrderController::class, 'complete'])->name('orders.complete');
-    Route::post('/orders/{order}/fail', [App\Http\Controllers\Staff\ShipperOrderController::class, 'fail'])->name('orders.fail');
-});
 
 
 // Quick Test Route
@@ -377,4 +359,3 @@ Route::name('test.payment.')->prefix('test-payment')->middleware('web')->group(f
     })->name('check-order');
 });
 }
-

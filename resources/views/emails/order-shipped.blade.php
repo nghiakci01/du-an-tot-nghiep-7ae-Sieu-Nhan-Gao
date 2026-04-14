@@ -13,7 +13,7 @@
 
     Đơn hàng sẽ sớm được giao đến địa chỉ của bạn. Vui lòng chú ý điện thoại để nhận hàng nhé.
 
-    <x-mail::button :url="url('/account/orders/' . $order->id)">
+    <x-mail::button :url="route('account.orders.show', $order->id)">
         Xem Chi Tiết Đơn Hàng
     </x-mail::button>
 

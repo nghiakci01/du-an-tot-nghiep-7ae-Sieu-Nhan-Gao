@@ -38,8 +38,8 @@
             <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
                 <form action="{{ route('admin.settings.chatbot.update') }}" method="POST">
                     @csrf
-                    <div id="js-data" 
-                         data-old-rules='{{ old("keyword_rules") }}' 
+                    <div id="js-data"
+                         data-old-rules='{{ old("keyword_rules") }}'
                          data-db-rules='{{ $chatbotSettings["keyword_rules"] ?? "[]" }}'
                          style="display: none;"></div>
                     <div class="card">
@@ -117,7 +117,7 @@
                                 </table>
                             </div>
                             <input type="hidden" name="keyword_rules" id="keyword_rules_input">
-                            
+
                             <div class="px-3 py-3 border-top bg-light bg-opacity-25">
                                 <span class="fw-bold small d-block mb-2 text-info"><i class="ti ti-info-circle me-1"></i> Các thẻ động được hỗ trợ:</span>
                                 <div class="d-flex flex-wrap gap-2">
@@ -209,7 +209,7 @@
                                                 <a href="{{ route('admin.chatbot.questions.edit', $question) }}" class="btn btn-warning"><i class="ti ti-edit"></i></a>
                                                 <button type="button" class="btn btn-danger" onclick="confirmDelete('delete-question-{{ $question->id }}')"><i class="ti ti-trash"></i></button>
                                             </div>
-                                            <form id="delete-question-{{ $question->id }}" action="{{ route('admin.chatbot.questions.destroy', $question) }}" method="POST" class="d-none">
+                                            <form id="delete-question-{{ $question->id }}" action="{{ route('admin.chatbot.questions.destroy', $question) }}" method="POST" class="d-none no-pjax">
                                                 @csrf @method('DELETE')
                                             </form>
                                         </td>
@@ -231,7 +231,7 @@
 <script>
 (function() {
     console.log("Chatbot settings JS re-initializing (Pjax-ready)...");
-    
+
     // 1. Khai báo các elements chính
     const chatbotMode = document.getElementById('chatbot_mode');
     const aiProviderSection = document.getElementById('ai_provider_section');
@@ -246,10 +246,10 @@
         const isAI = chatbotMode.value === 'ai';
         if (aiProviderSection) aiProviderSection.style.display = isAI ? 'block' : 'none';
         if (systemInstructionSection) systemInstructionSection.style.display = isAI ? 'block' : 'none';
-        
+
         const provider = aiProvider ? aiProvider.value : 'gemini';
         document.querySelectorAll('.provider-key-section').forEach(s => s.style.display = 'none');
-        
+
         if (isAI) {
             const activeSection = document.getElementById(provider + '_key_section');
             if (activeSection) activeSection.style.display = 'block';
@@ -266,10 +266,10 @@
             const provider = this.getAttribute('data-provider');
             const apiKeyInput = document.getElementById(provider + '_api_key');
             if (!apiKeyInput) return;
-            
+
             const apiKey = apiKeyInput.value;
             const resultDiv = document.getElementById('test-connection-result');
-            
+
             if (resultDiv) {
                 resultDiv.style.display = 'block';
                 resultDiv.className = 'mt-2 alert alert-warning';

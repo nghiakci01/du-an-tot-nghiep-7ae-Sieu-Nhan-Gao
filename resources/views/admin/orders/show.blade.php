@@ -227,57 +227,6 @@
                 @endif
             </div>
         </div>
-
-        <!-- Shipper Assignment Card -->
-        <div class="card shadow-sm mb-4 border-top border-info border-3">
-            <div class="card-header border-bottom">
-                <h5 class="mb-0"><i class="feather icon-truck text-info me-2"></i>Nhân viên giao hàng</h5>
-            </div>
-            <div class="card-body">
-                @if($order->shipper)
-                    <div class="d-flex align-items-center mb-3 p-2 bg-light rounded border">
-                        <div class="avatar me-3">
-                            <img src="{{ $order->shipper->avatar_url }}" class="rounded-circle" width="40" height="40" alt="Shipper">
-                        </div>
-                        <div>
-                            <h6 class="mb-0 fw-bold">{{ $order->shipper->name }}</h6>
-                            <p class="mb-0 small text-muted">{{ $order->shipper->phone ?? 'Chưa có SĐT' }}</p>
-                        </div>
-                    </div>
-                    @if($order->delivery_note)
-                        <div class="alert alert-secondary small p-2 mb-3">
-                            <strong>Ghi chú giao hàng:</strong><br>
-                            {{ $order->delivery_note }}
-                        </div>
-                    @endif
-                @else
-                    <div class="alert alert-light border small text-center mb-3">
-                        <i class="feather icon-alert-circle me-1"></i> Chưa có nhân viên nhận đơn này.
-                    </div>
-                @endif
-
-                @if(!in_array($order->status, [\App\Models\Order::STATUS_COMPLETED, \App\Models\Order::STATUS_CANCELLED]))
-                    <form action="{{ route('admin.orders.assign-shipper', $order->id) }}" method="POST" class="mt-2">
-                        @csrf
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Gán / Đổi Shipper:</label>
-                            <select name="shipper_id" class="form-select form-select-sm" required>
-                                <option value="">-- Chọn Shipper --</option>
-                                @foreach($shippers as $shipper)
-                                    <option value="{{ $shipper->id }}" {{ $order->shipper_id == $shipper->id ? 'selected' : '' }}>
-                                        {{ $shipper->name }} ({{ $shipper->email }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-info btn-sm w-100">
-                            <i class="feather icon-user-plus"></i> {{ $order->shipper_id ? 'Đổi Shipper' : 'Gán Shipper' }}
-                        </button>
-                    </form>
-                @endif
-            </div>
-        </div>
-
         <!-- Customer Card -->
         <div class="card shadow-sm mb-4">
             <div class="card-header border-bottom">
@@ -340,10 +289,29 @@
                         </form>
                     @endif
                 </div>
-                @if($order->shipping_service_name)
+                @if($order->shipping_service_name || $order->tracking_code)
                 <div class="mb-0">
                     <p class="mb-1 text-muted small">ĐƠN VỊ VẬN CHUYỂN</p>
-                    <p class="mb-0 fw-bold">{{ $order->shipping_service_name }}</p>
+                    @if($order->shipping_service_name)
+                        <p class="mb-1 fw-bold">{{ $order->shipping_service_name }}</p>
+                    @endif
+                    
+                    @if($order->tracking_code)
+                        <p class="mb-0 mt-2">
+                            Mã Vận Đơn: <span class="badge bg-primary fs-6">{{ $order->tracking_code }}</span>
+                        </p>
+                    @endif
+                </div>
+                @endif
+
+                @if(!$order->tracking_code && in_array($order->status, [\App\Models\Order::STATUS_PENDING, \App\Models\Order::STATUS_CONFIRMED, \App\Models\Order::STATUS_SHIPPED]))
+                <div class="mb-0 border-top pt-3 mt-3">
+                    <form action="{{ route('admin.orders.push-to-ghn', $order) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn phát sinh Mã Vận Đơn trực tiếp qua hệ thống Giao Hàng Nhanh (GHN) cho đơn hàng này?')">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-outline-primary w-100 fw-bold shadow-sm">
+                            <i class="feather icon-navigation me-1"></i> Tạo đơn sang Giao Hàng Nhanh
+                        </button>
+                    </form>
                 </div>
                 @endif
             </div>
@@ -364,8 +332,6 @@
     </div>
 </div>
 @endsection
-
-
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {

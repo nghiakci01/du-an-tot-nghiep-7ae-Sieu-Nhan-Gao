@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         // Use DB statement to modify enum as Schema builder has limitations with enums
-        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {
+        if (\Illuminate\Support\Facades\DB::connection()->getDriverName() !== 'sqlite') {
             \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'confirmed', 'shipped', 'completed', 'cancelled', 'failed', 'returned') NOT NULL DEFAULT 'pending'");
         }
     }
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         // Revert to original enum
-        if (\Illuminate\Support\Facades\DB::getDriverName() !== 'sqlite') {
+        if (\Illuminate\Support\Facades\DB::connection()->getDriverName() !== 'sqlite') {
             \Illuminate\Support\Facades\DB::statement("ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'confirmed', 'shipped', 'completed', 'cancelled') NOT NULL DEFAULT 'pending'");
         }
     }

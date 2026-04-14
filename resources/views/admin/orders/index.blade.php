@@ -28,22 +28,6 @@
 
                 </div>
                 
-                <div class="card-body border-bottom bg-light bg-opacity-50">
-                    <form action="{{ route('admin.orders.trigger-auto-cancel') }}" method="POST" class="d-flex align-items-center flex-wrap gap-2">
-                        @csrf
-                        <div class="d-flex align-items-center">
-                            <label for="auto_cancel_unpaid_order_minutes" class="form-label mb-0 me-2 text-nowrap font-weight-bold text-danger">
-                                <i class="feather icon-trash-2"></i> Tự động Hủy đơn chưa thanh toán sau (Phút):
-                            </label>
-                            <input type="number" class="form-control form-control-sm" name="auto_cancel_unpaid_order_minutes" id="auto_cancel_unpaid_order_minutes" 
-                                value="{{ \App\Models\Setting::where('key', 'auto_cancel_unpaid_order_minutes')->value('value') ?? '60' }}" 
-                                style="width: 80px;" min="5" required>
-                        </div>
-                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Hệ thống sẽ lưu cấu hình này và quét để HỦY các đơn hàng chưa thanh toán quá thời gian quy định theo hệ thống giờ bạn vừa nhập. Dữ liệu đơn hàng VẪN ĐƯỢC GIỮ LẠI với trạng thái Đã Hủy, sản phẩm sẽ được hoàn lại vào kho. Bạn có chắc chắn?')">
-                            Lưu cấu hình & Chạy kiểm tra hủy đơn ngay
-                        </button>
-                    </form>
-                </div>
 
                 <div class="card-body">
                     <form action="{{ route('admin.orders.index') }}" method="GET" class="mb-3 d-flex align-items-center">
@@ -58,14 +42,6 @@
                             </option>
                             <option value="{{ \App\Models\Order::STATUS_COMPLETED }}" {{ request('status') == \App\Models\Order::STATUS_COMPLETED ? 'selected' : '' }}>Hoàn thành</option>
                         </select>
-
-                        <label for="delivery_status" class="form-label mb-0 me-2 text-nowrap ms-3">Giao hàng:</label>
-                        <select name="delivery_status" id="delivery_status" class="form-select form-select-sm w-auto me-2">
-                            <option value="">Tất cả</option>
-                            <option value="unassigned" {{ request('delivery_status') == 'unassigned' ? 'selected' : '' }}>Chưa giao (Cần gán Shipper)</option>
-                            <option value="delivering" {{ request('delivery_status') == 'delivering' ? 'selected' : '' }}>Đang đi giao</option>
-                            <option value="completed" {{ request('delivery_status') == 'completed' ? 'selected' : '' }}>Giao thành công</option>
-                        </select>
                         <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
                     </form>
 
@@ -78,7 +54,6 @@
                                     <th>Tổng tiền</th>
                                     <th>P.thức T.toán</th>
                                     <th>Trạng thái</th>
-                                    <th>Shipper</th>
                                     <th>Ngày đặt</th>
                                     <th class="sticky-action-column">Hành động</th>
                                 </tr>
@@ -104,19 +79,12 @@
                                                 {{ $order->status_text }}
                                             </span>
                                         </td>
-                                        <td>
-                                            @if($order->shipper)
-                                                <span class="text-primary font-weight-bold"><i class="feather icon-truck"></i> {{ $order->shipper->name }}</span>
-                                            @else
-                                                <span class="text-muted small"><em>Chưa gán</em></span>
-                                            @endif
-                                        </td>
                                         <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                         <td class="sticky-action-column">
                                             <a href="{{ route('admin.orders.show', $order) }}"
                                                 class="btn btn-info btn-sm">Xem</a>
-                                            <a href="{{ route('admin.orders.edit', $order) }}"
-                                                class="btn btn-warning btn-sm">Sửa</a>
+                                            {{-- <a href="{{ route('admin.orders.edit', $order) }}"
+                                                class="btn btn-warning btn-sm">Sửa</a> --}}
                                             <!-- @if($order->status === \App\Models\Order::STATUS_CANCELLED || $order->status === \App\Models\Order::STATUS_COMPLETED)
                                                 <form id="delete-form-odr-{{ $order->id }}"
                                                     action="{{ route('admin.orders.destroy', $order) }}" method="POST"

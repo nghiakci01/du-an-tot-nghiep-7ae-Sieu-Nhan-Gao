@@ -38,8 +38,6 @@
                         <p>
                             @if($user->isAdmin())
                                 <span class="badge bg-danger">Quản trị viên</span>
-                            @elseif($user->isStaff())
-                                <span class="badge bg-warning text-dark">Nhân viên</span>
                             @else
                                 <span class="badge bg-primary">Khách hàng</span>
                             @endif

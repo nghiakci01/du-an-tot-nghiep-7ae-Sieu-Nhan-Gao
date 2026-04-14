@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\phpunit.xml" tests="55" assertions="125" errors="0" failures="2" skipped="0" time="43.957465">
+    <testsuite name="Unit" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.004088">
+      <testsuite name="Tests\Unit\ExampleTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Unit\ExampleTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.004088">
+        <testcase name="test_that_true_is_true" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Unit\ExampleTest.php" line="12" class="Tests\Unit\ExampleTest" classname="Tests.Unit.ExampleTest" assertions="1" time="0.004088"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Feature" tests="54" assertions="124" errors="0" failures="2" skipped="0" time="43.953376">
+      <testsuite name="Tests\Feature\AdminBannerTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\AdminBannerTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.420350">
+        <testcase name="test_admin_banner_management" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\AdminBannerTest.php" line="7" class="Tests\Feature\AdminBannerTest" classname="Tests.Feature.AdminBannerTest" assertions="1" time="0.420350"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\AdminPostTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\AdminPostTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.024480">
+        <testcase name="test_admin_post_management" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\AdminPostTest.php" line="7" class="Tests\Feature\AdminPostTest" classname="Tests.Feature.AdminPostTest" assertions="1" time="0.024480"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\AdminUserTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\AdminUserTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.032666">
+        <testcase name="test_admin_user_management" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\AdminUserTest.php" line="7" class="Tests\Feature\AdminUserTest" classname="Tests.Feature.AdminUserTest" assertions="1" time="0.032666"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\Admin\BannerTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\BannerTest.php" tests="10" assertions="26" errors="0" failures="0" skipped="0" time="3.933620">
+        <testcase name="admin_can_view_banners_list" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\BannerTest.php" line="32" class="Tests\Feature\Admin\BannerTest" classname="Tests.Feature.Admin.BannerTest" assertions="2" time="1.005026"/>
+        <testcase name="admin_can_view_create_banner_form" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\BannerTest.php" line="48" class="Tests\Feature\Admin\BannerTest" classname="Tests.Feature.Admin.BannerTest" assertions="2" time="1.317382"/>
+        <testcase name="admin_can_create_banner_with_image" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\BannerTest.php" line="57" class="Tests\Feature\Admin\BannerTest" classname="Tests.Feature.Admin.BannerTest" assertions="4" time="0.042738"/>
+        <testcase name="creating_banner_without_image_fails" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\BannerTest.php" line="80" class="Tests\Feature\Admin\BannerTest" classname="Tests.Feature.Admin.BannerTest" assertions="2" time="0.028011"/>
+        <testcase name="admin_can_edit_banner" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\BannerTest.php" line="91" class="Tests\Feature\Admin\BannerTest" classname="Tests.Feature.Admin.BannerTest" assertions="2" time="1.391833"/>
+        <testcase name="admin_can_update_banner_without_new_image" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\BannerTest.php" line="107" class="Tests\Feature\Admin\BannerTest" classname="Tests.Feature.Admin.BannerTest" assertions="3" time="0.035358"/>
+        <testcase name="admin_can_update_banner_with_new_image" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\BannerTest.php" line="131" class="Tests\Feature\Admin\BannerTest" classname="Tests.Feature.Admin.BannerTest" assertions="3" time="0.031813"/>
+        <testcase name="admin_can_delete_banner" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\BannerTest.php" line="154" class="Tests\Feature\Admin\BannerTest" classname="Tests.Feature.Admin.BannerTest" assertions="3" time="0.028462"/>
+        <testcase name="banner_image_must_be_valid_format" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\BannerTest.php" line="170" class="Tests\Feature\Admin\BannerTest" classname="Tests.Feature.Admin.BannerTest" assertions="2" time="0.028491"/>
+        <testcase name="banner_upload_with_invalid_file_does_not_trigger_500_error" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\BannerTest.php" line="186" class="Tests\Feature\Admin\BannerTest" classname="Tests.Feature.Admin.BannerTest" assertions="3" time="0.024506"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\Admin\DashboardTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\DashboardTest.php" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="1.556438">
+        <testcase name="admin_can_view_dashboard" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\DashboardTest.php" line="34" class="Tests\Feature\Admin\DashboardTest" classname="Tests.Feature.Admin.DashboardTest" assertions="2" time="1.504594"/>
+        <testcase name="guest_cannot_access_dashboard" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\DashboardTest.php" line="45" class="Tests\Feature\Admin\DashboardTest" classname="Tests.Feature.Admin.DashboardTest" assertions="2" time="0.024553"/>
+        <testcase name="customer_cannot_access_admin_dashboard" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\DashboardTest.php" line="53" class="Tests\Feature\Admin\DashboardTest" classname="Tests.Feature.Admin.DashboardTest" assertions="2" time="0.027290"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\Admin\OrderTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\OrderTest.php" tests="2" assertions="5" errors="0" failures="0" skipped="0" time="1.374950">
+        <testcase name="test_admin_can_view_orders_list" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\OrderTest.php" line="25" class="Tests\Feature\Admin\OrderTest" classname="Tests.Feature.Admin.OrderTest" assertions="2" time="1.330836"/>
+        <testcase name="test_admin_can_create_manual_order" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\OrderTest.php" line="35" class="Tests\Feature\Admin\OrderTest" classname="Tests.Feature.Admin.OrderTest" assertions="3" time="0.044114"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\Admin\ProductVariantTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\ProductVariantTest.php" tests="4" assertions="8" errors="0" failures="0" skipped="0" time="0.118266">
+        <testcase name="test_can_create_product_with_variants" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\ProductVariantTest.php" line="36" class="Tests\Feature\Admin\ProductVariantTest" classname="Tests.Feature.Admin.ProductVariantTest" assertions="2" time="0.031635"/>
+        <testcase name="test_cannot_create_product_with_duplicate_variants" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\ProductVariantTest.php" line="69" class="Tests\Feature\Admin\ProductVariantTest" classname="Tests.Feature.Admin.ProductVariantTest" assertions="2" time="0.028882"/>
+        <testcase name="test_sale_price_must_be_less_than_regular_price" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\ProductVariantTest.php" line="88" class="Tests\Feature\Admin\ProductVariantTest" classname="Tests.Feature.Admin.ProductVariantTest" assertions="2" time="0.027193"/>
+        <testcase name="test_can_update_variants_on_existing_product" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\ProductVariantTest.php" line="112" class="Tests\Feature\Admin\ProductVariantTest" classname="Tests.Feature.Admin.ProductVariantTest" assertions="2" time="0.030556"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\Admin\ReportTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\ReportTest.php" tests="3" assertions="9" errors="0" failures="0" skipped="0" time="1.905566">
+        <testcase name="admin_can_view_dashboard_with_date_filters" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\ReportTest.php" line="24" class="Tests\Feature\Admin\ReportTest" classname="Tests.Feature.Admin.ReportTest" assertions="3" time="1.661866"/>
+        <testcase name="admin_can_export_orders_to_excel" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\ReportTest.php" line="46" class="Tests\Feature\Admin\ReportTest" classname="Tests.Feature.Admin.ReportTest" assertions="3" time="0.030549"/>
+        <testcase name="admin_can_export_revenue_to_pdf" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\ReportTest.php" line="58" class="Tests\Feature\Admin\ReportTest" classname="Tests.Feature.Admin.ReportTest" assertions="3" time="0.213151"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\Admin\UserTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\UserTest.php" tests="7" assertions="15" errors="0" failures="0" skipped="0" time="3.133961">
+        <testcase name="admin_can_view_users_list" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\UserTest.php" line="28" class="Tests\Feature\Admin\UserTest" classname="Tests.Feature.Admin.UserTest" assertions="2" time="1.024293"/>
+        <testcase name="admin_can_view_user_detail" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\UserTest.php" line="37" class="Tests\Feature\Admin\UserTest" classname="Tests.Feature.Admin.UserTest" assertions="1" time="1.038088"/>
+        <testcase name="admin_can_filter_users_by_role" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\UserTest.php" line="52" class="Tests\Feature\Admin\UserTest" classname="Tests.Feature.Admin.UserTest" assertions="1" time="0.960105"/>
+        <testcase name="admin_cannot_delete_themselves" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\UserTest.php" line="60" class="Tests\Feature\Admin\UserTest" classname="Tests.Feature.Admin.UserTest" assertions="3" time="0.035299"/>
+        <testcase name="admin_cannot_delete_last_admin" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\UserTest.php" line="70" class="Tests\Feature\Admin\UserTest" classname="Tests.Feature.Admin.UserTest" assertions="3" time="0.024055"/>
+        <testcase name="admin_can_delete_customer" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\UserTest.php" line="82" class="Tests\Feature\Admin\UserTest" classname="Tests.Feature.Admin.UserTest" assertions="3" time="0.027527"/>
+        <testcase name="guest_cannot_access_users_management" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\Admin\UserTest.php" line="99" class="Tests\Feature\Admin\UserTest" classname="Tests.Feature.Admin.UserTest" assertions="2" time="0.024594"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\CartAuditTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CartAuditTest.php" tests="7" assertions="20" errors="0" failures="0" skipped="0" time="0.281374">
+        <testcase name="it_requires_variant_selection_if_product_has_multiple_variants" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CartAuditTest.php" line="54" class="Tests\Feature\CartAuditTest" classname="Tests.Feature.CartAuditTest" assertions="3" time="0.032537"/>
+        <testcase name="it_auto_selects_variant_if_product_has_only_one_variant" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CartAuditTest.php" line="72" class="Tests\Feature\CartAuditTest" classname="Tests.Feature.CartAuditTest" assertions="5" time="0.046249"/>
+        <testcase name="it_prevents_adding_more_than_stock_quantity" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CartAuditTest.php" line="93" class="Tests\Feature\CartAuditTest" classname="Tests.Feature.CartAuditTest" assertions="2" time="0.030896"/>
+        <testcase name="it_prevents_adding_if_existing_cart_quantity_plus_new_quantity_exceeds_stock" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CartAuditTest.php" line="109" class="Tests\Feature\CartAuditTest" classname="Tests.Feature.CartAuditTest" assertions="3" time="0.032801"/>
+        <testcase name="it_accumulates_quantity_when_added_multiple_times" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CartAuditTest.php" line="136" class="Tests\Feature\CartAuditTest" classname="Tests.Feature.CartAuditTest" assertions="1" time="0.048551"/>
+        <testcase name="it_can_update_cart_quantity" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CartAuditTest.php" line="160" class="Tests\Feature\CartAuditTest" classname="Tests.Feature.CartAuditTest" assertions="3" time="0.042419"/>
+        <testcase name="it_can_remove_item_from_cart" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CartAuditTest.php" line="184" class="Tests\Feature\CartAuditTest" classname="Tests.Feature.CartAuditTest" assertions="3" time="0.047920"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\CartTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CartTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="2.680525">
+        <testcase name="test_user_can_view_cart" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CartTest.php" line="12" class="Tests\Feature\CartTest" classname="Tests.Feature.CartTest" assertions="1" time="2.680525"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\CheckoutTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CheckoutTest.php" tests="3" assertions="8" errors="0" failures="0" skipped="0" time="4.532260">
+        <testcase name="test_user_can_access_checkout_page" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CheckoutTest.php" line="47" class="Tests\Feature\CheckoutTest" classname="Tests.Feature.CheckoutTest" assertions="3" time="2.408963"/>
+        <testcase name="test_user_can_place_cod_order" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CheckoutTest.php" line="56" class="Tests\Feature\CheckoutTest" classname="Tests.Feature.CheckoutTest" assertions="3" time="2.037898"/>
+        <testcase name="test_checkout_fails_if_stock_insufficient" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CheckoutTest.php" line="84" class="Tests\Feature\CheckoutTest" classname="Tests.Feature.CheckoutTest" assertions="2" time="0.085399"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\DemoSafetyTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\DemoSafetyTest.php" tests="2" assertions="2" errors="0" failures="0" skipped="0" time="21.765764">
+        <testcase name="test_dev_payment_routes_are_hidden_by_default" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\DemoSafetyTest.php" line="12" class="Tests\Feature\DemoSafetyTest" classname="Tests.Feature.DemoSafetyTest" assertions="1" time="10.355415"/>
+        <testcase name="test_stock_report_route_is_hidden_by_default" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\DemoSafetyTest.php" line="17" class="Tests\Feature\DemoSafetyTest" classname="Tests.Feature.DemoSafetyTest" assertions="1" time="11.410349"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\MiddlewareTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\MiddlewareTest.php" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="1.885677">
+        <testcase name="test_guest_cannot_access_admin_dashboard" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\MiddlewareTest.php" line="13" class="Tests\Feature\MiddlewareTest" classname="Tests.Feature.MiddlewareTest" assertions="2" time="0.060717"/>
+        <testcase name="test_non_admin_user_cannot_access_admin_dashboard" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\MiddlewareTest.php" line="20" class="Tests\Feature\MiddlewareTest" classname="Tests.Feature.MiddlewareTest" assertions="3" time="0.030000"/>
+        <testcase name="test_admin_can_access_admin_dashboard" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\MiddlewareTest.php" line="30" class="Tests\Feature\MiddlewareTest" classname="Tests.Feature.MiddlewareTest" assertions="1" time="1.794960"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\OrderReturnTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\OrderReturnTest.php" tests="2" assertions="6" errors="0" failures="1" skipped="0" time="0.156585">
+        <testcase name="test_user_can_submit_partial_return_request" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\OrderReturnTest.php" line="19" class="Tests\Feature\OrderReturnTest" classname="Tests.Feature.OrderReturnTest" assertions="2" time="0.047834">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\OrderReturnTest::test_user_can_submit_partial_return_request&#13;
+Failed asserting that a row in the table [order_return_requests] matches the attributes {
+    "order_id": 1,
+    "refund_amount": 1000,
+    "status": "pending"
+}.
+
+The table is empty.
+&#13;
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase.php:43
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\OrderReturnTest.php:78</failure>
+        </testcase>
+        <testcase name="test_admin_completing_return_restores_correct_stock" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\OrderReturnTest.php" line="92" class="Tests\Feature\OrderReturnTest" classname="Tests.Feature.OrderReturnTest" assertions="4" time="0.108751"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ShippingApiTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\ShippingApiTest.php" tests="2" assertions="7" errors="0" failures="1" skipped="0" time="0.071540">
+        <testcase name="test_shipping_api_returns_ranked_home_delivery_options" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\ShippingApiTest.php" line="49" class="Tests\Feature\ShippingApiTest" classname="Tests.Feature.ShippingApiTest" assertions="3" time="0.038085">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ShippingApiTest::test_shipping_api_returns_ranked_home_delivery_options&#13;
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'ghtk'
++'default'
+&#13;
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Testing\AssertableJsonString.php:243
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:879
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\ShippingApiTest.php:60</failure>
+        </testcase>
+        <testcase name="test_shipping_api_returns_store_pickup_option" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\ShippingApiTest.php" line="63" class="Tests\Feature\ShippingApiTest" classname="Tests.Feature.ShippingApiTest" assertions="4" time="0.033455"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\UserAuthTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\UserAuthTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.049384">
+        <testcase name="test_user_can_login" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\UserAuthTest.php" line="13" class="Tests\Feature\UserAuthTest" classname="Tests.Feature.UserAuthTest" assertions="1" time="0.049384"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\WishlistTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\WishlistTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.029969">
+        <testcase name="test_wishlist_access" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\WishlistTest.php" line="7" class="Tests\Feature\WishlistTest" classname="Tests.Feature.WishlistTest" assertions="1" time="0.029969"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

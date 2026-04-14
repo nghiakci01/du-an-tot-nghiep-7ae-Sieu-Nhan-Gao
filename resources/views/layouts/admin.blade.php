@@ -18,7 +18,7 @@
       if (savedTheme === 'dark') {
           html.classList.add('dark-mode');
       }
-      
+
       // Đồng bộ luôn cho body nếu nó đã có sẵn (dù script này thường chạy ở head)
       document.addEventListener('DOMContentLoaded', () => {
           document.body.setAttribute('data-pc-theme', savedTheme);
@@ -84,7 +84,7 @@
     body:not([data-pc-layout="compact"]):not([data-pc-layout="tab"]) .pc-user-profile-header {
         display: none !important;
     }
-    
+
     /* Ẩn Sidebar Profile khi ở Compact hoặc Tab */
     body[data-pc-layout="compact"] .pc-user-profile-sidebar,
     body[data-pc-layout="tab"] .pc-user-profile-sidebar {
@@ -177,7 +177,7 @@
     }
 
     /* --- Global Header Adjustments --- */
-    /* Loại bỏ vách ngăn giữa các thẻ ở Header */    
+    /* Loại bỏ vách ngăn giữa các thẻ ở Header */
   </style>
   @stack('css')
 </head><!-- [Head] end --><!-- [Body] Start -->
@@ -278,7 +278,7 @@
 
           // Hiển thị loading
           $(document).on('pjax:send', function() {
-              $('.loader-bg').show(); 
+              $('.loader-bg').show();
           });
 
           // Tắt loading
@@ -296,13 +296,13 @@
 
               // Khởi tạo lại Feather icons và tooltip/popover nêú cần
               if(window.feather) feather.replace();
-              
+
               const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
               tooltipTriggerList.map(function (tooltipTriggerEl) {
                   return new bootstrap.Tooltip(tooltipTriggerEl);
               });
 
-              // the following block is commented out because jquery-pjax already executes scripts 
+              // the following block is commented out because jquery-pjax already executes scripts
               // within the fragment, and manual eval causes double execution (e.g., double event binding)
               /*
               $('.pc-content script').each(function() {
@@ -313,7 +313,7 @@
                   }
               });
               */
-              
+
               // Nếu có sử dụng DataTables, cần re-init lại bảng
               if ($.fn.DataTable) {
                   $('.table:not(.initialized)').addClass('initialized').DataTable();
@@ -340,12 +340,18 @@
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
         confirmButtonText: 'Xóa',
-        cancelButtonText: 'Hủy'
+        cancelButtonText: 'Hủy',
+        allowOutsideClick: false,
+        allowEscapeKey: false
       }).then((result) => {
         if (result.isConfirmed) {
-          document.getElementById(formId).submit();
+          const form = document.getElementById(formId);
+          if (form) {
+            form.submit();
+          }
         }
-      })
+      });
+      return false;
     }
   </script>
 

@@ -68,7 +68,7 @@ route dang bi tat.
 - Kho / stock report:
 hien chi la trang placeholder.
 - Shipping provider thuc te:
-GHN, GHTK, ViettelPost moi co khung service.
+GHN da san sang cho quote live; GHTK va ViettelPost giu vai tro fallback/mock.
 - Route test thanh toan:
 chi phuc vu phat trien, khong nen trinh bay nhu chuc nang chinh thuc.
 - Dang nhap xa hoi:
@@ -85,11 +85,11 @@ luong mua hang hoan chinh, phan quyen admin, bao cao, chatbot, quan ly noi dung.
 - Tinh nang nao da test:
 gio hang, checkout, admin banner, admin user, admin report, middleware phan quyen.
 - Tinh nang nao chua dong goi xong:
-shipping provider thuc te, stock report, wallet, route test can khoa truoc production.
+GHN live config, stock report, wallet, route test can khoa truoc production.
 
 ## Chot buoi demo
 
 - Nhan manh bai toan thuc te da giai quyet.
 - Nhac den bo test dang xanh.
 - Neu can noi ve huong mo rong:
-tich hop shipping API that, kho hoan chinh, wallet, khoa route test cho production.
+tich hop tiep GHN, kho hoan chinh, wallet, khoa route test cho production.

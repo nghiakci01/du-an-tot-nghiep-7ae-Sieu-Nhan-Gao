@@ -24,14 +24,14 @@ class Order extends Model
         'shipping_fee',
         'shipping_provider',
         'shipping_service_name',
+        'tracking_code',
         'final_total',
         'payment_method',
         'payment_status',
         'transaction_id',
         'shipping_address',
         'note',
-        'shipper_id',
-        'delivery_note',
+        'reminder_step',
     ];
 
     const STATUS_PENDING = 'pending';
@@ -63,11 +63,6 @@ class Order extends Model
     public function histories()
     {
         return $this->hasMany(OrderHistory::class)->orderBy('created_at', 'desc');
-    }
-
-    public function shipper()
-    {
-        return $this->belongsTo(User::class, 'shipper_id');
     }
 
     public function returnRequest()

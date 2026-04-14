@@ -6,11 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -25,21 +23,80 @@ class OrderController extends Controller
             $query->where('status', request('status'));
         }
 
-        // Filter by Delivery Status
-        if (request()->has('delivery_status') && request()->delivery_status != '') {
-            match (request()->delivery_status) {
-                'unassigned' => $query->where('status', Order::STATUS_CONFIRMED)->whereNull('shipper_id'),
-                'delivering' => $query->whereIn('status', [Order::STATUS_SHIPPED]),
-                'completed'  => $query->where('status', Order::STATUS_COMPLETED),
-                default      => null
-            };
-        }
-
         $orders = $query->paginate(10)->appends(request()->all());
+        return view('admin.orders.index', compact('orders'));
+    }
 
-        $shippers = User::where('role', User::ROLE_STAFF)->get();
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'province' => 'required|string',
+            'address' => 'required|string',
+            'payment_method' => 'required|string',
+            'status' => 'required|string',
+            'items' => 'required|array|min:1',
+            'items.*.variant_id' => 'required|exists:product_variants,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
 
-        return view('admin.orders.index', compact('orders', 'shippers'));
+        try {
+            DB::beginTransaction();
+
+            $totalPrice = 0;
+            $itemsData = [];
+
+            foreach ($request->items as $item) {
+                $variant = ProductVariant::lockForUpdate()->findOrFail($item['variant_id']);
+
+                if ($variant->stock_quantity < $item['quantity']) {
+                    throw new \Exception("Sản phẩm {$variant->sku} không đủ tồn kho.");
+                }
+
+                $totalPrice += $variant->price * $item['quantity'];
+                $itemsData[] = [
+                    'product_id' => $variant->product_id,
+                    'variant_id' => $variant->id,
+                    'quantity' => $item['quantity'],
+                    'price' => $variant->price,
+                    'cost_price' => $variant->price, // Simplified for admin order
+                ];
+
+                $variant->decrement('stock_quantity', $item['quantity']);
+            }
+
+            $order = Order::create([
+                'user_id' => $request->user_id ?? null,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'province' => $request->province,
+                'address' => $request->address,
+                'status' => $request->status,
+                'total_price' => $totalPrice,
+                'final_total' => $totalPrice, // No discount/shipping for manual admin order in this basic impl
+                'payment_method' => $request->payment_method,
+                'payment_status' => $request->status === Order::STATUS_COMPLETED ? 'paid' : 'pending',
+                'shipping_address' => $request->address . ', ' . $request->province,
+            ]);
+
+            foreach ($itemsData as $itemData) {
+                $itemData['order_id'] = $order->id;
+                OrderItem::create($itemData);
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.orders.index')->with('success', 'Đơn hàng đã được tạo thành công.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Lỗi khi tạo đơn hàng: ' . $e->getMessage())->withInput();
+        }
     }
 
 
@@ -48,49 +105,7 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        $shippers = User::where('role', User::ROLE_STAFF)->get();
-
-        return view('admin.orders.show', compact('order', 'shippers'));
-    }
-
-    /**
-     * Assign a shipper to the order
-     */
-    public function assignShipper(Request $request, Order $order)
-    {
-        $request->validate([
-            'shipper_id' => 'required|exists:users,id',
-        ]);
-
-        $shipper = User::findOrFail($request->shipper_id);
-
-        if (!$shipper->isStaff()) {
-            return back()->with('error', 'Người dùng được chọn không phải là nhân viên giao hàng.');
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $order->update(['shipper_id' => $shipper->id]);
-
-            // Log history
-            \App\Models\OrderHistory::create([
-                'order_id' => $order->id,
-                'user_id' => Auth::id(),
-                'new_status' => $order->status,
-                'note' => 'Admin đã gán nhân viên giao hàng: ' . $shipper->name,
-            ]);
-
-            // Notify Shipper
-            $shipper->notify(new \App\Notifications\ShipperAssignedNotification($order));
-
-            DB::commit();
-
-            return back()->with('success', 'Đã gán nhân viên ' . $shipper->name . ' cho đơn hàng thành công.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
-        }
+        return view('admin.orders.show', compact('order'));
     }
 
     /**
@@ -114,6 +129,25 @@ class OrderController extends Controller
 
         try {
             $orderService->updateOrderStatus($order, $newStatus, Auth::user());
+            
+            // Tự động tạo mã vận đơn nếu Admin chuyển sang "Đã xác nhận" (Confirmed)
+            if ($newStatus === \App\Models\Order::STATUS_CONFIRMED && empty($order->tracking_code)) {
+                try {
+                    $ghnProvider = app(\App\Services\Shipping\GhnShippingProvider::class);
+                    $ghnProvider->createShippingOrder($order);
+                    $order->update([
+                        'shipping_provider' => 'ghn',
+                        'shipping_service_name' => 'Giao Hàng Nhanh',
+                    ]);
+                    
+                    return redirect()->route('admin.orders.show', $order)
+                        ->with('success', 'Trạng thái đơn hàng đã được cập nhật & Đã tự động tạo mã vận đơn GHN thành công!');
+                } catch (\Exception $ghnEx) {
+                    return redirect()->route('admin.orders.show', $order)
+                        ->with('warning', 'Trạng thái đã cập nhật nhưng không thể tạo mã lệnh GHN tự động: ' . $ghnEx->getMessage());
+                }
+            }
+
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -132,37 +166,6 @@ class OrderController extends Controller
         return view('admin.orders.print', compact('order'));
     }
 
-    public function confirmPayment(Order $order)
-    {
-        if ($order->payment_method !== 'BANK_TRANSFER' || $order->payment_status !== 'waiting_confirmation') {
-            return back()->with('error', 'Đơn hàng không ở trạng thái chờ xác nhận thanh toán.');
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $order->update([
-                'payment_status' => 'paid',
-                'status' => Order::STATUS_CONFIRMED
-            ]);
-
-            // Log history
-            \App\Models\OrderHistory::create([
-                'order_id' => $order->id,
-                'user_id' => Auth::id(),
-                'previous_status' => 'waiting_confirmation',
-                'new_status' => Order::STATUS_CONFIRMED,
-                'note' => 'Admin xác nhận đã nhận tiền chuyển khoản. Đơn hàng chuyển sang trạng thái Đã xác nhận.',
-            ]);
-
-            DB::commit();
-
-            return back()->with('success', 'Đã xác nhận thanh toán cho đơn hàng #' . $order->id);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
-        }
-    }
 
     /**
      * Remove the specified resource from storage.
@@ -194,7 +197,7 @@ class OrderController extends Controller
     public function triggerAutoCancel(Request $request)
     {
         $minutes = $request->input('auto_cancel_unpaid_order_minutes');
-        
+
         if ($minutes && is_numeric($minutes) && $minutes >= 5) {
             \App\Models\Setting::updateOrCreate(
                 ['key' => 'auto_cancel_unpaid_order_minutes'],
@@ -205,10 +208,32 @@ class OrderController extends Controller
         try {
             \Illuminate\Support\Facades\Artisan::call('app:check-payment-reminders');
             $output = \Illuminate\Support\Facades\Artisan::output();
-            
+
             return redirect()->back()->with('success', 'Đã lưu cấu hình (' . $minutes . ' phút) và chạy lệnh rà soát đơn hàng thành công!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Lỗi khi chạy rà soát đơn hàng: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Push order to GHN API to get tracking code
+     */
+    public function pushToGhn(Order $order, \App\Services\Shipping\GhnShippingProvider $ghnProvider)
+    {
+        if ($order->tracking_code) {
+            return back()->with('error', 'Đơn hàng này đã có mã vận đơn GHN rồi.');
+        }
+
+        try {
+            $ghnProvider->createShippingOrder($order);
+            // Cập nhật nhà cung cấp vận chuyển là GHN
+            $order->update([
+                'shipping_provider' => 'ghn',
+                'shipping_service_name' => 'Giao Hàng Nhanh',
+            ]);
+            return back()->with('success', 'Đã tạo vận đơn GHN thành công! Mã vận đơn: ' . $order->tracking_code);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Lỗi khi tạo vận đơn GHN: ' . $e->getMessage());
         }
     }
 }

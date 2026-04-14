@@ -13,6 +13,11 @@ Thumbs.db
 /public/hot
 
 /storage/*.key
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/app/public/*
 /storage/pail
 
 .phpunit.result.cache

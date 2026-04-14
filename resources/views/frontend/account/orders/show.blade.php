@@ -161,9 +161,15 @@
   $progressW    = ($curIdx !== false && !$isCancelled) ? ($curIdx / (count($statusSteps)-1)) * 84 : 0;
   $pmLabel = match($order->payment_method) {
     'COD'           => '💵 Thanh toán khi nhận hàng (COD)',
-    'BANK_TRANSFER' => '🏦 Chuyển khoản ngân hàng',
+    'VNPAY'         => '💳 VNPay',
     default         => $order->payment_method,
   };
+  $returnShippingInfo = [
+    'name' => $settings['return_receiver_name'] ?? ($settings['site_title'] ?? 'Elite'),
+    'phone' => $settings['return_receiver_phone'] ?? ($settings['site_phone'] ?? ''),
+    'address' => $settings['return_receiver_address'] ?? ($settings['site_address'] ?? ''),
+    'note' => $settings['return_receiver_note'] ?? 'Vui lòng ghi rõ mã đơn hàng và giữ lại biên nhận khi gửi trả hàng.',
+  ];
 @endphp
 
 {{-- Breadcrumb --}}
@@ -247,6 +253,38 @@
               <strong>Ghi chú từ cửa hàng:</strong><br>
               {!! nl2br(e($order->returnRequest->admin_note)) !!}
             </div>
+          @endif
+        </div>
+      </div>
+      @endif
+
+      @if($order->returnRequest && $order->returnRequest->isApproved())
+      <div class="detail-card border-info mb-4 shadow-sm">
+        <div class="detail-header bg-info text-white">
+          <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Thông tin nhận hàng hoàn trả</h5>
+        </div>
+        <div class="detail-body">
+          <div class="info-row">
+            <span class="text-muted">Người nhận</span>
+            <span class="fw-semibold text-end" style="max-width:60%;font-size:0.9rem;">{{ $returnShippingInfo['name'] }}</span>
+          </div>
+          @if($returnShippingInfo['phone'])
+          <div class="info-row">
+            <span class="text-muted">Số điện thoại</span>
+            <span class="text-end" style="max-width:60%;font-size:0.9rem;">
+              <a href="tel:{{ preg_replace('/\s+/', '', $returnShippingInfo['phone']) }}" class="text-decoration-none">{{ $returnShippingInfo['phone'] }}</a>
+            </span>
+          </div>
+          @endif
+          <div class="info-row">
+            <span class="text-muted">Địa chỉ</span>
+            <span class="text-end" style="max-width:60%;font-size:0.85rem;">{{ $returnShippingInfo['address'] }}</span>
+          </div>
+          @if($returnShippingInfo['note'])
+          <div class="mt-3 p-3 rounded" style="background:#f8fbff; border:1px dashed #cfe2ff;">
+            <small class="text-muted d-block mb-1">Ghi chú cho khách</small>
+            <div class="small">{{ $returnShippingInfo['note'] }}</div>
+          </div>
           @endif
         </div>
       </div>
