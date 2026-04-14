@@ -374,27 +374,61 @@ class GhnShippingProvider implements ShippingProviderInterface
         $addressPart = explode(' - ', $addressFull)[0] ?? '';
         $parts = array_map('trim', explode(',', $addressPart));
         
-        $province = $order->province ?? '';
-        $district = '';
-        $ward = '';
+        $provinceName = $order->province ?: (end($parts) ?: '');
+        $provinceId = $this->findProvinceId($provinceName, $config);
         
-        $count = count($parts);
-        if ($count >= 4) {
-             $province = $parts[$count - 1];
-             $district = $parts[$count - 2];
-             $ward = $parts[$count - 3];
-        } elseif ($count === 3) {
-             $province = $parts[2];
-             $district = $parts[1];
-             $ward = $parts[0];
+        if (!$provinceId) {
+            throw new \Exception("Không thể nhận diện Tỉnh/Thành phố từ địa chỉ: $addressPart. Vui lòng kiểm tra lại thông tin Tỉnh/Thành.");
         }
-        
-        $destination = $this->resolveDestination($province, $district, $ward, $config);
-        
-        if (!$destination) {
-             throw new \Exception("Không thể nhận diện Quận/Huyện hoặc Phường/Xã từ địa chỉ: $addressPart. Đảm bảo địa chỉ có định dạng 'Số nhà, Phường, Quận, Tỉnh'.");
+
+        $districts = $this->getDistrictsByProvinceId($provinceId, $config);
+        $districtId = null;
+        $foundDistrictIndex = -1;
+
+        // Quét ngược để tìm Quận/Huyện
+        for ($i = count($parts) - 1; $i >= 0; $i--) {
+            $needle = $this->normalize($parts[$i]);
+            foreach ($districts as $d) {
+                $names = array_filter([
+                    data_get($d, 'DistrictName'),
+                    data_get($d, 'district_name'),
+                    data_get($d, 'NameExtension'),
+                ]);
+                if ($this->matchesAnyName($needle, $names)) {
+                    $districtId = (int)$d['DistrictID'];
+                    $foundDistrictIndex = $i;
+                    break 2;
+                }
+            }
         }
-        
+
+        if (!$districtId) {
+            throw new \Exception("Không thể nhận diện Quận/Huyện từ địa chỉ: $addressPart. GHN yêu cầu Quận/Huyện phải thuộc Tỉnh/Thành: $provinceName.");
+        }
+
+        $wards = $this->getWardsByDistrictId($districtId, $config);
+        $wardCode = null;
+
+        // Quét các phần còn lại bên trái để tìm Phường/Xã
+        for ($i = $foundDistrictIndex - 1; $i >= 0; $i--) {
+            $needle = $this->normalize($parts[$i]);
+            foreach ($wards as $w) {
+                $names = array_filter([
+                    data_get($w, 'WardName'),
+                    data_get($w, 'ward_name'),
+                    data_get($w, 'NameExtension'),
+                ]);
+                if ($this->matchesAnyName($needle, $names)) {
+                    $wardCode = (string)$w['WardCode'];
+                    break 2;
+                }
+            }
+        }
+
+        if (!$wardCode) {
+            throw new \Exception("Không thể nhận diện Phường/Xã từ địa chỉ: $addressPart. Vui lòng đảm bảo thông tin Phường/Xã chính xác và thuộc Quận/Huyện đã chọn.");
+        }
+
         $weight = 500;
         $totalQuantity = $order->items->sum('quantity');
         if ($totalQuantity > 0) {
@@ -419,8 +453,8 @@ class GhnShippingProvider implements ShippingProviderInterface
             'to_name' => $order->name,
             'to_phone' => $order->phone,
             'to_address' => $addressPart,
-            'to_ward_code' => $destination['ward_code'],
-            'to_district_id' => $destination['district_id'],
+            'to_ward_code' => $wardCode,
+            'to_district_id' => $districtId,
             'cod_amount' => (int) $codAmount,
             'weight' => $weight,
             'length' => 20,
