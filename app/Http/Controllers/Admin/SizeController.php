@@ -23,7 +23,7 @@ class SizeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:sizes,name',
+            'name' => 'required|string|max:25|unique:sizes,name',
             'display_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);
@@ -45,7 +45,7 @@ class SizeController extends Controller
     public function update(Request $request, Size $size)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:sizes,name,'.$size->id,
+            'name' => 'required|string|max:25|unique:sizes,name,'.$size->id,
             'display_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);

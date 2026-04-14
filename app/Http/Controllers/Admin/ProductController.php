@@ -93,7 +93,7 @@ class ProductController extends Controller
 
                     $sku = $variantData['sku'] ?? null;
                     if (empty($sku)) {
-                        $sku = strtoupper(Str::slug($product->name.'-'.$sizeName.'-'.$colorName.'-'.uniqid()));
+                        $sku = $this->generateSKU($product->name, $sizeName, $colorName);
                     }
 
                     $product->variants()->create([
@@ -233,7 +233,7 @@ class ProductController extends Controller
 
                 $sku = $variantData['sku'] ?? null;
                 if (empty($sku)) {
-                    $sku = strtoupper(Str::slug($product->name.'-'.$sizeName.'-'.$colorName.'-'.uniqid()));
+                    $sku = $this->generateSKU($product->name, $sizeName, $colorName);
                 }
 
                 $variantAttributes = [
@@ -394,4 +394,18 @@ class ProductController extends Controller
     }
 
 
+
+    /**
+     * Generate a unique SKU based on product name, size, and color.
+     * Format: <tensanpham>-<size>-<mau>-<6kitutudong>
+     */
+    private function generateSKU($productName, $sizeName, $colorName): string
+    {
+        $cleanName = strtoupper(substr(Str::slug($productName, ''), 0, 5));
+        $cleanSize = strtoupper(Str::slug($sizeName, ''));
+        $cleanColor = strtoupper(Str::slug($colorName, ''));
+        $random = strtoupper(Str::random(6));
+
+        return "{$cleanName}-{$cleanSize}-{$cleanColor}-{$random}";
+    }
 }
