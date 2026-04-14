@@ -129,12 +129,20 @@ class AccountController extends Controller
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'current_password' => 'required_with:new_password|nullable',
             'new_password' => 'nullable|min:8|confirmed',
+            'bank_name' => 'nullable|string|max:255',
+            'bank_bin' => 'nullable|string|max:20',
+            'account_number' => 'nullable|string|max:50',
+            'account_name' => 'nullable|string|max:255',
         ], [
             'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
         ]);
 
         $user->name = $request->name;
         $user->phone = $request->phone;
+        $user->bank_name = $request->bank_name;
+        $user->bank_bin = $request->bank_bin;
+        $user->account_number = $request->account_number;
+        $user->account_name = $request->account_name;
 
         if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             if ($user->avatar) {

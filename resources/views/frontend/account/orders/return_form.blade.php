@@ -339,40 +339,40 @@
                     <select name="bank_bin" id="bank_bin" class="form-select select2-bank" required>
                       <option value="">-- Chọn Ngân Hàng --</option>
                       <!-- Top Preferred Banks -->
-                      <option value="970436" data-logo="https://api.vietqr.io/img/VCB.png" data-name="Vietcombank">Vietcombank</option>
-                      <option value="970418" data-logo="https://api.vietqr.io/img/BIDV.png" data-name="BIDV">BIDV</option>
-                      <option value="970405" data-logo="https://api.vietqr.io/img/VBA.png" data-name="Agribank">Agribank</option>
-                      <option value="970415" data-logo="https://api.vietqr.io/img/CTG.png" data-name="VietinBank">VietinBank</option>
-                      <option value="970407" data-logo="https://api.vietqr.io/img/TCB.png" data-name="Techcombank">Techcombank</option>
-                      <option value="970422" data-logo="https://api.vietqr.io/img/MB.png" data-name="MBBank">MBBank</option>
-                      <option value="970416" data-logo="https://api.vietqr.io/img/ACB.png" data-name="ACB">ACB</option>
-                      <option value="970403" data-logo="https://api.vietqr.io/img/STB.png" data-name="Sacombank">Sacombank</option>
-                      <option value="970432" data-logo="https://api.vietqr.io/img/VPB.png" data-name="VPBank">VPBank</option>
-                      <option value="970423" data-logo="https://api.vietqr.io/img/TPB.png" data-name="TPBank">TPBank</option>
+                      <option value="970436" data-logo="https://api.vietqr.io/img/VCB.png" data-name="Vietcombank" {{ auth()->user()->bank_bin == '970436' ? 'selected' : '' }}>Vietcombank</option>
+                      <option value="970418" data-logo="https://api.vietqr.io/img/BIDV.png" data-name="BIDV" {{ auth()->user()->bank_bin == '970418' ? 'selected' : '' }}>BIDV</option>
+                      <option value="970405" data-logo="https://api.vietqr.io/img/VBA.png" data-name="Agribank" {{ auth()->user()->bank_bin == '970405' ? 'selected' : '' }}>Agribank</option>
+                      <option value="970415" data-logo="https://api.vietqr.io/img/CTG.png" data-name="VietinBank" {{ auth()->user()->bank_bin == '970415' ? 'selected' : '' }}>VietinBank</option>
+                      <option value="970407" data-logo="https://api.vietqr.io/img/TCB.png" data-name="Techcombank" {{ auth()->user()->bank_bin == '970407' ? 'selected' : '' }}>Techcombank</option>
+                      <option value="970422" data-logo="https://api.vietqr.io/img/MB.png" data-name="MBBank" {{ auth()->user()->bank_bin == '970422' ? 'selected' : '' }}>MBBank</option>
+                      <option value="970416" data-logo="https://api.vietqr.io/img/ACB.png" data-name="ACB" {{ auth()->user()->bank_bin == '970416' ? 'selected' : '' }}>ACB</option>
+                      <option value="970403" data-logo="https://api.vietqr.io/img/STB.png" data-name="Sacombank" {{ auth()->user()->bank_bin == '970403' ? 'selected' : '' }}>Sacombank</option>
+                      <option value="970432" data-logo="https://api.vietqr.io/img/VPB.png" data-name="VPBank" {{ auth()->user()->bank_bin == '970432' ? 'selected' : '' }}>VPBank</option>
+                      <option value="970423" data-logo="https://api.vietqr.io/img/TPB.png" data-name="TPBank" {{ auth()->user()->bank_bin == '970423' ? 'selected' : '' }}>TPBank</option>
                       <!-- Other Banks -->
-                      <option value="970437" data-logo="https://api.vietqr.io/img/HDB.png" data-name="HDBank">HDBBank</option>
-                      <option value="970441" data-logo="https://api.vietqr.io/img/VIB.png" data-name="VIB">VIB</option>
-                      <option value="970443" data-logo="https://api.vietqr.io/img/SHB.png" data-name="SHB">SHB</option>
-                      <option value="970426" data-logo="https://api.vietqr.io/img/MSB.png" data-name="MSB">MSB</option>
-                      <option value="970440" data-logo="https://api.vietqr.io/img/SEAB.png" data-name="SeABank">SeABank</option>
-                      <option value="970449" data-logo="https://api.vietqr.io/img/LPB.png" data-name="LPBank">LPBank</option>
-                      <option value="970428" data-logo="https://api.vietqr.io/img/NAB.png" data-name="NamABank">NamABank</option>
-                      <option value="970414" data-logo="https://api.vietqr.io/img/OCB.png" data-name="OCB">OCB</option>
-                      <option value="970431" data-logo="https://api.vietqr.io/img/EIB.png" data-name="Eximbank">Eximbank</option>
-                      <option value="970438" data-logo="https://api.vietqr.io/img/BVB.png" data-name="BVBank">BVBank</option>
+                      <option value="970437" data-logo="https://api.vietqr.io/img/HDB.png" data-name="HDBank" {{ auth()->user()->bank_bin == '970437' ? 'selected' : '' }}>HDBank</option>
+                      <option value="970441" data-logo="https://api.vietqr.io/img/VIB.png" data-name="VIB" {{ auth()->user()->bank_bin == '970441' ? 'selected' : '' }}>VIB</option>
+                      <option value="970443" data-logo="https://api.vietqr.io/img/SHB.png" data-name="SHB" {{ auth()->user()->bank_bin == '970443' ? 'selected' : '' }}>SHB</option>
+                      <option value="970426" data-logo="https://api.vietqr.io/img/MSB.png" data-name="MSB" {{ auth()->user()->bank_bin == '970426' ? 'selected' : '' }}>MSB</option>
+                      <option value="970440" data-logo="https://api.vietqr.io/img/SEAB.png" data-name="SeABank" {{ auth()->user()->bank_bin == '970440' ? 'selected' : '' }}>SeABank</option>
+                      <option value="970449" data-logo="https://api.vietqr.io/img/LPB.png" data-name="LPBank" {{ auth()->user()->bank_bin == '970449' ? 'selected' : '' }}>LPBank</option>
+                      <option value="970428" data-logo="https://api.vietqr.io/img/NAB.png" data-name="NamABank" {{ auth()->user()->bank_bin == '970428' ? 'selected' : '' }}>NamABank</option>
+                      <option value="970414" data-logo="https://api.vietqr.io/img/OCB.png" data-name="OCB" {{ auth()->user()->bank_bin == '970414' ? 'selected' : '' }}>OCB</option>
+                      <option value="970431" data-logo="https://api.vietqr.io/img/EIB.png" data-name="Eximbank" {{ auth()->user()->bank_bin == '970431' ? 'selected' : '' }}>Eximbank</option>
+                      <option value="970438" data-logo="https://api.vietqr.io/img/BVB.png" data-name="BVBank" {{ auth()->user()->bank_bin == '970438' ? 'selected' : '' }}>BVBank</option>
                     </select>
-                    <input type="hidden" name="bank_name" id="bank_name">
+                    <input type="hidden" name="bank_name" id="bank_name" value="{{ auth()->user()->bank_name }}">
                   </div>
 
                   <div class="col-md-6">
                     <label class="form-label small fw-bold">Số tài khoản <span class="text-danger">*</span></label>
-                    <input type="text" name="account_number" id="account_number" class="form-control" placeholder="Nhập số tài khoản" required style="border-radius:10px; height:45px;">
+                    <input type="text" name="account_number" id="account_number" class="form-control" value="{{ auth()->user()->account_number }}" placeholder="Nhập số tài khoản" required style="border-radius:10px; height:45px;">
                   </div>
 
                   <div class="col-md-12">
                     <label class="form-label small fw-bold">Tên chủ tài khoản <span class="text-danger">*</span></label>
                     <div class="position-relative">
-                      <input type="text" name="account_name" id="account_name" class="form-control text-uppercase" placeholder="Hệ thống sẽ tra cứu tự động..." required style="border-radius:10px; height:45px; background-color: #f8f9fa;">
+                      <input type="text" name="account_name" id="account_name" class="form-control text-uppercase" value="{{ auth()->user()->account_name }}" placeholder="Hệ thống sẽ tra cứu tự động..." required style="border-radius:10px; height:45px; background-color: #f8f9fa;">
                       <div id="lookup-spinner" class="spinner-border spinner-border-sm text-primary position-absolute" role="status" style="right: 15px; top: 15px; display: none;">
                         <span class="visually-hidden">Loading...</span>
                       </div>
@@ -573,6 +573,11 @@ $(document).ready(function() {
             });
         }
     });
+
+    // Trigger initial lookup if data exists
+    if ($('#bank_bin').val() && $('#account_number').val()) {
+        checkAccountName();
+    }
 
     // Trigger initial calculation
     calculateTotalRefund();
