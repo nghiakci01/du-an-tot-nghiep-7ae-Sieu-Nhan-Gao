@@ -104,7 +104,7 @@
                                 </td>
                                 <td><span class="text-danger fw-bold">{{ number_format($req->refund_amount) }}đ</span></td>
                                 <td>{{ $req->created_at->format('d/m/Y H:i') }}</td>
-                                <td>{!! $req->status_badge !!}</td>
+                                <td><span class="badge {{ $req->status_badge }}">{{ $req->status_text }}</span></td>
                                 <td class="sticky-action-column">
                                     <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailModal{{ $req->id }}">
                                         <i class="fas fa-eye"></i> Xử lý
@@ -169,7 +169,7 @@
 
                                             <div class="mb-3">
                                                 <h6>Mô tả chi tiết:</h6>
-                                                <div class="p-2 bg-light border rounded">{{ $req->description ?: 'Không có mô tả' }}</div>
+                                                <div class="p-2 bg-light border rounded">{{ $req->note ?: 'Không có mô tả' }}</div>
                                             </div>
 
                                             @if($req->images)

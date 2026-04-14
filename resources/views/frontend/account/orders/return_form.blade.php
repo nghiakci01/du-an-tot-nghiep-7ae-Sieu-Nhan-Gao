@@ -227,8 +227,8 @@
 
               {{-- Note --}}
               <div class="mb-4">
-                <label class="form-label fw-bold">Chi tiết lỗi / Yêu cầu thêm</label>
-                <textarea name="note" class="form-control" rows="4" placeholder="Vui lòng mô tả chi tiết tình trạng sản phẩm..." style="border-radius:10px;"></textarea>
+                <label class="form-label fw-bold">Chi tiết lỗi / Yêu cầu thêm <span class="text-danger">*</span></label>
+                <textarea name="note" class="form-control" rows="4" placeholder="Vui lòng mô tả chi tiết tình trạng sản phẩm..." style="border-radius:10px;" required></textarea>
               </div>
 
               {{-- Images --}}

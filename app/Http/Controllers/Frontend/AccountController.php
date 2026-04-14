@@ -213,7 +213,7 @@ class AccountController extends Controller
 
         $request->validate([
             'reason' => 'required|string|max:255',
-            'note' => 'nullable|string|max:1000',
+            'note' => 'required|string|max:1000',
             'images' => 'required|array|min:1',
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'videos' => 'required|array|min:1',
@@ -228,6 +228,7 @@ class AccountController extends Controller
         ], [
             'images.required' => 'Vui lòng cung cấp ít nhất một hình ảnh minh chứng.',
             'images.*.image' => 'File tải lên phải là hình ảnh.',
+            'note.required' => 'Vui lòng mô tả chi tiết tình trạng sản phẩm hoặc yêu cầu của bạn.',
             'videos.required' => 'Vui lòng cung cấp ít nhất một video minh chứng.',
             'videos.*.mimes' => 'Video phải có định dạng mp4, mov, avi hoặc webm.',
             'bank_name.required' => 'Vui lòng chọn ngân hàng nhận tiền hoàn.',
