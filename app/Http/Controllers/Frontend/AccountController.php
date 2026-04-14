@@ -213,6 +213,7 @@ class AccountController extends Controller
 
         $request->validate([
             'reason' => 'required|string|max:255',
+            'return_method' => 'required|string|in:at_home,at_post_office',
             'note' => 'required|string|max:1000',
             'images' => 'required|array|min:1',
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -229,6 +230,7 @@ class AccountController extends Controller
             'images.required' => 'Vui lòng cung cấp ít nhất một hình ảnh minh chứng.',
             'images.*.image' => 'File tải lên phải là hình ảnh.',
             'note.required' => 'Vui lòng mô tả chi tiết tình trạng sản phẩm hoặc yêu cầu của bạn.',
+            'return_method.required' => 'Vui lòng chọn phương thức gửi hàng hoàn trả.',
             'videos.required' => 'Vui lòng cung cấp ít nhất một video minh chứng.',
             'videos.*.mimes' => 'Video phải có định dạng mp4, mov, avi hoặc webm.',
             'bank_name.required' => 'Vui lòng chọn ngân hàng nhận tiền hoàn.',
@@ -287,6 +289,7 @@ class AccountController extends Controller
                 'user_id' => $user->id,
                 'order_id' => $order->id,
                 'reason' => $request->reason,
+                'return_method' => $request->return_method,
                 'note' => $request->note,
                 'images' => $imagePaths,
                 'videos' => $videoPaths,
@@ -359,6 +362,22 @@ class AccountController extends Controller
         }
 
         return redirect()->back()->with('success', 'Gửi thông tin vận chuyển thành công. Chúng tôi sẽ thông báo khi nhận được hàng.');
+    }
+
+    public function updateReturnMethod(Request $request, $id)
+    {
+        $request->validate([
+            'return_method' => 'required|string|in:at_home,at_post_office',
+        ]);
+
+        $order = \App\Models\Order::findOrFail($id);
+        if ($order->returnRequest) {
+            $order->returnRequest->update([
+                'return_method' => $request->return_method
+            ]);
+        }
+
+        return back()->with('success', 'Đã cập nhật phương thức gửi hàng thành công.');
     }
 
 }

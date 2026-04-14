@@ -248,6 +248,44 @@
             @endif
           </div>
           <div class="mb-1"><strong>Lý do:</strong> {{ $order->returnRequest->reason }}</div>
+          
+          @if($order->returnRequest->return_method)
+            <div class="mb-1 d-flex align-items-center">
+                <strong>Phương thức gửi trả:</strong> 
+                <span class="ms-1">{{ $order->returnRequest->return_method_text }}</span>
+                @if($order->returnRequest->isApproved())
+                    <a href="javascript:void(0)" onclick="document.getElementById('change-return-method').classList.toggle('d-none')" class="ms-2 badge bg-secondary text-decoration-none" style="font-size: 0.65rem; cursor:pointer;">Thay đổi</a>
+                @endif
+            </div>
+          @endif
+
+          {{-- UI Chọn/Đổi phương thức --}}
+          @if($order->returnRequest->isApproved())
+            <div id="change-return-method" class="mt-3 p-3 rounded-3 bg-white border border-warning shadow-sm {{ $order->returnRequest->return_method ? 'd-none' : '' }}">
+                <p class="mb-2 small fw-bold text-danger"><i class="bi bi-info-circle me-1"></i> {{ $order->returnRequest->return_method ? 'Thay đổi phương thức gửi hàng:' : 'Chọn phương thức gửi hàng:' }}</p>
+                <form action="{{ route('account.orders.return.update_method', $order->id) }}" method="POST">
+                    @csrf
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="return_method" value="at_home" class="btn {{ $order->returnRequest->return_method === 'at_home' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm rounded-pill flex-grow-1">
+                            <i class="bi bi-house-door me-1"></i> Shipper lấy hàng
+                        </button>
+                        <button type="submit" name="return_method" value="at_post_office" class="btn {{ $order->returnRequest->return_method === 'at_post_office' ? 'btn-success' : 'btn-outline-success' }} btn-sm rounded-pill flex-grow-1">
+                            <i class="bi bi-building me-1"></i> Tự mang đến bưu cục
+                        </button>
+                    </div>
+                </form>
+            </div>
+          @endif
+
+          @if($order->returnRequest->return_method === 'at_post_office' && $order->returnRequest->isApproved())
+            <div class="mt-2 text-center p-3 rounded-3" style="background: #fff; border: 1px solid #198754; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <p class="mb-2 small fw-bold text-success">📍 Bạn đã chọn tự mang ra bưu cục:</p>
+                <a href="https://www.google.com/maps/search/Giao+hàng+tiết+kiệm/" target="_blank" class="btn btn-success btn-sm w-100 rounded-pill py-2">
+                    <i class="bi bi-geo-alt-fill me-1"></i>🌏 Tìm bưu cục GHTK gần nhất (Google Maps)
+                </a>
+            </div>
+          @endif
+
           @if($order->returnRequest->admin_note)
             <div class="mt-2 p-2 rounded" style="background:rgba(255,255,255,0.6);">
               <strong>Ghi chú từ cửa hàng:</strong><br>

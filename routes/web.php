@@ -73,6 +73,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/my-account/orders/{id}/return', [App\Http\Controllers\Frontend\AccountController::class, 'returnOrderForm'])->name('account.orders.return_form');
     Route::post('/my-account/orders/{id}/return', [App\Http\Controllers\Frontend\AccountController::class, 'submitReturnRequest'])->name('account.orders.return_submit');
     Route::post('/my-account/orders/{id}/return/shipping', [App\Http\Controllers\Frontend\AccountController::class, 'submitShipping'])->name('account.orders.return.shipping');
+    Route::post('/my-account/orders/{id}/return/update-method', [App\Http\Controllers\Frontend\AccountController::class, 'updateReturnMethod'])->name('account.orders.return.update_method');
 
     // User Notifications
     Route::get('/notifications', [App\Http\Controllers\Frontend\NotificationController::class, 'index'])->name('notifications.list');

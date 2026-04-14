@@ -130,7 +130,8 @@
                                                 <div class="col-md-6">
                                                     <h6 class="fw-bold text-danger text-end"><i class="fas fa-money-bill-wave me-1"></i> Thông tin hoàn trả:</h6>
                                                     <p class="mb-1 text-end">Số tiền: <strong class="fs-5 text-danger">{{ number_format($req->refund_amount) }}đ</strong></p>
-                                                    <p class="mb-0 text-end">Lý do: <span class="badge bg-white text-dark border">{{ $req->reason_text }}</span></p>
+                                                    <p class="mb-1 text-end">Lý do: <span class="badge bg-white text-dark border">{{ $req->reason_text }}</span></p>
+                                                    <p class="mb-0 text-end">Phương thức: <span class="badge bg-info text-white">{{ $req->return_method_text }}</span></p>
                                                 </div>
                                             </div>
 
