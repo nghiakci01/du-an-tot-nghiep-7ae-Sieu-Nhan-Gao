@@ -50,15 +50,21 @@ class OrderReturnRequestStatusNotification extends Notification
                 ->line($this->returnRequest->admin_note ? 'Lý do: '.$this->returnRequest->admin_note : '')
                 ->action('Xem chi tiết', route('account.orders.show', $this->returnRequest->order_id)),
 
-            'completed' => $message
+            'refunded' => $message
                 ->greeting('Xin chào '.$notifiable->name.'!')
-                ->line('Hoàn hàng cho đơn **#'.$this->returnRequest->order_id.'** đã **hoàn tất**.')
-                ->line('Tiền hoàn đã được cộng vào ví/tài khoản của bạn.')
-                ->action('Kiểm tra tài khoản', url('/my-account')),
+                ->line('Yêu cầu trả hàng hoàn tiền cho đơn **#'.$this->returnRequest->order_id.'** đã **hoàn tất**.')
+                ->line('Số tiền '.number_format($this->returnRequest->refund_amount).'đ đã được cộng vào ví của bạn.')
+                ->action('Kiểm tra ví', route('account.index', ['tab' => 'wallet'])),
+
+            'exchanged' => $message
+                ->greeting('Xin chào '.$notifiable->name.'!')
+                ->line('Yêu cầu đổi hàng cho đơn **#'.$this->returnRequest->order_id.'** đã được **xử lý thành công**.')
+                ->line('Chúng tôi sẽ sớm gửi sản phẩm mới đến cho bạn.')
+                ->action('Xem chi tiết', route('account.orders.show', $this->returnRequest->order_id)),
 
             default => $message
                 ->greeting('Xin chào '.$notifiable->name.'!')
-                ->line('Yêu cầu hoàn hàng cho đơn #'.$this->returnRequest->order_id.' đã '.$statusText.'.')
+                ->line('Yêu cầu hoàn trả đơn #'.$this->returnRequest->order_id.' đã '.$statusText.'.')
                 ->action('Xem chi tiết', route('account.orders.show', $this->returnRequest->order_id)),
         };
 
@@ -84,9 +90,10 @@ class OrderReturnRequestStatusNotification extends Notification
     {
         return match ($this->status) {
             'approved' => 'được chấp nhận (Chờ bạn gửi hàng)',
-            'shipping' => 'đang được vận chuyển về kho',
-            'received' => 'đã được nhận tại kho (Đang chờ hoàn tiền)',
-            'completed' => 'hoàn thành (Đã hoàn tiền vào ví)',
+            'shipping_back' => 'đang được vận chuyển về kho',
+            'received' => 'đã được nhận tại kho (Đang chờ xử lý cuối cùng)',
+            'refunded' => 'hoàn tất (Đã hoàn tiền vào ví)',
+            'exchanged' => 'hoàn tất (Đã đổi hàng thành công)',
             'rejected' => 'bị từ chối',
             default => 'thay đổi trạng thái',
         };

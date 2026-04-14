@@ -63,16 +63,19 @@
                         <a class="nav-link {{ request('status') === 'pending' ? 'active alert-warning' : '' }}" href="{{ route('admin.returns.index', ['status' => 'pending']) }}">Chờ duyệt</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request('status') === 'approved' ? 'active alert-info' : '' }}" href="{{ route('admin.returns.index', ['status' => 'approved']) }}">Chờ gửi hàng</a>
+                        <a class="nav-link {{ request('status') === 'approved' ? 'active alert-info' : '' }}" href="{{ route('admin.returns.index', ['status' => 'approved']) }}">Chờ khách gửi hàng</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request('status') === 'shipping' ? 'active alert-primary' : '' }}" href="{{ route('admin.returns.index', ['status' => 'shipping']) }}">Đang di chuyển</a>
+                        <a class="nav-link {{ request('status') === 'shipping_back' ? 'active alert-primary' : '' }}" href="{{ route('admin.returns.index', ['status' => 'shipping_back']) }}">Đang về kho</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request('status') === 'received' ? 'active alert-success' : '' }}" href="{{ route('admin.returns.index', ['status' => 'received']) }}">Đã nhận hàng</a>
+                        <a class="nav-link {{ request('status') === 'received' ? 'active alert-dark' : '' }}" href="{{ route('admin.returns.index', ['status' => 'received']) }}">Đã nhận hàng</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request('status') === 'completed' ? 'active alert-success' : '' }}" href="{{ route('admin.returns.index', ['status' => 'completed']) }}">Hoàn thành</a>
+                        <a class="nav-link {{ request('status') === 'refunded' ? 'active alert-success' : '' }}" href="{{ route('admin.returns.index', ['status' => 'refunded']) }}">Đã hoàn tiền</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request('status') === 'exchanged' ? 'active alert-success' : '' }}" href="{{ route('admin.returns.index', ['status' => 'exchanged']) }}">Đã đổi hàng</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request('status') === 'rejected' ? 'active alert-danger' : '' }}" href="{{ route('admin.returns.index', ['status' => 'rejected']) }}">Từ chối</a>
@@ -84,6 +87,7 @@
                         <tr>
                             <th>MÃ ĐH</th>
                             <th>KHÁCH HÀNG</th>
+                            <th>LOẠI</th>
                             <th>LÝ DO</th>
                             <th>TIỀN HOÀN</th>
                             <th>NGÀY YC</th>
@@ -100,7 +104,10 @@
                                     <small class="text-muted">{{ $req->user->email }}</small>
                                 </td>
                                 <td>
-                                    <span class="badge bg-light text-dark border">{{ $req->reason_text }}</span>
+                                    <span class="badge {{ $req->type === 'exchange' ? 'bg-info' : 'bg-primary' }}">{{ $req->type_text }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">{{ $req->reason_type_text }}</span>
                                 </td>
                                 <td><span class="text-danger fw-bold">{{ number_format($req->refund_amount) }}đ</span></td>
                                 <td>{{ $req->created_at->format('d/m/Y H:i') }}</td>
@@ -247,26 +254,28 @@
                                                     <div class="card-body">
                                                         <h6 class="fw-bold text-info mb-3">Trạng thái: Đã duyệt (Chờ khách gửi hàng)</h6>
                                                         <div class="d-flex gap-2">
-                                                            <button type="button" class="btn btn-outline-info flex-grow-1" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.shipping', $req->id) }}', 'Xác nhận khách đã bắt đầu gửi hàng?')">Hàng đang di chuyển</button>
-                                                            <button type="button" class="btn btn-success flex-grow-1" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.complete', $req->id) }}', 'Bỏ qua các bước và HOÀN TIỀN NGAY?')">Hoàn tiền ngay</button>
+                                                            <button type="button" class="btn btn-outline-info flex-grow-1" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.shipping', $req->id) }}', 'Xác nhận khách đã bắt đầu gửi hàng?')">Hàng đang về kho</button>
+                                                            <button type="button" class="btn btn-success flex-grow-1" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.complete', $req->id) }}', 'Bỏ qua các bước và XÁC NHẬN HOÀN TẤT?')">Xử lý xong ngay</button>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            @elseif($req->isShipping())
+                                            @elseif($req->isShippingBack())
                                                 <div class="card border-primary mb-0 shadow-sm">
                                                     <div class="card-body">
                                                         <h6 class="fw-bold text-primary mb-3">Trạng thái: Hàng đang trên đường về kho</h6>
                                                         <div class="d-flex gap-2">
                                                             <button type="button" class="btn btn-outline-primary flex-grow-1" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.received', $req->id) }}', 'Xác nhận đã nhận được hàng thực tế?')">Đã nhận được hàng</button>
-                                                            <button type="button" class="btn btn-success flex-grow-1" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.complete', $req->id) }}', 'Hoàn tất và HOÀN TIỀN?')">Hoàn tiền</button>
+                                                            <button type="button" class="btn btn-success flex-grow-1" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.complete', $req->id) }}', 'Hoàn tất quy trình?')">Xử lý xong</button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             @elseif($req->isReceived())
                                                 <div class="card border-success mb-0 shadow-sm">
                                                     <div class="card-body text-center">
-                                                        <h6 class="fw-bold text-success mb-3">Hàng đã ở trong kho - Sẵn sàng hoàn tiền</h6>
-                                                        <button type="button" class="btn btn-success w-100 py-2" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.complete', $req->id) }}', 'Cộng tiền vào ví khách hàng và đóng yêu cầu?')">BẤM VÀO ĐÂY ĐỂ HOÀN TIỀN</button>
+                                                        <h6 class="fw-bold text-success mb-3">Hàng đã ở trong kho - Sẵn sàng hoàn tất</h6>
+                                                        <button type="button" class="btn btn-success w-100 py-2" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.complete', $req->id) }}', 'Cập nhật trạng thái và thông báo cho khách?')">
+                                                            BẤM VÀO ĐÂY ĐỂ XÁC NHẬN {{ $req->type === 'exchange' ? 'ĐỔI HÀNG' : 'HOÀN TIỀN' }}
+                                                        </button>
                                                     </div>
                                                 </div>
                                             @else
