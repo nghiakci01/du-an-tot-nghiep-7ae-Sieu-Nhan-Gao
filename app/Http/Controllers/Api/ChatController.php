@@ -15,11 +15,9 @@ class ChatController extends Controller
         $this->chatService = $chatService;
     }
 
-    public function sendMessage(Request $request)
+    public function sendMessage(\App\Http\Requests\Generated\ChatMessageRequest $request)
     {
-        $request->validate([
-            'message' => 'required|string|max:1000',
-        ]);
+        // Validation handled by ChatMessageRequest
 
         try {
             $message = $request->input('message');
@@ -33,7 +31,7 @@ class ChatController extends Controller
                 'message' => $message,
                 'sender_type' => 'user',
             ]);
-            
+
             event(new \App\Events\ChatMessageSent($userMessage));
 
             // 2. Check if Bot is enabled for this session
@@ -61,7 +59,7 @@ class ChatController extends Controller
                     'products' => $result['products'] ?? [],
                 ],
             ]);
-            
+
             event(new \App\Events\ChatMessageSent($botMessage));
 
             return response()->json([

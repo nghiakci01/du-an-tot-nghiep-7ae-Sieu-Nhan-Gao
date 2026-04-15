@@ -204,7 +204,7 @@ class CheckoutController extends Controller
         return response()->json(['valid' => true]);
     }
 
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Generated\CheckoutRequest $request)
     {
         Log::info('Checkout process started', [
             'user_id' => Auth::id(),
@@ -244,36 +244,7 @@ class CheckoutController extends Controller
             $request->merge(['ward' => $request->input('commune')]);
         }
 
-        $rules = [
-            'name' => 'required|string|max:255',
-            'phone' => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
-            'email' => 'required|email:rfc,dns|max:255',
-            'delivery_type' => 'nullable|in:home,store',
-            'district' => 'nullable|string|max:255',
-            'commune' => 'nullable|string|max:255',
-            'ward' => 'nullable|string|max:255',
-            'payment_method' => 'required|in:COD,VNPAY',
-            'shipping_provider' => 'nullable|string',
-            'shipping_service_name' => 'nullable|string',
-            'shipping_fee' => 'nullable|numeric',
-        ];
-
-        if ($deliveryType === 'store') {
-            $rules['province'] = 'nullable|string|max:255';
-            $rules['address'] = 'nullable|string|max:500';
-        } else {
-            $rules['province'] = $request->filled('user_address_id') ? 'required|string' : 'required|string|in:' . implode(',', $provinces);
-            $rules['address'] = 'required|string|max:500';
-        }
-
-        $request->validate($rules, [
-            'phone.required' => 'Vui lòng nhập số điện thoại.',
-            'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
-            'email.required' => 'Vui lòng nhập địa chỉ email.',
-            'email.email' => 'Địa chỉ email không hợp lệ.',
-            'province.required' => 'Vui lòng chọn tỉnh thành.',
-            'province.in' => 'Tỉnh thành không hợp lệ.',
-        ]);
+        // Validation handled by Generated\CheckoutRequest (prepareForValidation and rules/messages)
 
         $cart = $this->cartService->getCart();
 
@@ -409,7 +380,7 @@ class CheckoutController extends Controller
                 $coupon = Coupon::where('code', $couponCode)->first();
                 if ($coupon) {
                     $coupon->increment('used_count');
-                    
+
                     // Mark as used in coupon_user pivot
                     if (Auth::check()) {
                         DB::table('coupon_user')->updateOrInsert(
@@ -551,11 +522,9 @@ class CheckoutController extends Controller
     /**
      * Apply coupon code
      */
-    public function applyCoupon(Request $request)
+    public function applyCoupon(\App\Http\Requests\Generated\CartActionRequest $request)
     {
-        $request->validate([
-            'coupon_code' => 'required|string|max:50',
-        ]);
+        // Validation handled by CartActionRequest
 
         $cart = $this->cartService->getCart();
         if (count($cart) == 0) {

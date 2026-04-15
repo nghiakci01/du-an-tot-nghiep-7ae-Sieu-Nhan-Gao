@@ -327,21 +327,18 @@ class ProductController extends Controller
         }
     }
 
-    public function bulkDelete(Request $request)
+    public function bulkDelete(\App\Http\Requests\Generated\ProductBulkDeleteRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:products,id'
-        ]);
+        $validated = $request->validated();
 
         try {
             DB::beginTransaction();
 
-            $ids = $request->ids;
-            
+            $ids = $validated['ids'];
+
             // Delete variants first
             ProductVariant::whereIn('product_id', $ids)->delete();
-            
+
             // Delete products
             Product::whereIn('id', $ids)->delete();
 
@@ -361,7 +358,7 @@ class ProductController extends Controller
 
             // Delete all variants first
             ProductVariant::query()->delete();
-            
+
             // Delete all products
             Product::query()->delete();
 
