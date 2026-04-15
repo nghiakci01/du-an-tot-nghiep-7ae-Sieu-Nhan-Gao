@@ -237,17 +237,36 @@
                 </div>
               </div>
 
-              {{-- Reason --}}
+              {{-- Return Type --}}
+              <div class="mb-5">
+                <label class="form-label fw-bold mb-3">Bạn muốn Đổi hàng hay Hoàn tiền? <span class="text-danger">*</span></label>
+                <div class="d-flex gap-4">
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" name="type" id="type_refund" value="refund" checked>
+                    <label class="form-check-label fw-600" for="type_refund">
+                      <i class="bi bi-cash-stack me-1"></i> Trả hàng & Hoàn tiền
+                    </label>
+                  </div>
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" name="type" id="type_exchange" value="exchange">
+                    <label class="form-check-label fw-600" for="type_exchange">
+                      <i class="bi bi-arrow-left-right me-1"></i> Đổi size / Phân loại khác
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {{-- Reason Type --}}
               <div class="mb-4">
-                <label class="form-label fw-bold">Lý do hoàn trả <span class="text-danger">*</span></label>
-                <select name="reason" class="form-select form-select-lg" required style="border-radius:10px; font-size:15px;">
+                <label class="form-label fw-bold">Lý do cụ thể <span class="text-danger">*</span></label>
+                <select name="reason_type" id="reason_type" class="form-select form-select-lg" required style="border-radius:10px; font-size:15px;">
                   <option value="" disabled selected>-- Chọn lý do --</option>
-                  <option value="Hàng lỗi / Hỏng hóc">Hàng lỗi / Hỏng hóc</option>
-                  <option value="Đổi kích cỡ (Size)">Đổi kích cỡ (Size)</option>
-                  <option value="Sản phẩm không giống mô tả">Sản phẩm không giống mô tả</option>
-                  <option value="Đóng gói lộn xộn, thiếu hàng">Thiếu hàng / Mất hàng</option>
-                  <option value="Khác">Lý do khác</option>
+                  <option value="defective">Hàng lỗi / Hư hỏng do vận chuyển hoặc NSX</option>
+                  <option value="wrong_size">Đổi kích cỡ (Size) / Màu sắc</option>
+                  <option value="disliked">Sản phẩm không giống mô tả / Không ưng ý</option>
+                  <option value="other">Lý do khác</option>
                 </select>
+                <input type="hidden" name="reason" id="reason_text">
               </div>
 
               {{-- Note --}}

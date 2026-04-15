@@ -86,7 +86,7 @@ class OrderReturnController extends Controller
             $returnReq = OrderReturnRequest::findOrFail($id);
             $this->returnService->markAsShipping($returnReq, $user);
             
-            return redirect()->back()->with('success', 'Đã cập nhật trạng thái đang di chuyển.');
+            return redirect()->back()->with('success', 'Đã cập nhật trạng thái khách đang gửi hàng về.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
@@ -104,20 +104,20 @@ class OrderReturnController extends Controller
         }
     }
 
-    public function completeRefund(Request $request, $id)
+    public function complete(Request $request, $id)
     {
         try {
             $returnReq = OrderReturnRequest::findOrFail($id);
             
-            // if (!in_array($returnReq->status, ['approved', 'shipping', 'received'])) { // This check is now handled by the service
-            //     return redirect()->back()->with('error', 'Chỉ có thể hoàn tiền cho yêu cầu đã được duyệt.');
-            // }
-
             /** @var \App\Models\User $user */
             $user = Auth::user();
             $this->returnService->complete($returnReq, $user);
             
-            return redirect()->back()->with('success', 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.');
+            $msg = ($returnReq->type === OrderReturnRequest::TYPE_EXCHANGE) 
+                ? 'Đã hoàn tất quy trình đổi hàng cho khách.' 
+                : 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.';
+
+            return redirect()->back()->with('success', $msg);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }

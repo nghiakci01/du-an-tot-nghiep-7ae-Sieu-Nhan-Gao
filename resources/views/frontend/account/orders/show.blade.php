@@ -237,19 +237,12 @@
       <div class="alert alert-light border border-dark rounded-0 mb-4 shadow-sm">
         <h6 class="fw-bold mb-2">
           <i class="bi bi-arrow-return-left me-2"></i>
-          Trạng thái Yêu cầu Hoàn hàng
+          Yêu cầu {{ $order->returnRequest->type_text }}
         </h6>
         <div class="p-3" style="color: #000; font-size: 0.95rem;">
           <div class="mb-2"><strong>Trạng thái:</strong> 
-            @if($order->returnRequest->isPending())
-              <span class="badge bg-dark">Chờ xử lý</span>
-            @elseif($order->returnRequest->isApproved())
-              <span class="badge bg-secondary">Đã duyệt - Đang chờ gửi hàng</span>
-            @elseif($order->returnRequest->isCompleted())
-              <span class="badge bg-dark">Hoàn thành - Đã hoàn tiền</span>
-            @elseif($order->returnRequest->isRejected())
-              <span class="badge bg-dark border">Từ chối</span>
-            @endif
+            <span class="badge {{ $order->returnRequest->status_badge }}">{{ $order->returnRequest->status_text }}</span>
+          </div>
           </div>
           <div class="mb-2"><strong>Lý do:</strong> {{ $order->returnRequest->reason }}</div>
           
@@ -293,7 +286,7 @@
 
           @if($order->returnRequest->admin_note)
             <div class="mt-2 p-2 rounded" style="background:rgba(255,255,255,0.6);">
-              <strong>Ghi chú từ cửa hàng:</strong><br>
+              <strong>Phản hồi từ cửa hàng:</strong><br>
               {!! nl2br(e($order->returnRequest->admin_note)) !!}
             </div>
           @endif
@@ -521,7 +514,7 @@
       @endif
 
       {{-- Return Shipping Action --}}
-      @if($order->returnRequest && $order->returnRequest->status === 'approved')
+      @if($order->returnRequest && $order->returnRequest->isApproved())
       <div class="detail-card border-dark bg-white mb-3">
         <div class="detail-header bg-dark text-white">
           <h5 class="mb-0 text-white"><i class="bi bi-truck me-2"></i>Gửi hàng hoàn trả</h5>
