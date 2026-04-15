@@ -16,22 +16,14 @@ class ShippingController extends Controller
     ) {
     }
 
-    public function calculateFees(Request $request)
+    public function calculateFees(\App\Http\Requests\Generated\ShippingFeesRequest $request)
     {
         try {
             $deliveryType = $request->input('delivery_type');
             if (!in_array($deliveryType, ['home', 'store'], true)) {
                 $deliveryType = 'home';
             }
-
-            $request->validate([
-                'delivery_type' => 'nullable|in:home,store',
-                'province' => $deliveryType === 'store' ? 'nullable|string' : 'required|string',
-                'district' => 'nullable|string',
-                'commune' => 'nullable|string',
-                'ward' => 'nullable|string',
-                'weight' => 'nullable|integer',
-            ]);
+            // Validation handled by ShippingFeesRequest
 
             $province = $request->input('province');
             $district = $request->input('district');

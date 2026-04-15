@@ -14,6 +14,8 @@ class User extends Authenticatable
 
     const ROLE_ADMIN = 'admin';
 
+    const ROLE_STAFF = 'staff';
+
     const ROLE_USER = 'user';
 
     /**
@@ -30,6 +32,10 @@ class User extends Authenticatable
         'role',
         'avatar',
         'cart_data',
+        'bank_name',
+        'bank_bin',
+        'account_number',
+        'account_name',
     ];
 
     /**

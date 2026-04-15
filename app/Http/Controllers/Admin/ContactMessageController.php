@@ -34,21 +34,18 @@ class ContactMessageController extends Controller
     /**
      * Reply to the contact message.
      */
-    public function reply(Request $request, string $id)
+    public function reply(\App\Http\Requests\Generated\ContactReplyRequest $request, string $id)
     {
         $message = \App\Models\ContactMessage::findOrFail($id);
-
-        $request->validate([
-            'reply_message' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         try {
             // Send email
-            \Illuminate\Support\Facades\Mail::to($message->email)->send(new \App\Mail\ContactReply($message, $request->reply_message));
+            \Illuminate\Support\Facades\Mail::to($message->email)->send(new \App\Mail\ContactReply($message, $validated['reply_message']));
 
             // Update message status
             $message->update([
-                'reply_message' => $request->reply_message,
+                'reply_message' => $validated['reply_message'],
                 'replied_at' => now(),
                 'status' => 'replied',
             ]);

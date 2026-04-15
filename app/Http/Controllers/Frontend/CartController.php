@@ -155,16 +155,9 @@ class CartController extends Controller
         return view('frontend.cart.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'crossSellProducts'));
     }
 
-    public function changeVariant(Request $request)
+    public function changeVariant(\App\Http\Requests\Generated\CartActionRequest $request)
     {
-        $request->validate([
-            'old_variant_id' => 'required',
-            'product_id' => 'required|exists:products,id',
-            'new_product_id' => 'nullable|exists:products,id',
-            'size_id' => 'nullable',
-            'color_id' => 'nullable',
-            'changed_type' => 'nullable|string', // 'size', 'color', or 'product'
-        ]);
+        // Validation handled by CartActionRequest
 
         $oldVariantId = $request->old_variant_id;
         $currentProductId = $request->product_id;
@@ -224,7 +217,7 @@ class CartController extends Controller
         }
 
         $oldQuantity = $cart[$oldVariantId]['quantity'];
-        
+
         // Determine price
         $itemPrice = $newVariant->price ?? $product->price;
         if ($newVariant->sale_price && $newVariant->sale_price < ($newVariant->price ?? PHP_INT_MAX)) {
@@ -268,13 +261,9 @@ class CartController extends Controller
         ]);
     }
 
-    public function addToCart(Request $request)
+    public function addToCart(\App\Http\Requests\Generated\CartActionRequest $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'variant_id' => 'nullable|exists:product_variants,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
+        // Validation handled by CartActionRequest
 
         $product = Product::findOrFail($request->product_id);
         $variantId = $request->variant_id;
@@ -397,7 +386,7 @@ class CartController extends Controller
         return redirect()->route('cart.index')->with('success', 'Product added to cart!');
     }
 
-    public function updateCart(Request $request)
+    public function updateCart(\App\Http\Requests\Generated\CartActionRequest $request)
     {
         if ($request->id && $request->quantity) {
             $cart = $this->cartService->getCart();
@@ -582,11 +571,9 @@ class CartController extends Controller
         return response()->json(['count' => $count]);
     }
 
-    public function applyCoupon(Request $request)
+    public function applyCoupon(\App\Http\Requests\Generated\CartActionRequest $request)
     {
-        $request->validate([
-            'coupon_code' => 'required|string|max:50',
-        ]);
+        // Validation handled by CartActionRequest
 
         $cart = $this->cartService->getCart();
         if (count($cart) == 0) {

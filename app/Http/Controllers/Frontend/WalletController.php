@@ -32,16 +32,13 @@ class WalletController extends Controller
     /**
      * Submit a withdraw request.
      */
-    public function requestWithdraw(Request $request)
+    public function requestWithdraw(\App\Http\Requests\Generated\WalletWithdrawRequest $request)
     {
-        $request->validate([
-            'amount'               => 'required|numeric|min:50000',
-            'user_bank_account_id' => 'required|exists:user_bank_accounts,id,user_id,' . Auth::id(),
-        ]);
+        $validated = $request->validated();
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $amount = (float) $request->amount;
+        $amount = (float) $validated['amount'];
 
         if ($user->wallet_balance < $amount) {
             return back()->with('wallet_error', 'Số dư ví không đủ để rút tiền.');
@@ -56,7 +53,7 @@ class WalletController extends Controller
 
         \App\Models\WalletWithdrawRequest::create([
             'user_id'              => $user->id,
-            'user_bank_account_id' => $request->user_bank_account_id,
+            'user_bank_account_id' => $validated['user_bank_account_id'],
             'amount'               => $amount,
             'status'               => 'pending',
         ]);

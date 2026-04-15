@@ -71,20 +71,18 @@ class ChatManagementController extends Controller
         return redirect()->route('admin.chat.index')->with('error', 'Không tìm thấy phiên hội thoại.');
     }
 
-    public function reply(Request $request, $sessionId)
+    public function reply(\App\Http\Requests\Generated\ChatMessageRequest $request, $sessionId)
     {
-        $request->validate([
-            'message' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $staffMessage = ChatMessage::create([
             'session_id' => $sessionId,
             'user_id' => Auth::id(),
-            'message' => $request->message,
+            'message' => $validated['message'],
             'sender_type' => 'staff',
             'is_read' => true,
         ]);
-        
+
         event(new \App\Events\ChatMessageSent($staffMessage));
 
         // Auto-disable bot when staff replies to prevent interference

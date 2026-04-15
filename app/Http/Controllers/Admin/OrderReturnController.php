@@ -22,7 +22,7 @@ class OrderReturnController extends Controller
     public function index(Request $request)
     {
         $query = OrderReturnRequest::with(['user', 'order']);
-        
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -30,25 +30,23 @@ class OrderReturnController extends Controller
         if ($request->filled('order_id')) {
             $query->where('order_id', $request->order_id);
         }
-        
+
         $requests = $query->latest()->paginate(15);
         $tab = $request->input('status', 'all');
-        
+
         return view('admin.returns.index', compact('requests', 'tab'));
     }
 
-    public function approve(Request $request, $id)
+    public function approve(\App\Http\Requests\Generated\OrderReturnAdminNoteRequest $request, $id)
     {
         try {
-            $request->validate([
-                'admin_note' => 'required|string|max:1000'
-            ]);
-            
+            $validated = $request->validated();
+
             /** @var \App\Models\User $user */
             $user = Auth::user();
-            
+
             $returnReq = OrderReturnRequest::findOrFail($id);
-            $this->returnService->approve($returnReq, $user, $request->admin_note);
+            $this->returnService->approve($returnReq, $user, $validated['admin_note']);
 
             return redirect()->back()->with('success', 'Đã duyệt yêu cầu trả hàng.');
         } catch (\Exception $e) {
@@ -57,18 +55,16 @@ class OrderReturnController extends Controller
         }
     }
 
-    public function reject(Request $request, $id)
+    public function reject(\App\Http\Requests\Generated\OrderReturnAdminNoteRequest $request, $id)
     {
         try {
-            $request->validate([
-                'admin_note' => 'required|string|max:1000'
-            ]);
-            
+            $validated = $request->validated();
+
             /** @var \App\Models\User $user */
             $user = Auth::user();
-            
+
             $returnReq = OrderReturnRequest::findOrFail($id);
-            $this->returnService->reject($returnReq, $user, $request->admin_note);
+            $this->returnService->reject($returnReq, $user, $validated['admin_note']);
 
             return redirect()->back()->with('success', 'Yêu cầu trả hàng đã bị từ chối.');
         } catch (\Exception $e) {
@@ -82,10 +78,10 @@ class OrderReturnController extends Controller
         try {
             /** @var \App\Models\User $user */
             $user = Auth::user();
-            
+
             $returnReq = OrderReturnRequest::findOrFail($id);
             $this->returnService->markAsShipping($returnReq, $user);
-            
+
             return redirect()->back()->with('success', 'Đã cập nhật trạng thái khách đang gửi hàng về.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
@@ -97,7 +93,7 @@ class OrderReturnController extends Controller
         try {
             $returnReq = OrderReturnRequest::findOrFail($id);
             $this->returnService->markAsReceived($returnReq);
-            
+
             return redirect()->back()->with('success', 'Đã xác nhận nhận hàng tại kho.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
@@ -108,13 +104,13 @@ class OrderReturnController extends Controller
     {
         try {
             $returnReq = OrderReturnRequest::findOrFail($id);
-            
+
             /** @var \App\Models\User $user */
             $user = Auth::user();
             $this->returnService->complete($returnReq, $user);
-            
-            $msg = ($returnReq->type === OrderReturnRequest::TYPE_EXCHANGE) 
-                ? 'Đã hoàn tất quy trình đổi hàng cho khách.' 
+
+            $msg = ($returnReq->type === OrderReturnRequest::TYPE_EXCHANGE)
+                ? 'Đã hoàn tất quy trình đổi hàng cho khách.'
                 : 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.';
 
             return redirect()->back()->with('success', $msg);

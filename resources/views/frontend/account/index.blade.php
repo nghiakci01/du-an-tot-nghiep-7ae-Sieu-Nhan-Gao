@@ -3,7 +3,34 @@
 @section('title', 'Tài khoản của tôi | ' . ($settings['site_title'] ?? 'Elite'))
 
 @push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
+/* Bank Selector Styling */
+.select2-container .select2-selection--single {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 45px;
+    padding-left: 12px;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 43px;
+}
+.bank-logo {
+    height: 20px;
+    width: auto;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+.bank-item {
+    display: flex;
+    align-items: center;
+    padding: 2px 0;
+}
 /* ===== ACCOUNT PAGE ===== */
 .account-wrapper {
   background: #f5f5f7;
@@ -662,6 +689,63 @@
           <div class="mt-4">
             <button type="submit" class="btn btn-save">Lưu thay đổi</button>
           </div>
+
+          <hr class="my-5">
+
+          {{-- ===== REFUND INFO SECTION ===== --}}
+          <div class="refund-info-section bg-light p-4 rounded-4 border border-dark-subtle shadow-sm">
+            <h5 class="fw-bold mb-3 d-flex align-items-center">
+              <i class="bi bi-bank me-2 text-dark"></i>Thông tin hoàn tiền mặc định
+            </h5>
+            <p class="text-muted small mb-4">Thông tin này sẽ được tự động điền vào Form khi bạn yêu cầu hoàn tiền cho đơn hàng.</p>
+            
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Ngân hàng</label>
+                <select name="bank_bin" id="bank_bin_profile" class="form-select select2-bank" style="height: 45px;">
+                  <option value="">-- Chọn Ngân Hàng --</option>
+                  <option value="970436" data-logo="https://api.vietqr.io/img/VCB.png" data-name="Vietcombank" {{ $user->bank_bin == '970436' ? 'selected' : '' }}>Vietcombank</option>
+                  <option value="970418" data-logo="https://api.vietqr.io/img/BIDV.png" data-name="BIDV" {{ $user->bank_bin == '970418' ? 'selected' : '' }}>BIDV</option>
+                  <option value="970405" data-logo="https://api.vietqr.io/img/VBA.png" data-name="Agribank" {{ $user->bank_bin == '970405' ? 'selected' : '' }}>Agribank</option>
+                  <option value="970415" data-logo="https://api.vietqr.io/img/CTG.png" data-name="VietinBank" {{ $user->bank_bin == '970415' ? 'selected' : '' }}>VietinBank</option>
+                  <option value="970407" data-logo="https://api.vietqr.io/img/TCB.png" data-name="Techcombank" {{ $user->bank_bin == '970407' ? 'selected' : '' }}>Techcombank</option>
+                  <option value="970422" data-logo="https://api.vietqr.io/img/MB.png" data-name="MBBank" {{ $user->bank_bin == '970422' ? 'selected' : '' }}>MBBank</option>
+                  <option value="970416" data-logo="https://api.vietqr.io/img/ACB.png" data-name="ACB" {{ $user->bank_bin == '970416' ? 'selected' : '' }}>ACB</option>
+                  <option value="970403" data-logo="https://api.vietqr.io/img/STB.png" data-name="Sacombank" {{ $user->bank_bin == '970403' ? 'selected' : '' }}>Sacombank</option>
+                  <option value="970432" data-logo="https://api.vietqr.io/img/VPB.png" data-name="VPBank" {{ $user->bank_bin == '970432' ? 'selected' : '' }}>VPBank</option>
+                  <option value="970423" data-logo="https://api.vietqr.io/img/TPB.png" data-name="TPBank" {{ $user->bank_bin == '970423' ? 'selected' : '' }}>TPBank</option>
+                  <option value="970437" data-logo="https://api.vietqr.io/img/HDB.png" data-name="HDBank" {{ $user->bank_bin == '970437' ? 'selected' : '' }}>HDBank</option>
+                  <option value="970441" data-logo="https://api.vietqr.io/img/VIB.png" data-name="VIB" {{ $user->bank_bin == '970441' ? 'selected' : '' }}>VIB</option>
+                  <option value="970443" data-logo="https://api.vietqr.io/img/SHB.png" data-name="SHB" {{ $user->bank_bin == '970443' ? 'selected' : '' }}>SHB</option>
+                  <option value="970426" data-logo="https://api.vietqr.io/img/MSB.png" data-name="MSB" {{ $user->bank_bin == '970426' ? 'selected' : '' }}>MSB</option>
+                  <option value="970440" data-logo="https://api.vietqr.io/img/SEAB.png" data-name="SeABank" {{ $user->bank_bin == '970440' ? 'selected' : '' }}>SeABank</option>
+                  <option value="970449" data-logo="https://api.vietqr.io/img/LPB.png" data-name="LPBank" {{ $user->bank_bin == '970449' ? 'selected' : '' }}>LPBank</option>
+                  <option value="970428" data-logo="https://api.vietqr.io/img/NAB.png" data-name="NamABank" {{ $user->bank_bin == '970428' ? 'selected' : '' }}>NamABank</option>
+                  <option value="970414" data-logo="https://api.vietqr.io/img/OCB.png" data-name="OCB" {{ $user->bank_bin == '970414' ? 'selected' : '' }}>OCB</option>
+                  <option value="970431" data-logo="https://api.vietqr.io/img/EIB.png" data-name="Eximbank" {{ $user->bank_bin == '970431' ? 'selected' : '' }}>Eximbank</option>
+                  <option value="970438" data-logo="https://api.vietqr.io/img/BVB.png" data-name="BVBank" {{ $user->bank_bin == '970438' ? 'selected' : '' }}>BVBank</option>
+                </select>
+                <input type="hidden" name="bank_name" id="bank_name_profile" value="{{ $user->bank_name }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Số tài khoản</label>
+                <input type="text" name="account_number" id="account_number_profile" class="form-control" value="{{ $user->account_number }}" placeholder="Nhập số tài khoản">
+              </div>
+              <div class="col-12 mt-3">
+                <label class="form-label small fw-bold">Tên chủ tài khoản</label>
+                <div class="position-relative">
+                  <input type="text" name="account_name" id="account_name_profile" class="form-control text-uppercase" value="{{ $user->account_name }}" placeholder="Hệ thống sẽ tra cứu tự động..." style="background-color: #f8f9fa;">
+                  <div id="lookup-spinner-profile" class="spinner-border spinner-border-sm text-primary position-absolute" role="status" style="right: 15px; top: 15px; display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+                <small id="lookup-msg-profile" class="text-muted"></small>
+              </div>
+            </div>
+            <div class="mt-4">
+              <button type="submit" class="btn btn-save w-100">Lưu thông tin hoàn tiền</button>
+            </div>
+          </div>
         </form>
 
         <hr class="my-5">
@@ -1252,23 +1336,81 @@ document.querySelectorAll('.mark-read-manual').forEach(btn => {
     });
 });
 
-// Mark all as read within tab
-const markAllTabBtn = document.querySelector('.mark-all-read-tab');
-if (markAllTabBtn) {
-    markAllTabBtn.addEventListener('click', function() {
-        fetch('{{ route("notifications.mark_all_read") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-        }).then(r => r.json()).then(data => {
-            if (data.status === 'success') {
-                window.location.reload(); // Refresh to update all badges and list
-            }
-        });
+
+// ===== REFUND BANK LOGIC =====
+$(document).ready(function() {
+    function formatBank(bank) {
+        if (!bank.id) return bank.text;
+        var logoUrl = $(bank.element).data('logo');
+        if (logoUrl) {
+            return $('<div class="bank-item"><img src="' + logoUrl + '" class="bank-logo" /> <span>' + bank.text + '</span></div>');
+        }
+        return bank.text;
+    }
+
+    $('.select2-bank').select2({
+        placeholder: '-- Chọn Ngân Hàng --',
+        allowClear: true,
+        templateResult: formatBank,
+        templateSelection: formatBank,
+        width: '100%'
     });
-}
+
+    $('#bank_bin_profile').on('change', function() {
+        const selected = $(this).find('option:selected');
+        $('#bank_name_profile').val(selected.data('name') || '');
+        checkProfileAccountName();
+    });
+
+    let profileLookupTimer;
+    $('#account_number_profile').on('input', function() {
+        clearTimeout(profileLookupTimer);
+        profileLookupTimer = setTimeout(checkProfileAccountName, 800);
+    });
+
+    function checkProfileAccountName() {
+        const bin = $('#bank_bin_profile').val();
+        const accountNo = $('#account_number_profile').val().trim();
+        const $accNameInput = $('#account_name_profile');
+        const $spinner = $('#lookup-spinner-profile');
+        const $msg = $('#lookup-msg-profile');
+
+        if (bin && accountNo && accountNo.length >= 6) {
+            $spinner.show();
+            $msg.text('Đang xác thực tài khoản...');
+            $accNameInput.css('background-color', '#fff');
+
+            $.ajax({
+                url: 'https://api.vietqr.io/v2/lookup',
+                method: 'POST',
+                headers: {
+                    'x-client-id': 'b85a3c26-f831-4a5f-abaa-ae57d25e40e2',
+                    'x-api-key': 'd102dc85-2eec-4752-9654-20a221f7e34a',
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify({ bin: bin, accountNumber: accountNo }),
+                success: function(res) {
+                    $spinner.hide();
+                    if (res.code == '00') {
+                        $accNameInput.val(res.data.accountName);
+                        $msg.html('<span class="text-success"><i class="bi bi-check-circle-fill"></i> Tài khoản hợp lệ</span>');
+                    } else {
+                        $msg.html('<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Không tìm thấy tài khoản.</span>');
+                    }
+                },
+                error: function() {
+                    $spinner.hide();
+                    $msg.text('Không thể tra cứu tự động. Vui lòng nhập tay.');
+                }
+            });
+        }
+    }
+
+    // Trigger initial lookup if data exists
+    if ($('#bank_bin_profile').val() && $('#account_number_profile').val()) {
+        checkProfileAccountName();
+    }
+});
 
 </script>
 @endpush

@@ -20,14 +20,9 @@ class ColorController extends Controller
         return view('admin.colors.create');
     }
 
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Generated\ColorRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:25|unique:colors,name',
-            'hex_code' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
-            'display_order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $validated['is_active'] = $request->has('is_active');
         $validated['display_order'] = $validated['display_order'] ?? 0;
@@ -44,14 +39,9 @@ class ColorController extends Controller
         return view('admin.colors.edit', compact('color'));
     }
 
-    public function update(Request $request, Color $color)
+    public function update(\App\Http\Requests\Generated\ColorRequest $request, Color $color)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:25|unique:colors,name,'.$color->id,
-            'hex_code' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
-            'display_order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $validated['is_active'] = $request->has('is_active');
         $validated['display_order'] = $validated['display_order'] ?? 0;
