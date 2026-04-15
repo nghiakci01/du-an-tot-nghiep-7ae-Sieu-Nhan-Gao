@@ -124,6 +124,7 @@ class AccountController extends Controller
         $user = Auth::user();
 
         $validated = $request->validated();
+
         $user->name = $validated['name'];
         $user->phone = $validated['phone'] ?? null;
         $user->bank_name = $validated['bank_name'] ?? null;
