@@ -33,7 +33,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+    <form id="product-form" action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" novalidate>
         @csrf
         
         <!-- Product Details -->
@@ -412,6 +412,30 @@
                         mainImagePreview.innerHTML = `<img src="${e.target.result}" width="150" class="border rounded mt-2">`;
                     };
                     reader.readAsDataURL(file);
+                }
+            });
+        }
+        // Mark empty required fields red with shake on submit
+        const mainForm = document.getElementById('product-form');
+        if (mainForm) {
+            mainForm.addEventListener('submit', function(e) {
+                const invalids = [];
+                mainForm.querySelectorAll('[required]').forEach(function(el) {
+                    if (!el.value || el.value.trim() === '') {
+                        el.classList.add('is-invalid', 'shake-error');
+                        invalids.push(el);
+                        el.addEventListener('input', function() {
+                            el.classList.remove('is-invalid', 'shake-error');
+                        }, { once: true });
+                        el.addEventListener('change', function() {
+                            el.classList.remove('is-invalid', 'shake-error');
+                        }, { once: true });
+                    }
+                });
+                if (invalids.length > 0) {
+                    e.preventDefault();
+                    invalids[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    invalids[0].focus();
                 }
             });
         }
