@@ -239,7 +239,7 @@
                                                         <div class="mb-3">
                                                             <div class="d-flex justify-content-between mb-2">
                                                                 <label class="small fw-bold">Phản hồi / Mã vận chuyển <span class="text-danger">*</span></label>
-                                                                <button type="button" class="btn btn-xs btn-link p-0 text-decoration-none" onclick="document.getElementById('admin_note_{{ $req->id }}').value = 'Mã KS-RET-{{ $req->order_id }}-{{ strtoupper(Str::random(5)) }}\nVui lòng đóng gói và gửi về kho.'">Tạo mã vận chuyển mẫu</button>
+                                                                <button type="button" class="btn btn-xs btn-link p-0 text-decoration-none" onclick="document.getElementById('admin_note_{{ $req->id }}').value = 'Mã KS-RET-{{ $req->order_id }}-{{ strtoupper(Str::random(5)) }}\nVui lòng đóng gói và ghi mã đơn lên kiện hàng.'">Tạo mã vận chuyển mẫu</button>
                                                             </div>
                                                             <textarea id="admin_note_{{ $req->id }}" class="form-control" rows="3" placeholder="Nhập mã vận chuyển hoặc lý do từ chối..."></textarea>
                                                         </div>
