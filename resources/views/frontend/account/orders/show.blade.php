@@ -559,9 +559,18 @@
         @endif
         @if($user && in_array($order->status, [\App\Models\Order::STATUS_COMPLETED, \App\Models\Order::STATUS_SHIPPED]))
           @if(!$order->returnRequest)
-          <a href="{{ route('account.orders.return_form', $order->id) }}" class="btn btn-outline-warning rounded-pill py-2 w-100 mt-2">
-            <i class="bi bi-arrow-return-left me-1"></i> Yêu cầu hoàn hàng
-          </a>
+            @if($order->status === \App\Models\Order::STATUS_SHIPPED)
+              <form action="{{ route('account.orders.received', $order->id) }}" method="POST" onsubmit="return confirm('Bạn xác nhận đã nhận được hàng?');">
+                @csrf
+                <button type="submit" class="btn btn-dark rounded-0 w-100 mt-2" style="padding-top: 13px; padding-bottom: 13px;">
+                  <i class="bi bi-check-circle me-1"></i> Đã nhận được hàng
+                </button>
+              </form>
+            @else
+              <a href="{{ route('account.orders.return_form', $order->id) }}" class="btn btn-outline-warning rounded-pill py-2 w-100 mt-2">
+                <i class="bi bi-arrow-return-left me-1"></i> Yêu cầu hoàn hàng
+              </a>
+            @endif
           @endif
         @endif
       </div>

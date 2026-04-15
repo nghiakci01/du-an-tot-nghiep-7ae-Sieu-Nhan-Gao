@@ -70,10 +70,10 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="me-3">
-                                            <img src="{{ $item->product->image_url ?? asset('assets/images/default-product.png') }}" class="rounded border" width="50" height="50" style="object-fit:cover;" alt="Product">
+                                            <img src="{{ $item->product?->image_url ?? asset('assets/images/default-product.png') }}" class="rounded border" width="50" height="50" style="object-fit:cover;" alt="Product">
                                         </div>
                                         <div>
-                                            <strong class="d-block">{{ $item->product->name }}</strong>
+                                            <strong class="d-block">{{ $item->product?->name ?? 'Sản phẩm #'.$item->product_id.' (Đã xóa)' }}</strong>
                                             @if($item->variant)
                                                 <small class="text-muted">Phân loại: {{ $item->variant->name ?? ($item->variant->size . '/' . $item->variant->color) }}</small>
                                             @endif
