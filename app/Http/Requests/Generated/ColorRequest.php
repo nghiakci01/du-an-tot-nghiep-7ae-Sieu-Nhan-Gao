@@ -19,7 +19,7 @@ class ColorRequest extends FormRequest
             $colorId = is_object($color) ? ($color->id ?? null) : $color;
         }
 
-        $nameRule = 'required|string|max:255' . ($colorId ? '|unique:colors,name,' . $colorId : '|unique:colors,name');
+        $nameRule = 'required|string|max:25' . ($colorId ? '|unique:colors,name,' . $colorId : '|unique:colors,name');
 
         return [
             'name' => $nameRule,

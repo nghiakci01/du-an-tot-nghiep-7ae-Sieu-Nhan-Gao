@@ -15,7 +15,7 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label for="name">Color Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
+                            <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" maxlength="25" required>
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
