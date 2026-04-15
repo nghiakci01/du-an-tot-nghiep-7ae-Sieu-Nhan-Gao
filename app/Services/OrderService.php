@@ -62,6 +62,16 @@ class OrderService
 
         });
 
+        // Tự động hủy đơn trên GHN nếu có mã vận đơn
+        if ($newStatus === Order::STATUS_CANCELLED && $order->tracking_code && $order->shipping_provider === 'ghn') {
+            try {
+                $ghnProvider = app(\App\Services\Shipping\GhnShippingProvider::class);
+                $ghnProvider->cancelShippingOrder($order->tracking_code);
+            } catch (Exception $e) {
+                Log::error("Lỗi khi tự động hủy đơn GHN cho đơn hàng #{$order->id}: " . $e->getMessage());
+            }
+        }
+
         // Dispatch Database & Email Notifications
         try {
             if ($order->user) {

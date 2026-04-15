@@ -2,6 +2,7 @@
 
 namespace App\Services\Shipping;
 
+use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -462,6 +463,7 @@ class GhnShippingProvider implements ShippingProviderInterface
             'height' => 10,
             'service_type_id' => (int) ($config['service_type_id'] ?? 2),
             'items' => $items,
+            'client_order_code' => (string) $order->id,
         ];
         
         $response = Http::timeout(10)
@@ -486,5 +488,45 @@ class GhnShippingProvider implements ShippingProviderInterface
         $order->update(['tracking_code' => $orderCode]);
         
         return $data;
+    }
+
+    /**
+     * Hủy đơn hàng trên hệ thống GHN
+     */
+    public function cancelShippingOrder(string $trackingCode): bool
+    {
+        $config = config('shipping.ghn', []);
+
+        if (!$this->canUseLiveApi($config)) {
+            Log::warning("GHN Cancellation skipped: API not configured or disabled.", ['tracking_code' => $trackingCode]);
+            return false;
+        }
+
+        try {
+            $response = Http::timeout(10)
+                ->acceptJson()
+                ->withHeaders(array_filter([
+                    'Token' => $config['token'] ?? null,
+                    'ShopId' => $config['shop_id'] ?? null,
+                ]))
+                ->post(rtrim($config['api_url'], '/') . '/shiip/public-api/v2/shipping-order/cancel', [
+                    'order_codes' => [$trackingCode]
+                ]);
+
+            if (!$response->successful()) {
+                Log::error('GHN Cancel Order failed', [
+                    'tracking_code' => $trackingCode,
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                return false;
+            }
+
+            Log::info("GHN Order cancelled successfully: $trackingCode");
+            return true;
+        } catch (\Exception $e) {
+            Log::error('GHN Cancel Order error: ' . $e->getMessage(), ['tracking_code' => $trackingCode]);
+            return false;
+        }
     }
 }
