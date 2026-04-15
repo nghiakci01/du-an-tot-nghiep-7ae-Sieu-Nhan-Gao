@@ -75,26 +75,21 @@ class WalletController extends Controller
     /**
      * Manually adjust a user's wallet balance.
      */
-    public function manualAdjust(Request $request)
+    public function manualAdjust(\App\Http\Requests\Generated\WalletManualAdjustRequest $request)
     {
-        $request->validate([
-            'user_id'     => 'required|exists:users,id',
-            'type'        => 'required|in:credit,debit',
-            'amount'      => 'required|numeric|min:1000',
-            'description' => 'required|string|max:255',
-        ]);
+        $validated = $request->validated();
 
-        $user = User::findOrFail($request->user_id);
+        $user = User::findOrFail($validated['user_id']);
 
-        if ($request->type === 'credit') {
-            $this->walletService->credit($user, $request->amount, $request->description, 'manual');
-            $msg = 'Đã cộng ' . number_format($request->amount) . '₫ vào ví của ' . $user->name;
+        if ($validated['type'] === 'credit') {
+            $this->walletService->credit($user, $validated['amount'], $validated['description'], 'manual');
+            $msg = 'Đã cộng ' . number_format($validated['amount']) . '₫ vào ví của ' . $user->name;
         } else {
-            $result = $this->walletService->debit($user, $request->amount, $request->description, 'manual');
+            $result = $this->walletService->debit($user, $validated['amount'], $validated['description'], 'manual');
             if ($result === false) {
                 return back()->with('error', 'Số dư ví không đủ để trừ.');
             }
-            $msg = 'Đã trừ ' . number_format($request->amount) . '₫ từ ví của ' . $user->name;
+            $msg = 'Đã trừ ' . number_format($validated['amount']) . '₫ từ ví của ' . $user->name;
         }
 
         return back()->with('success', $msg);
@@ -117,15 +112,13 @@ class WalletController extends Controller
     /**
      * Approve a withdrawal request.
      */
-    public function approveWithdraw(Request $request, \App\Models\WalletWithdrawRequest $withdrawRequest)
+    public function approveWithdraw(\App\Http\Requests\Generated\ApproveWithdrawRequest $request, \App\Models\WalletWithdrawRequest $withdrawRequest)
     {
         if (! $withdrawRequest->isPending()) {
             return back()->with('error', 'Yêu cầu này đã được xử lý.');
         }
 
-        $request->validate([
-            'proof_image' => 'nullable|image|max:5120',
-        ]);
+        $validated = $request->validated();
 
         $imagePath = null;
         if ($request->hasFile('proof_image')) {

@@ -18,15 +18,9 @@ class ChatbotSuggestedQuestionController extends Controller
         return view('admin.chatbot.questions.create');
     }
 
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Generated\ChatbotSuggestedQuestionRequest $request)
     {
-        $request->validate([
-            'question' => 'required|string|max:255',
-            'answer' => 'nullable|string',
-            'order' => 'required|integer',
-        ]);
-
-        $data = $request->all();
+        $data = $request->validated();
         $data['is_active'] = $request->has('is_active');
 
         ChatbotSuggestedQuestion::create($data);
@@ -40,15 +34,9 @@ class ChatbotSuggestedQuestionController extends Controller
         return view('admin.chatbot.questions.edit', compact('question'));
     }
 
-    public function update(Request $request, ChatbotSuggestedQuestion $question)
+    public function update(\App\Http\Requests\Generated\ChatbotSuggestedQuestionRequest $request, ChatbotSuggestedQuestion $question)
     {
-        $request->validate([
-            'question' => 'required|string|max:255',
-            'answer' => 'nullable|string',
-            'order' => 'required|integer',
-        ]);
-
-        $data = $request->all();
+        $data = $request->validated();
         $data['is_active'] = $request->has('is_active');
 
         $question->update($data);

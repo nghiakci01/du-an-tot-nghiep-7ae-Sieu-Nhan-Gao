@@ -13,25 +13,9 @@ class OrderTrackingController extends Controller
         return view('frontend.order-tracking.index');
     }
 
-    public function search(Request $request)
+    public function search(\App\Http\Requests\Generated\OrderTrackingRequest $request)
     {
-        // Normalize inputs
-        $orderId = trim(str_replace('#', '', $request->input('order_id')));
-        $contact = trim($request->input('contact'));
-
-        // Merge back to request for validation if needed, though we can just validate the variables
-        $request->merge([
-            'order_id' => $orderId,
-            'contact' => $contact,
-        ]);
-
-        $request->validate([
-            'order_id' => 'required|string',
-            'contact' => 'required|string', // Can be Email or Phone
-        ], [
-            'order_id.required' => 'Vui lòng nhập mã đơn hàng.',
-            'contact.required' => 'Vui lòng nhập Email hoặc Số điện thoại.',
-        ]);
+        // Validation & normalization handled by OrderTrackingRequest
 
         $order = Order::where('id', $orderId)
             ->where(function ($query) use ($contact) {

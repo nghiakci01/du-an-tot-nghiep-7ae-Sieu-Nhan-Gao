@@ -15,3 +15,6 @@ Route::post('/checkout/shipping-fees', [ShippingController::class, 'calculateFee
 // Address Routes
 Route::get('/address/districts', [AddressController::class, 'getDistricts'])->name('api.address.districts');
 Route::get('/address/wards', [AddressController::class, 'getWards'])->name('api.address.wards');
+
+// Webhook Routes
+Route::post('/webhooks/shipping/ghn', [\App\Http\Controllers\Webhooks\GhnWebhookController::class, 'handle']);
