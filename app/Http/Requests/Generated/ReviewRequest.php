@@ -18,7 +18,4 @@ class ReviewRequest extends FormRequest
             'comment' => 'required|string|max:1000',
         ];
     }
-            return [
-                'rating' => 'required|integer|min:1|max:5',
-                'comment' => 'required|string|max:1000',
-            ];
+}
