@@ -112,7 +112,7 @@ class Order extends Model
     {
         $transitions = match ($this->status) {
             self::STATUS_PENDING => [self::STATUS_CONFIRMED, self::STATUS_CANCELLED],
-            self::STATUS_CONFIRMED => [self::STATUS_SHIPPED, self::STATUS_CANCELLED],
+            self::STATUS_CONFIRMED => [self::STATUS_SHIPPED, self::STATUS_COMPLETED, self::STATUS_CANCELLED],
             self::STATUS_SHIPPED => [self::STATUS_COMPLETED, self::STATUS_FAILED],
             self::STATUS_COMPLETED => [self::STATUS_RETURNED, self::STATUS_PARTIALLY_RETURNED],
             self::STATUS_CANCELLED => [],

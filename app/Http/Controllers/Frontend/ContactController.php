@@ -18,16 +18,9 @@ class ContactController extends Controller
         return view('frontend.contact.index');
     }
 
-    public function send(Request $request)
+    public function send(\App\Http\Requests\Generated\ContactFormRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'subject' => 'required|string|max:255',
-            'message' => 'required|string',
-        ]);
-
-        $data = $validated;
+        $data = $request->validated();
         if (Auth::check()) {
             $data['user_id'] = Auth::id();
         }

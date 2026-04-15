@@ -14,18 +14,9 @@ class AddressController extends Controller
         return view('frontend.account.address_create');
     }
 
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Generated\AddressRequest $request)
     {
-        $validated = $request->validate([
-            'receiver_name' => 'required|string|max:100',
-            'phone'         => ['required', 'regex:/^(03|05|07|08|09)\d{8}$/'],
-            'province'      => 'required|string|max:100',
-            'commune'       => 'required|string|max:100',
-            'address'       => 'required|string|max:255',
-            'is_default'    => 'nullable|boolean',
-        ], [
-            'phone.regex' => 'Số điện thoại phải có 10 chữ số và bắt đầu bằng 03, 05, 07, 08 hoặc 09.',
-        ]);
+        $validated = $request->validated();
 
         $user = Auth::user();
         $isDefault = $request->boolean('is_default');
@@ -60,20 +51,10 @@ class AddressController extends Controller
         return view('frontend.account.address_edit', compact('address'));
     }
 
-    public function update(Request $request, $id)
+    public function update(\App\Http\Requests\Generated\AddressRequest $request, $id)
     {
         $address = UserAddress::where('user_id', Auth::id())->findOrFail($id);
-
-        $validated = $request->validate([
-            'receiver_name' => 'required|string|max:100',
-            'phone'         => ['required', 'regex:/^(03|05|07|08|09)\d{8}$/'],
-            'province'      => 'required|string|max:100',
-            'commune'       => 'required|string|max:100',
-            'address'       => 'required|string|max:255',
-            'is_default'    => 'nullable|boolean',
-        ], [
-            'phone.regex' => 'Số điện thoại phải có 10 chữ số và bắt đầu bằng 03, 05, 07, 08 hoặc 09.',
-        ]);
+        $validated = $request->validated();
 
         if ($request->boolean('is_default')) {
             UserAddress::where('user_id', Auth::id())

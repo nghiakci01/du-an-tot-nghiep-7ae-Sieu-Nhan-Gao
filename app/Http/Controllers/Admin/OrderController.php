@@ -30,20 +30,9 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Generated\OrderStoreRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'province' => 'required|string',
-            'address' => 'required|string',
-            'payment_method' => 'required|string',
-            'status' => 'required|string',
-            'items' => 'required|array|min:1',
-            'items.*.variant_id' => 'required|exists:product_variants,id',
-            'items.*.quantity' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         try {
             DB::beginTransaction();
@@ -71,18 +60,22 @@ class OrderController extends Controller
             }
 
             $order = Order::create([
-                'user_id' => $request->user_id ?? null,
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'province' => $request->province,
-                'address' => $request->address,
-                'status' => $request->status,
+                'user_id' => $validated['user_id'] ?? null,
+                'name' => $validated['name'],
+                'email' => $validated['email'] ?? null,
+                'phone' => $validated['phone'],
+                'province' => $validated['province'],
+                'address' => $validated['address'],
+                'status' => $validated['status'],
                 'total_price' => $totalPrice,
                 'final_total' => $totalPrice, // No discount/shipping for manual admin order in this basic impl
                 'payment_method' => $request->payment_method,
                 'payment_status' => $request->status === Order::STATUS_COMPLETED ? 'paid' : 'pending',
-                'shipping_address' => $request->address . ', ' . $request->province,
+                'shipping_address' => implode(', ', array_filter([
+                    $request->address,
+                    $request->input('commune'),
+                    $request->province,
+                ])),
             ]);
 
             foreach ($itemsData as $itemData) {
@@ -119,19 +112,18 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Order $order, \App\Services\OrderService $orderService)
+    public function update(\App\Http\Requests\Generated\OrderStatusUpdateRequest $request, Order $order, \App\Services\OrderService $orderService)
     {
-        $request->validate([
-            'status' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
-        $newStatus = $request->input('status');
+        $newStatus = $validated['status'];
 
         try {
             $orderService->updateOrderStatus($order, $newStatus, Auth::user());
-            
+            $order->refresh();
+
             // Tự động tạo mã vận đơn nếu Admin chuyển sang "Đã xác nhận" (Confirmed)
-            if ($newStatus === \App\Models\Order::STATUS_CONFIRMED && empty($order->tracking_code)) {
+            if ($newStatus === \App\Models\Order::STATUS_CONFIRMED && $this->shouldAutoCreateGhnOrder($order)) {
                 try {
                     $ghnProvider = app(\App\Services\Shipping\GhnShippingProvider::class);
                     $ghnProvider->createShippingOrder($order);
@@ -139,7 +131,7 @@ class OrderController extends Controller
                         'shipping_provider' => 'ghn',
                         'shipping_service_name' => 'Giao Hàng Nhanh',
                     ]);
-                    
+
                     return redirect()->route('admin.orders.show', $order)
                         ->with('success', 'Trạng thái đơn hàng đã được cập nhật & Đã tự động tạo mã vận đơn GHN thành công!');
                 } catch (\Exception $ghnEx) {
@@ -220,6 +212,10 @@ class OrderController extends Controller
      */
     public function pushToGhn(Order $order, \App\Services\Shipping\GhnShippingProvider $ghnProvider)
     {
+        if ($order->shipping_provider === 'store_pickup') {
+            return back()->with('error', 'Don nhan tai cua hang khong the tao van don GHN.');
+        }
+
         if ($order->tracking_code) {
             return back()->with('error', 'Đơn hàng này đã có mã vận đơn GHN rồi.');
         }
@@ -235,5 +231,14 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Lỗi khi tạo vận đơn GHN: ' . $e->getMessage());
         }
+    }
+
+    protected function shouldAutoCreateGhnOrder(Order $order): bool
+    {
+        if (filled($order->tracking_code)) {
+            return false;
+        }
+
+        return $order->shipping_provider === 'ghn' || blank($order->shipping_provider);
     }
 }

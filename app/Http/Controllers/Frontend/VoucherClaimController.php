@@ -10,8 +10,9 @@ use Illuminate\Support\Facades\DB;
 
 class VoucherClaimController extends Controller
 {
-    public function claim(Request $request)
+    public function claim(\App\Http\Requests\Generated\VoucherClaimRequest $request)
     {
+        // Validation handled by VoucherClaimRequest
         if (!Auth::check()) {
             return response()->json([
                 'success' => false,
@@ -20,13 +21,7 @@ class VoucherClaimController extends Controller
             ], 401);
         }
 
-        $request->validate([
-            'coupon_id' => 'required|exists:coupons,id',
-            'source' => 'nullable|string|max:20',
-            'source_id' => 'nullable|exists:posts,id',
-        ]);
-
-        $coupon = Coupon::findOrFail($request->coupon_id);
+        $coupon = Coupon::findOrFail($request->validated()['coupon_id']);
 
         if (!$coupon->isValid()) {
             $message = 'Mã giảm giá không còn hiệu lực.';
