@@ -99,7 +99,7 @@ class StoreProductRequest extends FormRequest
             ],
             'variants.*.size_id' => 'required|exists:sizes,id',
             'variants.*.color_id' => 'required|exists:colors,id',
-            'variants.*.price' => 'nullable|numeric|min:0|max:99999999',
+            'variants.*.price' => 'required|numeric|min:0|max:99999999',
             'variants.*.sale_price' => [
                 'nullable',
                 'numeric',
@@ -133,7 +133,7 @@ class StoreProductRequest extends FormRequest
             'variants' => 'Biến thể',
             'variants.*.size_id' => 'Kích thước',
             'variants.*.color_id' => 'Màu sắc',
-            'variants.*.price' => 'Giá biến thể',
+            'variants.*.price' => 'Giá',
             'variants.*.sale_price' => 'Giá khuyến mãi biến thể',
             'variants.*.stock_quantity' => 'Số lượng tồn kho',
             'variants.*.sku' => 'Mã SKU',
