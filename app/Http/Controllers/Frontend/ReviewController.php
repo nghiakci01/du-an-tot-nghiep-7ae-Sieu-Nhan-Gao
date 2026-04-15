@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Notification;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request, $productId)
+    public function store(\App\Http\Requests\Generated\ReviewRequest $request, $productId)
     {
         if (! Auth::check()) {
             return back()->with('error', 'Vui lòng đăng nhập để gửi đánh giá.');
@@ -38,10 +38,7 @@ class ReviewController extends Controller
             return back()->with('error', 'Bạn đã đánh giá sản phẩm này rồi.');
         }
 
-        $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'required|string|max:1000',
-        ]);
+        // Validation handled by ReviewRequest
 
         $review = Review::create([
             'product_id' => $productId,

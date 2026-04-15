@@ -19,23 +19,9 @@ class ChatbotSettingController extends Controller
         return view('admin.settings.chatbot', compact('chatbotSettings', 'questions'));
     }
 
-    public function update(Request $request)
+    public function update(\App\Http\Requests\Generated\ChatbotSettingRequest $request)
     {
-        $request->validate([
-            'chatbot_enabled' => 'nullable|in:1,0',
-            'chatbot_mode' => 'required|in:rules,ai',
-            'ai_provider' => 'required_if:chatbot_mode,ai|in:gemini',
-            'greeting_message' => 'required|string',
-            'fallback_message' => 'required|string',
-            'hotline' => 'required|string',
-            'email' => 'required|email',
-            'system_instruction' => 'required_if:chatbot_mode,ai|nullable|string',
-            'gemini_api_key' => 'nullable|string',
-            'openai_api_key' => 'nullable|string',
-            'keyword_rules' => 'nullable|string',
-        ]);
-
-        $data = $request->except('_token');
+        $data = $request->validated();
 
         // Handle checkbox (if not checked, Laravel request doesn't include it)
         $data['chatbot_enabled'] = $request->has('chatbot_enabled') ? '1' : '0';

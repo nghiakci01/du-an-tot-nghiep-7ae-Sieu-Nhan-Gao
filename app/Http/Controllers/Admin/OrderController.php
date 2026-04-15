@@ -30,21 +30,9 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Generated\OrderStoreRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'province' => 'required|string',
-            'commune' => 'nullable|string|max:255',
-            'address' => 'required|string',
-            'payment_method' => 'required|string',
-            'status' => 'required|string',
-            'items' => 'required|array|min:1',
-            'items.*.variant_id' => 'required|exists:product_variants,id',
-            'items.*.quantity' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         try {
             DB::beginTransaction();
@@ -72,13 +60,13 @@ class OrderController extends Controller
             }
 
             $order = Order::create([
-                'user_id' => $request->user_id ?? null,
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'province' => $request->province,
-                'address' => $request->address,
-                'status' => $request->status,
+                'user_id' => $validated['user_id'] ?? null,
+                'name' => $validated['name'],
+                'email' => $validated['email'] ?? null,
+                'phone' => $validated['phone'],
+                'province' => $validated['province'],
+                'address' => $validated['address'],
+                'status' => $validated['status'],
                 'total_price' => $totalPrice,
                 'final_total' => $totalPrice, // No discount/shipping for manual admin order in this basic impl
                 'payment_method' => $request->payment_method,
@@ -124,18 +112,16 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Order $order, \App\Services\OrderService $orderService)
+    public function update(\App\Http\Requests\Generated\OrderStatusUpdateRequest $request, Order $order, \App\Services\OrderService $orderService)
     {
-        $request->validate([
-            'status' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
-        $newStatus = $request->input('status');
+        $newStatus = $validated['status'];
 
         try {
             $orderService->updateOrderStatus($order, $newStatus, Auth::user());
             $order->refresh();
-            
+
             // Tự động tạo mã vận đơn nếu Admin chuyển sang "Đã xác nhận" (Confirmed)
             if ($newStatus === \App\Models\Order::STATUS_CONFIRMED && $this->shouldAutoCreateGhnOrder($order)) {
                 try {
@@ -145,7 +131,7 @@ class OrderController extends Controller
                         'shipping_provider' => 'ghn',
                         'shipping_service_name' => 'Giao Hàng Nhanh',
                     ]);
-                    
+
                     return redirect()->route('admin.orders.show', $order)
                         ->with('success', 'Trạng thái đơn hàng đã được cập nhật & Đã tự động tạo mã vận đơn GHN thành công!');
                 } catch (\Exception $ghnEx) {

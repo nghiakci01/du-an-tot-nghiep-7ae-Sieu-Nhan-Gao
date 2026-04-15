@@ -22,13 +22,11 @@ class LockScreenController extends Controller
         return view('admin.auth.lock-screen');
     }
 
-    public function unlock(Request $request)
+    public function unlock(\App\Http\Requests\Generated\UnlockRequest $request)
     {
-        $request->validate([
-            'password' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
-        if (Hash::check($request->password, Auth::user()->password)) {
+        if (Hash::check($validated['password'], Auth::user()->password)) {
             Session::forget('locked');
 
             return redirect()->route('admin.dashboard');
