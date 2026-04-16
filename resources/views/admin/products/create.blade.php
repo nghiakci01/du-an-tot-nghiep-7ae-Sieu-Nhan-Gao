@@ -45,7 +45,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="name" class="form-label">Tên Sản phẩm</label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" placeholder="Nhập tên sản phẩm..." required>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" placeholder="Nhập tên sản phẩm..." maxlength="200" required>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -424,12 +424,22 @@
                     if (!el.value || el.value.trim() === '') {
                         el.classList.add('is-invalid', 'shake-error');
                         invalids.push(el);
-                        el.addEventListener('input', function() {
+                        
+                        // Update error message if any
+                        const feedback = el.parentNode.querySelector('.invalid-feedback');
+                        if (feedback) {
+                            feedback.textContent = 'Vui lòng nhập trường này';
+                            feedback.style.display = 'block';
+                        }
+
+                        const removeError = function() {
                             el.classList.remove('is-invalid', 'shake-error');
-                        }, { once: true });
-                        el.addEventListener('change', function() {
-                            el.classList.remove('is-invalid', 'shake-error');
-                        }, { once: true });
+                            if (feedback) {
+                                feedback.style.display = '';
+                            }
+                        };
+                        el.addEventListener('input', removeError, { once: true });
+                        el.addEventListener('change', removeError, { once: true });
                     }
                 });
                 if (invalids.length > 0) {
