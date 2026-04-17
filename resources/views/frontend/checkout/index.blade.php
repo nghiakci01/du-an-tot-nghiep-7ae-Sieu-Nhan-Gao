@@ -526,7 +526,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
 
 @auth
 {{-- ══════════ ADDRESS PICKER MODAL ══════════ --}}
-<div class="modal fade" id="addr-pick-modal" tabindex="-1" aria-labelledby="addr-modal-label" aria-hidden="true">
+<div class="modal fade" id="addr-pick-modal" tabindex="-1" aria-labelledby="addr-modal-label">
   <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
     <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 8px 40px rgba(0,0,0,.14);">
       <div class="modal-header" style="border-bottom:1px solid #f0f0f0;padding:18px 24px;">
@@ -537,9 +537,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       </div>
 
       <div class="modal-body" style="padding:20px 24px;">
-        {{-- Hidden dismiss trigger (JS uses this to close modal safely) --}}
-        <button id="modal-dismiss-hidden" type="button" data-bs-dismiss="modal"
-                style="display:none;" aria-hidden="true"></button>
+
 
         @if($userAddresses->isNotEmpty())
         {{-- Address List Grid 2 Cols --}}
@@ -811,7 +809,13 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
   }, false);
   refreshShippingQuote();
 
-  function closeAddrModal(){ document.getElementById('modal-dismiss-hidden')?.click(); }
+  function closeAddrModal(){ 
+    const modalEl = document.getElementById('addr-pick-modal');
+    if (modalEl && window.bootstrap) {
+      const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+      modal.hide();
+    }
+  }
 
   function applyAddrSelection(card){
     qsa('.mpick-card').forEach(c=>c.classList.remove('is-sel'));
@@ -993,6 +997,12 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       }
     } catch(e){} finally { btn.disabled=false; btn.innerHTML='<i class="fa fa-trash"></i> Xóa địa chỉ'; }
   }
+
+  // ───── Initial Load ─────
+  // Load for Guest form selects
+  bindCascade(qs('#g_province'), qs('#g_commune'), '{{ old("province") }}', '{{ old("commune") }}');
+  // Load for Modal form selects (if starting in Add mode)
+  bindCascade(qs('#modal_province'), qs('#modal_commune'), '', '');
 
   // ───── Order Submit ─────
   pageContainer?.addEventListener('submit', function(e){
