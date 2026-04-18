@@ -179,7 +179,7 @@
           <div class="detail-body">
             
             <div class="alert alert-info rounded-3 mb-4 border-0 shadow-sm" style="font-size:0.9rem;">
-              <strong>Lưu ý:</strong> Yêu cầu hoàn trả sẽ được cửa hàng xem xét. Sau khi được chấp thuận, hệ thống sẽ cấp mã vận chuyển để bạn gửi hàng về cửa hàng. Tiền sẽ được hoàn vào <strong>Ví của bạn</strong> sau khi cửa hàng nhận được sản phẩm.
+              <strong>Lưu ý:</strong> Hiện tại cửa hàng chỉ hỗ trợ <strong>Hoàn trả toàn bộ đơn hàng</strong>. Chúng tôi không hỗ trợ trả lẻ từng sản phẩm. Nếu bạn muốn đổi size/màu, vui lòng hoàn trả toàn bộ đơn hàng này và đặt một đơn hàng mới.
             </div>
 
             <form action="{{ route('account.orders.return_submit', $order->id) }}" method="POST" enctype="multipart/form-data">
@@ -192,17 +192,19 @@
                   <table class="table table-borderless align-middle">
                     <thead class="table-light">
                       <tr>
-                        <th width="50" class="text-center">Chọn</th>
+                        <th width="80" class="text-center">STT</th>
                         <th>Sản phẩm</th>
-                        <th width="120" class="text-center">Số lượng trả</th>
+                        <th width="120" class="text-center">Số lượng</th>
                         <th width="150" class="text-end">Đơn giá</th>
                       </tr>
                     </thead>
                     <tbody>
-                      @foreach($order->items as $item)
+                      @php $totalOrderAmount = 0; @endphp
+                      @foreach($order->items as $index => $item)
+                      @php $totalOrderAmount += $item->price * $item->quantity; @endphp
                       <tr class="item-row border-bottom">
-                        <td class="text-center">
-                          <input type="checkbox" name="items[{{ $item->id }}][selected]" value="1" class="form-check-input item-checkbox" style="width:20px; height:20px;" {{ old("items.{$item->id}.selected") == '1' ? 'checked' : '' }}>
+                        <td class="text-center text-muted">
+                          {{ $index + 1 }}
                         </td>
                         <td>
                           <div class="d-flex align-items-center">
@@ -219,12 +221,11 @@
                             </div>
                           </div>
                         </td>
-                        <td>
-                          <input type="number" name="items[{{ $item->id }}][quantity]" value="{{ old("items.{$item->id}.quantity", $item->quantity) }}" min="1" max="{{ $item->quantity }}" class="form-control form-control-sm text-center item-qty" {{ old("items.{$item->id}.selected") == '1' ? '' : 'disabled' }}>
+                        <td class="text-center fw-bold">
+                          x{{ $item->quantity }}
                         </td>
                         <td class="text-end fw-bold">
                           {{ number_format($item->price, 0, ',', '.') }}₫
-                          <input type="hidden" class="item-price" value="{{ $item->price }}">
                         </td>
                       </tr>
                       @endforeach
@@ -232,29 +233,13 @@
                   </table>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-3 p-3 bg-light rounded-3">
-                  <span class="fw-bold">Ước tính số tiền hoàn lại:</span>
-                  <span class="text-danger fw-bold fs-5" id="total-refund-preview">0₫</span>
+                  <span class="fw-bold">Tổng số tiền hoàn lại (Toàn bộ đơn):</span>
+                  <span class="text-danger fw-bold fs-5">{{ number_format($totalOrderAmount, 0, ',', '.') }}₫</span>
                 </div>
               </div>
 
               {{-- Return Type --}}
-              <div class="mb-5">
-                <label class="form-label fw-bold mb-3">Bạn muốn Đổi hàng hay Hoàn tiền? <span class="text-danger">*</span></label>
-                <div class="d-flex gap-4">
-                  <div class="form-check custom-radio">
-                    <input class="form-check-input" type="radio" name="type" id="type_refund" value="refund" {{ old('type', 'refund') == 'refund' ? 'checked' : '' }}>
-                    <label class="form-check-label fw-600" for="type_refund">
-                      <i class="bi bi-cash-stack me-1"></i> Trả hàng & Hoàn tiền
-                    </label>
-                  </div>
-                  <div class="form-check custom-radio">
-                    <input class="form-check-input" type="radio" name="type" id="type_exchange" value="exchange" {{ old('type') == 'exchange' ? 'checked' : '' }}>
-                    <label class="form-check-label fw-600" for="type_exchange">
-                      <i class="bi bi-arrow-left-right me-1"></i> Đổi size / Phân loại khác
-                    </label>
-                  </div>
-                </div>
-              </div>
+              <input type="hidden" name="type" value="refund">
 
               {{-- Reason Type --}}
               <div class="mb-4">
@@ -262,7 +247,6 @@
                 <select name="reason_type" id="reason_type" class="form-select form-select-lg" required style="border-radius:10px; font-size:15px;">
                   <option value="" disabled {{ !old('reason_type') ? 'selected' : '' }}>-- Chọn lý do --</option>
                   <option value="defective" {{ old('reason_type') == 'defective' ? 'selected' : '' }}>Hàng lỗi / Hư hỏng do vận chuyển hoặc NSX</option>
-                  <option value="wrong_size" {{ old('reason_type') == 'wrong_size' ? 'selected' : '' }}>Đổi kích cỡ (Size) / Màu sắc</option>
                   <option value="disliked" {{ old('reason_type') == 'disliked' ? 'selected' : '' }}>Sản phẩm không giống mô tả / Không ưng ý</option>
                   <option value="other" {{ old('reason_type') == 'other' ? 'selected' : '' }}>Lý do khác</option>
                 </select>
@@ -464,10 +448,16 @@ $(document).ready(function() {
     });
 
     // 3.1. Update hidden reason field when reason_type changes
-    $('#reason_type').on('change', function() {
-        const selectedText = $(this).find('option:selected').text();
-        $('#reason_text').val(selectedText);
-    });
+    function syncReason() {
+        const selectedOption = $('#reason_type').find('option:selected');
+        if (selectedOption.val()) {
+            $('#reason_text').val(selectedOption.text());
+        } else {
+            $('#reason_text').val('');
+        }
+    }
+    $('#reason_type').on('change', syncReason);
+    syncReason(); // Initial sync on load
 
     // 4. Real-time VietQR Lookup
     let lookupTimer;
@@ -517,32 +507,6 @@ $(document).ready(function() {
         }
     }
 
-    // 5. Item selection and refund calculation
-    const itemCheckboxes = $('.item-checkbox');
-    const itemQtys = $('.item-qty');
-    const refundPreview = $('#total-refund-preview');
-
-    function calculateTotalRefund() {
-        let total = 0;
-        $('.item-row').each(function() {
-            const checkbox = $(this).find('.item-checkbox');
-            const qtyInput = $(this).find('.item-qty');
-            const price = parseFloat($(this).find('.item-price').val());
-            
-            if (checkbox.is(':checked')) {
-                qtyInput.prop('disabled', false);
-                const qty = parseInt(qtyInput.val()) || 0;
-                total += qty * price;
-            } else {
-                qtyInput.prop('disabled', true);
-            }
-        });
-        const formatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total).replace('₫', '') + '₫';
-        refundPreview.text(formatted);
-    }
-
-    itemCheckboxes.on('change', calculateTotalRefund);
-    itemQtys.on('input', calculateTotalRefund);
 
     // 6. Image preview
     $('#return-images').on('change', function(e) {
@@ -607,7 +571,7 @@ $(document).ready(function() {
     }
 
     // Trigger initial calculation
-    calculateTotalRefund();
+    // calculateTotalRefund(); // No longer needed for 'Return All' policy
 });
 </script>
 @endpush

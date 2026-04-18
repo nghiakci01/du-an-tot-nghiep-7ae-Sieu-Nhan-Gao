@@ -179,6 +179,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
         Route::get('returns/{id}/reject', function() { return redirect()->route('admin.returns.index'); });
         Route::post('returns/{id}/complete', [App\Http\Controllers\Admin\OrderReturnController::class, 'complete'])->name('returns.complete');
         Route::get('returns/{id}/complete', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/generate-ghn', [App\Http\Controllers\Admin\OrderReturnController::class, 'generateGhnCode'])->name('returns.generate_ghn');
 
         Route::delete('products/bulk-delete', [App\Http\Controllers\Admin\ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
         Route::delete('products/delete-all', [App\Http\Controllers\Admin\ProductController::class, 'deleteAll'])->name('products.delete-all');
