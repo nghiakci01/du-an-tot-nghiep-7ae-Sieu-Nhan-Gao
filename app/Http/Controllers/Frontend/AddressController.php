@@ -77,7 +77,7 @@ class AddressController extends Controller
             ->with('success', 'Địa chỉ đã được cập nhật!');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $address = UserAddress::where('user_id', Auth::id())->findOrFail($id);
         $wasDefault = $address->is_default;

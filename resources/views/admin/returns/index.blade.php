@@ -22,9 +22,9 @@
                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
                         <div>
                             <h5 class="mb-0 text-info">
-                                <i class="bi bi-truck me-2"></i>Thông tin nhận hàng hoàn trả
+                                <i class="fas fa-truck-loading me-2"></i>Thông tin nhận hàng hoàn trả (Cấu hình GHN)
                             </h5>
-                            <small class="text-muted">Thông tin này sẽ hiển thị cho khách khi yêu cầu hoàn trả được duyệt.</small>
+                            <small class="text-muted">Thông tin này là bắt buộc để tạo mã vận đơn GHN. Admin cần cấu hình 1 lần tại đây.</small>
                         </div>
                     </div>
                     <div class="card-body">
@@ -47,8 +47,8 @@
                                 <textarea name="return_receiver_note" class="form-control" rows="2" placeholder="Nhập hướng dẫn thêm cho khách">{{ old('return_receiver_note', $returnReceiverNote) }}</textarea>
                             </div>
                             <div class="col-12 text-end">
-                                <button type="submit" class="btn btn-info text-white">
-                                    <i class="bi bi-save me-1"></i> Lưu thông tin hoàn trả
+                                <button type="submit" class="btn btn-info text-white shadow-sm">
+                                    <i class="fas fa-save me-1"></i> Lưu cấu hình trả hàng
                                 </button>
                             </div>
                         </form>
@@ -239,7 +239,14 @@
                                                         <div class="mb-3">
                                                             <div class="d-flex justify-content-between mb-2">
                                                                 <label class="small fw-bold">Phản hồi / Mã vận chuyển <span class="text-danger">*</span></label>
-                                                                <button type="button" class="btn btn-xs btn-link p-0 text-decoration-none" onclick="document.getElementById('admin_note_{{ $req->id }}').value = 'Mã KS-RET-{{ $req->order_id }}-{{ strtoupper(Str::random(5)) }}\nVui lòng đóng gói và ghi mã đơn lên kiện hàng.'">Tạo mã vận chuyển mẫu</button>
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    @if($req->tracking_code)
+                                                                        <span class="badge bg-success" id="badge_ghn_{{ $req->id }}"><i class="fas fa-check-circle me-1"></i>GHN: {{ $req->tracking_code }}</span>
+                                                                    @endif
+                                                                    <button type="button" class="btn btn-xs btn-outline-primary px-2" id="btn_generate_ghn_{{ $req->id }}" onclick="generateGhnTrackingCode({{ $req->id }})">
+                                                                        <i class="fas fa-shipping-fast me-1"></i> {{ $req->tracking_code ? 'Tạo lại mã GHN' : 'Tạo mã GHN thực tế' }}
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                             <textarea id="admin_note_{{ $req->id }}" class="form-control" rows="3" placeholder="Nhập mã vận chuyển hoặc lý do từ chối..."></textarea>
                                                         </div>
@@ -340,6 +347,57 @@
 
             console.log('Submitting form to:', actionUrl);
             form.submit();
+        }
+
+        function generateGhnTrackingCode(requestId) {
+            const btn = document.getElementById('btn_generate_ghn_' + requestId);
+            const noteArea = document.getElementById('admin_note_' + requestId);
+            
+            if (!confirm('Hệ thống sẽ gọi API GHN để tạo vận đơn thu hồi hàng thực tế. Tiếp tục?')) return;
+
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Đang tạo...';
+
+            fetch(`/admin/returns/${requestId}/generate-ghn`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    noteArea.value = 'Mã vận đơn GHN: ' + data.tracking_code + '\nVui lòng đóng gói và mang ra bưu cục GHN gần nhất để gửi trả hàng.';
+                    alert('Đã tạo mã vận đơn GHN thành công: ' + data.tracking_code);
+                    
+                    // Update UI if possible
+                    const badge = document.getElementById('badge_ghn_' + requestId);
+                    if (badge) {
+                        badge.innerHTML = '<i class="fas fa-check-circle me-1"></i>GHN: ' + data.tracking_code;
+                    } else {
+                        location.reload(); 
+                    }
+                } else {
+                    let errorMsg = data.message || 'Không thể tạo mã vận đơn.';
+                    if (errorMsg.includes('Chưa cấu hình địa chỉ')) {
+                        errorMsg += '\n\nVui lòng điền "Thông tin nhận hàng hoàn trả" ở bảng phía trên đầu trang trước khi tiếp tục.';
+                        // Scroll to top
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    alert('Lỗi: ' + errorMsg);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi gọi API tạo mã.');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            });
         }
 
         // Cleanup Modal Backdrop

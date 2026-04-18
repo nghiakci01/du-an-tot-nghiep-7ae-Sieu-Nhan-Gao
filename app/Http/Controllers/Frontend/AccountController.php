@@ -231,30 +231,21 @@ class AccountController extends Controller
             }
         }
 
-        // Filter selected items and calculate refund amount
+        // Force return all items strategy
         $selectedItems = [];
         $totalRefund = 0;
 
-        foreach ($request->items as $itemId => $data) {
-            if (isset($data['selected']) && $data['selected'] == 1) {
-                $orderItem = \App\Models\OrderItem::where('order_id', $order->id)->findOrFail($itemId);
-
-                $qty = (int) ($data['quantity'] ?? 1);
-                if ($qty > $orderItem->quantity) {
-                    return redirect()->back()->with('error', "Số lượng trả của sản phẩm {$orderItem->product_name} vượt quá số lượng đã mua.");
-                }
-
-                $selectedItems[] = [
-                    'order_item_id' => $itemId,
-                    'quantity' => $qty,
-                    'price' => $orderItem->price,
-                ];
-                $totalRefund += $qty * $orderItem->price;
-            }
+        foreach ($order->items as $item) {
+            $selectedItems[] = [
+                'order_item_id' => $item->id,
+                'quantity' => $item->quantity, // Return full quantity
+                'price' => $item->price,
+            ];
+            $totalRefund += $item->quantity * $item->price;
         }
 
         if (empty($selectedItems)) {
-            return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một sản phẩm để hoàn trả.');
+            return redirect()->back()->with('error', 'Đơn hàng này không có sản phẩm để hoàn trả.');
         }
 
         $imagePaths = [];
@@ -281,7 +272,7 @@ class AccountController extends Controller
             $returnRequest = \App\Models\OrderReturnRequest::create([
                 'user_id' => $user->id,
                 'order_id' => $order->id,
-                'type' => $request->type,
+                'type' => 'refund',
                 'reason_type' => $request->reason_type,
                 'reason' => $request->reason,
                 'return_method' => $request->return_method,
