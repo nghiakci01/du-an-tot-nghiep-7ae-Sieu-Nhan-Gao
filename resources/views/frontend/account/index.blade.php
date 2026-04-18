@@ -266,7 +266,7 @@
         </li>
         @endif
         <li>
-          <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-account').submit();" class="text-danger">
+          <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-account').submit();" class="text-danger" style="border-bottom: 0 !important;">
             <i class="bi bi-box-arrow-right"></i> Đăng xuất
           </a>
           <form id="logout-form-account" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
