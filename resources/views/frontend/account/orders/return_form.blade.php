@@ -293,13 +293,15 @@
                     </div>
                   </div>
                   
-                  <div id="ghtk-map-link" class="mt-3 p-3 rounded-3 border border-success d-none" style="background-color: #f0fdf4;">
+                  <div id="ghn-map-link" class="mt-3 p-3 rounded-3 border border-warning d-none" style="background-color: #fffaf0;">
                     <div class="d-flex align-items-center mb-2">
-                        <img src="https://giaohangtietkiem.vn/wp-content/uploads/2015/10/logo-ghtk.png" style="height: 18px;" class="me-2">
-                        <span class="small fw-bold text-success">Bạn có thể gửi hàng hoàn trả tại bất kỳ bưu cục Giao Hàng Tiết Kiệm nào.</span>
+                        <div class="d-flex align-items-center gap-1 me-2" style="color: #f26522; font-weight: 800; font-size: 1.1rem; line-height: 1;">
+                            <i class="bi bi-truck"></i> GHN
+                        </div>
+                        <span class="small fw-bold" style="color: #f26522;">Bạn có thể gửi hàng hoàn trả tại bất kỳ bưu cục Giao Hàng Nhanh (GHN) nào.</span>
                     </div>
-                    <a href="https://www.google.com/maps/search/Giao+hàng+tiết+kiệm/" target="_blank" class="btn btn-success btn-sm w-100 rounded-pill py-2">
-                      <i class="bi bi-geo-alt-fill me-1"></i>🌏 Tìm bưu cục GHTK gần nhất trên Google Maps
+                    <a href="https://www.google.com/maps/search/Giao+hàng+nhanh/" target="_blank" class="btn btn-warning btn-sm w-100 rounded-pill py-2" style="background-color: #f26522; border-color: #f26522; color: white;">
+                      <i class="bi bi-geo-alt-fill me-1"></i>🌏 Tìm bưu cục GHN gần nhất trên Google Maps
                     </a>
                   </div>
               </div>
@@ -554,11 +556,11 @@ $(document).ready(function() {
         $('.method-card input[type="radio"]').prop('checked', false);
         $(this).find('input[type="radio"]').prop('checked', true);
         
-        // Show/Hide GHTK link
+        // Show/Hide GHN link
         if (value === 'at_post_office') {
-            $('#ghtk-map-link').removeClass('d-none').hide().fadeIn(300);
+            $('#ghn-map-link').removeClass('d-none').hide().fadeIn(300);
         } else {
-            $('#ghtk-map-link').fadeOut(200, function() {
+            $('#ghn-map-link').fadeOut(200, function() {
                 $(this).addClass('d-none');
             });
         }

@@ -201,6 +201,33 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
 .mpick-add-btn:hover { border-color:var(--ck-black); color:var(--ck-black); }
 .modal-addr-form { border-top:1px solid var(--ck-border); padding-top:20px; margin-top:6px; }
 .modal-addr-form .ck-label { font-size:11px; }
+/* vouchers */
+.ck-v-list { display:flex; flex-direction:column; gap:10px; margin-top:15px; }
+.v-card {
+  display:flex; align-items:center; gap:12px; padding:12px;
+  border:1.5px solid var(--ck-border); border-radius:10px;
+  position:relative; transition:all .2s; cursor:pointer;
+  background:#fff;
+}
+.v-card.selectable:hover { border-color:var(--ck-black); transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.05); }
+.v-card.is-sel { border-color:var(--ck-black); background:#fafafa; }
+.v-card.disabled { opacity:0.6; cursor:not-allowed; filter:grayscale(0.8); background:#f9fafb; }
+.v-icon-box {
+  width:40px; height:40px; border-radius:8px; background:#fff2eb;
+  color:#f26522; display:flex; align-items:center; justify-content:center;
+  font-size:18px; flex-shrink:0;
+}
+.v-card.disabled .v-icon-box { background:#f1f1f1; color:#999; }
+.v-info { flex:1; min-width:0; }
+.v-code { font-size:13px; font-weight:700; color:var(--ck-black); margin-bottom:1px; display:flex; align-items:center; gap:6px; }
+.v-desc { font-size:11.5px; color:var(--ck-gray); line-height:1.3; margin-bottom:2px; }
+.v-fail { font-size:10px; font-weight:600; color:var(--ck-red); text-transform:uppercase; letter-spacing:0.3px; }
+.v-apply-btn {
+  font-size:12px; font-weight:700; color:#f26522;
+  padding:4px 10px; border-radius:6px; background:#fff2eb;
+  transition:all .15s;
+}
+.v-card.selectable:hover .v-apply-btn { background:#f26522; color:#fff; }
 </style>
 @endpush
 
@@ -497,6 +524,39 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
               <button class="btn-cpn" id="btn-cpn" type="button" aria-label="Áp dụng mã">Áp dụng</button>
             </div>
             <div id="cpn-msg" aria-live="polite" style="font-size:12px;margin-bottom:8px;min-height:16px;"></div>
+
+            {{-- Available Vouchers List --}}
+            @if(isset($availableCoupons) && $availableCoupons->isNotEmpty())
+              <div class="mt-4">
+                <h4 style="font-size:13px; font-weight:700; color:var(--ck-black); margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                  <i class="bi bi-ticket-perforated"></i> Mã giảm giá dành cho bạn
+                </h4>
+                <div class="ck-v-list">
+                  @foreach($availableCoupons as $v)
+                    <div class="v-card {{ $v->is_applicable ? 'selectable js-v-apply' : 'disabled' }}" 
+                         data-code="{{ $v->code }}"
+                         title="{{ !$v->is_applicable ? $v->failure_reason : '' }}">
+                      <div class="v-icon-box"><i class="bi bi-tag-fill"></i></div>
+                      <div class="v-info">
+                        <div class="v-code">
+                          {{ $v->code }}
+                          @if($v->is_applicable)
+                            <span class="badge rounded-pill bg-success" style="font-size:9px; font-weight:500;">Có thể áp dụng</span>
+                          @endif
+                        </div>
+                        <div class="v-desc">{{ $v->description ?: ('Giảm ' . $v->getFormattedValue() . ($v->min_order_amount > 0 ? ' cho đơn từ ₫' . number_format($v->min_order_amount, 0, ',', '.') : '')) }}</div>
+                        @if(!$v->is_applicable)
+                          <div class="v-fail"><i class="bi bi-exclamation-circle-fill me-1"></i>{{ $v->failure_reason }}</div>
+                        @endif
+                      </div>
+                      @if($v->is_applicable)
+                        <div class="v-apply-btn">Dùng ngay</div>
+                      @endif
+                    </div>
+                  @endforeach
+                </div>
+              </div>
+            @endif
           </div>
 
           <div class="sum-row"><span>Tạm tính</span><span>{{ number_format($total,0,',','.') }}đ</span></div>
@@ -886,6 +946,13 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
 
     if(e.target.closest('#btn-cpn')){ handleApplyCoupon(); return; }
     if(e.target.closest('#btn-rm-cpn')){ handleRemoveCoupon(); return; }
+    const vCard = e.target.closest('.js-v-apply');
+    if(vCard){
+      const code = vCard.dataset.code;
+      if(qs('#cpn-input')) qs('#cpn-input').value = code;
+      handleApplyCoupon();
+      return;
+    }
     const rmItemBtn = e.target.closest('.sum-item-rm'); if(rmItemBtn){ handleRemoveItem(rmItemBtn); return; }
 
     const saveBtn = e.target.closest('#modal-save-addr-btn'); if(saveBtn) handleSaveAddress(saveBtn);

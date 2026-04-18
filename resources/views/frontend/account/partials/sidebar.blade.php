@@ -20,7 +20,7 @@
         
         @if(Auth::check())
         <li>
-            <a href="{{ route('logout') }}" class="nav-link"
+            <a href="{{ route('logout') }}" class="nav-link" style="border-bottom: 0 !important;"
                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 {{ __('messages.logout') }}
             </a>
