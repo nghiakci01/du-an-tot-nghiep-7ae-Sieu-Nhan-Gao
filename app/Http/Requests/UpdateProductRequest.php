@@ -14,7 +14,7 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:200',
             'category_id' => 'required|exists:categories,id',
             'price' => 'nullable|numeric|min:0|max:99999999',
             'sale_price' => 'nullable|numeric|min:0|max:99999999',
@@ -100,7 +100,7 @@ class UpdateProductRequest extends FormRequest
             'variants.*.id' => 'nullable|exists:product_variants,id',
             'variants.*.size_id' => 'required|exists:sizes,id',
             'variants.*.color_id' => 'required|exists:colors,id',
-            'variants.*.price' => 'nullable|numeric|min:0|max:99999999',
+            'variants.*.price' => 'required|numeric|min:0|max:99999999',
             'variants.*.sale_price' => [
                 'nullable',
                 'numeric',
@@ -134,7 +134,7 @@ class UpdateProductRequest extends FormRequest
             'variants' => 'Biến thể',
             'variants.*.size_id' => 'Kích thước',
             'variants.*.color_id' => 'Màu sắc',
-            'variants.*.price' => 'Giá biến thể',
+            'variants.*.price' => 'Giá',
             'variants.*.sale_price' => 'Giá khuyến mãi biến thể',
             'variants.*.stock_quantity' => 'Số lượng tồn kho',
             'variants.*.sku' => 'Mã SKU',

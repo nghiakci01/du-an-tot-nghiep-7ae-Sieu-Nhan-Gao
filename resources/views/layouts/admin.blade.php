@@ -98,6 +98,23 @@
     }
     [data-pc-theme="dark"] .bg-light-success {
         background-color: rgba(44, 168, 127, 0.15) !important;
+    }
+
+    /* Red Shake Validation */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+        75% { transform: translateX(-5px); }
+    }
+    .shake-error {
+        animation: shake 0.3s ease-in-out;
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+    .is-invalid.shake-error {
+        border-color: #dc3545 !important;
+    }
         color: #48d6a8 !important;
     }
     [data-pc-theme="dark"] .bg-light-warning {

@@ -27,10 +27,10 @@ class ProductImage extends Model
      */
     public function getImageUrlAttribute()
     {
-        if (!empty($this->image_path)) {
+        if (!empty($this->image_path) && file_exists(public_path('storage/' . $this->image_path))) {
             return asset('storage/'.$this->image_path);
         }
 
-        return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        return asset('frontend-assets/img/s-product/product.jpg') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     }
 }

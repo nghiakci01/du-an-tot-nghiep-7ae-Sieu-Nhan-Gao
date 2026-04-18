@@ -19,7 +19,7 @@ class SizeRequest extends FormRequest
             $id = is_object($size) ? ($size->id ?? null) : $size;
         }
 
-        $nameRule = 'required|string|max:255' . ($id ? '|unique:sizes,name,' . $id : '|unique:sizes,name');
+        $nameRule = 'required|string|max:25' . ($id ? '|unique:sizes,name,' . $id : '|unique:sizes,name');
 
         return [
             'name' => $nameRule,
