@@ -271,7 +271,7 @@
                         <button type="submit" name="return_method" value="at_home" class="btn {{ $order->returnRequest->return_method === 'at_home' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm rounded-pill flex-grow-1">
                             <i class="bi bi-house-door me-1"></i> Shipper lấy hàng
                         </button>
-                        <button type="submit" name="return_method" value="at_post_office" class="btn {{ $order->returnRequest->return_method === 'at_post_office' ? 'btn-success' : 'btn-outline-success' }} btn-sm rounded-pill flex-grow-1">
+                        <button type="submit" name="return_method" value="at_post_office" class="btn {{ $order->returnRequest->return_method === 'at_post_office' ? 'btn-warning' : 'btn-outline-warning' }} btn-sm rounded-pill flex-grow-1" style="{{ $order->returnRequest->return_method === 'at_post_office' ? 'background-color: #f26522; border-color: #f26522; color: white;' : 'color: #f26522; border-color: #f26522;' }}">
                             <i class="bi bi-building me-1"></i> Tự mang đến bưu cục
                         </button>
                     </div>
@@ -280,10 +280,10 @@
           @endif
 
           @if($order->returnRequest->return_method === 'at_post_office' && $order->returnRequest->isApproved())
-            <div class="mt-2 text-center p-3 rounded-3" style="background: #fff; border: 1px solid #198754; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <p class="mb-2 small fw-bold text-success">📍 Bạn đã chọn tự mang ra bưu cục:</p>
-                <a href="https://www.google.com/maps/search/Giao+hàng+tiết+kiệm/" target="_blank" class="btn btn-success btn-sm w-100 rounded-pill py-2">
-                    <i class="bi bi-geo-alt-fill me-1"></i>🌏 Tìm bưu cục GHTK gần nhất (Google Maps)
+            <div class="mt-2 text-center p-3 rounded-3" style="background: #fff; border: 1px solid #f26522; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <p class="mb-2 small fw-bold" style="color: #f26522;">📍 Bạn đã chọn tự mang ra bưu cục:</p>
+                <a href="https://www.google.com/maps/search/Giao+hàng+nhanh/" target="_blank" class="btn btn-warning btn-sm w-100 rounded-pill py-2" style="background-color: #f26522; border-color: #f26522; color: white;">
+                    <i class="bi bi-geo-alt-fill me-1"></i>🌏 Tìm bưu cục GHN gần nhất (Google Maps)
                 </a>
             </div>
           @endif

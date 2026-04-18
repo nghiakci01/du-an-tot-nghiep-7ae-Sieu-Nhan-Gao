@@ -113,9 +113,45 @@ class CheckoutController extends Controller
 
         $defaultBank = null;
 
+        // Fetch all active coupons and pre-check applicability
+        $availableCoupons = Coupon::active()
+            ->where(function($q) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', now());
+            })
+            ->where(function($q) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+            })
+            ->orderByDesc('value')
+            ->get()
+            ->map(function($c) use ($total) {
+                $isApplicable = true;
+                $reason = '';
+
+                if ($c->hasReachedUsageLimit()) {
+                    $isApplicable = false;
+                    $reason = 'Hết lượt sử dụng';
+                } elseif ($c->min_order_amount && $total < $c->min_order_amount) {
+                    $isApplicable = false;
+                    $reason = 'Chưa đạt ₫' . number_format($c->min_order_amount, 0, ',', '.');
+                } elseif (Auth::check()) {
+                    $alreadyUsed = \App\Models\Order::where('user_id', Auth::id())
+                        ->where('coupon_code', $c->code)
+                        ->whereNotIn('status', ['cancelled', 'failed'])
+                        ->exists();
+                    if ($alreadyUsed) {
+                        $isApplicable = false;
+                        $reason = 'Bạn đã sử dụng mã này';
+                    }
+                }
+
+                $c->is_applicable = $isApplicable;
+                $c->failure_reason = $reason;
+                return $c;
+            });
+
         return view('frontend.checkout.index', compact(
             'cart', 'total', 'coupon', 'discount', 'shippingFee', 'shippingProviderName', 'shippingExpectedDeliveryTime', 'finalTotal',
-            'provinces', 'userAddresses', 'defaultBank'
+            'provinces', 'userAddresses', 'defaultBank', 'availableCoupons'
         ));
     }
 
