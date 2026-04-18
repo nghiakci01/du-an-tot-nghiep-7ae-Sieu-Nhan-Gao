@@ -66,7 +66,6 @@
                             <label class="form-label">Vai trò <span class="text-danger">*</span></label>
                             <select name="role" class="form-control @error('role') is-invalid @enderror" required>
                                 <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>Khách hàng</option>
-                                <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Nhân viên</option>
                                 <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Quản trị viên</option>
                             </select>
                             @error('role')

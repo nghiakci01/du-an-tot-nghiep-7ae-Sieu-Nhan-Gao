@@ -30,13 +30,9 @@ class PostCategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Generated\PostCategoryRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:post_categories',
-            'description' => 'nullable|string',
-            'is_active' => 'required|boolean',
-        ]);
+        $validated = $request->validated();
 
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
 
@@ -58,15 +54,11 @@ class PostCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(\App\Http\Requests\Generated\PostCategoryRequest $request, $id)
     {
         $category = \App\Models\PostCategory::findOrFail($id);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:post_categories,name,'.$category->id,
-            'description' => 'nullable|string',
-            'is_active' => 'required|boolean',
-        ]);
+        $validated = $request->validated();
 
         $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
 

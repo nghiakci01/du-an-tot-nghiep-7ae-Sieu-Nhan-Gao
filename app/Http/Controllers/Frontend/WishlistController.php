@@ -28,15 +28,12 @@ class WishlistController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Generated\WishlistRequest $request)
     {
         if (! Auth::check()) {
             return response()->json(['status' => 'error', 'message' => 'Bạn cần đăng nhập để thêm vào danh sách yêu thích!'], 401);
         }
 
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-        ]);
 
         $productId = $request->product_id;
         $userId = Auth::id();

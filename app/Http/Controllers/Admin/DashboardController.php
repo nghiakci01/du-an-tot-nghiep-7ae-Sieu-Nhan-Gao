@@ -13,12 +13,10 @@ use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
     protected $reportService;
-    protected $conversionService;
 
-    public function __construct(\App\Services\ReportService $reportService, ConversionTrackingService $conversionService)
+    public function __construct(\App\Services\ReportService $reportService)
     {
         $this->reportService = $reportService;
-        $this->conversionService = $conversionService;
     }
 
     public function index(Request $request)
@@ -68,11 +66,12 @@ class DashboardController extends Controller
 
         $stats = $this->reportService->getOverviewStats($startDate, $endDate);
         $revenueChart = $this->reportService->getRevenueChartData($startDate, $endDate);
+        $halfYearChart = $this->reportService->getHalfYearComparisonData(now()->year);
         $orderStatus = $this->reportService->getOrderStatusData($startDate, $endDate);
         $topProducts = $this->reportService->getTopProducts($startDate, $endDate);
 
         // Tính tổng số lượng sản phẩm đã bán trong kỳ để làm thanh tiến trình
-        $totalProductsSold = \DB::table('order_items')
+        $totalProductsSold = DB::table('order_items')
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
             ->where('orders.status', Order::STATUS_COMPLETED)
             ->whereBetween('orders.created_at', [$startDate, $endDate])
@@ -80,8 +79,21 @@ class DashboardController extends Controller
 
         $recentOrders = Order::with('user')->latest()->take(5)->get();
 
-        // Conversion funnel stats
-        $funnelStats = $this->conversionService->getFunnelStats('30d');
+        // Get Top Wishlisted Products
+        $topWishlisted = \App\Models\Product::withCount('wishlistedBy')
+            ->orderByDesc('wishlisted_by_count')
+            ->take(10)
+            ->get();
+
+        // Get Best Selling Products (Top Sold)
+        $bestSellers = $this->reportService->getTopProducts($startDate, $endDate, 10);
+
+        // Get Low Stock List
+        $lowStockList = \App\Models\ProductVariant::with(['product', 'sizeRelationship', 'colorRelationship'])
+            ->whereColumn('stock_quantity', '<=', 'alert_threshold')
+            ->orderBy('stock_quantity', 'asc')
+            ->take(10)
+            ->get();
 
         return view('admin.dashboard', [
             'totalRevenue' => $stats['total_revenue'],
@@ -97,12 +109,15 @@ class DashboardController extends Controller
             'revenueValues' => $revenueChart['values'],
             'statusLabels' => $orderStatus['labels'],
             'statusValues' => $orderStatus['values'],
+            'halfYearChart' => $halfYearChart,
             'topProducts' => $topProducts,
             'totalProductsSold' => $totalProductsSold > 0 ? $totalProductsSold : 1, // Tránh chia cho 0
             'startDate' => $startDate->format('Y-m-d'),
             'endDate' => $endDate->format('Y-m-d'),
             'preset' => $preset,
-            'funnelStats' => $funnelStats,
+            'topWishlisted' => $topWishlisted,
+            'bestSellers' => $bestSellers,
+            'lowStockList' => $lowStockList,
         ]);
     }
 

@@ -68,10 +68,7 @@ class User extends Authenticatable
         return $this->role === self::ROLE_ADMIN;
     }
 
-    public function isStaff(): bool
-    {
-        return $this->role === self::ROLE_STAFF;
-    }
+
 
     public function socialAccounts()
     {
@@ -86,6 +83,13 @@ class User extends Authenticatable
     public function wishlists()
     {
         return $this->hasMany(Wishlist::class);
+    }
+
+    public function claimedCoupons()
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_user')
+            ->withPivot('claimed_at', 'source', 'source_id')
+            ->withTimestamps();
     }
 
     public function addresses()
@@ -126,8 +130,8 @@ class User extends Authenticatable
 
     public function getAvatarUrlAttribute()
     {
-        if (! $this->avatar) {
-            return null;
+        if (!$this->avatar) {
+            return asset('assets/images/default-avatar.png');
         }
 
         if (filter_var($this->avatar, FILTER_VALIDATE_URL)) {

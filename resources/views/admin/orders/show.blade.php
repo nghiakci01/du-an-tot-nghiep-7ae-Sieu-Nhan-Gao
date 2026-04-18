@@ -201,6 +201,9 @@
                         <select name="status" class="form-select">
                             <option value="">-- Chọn thao tác --</option>
                             @foreach($allowed as $status)
+                                @if($status === \App\Models\Order::STATUS_RETURNED || $status === \App\Models\Order::STATUS_PARTIALLY_RETURNED)
+                                    @continue
+                                @endif
                                 <option value="{{ $status }}">
                                     @switch($status)
                                         @case(\App\Models\Order::STATUS_CONFIRMED) 🟢 Duyệt & Đã xác nhận @break
@@ -208,7 +211,6 @@
                                         @case(\App\Models\Order::STATUS_COMPLETED) ✅ Giao thành công (Hoàn thành) @break
                                         @case(\App\Models\Order::STATUS_CANCELLED) ❌ Hủy đơn này @break
                                         @case(\App\Models\Order::STATUS_FAILED) ⚠️ Giao thất bại @break
-                                        @case(\App\Models\Order::STATUS_RETURNED) 🔄 Khách trả hàng @break
                                         @default {{ $status }}
                                     @endswitch
                                 </option>
@@ -225,7 +227,6 @@
                 @endif
             </div>
         </div>
-
         <!-- Customer Card -->
         <div class="card shadow-sm mb-4">
             <div class="card-header border-bottom">
@@ -279,7 +280,7 @@
                     </p>
 
 
-                    @if($order->payment_method == 'BANK_TRANSFER' && $order->payment_status == 'waiting_confirmation')
+                    @if($order->status !== \App\Models\Order::STATUS_CANCELLED && $order->payment_method == 'BANK_TRANSFER' && $order->payment_status == 'waiting_confirmation')
                         <form action="{{ route('admin.orders.confirm-payment', $order->id) }}" method="POST" onsubmit="return confirm('Bạn đã chắc chắn nhận được tiền cho đơn hàng này?')">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-success w-100">
@@ -288,10 +289,29 @@
                         </form>
                     @endif
                 </div>
-                @if($order->shipping_service_name)
+                @if($order->shipping_service_name || $order->tracking_code)
                 <div class="mb-0">
                     <p class="mb-1 text-muted small">ĐƠN VỊ VẬN CHUYỂN</p>
-                    <p class="mb-0 fw-bold">{{ $order->shipping_service_name }}</p>
+                    @if($order->shipping_service_name)
+                        <p class="mb-1 fw-bold">{{ $order->shipping_service_name }}</p>
+                    @endif
+                    
+                    @if($order->tracking_code)
+                        <p class="mb-0 mt-2">
+                            Mã Vận Đơn: <span class="badge bg-primary fs-6">{{ $order->tracking_code }}</span>
+                        </p>
+                    @endif
+                </div>
+                @endif
+
+                @if(!$order->tracking_code && in_array($order->status, [\App\Models\Order::STATUS_PENDING, \App\Models\Order::STATUS_CONFIRMED, \App\Models\Order::STATUS_SHIPPED]))
+                <div class="mb-0 border-top pt-3 mt-3">
+                    <form action="{{ route('admin.orders.push-to-ghn', $order) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn phát sinh Mã Vận Đơn trực tiếp qua hệ thống Giao Hàng Nhanh (GHN) cho đơn hàng này?')">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-outline-primary w-100 fw-bold shadow-sm">
+                            <i class="feather icon-navigation me-1"></i> Tạo đơn sang Giao Hàng Nhanh
+                        </button>
+                    </form>
                 </div>
                 @endif
             </div>
@@ -312,8 +332,6 @@
     </div>
 </div>
 @endsection
-
-
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {

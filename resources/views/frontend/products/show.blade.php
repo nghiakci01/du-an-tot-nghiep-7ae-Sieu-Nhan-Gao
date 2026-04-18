@@ -681,8 +681,8 @@
                                                     qtyInput.value = maxQty;
                                                     Swal.fire({
                                                         icon: 'error',
-                                                        title: 'Vượt quá số lượng tồn kho!',
-                                                        html: `Sản phẩm này chỉ còn <strong>${maxQty}</strong> trong kho.<br>Số lượng đã được điều chỉnh về mức tối đa.`,
+                                                        title: 'Vượt quá giới hạn!',
+                                                        html: `Số lượng tối đa bạn có thể mua là <strong>${maxQty}</strong> sản phẩm.<br>Số lượng đã được điều chỉnh về mức tối đa.`,
                                                         confirmButtonColor: '#ef233c',
                                                         confirmButtonText: 'Đồng ý',
                                                         timer: 5000,
@@ -703,7 +703,7 @@
                                                             toast: true,
                                                             position: 'top-end',
                                                             icon: 'warning',
-                                                            title: `Chỉ còn ${max} sản phẩm trong kho!`,
+                                                            title: `Số lượng tối đa còn lại là ${max} sản phẩm!`,
                                                             showConfirmButton: false,
                                                             timer: 2500,
                                                             timerProgressBar: true,
@@ -757,17 +757,18 @@
                                                     if (matchedVariant.stock_quantity > 0) {
                                                         variantInput.value = matchedVariant.id;
                                                         msg.style.display = 'none';
-                                                        // Cập nhật stock info và max quantity
+                                                        // Cập nhật stock info và max quantity (Tối đa 10)
                                                         const qtyInput = document.getElementById('quantity_input');
                                                         const stockInfo = document.getElementById('stock-info');
                                                         if (qtyInput) {
-                                                            qtyInput.max = matchedVariant.stock_quantity;
-                                                            if (parseInt(qtyInput.value) > matchedVariant.stock_quantity) {
-                                                                qtyInput.value = matchedVariant.stock_quantity;
+                                                            let limit = matchedVariant.stock_quantity;
+                                                            qtyInput.max = limit;
+                                                            if (parseInt(qtyInput.value) > limit) {
+                                                                qtyInput.value = limit;
                                                             }
                                                         }
                                                         if (stockInfo) {
-                                                            stockInfo.textContent = `(Còn ${matchedVariant.stock_quantity} sản phẩm)`;
+                                                            stockInfo.textContent = `(Còn ${matchedVariant.stock_quantity} trong kho)`;
                                                             stockInfo.style.display = 'inline';
                                                             stockInfo.style.color = matchedVariant.stock_quantity <= 5 ? '#ef233c' : '#666';
                                                         }
@@ -1213,15 +1214,16 @@
 
                     // Kiểm tra số lượng yêu cầu vượt tồn kho
                     var requestedQty = parseInt($('#quantity_input').val()) || 1;
-                    if (requestedQty > matchedVariant.stock_quantity) {
+                    var maxLimit = matchedVariant.stock_quantity;
+                    if (requestedQty > maxLimit) {
                         Swal.fire({
                             icon: 'warning',
                             title: 'Vượt quá tồn kho!',
-                            html: `Chỉ còn <strong>${matchedVariant.stock_quantity}</strong> sản phẩm trong kho.<br>Số lượng đã được điều chỉnh về mức tối đa.`,
+                            html: `Bạn chỉ có thể mua tối đa <strong>${maxLimit}</strong> sản phẩm này.<br>Số lượng đã được điều chỉnh.`,
                             confirmButtonColor: '#ef233c',
                             confirmButtonText: 'Đồng ý',
                         });
-                        $('#quantity_input').val(matchedVariant.stock_quantity);
+                        $('#quantity_input').val(maxLimit);
                         return;
                     }
 
@@ -1275,17 +1277,12 @@
                                 void el.offsetWidth;
                                 el.classList.add('pulse-animation');
                             });
-                        } else {
-                            const config = document.getElementById('product-details-container').dataset;
-                            $.get(config.routeCartCount, function(res) {
-                                if (res && res.count !== undefined) {
-                                    cartCountElements.forEach(el => {
-                                        el.innerText = res.count;
-                                        el.classList.remove('pulse-animation');
-                                        void el.offsetWidth;
-                                        el.classList.add('pulse-animation');
-                                    });
-                                }
+                        }
+
+                        // Cập nhật Mini Cart HTML
+                        if (response.mini_cart_html) {
+                            $('.mini-cart-container').each(function() {
+                                $(this).replaceWith(response.mini_cart_html);
                             });
                         }
                     },
@@ -1322,7 +1319,7 @@
                         toast: true,
                         position: 'top-end',
                         icon: 'warning',
-                        title: `Chỉ còn ${max} sản phẩm trong kho!`,
+                        title: `Đã đạt giới hạn tồn kho: ${max}`,
                         showConfirmButton: false,
                         timer: 2000
                     });

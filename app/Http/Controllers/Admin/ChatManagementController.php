@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ChatManagementController extends Controller
 {
@@ -69,20 +71,18 @@ class ChatManagementController extends Controller
         return redirect()->route('admin.chat.index')->with('error', 'Không tìm thấy phiên hội thoại.');
     }
 
-    public function reply(Request $request, $sessionId)
+    public function reply(\App\Http\Requests\Generated\ChatMessageRequest $request, $sessionId)
     {
-        $request->validate([
-            'message' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $staffMessage = ChatMessage::create([
             'session_id' => $sessionId,
-            'user_id' => auth()->id(),
-            'message' => $request->message,
+            'user_id' => Auth::id(),
+            'message' => $validated['message'],
             'sender_type' => 'staff',
             'is_read' => true,
         ]);
-        
+
         event(new \App\Events\ChatMessageSent($staffMessage));
 
         // Auto-disable bot when staff replies to prevent interference
@@ -108,7 +108,7 @@ class ChatManagementController extends Controller
 
         $conversations = ChatMessage::onlyTrashed()
             ->whereNotIn('session_id', $activeSessionIds)
-            ->select('session_id', 'user_id', \DB::raw('MAX(deleted_at) as deleted_at'))
+            ->select('session_id', 'user_id', DB::raw('MAX(deleted_at) as deleted_at'))
             ->with(['user'])
             ->groupBy('session_id', 'user_id')
             ->orderBy('deleted_at', 'desc')

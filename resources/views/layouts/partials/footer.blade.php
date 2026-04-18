@@ -7,7 +7,7 @@
                         <p style="text-transform: uppercase; font-size: 14px; color: #333; margin-bottom: 15px; font-weight: 500;">GỌI MUA HÀNG ( 8:30 - 22:20 )</p>
                         <div class="support_phone" style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
                             <i class="fa fa-phone" style="background: #df2d2d; color: #fff; width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 50%; font-size: 20px;"></i>
-                            <span style="font-size: 24px; font-weight: 300; color: #333; letter-spacing: 1px;">096728.4444</span>
+                            <span style="font-size: 24px; font-weight: 300; color: #333; letter-spacing: 1px;">0372.844.577</span>
                         </div>
                         <p style="color: #666; font-size: 13px; margin-bottom: 0;">Tất cả các ngày trong tuần</p>
                     </div>
@@ -17,7 +17,7 @@
                         <p style="text-transform: uppercase; font-size: 14px; color: #333; margin-bottom: 15px; font-weight: 500;">GÓP Ý, KHIẾU NẠI ( 8:00 - 17:00 )</p>
                         <div class="support_phone" style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
                             <i class="fa fa-phone" style="background: #df2d2d; color: #fff; width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 50%; font-size: 20px;"></i>
-                            <span style="font-size: 24px; font-weight: 300; color: #333; letter-spacing: 1px;">096.895.90.50</span>
+                            <span style="font-size: 24px; font-weight: 300; color: #333; letter-spacing: 1px;">0372.844.577</span>
                         </div>
                         <p style="color: #666; font-size: 13px; margin-bottom: 0;">Các ngày trong tuần ( trừ ngày lễ )</p>
                     </div>
@@ -47,10 +47,10 @@
                     <div class="widgets_container">
                         <h3>{{ __('messages.information') }}</h3>
                         <div class="footer_menu">
-                            <ul>
+                            <ul style="padding-left: 0; list-style: none;">
                                 <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
                                 <li><a href="http://127.0.0.1:8000/news">{{ __('messages.delivery_information') }}</a></li>
-                                <li><a href="http://127.0.0.1:8000/news">    {{ __('messages.privacy_policy') }}</a></li>
+                                <li><a href="http://127.0.0.1:8000/news">{{ __('messages.privacy_policy') }}</a></li>
                                 <li><a href="http://127.0.0.1:8000/news">{{ __('messages.terms_conditions') }}</a></li>
                                 <li><a href="{{ route('contact.index') }}">{{ __('messages.contact_us') }}</a></li>
                                 <li><a href="http://127.0.0.1:8000/news">{{ __('messages.returns') }}</a></li>
@@ -62,7 +62,7 @@
                     <div class="widgets_container">
                         <h3>{{ __('messages.extras') }}</h3>
                         <div class="footer_menu">
-                            <ul>
+                            <ul style="padding-left: 0; list-style: none;">
                                 <li><a href="#">{{ __('messages.brands') }}</a></li>
                                 <li><a href="#">{{ __('messages.gift_certificates') }}</a></li>
                                 <li><a href="#">{{ __('messages.affiliate') }}</a></li>
@@ -78,14 +78,11 @@
                         <h3>{{ __('messages.contact_us') }}</h3>
                         <div class="footer_contact">
                             <p>{{ __('messages.address') }}: {{ $settings['site_address'] ?? 'Số 7 Ngõ 91 Lai Xá - Hoài Đức - Thành Phố Hà Nội - Việt Nam' }}</p>
-                            <p>{{ __('messages.phone') }}: <a href="tel:{{ str_replace(' ', '', $settings['site_phone'] ?? '0354869999') }}">{{ $settings['site_phone'] ?? '0354869999' }}</a> </p>
-                            <p>{{ __('messages.email') }}: {{ $settings['site_email'] ?? 'Elite@gmail.com' }}</p>
+                            <p>{{ __('messages.phone') }}: <a href="tel:{{ str_replace(' ', '', $settings['site_phone'] ?? '0372844577') }}">{{ $settings['site_phone'] ?? '0372844577' }}</a> </p>
+                            <p>{{ __('messages.email') }}: {{ $settings['site_email'] ?? 'elite22326@gmail.com' }}</p>
                             <ul>
-                                <li><a href="https://twitter.com/" title="Twitter" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="https://plus.google.com/" title="google-plus" target="_blank" rel="noopener noreferrer"><i class="fa fa-google-plus"></i></a></li>
                                 <li><a href="{{ $settings['social_facebook'] ?? 'https://www.facebook.com/profile.php?id=61577211110743' }}" title="facebook" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook"></i></a></li>
                                 <li><a href="{{ $settings['social_instagram'] ?? 'https://www.instagram.com/' }}" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a></li>
-                                <li><a href="https://www.youtube.com/" title="youtube" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube"></i></a></li>
                             </ul>
                             <div class="bocongthuong_logo" style="margin-top: 15px;">
                                 <a href="http://online.gov.vn/" target="_blank" rel="noopener noreferrer">

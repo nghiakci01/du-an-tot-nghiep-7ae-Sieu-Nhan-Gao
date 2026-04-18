@@ -148,6 +148,16 @@
 /* Buttons */
 .btn-primary-dark { background:#1a1a2e; color:white; border:none; border-radius:50px; padding:10px 28px; font-weight:600; transition:background .2s; }
 .btn-primary-dark:hover { background:#2d2d5e; color:white; }
+
+/* Modal & Collapse */
+.history-toggle { cursor: pointer; border-radius: 12px; transition: all 0.2s; }
+.history-toggle:hover { background: #eee !important; }
+.review-item-minimal { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+.review-item-minimal:last-child { border-bottom: none; }
+.modal-content { border-radius: 20px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+.modal-header { border-bottom: 1px solid #f0f0f0; padding: 20px 25px; }
+.modal-body { padding: 25px; }
+.modal-footer { border-top: none; padding: 10px 25px 25px; }
 </style>
 @endpush
 
@@ -161,9 +171,15 @@
   $progressW    = ($curIdx !== false && !$isCancelled) ? ($curIdx / (count($statusSteps)-1)) * 84 : 0;
   $pmLabel = match($order->payment_method) {
     'COD'           => '💵 Thanh toán khi nhận hàng (COD)',
-    'BANK_TRANSFER' => '🏦 Chuyển khoản ngân hàng',
+    'VNPAY'         => '💳 VNPay',
     default         => $order->payment_method,
   };
+  $returnShippingInfo = [
+    'name' => $settings['return_receiver_name'] ?? ($settings['site_title'] ?? 'Elite'),
+    'phone' => $settings['return_receiver_phone'] ?? ($settings['site_phone'] ?? ''),
+    'address' => $settings['return_receiver_address'] ?? ($settings['site_address'] ?? ''),
+    'note' => $settings['return_receiver_note'] ?? 'Vui lòng ghi rõ mã đơn hàng và giữ lại biên nhận khi gửi trả hàng.',
+  ];
 @endphp
 
 {{-- Breadcrumb --}}
@@ -227,26 +243,88 @@
       <div class="alert {{ $order->returnRequest->isRejected() ? 'alert-danger' : ($order->returnRequest->isCompleted() ? 'alert-success' : 'alert-warning') }} rounded-3 mb-4 shadow-sm border-0">
         <h6 class="fw-bold mb-2">
           <i class="bi bi-arrow-return-left me-2"></i>
-          Trạng thái Yêu cầu Hoàn hàng
+          Yêu cầu {{ $order->returnRequest->type_text }}
         </h6>
         <div class="small">
           <div class="mb-1"><strong>Trạng thái:</strong> 
-            @if($order->returnRequest->isPending())
-              <span class="badge bg-warning text-dark">Chờ xử lý</span>
-            @elseif($order->returnRequest->isApproved())
-              <span class="badge bg-info">Đã duyệt - Đang chờ gửi hàng</span>
-            @elseif($order->returnRequest->isCompleted())
-              <span class="badge bg-success">Hoàn thành - Đã hoàn tiền</span>
-            @elseif($order->returnRequest->isRejected())
-              <span class="badge bg-danger">Từ chối</span>
-            @endif
+            <span class="badge {{ $order->returnRequest->status_badge }}">{{ $order->returnRequest->status_text }}</span>
           </div>
           <div class="mb-1"><strong>Lý do:</strong> {{ $order->returnRequest->reason }}</div>
+          
+          @if($order->returnRequest->return_method)
+            <div class="mb-1 d-flex align-items-center">
+                <strong>Phương thức gửi trả:</strong> 
+                <span class="ms-1">{{ $order->returnRequest->return_method_text }}</span>
+                @if($order->returnRequest->isApproved())
+                    <a href="javascript:void(0)" onclick="document.getElementById('change-return-method').classList.toggle('d-none')" class="ms-2 badge bg-secondary text-decoration-none" style="font-size: 0.65rem; cursor:pointer;">Thay đổi</a>
+                @endif
+            </div>
+          @endif
+
+          {{-- UI Chọn/Đổi phương thức --}}
+          @if($order->returnRequest->isApproved())
+            <div id="change-return-method" class="mt-3 p-3 rounded-3 bg-white border border-warning shadow-sm {{ $order->returnRequest->return_method ? 'd-none' : '' }}">
+                <p class="mb-2 small fw-bold text-danger"><i class="bi bi-info-circle me-1"></i> {{ $order->returnRequest->return_method ? 'Thay đổi phương thức gửi hàng:' : 'Chọn phương thức gửi hàng:' }}</p>
+                <form action="{{ route('account.orders.return.update_method', $order->id) }}" method="POST">
+                    @csrf
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="return_method" value="at_home" class="btn {{ $order->returnRequest->return_method === 'at_home' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm rounded-pill flex-grow-1">
+                            <i class="bi bi-house-door me-1"></i> Shipper lấy hàng
+                        </button>
+                        <button type="submit" name="return_method" value="at_post_office" class="btn {{ $order->returnRequest->return_method === 'at_post_office' ? 'btn-warning' : 'btn-outline-warning' }} btn-sm rounded-pill flex-grow-1" style="{{ $order->returnRequest->return_method === 'at_post_office' ? 'background-color: #f26522; border-color: #f26522; color: white;' : 'color: #f26522; border-color: #f26522;' }}">
+                            <i class="bi bi-building me-1"></i> Tự mang đến bưu cục
+                        </button>
+                    </div>
+                </form>
+            </div>
+          @endif
+
+          @if($order->returnRequest->return_method === 'at_post_office' && $order->returnRequest->isApproved())
+            <div class="mt-2 text-center p-3 rounded-3" style="background: #fff; border: 1px solid #f26522; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <p class="mb-2 small fw-bold" style="color: #f26522;">📍 Bạn đã chọn tự mang ra bưu cục:</p>
+                <a href="https://www.google.com/maps/search/Giao+hàng+nhanh/" target="_blank" class="btn btn-warning btn-sm w-100 rounded-pill py-2" style="background-color: #f26522; border-color: #f26522; color: white;">
+                    <i class="bi bi-geo-alt-fill me-1"></i>🌏 Tìm bưu cục GHN gần nhất (Google Maps)
+                </a>
+            </div>
+          @endif
+
           @if($order->returnRequest->admin_note)
             <div class="mt-2 p-2 rounded" style="background:rgba(255,255,255,0.6);">
-              <strong>Ghi chú từ cửa hàng:</strong><br>
+              <strong>Phản hồi từ cửa hàng:</strong><br>
               {!! nl2br(e($order->returnRequest->admin_note)) !!}
             </div>
+          @endif
+        </div>
+      </div>
+      @endif
+
+      @if($order->returnRequest && $order->returnRequest->isApproved())
+      <div class="detail-card border-info mb-4 shadow-sm">
+        <div class="detail-header bg-info text-white">
+          <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Thông tin nhận hàng hoàn trả</h5>
+        </div>
+        <div class="detail-body">
+          <div class="info-row">
+            <span class="text-muted">Người nhận</span>
+            <span class="fw-semibold text-end" style="max-width:60%;font-size:0.9rem;">{{ $returnShippingInfo['name'] }}</span>
+          </div>
+          @if($returnShippingInfo['phone'])
+          <div class="info-row">
+            <span class="text-muted">Số điện thoại</span>
+            <span class="text-end" style="max-width:60%;font-size:0.9rem;">
+              <a href="tel:{{ preg_replace('/\s+/', '', $returnShippingInfo['phone']) }}" class="text-decoration-none">{{ $returnShippingInfo['phone'] }}</a>
+            </span>
+          </div>
+          @endif
+          <div class="info-row">
+            <span class="text-muted">Địa chỉ</span>
+            <span class="text-end" style="max-width:60%;font-size:0.85rem;">{{ $returnShippingInfo['address'] }}</span>
+          </div>
+          @if($returnShippingInfo['note'])
+          <div class="mt-3 p-3 rounded" style="background:#f8fbff; border:1px dashed #cfe2ff;">
+            <small class="text-muted d-block mb-1">Ghi chú cho khách</small>
+            <div class="small">{{ $returnShippingInfo['note'] }}</div>
+          </div>
           @endif
         </div>
       </div>
@@ -288,26 +366,29 @@
       {{-- Order History --}}
       @if($order->histories->count() > 0)
       <div class="detail-card">
-        <div class="detail-header">
-          <h5><i class="bi bi-clock-history me-2"></i>Lịch sử đơn hàng</h5>
+        <div class="detail-header history-toggle" onclick="toggleOrderHistory()" role="button">
+          <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Lịch sử đơn hàng</h5>
+          <i class="bi bi-chevron-down opacity-50 transition-transform" id="historyChevron"></i>
         </div>
-        <div class="detail-body">
-          @foreach($order->histories as $history)
-          <div class="timeline-item">
-            <div class="timeline-dot"><i class="bi bi-activity"></i></div>
-            <div>
-              <div class="fw-semibold small">
-                {{ $history->user?->name ?? 'Hệ thống' }}:
-                <span class="badge bg-secondary rounded-pill">{{ $history->previous_status }}</span>
-                → <span class="badge rounded-pill" style="background:#1a1a2e;">{{ $history->new_status }}</span>
+        <div class="collapse" id="orderHistoryCollapse">
+          <div class="detail-body">
+            @foreach($order->histories as $history)
+            <div class="timeline-item">
+              <div class="timeline-dot"><i class="bi bi-activity"></i></div>
+              <div>
+                <div class="fw-semibold small">
+                  {{ $history->user?->name ?? 'Hệ thống' }}:
+                  <span class="badge bg-secondary rounded-pill">{{ $history->previous_status }}</span>
+                  → <span class="badge rounded-pill" style="background:#1a1a2e;">{{ $history->new_status }}</span>
+                </div>
+                @if($history->note)
+                  <div class="text-muted small">{{ $history->note }}</div>
+                @endif
+                <div style="font-size:0.75rem;" class="text-muted">{{ $history->created_at->format('H:i - d/m/Y') }}</div>
               </div>
-              @if($history->note)
-                <div class="text-muted small">{{ $history->note }}</div>
-              @endif
-              <div style="font-size:0.75rem;" class="text-muted">{{ $history->created_at->format('H:i - d/m/Y') }}</div>
             </div>
+            @endforeach
           </div>
-          @endforeach
         </div>
       </div>
       @endif
@@ -319,51 +400,35 @@
           <h5><i class="bi bi-star me-2"></i>Đánh giá sản phẩm</h5>
         </div>
         <div class="detail-body">
-          <p class="text-muted small mb-3">Chia sẻ cảm nhận của bạn về các sản phẩm đã mua.</p>
           @foreach($order->items as $item)
             @if($item->product)
               @php $existingReview = $userReviews->get($item->product_id); @endphp
-              <div class="review-card">
-                <div class="review-card-head">
+              <div class="review-item-minimal">
+                <div class="d-flex align-items-center gap-3">
                   @if($item->product->image)
-                    <img src="{{ asset('storage/'.$item->product->image) }}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;">
+                    <img src="{{ asset('storage/'.$item->product->image) }}" style="width:45px;height:45px;object-fit:cover;border-radius:8px;border:1px solid #f0f0f0;">
                   @endif
-                  <div class="flex-grow-1">
-                    <div class="fw-semibold">{{ $item->product->name }}</div>
-                    @if($item->variant)<small class="text-muted">{{ $item->variant->name }}</small>@endif
+                  <div>
+                    <div class="fw-semibold small">{{ $item->product->name }}</div>
+                    @if($item->variant)<small class="text-muted" style="font-size:0.7rem;">{{ $item->variant->name }}</small>@endif
                   </div>
-                  @if($existingReview)
-                    <span class="badge bg-success ms-auto"><i class="bi bi-check me-1"></i>Đã đánh giá</span>
-                  @endif
                 </div>
-                <div class="p-3">
+                <div>
                   @if($existingReview)
-                    <div class="d-flex gap-1 mb-1">
-                      @for($i=1;$i<=5;$i++)<i class="bi bi-star{{ $i<=$existingReview->rating?'-fill':'' }}" style="color:#f39c12;font-size:1.1rem;"></i>@endfor
-                      <small class="text-muted ms-2">{{ $existingReview->created_at->format('d/m/Y') }}</small>
-                    </div>
-                    <p class="text-muted small mb-0">{{ $existingReview->comment }}</p>
+                     <div class="text-end">
+                       <div class="d-flex gap-1 justify-content-end mb-1">
+                         @for($i=1;$i<=5;$i++)<i class="bi bi-star{{ $i<=$existingReview->rating?'-fill':'' }}" style="color:#f39c12;font-size:0.8rem;"></i>@endfor
+                       </div>
+                       <button class="btn btn-outline-secondary btn-sm rounded-pill" style="font-size:0.7rem;" 
+                               onclick="openReviewModal({{ $item->product_id }}, '{{ addslashes($item->product->name) }}', '{{ asset('storage/'.$item->product->image) }}', {{ $existingReview->rating }}, '{{ addslashes($existingReview->comment) }}')">
+                         Xem lại
+                       </button>
+                     </div>
                   @else
-                    <form action="{{ route('product.review.store', $item->product_id) }}" method="POST">
-                      @csrf
-                      <div class="mb-3">
-                        <label class="fw-semibold small d-block mb-1">Đánh giá của bạn:</label>
-                        <div class="star-rating-order">
-                          @for($s=5;$s>=1;$s--)
-                            <input type="radio" id="star{{$s}}_p{{$item->product_id}}" name="rating" value="{{$s}}" {{ $s===5?'required':'' }}>
-                            <label for="star{{$s}}_p{{$item->product_id}}" title="{{$s}} sao"><i class="fa fa-star"></i></label>
-                          @endfor
-                        </div>
-                        <div class="likert-label-order text-danger small fw-bold mt-1" style="min-height:18px;display:none;"></div>
-                      </div>
-                      <div class="mb-3">
-                        <label class="fw-semibold small d-block mb-1">Nhận xét:</label>
-                        <textarea name="comment" rows="3" required placeholder="Chia sẻ cảm nhận của bạn..." class="form-control" style="border-radius:10px;"></textarea>
-                      </div>
-                      <button type="submit" class="btn btn-sm btn-primary-dark rounded-pill px-4">
-                        <i class="bi bi-send me-1"></i>Gửi đánh giá
-                      </button>
-                    </form>
+                    <button class="btn btn-primary-dark btn-sm rounded-pill px-3" style="font-size:0.75rem;"
+                            onclick="openReviewModal({{ $item->product_id }}, '{{ addslashes($item->product->name) }}', '{{ asset('storage/'.$item->product->image) }}')">
+                      Đánh giá
+                    </button>
                   @endif
                 </div>
               </div>
@@ -439,7 +504,7 @@
       </div>
 
       {{-- Return Shipping Action --}}
-      @if($order->returnRequest && $order->returnRequest->status === 'approved')
+      @if($order->returnRequest && $order->returnRequest->isApproved())
       <div class="detail-card border-warning bg-light-warning mb-3">
         <div class="detail-header bg-warning text-white">
           <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Gửi hàng hoàn trả</h5>
@@ -491,28 +556,134 @@
 </div>
 </div>
 
+{{-- ===== REVIEW MODAL ===== --}}
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="reviewForm" action="" method="POST">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="modalProductName">Đánh giá sản phẩm</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="text-center mb-4">
+            <img id="modalProductImg" src="" style="width:80px;height:80px;object-fit:cover;border-radius:12px;margin-bottom:10px;border:1px solid #eee;">
+            <p class="text-muted small">Cảm ơn bạn đã tin dùng sản phẩm của chúng tôi!</p>
+          </div>
+          
+          <div class="mb-4 text-center">
+            <label class="fw-bold small d-block mb-2">Đánh giá của bạn:</label>
+            <div class="star-rating-order justify-content-center">
+              @for($s=5;$s>=1;$s--)
+                <input type="radio" id="modalStar{{$s}}" name="rating" value="{{$s}}" required>
+                <label for="modalStar{{$s}}" title="{{$s}} sao" style="font-size:35px;"><i class="fa fa-star"></i></label>
+              @endfor
+            </div>
+            <div id="modalLikert" class="text-danger small fw-bold mt-2" style="min-height:18px;"></div>
+          </div>
+
+          <div class="mb-0">
+            <label class="fw-bold small d-block mb-2">Nhận xét chi tiết:</label>
+            <textarea name="comment" id="modalComment" rows="4" required placeholder="Chia sẻ cảm nhận thực tế của bạn về sản phẩm này..." class="form-control" style="border-radius:12px; background:#f9fafb; border:1px solid #eee; font-size:0.9rem;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+          <button type="submit" class="btn btn-primary-dark rounded-pill px-4" id="modalSubmitBtn">Gửi đánh giá</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
 var likertLabels = {1:'Rất không hài lòng',2:'Không hài lòng',3:'Bình thường',4:'Hài lòng',5:'Rất hài lòng'};
+var reviewModal;
 
-document.querySelectorAll('.star-rating-order label').forEach(function(label) {
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Modal safely
+    if (typeof bootstrap !== 'undefined') {
+        reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
+    } else {
+        console.error('Bootstrap is not defined. Please ensure npm run dev/build is active.');
+    }
+});
+
+function toggleOrderHistory() {
+    const target = document.getElementById('orderHistoryCollapse');
+    const chevron = document.getElementById('historyChevron');
+    
+    // Sử dụng Bootstrap Collapse API để có hiệu ứng trượt mượt mà
+    let bsCollapse = bootstrap.Collapse.getInstance(target);
+    if (!bsCollapse) {
+        bsCollapse = new bootstrap.Collapse(target, { toggle: false });
+    }
+    
+    bsCollapse.toggle();
+
+    // Đồng bộ xoay icon theo trạng thái đóng/mở
+    target.addEventListener('shown.bs.collapse', function () {
+        chevron.style.transform = 'rotate(180deg)';
+    });
+    target.addEventListener('hidden.bs.collapse', function () {
+        chevron.style.transform = 'rotate(0deg)';
+    });
+}
+
+function openReviewModal(productId, productName, productImg, rating = 5, comment = '') {
+    if (!reviewModal) {
+        alert('Đang nạp thư viện, vui lòng thử lại sau giây lát!');
+        return;
+    }
+    const form = document.getElementById('reviewForm');
+    const title = document.getElementById('modalProductName');
+    const img = document.getElementById('modalProductImg');
+    const commentField = document.getElementById('modalComment');
+    const likert = document.getElementById('modalLikert');
+    const submitBtn = document.getElementById('modalSubmitBtn');
+
+    // Reset Form
+    form.action = `{{ url('product/review') }}/${productId}`;
+    title.textContent = productName;
+    img.src = productImg;
+    commentField.value = comment;
+    
+    // Set Rating
+    document.querySelectorAll('#reviewModal input[name="rating"]').forEach(inp => {
+        inp.checked = (inp.value == rating);
+    });
+    likert.textContent = likertLabels[rating];
+
+    // If already reviewed, visual adjustments
+    if (comment) {
+        submitBtn.innerHTML = '<i class="bi bi-pencil me-1"></i>Cập nhật đánh giá';
+    } else {
+        submitBtn.innerHTML = '<i class="bi bi-send me-1"></i>Gửi đánh giá';
+    }
+
+    reviewModal.show();
+}
+
+// Hover effects for stars in modal
+document.querySelectorAll('#reviewModal .star-rating-order label').forEach(function(label) {
   label.addEventListener('mouseenter', function() {
     var val = this.previousElementSibling?.value;
-    if(val) {
-      var lbl = this.closest('.mb-3').querySelector('.likert-label-order');
-      lbl.textContent = likertLabels[val];
-      lbl.style.display = 'block';
-    }
+    if(val) document.getElementById('modalLikert').textContent = likertLabels[val];
   });
 });
-document.querySelectorAll('.star-rating-order input').forEach(function(input) {
+
+// Selection change
+document.querySelectorAll('#reviewModal .star-rating-order input').forEach(function(input) {
   input.addEventListener('change', function() {
-    var lbl = this.closest('.mb-3').querySelector('.likert-label-order');
-    lbl.textContent = likertLabels[this.value];
-    lbl.style.display = 'block';
+    document.getElementById('modalLikert').textContent = likertLabels[this.value];
   });
 });
 </script>
+<style>
+.transition-transform { transition: transform 0.3s ease; }
+</style>
 @endpush

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\phpunit.xml" tests="3" assertions="5" errors="1" failures="1" skipped="0" time="3.909675">
+    <testsuite name="Feature" tests="3" assertions="5" errors="1" failures="1" skipped="0" time="3.909675">
+      <testsuite name="Tests\Feature\CheckoutTest" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CheckoutTest.php" tests="3" assertions="5" errors="1" failures="1" skipped="0" time="3.909675">
+        <testcase name="test_user_can_access_checkout_page" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CheckoutTest.php" line="47" class="Tests\Feature\CheckoutTest" classname="Tests.Feature.CheckoutTest" assertions="3" time="3.830914"/>
+        <testcase name="test_user_can_place_cod_order" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CheckoutTest.php" line="56" class="Tests\Feature\CheckoutTest" classname="Tests.Feature.CheckoutTest" assertions="2" time="0.078761">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CheckoutTest::test_user_can_place_cod_order&#13;
+Failed asserting that a row in the table [orders] matches the attributes {
+    "name": "John Doe",
+    "phone": "0381234567",
+    "payment_method": "COD",
+    "shipping_provider": "ghtk"
+}.
+
+The table is empty.
+&#13;
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase.php:43
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CheckoutTest.php:74</failure>
+        </testcase>
+        <testcase name="test_checkout_fails_if_stock_insufficient" file="C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CheckoutTest.php" line="84" class="Tests\Feature\CheckoutTest" classname="Tests.Feature.CheckoutTest" assertions="0" time="0.000000">
+          <error type="PDOException">Tests\Feature\CheckoutTest::test_checkout_fails_if_stock_insufficient&#13;
+PDOException: There is already an active transaction
+&#13;
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Database\SQLiteConnection.php:38
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Database\Concerns\ManagesTransactions.php:154
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Database\Concerns\ManagesTransactions.php:130
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:147
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:93
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:25
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:217
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:101
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\vendor\laravel\framework\src\Illuminate\Foundation\Testing\TestCase.php:63
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\TestCase.php:13
+C:\laragon\www\du-an-tot-nghiep-7ae-Sieu-Nhan-Gao\tests\Feature\CheckoutTest.php:22</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

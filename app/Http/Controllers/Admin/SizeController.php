@@ -20,13 +20,9 @@ class SizeController extends Controller
         return view('admin.sizes.create');
     }
 
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Generated\SizeRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:sizes,name',
-            'display_order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $validated['is_active'] = $request->has('is_active');
         $validated['display_order'] = $validated['display_order'] ?? 0;
@@ -42,13 +38,9 @@ class SizeController extends Controller
         return view('admin.sizes.edit', compact('size'));
     }
 
-    public function update(Request $request, Size $size)
+    public function update(\App\Http\Requests\Generated\SizeRequest $request, Size $size)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:sizes,name,'.$size->id,
-            'display_order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $validated['is_active'] = $request->has('is_active');
         $validated['display_order'] = $validated['display_order'] ?? 0;

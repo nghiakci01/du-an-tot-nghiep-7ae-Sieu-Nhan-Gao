@@ -9,22 +9,29 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
+use App\Models\UserAddress;
 use App\Notifications\NewOrderNotification;
+use App\Notifications\OrderPlacedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
 
 use App\Services\CartService;
+use App\Services\Shipping\ShippingService;
 
 class CheckoutController extends Controller
 {
     protected $cartService;
-    public function __construct(CartService $cartService)
+    protected $shippingService;
+
+    public function __construct(CartService $cartService, ShippingService $shippingService)
     {
         $this->cartService = $cartService;
+        $this->shippingService = $shippingService;
     }
 
     public function index(Request $request)
@@ -35,7 +42,7 @@ class CheckoutController extends Controller
         $selectedIds = session('selected_checkout_ids');
         if ($selectedIds && is_array($selectedIds)) {
             $selectedIds = array_map('strval', $selectedIds);
-            $cart = array_filter($cart, function($key) use ($selectedIds) {
+            $cart = array_filter($cart, function ($key) use ($selectedIds) {
                 return in_array(strval($key), $selectedIds);
             }, ARRAY_FILTER_USE_KEY);
         } else {
@@ -49,6 +56,8 @@ class CheckoutController extends Controller
 
         // Validate tồn kho trước khi vào trang checkout
         $invalidItems = [];
+        $productQtyTracker = [];
+
         foreach ($cart as $variantId => $item) {
             $variant = ProductVariant::find($variantId);
             if (!$variant || !$variant->product) {
@@ -62,6 +71,8 @@ class CheckoutController extends Controller
             if ($item['quantity'] > $variant->stock_quantity) {
                 $invalidItems[] = '“' . $item['name'] . '” - chỉ còn ' . $variant->stock_quantity . ' sản phẩm.';
             }
+
+            // Track per-product totals to enforce stock
         }
 
         if (!empty($invalidItems)) {
@@ -70,8 +81,10 @@ class CheckoutController extends Controller
         }
 
         $total = 0;
+        $totalQuantity = 0;
         foreach ($cart as $details) {
             $total += $details['price'] * $details['quantity'];
+            $totalQuantity += $details['quantity'];
         }
 
         // Get applied coupon from session
@@ -83,17 +96,72 @@ class CheckoutController extends Controller
             $coupon = Coupon::where('code', $couponCode)->first();
         }
 
-        $finalTotal = $total - $discount;
-        $shippingFee = \App\Models\Setting::getShippingFee($finalTotal);
-        $finalTotal += $shippingFee;
+        $userAddresses = collect();
+        if (auth()->check()) {
+            $userAddresses = auth()->user()->addresses()->orderByDesc('is_default')->get();
+        }
+
+        $defaultAddress = $userAddresses->firstWhere('is_default', true) ?? $userAddresses->first();
+        $shippingState = $this->resolveShippingState($cart, $total, $discount, $defaultAddress);
+        $shippingFee = (float) ($shippingState['fee'] ?? 0);
+        $shippingProviderName = $shippingState['service_name'] ?? 'Giao hàng tiêu chuẩn';
+        $shippingExpectedDeliveryTime = $shippingState['expected_delivery_time'] ?? null;
+
+        $finalTotal = $total - $discount + $shippingFee;
 
         $provinces = app(\App\Http\Controllers\Api\VnAddressController::class)->provinces()->getData(true);
 
-        // Lấy thông tin các tài khoản ngân hàng đang hoạt động
-        $banks = \App\Models\BankSetting::where('is_active', true)->get();
-        $defaultBank = $banks->where('is_default', true)->first() ?: $banks->first();
+        $defaultBank = null;
 
-        return view('frontend.checkout.index', compact('cart', 'total', 'coupon', 'discount', 'shippingFee', 'finalTotal', 'provinces', 'banks', 'defaultBank'));
+        // Fetch ONLY coupons claimed by or gifted to the user
+        $availableCoupons = collect();
+        if (Auth::check()) {
+            $availableCoupons = Coupon::active()
+                ->where(function($q) {
+                    $q->whereNull('start_date')->orWhere('start_date', '<=', now());
+                })
+                ->where(function($q) {
+                    $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+                })
+                ->where(function($q) {
+                    $q->where('user_id', Auth::id())
+                      ->orWhereHas('claimedByUsers', function($sq) {
+                          $sq->where('user_id', Auth::id())->whereNull('used_at');
+                      });
+                })
+                ->orderByDesc('value')
+                ->get()
+                ->map(function($c) use ($total) {
+                    $isApplicable = true;
+                    $reason = '';
+
+                    if ($c->hasReachedUsageLimit()) {
+                        $isApplicable = false;
+                        $reason = 'Hết lượt sử dụng';
+                    } elseif ($c->min_order_amount && $total < $c->min_order_amount) {
+                        $isApplicable = false;
+                        $reason = 'Chưa đạt ₫' . number_format($c->min_order_amount, 0, ',', '.');
+                    } else {
+                        $alreadyUsed = \App\Models\Order::where('user_id', Auth::id())
+                            ->where('coupon_code', $c->code)
+                            ->whereNotIn('status', ['cancelled', 'failed'])
+                            ->exists();
+                        if ($alreadyUsed) {
+                            $isApplicable = false;
+                            $reason = 'Bạn đã sử dụng mã này';
+                        }
+                    }
+
+                    $c->is_applicable = $isApplicable;
+                    $c->failure_reason = $reason;
+                    return $c;
+                });
+        }
+
+        return view('frontend.checkout.index', compact(
+            'cart', 'total', 'coupon', 'discount', 'shippingFee', 'shippingProviderName', 'shippingExpectedDeliveryTime', 'finalTotal',
+            'provinces', 'userAddresses', 'defaultBank', 'availableCoupons'
+        ));
     }
 
     /**
@@ -110,9 +178,9 @@ class CheckoutController extends Controller
                 $selectedIds = array_filter(explode(',', $selectedIds));
             }
             // Chuyển tất cả về string để so khớp chính xác
-            $selectedIds = array_values(array_map('strval', (array)$selectedIds));
+            $selectedIds = array_values(array_map('strval', (array) $selectedIds));
 
-            $cart = array_filter($cart, function($key) use ($selectedIds) {
+            $cart = array_filter($cart, function ($key) use ($selectedIds) {
                 return in_array(strval($key), $selectedIds);
             }, ARRAY_FILTER_USE_KEY);
 
@@ -129,6 +197,8 @@ class CheckoutController extends Controller
         }
 
         $errors = [];
+        $productQtyTracker = [];
+
         foreach ($cart as $variantId => $item) {
             $variant = ProductVariant::with('product')->find($variantId);
 
@@ -166,7 +236,10 @@ class CheckoutController extends Controller
                     'type' => 'insufficient_stock',
                     'available' => $variant->stock_quantity,
                 ];
+                continue;
             }
+
+            // Track per-product limit
         }
 
         if (!empty($errors)) {
@@ -176,34 +249,47 @@ class CheckoutController extends Controller
         return response()->json(['valid' => true]);
     }
 
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Generated\CheckoutRequest $request)
     {
-        $provinces = config('vietnam_provinces');
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => ['required', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
-            'email' => 'required|email:rfc,dns|max:255',
-            'province' => 'required',
-            'province_name' => 'required|string|in:'.implode(',', $provinces),
-            'district' => 'required',
-            'district_name' => 'required|string',
-            'ward' => 'required',
-            'ward_name' => 'required|string',
-            'address' => 'required|string|max:500',
-            'payment_method' => 'required|in:COD,BANK_TRANSFER,VNPAY',
-            'shipping_provider' => 'nullable|string',
-            'shipping_service_name' => 'nullable|string',
-            'shipping_fee' => 'nullable|numeric',
-        ], [
-            'phone.required' => 'Vui lòng nhập số điện thoại.',
-            'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
-            'email.required' => 'Vui lòng nhập địa chỉ email.',
-            'email.email' => 'Địa chỉ email không hợp lệ.',
-            'province_name.required' => 'Vui lòng chọn tỉnh thành.',
-            'province_name.in' => 'Tỉnh thành không hợp lệ.',
-            'district_name.required' => 'Vui lòng chọn quận huyện.',
-            'ward_name.required' => 'Vui lòng chọn phường xã.',
+        Log::info('Checkout process started', [
+            'user_id' => Auth::id(),
+            'ip' => $request->ip(),
+            'payment_method' => $request->input('payment_method'),
+            'cart_count' => count($this->cartService->getCart())
         ]);
+
+        $provinces = config('vietnam_provinces');
+
+        // Normalize province name (remove prefixes like "Tỉnh " or "Thành phố ")
+        if ($request->has('province')) {
+            $normalizedProv = preg_replace('/^(Tỉnh|Thành phố)\s+/u', '', $request->province);
+            $request->merge(['province' => $normalizedProv]);
+        }
+
+        $deliveryType = $request->input('delivery_type');
+        if (!in_array($deliveryType, ['home', 'store'], true)) {
+            $deliveryType = $request->input('shipping_provider') === 'store_pickup' ? 'store' : 'home';
+        }
+        $request->merge(['delivery_type' => $deliveryType]);
+
+        if ($request->filled('user_address_id')) {
+            $userAddr = \App\Models\UserAddress::where('user_id', Auth::id())->find($request->user_address_id);
+            if ($userAddr) {
+                $request->merge([
+                    'name'     => $userAddr->receiver_name,
+                    'phone'    => $userAddr->phone,
+                    'province' => preg_replace('/^(Tỉnh|Thành phố)\s+/u', '', $userAddr->province),
+                    'ward'     => $userAddr->commune,
+                    'address'  => $userAddr->address,
+                ]);
+            }
+        }
+
+        if ($request->filled('commune') && !$request->filled('ward')) {
+            $request->merge(['ward' => $request->input('commune')]);
+        }
+
+        // Validation handled by Generated\CheckoutRequest (prepareForValidation and rules/messages)
 
         $cart = $this->cartService->getCart();
 
@@ -211,7 +297,7 @@ class CheckoutController extends Controller
         $selectedIds = session('selected_checkout_ids');
         if ($selectedIds && is_array($selectedIds)) {
             $selectedIds = array_map('strval', $selectedIds);
-            $cart = array_filter($cart, function($key) use ($selectedIds) {
+            $cart = array_filter($cart, function ($key) use ($selectedIds) {
                 return in_array(strval($key), $selectedIds);
             }, ARRAY_FILTER_USE_KEY);
         } else {
@@ -229,12 +315,15 @@ class CheckoutController extends Controller
             $totalQuantity += $details['quantity'];
         }
 
-        // Giới hạn số lượng sản phẩm cho đơn COD
+        // --- NEW: Limit max 10 items for COD payment ---
         if ($request->payment_method === 'COD' && $totalQuantity > 10) {
             return redirect()->back()
-                ->with('error', 'Đơn hàng COD chỉ được tối đa 10 sản phẩm. Bạn đang có ' . $totalQuantity . ' sản phẩm. Vui lòng giảm số lượng hoặc chọn phương thức thanh toán khác.')
+                ->with('error', 'Đơn hàng COD chỉ được tối đa 10 sản phẩm (hiện có ' . $totalQuantity . '). Vui lòng giảm số lượng hoặc chọn Chuyển khoản/VNPAY.')
                 ->withInput();
         }
+        // -----------------------------------------------
+
+
 
         try {
             DB::beginTransaction();
@@ -243,26 +332,80 @@ class CheckoutController extends Controller
             $couponCode = session()->get('coupon_code');
             $discount = session()->get('discount_amount', 0);
 
-            // Calculate shipping fee (Get from request or default to old way)
-            $shippingFee = $request->input('shipping_fee');
-            if ($shippingFee === null) {
-                // Dự phòng nếu không có phí ship gửi lên
-                $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
+            // [SECURITY CHECK] Final verification before order creation
+            if ($couponCode && Auth::check()) {
+                $coupon = \App\Models\Coupon::where('code', $couponCode)->first();
+                if ($coupon) {
+                    $alreadyUsed = \App\Models\Order::where('user_id', Auth::id())
+                        ->where('coupon_code', $couponCode)
+                        ->whereNotIn('status', ['cancelled', 'failed'])
+                        ->exists();
+
+                    $usedInPivot = \Illuminate\Support\Facades\DB::table('coupon_user')
+                        ->where('user_id', Auth::id())
+                        ->where('coupon_id', $coupon->id)
+                        ->whereNotNull('used_at')
+                        ->exists();
+
+                    if ($alreadyUsed || $usedInPivot) {
+                        // Clear session coupon data as it's invalid now
+                        session()->forget(['coupon_code', 'discount_amount']);
+                        throw new \Exception('Bạn đã sử dụng mã giảm giá này cho một đơn hàng khác. Vui lòng kiểm tra lại.');
+                    }
+                }
             }
-            $shippingProvider = $request->input('shipping_provider');
-            $shippingServiceName = $request->input('shipping_service_name');
 
+            $shippingSubtotal = max(0, $total - $discount);
+            $shippingProviderInput = $request->input('shipping_provider');
+            if ($deliveryType === 'store') {
+                $shippingProviderInput = 'store_pickup';
+            }
+
+            $shippingOption = $this->shippingService->resolveSelectedOption(
+                $deliveryType,
+                $deliveryType === 'store' ? null : $request->input('province'),
+                $deliveryType === 'store' ? null : $request->input('district'),
+                $deliveryType === 'store' ? null : $request->input('ward'),
+                $this->shippingService->estimateWeightFromCart($cart),
+                $shippingSubtotal,
+                $shippingProviderInput
+            );
+            if ($shippingOption === null) {
+                return redirect()->back()
+                    ->with('error', 'Vui long chon phuong thuc van chuyen hop le.')
+                    ->withInput();
+            }
+            $shippingFee = (float) ($shippingOption['fee'] ?? 0);
+            $shippingProvider = $shippingOption['provider'] ?? null;
+            $shippingServiceName = $shippingOption['service_name'] ?? null;
             $finalTotal = $total - $discount + $shippingFee;
-
+            if ($deliveryType === 'store') {
+                $orderProvince = null;
+                $orderDistrict = null;
+                $orderWard = null;
+                $orderAddress = 'Nhận tại cửa hàng';
+                $shippingAddress = 'Nhận tại cửa hàng';
+            } else {
+                $orderProvince = $request->province;
+                $orderDistrict = $request->district;
+                $orderWard = $request->ward;
+                $orderAddress = $request->address;
+                $shippingAddress = trim(implode(', ', array_filter([
+                    $request->address,
+                    $request->ward,
+                    $request->district,
+                    $request->province,
+                ]))) . ' - ' . $request->phone . ' - ' . $request->name;
+            }
             $order = Order::create([
-                'user_id' => Auth::id(), // Nullable if guest
+                'user_id' => Auth::id(),
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'province' => $request->province_name,
-                'district' => $request->district_name,
-                'ward' => $request->ward_name,
-                'address' => $request->address,
+                'province' => $orderProvince,
+                'district' => $orderDistrict,
+                'ward' => $orderWard,
+                'address' => $orderAddress,
                 'status' => 'pending',
                 'total_price' => $total,
                 'coupon_code' => $couponCode,
@@ -273,15 +416,33 @@ class CheckoutController extends Controller
                 'final_total' => $finalTotal,
                 'payment_method' => $request->payment_method,
                 'payment_status' => 'pending',
-                'shipping_address' => $request->address.', '.$request->ward_name.', '.$request->district_name.', '.$request->province_name.' - '.$request->phone.' - '.$request->name,
+                'shipping_address' => $shippingAddress,
                 'note' => $request->note,
             ]);
 
-            // Increment coupon used_count if coupon was applied
+            Log::info('Order created successfully', [
+                'order_id' => $order->id,
+                'total' => $order->final_total,
+                'status' => $order->status
+            ]);
+
+            // Increment coupon used_count and mark as used for user
             if ($couponCode) {
                 $coupon = Coupon::where('code', $couponCode)->first();
                 if ($coupon) {
                     $coupon->increment('used_count');
+
+                    // Mark as used in coupon_user pivot
+                    if (Auth::check()) {
+                        DB::table('coupon_user')->updateOrInsert(
+                            ['user_id' => Auth::id(), 'coupon_id' => $coupon->id],
+                            [
+                                'used_at' => now(),
+                                'order_id' => $order->id,
+                                'updated_at' => now()
+                            ]
+                        );
+                    }
                 }
             }
 
@@ -306,9 +467,25 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            // Notify Admins
-            $admins = User::getAdmins();
-            Notification::send($admins, new NewOrderNotification($order));
+            // Notify Admins & Users (Wrap in individual try-catch to not block success response)
+            try {
+                $admins = User::getAdmins();
+                if ($admins->isNotEmpty()) {
+                    Notification::send($admins, new NewOrderNotification($order));
+                }
+            } catch (\Exception $e) {
+                Log::error('Admin Notification failed: ' . $e->getMessage());
+            }
+
+            try {
+                if (Auth::check()) {
+                    /** @var \App\Models\User $user */
+                    $user = Auth::user();
+                    $user->notify(new OrderPlacedNotification($order));
+                }
+            } catch (\Exception $e) {
+                Log::error('User Notification failed: ' . $e->getMessage());
+            }
 
             // Clear selected items and session
             if ($selectedIds && is_array($selectedIds)) {
@@ -328,11 +505,6 @@ class CheckoutController extends Controller
                 Log::warning('Cart abandonment recovery tracking failed: ' . $e->getMessage());
             }
 
-            // Set session for guest verification if not logged in
-            if (!Auth::check()) {
-                session(['verified_order_id' => $order->id]);
-            }
-
             // Nếu là VNPAY: redirect đến cổng thanh toán VNPay
             if ($request->payment_method === 'VNPAY') {
                 $vnpayService = app(\App\Services\VnpayService::class);
@@ -344,11 +516,12 @@ class CheckoutController extends Controller
                 return redirect($paymentUrl);
             }
 
-            // COD & BANK_TRANSFER: gửi email xác nhận ngay
+            // COD: gửi email xác nhận ngay
             try {
-                \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OrderConfirmationMail($order));
+                Mail::to($order->email)->send(new \App\Mail\OrderConfirmationMail($order));
+                Log::info('Order Confirmation Mail sent to: ' . $order->email . ' for Order #' . $order->id);
             } catch (\Exception $e) {
-                Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: '.$e->getMessage());
+                Log::error('Có lỗi xảy ra khi gửi email xác nhận đặt hàng: ' . $e->getMessage());
             }
 
             return redirect()->route('checkout.success', $order->id)->with('success', 'Đặt hàng thành công!');
@@ -356,7 +529,13 @@ class CheckoutController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return redirect()->back()->with('error', 'Order error: '.$e->getMessage())->withInput();
+            Log::error('Checkout failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->back()->with('error', 'Order error: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -364,54 +543,9 @@ class CheckoutController extends Controller
     {
         $order = Order::with(['items.product', 'items.variant'])->findOrFail($id);
 
-        // Lấy thông tin tài khoản ngân hàng mặc định
-        $bank = \App\Models\BankSetting::where('is_active', true)->where('is_default', true)->first();
-
-        // Nếu không có mặc định, lấy cái đầu tiên đang hoạt động
-        if (!$bank) {
-            $bank = \App\Models\BankSetting::where('is_active', true)->first();
-        }
-
-        $bankName = $bank->bank_name ?? 'Vietcombank';
-        $bankAccount = $bank->account_number ?? '0071001234567';
-        $bankOwner = $bank->account_name ?? 'CÔNG TY TNHH SIÊU NHÂN GAO';
-        $bankId = $bank->bank_id ?? 'vcb';
-
-        return view('frontend.checkout.success', compact('order', 'bankName', 'bankAccount', 'bankOwner', 'bankId'));
+        return view('frontend.checkout.success', compact('order'));
     }
 
-    /**
-     * Xác nhận đã chuyển khoản
-     */
-    public function confirmTransfer($id)
-    {
-        $order = Order::findOrFail($id);
-
-        if ($order->payment_method !== 'BANK_TRANSFER') {
-            return redirect()->back()->with('error', 'Phương thức thanh toán không hợp lệ.');
-        }
-
-        if ($order->payment_status !== 'pending') {
-            return redirect()->back()->with('error', 'Trạng thái thanh toán không hợp lệ.');
-        }
-
-        $order->update([
-            'payment_status' => 'waiting_confirmation'
-        ]);
-
-        // Ghi lại lịch sử (nếu có hệ thống lịch sử đơn hàng)
-        if (class_exists(\App\Models\OrderHistory::class)) {
-            \App\Models\OrderHistory::create([
-                'order_id'        => $order->id,
-                'previous_status' => $order->status,
-                'new_status'      => 'waiting_confirmation',
-                'note'            => 'Khách hàng xác nhận đã chuyển khoản. Chờ Admin kiểm tra.',
-                'user_id'         => Auth::id()
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Thông báo đã được gửi. Vui lòng chờ chúng tôi xác nhận giao dịch.');
-    }
 
     /**
      * Hủy đơn hàng khi đang chờ thanh toán
@@ -428,7 +562,7 @@ class CheckoutController extends Controller
             $orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, Auth::user(), 'Khách hàng tự hủy đơn hàng từ trang thanh toán.');
 
             // Khôi phục lại giỏ hàng cho khách
-            app(\App\Services\CartService::class)->restoreOrderToCart($order);
+            app(CartService::class)->restoreOrderToCart($order);
 
             return redirect()->route('shop')->with('success', 'Đơn hàng đã được hủy thành công. Các sản phẩm đã được hoàn lại vào giỏ hàng của bạn.');
         } catch (\Exception $e) {
@@ -439,11 +573,9 @@ class CheckoutController extends Controller
     /**
      * Apply coupon code
      */
-    public function applyCoupon(Request $request)
+    public function applyCoupon(\App\Http\Requests\Generated\CartActionRequest $request)
     {
-        $request->validate([
-            'coupon_code' => 'required|string|max:50',
-        ]);
+        // Validation handled by CartActionRequest
 
         $cart = $this->cartService->getCart();
         if (count($cart) == 0) {
@@ -463,7 +595,7 @@ class CheckoutController extends Controller
         $couponCode = strtoupper(trim($request->coupon_code));
         $coupon = Coupon::where('code', $couponCode)->first();
 
-        if (! $coupon) {
+        if (!$coupon) {
             return response()->json([
                 'success' => false,
                 'message' => __('Mã giảm giá không tồn tại.'),
@@ -471,7 +603,7 @@ class CheckoutController extends Controller
         }
 
         // Validate coupon
-        if (! $coupon->is_active) {
+        if (!$coupon->is_active) {
             return response()->json([
                 'success' => false,
                 'message' => __('Mã giảm giá này hiện không còn hoạt động.'),
@@ -499,18 +631,50 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Check if coupon belongs to this user
-        if ($coupon->user_id && $coupon->user_id != Auth::id()) {
+        // Check if user already used this coupon
+        if (Auth::check()) {
+            $alreadyUsed = Order::where('user_id', Auth::id())
+                ->where('coupon_code', $coupon->code)
+                ->whereNotIn('status', ['cancelled', 'failed'])
+                ->exists();
+
+            if ($alreadyUsed) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('Bạn đã sử dụng mã giảm giá này cho một đơn hàng trước đó.'),
+                ], 400);
+            }
+
+            // Also check pivot table as backup/explicit tracking
+            $usedInPivot = DB::table('coupon_user')
+                ->where('user_id', Auth::id())
+                ->where('coupon_id', $coupon->id)
+                ->whereNotNull('used_at')
+                ->exists();
+
+            if ($usedInPivot) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('Bạn đã sử dụng mã giảm giá này rồi.'),
+                ], 400);
+            }
+        }
+
+        // Check if coupon belongs to this user or is claimed
+        $isGifted = Auth::check() && $coupon->user_id == Auth::id();
+        $isClaimed = Auth::check() && $coupon->isClaimedBy(Auth::user());
+
+        if (!$isGifted && !$isClaimed) {
             return response()->json([
                 'success' => false,
-                'message' => __('Mã giảm giá này không dành cho tài khoản của bạn.'),
-            ], 400);
+                'message' => __('Bạn cần lưu mã giảm giá này vào tài khoản trước khi sử dụng.'),
+            ], 403);
         }
 
         if ($coupon->min_order_amount && $total < $coupon->min_order_amount) {
             return response()->json([
                 'success' => false,
-                'message' => __('Đơn hàng tối thiểu :amount để sử dụng mã này.', ['amount' => number_format($coupon->min_order_amount).' đ']),
+                'message' => __('Đơn hàng tối thiểu :amount để sử dụng mã này.', ['amount' => number_format($coupon->min_order_amount) . ' đ']),
             ], 400);
         }
 
@@ -528,9 +692,9 @@ class CheckoutController extends Controller
             'data' => [
                 'coupon_code' => $coupon->code,
                 'discount' => $discount,
-                'discount_formatted' => number_format($discount).' đ',
+                'discount_formatted' => number_format($discount) . ' đ',
                 'final_total' => $finalTotal,
-                'final_total_formatted' => number_format($finalTotal).' đ',
+                'final_total_formatted' => number_format($finalTotal) . ' đ',
             ],
         ]);
     }
@@ -546,5 +710,65 @@ class CheckoutController extends Controller
             'success' => true,
             'message' => 'Coupon removed.',
         ]);
+    }
+
+    /**
+     * Xóa sản phẩm hoàn toàn khỏi giỏ hàng từ trang checkout
+     */
+    public function removeItem($id)
+    {
+        // 1. Xóa khỏi giỏ hàng chính (DB hoặc Session tùy auth)
+        $this->cartService->removeItems([(string)$id]);
+
+        // 2. Xóa khỏi danh sách các item đang được chọn để checkout
+        $selectedIds = session('selected_checkout_ids', []);
+        if (is_array($selectedIds)) {
+            $selectedIds = array_diff(array_map('strval', $selectedIds), [(string)$id]);
+            session(['selected_checkout_ids' => array_values($selectedIds)]);
+        }
+
+        // 3. Nếu không còn sản phẩm nào để checkout, quay về giỏ hàng
+        if (empty(session('selected_checkout_ids'))) {
+            return redirect()->route('cart.index')->with('success', 'Sản phẩm đã được xóa. Danh sách thanh toán hiện đang trống.');
+        }
+
+        return redirect()->back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng.');
+    }
+
+    protected function resolveShippingState(array $cart, float $subtotal, float $discount = 0, ?UserAddress $defaultAddress = null): array
+    {
+        $shippingSubtotal = max(0, $subtotal - $discount);
+
+        if ($shippingSubtotal <= 0 || empty($cart)) {
+            return [
+                'provider' => 'default',
+                'service_name' => 'Giao hàng tiêu chuẩn',
+                'fee' => 0,
+                'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
+            ];
+        }
+
+        if ($defaultAddress && filled($defaultAddress->province) && filled($defaultAddress->commune)) {
+            $quote = $this->shippingService->resolveSelectedOption(
+                'home',
+                (string) $defaultAddress->province,
+                null,
+                (string) $defaultAddress->commune,
+                $this->shippingService->estimateWeightFromCart($cart),
+                $shippingSubtotal,
+                null
+            );
+
+            if ($quote !== null) {
+                return $quote;
+            }
+        }
+
+        return [
+            'provider' => 'default',
+            'service_name' => 'Giao hàng tiêu chuẩn',
+            'fee' => (float) \App\Models\Setting::getShippingFee($shippingSubtotal),
+            'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
+        ];
     }
 }

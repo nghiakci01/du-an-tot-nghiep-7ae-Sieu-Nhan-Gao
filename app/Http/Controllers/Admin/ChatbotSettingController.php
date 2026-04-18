@@ -19,23 +19,9 @@ class ChatbotSettingController extends Controller
         return view('admin.settings.chatbot', compact('chatbotSettings', 'questions'));
     }
 
-    public function update(Request $request)
+    public function update(\App\Http\Requests\Generated\ChatbotSettingRequest $request)
     {
-        $request->validate([
-            'chatbot_enabled' => 'nullable|in:1,0',
-            'chatbot_mode' => 'required|in:rules,ai',
-            'ai_provider' => 'required_if:chatbot_mode,ai|in:gemini,openai',
-            'greeting_message' => 'required|string',
-            'fallback_message' => 'required|string',
-            'hotline' => 'required|string',
-            'email' => 'required|email',
-            'system_instruction' => 'required_if:chatbot_mode,ai|nullable|string',
-            'gemini_api_key' => 'nullable|string',
-            'openai_api_key' => 'nullable|string',
-            'keyword_rules' => 'nullable|string',
-        ]);
-
-        $data = $request->except('_token');
+        $data = $request->validated();
 
         // Handle checkbox (if not checked, Laravel request doesn't include it)
         $data['chatbot_enabled'] = $request->has('chatbot_enabled') ? '1' : '0';
@@ -67,8 +53,6 @@ class ChatbotSettingController extends Controller
 
         if ($provider === 'gemini') {
             return $this->testGemini($apiKey);
-        } elseif ($provider === 'openai') {
-            return $this->testOpenAI($apiKey);
         }
 
         return response()->json(['success' => false, 'message' => 'Nhà cung cấp không hợp lệ!']);
@@ -100,34 +84,4 @@ class ChatbotSettingController extends Controller
         }
     }
 
-    private function testOpenAI($apiKey)
-    {
-        try {
-            /** @var \Illuminate\Http\Client\Response $response */
-            $response = \Illuminate\Support\Facades\Http::withOptions([
-                'curl' => [
-                    CURLOPT_SSL_VERIFYPEER => true,
-                    CURLOPT_SSL_VERIFYHOST => 2,
-                ],
-                'timeout' => 30,
-            ])->withHeaders([
-                'Authorization' => "Bearer {$apiKey}",
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-3.5-turbo',
-                'messages' => [['role' => 'user', 'content' => 'Hello']],
-                'max_tokens' => 20,
-            ]);
-
-            if ($response->successful()) {
-                return response()->json(['success' => true, 'message' => 'Kết nối OpenAI thành công! ✅']);
-            }
-
-            $error = $response->json()['error']['message'] ?? 'Lỗi không xác định';
-
-            return response()->json(['success' => false, 'message' => "OpenAI: {$error} (Mã: {$response->status()})"]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Lỗi OpenAI: '.$e->getMessage()]);
-        }
-    }
 }

@@ -199,7 +199,7 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-header">
-            <h5>Doanh Thu 30 Ngày Gần Nhất</h5>
+            <h5>Kết quả kinh doanh 6 tháng đầu năm</h5>
           </div>
           <div class="card-body">
             <div id="revenue-chart"></div>
@@ -220,56 +220,136 @@
       </div>
     </div>
 
-    <!-- Recent Notifications & Funnel Trends Row -->
+    <!-- Product Lists Row -->
     <div class="row">
-      <div class="col-lg-12 mb-4">
+      <!-- Top Wishlisted -->
+      <div class="col-lg-4 mb-4">
         <div class="card h-100 shadow-sm border-0">
-          <div class="card-header bg-transparent border-bottom-0 pb-0">
-            <h5 class="mb-0 fw-bold"><i class="ti ti-chart-funnel me-2 text-warning"></i>Phễu Chuyển Đổi (30 ngày)</h5>
+          <div class="card-header bg-transparent border-bottom-0 pb-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="ti ti-heart me-2 text-danger"></i>Yêu thích nhất</h5>
+            <span class="badge bg-light-danger text-danger">{{ $topWishlisted->count() }} sản phẩm</span>
           </div>
           <div class="card-body">
-            @if(isset($funnelStats))
-            <div class="row g-3 mb-3">
-              <div class="col-md-3 col-6">
-                <div class="p-3 rounded bg-light-danger text-center">
-                  <h3 class="mb-1 text-danger">{{ $funnelStats['abandoned_carts'] }}</h3>
-                  <small class="text-muted">Giỏ bị bỏ rơi</small>
-                </div>
-              </div>
-              <div class="col-md-3 col-6">
-                <div class="p-3 rounded bg-light-success text-center">
-                  <h3 class="mb-1 text-success">{{ $funnelStats['recovered_carts'] }}</h3>
-                  <small class="text-muted">Giỏ phục hồi</small>
-                </div>
-              </div>
-              <div class="col-md-3 col-6">
-                <div class="p-3 rounded bg-light-primary text-center">
-                  <h3 class="mb-1 text-primary">{{ $funnelStats['cart_to_order_rate'] }}%</h3>
-                  <small class="text-muted">Tỷ lệ chuyển đổi</small>
-                </div>
-              </div>
-              <div class="col-md-3 col-6">
-                <div class="p-3 rounded bg-light-warning text-center">
-                  <h3 class="mb-1 text-warning">{{ number_format($funnelStats['avg_order_value']) }}đ</h3>
-                  <small class="text-muted">Giá trị TB / đơn</small>
-                </div>
-              </div>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr class="small text-muted text-uppercase">
+                    <th>Sản phẩm</th>
+                    <th class="text-end">Lượt thích</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @forelse($topWishlisted as $product)
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <img src="{{ $product->image_url }}" alt="" class="rounded me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                        <div class="text-truncate" style="max-width: 150px;">
+                          <h6 class="mb-0 small fw-bold">{{ $product->name }}</h6>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <span class="fw-bold">{{ $product->wishlisted_by_count }}</span>
+                    </td>
+                  </tr>
+                  @empty
+                  <tr>
+                    <td colspan="2" class="text-center py-4 text-muted small">Chưa có dữ liệu</td>
+                  </tr>
+                  @endforelse
+                </tbody>
+              </table>
             </div>
-            <div class="p-3 rounded" style="background: #fff3e0;">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <small class="text-muted">Doanh thu tiềm năng bị mất</small>
-                  <h5 class="mb-0 text-danger fw-bold">{{ number_format($funnelStats['abandoned_value']) }}đ</h5>
-                </div>
-                <i class="ti ti-alert-triangle f-28 text-warning"></i>
-              </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Best Sellers -->
+      <div class="col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-header bg-transparent border-bottom-0 pb-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="ti ti-shopping-cart me-2 text-primary"></i>Bán chạy nhất</h5>
+            <span class="badge bg-light-primary text-primary">{{ $startDate }} - {{ $endDate }}</span>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr class="small text-muted text-uppercase">
+                    <th>Sản phẩm</th>
+                    <th class="text-end">Đã bán</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @forelse($bestSellers as $product)
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <img src="{{ asset('storage/' . $product->image) }}" alt="" class="rounded me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                        <div class="text-truncate" style="max-width: 150px;">
+                          <h6 class="mb-0 small fw-bold">{{ $product->name }}</h6>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <span class="fw-bold">{{ $product->total_sold }}</span>
+                    </td>
+                  </tr>
+                  @empty
+                  <tr>
+                    <td colspan="2" class="text-center py-4 text-muted small">Chưa có dữ liệu</td>
+                  </tr>
+                  @endforelse
+                </tbody>
+              </table>
             </div>
-            @else
-            <div class="text-center py-4 text-muted">
-              <i class="ti ti-chart-funnel f-40 opacity-50"></i>
-              <p class="mt-2 mb-0">Chưa có dữ liệu chuyển đổi.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Low Stock -->
+      <div class="col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-header bg-transparent border-bottom-0 pb-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="ti ti-alert-triangle me-2 text-warning"></i>Sắp hết hàng</h5>
+            <span class="badge bg-light-warning text-warning">{{ $lowStockList->count() }} biến thể</span>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr class="small text-muted text-uppercase">
+                    <th>Sản phẩm</th>
+                    <th class="text-end">Tồn kho</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @forelse($lowStockList as $variant)
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <img src="{{ asset('storage/' . $variant->product->image) }}" alt="" class="rounded me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                        <div class="text-truncate" style="max-width: 150px;">
+                          <h6 class="mb-0 small fw-bold">{{ $variant->product->name }}</h6>
+                          <small class="text-muted">{{ $variant->sizeRelationship ? $variant->sizeRelationship->name : $variant->size }} - {{ $variant->colorRelationship ? $variant->colorRelationship->name : $variant->color }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <span class="badge {{ $variant->stock_quantity <= 0 ? 'bg-light-danger text-danger' : 'bg-light-warning text-warning' }}">
+                        {{ $variant->stock_quantity }}
+                      </span>
+                    </td>
+                  </tr>
+                  @empty
+                  <tr>
+                    <td colspan="2" class="text-center py-4 text-muted small">Tất cả sản phẩm đều đủ hàng</td>
+                  </tr>
+                  @endforelse
+                </tbody>
+              </table>
             </div>
-            @endif
           </div>
         </div>
       </div>
@@ -357,6 +437,8 @@
   <script id="revenue-labels-data" type="application/json">@json($revenueLabels)</script>
   <script id="status-values-data" type="application/json">@json($statusValues)</script>
   <script id="status-labels-data" type="application/json">@json($statusLabels)</script>
+  <script id="half-year-data" type="application/json">@json($halfYearChart)</script>
+
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -371,43 +453,89 @@
           }
       });
 
-      // Revenue Chart
+      // Business Results (Mixed Chart: Bar & Line)
+      const halfYearData = JSON.parse(document.getElementById('half-year-data').textContent);
+      
       var revenueOptions = {
         series: [{
-          name: 'Doanh Thu',
-          data: JSON.parse(document.getElementById('revenue-values-data').textContent)
+          name: 'Lượng hàng bán ra',
+          type: 'column',
+          data: halfYearData.quantities
+        }, {
+          name: 'Doanh thu',
+          type: 'line',
+          data: halfYearData.revenues
         }],
         chart: {
-          type: 'area', // or line, bar
           height: 350,
+          type: 'line',
+          stacked: false,
           toolbar: {
             show: false
           }
         },
-        dataLabels: {
-          enabled: false
-        },
         stroke: {
+          width: [0, 4],
           curve: 'smooth'
         },
+        plotOptions: {
+          bar: {
+            columnWidth: '50%'
+          }
+        },
+        fill: {
+          opacity: [0.85, 1],
+        },
+        labels: halfYearData.labels,
+        markers: {
+          size: 0
+        },
         xaxis: {
-          categories: JSON.parse(document.getElementById('revenue-labels-data').textContent),
+          type: 'category'
         },
-        yaxis: {
-          labels: {
-            formatter: function (value) {
-              return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+        yaxis: [
+          {
+            title: {
+              text: 'Lượng hàng bán ra',
+            },
+            labels: {
+                formatter: function (val) {
+                    return Math.floor(val);
+                }
+            }
+          },
+          {
+            opposite: true,
+            title: {
+              text: 'Doanh thu (VND)',
+            },
+            labels: {
+              formatter: function (val) {
+                return new Intl.NumberFormat('vi-VN', { 
+                  notation: "compact", 
+                  compactDisplay: "short" 
+                }).format(val) + "đ";
+              }
             }
           }
-        },
+        ],
         tooltip: {
+          shared: true,
+          intersect: false,
           y: {
-            formatter: function (value) {
-              return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+            formatter: function (y) {
+              if (typeof y !== "undefined") {
+                return new Intl.NumberFormat('vi-VN').format(y);
+              }
+              return y;
             }
           }
         },
-        colors: ['#4680ff']
+        legend: {
+            position: 'top',
+            horizontalAlign: 'left',
+        },
+        colors: ['#4680ff', '#f44336']
       };
 
       var revenueChart = new ApexCharts(document.querySelector("#revenue-chart"), revenueOptions);
@@ -437,6 +565,8 @@
 
       var statusChart = new ApexCharts(document.querySelector("#order-status-chart"), statusOptions);
       statusChart.render();
+
+
     });
   </script>
 @endsection

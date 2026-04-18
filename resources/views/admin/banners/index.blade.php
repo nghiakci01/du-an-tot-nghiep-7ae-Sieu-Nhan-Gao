@@ -12,9 +12,6 @@
                         <a href="{{ route('admin.banners.create') }}" class="btn btn-primary">Thêm Banner Mới</a>
                     </div>
                     <div class="card-body">
-                        @if(session('success'))
-                            <div class="alert alert-success">{{ session('success') }}</div>
-                        @endif
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead>
@@ -24,7 +21,7 @@
                                         <th>Tiêu đề</th>
                                         <th>Vị trí</th>
                                         <th>Trạng thái</th>
-                                        <th class="text-center">Hành động</th>
+                                        <th class="text-center sticky-action-column">Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -66,7 +63,7 @@
                                                     <span class="badge bg-secondary"><i class="ti ti-eye-off small"></i> Ẩn</span>
                                                 @endif
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center sticky-action-column">
                                                 <div class="btn-group">
                                                     <a href="{{ route('admin.banners.edit', $banner) }}"
                                                         class="btn btn-sm btn-icon btn-light-warning" title="Chỉnh sửa">

@@ -3,78 +3,81 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\CartService;
+use App\Services\Shipping\ShippingService;
 use Illuminate\Http\Request;
-use App\Services\Shipping\GhnShippingProvider;
-use App\Services\Shipping\GhtkShippingProvider;
-use App\Services\Shipping\ViettelPostShippingProvider;
 use Illuminate\Support\Facades\Log;
 
 class ShippingController extends Controller
 {
-    public function calculateFees(Request $request)
+    public function __construct(
+        protected ShippingService $shippingService,
+        protected CartService $cartService
+    ) {
+    }
+
+    public function calculateFees(\App\Http\Requests\Generated\ShippingFeesRequest $request)
     {
         try {
-            $request->validate([
-                'province' => 'required|string',
-                'district' => 'nullable|string',
-                'ward' => 'nullable|string',
-                'weight' => 'nullable|integer',
-            ]);
+            $deliveryType = $request->input('delivery_type');
+            if (!in_array($deliveryType, ['home', 'store'], true)) {
+                $deliveryType = 'home';
+            }
+            // Validation handled by ShippingFeesRequest
 
             $province = $request->input('province');
             $district = $request->input('district');
-            $ward = $request->input('ward');
-            $weight = $request->input('weight', 1000); // Mặt định 1kg nếu không tính toán được
+            $ward = $request->filled('ward') ? $request->input('ward') : $request->input('commune');
 
-            $options = [];
+            $cart = $this->getSelectedCheckoutCart();
+            $subtotal = collect($cart)->sum(fn ($item) => (float) ($item['price'] ?? 0) * (int) ($item['quantity'] ?? 0));
+            $discount = (float) session('discount_amount', 0);
+            $weight = (int) $request->input('weight', $this->shippingService->estimateWeightFromCart($cart));
 
-            // Fetch GHN
-            $ghnProvider = new GhnShippingProvider();
-            if ($ghnResult = $ghnProvider->calculateFee($province, $district, $ward, $weight)) {
-                $options[] = $ghnResult;
-            }
-
-            // Fetch GHTK
-            $ghtkProvider = new GhtkShippingProvider();
-            if ($ghtkResult = $ghtkProvider->calculateFee($province, $district, $ward, $weight)) {
-                $options[] = $ghtkResult;
-            }
-
-            // Fetch Viettel Post
-            $viettelProvider = new ViettelPostShippingProvider();
-            if ($viettelResult = $viettelProvider->calculateFee($province, $district, $ward, $weight)) {
-                $options[] = $viettelResult;
-            }
-
-            // Nếu tất cả API đều lỗi (hoặc timeout), fallback về một cấu hình cơ bản cứng để không làm kẹt luồng mua hàng
-            if (empty($options)) {
-                 $options[] = [
-                    'provider' => 'flat_rate',
-                    'service_name' => 'Giao hàng tiêu chuẩn',
-                    'fee' => 30000,
-                    'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
-                ];
-            }
+            $options = $this->shippingService->getOptions(
+                $deliveryType,
+                $province,
+                $district,
+                $ward,
+                $weight,
+                max(0, $subtotal - $discount)
+            );
 
             return response()->json([
                 'success' => true,
-                'data' => $options
+                'data' => $options,
             ]);
-
         } catch (\Exception $e) {
             Log::error('ShippingController calculateFees error: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Lỗi tính phí vận chuyển',
+                'message' => 'Loi tinh phi van chuyen',
                 'data' => [
                     [
                         'provider' => 'flat_rate',
-                        'service_name' => 'Giao hàng tiêu chuẩn (Dự phòng)',
+                        'service_name' => 'Giao hang tieu chuan (Du phong)',
                         'fee' => 30000,
                         'expected_delivery_time' => now()->addDays(3)->format('d/m/Y'),
-                    ]
-                ]
+                    ],
+                ],
             ]);
         }
+    }
+
+    protected function getSelectedCheckoutCart(): array
+    {
+        $cart = $this->cartService->getCart();
+        $selectedIds = session('selected_checkout_ids');
+
+        if (!$selectedIds || !is_array($selectedIds)) {
+            return $cart;
+        }
+
+        $selectedIds = array_map('strval', $selectedIds);
+
+        return array_filter($cart, function ($key) use ($selectedIds) {
+            return in_array((string) $key, $selectedIds, true);
+        }, ARRAY_FILTER_USE_KEY);
     }
 }

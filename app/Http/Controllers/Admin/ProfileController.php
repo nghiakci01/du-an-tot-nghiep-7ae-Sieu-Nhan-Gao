@@ -18,21 +18,16 @@ class ProfileController extends Controller
         return view('admin.profile.index', compact('user'));
     }
 
-    public function update(Request $request)
+    public function update(\App\Http\Requests\Generated\ProfileUpdateRequest $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:15',
-            'address' => 'nullable|string|max:255',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $validated = $request->validated();
 
-        $user->name = $request->name;
-        $user->phone = $request->phone;
-        $user->address = $request->address;
+        $user->name = $validated['name'];
+        $user->phone = $validated['phone'] ?? null;
+        $user->address = $validated['address'] ?? null;
 
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
@@ -63,38 +58,28 @@ class ProfileController extends Controller
         return back()->with('success', 'Cập nhật hồ sơ thành công.');
     }
 
-    public function updatePassword(Request $request)
+    public function updatePassword(\App\Http\Requests\Generated\ProfilePasswordRequest $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $request->validate([
-            'current_password' => 'required',
-            'new_password' => 'required|min:8|confirmed',
-        ], [
-            'current_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
-            'new_password.required' => 'Vui lòng nhập mật khẩu mới.',
-            'new_password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
-            'new_password.confirmed' => 'Xác nhận mật khẩu mới không khớp.',
-        ]);
+        $validated = $request->validated();
 
-        if (! Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($validated['current_password'], $user->password)) {
             return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng']);
         }
 
-        $user->password = Hash::make($request->new_password);
+        $user->password = Hash::make($validated['new_password']);
         $user->save();
 
         return back()->with('success', 'Đổi mật khẩu thành công.');
     }
 
-    public function checkCurrentPassword(Request $request)
+    public function checkCurrentPassword(\App\Http\Requests\Generated\ProfileCheckPasswordRequest $request)
     {
-        $request->validate([
-            'current_password' => 'required'
-        ]);
+        $validated = $request->validated();
 
-        $isValid = Hash::check($request->current_password, Auth::user()->password);
+        $isValid = Hash::check($validated['current_password'], Auth::user()->password);
 
         return response()->json([
             'valid' => $isValid,

@@ -18,7 +18,7 @@
       if (savedTheme === 'dark') {
           html.classList.add('dark-mode');
       }
-      
+
       // Đồng bộ luôn cho body nếu nó đã có sẵn (dù script này thường chạy ở head)
       document.addEventListener('DOMContentLoaded', () => {
           document.body.setAttribute('data-pc-theme', savedTheme);
@@ -84,7 +84,7 @@
     body:not([data-pc-layout="compact"]):not([data-pc-layout="tab"]) .pc-user-profile-header {
         display: none !important;
     }
-    
+
     /* Ẩn Sidebar Profile khi ở Compact hoặc Tab */
     body[data-pc-layout="compact"] .pc-user-profile-sidebar,
     body[data-pc-layout="tab"] .pc-user-profile-sidebar {
@@ -143,7 +143,43 @@
     [data-pc-theme="dark"] {
         --barcode-brightness: 0.85;
     }
+
+    /* --- Global Sticky Action Column --- */
+    .table-responsive {
+        position: relative;
+    }
+    .sticky-action-column {
+        position: sticky !important;
+        right: 0;
+        z-index: 10;
+        background-color: #fff !important;
+        box-shadow: -5px 0 10px rgba(0,0,0,0.05);
+        border-left: 1px solid #dee2e6 !important;
+        text-align: center;
+        vertical-align: middle;
+    }
+    .table-striped tbody tr:nth-of-type(odd) .sticky-action-column {
+        background-color: #f8f9fa !important;
+    }
+    tr:hover .sticky-action-column {
+        background-color: #f1f4f9 !important;
+    }
+    [data-pc-theme="dark"] .sticky-action-column {
+        background-color: #1a1c1e !important;
+        border-left: 1px solid #323539 !important;
+        box-shadow: -5px 0 10px rgba(0,0,0,0.2);
+    }
+    [data-pc-theme="dark"] .table-striped tbody tr:nth-of-type(odd) .sticky-action-column {
+        background-color: #212529 !important;
+    }
+    [data-pc-theme="dark"] tr:hover .sticky-action-column {
+        background-color: #2b3035 !important;
+    }
+
+    /* --- Global Header Adjustments --- */
+    /* Loại bỏ vách ngăn giữa các thẻ ở Header */
   </style>
+  @stack('css')
 </head><!-- [Head] end --><!-- [Body] Start -->
 
 <body data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr"
@@ -174,15 +210,29 @@
   <div class="pc-container">
     <div class="pc-content">
       @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
+        <div class="alert alert-success alert-dismissible fade show m-x-4 m-t-4" role="alert">
           {{ session('success') }}
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       @endif
 
+      @if (session('warning'))
+        <div class="alert alert-warning alert-dismissible fade show m-x-4 m-t-4" role="alert">
+          {{ session('warning') }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      @endif
+
       @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show m-x-4 m-t-4" role="alert">
           {{ session('error') }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      @endif
+
+      @if (session('info'))
+        <div class="alert alert-info alert-dismissible fade show m-x-4 m-t-4" role="alert">
+          {{ session('info') }}
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       @endif
@@ -242,7 +292,7 @@
 
           // Hiển thị loading
           $(document).on('pjax:send', function() {
-              $('.loader-bg').show(); 
+              $('.loader-bg').show();
           });
 
           // Tắt loading
@@ -260,13 +310,13 @@
 
               // Khởi tạo lại Feather icons và tooltip/popover nêú cần
               if(window.feather) feather.replace();
-              
+
               const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
               tooltipTriggerList.map(function (tooltipTriggerEl) {
                   return new bootstrap.Tooltip(tooltipTriggerEl);
               });
 
-              // the following block is commented out because jquery-pjax already executes scripts 
+              // the following block is commented out because jquery-pjax already executes scripts
               // within the fragment, and manual eval causes double execution (e.g., double event binding)
               /*
               $('.pc-content script').each(function() {
@@ -277,7 +327,7 @@
                   }
               });
               */
-              
+
               // Nếu có sử dụng DataTables, cần re-init lại bảng
               if ($.fn.DataTable) {
                   $('.table:not(.initialized)').addClass('initialized').DataTable();
@@ -304,12 +354,18 @@
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
         confirmButtonText: 'Xóa',
-        cancelButtonText: 'Hủy'
+        cancelButtonText: 'Hủy',
+        allowOutsideClick: false,
+        allowEscapeKey: false
       }).then((result) => {
         if (result.isConfirmed) {
-          document.getElementById(formId).submit();
+          const form = document.getElementById(formId);
+          if (form) {
+            form.submit();
+          }
         }
-      })
+      });
+      return false;
     }
   </script>
 
@@ -368,12 +424,20 @@
       }
 
       // Poll for new notifications every 30 seconds
-      setInterval(function() {
+      var _adminNotifPollTimer = setInterval(function() {
         fetch('{{ route("admin.notifications.unread_count") }}', {
           headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
-        .then(r => r.json())
+        .then(r => {
+          if (r.status === 401) {
+            clearInterval(_adminNotifPollTimer);
+            if (badge) badge.classList.add('d-none');
+            return null;
+          }
+          return r.json();
+        })
         .then(data => {
+          if (!data) return;
           const count = data.count || 0;
           if (badge) {
             badge.textContent = count;

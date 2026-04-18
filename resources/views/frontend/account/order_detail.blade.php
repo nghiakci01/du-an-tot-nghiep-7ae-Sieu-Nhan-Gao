@@ -168,7 +168,7 @@
 
   $pmLabel = match($order->payment_method) {
     'COD'           => '💵 Thanh toán khi nhận hàng (COD)',
-    'BANK_TRANSFER' => '🏦 Chuyển khoản ngân hàng',
+    'VNPAY'         => '💳 VNPay',
     'VNPAY'         => '💳 VNPay',
     'ZALOPAY'       => '💳 ZaloPay',
     default         => $order->payment_method,

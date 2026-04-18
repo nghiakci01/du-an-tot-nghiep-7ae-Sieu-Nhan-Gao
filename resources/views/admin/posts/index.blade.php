@@ -29,9 +29,6 @@
                     <a href="{{ route('admin.posts.create') }}" class="btn btn-primary btn-sm">Thêm tin tức mới</a>
                 </div>
                 <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
 
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered text-center">
@@ -72,7 +69,7 @@
                                                 class="btn btn-warning btn-sm">Sửa</a>
                                             <form id="delete-form-{{ $post->id }}"
                                                 action="{{ route('admin.posts.destroy', $post) }}" method="POST"
-                                                class="d-inline">
+                                                class="d-inline no-pjax">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" class="btn btn-danger btn-sm"

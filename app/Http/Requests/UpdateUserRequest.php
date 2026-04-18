@@ -27,7 +27,7 @@ class UpdateUserRequest extends FormRequest
             'password' => 'nullable|string|min:8|confirmed',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
-            'role' => 'required|in:admin,staff,user',
+            'role' => 'required|in:admin,user',
         ];
     }
 

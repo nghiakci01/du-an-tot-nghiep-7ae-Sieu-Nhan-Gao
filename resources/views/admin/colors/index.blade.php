@@ -14,18 +14,6 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show">
-                            {{ session('success') }}
-                            <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        </div>
-                    @endif
-                    @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            {{ session('error') }}
-                            <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        </div>
-                    @endif
 
                     <table class="table table-bordered table-hover">
                         <thead>
@@ -34,7 +22,7 @@
                                 <th width="50%">Name</th>
                                 <th width="12%">Display Order</th>
                                 <th width="10%">Status</th>
-                                <th width="15%">Actions</th>
+                                <th width="15%" class="sticky-action-column">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -49,11 +37,11 @@
                                         {{ $color->is_active ? 'Active' : 'Inactive' }}
                                     </span>
                                 </td>
-                                <td>
+                                <td class="sticky-action-column">
                                     <a href="{{ route('admin.colors.edit', $color) }}" class="btn btn-sm btn-info">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
-                                    <form action="{{ route('admin.colors.destroy', $color) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this color?');">
+                                    <form action="{{ route('admin.colors.destroy', $color) }}" method="POST" class="d-inline no-pjax" onsubmit="return confirm('Are you sure you want to delete this color?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger">

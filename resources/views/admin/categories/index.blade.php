@@ -27,12 +27,6 @@
                 <a href="{{ route('admin.categories.create') }}" class="btn btn-primary btn-sm">Thêm mới</a>
             </div>
             <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-                @if(session('error'))
-                    <div class="alert alert-danger">{{ session('error') }}</div>
-                @endif
 
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
@@ -42,8 +36,7 @@
                                 <th>Tên danh mục</th>
                                 <th>Slug</th>
                                 <th>Danh mục cha</th>
-
-                                <th>Hành động</th>
+                                <th class="sticky-action-column">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -60,9 +53,9 @@
                                     @endif
                                 </td>
 
-                                <td>
+                                <td class="sticky-action-column">
                                     <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-warning btn-sm">Sửa</a>
-                                    <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
+                                    <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline no-pjax" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm">Xóa</button>

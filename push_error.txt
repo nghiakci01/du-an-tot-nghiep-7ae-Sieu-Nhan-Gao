@@ -1,0 +1,128 @@
+﻿git : remote: error: GH013: 
+Repository rule violations 
+found for 
+refs/heads/member/nghia.        
+At line:1 char:1
++ git push origin member/nghia 
+2>&1 | Out-File -FilePath 
+push_error.txt ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo          : N 
+   otSpecified: (remote: error  
+  : .../nghia.        :String   
+ ) [], RemoteException
+    + FullyQualifiedErrorId : N 
+   ativeCommandError
+ 
+remote: 
+remote: - GITHUB PUSH 
+PROTECTION        
+remote:   ΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓ
+ÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇö
+ΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇ
+öΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓ
+ÇöΓÇö        
+remote:     Resolve the 
+following violations before 
+pushing again        
+remote: 
+remote:     - Push cannot 
+contain secrets        
+remote: 
+remote:             
+remote:      (?) Learn how to 
+resolve a blocked push        
+remote:      https://docs.github
+.com/code-security/secret-scanni
+ng/working-with-secret-scanning-
+and-push-protection/working-with
+-push-protection-from-the-comman
+d-line#resolving-a-blocked-push 
+       
+remote:             
+remote:             
+remote:       ΓÇöΓÇö Google 
+OAuth Client ID ΓÇöΓÇöΓÇöΓÇöΓÇöΓ
+ÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇö
+ΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇ
+öΓÇö        
+remote:        locations:       
+ 
+remote:          - commit: 20147
+09a9589898acf209c5c014ed60a0edf7
+5c0        
+remote:            path: 
+.env.example:69        
+remote:             
+remote:        (?) To push, 
+remove secret from commit(s) or 
+follow this URL to allow the 
+secret.        
+remote:        https://github.co
+m/nghiakci01/du-an-tot-nghiep-7a
+e-Sieu-Nhan-Gao/security/secret-
+scanning/unblock-secret/3BiQuviL
+a5fiPMY7UT456Rawujg        
+remote:             
+remote:             
+remote:       ΓÇöΓÇö Google 
+OAuth Client Secret ΓÇöΓÇöΓÇöΓÇö
+ΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇ
+öΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇö    
+    
+remote:        locations:       
+ 
+remote:          - commit: 20147
+09a9589898acf209c5c014ed60a0edf7
+5c0        
+remote:            path: 
+.env.example:70        
+remote:             
+remote:        (?) To push, 
+remove secret from commit(s) or 
+follow this URL to allow the 
+secret.        
+remote:        https://github.co
+m/nghiakci01/du-an-tot-nghiep-7a
+e-Sieu-Nhan-Gao/security/secret-
+scanning/unblock-secret/3BiQuvLb
+jV1yWIbaW9xc35gc12W        
+remote:             
+remote:             
+remote:       ΓÇöΓÇö Replicate 
+API Token ΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓ
+ÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇö
+ΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇöΓÇ
+öΓÇöΓÇö        
+remote:        locations:       
+ 
+remote:          - commit: 20147
+09a9589898acf209c5c014ed60a0edf7
+5c0        
+remote:            path: 
+.env.example:82        
+remote:             
+remote:        (?) To push, 
+remove secret from commit(s) or 
+follow this URL to allow the 
+secret.        
+remote:        https://github.co
+m/nghiakci01/du-an-tot-nghiep-7a
+e-Sieu-Nhan-Gao/security/secret-
+scanning/unblock-secret/3BiQux0P
+nfuEwPtNUBR2ily07q2        
+remote:             
+remote: 
+remote: 
+To https://github.com/nghiakci01
+/du-an-tot-nghiep-7ae-Sieu-Nhan-
+Gao.git
+ ! [remote rejected] 
+member/nghia -> member/nghia 
+(push declined due to 
+repository rule violations)
+error: failed to push some refs 
+to 'https://github.com/nghiakci0
+1/du-an-tot-nghiep-7ae-Sieu-Nhan
+-Gao.git'

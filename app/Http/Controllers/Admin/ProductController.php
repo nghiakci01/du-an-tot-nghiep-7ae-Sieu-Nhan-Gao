@@ -327,21 +327,18 @@ class ProductController extends Controller
         }
     }
 
-    public function bulkDelete(Request $request)
+    public function bulkDelete(\App\Http\Requests\Generated\ProductBulkDeleteRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:products,id'
-        ]);
+        $validated = $request->validated();
 
         try {
             DB::beginTransaction();
 
-            $ids = $request->ids;
-            
+            $ids = $validated['ids'];
+
             // Delete variants first
             ProductVariant::whereIn('product_id', $ids)->delete();
-            
+
             // Delete products
             Product::whereIn('id', $ids)->delete();
 
@@ -361,7 +358,7 @@ class ProductController extends Controller
 
             // Delete all variants first
             ProductVariant::query()->delete();
-            
+
             // Delete all products
             Product::query()->delete();
 
@@ -393,41 +390,5 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Search product variants for autocomplete (e.g., in Order Creation)
-     */
-    public function variantsSearch(Request $request)
-    {
-        $q = $request->input('q');
-        if (empty($q)) {
-            return response()->json([]);
-        }
 
-        /** @var \Illuminate\Database\Eloquent\Builder $queryBuilder */
-        $queryBuilder = ProductVariant::with(['product', 'sizeRelationship', 'colorRelationship']);
-        $variants = $queryBuilder->where('sku', 'like', "%{$q}%")
-            ->orWhereHas('product', function (\Illuminate\Database\Eloquent\Builder $q2) use ($q) {
-                $q2->where('name', 'like', "%{$q}%");
-            })
-            ->latest()
-            ->get();
-
-        $results = $variants->map(function($variant) {
-            return [
-                'id' => $variant->id,
-                'name' => $variant->product->name,
-                'sku' => $variant->sku,
-                'price' => (float)$variant->price,
-                'size' => $variant->size ?: ($variant->sizeRelationship ? $variant->sizeRelationship->name : ''),
-                'color' => $variant->color ?: ($variant->colorRelationship ? $variant->colorRelationship->name : ''),
-                'stock' => $variant->stock_quantity,
-                'product' => [
-                    'name' => $variant->product->name,
-                    'image' => $variant->product->image_url,
-                ]
-            ];
-        });
-
-        return response()->json($results);
-    }
 }

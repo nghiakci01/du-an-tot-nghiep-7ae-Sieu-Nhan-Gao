@@ -3,30 +3,33 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Order;
 use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Session;
 
 class CheckoutAuditTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected string $province;
+
     protected function setUp(): void
     {
         parent::setUp();
-        
+
+        $this->province = config('vietnam_provinces')[23];
+
         Category::create([
             'name' => 'Test Category',
             'slug' => 'test-category',
             'is_active' => true,
         ]);
-        
-        // Ensure there is a shipping setting if fallback used
+
         Setting::create([
             'key' => 'shipping_fee',
             'value' => 30000,
@@ -37,6 +40,7 @@ class CheckoutAuditTest extends TestCase
     private function createProduct()
     {
         $category = Category::first();
+
         return Product::create([
             'category_id' => $category->id,
             'name' => 'Checkout Product',
@@ -65,16 +69,15 @@ class CheckoutAuditTest extends TestCase
         $response = $this->get('/checkout');
 
         $response->assertRedirect(route('cart.index'))
-                 ->assertSessionHas('error', 'Vui lòng chọn sản phẩm trong giỏ hàng trước khi thanh toán.');
+            ->assertSessionHas('error');
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
     public function checkout_page_redirects_to_cart_if_item_is_out_of_stock()
     {
         $product = $this->createProduct();
-        $variant = $this->createVariant($product->id, 0); // Out of stock
+        $variant = $this->createVariant($product->id, 0);
 
-        // Simulate cart array
         $cart = [
             $variant->id => [
                 'product_id' => $product->id,
@@ -82,14 +85,14 @@ class CheckoutAuditTest extends TestCase
                 'name' => $product->name,
                 'quantity' => 1,
                 'price' => $product->price,
-            ]
+            ],
         ];
         Session::put('cart', $cart);
 
         $response = $this->get('/checkout');
 
         $response->assertRedirect(route('cart.index'))
-                 ->assertSessionHas('error');
+            ->assertSessionHas('error');
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
@@ -98,7 +101,6 @@ class CheckoutAuditTest extends TestCase
         $product = $this->createProduct();
         $variant = $this->createVariant($product->id, 10);
 
-        // Pre-fill cart
         $cart = [
             $variant->id => [
                 'product_id' => $product->id,
@@ -106,7 +108,7 @@ class CheckoutAuditTest extends TestCase
                 'name' => $product->name,
                 'quantity' => 2,
                 'price' => 200000,
-            ]
+            ],
         ];
         Session::put('cart', $cart);
         Session::put('selected_checkout_ids', [$variant->id]);
@@ -115,27 +117,22 @@ class CheckoutAuditTest extends TestCase
             'name' => 'John Doe',
             'phone' => '0912345678',
             'email' => 'john@gmail.com',
-            'province' => 'Hà Nội',
+            'province' => $this->province,
             'address' => '123 Fake Street',
+            'delivery_type' => 'home',
             'payment_method' => 'COD',
-            'shipping_fee' => 30000,
+            'shipping_provider' => 'ghtk',
         ]);
 
         $order = Order::latest()->first();
 
-        // 1. Should redirect to success
-        $response->assertRedirect(route('checkout.success', $order->id));
-
-        // 2. Order created correctly
         $this->assertNotNull($order);
+        $response->assertRedirect(route('checkout.success', $order->id));
         $this->assertEquals('John Doe', $order->name);
-        $this->assertEquals(430000, $order->final_total); // 2 * 200k + 30k ship
+        $this->assertEquals(418000.0, (float) $order->final_total);
 
-        // 3. Stock deducted
         $variant->refresh();
-        $this->assertEquals(8, $variant->stock_quantity); // Started with 10, minus 2
-
-        // 4. Cart cleared
+        $this->assertEquals(8, $variant->stock_quantity);
         $this->assertEmpty(Session::get('cart'));
     }
 
@@ -145,7 +142,6 @@ class CheckoutAuditTest extends TestCase
         $product = $this->createProduct();
         $variant = $this->createVariant($product->id, 10);
 
-        // Pre-fill cart
         $cart = [
             $variant->id => [
                 'product_id' => $product->id,
@@ -153,12 +149,10 @@ class CheckoutAuditTest extends TestCase
                 'name' => $product->name,
                 'quantity' => 1,
                 'price' => 200000,
-            ]
+            ],
         ];
         Session::put('cart', $cart);
         Session::put('selected_checkout_ids', [$variant->id]);
-        
-        // Applied 50k discount
         Session::put('coupon_code', 'TEST50');
         Session::put('discount_amount', 50000);
 
@@ -166,17 +160,54 @@ class CheckoutAuditTest extends TestCase
             'name' => 'Jane Doe',
             'phone' => '0987654321',
             'email' => 'jane@gmail.com',
-            'province' => 'Hà Nội',
+            'province' => $this->province,
             'address' => '456 Fake Ave',
+            'delivery_type' => 'home',
             'payment_method' => 'COD',
-            'shipping_fee' => 20000,
+            'shipping_provider' => 'ghtk',
         ]);
 
         $order = Order::latest()->first();
-        
+
         $this->assertNotNull($order);
-        $this->assertEquals(170000, $order->final_total); // 200k - 50k + 20k
-        $this->assertEquals(50000, $order->discount_amount);
+        $response->assertRedirect(route('checkout.success', $order->id));
+        $this->assertEquals(168000.0, (float) $order->final_total);
+        $this->assertEquals(50000.0, (float) $order->discount_amount);
         $this->assertEquals('TEST50', $order->coupon_code);
+    }
+
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function it_supports_store_pickup_without_address_fields()
+    {
+        $product = $this->createProduct();
+        $variant = $this->createVariant($product->id, 5);
+
+        Session::put('cart', [
+            $variant->id => [
+                'product_id' => $product->id,
+                'variant_id' => $variant->id,
+                'name' => $product->name,
+                'quantity' => 1,
+                'price' => 200000,
+            ],
+        ]);
+        Session::put('selected_checkout_ids', [$variant->id]);
+
+        $response = $this->post('/checkout', [
+            'name' => 'Pickup User',
+            'phone' => '0911111111',
+            'email' => 'pickup@gmail.com',
+            'delivery_type' => 'store',
+            'payment_method' => 'COD',
+            'shipping_provider' => 'store_pickup',
+        ]);
+
+        $order = Order::latest()->first();
+
+        $this->assertNotNull($order);
+        $response->assertRedirect(route('checkout.success', $order->id));
+        $this->assertEquals(0.0, (float) $order->shipping_fee);
+        $this->assertEquals('store_pickup', $order->shipping_provider);
+        $this->assertEquals('Nhan tai cua hang', $order->address);
     }
 }

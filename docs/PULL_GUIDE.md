@@ -1,57 +1,126 @@
-# Hướng dẫn đồng bộ dự án (Sau khi Pull Code)
+# Huong dan chay du an sau khi pull code
 
-Tài liệu này hướng dẫn các bước cần thiết để khởi chạy dự án sau khi bạn pull mã nguồn mới nhất từ Git về.
+Tai lieu nay danh cho thanh vien moi pull code ve may local va can chay du an nhanh, dung, it loi nhat.
 
-## 1. Các bước cơ bản (Khuyên dùng)
+## Yeu cau
 
-Dự án đã tích hợp sẵn lệnh setup tự động trong `composer.json`. Bạn chỉ cần chạy một lệnh duy nhất:
+- PHP 8.2+
+- Composer
+- Node.js + npm
+- MySQL hoac MariaDB
+- Laragon hoac moi truong local tuong duong
+
+## Buoc 1: Cai dat dependencies
 
 ```bash
-composer setup
+composer install
+npm install
 ```
 
-**Lệnh này sẽ tự động thực hiện:**
-- Cài đặt các thư viện PHP (`composer install`).
-- Tạo file `.env` từ `.env.example` (nếu chưa có).
-- Khởi tạo Key ứng dụng (`php artisan key:generate`).
-- Chạy Migrations (`php artisan migrate --force`).
-- Cài đặt các thư viện Javascript (`npm install`).
-- Build assets (`npm run build`).
+## Buoc 2: Tao file moi truong
 
----
-
-## 2. Các bước bổ sung (Nếu cần)
-
-### Seeding dữ liệu (Nếu cần dữ liệu mẫu mới)
-Nếu có các bảng dữ liệu mới cần seed (như danh mục, sản phẩm mẫu), hãy chạy:
 ```bash
-php artisan db:seed
+copy .env.example .env
+php artisan key:generate
 ```
 
-### Tạo liên kết Storage (Khi bị lỗi không hiển thị được ảnh)
+Can kiem tra lai cac bien sau trong `.env`:
+
+- `APP_URL`
+- `DB_CONNECTION`
+- `DB_HOST`
+- `DB_PORT`
+- `DB_DATABASE`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `MAIL_*`
+- `VNPAY_*`
+- `GOOGLE_*`
+- `FACEBOOK_*`
+- `GEMINI_API_KEY`
+- `FEATURE_WALLET_ENABLED`
+- `FEATURE_STOCK_REPORT_ENABLED`
+- `FEATURE_DEV_PAYMENT_ROUTES`
+- `GHTK_*`
+- `SHIPPING_PICKUP_*`
+
+## Buoc 3: Tao database va nap du lieu mau
+
+Tao database rong truoc trong MySQL, sau do chay:
+
 ```bash
+php artisan migrate:fresh --seed
 php artisan storage:link
 ```
 
-### Dọn dẹp Cache (Nếu code không cập nhật)
+Tai khoan admin seed san:
+
+- Email: `admin@gmail.com`
+- Mat khau: `password`
+
+## Buoc 4: Build frontend
+
+Neu chi can chay nhanh:
+
 ```bash
-php artisan optimize:clear
+npm run build
 ```
 
----
+Neu can sua giao dien trong qua trinh phat trien:
 
-## 3. Chạy môi trường Local
+```bash
+npm run dev
+```
 
-### Khởi động Server & Vite (Cùng lúc)
+## Buoc 5: Chay local
+
 ```bash
 composer dev
 ```
-*Lệnh này sẽ chạy song hành: artisan serve, queue listener, và npm run dev.*
 
----
+Lenh nay se chay cung luc:
 
-## 4. Troubleshooting (Lỗi thường gặp)
+- `php artisan serve`
+- `php artisan queue:listen --tries=1`
+- `php artisan pail --timeout=0`
+- `npm run dev`
 
-1. **Lỗi database connection:** Kiểm tra lại thông tin `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` trong file `.env`.
-2. **Lỗi ảnh không hiển thị:** Đảm bảo đã chạy `php artisan storage:link`.
-3. **Lỗi OpCache (Dành cho Laragon):** Nếu sửa code nhưng web không đổi, hãy sử dụng script dọn dẹp cache có sẵn trong project.
+## Buoc 6: Kiem tra nhanh sau khi chay
+
+1. Mo trang chu.
+2. Dang nhap admin bang tai khoan seed san.
+3. Vao `/admin/dashboard`.
+4. Mo trang san pham, them vao gio hang.
+5. Thu checkout COD hoac chuyen khoan.
+6. Neu can test ship that, cau hinh `GHTK_TOKEN` va bo `GHTK_ENABLED=true`.
+
+## Lenh huu ich
+
+```bash
+php artisan optimize:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan test
+```
+
+## Loi thuong gap
+
+1. Loi ket noi database:
+Cap nhat lai thong tin `DB_*` trong `.env`, sau do chay `php artisan config:clear`.
+
+2. Anh khong hien:
+Chay `php artisan storage:link`.
+
+3. Giao dien khong cap nhat:
+Chay `npm run dev` hoac `npm run build`, sau do `php artisan optimize:clear`.
+
+4. Loi callback thanh toan hoac dang nhap xa hoi:
+Kiem tra `APP_URL` va cac bien `VNPAY_*`, `GOOGLE_*`, `FACEBOOK_*`.
+
+5. Chatbot khong phan hoi:
+Kiem tra `GEMINI_API_KEY` va cau hinh chatbot trong admin.
+
+6. GHTK khong tra phi ship that:
+Kiem tra `GHTK_TOKEN`, `GHTK_API_URL`, `SHIPPING_PICKUP_PROVINCE`, `SHIPPING_PICKUP_DISTRICT`.
+Neu thieu mot trong cac gia tri nay, he thong se tu fallback ve bang phi noi bo.

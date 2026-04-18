@@ -13,6 +13,16 @@ use Illuminate\Support\Facades\DB;
 
 class ReportService
 {
+    protected function monthExpression(string $column = 'created_at'): string
+    {
+        $driver = DB::connection()->getDriverName();
+
+        return match ($driver) {
+            'sqlite' => "CAST(strftime('%m', {$column}) AS INTEGER)",
+            default => "MONTH({$column})",
+        };
+    }
+
     /**
      * Get overview statistics for a date range
      */
@@ -127,5 +137,65 @@ class ReportService
             ->orderByDesc('total_sold')
             ->limit($limit)
             ->get();
+    }
+
+    /**
+     * Get monthly comparison data for the first 6 months of the year
+     */
+    public function getHalfYearComparisonData($year = null)
+    {
+        $year = $year ?: now()->year;
+        $startDate = Carbon::create($year, 1, 1)->startOfDay();
+        $endDate = Carbon::create($year, 6, 30)->endOfDay();
+        $orderMonthExpression = $this->monthExpression('created_at');
+        $orderItemsMonthExpression = $this->monthExpression('orders.created_at');
+
+        // Initialize arrays for all 6 months
+        $months = [];
+        $quantities = [];
+        $revenues = [];
+
+        for ($m = 1; $m <= 6; $m++) {
+            $monthDate = Carbon::create($year, $m, 1);
+            $months[] = 'Tháng ' . $m;
+            $quantities[$m] = 0;
+            $revenues[$m] = 0;
+        }
+
+        // Get Revenue by month
+        $revenueData = Order::where('status', Order::STATUS_COMPLETED)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw("{$orderMonthExpression} as month"),
+                DB::raw('SUM(final_total) as total')
+            )
+            ->groupBy('month')
+            ->get();
+
+        foreach ($revenueData as $data) {
+            $revenues[$data->month] = (float)$data->total;
+        }
+
+        // Get Quantity by month
+        $quantityData = DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.status', Order::STATUS_COMPLETED)
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw("{$orderItemsMonthExpression} as month"),
+                DB::raw('SUM(order_items.quantity) as total_qty')
+            )
+            ->groupBy('month')
+            ->get();
+
+        foreach ($quantityData as $data) {
+            $quantities[$data->month] = (int)$data->total_qty;
+        }
+
+        return [
+            'labels' => $months,
+            'quantities' => array_values($quantities),
+            'revenues' => array_values($revenues),
+        ];
     }
 }

@@ -16,7 +16,11 @@ class AdminOnlyMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->isAdmin()) {
+        if (!Auth::check()) {
+            return redirect()->guest('/login');
+        }
+
+        if (Auth::user()->isAdmin()) {
             return $next($request);
         }
 

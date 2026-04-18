@@ -10,9 +10,6 @@
                     <h5>Cấu hình chung</h5>
                 </div>
                 <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
 
                     <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf

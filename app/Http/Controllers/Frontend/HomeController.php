@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
@@ -31,6 +32,14 @@ class HomeController extends Controller
 
         $midBanner = Cache::remember('home_midBanner', 3600, function() {
             return Banner::where('position', 'home_middle')
+                ->where('is_active', true)
+                ->orderBy('sort_order', 'asc')
+                ->first();
+        });
+
+
+        $bannerBottom = Cache::remember('home_bannerBottom', 3600, function() {
+            return Banner::where('position', 'banner_bottom')
                 ->where('is_active', true)
                 ->orderBy('sort_order', 'asc')
                 ->first();
@@ -66,7 +75,7 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
-        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders', 'midBanner', 'flashSaleProducts'));
+        return view('frontend.home', compact('categories', 'featuredProducts', 'newProducts', 'topWishlisted', 'sliders', 'midBanner', 'flashSaleProducts', 'bannerBottom'));
     }
 
     public function about()
@@ -82,25 +91,33 @@ class HomeController extends Controller
     public function news()
     {
         $posts = \App\Models\Post::where('is_active', true)
+            ->with('coupon')
             ->latest()
             ->paginate(9);
 
         return view('frontend.news', compact('posts'));
     }
+
     public function newsDetail($slug)
     {
         $post = \App\Models\Post::where('slug', $slug)
             ->where('is_active', true)
+            ->with('coupon')
             ->firstOrFail();
 
-        // Lấy các bài viết liên quan (cùng danh mục)
+        $hasClaimed = false;
+        if ($post->coupon && Auth::check()) {
+            $hasClaimed = $post->coupon->isClaimedBy(Auth::user());
+        }
+
         $relatedPosts = \App\Models\Post::where('post_category_id', $post->post_category_id)
             ->where('id', '!=', $post->id)
             ->where('is_active', true)
+            ->with('coupon')
             ->latest()
             ->take(3)
             ->get();
 
-        return view('frontend.news_detail', compact('post', 'relatedPosts'));
+        return view('frontend.news_detail', compact('post', 'relatedPosts', 'hasClaimed'));
     }
 }

@@ -16,11 +16,11 @@ class UpdateProductRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'price' => 'nullable|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0',
+            'price' => 'nullable|numeric|min:0|max:99999999',
+            'sale_price' => 'nullable|numeric|min:0|max:99999999',
 
-            'short_description' => 'nullable|string|max:2000',
-            'description' => 'nullable|string|max:10000',
+            'short_description' => 'nullable|string|max:500',
+            'description' => 'nullable|string|max:5000',
             'image' => [
                 'nullable',
                 'image',
@@ -100,11 +100,12 @@ class UpdateProductRequest extends FormRequest
             'variants.*.id' => 'nullable|exists:product_variants,id',
             'variants.*.size_id' => 'required|exists:sizes,id',
             'variants.*.color_id' => 'required|exists:colors,id',
-            'variants.*.price' => 'nullable|numeric|min:0',
+            'variants.*.price' => 'nullable|numeric|min:0|max:99999999',
             'variants.*.sale_price' => [
                 'nullable',
                 'numeric',
                 'min:0',
+                'max:99999999',
                 function ($attribute, $value, $fail) {
                     $index = explode('.', $attribute)[1];
                     $price = request()->input("variants.{$index}.price");

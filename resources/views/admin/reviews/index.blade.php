@@ -26,18 +26,6 @@
                 <h5>Danh sách Đánh giá</h5>
             </div>
             <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
 
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered text-center">
@@ -49,7 +37,7 @@
                                 <th>Đánh giá</th>
                                 <th>Nội dung</th>
                                 <th>Ngày tạo</th>
-                                <th>Hạnh động</th>
+                                <th class="sticky-action-column">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,7 +70,7 @@
                                     {{ \Illuminate\Support\Str::limit($review->comment, 100) }}
                                 </td>
                                 <td>{{ $review->created_at->format('d/m/Y H:i') }}</td>
-                                <td>
+                                <td class="sticky-action-column">
                                     <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa đánh giá này?');">
                                         @csrf
                                         @method('DELETE')

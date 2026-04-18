@@ -38,13 +38,12 @@
             clip: rect(0, 0, 0, 0) !important;
             white-space: nowrap !important;
             border: 0 !important;
-        }
+            }
         /* Responsive Banner Styles */
         .banner-wide-slider .single_slider {
             background-size: cover !important;
             background-position: center center !important;
             background-repeat: no-repeat !important;
-            border-radius: 8px;
             overflow: hidden;
             position: relative;
             width: 100%;
@@ -87,6 +86,7 @@
         }
     </style>
     <!--slider area end-->
+
 
     <!--flash sale section start-->
     @if(isset($flashSaleProducts) && $flashSaleProducts->count() > 0)
@@ -387,9 +387,6 @@
                                                     <span>{{ __('messages.sale') }}</span>
                                                 </div>
                                             @endif
-                                            <div class="label_product">
-                                                <span>Yêu Thích</span>
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="product_content">
@@ -457,6 +454,27 @@
         }
     </style>
     <!--Middle Banner area end-->
+    @endif
+
+    @if($bannerBottom && $bannerBottom->image)
+    <!--Bottom Banner area start-->
+    <section class="bottom_banner_section mb-30 mt-10">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="banner_thumb">
+                        @if($bannerBottom->link)
+                            <a href="{{ $bannerBottom->link }}">
+                                <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title ?? 'Bottom Banner' }}" style="width: 100%; height: auto;">
+                            </a>
+                        @else
+                            <img src="{{ asset('storage/' . $bannerBottom->image) }}" alt="{{ $bannerBottom->title ?? 'Bottom Banner' }}" style="width: 100%; height: auto;">
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     @endif
 
     <!-- modal area start-->
@@ -605,5 +623,49 @@
     </div>
     <!-- modal area end-->
     <!-- modal area end-->
+
+    @auth
+        @php
+            $unreviewedProducts = App\Models\OrderItem::whereHas('order', function($q) {
+                    $q->where('user_id', Auth::id())->where('status', App\Models\Order::STATUS_COMPLETED);
+                })
+                ->whereDoesntHave('product.reviews', function($q) {
+                    $q->where('user_id', Auth::id());
+                })
+                ->with('product')
+                ->get()
+                ->unique('product_id');
+        @endphp
+
+        @if($unreviewedProducts->count() > 0)
+            <div id="review-reminder" style="position: fixed; bottom: 100px; right: 20px; z-index: 9999; max-width: 280px; transition: transform 0.3s ease;">
+                <div class="alert alert-info alert-dismissible fade show shadow-lg border-0" style="border-left: 4px solid #ff6a28 !important; background: #ffffff; color: #333; padding: 15px 35px 15px 15px; border-radius: 10px;">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="font-size: 10px; margin-top: 5px;"></button>
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="background: #ff6a28; color: white; border-radius: 12px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 3px 10px rgba(255,106,40,0.3);">
+                            <i class="fa fa-star" style="font-size: 18px;"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1" style="font-size: 13px; font-weight: 700; color: #222; line-height: 1.2;">Bạn có sản phẩm chưa đánh giá!</p>
+                            <p class="mb-2" style="font-size: 12px; color: #666; line-height: 1.3;">Đánh giá ngay cho shop để nhận được nhiều ưu đãi cực hot nhé!</p>
+                            <a href="{{ route('account.index', '#orders') }}" class="btn btn-sm text-white" style="background: #ff6a28; font-size: 11px; font-weight: 600; border-radius: 5px; padding: 4px 12px; display: inline-block;">Đánh giá ngay</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <style>
+                #review-reminder:hover {
+                    transform: translateY(-5px);
+                }
+                @media (max-width: 768px) {
+                    #review-reminder {
+                        bottom: 80px;
+                        right: 10px;
+                        max-width: 240px;
+                    }
+                }
+            </style>
+        @endif
+    @endauth
 
 @endsection

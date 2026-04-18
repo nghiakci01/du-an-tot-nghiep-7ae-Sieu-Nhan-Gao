@@ -150,19 +150,20 @@
               <div class="dropdown-body">
                 <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
 
+                  @auth
                   {{-- Avatar + info --}}
                   <div class="d-flex align-items-center mb-2">
                     <div class="flex-shrink-0">
-                      @if(Auth::check() && Auth::user()->avatar)
+                      @if(Auth::user()->avatar)
                           <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="user-image" class="user-avtar wid-45 rounded-circle" style="object-fit:cover" />
                       @else
-                          <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::check() ? Auth::user()->name : 'Admin') }}&background=random" alt="user-image" class="user-avtar wid-45 rounded-circle" />
+                          <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=random" alt="user-image" class="user-avtar wid-45 rounded-circle" />
                       @endif
                     </div>
                     <div class="flex-grow-1 ms-3">
-                      <h6 class="mb-0">{{ Auth::check() ? Auth::user()->name : 'Admin' }}</h6>
-                      <small class="text-muted">{{ ucfirst(Auth::check() ? Auth::user()->role : 'admin') }}</small><br>
-                      <small><a href="mailto:{{ Auth::check() ? Auth::user()->email : '#' }}" class="text-muted">{{ Auth::check() ? Auth::user()->email : 'admin@example.com' }}</a></small>
+                      <h6 class="mb-0">{{ Auth::user()->name }}</h6>
+                      <small class="text-muted">{{ ucfirst(Auth::user()->role) }}</small><br>
+                      <small><a href="mailto:{{ Auth::user()->email }}" class="text-muted">{{ Auth::user()->email }}</a></small>
                     </div>
                   </div>
 
@@ -219,6 +220,14 @@
                       </button>
                     </form>
                   </div>
+                  @else
+                  <div class="text-center py-3">
+                    <p class="text-muted">Bạn đang truy cập với tư cách Khách</p>
+                    <a href="{{ route('login') }}" class="btn btn-primary w-100">
+                        <i class="ti ti-login me-1"></i> Đăng nhập
+                    </a>
+                  </div>
+                  @endauth
 
                 </div>
               </div>

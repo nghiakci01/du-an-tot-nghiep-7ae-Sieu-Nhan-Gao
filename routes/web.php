@@ -30,13 +30,7 @@ Route::get('/cart/count', [App\Http\Controllers\Frontend\CartController::class, 
 Route::get('/cart/validate', [App\Http\Controllers\Frontend\CheckoutController::class, 'validateCart'])->name('cart.validate');
 Route::post('/api/checkout/check-inventory', [App\Http\Controllers\Api\InventoryCheckController::class, 'checkInventory'])->name('api.checkout.checkInventory');
 
-Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'store'])->name('checkout.store');
-Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
-Route::post('/checkout/remove-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeCoupon'])->name('checkout.removeCoupon');
-Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
-Route::post('/checkout/order/{id}/confirm-transfer', [App\Http\Controllers\Frontend\CheckoutController::class, 'confirmTransfer'])->name('checkout.confirm_transfer');
-Route::post('/checkout/order/{id}/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancelOrder'])->name('checkout.cancel_order');
+// Checkout routes moved to auth group
 
 // VNPay Payment Routes
 Route::get('/payment/vnpay/return', [App\Http\Controllers\Frontend\PaymentController::class, 'vnpayReturn'])->name('payment.vnpay.return');
@@ -48,7 +42,7 @@ Route::get('/payment/vnpay/retry/{id}', [App\Http\Controllers\Frontend\PaymentCo
 // Guest Order Tracking Routes
 Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'index'])->name('order-tracking.index');
 Route::post('/order-tracking/search', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'search'])->name('order-tracking.search');
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 // Fallback GET /logout → redirect về trang chủ (tránh lỗi 405)
 Route::get('/logout', function () {
@@ -65,11 +59,12 @@ Route::get('/logout', function () {
 Route::get('auth/{provider}', [App\Http\Controllers\Auth\SocialLoginController::class, 'redirectToProvider'])->name('social.login');
 Route::get('auth/{provider}/callback', [App\Http\Controllers\Auth\SocialLoginController::class, 'handleProviderCallback'])->name('social.callback');
 
-Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])->name('account.index');
+
 Route::get('/view-order/{id}', [App\Http\Controllers\Frontend\GuestOrderController::class, 'show'])->name('guest.order.show');
 
 Route::group(['middleware' => 'auth'], function () {
-    Route::get('/my-account/orders', function() {
+    Route::get('/my-account', [App\Http\Controllers\Frontend\AccountController::class, 'index'])->name('account.index');
+    Route::get('/my-account/orders', function () {
         return redirect()->route('account.index', ['#orders']);
     })->name('account.orders');
     Route::get('/my-account/orders/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'showOrder'])->name('account.orders.show');
@@ -78,15 +73,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/my-account/orders/{id}/return', [App\Http\Controllers\Frontend\AccountController::class, 'returnOrderForm'])->name('account.orders.return_form');
     Route::post('/my-account/orders/{id}/return', [App\Http\Controllers\Frontend\AccountController::class, 'submitReturnRequest'])->name('account.orders.return_submit');
     Route::post('/my-account/orders/{id}/return/shipping', [App\Http\Controllers\Frontend\AccountController::class, 'submitShipping'])->name('account.orders.return.shipping');
+    Route::post('/my-account/orders/{id}/return/update-method', [App\Http\Controllers\Frontend\AccountController::class, 'updateReturnMethod'])->name('account.orders.return.update_method');
 
     // User Notifications
     Route::get('/notifications', [App\Http\Controllers\Frontend\NotificationController::class, 'index'])->name('notifications.list');
     Route::post('/notifications/{id}/mark-as-read', [App\Http\Controllers\Frontend\NotificationController::class, 'markAsRead'])->name('notifications.mark_as_read');
     Route::post('/notifications/mark-all-read', [App\Http\Controllers\Frontend\NotificationController::class, 'markAllAsRead'])->name('notifications.mark_all_read');
 
-    // User Bank Accounts
-    Route::post('/my-account/bank-accounts', [App\Http\Controllers\Frontend\AccountController::class, 'storeBankAccount'])->name('account.bank-accounts.store');
-    Route::delete('/my-account/bank-accounts/{id}', [App\Http\Controllers\Frontend\AccountController::class, 'destroyBankAccount'])->name('account.bank-accounts.destroy');
 
     // Wallet (Disabled per user request)
     // Route::post('/my-account/wallet/topup', [App\Http\Controllers\Frontend\WalletController::class, 'requestTopup'])->name('wallet.topup.request');
@@ -103,6 +96,18 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('/my-account/addresses/{id}', [App\Http\Controllers\Frontend\AddressController::class, 'update'])->name('account.addresses.update');
     Route::delete('/my-account/addresses/{id}', [App\Http\Controllers\Frontend\AddressController::class, 'destroy'])->name('account.addresses.destroy');
     Route::patch('/my-account/addresses/{id}/default', [App\Http\Controllers\Frontend\AddressController::class, 'setDefault'])->name('account.addresses.default');
+
+    // Voucher Claim
+    Route::post('/voucher/claim', [App\Http\Controllers\Frontend\VoucherClaimController::class, 'claim'])->name('voucher.claim');
+
+    // Checkout Routes (Authenticated Only)
+    Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [App\Http\Controllers\Frontend\CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('/checkout/apply-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'applyCoupon'])->name('checkout.applyCoupon');
+    Route::post('/checkout/remove-coupon', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeCoupon'])->name('checkout.removeCoupon');
+    Route::get('/checkout/success/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'success'])->name('checkout.success');
+    Route::post('/checkout/remove-item/{id}', [App\Http\Controllers\Frontend\CheckoutController::class, 'removeItem'])->name('checkout.remove-item');
+    Route::post('/checkout/order/{id}/cancel', [App\Http\Controllers\Frontend\CheckoutController::class, 'cancelOrder'])->name('checkout.cancel_order');
 });
 
 
@@ -120,7 +125,7 @@ Route::get('/api/vn-address/communes/{provinceCode}', [App\Http\Controllers\Api\
 
 
 // Admin & Staff Routes
-Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'admin']], function () {
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']], function () {
 
     // Lock Screen Routes (No admin.lock)
     Route::get('/lock', [\App\Http\Controllers\Admin\LockScreenController::class, 'lock'])->name('lock');
@@ -147,20 +152,47 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'a
         // Admin & Staff Routes
         Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
         Route::get('orders/{order}/print', [App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
-        Route::get('orders/customers/search', [App\Http\Controllers\Admin\OrderController::class, 'customersSearch'])->name('orders.customers.search');
+        Route::post('orders/{order}/push-to-ghn', [App\Http\Controllers\Admin\OrderController::class, 'pushToGhn'])->name('orders.push-to-ghn');
+        Route::get('orders/{order}/push-to-ghn', function($order) {
+            return redirect()->route('admin.orders.show', $order);
+        });
         Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
-        Route::post('orders/{order}/confirm-payment', [App\Http\Controllers\Admin\OrderController::class, 'confirmPayment'])->name('orders.confirm-payment');
         Route::post('orders/{order}/query-payment', [App\Http\Controllers\Admin\OrderController::class, 'queryPayment'])->name('orders.query-payment');
+        Route::get('orders/{order}/query-payment', function($order) {
+            return redirect()->route('admin.orders.show', $order);
+        });
         Route::post('orders/{order}/refund-payment', [App\Http\Controllers\Admin\OrderController::class, 'refundPayment'])->name('orders.refund-payment');
+        Route::get('orders/{order}/refund-payment', function($order) {
+            return redirect()->route('admin.orders.show', $order);
+        });
         Route::any('orders-trigger-auto-cancel', [App\Http\Controllers\Admin\OrderController::class, 'triggerAutoCancel'])->name('orders.trigger-auto-cancel');
 
         // Order Returns Management
         Route::get('returns', [App\Http\Controllers\Admin\OrderReturnController::class, 'index'])->name('returns.index');
         Route::post('returns/{id}/approve', [App\Http\Controllers\Admin\OrderReturnController::class, 'approve'])->name('returns.approve');
+        Route::get('returns/{id}/approve', function() { return redirect()->route('admin.returns.index'); });
         Route::post('returns/{id}/shipping', [App\Http\Controllers\Admin\OrderReturnController::class, 'markAsShipping'])->name('returns.shipping');
+        Route::get('returns/{id}/shipping', function() { return redirect()->route('admin.returns.index'); });
         Route::post('returns/{id}/received', [App\Http\Controllers\Admin\OrderReturnController::class, 'markAsReceived'])->name('returns.received');
+        Route::get('returns/{id}/received', function() { return redirect()->route('admin.returns.index'); });
         Route::post('returns/{id}/reject', [App\Http\Controllers\Admin\OrderReturnController::class, 'reject'])->name('returns.reject');
-        Route::post('returns/{id}/complete', [App\Http\Controllers\Admin\OrderReturnController::class, 'completeRefund'])->name('returns.complete');
+        Route::get('returns/{id}/reject', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/complete', [App\Http\Controllers\Admin\OrderReturnController::class, 'complete'])->name('returns.complete');
+        Route::get('returns/{id}/complete', function() { return redirect()->route('admin.returns.index'); });
+
+        // Order Returns Management
+        Route::get('returns', [App\Http\Controllers\Admin\OrderReturnController::class, 'index'])->name('returns.index');
+        Route::post('returns/{id}/approve', [App\Http\Controllers\Admin\OrderReturnController::class, 'approve'])->name('returns.approve');
+        Route::get('returns/{id}/approve', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/shipping', [App\Http\Controllers\Admin\OrderReturnController::class, 'markAsShipping'])->name('returns.shipping');
+        Route::get('returns/{id}/shipping', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/received', [App\Http\Controllers\Admin\OrderReturnController::class, 'markAsReceived'])->name('returns.received');
+        Route::get('returns/{id}/received', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/reject', [App\Http\Controllers\Admin\OrderReturnController::class, 'reject'])->name('returns.reject');
+        Route::get('returns/{id}/reject', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/complete', [App\Http\Controllers\Admin\OrderReturnController::class, 'complete'])->name('returns.complete');
+        Route::get('returns/{id}/complete', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/generate-ghn', [App\Http\Controllers\Admin\OrderReturnController::class, 'generateGhnCode'])->name('returns.generate_ghn');
 
         Route::delete('products/bulk-delete', [App\Http\Controllers\Admin\ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
         Route::delete('products/delete-all', [App\Http\Controllers\Admin\ProductController::class, 'deleteAll'])->name('products.delete-all');
@@ -172,7 +204,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'a
         Route::resource('colors', App\Http\Controllers\Admin\ColorController::class);
 
         // General APIs for Admin Panel
-        Route::get('api/variants/search', [App\Http\Controllers\Admin\ProductController::class, 'variantsSearch'])->name('api.variants.search');
 
         // Admin Only Routes
         Route::middleware(['admin.only'])->group(function () {
@@ -181,16 +212,15 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'a
             Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
 
             // Inventory Management
-            Route::resource('suppliers', App\Http\Controllers\Admin\SupplierController::class);
-            Route::get('stock', function () {
-                return 'Stock Report Page (Coming Soon)';
-            })->name('stock.index');
+            if (config('features.stock_report')) {
+                Route::get('stock', function () {
+                    return 'Stock Report Page (Coming Soon)';
+                })->name('stock.index');
+            }
 
             Route::resource('coupons', App\Http\Controllers\Admin\CouponController::class);
 
 
-            // Cài đặt ngân hàng thanh toán (QR Bank Settings)
-            Route::resource('bank-settings', App\Http\Controllers\Admin\BankSettingController::class);
 
             // Wallet Management (Disabled per user request)
             // Route::get('wallet', [App\Http\Controllers\Admin\WalletController::class, 'index'])->name('wallet.index');
@@ -247,17 +277,13 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'a
         Route::get('/reports/orders/excel', [App\Http\Controllers\Admin\ReportController::class, 'exportOrdersExcel'])->name('reports.orders.excel');
         Route::get('/reports/revenue/pdf', [App\Http\Controllers\Admin\ReportController::class, 'exportRevenuePDF'])->name('reports.revenue.pdf');
 
-        // Audit Logs (Admin only)
-        Route::middleware(['admin.only'])->group(function () {
-
-            // Notifications
-            Route::get('notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
-            Route::post('notifications/mark-all-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
-            Route::get('notifications/{id}/mark-as-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
-            Route::get('notifications/unread-count', [App\Http\Controllers\Admin\NotificationController::class, 'unreadCount'])->name('notifications.unread_count');
-        });
+        // Notifications
+        Route::get('notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('notifications/mark-all-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
+        Route::get('notifications/{id}/mark-as-read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+        Route::get('notifications/unread-count', [App\Http\Controllers\Admin\NotificationController::class, 'unreadCount'])->name('notifications.unread_count');
     });
-});
+}); // End Admin Middleware Group
 
 
 
@@ -270,6 +296,7 @@ Route::get('lang/{locale}', function ($locale) {
 })->name('lang.switch');
 
 // ============ VNPAY TEST ROUTES (Development Only) ============
+if (config('features.dev_payment_routes')) {
 Route::name('test.payment.')->prefix('test-payment')->middleware('web')->group(function () {
     // Test: Create order and generate payment URL
     Route::get('/create-order', function () {
@@ -361,5 +388,4 @@ Route::name('test.payment.')->prefix('test-payment')->middleware('web')->group(f
         ]);
     })->name('check-order');
 });
-
-
+}

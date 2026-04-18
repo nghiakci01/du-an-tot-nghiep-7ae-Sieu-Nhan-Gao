@@ -25,12 +25,14 @@ class Order extends Model
         'shipping_fee',
         'shipping_provider',
         'shipping_service_name',
+        'tracking_code',
         'final_total',
         'payment_method',
         'payment_status',
         'transaction_id',
         'shipping_address',
         'note',
+        'reminder_step',
     ];
 
     const STATUS_PENDING = 'pending';
@@ -72,9 +74,9 @@ class Order extends Model
 
     public function getSubtotalAttribute()
     {
-        return $this->items->sum(function ($item) {
-            return $item->quantity * $item->price;
-        });
+        return $this->items->reduce(function ($carry, $item) {
+            return $carry + ($item->quantity * $item->price);
+        }, 0);
     }
 
     public function getStatusTextAttribute()
@@ -86,8 +88,8 @@ class Order extends Model
             self::STATUS_COMPLETED => 'Hoàn thành',
             self::STATUS_CANCELLED => 'Đã hủy',
             self::STATUS_FAILED => 'Thất bại',
-            self::STATUS_RETURNED => 'Đã trả hàng',
-            self::STATUS_PARTIALLY_RETURNED => 'Trả hàng một phần',
+            self::STATUS_RETURNED => 'Khách hoàn hàng',
+            self::STATUS_PARTIALLY_RETURNED => 'Hoàn hàng một phần',
             default => 'Không xác định',
         };
     }
@@ -111,7 +113,7 @@ class Order extends Model
     {
         $transitions = match ($this->status) {
             self::STATUS_PENDING => [self::STATUS_CONFIRMED, self::STATUS_CANCELLED],
-            self::STATUS_CONFIRMED => [self::STATUS_SHIPPED, self::STATUS_CANCELLED],
+            self::STATUS_CONFIRMED => [self::STATUS_SHIPPED, self::STATUS_COMPLETED, self::STATUS_CANCELLED],
             self::STATUS_SHIPPED => [self::STATUS_COMPLETED, self::STATUS_FAILED],
             self::STATUS_COMPLETED => [self::STATUS_RETURNED, self::STATUS_PARTIALLY_RETURNED],
             self::STATUS_CANCELLED => [],

@@ -33,7 +33,7 @@ class SetProductPricing extends Command
         if ($products->isEmpty()) {
             $this->warn('No products found.');
 
-            return Command::FAILURE;
+            return self::SUCCESS;
         }
 
         $this->info("Processing {$products->count()} products...");
@@ -65,7 +65,7 @@ class SetProductPricing extends Command
         $this->newLine();
         $this->info('✨ Done! All products now have pricing.');
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     /**
@@ -88,16 +88,16 @@ class SetProductPricing extends Command
         $range = $priceRanges[$categorySlug] ?? $priceRanges['default'];
 
         // Generate random price within range
-        $price = rand($range[0], $range[1]);
+        $price = fake()->numberBetween($range[0], $range[1]);
 
         // Round to nearest 10,000
         $price = round($price / 10000) * 10000;
 
         // 70% chance of having sale price
         $salePrice = null;
-        if (rand(1, 100) <= 70) {
+        if (fake()->numberBetween(1, 100) <= 70) {
             // Random discount between 10-30%
-            $discountPercent = rand(10, 30);
+            $discountPercent = fake()->numberBetween(10, 30);
             $salePrice = $price * (1 - $discountPercent / 100);
 
             // Round to nearest 10,000

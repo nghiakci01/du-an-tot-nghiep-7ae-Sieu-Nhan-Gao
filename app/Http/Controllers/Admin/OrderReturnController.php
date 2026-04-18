@@ -7,6 +7,7 @@ use App\Models\OrderReturnRequest;
 use App\Models\User;
 use App\Services\ReturnService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
@@ -21,7 +22,7 @@ class OrderReturnController extends Controller
     public function index(Request $request)
     {
         $query = OrderReturnRequest::with(['user', 'order']);
-        
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -29,25 +30,24 @@ class OrderReturnController extends Controller
         if ($request->filled('order_id')) {
             $query->where('order_id', $request->order_id);
         }
-        
+
         $requests = $query->latest()->paginate(15);
         $tab = $request->input('status', 'all');
-        
-        return view('admin.returns.index', compact('requests', 'tab'));
+        $settings = \App\Models\Setting::all()->pluck('value', 'key');
+
+        return view('admin.returns.index', compact('requests', 'tab', 'settings'));
     }
 
-    public function approve(Request $request, $id)
+    public function approve(\App\Http\Requests\Generated\OrderReturnAdminNoteRequest $request, $id)
     {
         try {
-            $request->validate([
-                'admin_note' => 'required|string|max:1000'
-            ]);
-            
+            $validated = $request->validated();
+
             /** @var \App\Models\User $user */
-            $user = auth()->user();
-            
+            $user = Auth::user();
+
             $returnReq = OrderReturnRequest::findOrFail($id);
-            $this->returnService->approve($returnReq, $user, $request->admin_note);
+            $this->returnService->approve($returnReq, $user, $validated['admin_note']);
 
             return redirect()->back()->with('success', 'Đã duyệt yêu cầu trả hàng.');
         } catch (\Exception $e) {
@@ -56,18 +56,16 @@ class OrderReturnController extends Controller
         }
     }
 
-    public function reject(Request $request, $id)
+    public function reject(\App\Http\Requests\Generated\OrderReturnAdminNoteRequest $request, $id)
     {
         try {
-            $request->validate([
-                'admin_note' => 'required|string|max:1000'
-            ]);
-            
+            $validated = $request->validated();
+
             /** @var \App\Models\User $user */
-            $user = auth()->user();
-            
+            $user = Auth::user();
+
             $returnReq = OrderReturnRequest::findOrFail($id);
-            $this->returnService->reject($returnReq, $user, $request->admin_note);
+            $this->returnService->reject($returnReq, $user, $validated['admin_note']);
 
             return redirect()->back()->with('success', 'Yêu cầu trả hàng đã bị từ chối.');
         } catch (\Exception $e) {
@@ -80,12 +78,12 @@ class OrderReturnController extends Controller
     {
         try {
             /** @var \App\Models\User $user */
-            $user = auth()->user();
-            
+            $user = Auth::user();
+
             $returnReq = OrderReturnRequest::findOrFail($id);
             $this->returnService->markAsShipping($returnReq, $user);
-            
-            return redirect()->back()->with('success', 'Đã cập nhật trạng thái đang di chuyển.');
+
+            return redirect()->back()->with('success', 'Đã cập nhật trạng thái khách đang gửi hàng về.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
@@ -96,29 +94,64 @@ class OrderReturnController extends Controller
         try {
             $returnReq = OrderReturnRequest::findOrFail($id);
             $this->returnService->markAsReceived($returnReq);
-            
+
             return redirect()->back()->with('success', 'Đã xác nhận nhận hàng tại kho.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
 
-    public function completeRefund(Request $request, $id)
+    public function complete(Request $request, $id)
     {
         try {
             $returnReq = OrderReturnRequest::findOrFail($id);
-            
-            // if (!in_array($returnReq->status, ['approved', 'shipping', 'received'])) { // This check is now handled by the service
-            //     return redirect()->back()->with('error', 'Chỉ có thể hoàn tiền cho yêu cầu đã được duyệt.');
-            // }
 
             /** @var \App\Models\User $user */
-            $user = auth()->user();
+            $user = Auth::user();
             $this->returnService->complete($returnReq, $user);
-            
-            return redirect()->back()->with('success', 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.');
+
+            $msg = ($returnReq->type === OrderReturnRequest::TYPE_EXCHANGE)
+                ? 'Đã hoàn tất quy trình đổi hàng cho khách.'
+                : 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.';
+
+            return redirect()->back()->with('success', $msg);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
+    public function generateGhnCode($id)
+    {
+        try {
+            $returnRequest = OrderReturnRequest::with(['items.orderItem.product', 'order'])->findOrFail($id);
+            
+            // Check if GHN is enabled
+            $ghnProvider = app(\App\Services\Shipping\GhnShippingProvider::class);
+            
+            $result = $ghnProvider->createReturnOrder($returnRequest);
+            $trackingCode = data_get($result, 'data.order_code');
+
+            if ($trackingCode) {
+                $returnRequest->update(['tracking_code' => $trackingCode]);
+                
+                return response()->json([
+                    'success' => true,
+                    'tracking_code' => $trackingCode,
+                    'message' => 'Đã tạo mã vận đơn GHN thành công.'
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy mã vận đơn trong phản hồi từ GHN.'
+            ], 400);
+
+        } catch (\Exception $e) {
+            Log::error("GHN return code error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

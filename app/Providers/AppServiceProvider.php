@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Support\SafeFilesystem;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Filesystem\Filesystem;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,7 +16,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton('files', fn () => new SafeFilesystem());
+        $this->app->alias('files', Filesystem::class);
     }
 
     /**
@@ -84,6 +87,19 @@ class AppServiceProvider extends ServiceProvider
                     if ($user && $user->role === \App\Models\User::ROLE_ADMIN) {
                         $sharedData['admin_notifications'] = $user->unreadNotifications()->latest()->limit(5)->get();
                         $sharedData['admin_unread_count'] = $user->unreadNotifications()->count();
+                    }
+                    
+                    // 6. Review Prompt for regular users
+                    if ($user) {
+                        $sharedData['unreviewedPromptItem'] = \App\Models\OrderItem::whereHas('order', function($q) use ($user) {
+                                $q->where('user_id', $user->id)
+                                  ->where('status', \App\Models\Order::STATUS_COMPLETED);
+                            })
+                            ->whereDoesntHave('product.reviews', function($q) use ($user) {
+                                $q->where('user_id', $user->id);
+                            })
+                            ->with('product')
+                            ->first();
                     }
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\Log::error('AppServiceProvider Data Prep Error: ' . $e->getMessage());

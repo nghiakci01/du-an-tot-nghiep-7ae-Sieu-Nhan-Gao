@@ -7,80 +7,107 @@
     <div class="page-block">
         <div class="row align-items-center">
             <div class="col-md-12">
-                <div class="page-header-title">
-                    <h5 class="m-b-10">Thêm Câu hỏi gợi ý</h5>
-                </div>
                 <ul class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="feather icon-home"></i></a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.settings.chatbot', ['tab' => 'questions']) }}">Câu hỏi gợi ý</a></li>
-                    <li class="breadcrumb-item"><a href="#!">Thêm mới</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.settings.chatbot', ['tab' => 'questions']) }}">Cấu hình Chatbot</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Thêm Câu hỏi gợi ý</li>
                 </ul>
+            </div>
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h2 class="mb-0">Thêm Câu hỏi gợi ý</h2>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-sm-8">
-        <div class="card">
-            <div class="card-header">
-                <h5>Thông tin Câu hỏi</h5>
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm border-start border-primary border-4">
+            <div class="card-header bg-transparent py-3">
+                <h5 class="mb-0"><i class="ti ti-help me-2"></i>Thông tin Câu hỏi</h5>
             </div>
             <div class="card-body">
                 <form action="{{ route('admin.chatbot.questions.store') }}" method="POST">
                     @csrf
-                    <div class="form-group mb-3">
-                        <label class="form-label">Câu hỏi <span class="text-danger">*</span></label>
-                        <input type="text" name="question" class="form-control @error('question') is-invalid @enderror" value="{{ old('question') }}" placeholder="VD: Hàng mới về">
-                        @error('question')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="text-muted">Đây là nội dung hiển thị trên nút bấm và gửi cho chatbot.</small>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Câu hỏi hiển thị <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="ti ti-message-dots"></i></span>
+                            <input type="text" name="question" class="form-control @error('question') is-invalid @enderror" value="{{ old('question') }}" placeholder="VD: Xem hàng mới về, Chính sách bảo hành...">
+                        </div>
+                        @error('question') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        <small class="text-muted mt-1 d-block"><i class="ti ti-info-circle me-1"></i> Đây là nội dung hiển thị trên nút bấm ở khung chat khách hàng.</small>
                     </div>
 
-                    <div class="form-group mb-3">
-                        <label class="form-label">Câu trả lời mẫu (Tùy chọn)</label>
-                        <div class="alert alert-info border-0 shadow-none py-2 px-3 mb-2" style="background: rgba(var(--bs-info-rgb), 0.1);">
-                            <small class="fw-bold d-block mb-1 text-info"><i class="ti ti-info-circle me-1"></i> Các thẻ động hỗ trợ:</small>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Câu trả lời mẫu (Tùy chọn)</label>
+                        <textarea name="answer" class="form-control @error('answer') is-invalid @enderror" rows="5" placeholder="Nhập câu trả lời mẫu chatbot sẽ gửi khi khách bấm nút này...">{{ old('answer') }}</textarea>
+                        @error('answer') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                        
+                        <div class="mt-2 p-3 bg-light rounded-3 border">
+                            <span class="fw-bold small d-block mb-2 text-info"><i class="ti ti-info-circle me-1"></i> Các thẻ động hỗ trợ:</span>
                             <div class="d-flex flex-wrap gap-2">
-                                <code class="text-primary small" title="Hiện danh sách sản phẩm liên quan">{product}</code>
-                                <code class="text-primary small" title="Số hotline hệ thống">{hotline}</code>
-                                <code class="text-primary small" title="Email hỗ trợ hệ thống">{email}</code>
-                                <code class="text-primary small" title="Danh sách các danh mục sản phẩm">{categories}</code>
+                                <span class="badge bg-info-subtle text-info border border-info-subtle cursor-help" title="Hiện sản phẩm">{product}</span>
+                                <span class="badge bg-info-subtle text-info border border-info-subtle cursor-help" title="Số điện thoại">{hotline}</span>
+                                <span class="badge bg-info-subtle text-info border border-info-subtle cursor-help" title="Email">{email}</span>
+                                <span class="badge bg-info-subtle text-info border border-info-subtle cursor-help" title="Danh mục">{categories}</span>
                             </div>
                         </div>
-                        <textarea name="answer" class="form-control @error('answer') is-invalid @enderror" rows="4" placeholder="Nhập câu trả lời mẫu cho quy tắc (nếu có)">{{ old('answer') }}</textarea>
-                        @error('answer')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label class="form-label">Thứ tự hiển thị <span class="text-danger">*</span></label>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-bold">Thứ tự hiển thị <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="ti ti-sort-ascending"></i></span>
                                 <input type="number" name="order" class="form-control @error('order') is-invalid @enderror" value="{{ old('order', 0) }}">
-                                @error('order')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
+                            @error('order') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label class="form-label d-block">Trạng thái</label>
-                                <div class="form-check form-switch mt-2">
-                                    <input type="checkbox" name="is_active" class="form-check-input" id="isActive" checked>
-                                    <label class="form-check-label" for="isActive">Hiển thị</label>
-                                </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-bold d-block">Trạng thái hoạt động</label>
+                            <div class="form-check form-switch mt-2">
+                                <input type="checkbox" name="is_active" class="form-check-input" id="isActive" checked>
+                                <label class="form-check-label" for="isActive">Kích hoạt hiển thị</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">Lưu lại</button>
-                        <a href="{{ route('admin.settings.chatbot', ['tab' => 'questions']) }}" class="btn btn-secondary">Quay lại</a>
+                    <div class="pt-3 border-top d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                            <i class="ti ti-device-floppy me-1"></i> Lưu câu hỏi
+                        </button>
+                        <a href="{{ route('admin.settings.chatbot', ['tab' => 'questions']) }}" class="btn btn-outline-secondary">
+                            Hủy bỏ
+                        </a>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header">
+                <h5><i class="ti ti-bulb me-2 text-warning"></i>Mẹo nhỏ</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="ti ti-check text-success me-2 mt-1"></i>
+                        <span><b>Câu hỏi gợi ý</b> giúp khách hàng bắt đầu cuộc hội thoại dễ dàng hơn.</span>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="ti ti-check text-success me-2 mt-1"></i>
+                        <span>Sử dụng <b>{product}</b> để tự động hiển thị các sản phẩm mới nhất hoặc liên quan.</span>
+                    </li>
+                    <li class="d-flex align-items-start">
+                        <i class="ti ti-check text-success me-2 mt-1"></i>
+                        <span>Thứ tự thấp hơn sẽ được ưu tiên hiển thị trước.</span>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>

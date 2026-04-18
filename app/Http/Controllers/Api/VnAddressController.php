@@ -22,7 +22,7 @@ class VnAddressController extends Controller
             ->values()
             ->map(fn($c) => [
                 'code' => $c['provinceCode'],
-                'name' => str_replace(['Tỉnh ', 'Thành phố '], '', $c['provinceName']),
+                'name' => preg_replace('/^(Tỉnh|Thành phố)\s+/u', '', $c['provinceName']),
             ]);
 
         return response()->json($provinces);

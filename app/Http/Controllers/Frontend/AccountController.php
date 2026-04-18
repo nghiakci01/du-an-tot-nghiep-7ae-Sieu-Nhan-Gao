@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Review;
-use App\Models\UserBankAccount;
-use App\Models\BankSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -18,31 +16,48 @@ class AccountController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $data = $this->getDashboardData($user);
 
-        $socialAccounts = collect();
-        $orders = collect();
-        $wishlists = collect();
-        $coupons = collect();
-        $addresses = collect();
-        $userBankAccounts = collect();
-        $walletTransactions = collect();
-        $walletTopupRequests = collect();
-        $walletWithdrawRequests = collect();
-        $bankSettings = BankSetting::where('is_active', true)->get();
-        $totalOrders = 0;
-        $totalSpent = 0;
-        $wishCount = 0;
+        return view('frontend.account.index', array_merge(['user' => $user], $data));
+    }
+
+    /**
+     * Gathers all necessary data for the account dashboard.
+     */
+    private function getDashboardData($user): array
+    {
+        $data = [
+            'socialAccounts' => collect(),
+            'orders' => collect(),
+            'wishlists' => collect(),
+            'coupons' => collect(),
+            'addresses' => collect(),
+            'walletTransactions' => collect(),
+            'walletTopupRequests' => collect(),
+            'walletWithdrawRequests' => collect(),
+            'bankSettings' => collect(),
+            'totalOrders' => 0,
+            'totalSpent' => 0,
+            'wishCount' => 0,
+            'notifications' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20),
+        ];
 
         if ($user) {
-            $orders = $user->orders()->latest()->paginate(10);
-            $wishCount = $user->wishlists()->count();
-            $wishlists = $user->wishlists()->with('product')->get();
-            $userBankAccounts = $user->bankAccounts;
-            $addresses = $user->addresses()->get();
-            
-            $coupons = \App\Models\Coupon::where(function ($q) use ($user) {
-                $q->whereNull('user_id')->orWhere('user_id', $user->id);
-            })
+            $data['orders'] = $user->orders()->latest()->paginate(10);
+            $data['wishCount'] = $user->wishlists()->count();
+            $data['wishlists'] = $user->wishlists()->with('product')->get();
+            $data['addresses'] = $user->addresses()->get();
+
+            // 2. Mã đã nhận (claimed) hoặc được gán riêng (user_id) - bao gồm cả mã đã dùng
+            $personalCoupons = $user->claimedCoupons()
+                ->where('is_active', true)
+                ->get();
+
+            $usedCouponIds = $personalCoupons->whereNotNull('pivot.used_at')->pluck('id')->toArray();
+
+            // 1. Mã công khai (không gán user_id) và chưa từng được user này sử dụng
+            $publicCoupons = \App\Models\Coupon::whereNull('user_id')
+                ->whereNotIn('id', $usedCouponIds)
                 ->where('is_active', true)
                 ->where('start_date', '<=', now())
                 ->where(function ($q) {
@@ -50,28 +65,32 @@ class AccountController extends Controller
                 })
                 ->whereRaw('used_count < usage_limit')
                 ->get();
-            
-            $walletTransactions   = $user->walletTransactions()->take(20)->get();
-            $walletTopupRequests  = $user->walletTopupRequests()->take(10)->get();
-            $walletWithdrawRequests = $user->walletWithdrawRequests()->take(10)->get();
 
-            $totalOrders = $orders->total();
-            $totalSpent = $user->orders()->where('status', 'completed')->sum('final_total');
-            $socialAccounts = $user->socialAccounts;
+            // Gộp lại và ưu tiên mã cá nhân (vì có dữ liệu pivot used_at)
+            $data['coupons'] = $personalCoupons->concat($publicCoupons)->unique('id');
+
+            if (config('features.wallet')) {
+                $data['walletTransactions'] = $user->walletTransactions()->take(20)->get();
+                $data['walletTopupRequests'] = $user->walletTopupRequests()->take(10)->get();
+                $data['walletWithdrawRequests'] = $user->walletWithdrawRequests()->take(10)->get();
+            }
+
+            $data['totalOrders'] = $data['orders']->total();
+            $data['totalSpent'] = $user->orders()->where('status', 'completed')->sum('final_total');
+            $data['socialAccounts'] = $user->socialAccounts;
+
+            // Notifications pagination
+            $data['notifications'] = $user->notifications()->latest()->paginate(20, ['*'], 'notifications_page');
         }
 
-        return view('frontend.account.index', compact(
-            'user', 'orders', 'coupons', 'wishlists', 'addresses',
-            'userBankAccounts', 'walletTransactions', 'walletTopupRequests', 'walletWithdrawRequests',
-            'bankSettings', 'totalOrders', 'totalSpent', 'wishCount', 'socialAccounts'
-        ));
+        return $data;
     }
 
     public function showOrder($id)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        
+
         if ($user) {
             $order = $user->orders()->with(['items.product', 'histories'])->findOrFail($id);
         } else {
@@ -88,7 +107,7 @@ class AccountController extends Controller
         $items = $order->items;
         $productIds = $items->pluck('product_id')->filter()->unique();
         $userReviews = collect();
-        
+
         if ($user) {
             $userReviews = Review::where('user_id', $user->id)
                 ->whereIn('product_id', $productIds)
@@ -99,7 +118,7 @@ class AccountController extends Controller
         return view('frontend.account.orders.show', compact('user', 'order', 'userReviews'));
     }
 
-    public function update(Request $request)
+    public function update(\App\Http\Requests\Generated\AccountUpdateRequest $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
@@ -110,12 +129,20 @@ class AccountController extends Controller
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'current_password' => 'required_with:new_password|nullable',
             'new_password' => 'nullable|min:8|confirmed',
+            'bank_name' => 'nullable|string|max:255',
+            'bank_bin' => 'nullable|string|max:20',
+            'account_number' => 'nullable|string|max:50',
+            'account_name' => 'nullable|string|max:255',
         ], [
             'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
         ]);
 
         $user->name = $request->name;
         $user->phone = $request->phone;
+        $user->bank_name = $request->bank_name;
+        $user->bank_bin = $request->bank_bin;
+        $user->account_number = $request->account_number;
+        $user->account_name = $request->account_name;
 
         if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             if ($user->avatar) {
@@ -127,11 +154,11 @@ class AccountController extends Controller
             $user->avatar = 'avatars/' . $avatarName;
         }
 
-        if ($request->filled('new_password')) {
-            if (! Hash::check($request->current_password, $user->password)) {
+        if (!empty($validated['new_password'] ?? null)) {
+            if (! Hash::check($validated['current_password'] ?? '', $user->password)) {
                 return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
             }
-            $user->password = Hash::make($request->new_password);
+            $user->password = Hash::make($validated['new_password']);
         }
 
         $user->save();
@@ -151,7 +178,7 @@ class AccountController extends Controller
 
         try {
             $orderService->updateOrderStatus($order, Order::STATUS_CANCELLED, $user, 'Customer cancelled order themselves');
-            
+
             // Khôi phục lại giỏ hàng cho khách
             app(\App\Services\CartService::class)->restoreOrderToCart($order);
         } catch (\Exception $e) {
@@ -167,8 +194,8 @@ class AccountController extends Controller
         $user = Auth::user();
         $order = $user->orders()->findOrFail($id);
 
-        if (!in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_SHIPPED])) {
-            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã giao hoặc hoàn thành.');
+        if (!\App\Models\OrderReturnRequest::canBeReturned($order)) {
+            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã hoàn thành và trong vòng 7 ngày kể từ lúc nhận hàng.');
         }
 
         if ($order->returnRequest) {
@@ -178,54 +205,47 @@ class AccountController extends Controller
         return view('frontend.account.orders.return_form', compact('order'));
     }
 
-    public function submitReturnRequest(Request $request, $id)
+    public function submitReturnRequest(\App\Http\Requests\Generated\ReturnRequest $request, $id)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
         $order = $user->orders()->findOrFail($id);
 
-        if (!in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_SHIPPED])) {
-            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã giao hoặc hoàn thành.');
+        if (!\App\Models\OrderReturnRequest::canBeReturned($order)) {
+            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã hoàn thành và trong vòng 7 ngày kể từ lúc nhận hàng.');
         }
 
         if ($order->returnRequest) {
             return redirect()->back()->with('error', 'Đơn hàng này đã có yêu cầu hoàn trả.');
         }
 
-        $request->validate([
-            'reason' => 'required|string|max:255',
-            'note' => 'nullable|string|max:1000',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'videos.*' => 'nullable|file|mimes:mp4,mov,avi,webm|max:51200',
-            'items' => 'required|array',
-            'items.*.selected' => 'sometimes|boolean',
-            'items.*.quantity' => 'sometimes|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
-        // Filter selected items and calculate refund amount
-        $selectedItems = [];
-        $totalRefund = 0;
-        
-        foreach ($request->items as $itemId => $data) {
-            if (isset($data['selected']) && $data['selected'] == 1) {
-                $orderItem = \App\Models\OrderItem::where('order_id', $order->id)->findOrFail($itemId);
-                
-                $qty = (int) ($data['quantity'] ?? 1);
-                if ($qty > $orderItem->quantity) {
-                    return redirect()->back()->with('error', "Số lượng trả của sản phẩm {$orderItem->product_name} vượt quá số lượng đã mua.");
-                }
-
-                $selectedItems[] = [
-                    'order_item_id' => $itemId,
-                    'quantity' => $qty,
-                    'price' => $orderItem->price,
-                ];
-                $totalRefund += $qty * $orderItem->price;
+        // Kiểm tra bắt buộc minh chứng cho hàng lỗi
+        if ($request->reason_type === 'defective') {
+            if (!$request->hasFile('images')) {
+                return redirect()->back()->with('error', 'Với lý do hàng lỗi, bạn bắt buộc phải tải lên ảnh minh chứng.')->withInput();
+            }
+            if (!$request->hasFile('videos')) {
+                return redirect()->back()->with('error', 'Với lý do hàng lỗi, bạn bắt buộc phải tải lên video minh chứng tình trạng lỗi.')->withInput();
             }
         }
 
+        // Force return all items strategy
+        $selectedItems = [];
+        $totalRefund = 0;
+
+        foreach ($order->items as $item) {
+            $selectedItems[] = [
+                'order_item_id' => $item->id,
+                'quantity' => $item->quantity, // Return full quantity
+                'price' => $item->price,
+            ];
+            $totalRefund += $item->quantity * $item->price;
+        }
+
         if (empty($selectedItems)) {
-            return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một sản phẩm để hoàn trả.');
+            return redirect()->back()->with('error', 'Đơn hàng này không có sản phẩm để hoàn trả.');
         }
 
         $imagePaths = [];
@@ -252,12 +272,19 @@ class AccountController extends Controller
             $returnRequest = \App\Models\OrderReturnRequest::create([
                 'user_id' => $user->id,
                 'order_id' => $order->id,
+                'type' => 'refund',
+                'reason_type' => $request->reason_type,
                 'reason' => $request->reason,
+                'return_method' => $request->return_method,
                 'note' => $request->note,
                 'images' => $imagePaths,
                 'videos' => $videoPaths,
                 'refund_amount' => $totalRefund,
-                'status' => 'pending',
+                'bank_name' => $request->bank_name,
+                'bank_bin' => $request->bank_bin,
+                'account_number' => $request->account_number,
+                'account_name' => $request->account_name,
+                'status' => \App\Models\OrderReturnRequest::STATUS_PENDING,
             ]);
 
             foreach ($selectedItems as $itemData) {
@@ -266,7 +293,7 @@ class AccountController extends Controller
 
             // Thông báo cho các Admin
             $admins = \App\Models\User::getAdmins();
-            Notification::send($admins, new \App\Notifications\NewOrderReturnRequestNotification($returnRequest));
+            Notification::send($admins, new NewOrderReturnRequestNotification($returnRequest));
 
             return redirect()->route('account.orders.show', $order->id)
                 ->with('success', 'Yêu cầu hoàn trả của bạn đã được gửi và đang chờ xử lý.');
@@ -277,26 +304,20 @@ class AccountController extends Controller
     /**
      * Khách hàng nộp thông tin vận chuyển khi hàng hoàn đã được Duyệt (Approved)
      */
-    public function submitShipping(Request $request, $id)
+    public function submitShipping(\App\Http\Requests\Generated\ReturnShippingRequest $request, $id)
     {
         $order = Order::where('user_id', Auth::id())->findOrFail($id);
         $returnRequest = $order->returnRequest;
 
-        if (!$returnRequest || $returnRequest->status !== 'approved') {
+        if (!$returnRequest || !$returnRequest->isApproved()) {
             return redirect()->back()->with('error', 'Yêu cầu trả hàng không ở trạng thái được phép gửi hàng.');
         }
 
-        $request->validate([
-            'shipping_info' => 'required|string|max:1000',
-            'shipping_proof' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ], [
-            'shipping_info.required' => 'Vui lòng nhập thông tin vận chuyển (Mã vận đơn, đơn vị vận chuyển...).',
-            'shipping_proof.required' => 'Vui lòng tải lên ảnh minh chứng đã gửi hàng.',
-        ]);
+        $validated = $request->validated();
 
         $data = [
-            'shipping_info' => $request->shipping_info,
-            'status' => 'shipping', // Chuyển sang trạng thái Đang gửi hàng
+            'shipping_info' => $validated['shipping_info'],
+            'status' => \App\Models\OrderReturnRequest::STATUS_SHIPPING_BACK,
         ];
 
         if ($request->hasFile('shipping_proof')) {
@@ -323,69 +344,18 @@ class AccountController extends Controller
         return redirect()->back()->with('success', 'Gửi thông tin vận chuyển thành công. Chúng tôi sẽ thông báo khi nhận được hàng.');
     }
 
-    // ===== USER BANK ACCOUNTS =====
-
-    public function storeBankAccount(Request $request)
+    public function updateReturnMethod(\App\Http\Requests\Generated\ReturnMethodRequest $request, $id)
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
+        $validated = $request->validated();
 
-        $request->validate([
-            'bank_name'      => 'required|string|max:100',
-            'bank_id'        => 'required|string|max:50',
-            'account_number' => 'required|string|max:100',
-            'account_name'   => 'required|string|max:255',
-        ]);
-
-        if ($request->boolean('is_default')) {
-            $user->bankAccounts()->update(['is_default' => false]);
+        $order = \App\Models\Order::findOrFail($id);
+        if ($order->returnRequest) {
+            $order->returnRequest->update([
+                'return_method' => $validated['return_method']
+            ]);
         }
 
-        $user->bankAccounts()->create([
-            'bank_name'      => $request->bank_name,
-            'bank_id'        => $request->bank_id,
-            'account_number' => $request->account_number,
-            'account_name'   => $request->account_name,
-            'is_default'     => $request->boolean('is_default'),
-        ]);
-
-        return redirect()->back()->with('success', 'Thêm tài khoản ngân hàng thành công!');
+        return back()->with('success', 'Đã cập nhật phương thức gửi hàng thành công.');
     }
 
-    public function updateBankAccount(Request $request, $id)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $bank = $user->bankAccounts()->findOrFail($id);
-
-        $request->validate([
-            'bank_name'      => 'required|string|max:100',
-            'bank_id'        => 'required|string|max:50',
-            'account_number' => 'required|string|max:100',
-            'account_name'   => 'required|string|max:255',
-        ]);
-
-        if ($request->boolean('is_default')) {
-            $user->bankAccounts()->where('id', '!=', $id)->update(['is_default' => false]);
-        }
-
-        $bank->update([
-            'bank_name'      => $request->bank_name,
-            'bank_id'        => $request->bank_id,
-            'account_number' => $request->account_number,
-            'account_name'   => $request->account_name,
-            'is_default'     => $request->boolean('is_default'),
-        ]);
-
-        return redirect()->back()->with('success', 'Cập nhật tài khoản ngân hàng thành công!');
-    }
-
-    public function destroyBankAccount($id)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $user->bankAccounts()->findOrFail($id)->delete();
-
-        return redirect()->back()->with('success', 'Đã xóa tài khoản ngân hàng.');
-    }
 }

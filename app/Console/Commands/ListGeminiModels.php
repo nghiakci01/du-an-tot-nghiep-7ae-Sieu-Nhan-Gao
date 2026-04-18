@@ -56,6 +56,6 @@ class ListGeminiModels extends Command
             $this->error('❌ Exception: '.$e->getMessage());
         }
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 }

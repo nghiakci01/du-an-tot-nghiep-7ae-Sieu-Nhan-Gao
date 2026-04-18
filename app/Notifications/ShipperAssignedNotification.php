@@ -1,0 +1,3 @@
+﻿<?php
+
+// Deprecated notification removed.

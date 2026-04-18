@@ -301,8 +301,7 @@
                                                                 <button type="button" class="qty-btn minus">-</button>
                                                                 <input min="1" max="{{ $stockQty }}" value="{{ $details['quantity'] }}" type="number"
                                                                     class="quantity update-cart item-quantity"
-                                                                    data-stock="{{ $stockQty }}"
-                                                                    title="Còn {{ $stockQty }} sản phẩm trong kho">
+                                                                    data-stock="{{ $stockQty }}">
                                                                 <button type="button" class="qty-btn plus">+</button>
                                                             </div>
                                                             <small class="d-block text-muted mt-1" style="font-size:11px;"
@@ -358,9 +357,6 @@
                                         </div>
                                         <div class="cart_subtotal">
                                             <p>{{ __('messages.shipping') }}</p>
-                                            @php
-                                                $shippingFee = \App\Models\Setting::getShippingFee($total - $discount);
-                                            @endphp
                                             <p class="cart_amount" id="shipping-fee">
                                                 <span>{{ $shippingFee > 0 ? (number_format($shippingFee) . ' đ') : __('messages.free') }}</span>
                                             </p>
@@ -376,7 +372,14 @@
                                             <p class="cart_amount" id="cart-grand-total">{{ number_format($total + $shippingFee) }} đ</p>
                                         </div>
                                         <div class="checkout_btn">
-                                            <a href="#" id="btn-proceed-checkout">{{ __('messages.proceed_to_checkout') }}</a>
+                                            @auth
+                                                <a href="#" id="btn-proceed-checkout">{{ __('messages.proceed_to_checkout') }}</a>
+                                            @else
+                                                <a href="{{ route('login') }}" class="btn-login-to-checkout" style="background: #ff6a28 !important; color: #fff !important; display: block; text-align: center; padding: 10px; text-transform: uppercase; font-weight: 600; border-radius: 4px;">
+                                                    <i class="fa fa-sign-in"></i> Đăng nhập để thanh toán
+                                                </a>
+                                                <p class="text-muted small mt-2 text-center">Vui lòng đăng nhập để tiếp tục đơn hàng của bạn.</p>
+                                            @endauth
                                         </div>
 
                                         <script>
@@ -523,7 +526,7 @@
 
         // Realtime stock check khi nhập số lượng
         $(document).on('input', '.update-cart', function() {
-            const max = parseInt($(this).attr('max')) || 100;
+            const max = parseInt($(this).attr('data-stock')) || 999;
             const val = parseInt($(this).val());
             const productName = $(this).closest('tr').find('.product_name a').text().trim();
 
@@ -532,7 +535,7 @@
                     toast: true,
                     position: 'top-end',
                     icon: 'warning',
-                    title: `Chỉ còn ${max} sản phẩm trong kho!`,
+                    title: `Vượt quá tồn kho (${max} sản phẩm)!`,
                     text: productName,
                     showConfirmButton: false,
                     timer: 2500,
@@ -543,25 +546,26 @@
             if (val < 1 || isNaN(val)) $(this).val(1);
         });
 
-        // Update cart quantity (AJAX)
-        $(".update-cart").on('change', function (e) {
+        // Update cart quantity (AJAX) - Use delegation to be safe and handle all instances
+        $(document).on('change', '.update-cart', function (e) {
             const ele = $(this);
             const row = ele.closest("tr");
             const id = row.attr("data-id");
             const quantity = parseInt(ele.val());
             const max = parseInt(ele.attr('max')) || 100;
 
-            if (ele.data('prev-val') == quantity) return;
-            ele.data('prev-val', quantity);
-            if (quantity < 1) return;
+            if (quantity < 1) {
+                ele.val(1);
+                return;
+            }
 
-            // Block nếu vượt stock (double-check trước AJAX)
+            // Block nếu vượt max limits (double-check trước AJAX)
             if (quantity > max) {
                 ele.val(max);
                 Swal.fire({
                     icon: 'error',
                     title: 'Vượt quá tồn kho!',
-                    html: `Chỉ còn <strong>${max}</strong> sản phẩm trong kho.`,
+                    html: `Bạn chỉ có thể mua tối đa <strong>${max}</strong> sản phẩm này.`,
                     confirmButtonColor: '#ef233c',
                     confirmButtonText: 'Đồng ý',
                 });
@@ -578,10 +582,14 @@
                         $('#cart-subtotal').text(response.cart_total);
                         $('#shipping-fee span').text(response.shipping_fee);
                         $('#cart-grand-total').text(response.grand_total);
-                        $('.cart-count').text(response.cart_count);
+                        $('.cart-count').each(function() { $(this).text(response.cart_count); });
 
-                        // Cập nhật giá trị html cho item
-                        row.find('.product_total').text(response.item_total);
+                        // Cập nhật Mini Cart HTML nếu có
+                        if (response.mini_cart_html) {
+                            $('.mini-cart-container').each(function() {
+                                $(this).replaceWith(response.mini_cart_html);
+                            });
+                        }
 
                         // Toast nhỏ xác nhận cập nhật
                         Swal.fire({
@@ -593,6 +601,7 @@
                             timer: 1500,
                         });
                     } else {
+                        // ...
                         Swal.fire({
                             icon: 'error',
                             title: 'Lỗi!',
@@ -645,7 +654,15 @@
                                 $('#cart-subtotal').text(response.cart_total);
                                 $('#shipping-fee span').text(response.shipping_fee);
                                 $('#cart-grand-total').text(response.grand_total);
-                                $('.cart-count').text(response.cart_count);
+                                $('.cart-count').each(function() { $(this).text(response.cart_count); });
+
+                                // Cập nhật Mini Cart HTML
+                                if (response.mini_cart_html) {
+                                    $('.mini-cart-container').each(function() {
+                                        $(this).replaceWith(response.mini_cart_html);
+                                    });
+                                }
+
                                 if (response.cart_count == 0) {
                                     setTimeout(function() { window.location.reload(); }, 600);
                                 }
@@ -662,6 +679,10 @@
         });
 
         // Tính toán lại tổng tiền dựa trên tất cả sản phẩm hợp lệ
+        function parseMoney(text) {
+            return parseInt(String(text || '').replace(/[^0-9-]/g, ''), 10) || 0;
+        }
+
         function calculateCartTotal() {
             let subtotal = 0;
             
@@ -678,20 +699,11 @@
             $('#cart-subtotal').text(new Intl.NumberFormat('vi-VN').format(subtotal) + ' đ');
 
             // Phí ship (Giả lập logic: > 500k free ship, dưới thì 30k)
-            let shippingFee = 0;
-            if (subtotal > 0 && subtotal < 500000) {
-                shippingFee = 30000;
-            }
-            
-            if (shippingFee > 0) {
-                $('#shipping-fee span').text(new Intl.NumberFormat('vi-VN').format(shippingFee) + ' đ');
-            } else {
-                $('#shipping-fee span').text('Miễn phí');
-            }
+            let shippingFee = parseMoney($('#shipping-fee span').text());
 
             // Tính discount nếu có mã (lấy từ dữ liệu hiển thị hiện tại)
             let discountText = $('#cart-discount').text().replace(/[^-0-9]/g, '');
-            let discount = Math.abs(parseInt(discountText)) || 0;
+            let discount = Math.abs(parseInt(discountText, 10)) || 0;
             
             // Grand Total
             let grandTotal = subtotal + shippingFee - discount;
@@ -747,7 +759,7 @@
                         toast: true,
                         position: 'top-end',
                         icon: 'warning',
-                        title: 'Chỉ còn ' + max + ' sản phẩm trong kho!',
+                        title: 'Đã đạt giới hạn tồn kho: ' + max,
                         showConfirmButton: false,
                         timer: 2000
                     });

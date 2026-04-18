@@ -87,7 +87,7 @@ class SupplementProductInfo extends Command
     private function generateShortDescription(Product $product): string
     {
         $category = $product->category ? $product->category->name : 'Sản phẩm';
-        $price = number_format($product->price, 0, ',', '.');
+        $price = number_format((float) $product->price, 0, ',', '.');
 
         return "{$product->name} - {$category} chất lượng cao, giá {$price}đ. Phù hợp cho mọi lứa tuổi, thiết kế hiện đại.";
     }
@@ -98,11 +98,11 @@ class SupplementProductInfo extends Command
     private function generateDescription(Product $product): string
     {
         $category = $product->category ? $product->category->name : 'Sản phẩm';
-        $price = number_format($product->price, 0, ',', '.');
+        $price = number_format((float) $product->price, 0, ',', '.');
 
         $saleInfo = '';
         if ($product->sale_price && $product->sale_price < $product->price) {
-            $salePrice = number_format($product->sale_price, 0, ',', '.');
+            $salePrice = number_format((float) $product->sale_price, 0, ',', '.');
             $discount = round((($product->price - $product->sale_price) / $product->price) * 100);
             $saleInfo = "\n\n🔥 Giá khuyến mãi: {$salePrice}đ (Tiết kiệm {$discount}%)";
         }

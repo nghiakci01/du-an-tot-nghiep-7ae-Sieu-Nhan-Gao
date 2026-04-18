@@ -246,6 +246,19 @@
         }
         /* ----- ZARA STYLE OVERRIDES END ----- */
 
+        /* Sticky Header Global Styles */
+        .sticky-header.sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999 !important;
+            background: #fff !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: block !important;
+            animation: fadeInDown 0.5s ease;
+        }
+
         /* Remove underlines from header and breadcrumb links */
         .header_area a, 
         .breadcrumbs_area a, 
@@ -261,6 +274,7 @@
             text-decoration: none !important;
         }
     </style>
+    @stack('styles')
 </head>
 
 <body>
@@ -288,7 +302,6 @@
     <!-- Global UX Fixes -->
     <script src="{{ asset('frontend-assets/js/ux-fixes.js') }}"></script>
 
-    @stack('styles')
     @stack('scripts')
     @yield('scripts')
 
@@ -401,6 +414,82 @@
     </style>
     <script type="text/javascript">
         $(document).ready(function () {
+            // Global AJAX Add to Cart (for grid and card items)
+            $(document).on('click', '.btn-ajax-add-to-cart', function(e) {
+                e.preventDefault();
+                let formId = $(this).data('form-id');
+                let form = $('#' + formId);
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    method: form.attr('method'),
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            // Cập nhật số lượng trên icon giỏ hàng
+                            if (response.cart_count !== undefined) {
+                                let cartCountElements = document.querySelectorAll('.cart-count');
+                                cartCountElements.forEach(el => {
+                                    el.innerText = response.cart_count;
+                                    el.classList.remove('pulse-animation');
+                                    void el.offsetWidth;
+                                    el.classList.add('pulse-animation');
+                                });
+                            }
+
+                            // Cập nhật nội dung Mini Cart dropdown
+                            if (response.mini_cart_html) {
+                                $('.mini-cart-container').each(function() {
+                                    $(this).replaceWith(response.mini_cart_html);
+                                });
+                            }
+
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: response.message || 'Đã thêm vào giỏ hàng!',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                timerProgressBar: true,
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            // Missing variant or options
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Vui lòng chọn phân loại',
+                                text: 'Sản phẩm này có nhiều lựa chọn, vui lòng chọn kích thước/màu sắc trước khi thêm vào giỏ.',
+                                confirmButtonColor: '#ef233c',
+                            }).then((result) => {
+                                // Nếu sản phẩm không cấu hình sẵn form đầy đủ, chuyển hướng đến trang chi tiết
+                                let productLink = form.closest('.single_product').find('.primary_img').attr('href');
+                                if(productLink) {
+                                    window.location.href = productLink;
+                                }
+                            });
+                        } else if (xhr.status === 400 && xhr.responseJSON && xhr.responseJSON.message) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Không thể thêm',
+                                text: xhr.responseJSON.message,
+                                confirmButtonColor: '#ef233c',
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: 'Đã có lỗi xảy ra, không thể thêm vào giỏ hàng!',
+                                confirmButtonColor: '#ef233c',
+                            });
+                        }
+                    }
+                });
+            });
+
+            // Add to wishlist
             $(document).on('click', '.add-to-wishlist', function (e) {
                 e.preventDefault();
                 var productId = $(this).data('id');
@@ -440,6 +529,30 @@
             });
         });
     </script>
+    
+    @if(isset($unreviewedPromptItem) && $unreviewedPromptItem && !request()->routeIs('account.orders.show') && !request()->routeIs('product.detail'))
+    <div class="toast-container position-fixed bottom-0 start-0 p-3" style="z-index: 1080;">
+        <div id="reviewPromptToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false" style="border-radius:10px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); border:none;">
+            <div class="toast-header bg-dark text-white" style="border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                <i class="bi bi-star-fill text-warning me-2 pb-1"></i>
+                <strong class="me-auto">Đánh giá sản phẩm</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body bg-white" style="border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+                <p class="mb-2" style="font-size: 14px;">Bạn đã nhận được <strong>{{ $unreviewedPromptItem->product->name ?? 'sản phẩm' }}</strong>? Hãy đánh giá để giúp những người mua sau nhé!</p>
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{{ $unreviewedPromptItem->product->image_url ?? '' }}" alt="{{ $unreviewedPromptItem->product->name ?? '' }}" class="img-fluid rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                    <div class="ms-2 text-warning">
+                        <i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <a href="{{ route('account.orders.show', $unreviewedPromptItem->order_id) }}?review={{ $unreviewedPromptItem->product_id }}" class="btn btn-sm btn-dark w-100" style="border-radius: 5px;">Đánh giá ngay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </body>
 
 

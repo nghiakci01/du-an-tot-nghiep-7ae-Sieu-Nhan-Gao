@@ -33,18 +33,11 @@
                         <select name="role" id="role" class="form-select form-select-sm w-auto me-2">
                             <option value="">Tất cả</option>
                             <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Quản trị viên</option>
-                            <option value="staff" {{ request('role') == 'staff' ? 'selected' : '' }}>Nhân viên</option>
-                            <option value="customer" {{ request('role') == 'customer' ? 'selected' : '' }}>Khách hàng</option>
+                            <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>Khách hàng</option>
                         </select>
                         <button type="submit" class="btn btn-primary btn-sm">Lọc</button>
                     </form>
 
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
-                    @if(session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
-                    @endif
 
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
@@ -57,7 +50,7 @@
                                     <th>Vai trò</th>
                                     <th>Số đơn hàng</th>
                                     <th>Ngày tạo</th>
-                                    <th>Hành động</th>
+                                    <th class="sticky-action-column">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -70,8 +63,6 @@
                                         <td>
                                             @if($user->isAdmin())
                                                 <span class="badge bg-danger">Quản trị viên</span>
-                                            @elseif($user->isStaff())
-                                                <span class="badge bg-warning text-dark">Nhân viên</span>
                                             @else
                                                 <span class="badge bg-primary">Khách hàng</span>
                                             @endif
@@ -84,7 +75,7 @@
                                             @endif
                                         </td>
                                         <td>{{ $user->created_at->format('d/m/Y') }}</td>
-                                        <td>
+                                        <td class="sticky-action-column">
                                             <a href="{{ route('admin.users.edit', $user) }}"
                                                 class="btn btn-warning btn-sm">Sửa</a>
                                             @if($user->id !== auth()->id())

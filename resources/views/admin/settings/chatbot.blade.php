@@ -24,24 +24,6 @@
 
 <div class="row">
     <div class="col-md-12">
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-
-        @if($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show">
-                <ul class="mb-0">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-
         <ul class="nav nav-tabs mb-3" id="chatbotTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">Cấu hình chung</button>
@@ -56,9 +38,9 @@
             <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
                 <form action="{{ route('admin.settings.chatbot.update') }}" method="POST">
                     @csrf
-                    <div id="js-data" 
-                         data-old-rules="{{ json_encode(old('keyword_rules')) }}" 
-                         data-db-rules="{{ json_encode($chatbotSettings['keyword_rules'] ?? '[]') }}"
+                    <div id="js-data"
+                         data-old-rules='{{ old("keyword_rules") }}'
+                         data-db-rules='{{ $chatbotSettings["keyword_rules"] ?? "[]" }}'
                          style="display: none;"></div>
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -71,83 +53,62 @@
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label">Chế độ hoạt động</label>
-                                <select name="chatbot_mode" id="chatbot_mode" class="form-select @error('chatbot_mode') is-invalid @enderror">
+                                <select name="chatbot_mode" id="chatbot_mode" class="form-select">
                                     <option value="rules" {{ old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'rules' ? 'selected' : '' }}>Rule-based (Từ khóa)</option>
                                     <option value="ai" {{ old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai' ? 'selected' : '' }}>AI Assistant (AI thông minh)</option>
                                 </select>
-                                @error('chatbot_mode') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
-                            <div id="ai_provider_section" @style([
-                                'display: block' => old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai',
-                                'display: none' => old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') != 'ai'
-                            ])>
+                            <div id="ai_provider_section" style="display: {{ old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai' ? 'block' : 'none' }};">
                                 <div class="mb-3">
                                     <label class="form-label">Nhà cung cấp AI</label>
-                                    <select name="ai_provider" id="ai_provider" class="form-select @error('ai_provider') is-invalid @enderror">
+                                    <select name="ai_provider" id="ai_provider" class="form-select">
                                         <option value="gemini" {{ old('ai_provider', $chatbotSettings['ai_provider'] ?? '') == 'gemini' ? 'selected' : '' }}>Google Gemini (Khuyên dùng)</option>
-                                        <option value="openai" {{ old('ai_provider', $chatbotSettings['ai_provider'] ?? '') == 'openai' ? 'selected' : '' }}>OpenAI (GPT-3.5/4)</option>
                                     </select>
-                                    @error('ai_provider') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Câu chào mừng</label>
-                                <textarea name="greeting_message" class="form-control @error('greeting_message') is-invalid @enderror" rows="3">{{ old('greeting_message', $chatbotSettings['greeting_message'] ?? '') }}</textarea>
-                                @error('greeting_message') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <textarea name="greeting_message" class="form-control" rows="3">{{ old('greeting_message', $chatbotSettings['greeting_message'] ?? '') }}</textarea>
                                 <small class="text-muted">Hiển thị khi khách hàng lần đầu mở khung chat.</small>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Câu phản hồi khi không hiểu (Fallback)</label>
-                                <textarea name="fallback_message" class="form-control @error('fallback_message') is-invalid @enderror" rows="3">{{ old('fallback_message', $chatbotSettings['fallback_message'] ?? '') }}</textarea>
-                                @error('fallback_message') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <textarea name="fallback_message" class="form-control" rows="3">{{ old('fallback_message', $chatbotSettings['fallback_message'] ?? '') }}</textarea>
                                 <small class="text-muted">Sử dụng {hotline} để tự động chèn số điện thoại hỗ trợ.</small>
                             </div>
 
-                            <div id="system_instruction_section" @style([
-                                'display: block' => old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai',
-                                'display: none' => old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') != 'ai'
-                            ])>
+                            <div id="system_instruction_section" style="display: {{ old('chatbot_mode', $chatbotSettings['chatbot_mode'] ?? '') == 'ai' ? 'block' : 'none' }};">
                                 <div class="mb-3">
                                     <label class="form-label">System Instruction (Chỉ dẫn cho AI)</label>
-                                    <textarea name="system_instruction" class="form-control @error('system_instruction') is-invalid @enderror" rows="10">{{ old('system_instruction', $chatbotSettings['system_instruction'] ?? '') }}</textarea>
-                                    @error('system_instruction') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                    <div class="mt-2">
-                                        <small class="text-muted d-block">Đây là "linh hồn" của AI. Hãy định nghĩa <b>Bạn là ai</b>, <b>Bạn phải làm gì</b> và <b>Dữ liệu</b>.</small>
-                                        <small class="text-info d-block">Có thể dùng biến: {hotline}, {email}, {categories}</small>
-                                    </div>
+                                    <textarea name="system_instruction" class="form-control" rows="8">{{ old('system_instruction', $chatbotSettings['system_instruction'] ?? '') }}</textarea>
+                                    <small class="text-info d-block mt-1">Có thể dùng biến: {hotline}, {email}, {categories}</small>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card mt-4">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5>Quản lý từ khóa (Keyword Rules)</h5>
-                            <button type="button" class="btn btn-sm btn-success" id="add-keyword-rule">
+                    <div class="card mt-4 border-0 shadow-sm border-start border-success border-4">
+                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <h5 class="mb-0 text-success"><i class="ti ti-key me-2"></i>Quản lý từ khóa (Keyword Rules)</h5>
+                                <p class="text-muted small mb-0 mt-1">Chatbot sẽ phản hồi dựa trên từ khóa khớp (Quy tắc trên cùng được ưu tiên)</p>
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm px-3 shadow-sm" id="add-keyword-rule">
                                 <i class="ti ti-plus me-1"></i> Thêm quy tắc
                             </button>
                         </div>
-                        <div class="card-body">
-                            <p class="text-muted small mb-1">Khi khách hàng nhắn tin khớp với từ khóa, Chatbot sẽ trả lời bằng câu văn bản tương ứng. Hệ thống sẽ kiểm tra theo thứ tự từ trên xuống dưới.</p>
-                            <div class="alert alert-info border-0 shadow-none py-2 px-3 mb-3" style="background: rgba(var(--bs-info-rgb), 0.1);">
-                                <small class="fw-bold d-block mb-1 text-info"><i class="ti ti-info-circle me-1"></i> Các thẻ động (Dynamic Tags) hỗ trợ:</small>
-                                <div class="d-flex flex-wrap gap-3">
-                                    <code class="text-primary small" title="Hiện danh sách sản phẩm liên quan">{product}</code>
-                                    <code class="text-primary small" title="Số hotline hệ thống">{hotline}</code>
-                                    <code class="text-primary small" title="Email hỗ trợ hệ thống">{email}</code>
-                                    <code class="text-primary small" title="Danh sách các danh mục sản phẩm">{categories}</code>
-                                </div>
-                            </div>
+                        <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle" id="keyword-rules-table">
-                                    <thead>
+                                <table class="table table-hover align-middle mb-0" id="keyword-rules-table">
+                                    <thead class="bg-light bg-opacity-50">
                                         <tr>
-                                            <th style="width: 30%">Từ khóa / Mẫu (Regex)</th>
-                                            <th>Câu trả lời</th>
-                                            <th style="width: 80px" class="text-center">Xóa</th>
+                                            <th style="width: 50px" class="ps-3 text-center">STT</th>
+                                            <th style="width: 30%">Từ khóa (Phân cách bằng dấu phẩy)</th>
+                                            <th>Câu trả lời & Thẻ động</th>
+                                            <th style="width: 120px" class="text-center ps-3 pe-3">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody id="keyword-rules-body">
@@ -156,49 +117,39 @@
                                 </table>
                             </div>
                             <input type="hidden" name="keyword_rules" id="keyword_rules_input">
+
+                            <div class="px-3 py-3 border-top bg-light bg-opacity-25">
+                                <span class="fw-bold small d-block mb-2 text-info"><i class="ti ti-info-circle me-1"></i> Các thẻ động được hỗ trợ:</span>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle cursor-help tag-info" title="Hiện sản phẩm liên quan">{product}</span>
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle cursor-help tag-info" title="Số điện thoại">{hotline}</span>
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle cursor-help tag-info" title="Email liên hệ">{email}</span>
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle cursor-help tag-info" title="Danh sách danh mục">{categories}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="card mt-4">
-                        <div class="card-header">
-                            <h5>Thông tin hỗ trợ & AI Keys</h5>
-                        </div>
+                        <div class="card-header"><h5>Thông tin hỗ trợ & AI Keys</h5></div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Số Hotline</label>
-                                    <input type="text" name="hotline" class="form-control @error('hotline') is-invalid @enderror" value="{{ old('hotline', $chatbotSettings['hotline'] ?? '') }}">
-                                    @error('hotline') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    <input type="text" name="hotline" class="form-control" value="{{ old('hotline', $chatbotSettings['hotline'] ?? '') }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Email hỗ trợ</label>
-                                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $chatbotSettings['email'] ?? '') }}">
-                                    @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    <input type="email" name="email" class="form-control" value="{{ old('email', $chatbotSettings['email'] ?? '') }}">
                                 </div>
                             </div>
 
-                            <div id="gemini_key_section" class="provider-key-section" {!! old('ai_provider', $chatbotSettings['ai_provider'] ?? 'gemini') != 'gemini' ? 'style="display: none;"' : 'style="display: block;"' !!}>
+                            <div id="gemini_key_section" class="provider-key-section" style="display: {{ old('ai_provider', $chatbotSettings['ai_provider'] ?? 'gemini') == 'gemini' ? 'block' : 'none' }};">
                                 <div class="mb-3">
                                     <label class="form-label">Gemini API Key</label>
                                     <div class="input-group">
-                                        <input type="password" name="gemini_api_key" id="gemini_api_key" class="form-control @error('gemini_api_key') is-invalid @enderror" value="{{ old('gemini_api_key', $chatbotSettings['gemini_api_key'] ?? '') }}">
-                                        <button type="button" class="btn btn-outline-info btn-test-connection" data-provider="gemini">
-                                            <i class="ti ti-plug me-1"></i> Kiểm tra Gemini
-                                        </button>
-                                        @error('gemini_api_key') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="openai_key_section" class="provider-key-section" {!! old('ai_provider', $chatbotSettings['ai_provider'] ?? '') != 'openai' ? 'style="display: none;"' : 'style="display: block;"' !!}>
-                                <div class="mb-3">
-                                    <label class="form-label">OpenAI API Key</label>
-                                    <div class="input-group">
-                                        <input type="password" name="openai_api_key" id="openai_api_key" class="form-control @error('openai_api_key') is-invalid @enderror" value="{{ old('openai_api_key', $chatbotSettings['openai_api_key'] ?? '') }}">
-                                        <button type="button" class="btn btn-outline-info btn-test-connection" data-provider="openai">
-                                            <i class="ti ti-plug me-1"></i> Kiểm tra OpenAI
-                                        </button>
-                                        @error('openai_api_key') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        <input type="password" name="gemini_api_key" id="gemini_api_key" class="form-control" value="{{ old('gemini_api_key', $chatbotSettings['gemini_api_key'] ?? '') }}">
+                                        <button type="button" class="btn btn-outline-info btn-test-connection" data-provider="gemini"><i class="ti ti-plug me-1"></i> Kiểm tra</button>
                                     </div>
                                 </div>
                             </div>
@@ -208,7 +159,7 @@
                     </div>
 
                     <div class="mt-4 text-end">
-                        <button type="submit" class="btn btn-primary">Lưu cấu hình</button>
+                        <button type="submit" class="btn btn-primary shadow-sm px-4">Lưu cấu hình</button>
                     </div>
                 </form>
             </div>
@@ -222,27 +173,26 @@
                             <i class="ti ti-plus me-1"></i> Thêm mới
                         </a>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light bg-opacity-50">
                                     <tr>
-                                        <th style="width: 80px">Thứ tự</th>
+                                        <th style="width: 80px" class="ps-3">Thứ tự</th>
                                         <th>Câu hỏi (Nút bấm)</th>
                                         <th>Câu trả lời mẫu</th>
                                         <th style="width: 120px">Trạng thái</th>
-                                        <th style="width: 150px" class="text-center">Hành động</th>
+                                        <th style="width: 120px" class="text-center pe-3">Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if(count($questions) > 0)
-                                        @foreach($questions as $question) @php /** @var \App\Models\ChatbotQuestion $question */ @endphp
+                                    @forelse($questions as $question)
                                     <tr>
-                                        <td><span class="badge bg-light text-dark border">{{ $question->order }}</span></td>
+                                        <td class="ps-3"><span class="badge bg-light text-dark border">{{ $question->order }}</span></td>
                                         <td class="fw-bold">{{ $question->question }}</td>
                                         <td>
                                             @if($question->answer)
-                                                <div class="text-muted small text-truncate" style="max-width: 250px;">{{ $question->answer }}</div>
+                                                <div class="text-muted small text-truncate" style="max-width: 300px;">{{ $question->answer }}</div>
                                             @else
                                                 <span class="text-muted small italic">Sử dụng quy tắc/AI</span>
                                             @endif
@@ -254,30 +204,19 @@
                                                 <span class="badge bg-secondary-subtle text-secondary">Tạm ẩn</span>
                                             @endif
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-center pe-3">
                                             <div class="btn-group btn-group-sm">
-                                                <a href="{{ route('admin.chatbot.questions.edit', $question) }}" class="btn btn-warning" title="Sửa">
-                                                    <i class="ti ti-edit"></i>
-                                                </a>
-                                                <form action="{{ route('admin.chatbot.questions.destroy', $question) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận xóa câu hỏi này?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger" title="Xóa">
-                                                        <i class="ti ti-trash"></i>
-                                                    </button>
-                                                </form>
+                                                <a href="{{ route('admin.chatbot.questions.edit', $question) }}" class="btn btn-warning"><i class="ti ti-edit"></i></a>
+                                                <button type="button" class="btn btn-danger" onclick="confirmDelete('delete-question-{{ $question->id }}')"><i class="ti ti-trash"></i></button>
                                             </div>
+                                            <form id="delete-question-{{ $question->id }}" action="{{ route('admin.chatbot.questions.destroy', $question) }}" method="POST" class="d-none no-pjax">
+                                                @csrf @method('DELETE')
+                                            </form>
                                         </td>
                                     </tr>
-                                        @endforeach
-                                    @else
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4 text-muted">
-                                            <i class="ti ti-help-circle fs-2 d-block mb-2"></i>
-                                            Chưa có câu hỏi gợi ý nào.
-                                        </td>
-                                    </tr>
-                                    @endif
+                                    @empty
+                                    <tr><td colspan="5" class="text-center py-5 text-muted">Chưa có câu hỏi gợi ý nào.</td></tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -287,141 +226,102 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
+{{-- SCRIPT ĐẶT TRONG @section('content') ĐỂ TỰ ĐỘNG CHẠY LẠI SAU KHI PJAX UPDATE --}}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
+    console.log("Chatbot settings JS re-initializing (Pjax-ready)...");
+
+    // 1. Khai báo các elements chính
     const chatbotMode = document.getElementById('chatbot_mode');
     const aiProviderSection = document.getElementById('ai_provider_section');
     const systemInstructionSection = document.getElementById('system_instruction_section');
     const aiProvider = document.getElementById('ai_provider');
-    const geminiSection = document.getElementById('gemini_key_section');
-    const openaiSection = document.getElementById('openai_key_section');
+    const chatbotForm = document.querySelector('form[action*="chatbot/update"]');
 
+    if (!chatbotMode) return;
+
+    // 2. Logic đồng bộ hiển thị các phần tử
     function syncSections() {
         const isAI = chatbotMode.value === 'ai';
-        aiProviderSection.style.display = isAI ? 'block' : 'none';
-        systemInstructionSection.style.display = isAI ? 'block' : 'none';
-        
-        const provider = aiProvider.value;
-        const sections = document.querySelectorAll('.provider-key-section');
-        sections.forEach(s => s.style.display = 'none');
-        
+        if (aiProviderSection) aiProviderSection.style.display = isAI ? 'block' : 'none';
+        if (systemInstructionSection) systemInstructionSection.style.display = isAI ? 'block' : 'none';
+
+        const provider = aiProvider ? aiProvider.value : 'gemini';
+        document.querySelectorAll('.provider-key-section').forEach(s => s.style.display = 'none');
+
         if (isAI) {
             const activeSection = document.getElementById(provider + '_key_section');
             if (activeSection) activeSection.style.display = 'block';
         }
     }
 
-    // Chuyển đổi hiển thị AI Provider & System Instruction
     chatbotMode.addEventListener('change', syncSections);
-    aiProvider.addEventListener('change', syncSections);
+    if (aiProvider) aiProvider.addEventListener('change', syncSections);
+    syncSections(); // Khởi tạo lần đầu
 
-    // Run on load
-    syncSections();
-
-    // Xử lý kiểm tra kết nối
+    // 3. Xử lý Kiểm tra kết nối API
     document.querySelectorAll('.btn-test-connection').forEach(btn => {
         btn.addEventListener('click', function() {
             const provider = this.getAttribute('data-provider');
-            const apiKey = document.getElementById(provider + '_api_key').value;
+            const apiKeyInput = document.getElementById(provider + '_api_key');
+            if (!apiKeyInput) return;
+
+            const apiKey = apiKeyInput.value;
             const resultDiv = document.getElementById('test-connection-result');
-            
-            // Reset state
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'mt-2 alert alert-warning';
-            resultDiv.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Đang kết nối thử với ' + provider + '...';
+
+            if (resultDiv) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'mt-2 alert alert-warning';
+                resultDiv.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang kiểm tra...';
+            }
             this.disabled = true;
 
             fetch('{{ route("admin.settings.chatbot.test") }}', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ 
-                    ai_provider: provider,
-                    api_key: apiKey 
-                })
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify({ ai_provider: provider, api_key: apiKey })
             })
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
                 this.disabled = false;
-                if (data.success) {
-                    resultDiv.className = 'mt-2 alert alert-success';
-                    resultDiv.innerHTML = data.message;
-                } else {
-                    resultDiv.className = 'mt-2 alert alert-danger';
-                    resultDiv.innerHTML = data.message;
-                }
+                if (!resultDiv) return;
+                resultDiv.className = 'mt-2 alert alert-' + (data.success ? 'success' : 'danger');
+                resultDiv.innerHTML = data.message;
             })
-            .catch(error => {
+            .catch(e => {
                 this.disabled = false;
-                resultDiv.className = 'mt-2 alert alert-danger';
-                resultDiv.innerHTML = 'Lỗi hệ thống khi gửi yêu cầu. Vui lòng thử lại sau!';
-                console.error('Error:', error);
+                if (resultDiv) {
+                    resultDiv.className = 'mt-2 alert alert-danger';
+                    resultDiv.innerHTML = 'Lỗi hệ thống!';
+                }
             });
         });
     });
 
-    // Xử lý chuyển tab tự động từ URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const activeTab = urlParams.get('tab');
-    if (activeTab === 'questions') {
-        const questionsTab = document.getElementById('questions-tab');
-        if (questionsTab) {
-            new bootstrap.Tab(questionsTab).show();
-        }
-    }
-
-    // Logic cho Quản lý từ khóa
+    // 4. Logic quản lý Keyword Rules
     const rulesBody = document.getElementById('keyword-rules-body');
     const addBtn = document.getElementById('add-keyword-rule');
     const rulesInput = document.getElementById('keyword_rules_input');
-    
-    // Load existing rules - Safely pass from PHP to JS via data attributes
     let rules = [];
+
+    // Tải dữ liệu ban đầu
     try {
         const jsData = document.getElementById('js-data');
-        const oldRules = jsData.dataset.oldRules ? JSON.parse(jsData.dataset.oldRules) : null;
-        let dbRulesRaw = jsData.dataset.dbRules;
-        const dbRules = dbRulesRaw ? JSON.parse(dbRulesRaw) : [];
-        
-        const rawJson = (oldRules !== null && typeof oldRules !== 'undefined') ? oldRules : dbRules;
-        rules = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
-        if (!Array.isArray(rules)) rules = [];
-    } catch (e) {
-        console.error('Failed to parse keyword rules:', e);
-        rules = [];
-    }
-
-    function renderRules() {
-        if (!rulesBody) return;
-        rulesBody.innerHTML = '';
-        if (rules.length === 0) {
-            rulesBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">Chưa có quy tắc nào. Hãy nhấn "Thêm quy tắc" để bắt đầu.</td></tr>';
-            return;
+        if (jsData) {
+            let rawOld = jsData.dataset.oldRules;
+            let rawDb = jsData.dataset.dbRules;
+            let rawJson = (rawOld && rawOld !== 'null' && rawOld !== '') ? rawOld : rawDb;
+            if (rawJson) rules = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
+            if (!Array.isArray(rules)) rules = [];
         }
+    } catch (e) { console.error('Lỗi parse keyword rules:', e); }
 
-        rules.forEach((rule, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>
-                    <input type="text" class="form-control rule-keyword" value="${escapeHtml(rule.keyword || '')}" placeholder="Vd: khuyến mãi, giá,..." data-index="${index}">
-                </td>
-                <td>
-                    <textarea class="form-control rule-response" rows="2" placeholder="Nhập câu trả lời..." data-index="${index}">${escapeHtml(rule.response || '')}</textarea>
-                </td>
-                <td class="text-center">
-                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-rule" data-index="${index}">
-                        <i class="ti ti-trash"></i>
-                    </button>
-                </td>
-            `;
-            rulesBody.appendChild(tr);
-        });
-        updateHiddenInput();
+    function updateHiddenInput() { if (rulesInput) rulesInput.value = JSON.stringify(rules); }
+
+    function autoResize(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight + 2) + 'px';
     }
 
     function escapeHtml(text) {
@@ -430,42 +330,113 @@ document.addEventListener('DOMContentLoaded', function() {
         return div.innerHTML;
     }
 
-    function updateHiddenInput() {
-        if (rulesInput) {
-            rulesInput.value = JSON.stringify(rules);
-        }
-    }
-
-    if (addBtn) {
-        addBtn.addEventListener('click', function() {
-            rules.push({ keyword: '', response: '' });
-            renderRules();
+    function refreshControlButtons() {
+        const rows = rulesBody.querySelectorAll('.rule-row');
+        rows.forEach((row, index) => {
+            row.dataset.index = index;
+            row.querySelector('.row-index').textContent = index + 1;
+            row.querySelectorAll('[data-index]').forEach(el => el.dataset.index = index);
+            const upBtn = row.querySelector('.btn-move-up');
+            const downBtn = row.querySelector('.btn-move-down');
+            if (upBtn) upBtn.disabled = (index === 0);
+            if (downBtn) downBtn.disabled = (index === rows.length - 1);
         });
     }
 
+    function createRuleRow(rule, index) {
+        const tr = document.createElement('tr');
+        tr.className = 'rule-row';
+        tr.dataset.index = index;
+        tr.innerHTML = `
+            <td class="text-center text-muted small fw-bold row-index ps-3">${index + 1}</td>
+            <td><input type="text" class="form-control form-control-sm rule-keyword" value="${escapeHtml(rule.keyword || '')}" placeholder="Từ khóa..." data-index="${index}"></td>
+            <td>
+                <div class="position-relative">
+                    <textarea class="form-control form-control-sm rule-response auto-expand" rows="1" placeholder="Câu trả lời..." data-index="${index}">${escapeHtml(rule.response || '')}</textarea>
+                    <div class="mt-1 d-flex gap-1">
+                        <button type="button" class="btn btn-xs btn-outline-info tag-shortcut" data-tag="{product}">+ Sản phẩm</button>
+                        <button type="button" class="btn btn-xs btn-outline-info tag-shortcut" data-tag="{hotline}">+ Hotline</button>
+                        <button type="button" class="btn btn-xs btn-outline-info tag-shortcut" data-tag="{categories}">+ Danh mục</button>
+                    </div>
+                </div>
+            </td>
+            <td class="text-center ps-3 pe-3">
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-secondary btn-move-up" ${index === 0 ? 'disabled' : ''}><i class="ti ti-arrow-up"></i></button>
+                    <button type="button" class="btn btn-outline-secondary btn-move-down" ${index === rules.length - 1 ? 'disabled' : ''}><i class="ti ti-arrow-down"></i></button>
+                    <button type="button" class="btn btn-outline-danger btn-remove-rule" title="Xóa"><i class="ti ti-trash"></i></button>
+                </div>
+            </td>
+        `;
+        return tr;
+    }
+
+    function renderRules() {
+        if (!rulesBody) return;
+        rulesBody.innerHTML = '';
+        if (rules.length === 0) {
+            rulesBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Chưa có quy tắc nào.</td></tr>';
+            return;
+        }
+        rules.forEach((rule, index) => rulesBody.appendChild(createRuleRow(rule, index)));
+        document.querySelectorAll('.auto-expand').forEach(ta => autoResize(ta));
+        updateHiddenInput();
+    }
+
+    if (addBtn) addBtn.addEventListener('click', () => {
+        const index = rules.length;
+        rules.push({ keyword: '', response: '' });
+        if (rules.length === 1) rulesBody.innerHTML = '';
+        const row = createRuleRow(rules[index], index);
+        rulesBody.appendChild(row);
+        row.querySelector('.rule-keyword').focus();
+        refreshControlButtons();
+        updateHiddenInput();
+    });
+
     if (rulesBody) {
-        rulesBody.addEventListener('click', function(e) {
-            const btn = e.target.closest('.btn-remove-rule');
-            if (btn) {
-                const index = btn.dataset.index;
+        rulesBody.addEventListener('click', (e) => {
+            const row = e.target.closest('.rule-row');
+            if (!row) return;
+            const index = parseInt(row.dataset.index);
+
+            if (e.target.closest('.btn-remove-rule')) {
                 rules.splice(index, 1);
                 renderRules();
+            } else if (e.target.closest('.btn-move-up') && index > 0) {
+                [rules[index], rules[index-1]] = [rules[index-1], rules[index]];
+                renderRules();
+            } else if (e.target.closest('.btn-move-down') && index < rules.length - 1) {
+                [rules[index], rules[index+1]] = [rules[index+1], rules[index]];
+                renderRules();
+            } else if (e.target.closest('.tag-shortcut')) {
+                const tag = e.target.closest('.tag-shortcut').dataset.tag;
+                const textarea = row.querySelector('.rule-response');
+                const start = textarea.selectionStart;
+                textarea.value = textarea.value.slice(0, start) + tag + textarea.value.slice(textarea.selectionEnd);
+                textarea.focus();
+                rules[index].response = textarea.value;
+                updateHiddenInput();
+                autoResize(textarea);
             }
         });
 
-        rulesBody.addEventListener('input', function(e) {
-            const input = e.target;
-            const index = input.dataset.index;
-            if (input.classList.contains('rule-keyword')) {
-                rules[index].keyword = input.value;
-            } else if (input.classList.contains('rule-response')) {
-                rules[index].response = input.value;
+        rulesBody.addEventListener('input', (e) => {
+            const row = e.target.closest('.rule-row');
+            if (!row) return;
+            const index = parseInt(row.dataset.index);
+            if (e.target.classList.contains('rule-keyword')) rules[index].keyword = e.target.value;
+            else if (e.target.classList.contains('rule-response')) {
+                rules[index].response = e.target.value;
+                autoResize(e.target);
             }
             updateHiddenInput();
         });
     }
 
+    if (chatbotForm) chatbotForm.addEventListener('submit', () => updateHiddenInput());
+
     renderRules();
-});
+})();
 </script>
 @endsection

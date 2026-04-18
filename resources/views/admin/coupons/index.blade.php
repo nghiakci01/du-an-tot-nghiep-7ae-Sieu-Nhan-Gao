@@ -27,12 +27,6 @@
                 <a href="{{ route('admin.coupons.create') }}" class="btn btn-primary btn-sm">Thêm mới</a>
             </div>
             <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-                @if(session('error'))
-                    <div class="alert alert-danger">{{ session('error') }}</div>
-                @endif
 
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
@@ -46,7 +40,7 @@
                                 <th>Lượt dùng</th>
                                 <th>Thời hạn</th>
                                 <th>Trạng thái</th>
-                                <th>Hành động</th>
+                                <th class="sticky-action-column">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -104,7 +98,7 @@
                                     @endif
                                 </td>
                                 <td>{!! $coupon->getStatusBadge() !!}</td>
-                                <td>
+                                <td class="sticky-action-column">
                                     <a href="{{ route('admin.coupons.edit', $coupon) }}" class="btn btn-warning btn-sm">Sửa</a>
                                     <form action="{{ route('admin.coupons.destroy', $coupon) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
                                         @csrf

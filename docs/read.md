@@ -22,7 +22,6 @@ Tài liệu phục vụ cho dự án tốt nghiệp trong thời gian 4 tháng.
 Website cung cấp nền tảng bán quần áo trực tuyến, cho phép:
 
 * Khách hàng xem sản phẩm, đặt hàng, thanh toán và theo dõi đơn hàng
-* Nhân viên hỗ trợ bán hàng, xử lý đơn và tồn kho
 * Chủ cửa hàng quản lý toàn bộ hệ thống, doanh thu và báo cáo
 
 Việc giao hàng được thực hiện thông qua đơn vị vận chuyển bên thứ ba.
@@ -37,7 +36,6 @@ Website phục vụ:
 
 * **SRS:** Software Requirements Specification
 * **Admin:** Chủ cửa hàng / Quản trị hệ thống
-* **Nhân viên:** Nhân viên bán hàng, hỗ trợ vận hành
 * **User:** Khách hàng đã đăng ký tài khoản
 * **Guest:** Khách hàng vãng lai
 
@@ -83,14 +81,13 @@ Hệ thống hoạt động trên trình duyệt web, hỗ trợ:
 | Actor               | Mô tả                                      |
 | ------------------- | ------------------------------------------ |
 | Admin               | Quản lý toàn bộ hệ thống                   |
-| Nhân viên           | Hỗ trợ bán hàng, xử lý đơn và kho          |
 | Khách hàng          | Đăng ký tài khoản và mua hàng              |
 | Khách hàng vãng lai | Xem sản phẩm, cần đăng nhập khi thanh toán |
 
 ### 2.3 Sơ đồ tổng quát (mô tả)
 
 * Khách hàng / Guest ↔ Website ↔ Cơ sở dữ liệu
-* Admin / Nhân viên ↔ Trang quản trị ↔ Cơ sở dữ liệu
+* Admin ↔ Trang quản trị ↔ Cơ sở dữ liệu
 
 ### 2.4 Ràng buộc hệ thống
 
@@ -103,7 +100,7 @@ Hệ thống hoạt động trên trình duyệt web, hỗ trợ:
 
 * Người dùng có kiến thức cơ bản về sử dụng website
 * Người dùng có email hợp lệ
-* Admin và nhân viên được đào tạo sử dụng hệ thống
+* Admin được đào tạo sử dụng hệ thống
 
 ---
 
@@ -196,13 +193,15 @@ Hệ thống hoạt động trên trình duyệt web, hỗ trợ:
 
 ---
 
-### 3.5 Chức năng cho Nhân viên
+### 3.5 Chức năng vận hành nội bộ
 
 #### FR-14: Xử lý đơn hàng
 
+* **Actor:** Admin
 * Cập nhật trạng thái đơn
 
 #### FR-15: Quản lý tồn kho
+* **Actor:** Admin
 
 ---
 

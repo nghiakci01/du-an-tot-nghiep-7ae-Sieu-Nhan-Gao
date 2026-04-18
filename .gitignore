@@ -11,9 +11,13 @@ Thumbs.db
 
 /public/build
 /public/hot
-/public/storage
 
 /storage/*.key
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/app/public/*
 /storage/pail
 
 .phpunit.result.cache
@@ -28,3 +32,6 @@ auth.json
 
 Homestead.yaml
 Homestead.json
+
+/public/storage
+/storage/app/public
