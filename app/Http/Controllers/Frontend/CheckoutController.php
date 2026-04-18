@@ -113,41 +113,50 @@ class CheckoutController extends Controller
 
         $defaultBank = null;
 
-        // Fetch all active coupons and pre-check applicability
-        $availableCoupons = Coupon::active()
-            ->where(function($q) {
-                $q->whereNull('start_date')->orWhere('start_date', '<=', now());
-            })
-            ->where(function($q) {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', now());
-            })
-            ->orderByDesc('value')
-            ->get()
-            ->map(function($c) use ($total) {
-                $isApplicable = true;
-                $reason = '';
+        // Fetch ONLY coupons claimed by or gifted to the user
+        $availableCoupons = collect();
+        if (Auth::check()) {
+            $availableCoupons = Coupon::active()
+                ->where(function($q) {
+                    $q->whereNull('start_date')->orWhere('start_date', '<=', now());
+                })
+                ->where(function($q) {
+                    $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+                })
+                ->where(function($q) {
+                    $q->where('user_id', Auth::id())
+                      ->orWhereHas('claimedByUsers', function($sq) {
+                          $sq->where('user_id', Auth::id())->whereNull('used_at');
+                      });
+                })
+                ->orderByDesc('value')
+                ->get()
+                ->map(function($c) use ($total) {
+                    $isApplicable = true;
+                    $reason = '';
 
-                if ($c->hasReachedUsageLimit()) {
-                    $isApplicable = false;
-                    $reason = 'Hết lượt sử dụng';
-                } elseif ($c->min_order_amount && $total < $c->min_order_amount) {
-                    $isApplicable = false;
-                    $reason = 'Chưa đạt ₫' . number_format($c->min_order_amount, 0, ',', '.');
-                } elseif (Auth::check()) {
-                    $alreadyUsed = \App\Models\Order::where('user_id', Auth::id())
-                        ->where('coupon_code', $c->code)
-                        ->whereNotIn('status', ['cancelled', 'failed'])
-                        ->exists();
-                    if ($alreadyUsed) {
+                    if ($c->hasReachedUsageLimit()) {
                         $isApplicable = false;
-                        $reason = 'Bạn đã sử dụng mã này';
+                        $reason = 'Hết lượt sử dụng';
+                    } elseif ($c->min_order_amount && $total < $c->min_order_amount) {
+                        $isApplicable = false;
+                        $reason = 'Chưa đạt ₫' . number_format($c->min_order_amount, 0, ',', '.');
+                    } else {
+                        $alreadyUsed = \App\Models\Order::where('user_id', Auth::id())
+                            ->where('coupon_code', $c->code)
+                            ->whereNotIn('status', ['cancelled', 'failed'])
+                            ->exists();
+                        if ($alreadyUsed) {
+                            $isApplicable = false;
+                            $reason = 'Bạn đã sử dụng mã này';
+                        }
                     }
-                }
 
-                $c->is_applicable = $isApplicable;
-                $c->failure_reason = $reason;
-                return $c;
-            });
+                    $c->is_applicable = $isApplicable;
+                    $c->failure_reason = $reason;
+                    return $c;
+                });
+        }
 
         return view('frontend.checkout.index', compact(
             'cart', 'total', 'coupon', 'discount', 'shippingFee', 'shippingProviderName', 'shippingExpectedDeliveryTime', 'finalTotal',
@@ -634,7 +643,7 @@ class CheckoutController extends Controller
             $usedInPivot = DB::table('coupon_user')
                 ->where('user_id', Auth::id())
                 ->where('coupon_id', $coupon->id)
-                ->whereNotNull('claimed_at')
+                ->whereNotNull('used_at')
                 ->exists();
 
             if ($usedInPivot) {
@@ -645,12 +654,15 @@ class CheckoutController extends Controller
             }
         }
 
-        // Check if coupon belongs to this user
-        if ($coupon->user_id && $coupon->user_id != Auth::id()) {
+        // Check if coupon belongs to this user or is claimed
+        $isGifted = Auth::check() && $coupon->user_id == Auth::id();
+        $isClaimed = Auth::check() && $coupon->isClaimedBy(Auth::user());
+
+        if (!$isGifted && !$isClaimed) {
             return response()->json([
                 'success' => false,
-                'message' => __('Mã giảm giá này không dành cho tài khoản của bạn.'),
-            ], 400);
+                'message' => __('Bạn cần lưu mã giảm giá này vào tài khoản trước khi sử dụng.'),
+            ], 403);
         }
 
         if ($coupon->min_order_amount && $total < $coupon->min_order_amount) {

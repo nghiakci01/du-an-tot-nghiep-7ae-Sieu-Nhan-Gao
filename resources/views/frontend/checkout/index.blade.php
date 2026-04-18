@@ -529,7 +529,7 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
             @if(isset($availableCoupons) && $availableCoupons->isNotEmpty())
               <div class="mt-4">
                 <h4 style="font-size:13px; font-weight:700; color:var(--ck-black); margin-bottom:12px; display:flex; align-items:center; gap:6px;">
-                  <i class="bi bi-ticket-perforated"></i> Mã giảm giá dành cho bạn
+                  <i class="bi bi-ticket-perforated"></i> Mã giảm giá của bạn
                 </h4>
                 <div class="ck-v-list">
                   @foreach($availableCoupons as $v)
@@ -1069,6 +1069,20 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       [btn1, btn2].forEach(b=>{ if(b){ b.disabled=true; b.textContent='Đang xử lý…'; } });
     }
   });
+
+  function init(){
+    // Bind Guest Address (if exists)
+    const gP = qs('#g_province'), gC = qs('#g_commune');
+    if(gP && gC) bindCascade(gP, gC, '{{ old("province") }}', '{{ old("commune") }}');
+
+    // Initial Address Selection (if auth)
+    @auth
+      const selCard = qs('.mpick-card.is-sel');
+      if(selCard) applyAddrSelection(selCard);
+    @endauth
+  }
+
+  init();
 })();
 </script>
 @endsection
