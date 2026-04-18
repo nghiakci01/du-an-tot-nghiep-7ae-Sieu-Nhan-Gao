@@ -123,10 +123,26 @@ class AccountController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $validated = $request->validated();
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => ['nullable', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'current_password' => 'required_with:new_password|nullable',
+            'new_password' => 'nullable|min:8|confirmed',
+            'bank_name' => 'nullable|string|max:255',
+            'bank_bin' => 'nullable|string|max:20',
+            'account_number' => 'nullable|string|max:50',
+            'account_name' => 'nullable|string|max:255',
+        ], [
+            'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
+        ]);
 
-        $user->name = $validated['name'];
-        $user->phone = $validated['phone'] ?? null;
+        $user->name = $request->name;
+        $user->phone = $request->phone;
+        $user->bank_name = $request->bank_name;
+        $user->bank_bin = $request->bank_bin;
+        $user->account_number = $request->account_number;
+        $user->account_name = $request->account_name;
 
         if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             if ($user->avatar) {
@@ -215,30 +231,21 @@ class AccountController extends Controller
             }
         }
 
-        // Filter selected items and calculate refund amount
+        // Force return all items strategy
         $selectedItems = [];
         $totalRefund = 0;
 
-        foreach ($request->items as $itemId => $data) {
-            if (isset($data['selected']) && $data['selected'] == 1) {
-                $orderItem = \App\Models\OrderItem::where('order_id', $order->id)->findOrFail($itemId);
-
-                $qty = (int) ($data['quantity'] ?? 1);
-                if ($qty > $orderItem->quantity) {
-                    return redirect()->back()->with('error', "Số lượng trả của sản phẩm {$orderItem->product_name} vượt quá số lượng đã mua.");
-                }
-
-                $selectedItems[] = [
-                    'order_item_id' => $itemId,
-                    'quantity' => $qty,
-                    'price' => $orderItem->price,
-                ];
-                $totalRefund += $qty * $orderItem->price;
-            }
+        foreach ($order->items as $item) {
+            $selectedItems[] = [
+                'order_item_id' => $item->id,
+                'quantity' => $item->quantity, // Return full quantity
+                'price' => $item->price,
+            ];
+            $totalRefund += $item->quantity * $item->price;
         }
 
         if (empty($selectedItems)) {
-            return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một sản phẩm để hoàn trả.');
+            return redirect()->back()->with('error', 'Đơn hàng này không có sản phẩm để hoàn trả.');
         }
 
         $imagePaths = [];
@@ -265,7 +272,7 @@ class AccountController extends Controller
             $returnRequest = \App\Models\OrderReturnRequest::create([
                 'user_id' => $user->id,
                 'order_id' => $order->id,
-                'type' => $request->type,
+                'type' => 'refund',
                 'reason_type' => $request->reason_type,
                 'reason' => $request->reason,
                 'return_method' => $request->return_method,

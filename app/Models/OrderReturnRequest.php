@@ -46,6 +46,7 @@ class OrderReturnRequest extends Model
         'account_name',
         'processed_by',
         'processed_at',
+        'tracking_code',
     ];
 
     protected $casts = [

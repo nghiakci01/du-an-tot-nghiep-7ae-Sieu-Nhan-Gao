@@ -179,7 +179,7 @@
           <div class="detail-body">
             
             <div class="alert alert-info rounded-3 mb-4 border-0 shadow-sm" style="font-size:0.9rem;">
-              <strong>Lưu ý:</strong> Yêu cầu hoàn trả sẽ được cửa hàng xem xét. Sau khi được chấp thuận, hệ thống sẽ cấp mã vận chuyển để bạn gửi hàng về cửa hàng. Tiền sẽ được hoàn vào <strong>Ví của bạn</strong> sau khi cửa hàng nhận được sản phẩm.
+              <strong>Lưu ý:</strong> Hiện tại cửa hàng chỉ hỗ trợ <strong>Hoàn trả toàn bộ đơn hàng</strong>. Chúng tôi không hỗ trợ trả lẻ từng sản phẩm. Nếu bạn muốn đổi size/màu, vui lòng hoàn trả toàn bộ đơn hàng này và đặt một đơn hàng mới.
             </div>
 
             <form action="{{ route('account.orders.return_submit', $order->id) }}" method="POST" enctype="multipart/form-data">
@@ -192,17 +192,19 @@
                   <table class="table table-borderless align-middle">
                     <thead class="table-light">
                       <tr>
-                        <th width="50" class="text-center">Chọn</th>
+                        <th width="80" class="text-center">STT</th>
                         <th>Sản phẩm</th>
-                        <th width="120" class="text-center">Số lượng trả</th>
+                        <th width="120" class="text-center">Số lượng</th>
                         <th width="150" class="text-end">Đơn giá</th>
                       </tr>
                     </thead>
                     <tbody>
-                      @foreach($order->items as $item)
+                      @php $totalOrderAmount = 0; @endphp
+                      @foreach($order->items as $index => $item)
+                      @php $totalOrderAmount += $item->price * $item->quantity; @endphp
                       <tr class="item-row border-bottom">
-                        <td class="text-center">
-                          <input type="checkbox" name="items[{{ $item->id }}][selected]" value="1" class="form-check-input item-checkbox" style="width:20px; height:20px;">
+                        <td class="text-center text-muted">
+                          {{ $index + 1 }}
                         </td>
                         <td>
                           <div class="d-flex align-items-center">
@@ -219,12 +221,11 @@
                             </div>
                           </div>
                         </td>
-                        <td>
-                          <input type="number" name="items[{{ $item->id }}][quantity]" value="{{ $item->quantity }}" min="1" max="{{ $item->quantity }}" class="form-control form-control-sm text-center item-qty" disabled>
+                        <td class="text-center fw-bold">
+                          x{{ $item->quantity }}
                         </td>
                         <td class="text-end fw-bold">
                           {{ number_format($item->price, 0, ',', '.') }}₫
-                          <input type="hidden" class="item-price" value="{{ $item->price }}">
                         </td>
                       </tr>
                       @endforeach
@@ -232,47 +233,30 @@
                   </table>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-3 p-3 bg-light rounded-3">
-                  <span class="fw-bold">Ước tính số tiền hoàn lại:</span>
-                  <span class="text-danger fw-bold fs-5" id="total-refund-preview">0₫</span>
+                  <span class="fw-bold">Tổng số tiền hoàn lại (Toàn bộ đơn):</span>
+                  <span class="text-danger fw-bold fs-5">{{ number_format($totalOrderAmount, 0, ',', '.') }}₫</span>
                 </div>
               </div>
 
               {{-- Return Type --}}
-              <div class="mb-5">
-                <label class="form-label fw-bold mb-3">Bạn muốn Đổi hàng hay Hoàn tiền? <span class="text-danger">*</span></label>
-                <div class="d-flex gap-4">
-                  <div class="form-check custom-radio">
-                    <input class="form-check-input" type="radio" name="type" id="type_refund" value="refund" checked>
-                    <label class="form-check-label fw-600" for="type_refund">
-                      <i class="bi bi-cash-stack me-1"></i> Trả hàng & Hoàn tiền
-                    </label>
-                  </div>
-                  <div class="form-check custom-radio">
-                    <input class="form-check-input" type="radio" name="type" id="type_exchange" value="exchange">
-                    <label class="form-check-label fw-600" for="type_exchange">
-                      <i class="bi bi-arrow-left-right me-1"></i> Đổi size / Phân loại khác
-                    </label>
-                  </div>
-                </div>
-              </div>
+              <input type="hidden" name="type" value="refund">
 
               {{-- Reason Type --}}
               <div class="mb-4">
                 <label class="form-label fw-bold">Lý do cụ thể <span class="text-danger">*</span></label>
                 <select name="reason_type" id="reason_type" class="form-select form-select-lg" required style="border-radius:10px; font-size:15px;">
-                  <option value="" disabled selected>-- Chọn lý do --</option>
-                  <option value="defective">Hàng lỗi / Hư hỏng do vận chuyển hoặc NSX</option>
-                  <option value="wrong_size">Đổi kích cỡ (Size) / Màu sắc</option>
-                  <option value="disliked">Sản phẩm không giống mô tả / Không ưng ý</option>
-                  <option value="other">Lý do khác</option>
+                  <option value="" disabled {{ !old('reason_type') ? 'selected' : '' }}>-- Chọn lý do --</option>
+                  <option value="defective" {{ old('reason_type') == 'defective' ? 'selected' : '' }}>Hàng lỗi / Hư hỏng do vận chuyển hoặc NSX</option>
+                  <option value="disliked" {{ old('reason_type') == 'disliked' ? 'selected' : '' }}>Sản phẩm không giống mô tả / Không ưng ý</option>
+                  <option value="other" {{ old('reason_type') == 'other' ? 'selected' : '' }}>Lý do khác</option>
                 </select>
-                <input type="hidden" name="reason" id="reason_text">
+                <input type="hidden" name="reason" id="reason_text" value="{{ old('reason') }}">
               </div>
 
               {{-- Note --}}
               <div class="mb-4">
                 <label class="form-label fw-bold">Chi tiết lỗi / Yêu cầu thêm <span class="text-danger">*</span></label>
-                <textarea name="note" class="form-control" rows="4" placeholder="Vui lòng mô tả chi tiết tình trạng sản phẩm..." style="border-radius:10px;" required></textarea>
+                <textarea name="note" class="form-control" rows="4" placeholder="Vui lòng mô tả chi tiết tình trạng sản phẩm..." style="border-radius:10px;" required>{{ old('note') }}</textarea>
               </div>
 
               {{-- Return Method --}}
@@ -358,40 +342,40 @@
                     <select name="bank_bin" id="bank_bin" class="form-select select2-bank" required>
                       <option value="">-- Chọn Ngân Hàng --</option>
                       <!-- Top Preferred Banks -->
-                      <option value="970436" data-logo="https://api.vietqr.io/img/VCB.png" data-name="Vietcombank">Vietcombank</option>
-                      <option value="970418" data-logo="https://api.vietqr.io/img/BIDV.png" data-name="BIDV">BIDV</option>
-                      <option value="970405" data-logo="https://api.vietqr.io/img/VBA.png" data-name="Agribank">Agribank</option>
-                      <option value="970415" data-logo="https://api.vietqr.io/img/CTG.png" data-name="VietinBank">VietinBank</option>
-                      <option value="970407" data-logo="https://api.vietqr.io/img/TCB.png" data-name="Techcombank">Techcombank</option>
-                      <option value="970422" data-logo="https://api.vietqr.io/img/MB.png" data-name="MBBank">MBBank</option>
-                      <option value="970416" data-logo="https://api.vietqr.io/img/ACB.png" data-name="ACB">ACB</option>
-                      <option value="970403" data-logo="https://api.vietqr.io/img/STB.png" data-name="Sacombank">Sacombank</option>
-                      <option value="970432" data-logo="https://api.vietqr.io/img/VPB.png" data-name="VPBank">VPBank</option>
-                      <option value="970423" data-logo="https://api.vietqr.io/img/TPB.png" data-name="TPBank">TPBank</option>
+                      <option value="970436" data-logo="https://api.vietqr.io/img/VCB.png" data-name="Vietcombank" {{ old('bank_bin') == '970436' ? 'selected' : '' }}>Vietcombank</option>
+                      <option value="970418" data-logo="https://api.vietqr.io/img/BIDV.png" data-name="BIDV" {{ old('bank_bin') == '970418' ? 'selected' : '' }}>BIDV</option>
+                      <option value="970405" data-logo="https://api.vietqr.io/img/VBA.png" data-name="Agribank" {{ old('bank_bin') == '970405' ? 'selected' : '' }}>Agribank</option>
+                      <option value="970415" data-logo="https://api.vietqr.io/img/CTG.png" data-name="VietinBank" {{ old('bank_bin') == '970415' ? 'selected' : '' }}>VietinBank</option>
+                      <option value="970407" data-logo="https://api.vietqr.io/img/TCB.png" data-name="Techcombank" {{ old('bank_bin') == '970407' ? 'selected' : '' }}>Techcombank</option>
+                      <option value="970422" data-logo="https://api.vietqr.io/img/MB.png" data-name="MBBank" {{ old('bank_bin') == '970422' ? 'selected' : '' }}>MBBank</option>
+                      <option value="970416" data-logo="https://api.vietqr.io/img/ACB.png" data-name="ACB" {{ old('bank_bin') == '970416' ? 'selected' : '' }}>ACB</option>
+                      <option value="970403" data-logo="https://api.vietqr.io/img/STB.png" data-name="Sacombank" {{ old('bank_bin') == '970403' ? 'selected' : '' }}>Sacombank</option>
+                      <option value="970432" data-logo="https://api.vietqr.io/img/VPB.png" data-name="VPBank" {{ old('bank_bin') == '970432' ? 'selected' : '' }}>VPBank</option>
+                      <option value="970423" data-logo="https://api.vietqr.io/img/TPB.png" data-name="TPBank" {{ old('bank_bin') == '970423' ? 'selected' : '' }}>TPBank</option>
                       <!-- Other Banks -->
-                      <option value="970437" data-logo="https://api.vietqr.io/img/HDB.png" data-name="HDBank">HDBBank</option>
-                      <option value="970441" data-logo="https://api.vietqr.io/img/VIB.png" data-name="VIB">VIB</option>
-                      <option value="970443" data-logo="https://api.vietqr.io/img/SHB.png" data-name="SHB">SHB</option>
-                      <option value="970426" data-logo="https://api.vietqr.io/img/MSB.png" data-name="MSB">MSB</option>
-                      <option value="970440" data-logo="https://api.vietqr.io/img/SEAB.png" data-name="SeABank">SeABank</option>
-                      <option value="970449" data-logo="https://api.vietqr.io/img/LPB.png" data-name="LPBank">LPBank</option>
-                      <option value="970428" data-logo="https://api.vietqr.io/img/NAB.png" data-name="NamABank">NamABank</option>
-                      <option value="970414" data-logo="https://api.vietqr.io/img/OCB.png" data-name="OCB">OCB</option>
-                      <option value="970431" data-logo="https://api.vietqr.io/img/EIB.png" data-name="Eximbank">Eximbank</option>
-                      <option value="970438" data-logo="https://api.vietqr.io/img/BVB.png" data-name="BVBank">BVBank</option>
+                      <option value="970437" data-logo="https://api.vietqr.io/img/HDB.png" data-name="HDBank" {{ old('bank_bin') == '970437' ? 'selected' : '' }}>HDBBank</option>
+                      <option value="970441" data-logo="https://api.vietqr.io/img/VIB.png" data-name="VIB" {{ old('bank_bin') == '970441' ? 'selected' : '' }}>VIB</option>
+                      <option value="970443" data-logo="https://api.vietqr.io/img/SHB.png" data-name="SHB" {{ old('bank_bin') == '970443' ? 'selected' : '' }}>SHB</option>
+                      <option value="970426" data-logo="https://api.vietqr.io/img/MSB.png" data-name="MSB" {{ old('bank_bin') == '970426' ? 'selected' : '' }}>MSB</option>
+                      <option value="970440" data-logo="https://api.vietqr.io/img/SEAB.png" data-name="SeABank" {{ old('bank_bin') == '970440' ? 'selected' : '' }}>SeABank</option>
+                      <option value="970449" data-logo="https://api.vietqr.io/img/LPB.png" data-name="LPBank" {{ old('bank_bin') == '970449' ? 'selected' : '' }}>LPBank</option>
+                      <option value="970428" data-logo="https://api.vietqr.io/img/NAB.png" data-name="NamABank" {{ old('bank_bin') == '970428' ? 'selected' : '' }}>NamABank</option>
+                      <option value="970414" data-logo="https://api.vietqr.io/img/OCB.png" data-name="OCB" {{ old('bank_bin') == '970414' ? 'selected' : '' }}>OCB</option>
+                      <option value="970431" data-logo="https://api.vietqr.io/img/EIB.png" data-name="Eximbank" {{ old('bank_bin') == '970431' ? 'selected' : '' }}>Eximbank</option>
+                      <option value="970438" data-logo="https://api.vietqr.io/img/BVB.png" data-name="BVBank" {{ old('bank_bin') == '970438' ? 'selected' : '' }}>BVBank</option>
                     </select>
-                    <input type="hidden" name="bank_name" id="bank_name">
+                    <input type="hidden" name="bank_name" id="bank_name" value="{{ old('bank_name') }}">
                   </div>
 
                   <div class="col-md-6">
                     <label class="form-label small fw-bold">Số tài khoản <span class="text-danger">*</span></label>
-                    <input type="text" name="account_number" id="account_number" class="form-control" placeholder="Nhập số tài khoản" required style="border-radius:10px; height:45px;">
+                    <input type="text" name="account_number" id="account_number" class="form-control" placeholder="Nhập số tài khoản" required style="border-radius:10px; height:45px;" value="{{ old('account_number') }}">
                   </div>
 
                   <div class="col-md-12">
                     <label class="form-label small fw-bold">Tên chủ tài khoản <span class="text-danger">*</span></label>
                     <div class="position-relative">
-                      <input type="text" name="account_name" id="account_name" class="form-control text-uppercase" placeholder="Hệ thống sẽ tra cứu tự động..." required style="border-radius:10px; height:45px; background-color: #f8f9fa;">
+                      <input type="text" name="account_name" id="account_name" class="form-control text-uppercase" placeholder="Hệ thống sẽ tra cứu tự động..." required style="border-radius:10px; height:45px; background-color: #f8f9fa;" value="{{ old('account_name') }}">
                       <div id="lookup-spinner" class="spinner-border spinner-border-sm text-primary position-absolute" role="status" style="right: 15px; top: 15px; display: none;">
                         <span class="visually-hidden">Loading...</span>
                       </div>
@@ -463,6 +447,18 @@ $(document).ready(function() {
         checkAccountName();
     });
 
+    // 3.1. Update hidden reason field when reason_type changes
+    function syncReason() {
+        const selectedOption = $('#reason_type').find('option:selected');
+        if (selectedOption.val()) {
+            $('#reason_text').val(selectedOption.text());
+        } else {
+            $('#reason_text').val('');
+        }
+    }
+    $('#reason_type').on('change', syncReason);
+    syncReason(); // Initial sync on load
+
     // 4. Real-time VietQR Lookup
     let lookupTimer;
     $('#account_number').on('input', function() {
@@ -511,32 +507,6 @@ $(document).ready(function() {
         }
     }
 
-    // 5. Item selection and refund calculation
-    const itemCheckboxes = $('.item-checkbox');
-    const itemQtys = $('.item-qty');
-    const refundPreview = $('#total-refund-preview');
-
-    function calculateTotalRefund() {
-        let total = 0;
-        $('.item-row').each(function() {
-            const checkbox = $(this).find('.item-checkbox');
-            const qtyInput = $(this).find('.item-qty');
-            const price = parseFloat($(this).find('.item-price').val());
-            
-            if (checkbox.is(':checked')) {
-                qtyInput.prop('disabled', false);
-                const qty = parseInt(qtyInput.val()) || 0;
-                total += qty * price;
-            } else {
-                qtyInput.prop('disabled', true);
-            }
-        });
-        const formatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total).replace('₫', '') + '₫';
-        refundPreview.text(formatted);
-    }
-
-    itemCheckboxes.on('change', calculateTotalRefund);
-    itemQtys.on('input', calculateTotalRefund);
 
     // 6. Image preview
     $('#return-images').on('change', function(e) {
@@ -581,6 +551,7 @@ $(document).ready(function() {
         $(this).addClass('active');
         
         // Update radio input
+        $('.method-card input[type="radio"]').prop('checked', false);
         $(this).find('input[type="radio"]').prop('checked', true);
         
         // Show/Hide GHTK link
@@ -593,8 +564,14 @@ $(document).ready(function() {
         }
     });
 
+    // Handle initial state for Return Method if has old value
+    const oldMethod = "{{ old('return_method') }}";
+    if (oldMethod) {
+        $(`.method-card[data-value="${oldMethod}"]`).trigger('click');
+    }
+
     // Trigger initial calculation
-    calculateTotalRefund();
+    // calculateTotalRefund(); // No longer needed for 'Return All' policy
 });
 </script>
 @endpush
