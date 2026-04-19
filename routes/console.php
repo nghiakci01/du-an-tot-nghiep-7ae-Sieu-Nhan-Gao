@@ -12,5 +12,5 @@ use Illuminate\Support\Facades\Schedule;
 // Tự động kiểm tra nhắc nhở và hủy đơn hàng online chưa thanh toán (chạy mỗi phút)
 Schedule::command('app:check-payment-reminders')->everyMinute();
 
-// Quét giỏ hàng bị bỏ quên quá 2 tiếng (chạy mỗi 15 phút)
-Schedule::command('cart:check-abandoned')->everyFifteenMinutes();
+// Tự động từ chối return requests quá hạn (chạy hàng ngày lúc 9h sáng)
+Schedule::command('returns:auto-reject-expired')->dailyAt('09:00');

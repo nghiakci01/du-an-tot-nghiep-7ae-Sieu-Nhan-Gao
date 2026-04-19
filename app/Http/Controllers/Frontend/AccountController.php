@@ -154,11 +154,11 @@ class AccountController extends Controller
             $user->avatar = 'avatars/' . $avatarName;
         }
 
-        if (!empty($validated['new_password'] ?? null)) {
-            if (! Hash::check($validated['current_password'] ?? '', $user->password)) {
+        if (!empty($request->validated()['new_password'] ?? null)) {
+            if (! Hash::check($request->validated()['current_password'] ?? '', $user->password)) {
                 return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
             }
-            $user->password = Hash::make($validated['new_password']);
+            $user->password = Hash::make($request->validated()['new_password']);
         }
 
         $user->save();
@@ -212,7 +212,15 @@ class AccountController extends Controller
         $order = $user->orders()->findOrFail($id);
 
         if (!\App\Models\OrderReturnRequest::canBeReturned($order)) {
-            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã hoàn thành và trong vòng 7 ngày kể từ lúc nhận hàng.');
+            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã hoàn thành và trong vòng ' . config('services.return.window_days', 7) . ' ngày kể từ lúc nhận hàng.');
+        }
+
+        // Kiểm tra giới hạn số lượng trả hàng (tối đa 3 lần/tháng)
+        $monthlyReturns = $user->returnRequests()
+            ->where('created_at', '>=', now()->startOfMonth())
+            ->count();
+        if ($monthlyReturns >= 3) {
+            return redirect()->back()->with('error', 'Bạn đã đạt giới hạn 3 yêu cầu trả hàng trong tháng này.');
         }
 
         if ($order->returnRequest) {

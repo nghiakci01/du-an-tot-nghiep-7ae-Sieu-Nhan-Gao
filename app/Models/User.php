@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function returnRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderReturnRequest::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;
