@@ -49,11 +49,11 @@
                         <div class="footer_menu">
                             <ul style="padding-left: 0; list-style: none;">
                                 <li><a href="{{ route('about') }}">{{ __('messages.about') }}</a></li>
-                                <li><a href="http://127.0.0.1:8000/news">{{ __('messages.delivery_information') }}</a></li>
-                                <li><a href="http://127.0.0.1:8000/news">{{ __('messages.privacy_policy') }}</a></li>
-                                <li><a href="http://127.0.0.1:8000/news">{{ __('messages.terms_conditions') }}</a></li>
+                                <li><a href="{{ route('delivery-info') }}">{{ __('messages.delivery_information') }}</a></li>
+                                <li><a href="{{ route('privacy-policy') }}">{{ __('messages.privacy_policy') }}</a></li>
+                                <li><a href="{{ route('terms-conditions') }}">{{ __('messages.terms_conditions') }}</a></li>
                                 <li><a href="{{ route('contact.index') }}">{{ __('messages.contact_us') }}</a></li>
-                                <li><a href="http://127.0.0.1:8000/news">{{ __('messages.returns') }}</a></li>
+                                <li><a href="{{ route('returns-policy') }}">{{ __('messages.returns') }}</a></li>
                             </ul>
                         </div>
                     </div>

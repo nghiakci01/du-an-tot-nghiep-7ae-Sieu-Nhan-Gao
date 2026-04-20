@@ -120,4 +120,24 @@ class HomeController extends Controller
 
         return view('frontend.news_detail', compact('post', 'relatedPosts', 'hasClaimed'));
     }
+
+    public function deliveryInfo()
+    {
+        return view('frontend.pages.delivery_info');
+    }
+
+    public function privacyPolicy()
+    {
+        return view('frontend.pages.privacy_policy');
+    }
+
+    public function termsConditions()
+    {
+        return view('frontend.pages.terms_conditions');
+    }
+
+    public function returnsPolicy()
+    {
+        return view('frontend.pages.returns_policy');
+    }
 }

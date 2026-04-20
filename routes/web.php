@@ -14,6 +14,12 @@ Route::get('/about', [App\Http\Controllers\Frontend\HomeController::class, 'abou
 Route::get('/news', [App\Http\Controllers\Frontend\HomeController::class, 'news'])->name('news');
 Route::get('/news/{slug}', [App\Http\Controllers\Frontend\HomeController::class, 'newsDetail'])->name('news.detail');
 
+// Policy & Info Pages
+Route::get('/delivery-information', [App\Http\Controllers\Frontend\HomeController::class, 'deliveryInfo'])->name('delivery-info');
+Route::get('/privacy-policy', [App\Http\Controllers\Frontend\HomeController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/terms-conditions', [App\Http\Controllers\Frontend\HomeController::class, 'termsConditions'])->name('terms-conditions');
+Route::get('/returns-policy', [App\Http\Controllers\Frontend\HomeController::class, 'returnsPolicy'])->name('returns-policy');
+
 // Search Routes
 Route::get('/search', [App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('search.index');
 Route::get('/search/suggestions', [App\Http\Controllers\Frontend\SearchController::class, 'suggestions'])->name('search.suggestions');

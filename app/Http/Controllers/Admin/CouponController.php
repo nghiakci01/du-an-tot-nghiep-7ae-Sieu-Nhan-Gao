@@ -14,7 +14,30 @@ class CouponController extends Controller
      */
     public function index()
     {
-        $coupons = Coupon::orderBy('created_at', 'desc')->paginate(10);
+        $query = Coupon::query();
+
+        if (request()->filled('search')) {
+            $query->where('code', 'like', '%' . request('search') . '%');
+        }
+
+        if (request()->filled('status')) {
+            $status = request('status');
+            if ($status === 'active') {
+                $query->active()->where(function($q) {
+                    $q->whereNull('start_date')->orWhere('start_date', '<=', now());
+                })->where(function($q) {
+                    $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+                })->where(function($q) {
+                    $q->whereNull('usage_limit')->orWhereRaw('used_count < usage_limit');
+                });
+            } elseif ($status === 'expired') {
+                $query->whereNotNull('end_date')->where('end_date', '<', now());
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+
+        $coupons = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin.coupons.index', compact('coupons'));
     }

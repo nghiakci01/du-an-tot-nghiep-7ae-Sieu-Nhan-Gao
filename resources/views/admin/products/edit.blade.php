@@ -109,7 +109,7 @@
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="short_description" class="form-label">Mô tả ngắn <small class="text-muted">(Tối đa 500 ký tự)</small></label>
-                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="short_description" name="short_description" rows="4" maxlength="500">{{ old('short_description', $product->short_description) }}</textarea>
+                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="short_description" name="short_description" rows="4" maxlength="500" data-char-count="true" data-char-target="#short-char-count">{{ old('short_description', $product->short_description) }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('short_description')
@@ -123,7 +123,7 @@
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="description" class="form-label">Mô tả <small class="text-muted">(Tối đa 5000 ký tự)</small></label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="5000">{{ old('description', $product->description) }}</textarea>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="5000" data-char-count="true" data-char-target="#char-count">{{ old('description', $product->description) }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('description')
@@ -378,27 +378,7 @@
         });
 
 
-        // Character counters for descriptions
-        const shortDescTextarea = document.getElementById('short_description');
-        const shortCharCount = document.getElementById('short-char-count');
-        const descTextarea = document.getElementById('description');
-        const charCount = document.getElementById('char-count');
-        
-        function updateCount(textarea, counter) {
-            if (textarea && counter) {
-                counter.textContent = textarea.value.length;
-            }
-        }
-
-        if (shortDescTextarea && shortCharCount) {
-            updateCount(shortDescTextarea, shortCharCount);
-            shortDescTextarea.addEventListener('input', () => updateCount(shortDescTextarea, shortCharCount));
-        }
-        
-        if (descTextarea && charCount) {
-            updateCount(descTextarea, charCount);
-            descTextarea.addEventListener('input', () => updateCount(descTextarea, charCount));
-        }
+        // Character counters handled globally via [data-char-count="true"] in admin.blade.php
 
         // Gallery images preview
         const galleryInput = document.getElementById('gallery_images');

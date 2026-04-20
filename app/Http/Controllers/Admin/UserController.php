@@ -13,15 +13,44 @@ class UserController extends Controller
      */
     public function index()
     {
-        $query = User::withCount('orders')->latest();
+        $query = User::withCount('orders');
 
-        if (request()->has('role') && request()->role != '') {
+        // Search by Name, Email, or Phone
+        if (request()->filled('search')) {
+            $search = request('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('phone', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Filter by Role
+        if (request()->filled('role')) {
             $query->where('role', request('role'));
         }
 
-        $users = $query->paginate(10)->appends(request()->all());
+        // Sorting
+        $sort = request('sort', 'newest');
+        if ($sort === 'oldest') {
+            $query->orderBy('created_at', 'asc');
+        } elseif ($sort === 'order_count') {
+            $query->orderBy('orders_count', 'desc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
 
-        return view('admin.users.index', compact('users'));
+        // Statistics for Summary Cards
+        $stats = [
+            'total' => User::count(),
+            'admins' => User::where('role', User::ROLE_ADMIN)->count(),
+            'users' => User::where('role', User::ROLE_USER)->count(),
+            'new_today' => User::whereDate('created_at', now()->today())->count(),
+        ];
+
+        $users = $query->paginate(20)->withQueryString();
+
+        return view('admin.users.index', compact('users', 'stats'));
     }
 
     /**

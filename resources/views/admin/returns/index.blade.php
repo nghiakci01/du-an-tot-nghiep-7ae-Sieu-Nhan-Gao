@@ -19,39 +19,42 @@
                 @endphp
 
                 <div class="card border-info mb-4 shadow-sm">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="mb-0 text-info">
-                                <i class="fas fa-truck-loading me-2"></i>Thông tin nhận hàng hoàn trả (Cấu hình GHN)
-                            </h5>
-                            <small class="text-muted">Thông tin này là bắt buộc để tạo mã vận đơn GHN. Admin cần cấu hình 1 lần tại đây.</small>
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center p-2" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#ghnConfigCollapse">
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0 text-info me-2">
+                                <i class="fas fa-truck-loading me-2"></i>Cấu hình GHN Hoàn trả
+                            </h6>
+                            <small class="text-muted d-none d-md-inline">(Click để mở rộng/thu gọn)</small>
                         </div>
+                        <i class="fas fa-chevron-down text-info"></i>
                     </div>
-                    <div class="card-body">
-                        <form action="{{ route('admin.settings.update') }}" method="POST" class="row g-3">
-                            @csrf
-                            <div class="col-md-6">
-                                <label class="form-label">Người nhận</label>
-                                <input type="text" name="return_receiver_name" class="form-control" value="{{ old('return_receiver_name', $returnReceiverName) }}" placeholder="Nhập tên người nhận hoàn trả">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Số điện thoại nhận hàng</label>
-                                <input type="text" name="return_receiver_phone" class="form-control" value="{{ old('return_receiver_phone', $returnReceiverPhone) }}" placeholder="Nhập số điện thoại nhận hàng">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Địa chỉ nhận hàng hoàn trả</label>
-                                <textarea name="return_receiver_address" class="form-control" rows="3" placeholder="Nhập địa chỉ chi tiết để khách gửi hàng trả lại">{{ old('return_receiver_address', $returnReceiverAddress) }}</textarea>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Ghi chú cho khách</label>
-                                <textarea name="return_receiver_note" class="form-control" rows="2" placeholder="Nhập hướng dẫn thêm cho khách">{{ old('return_receiver_note', $returnReceiverNote) }}</textarea>
-                            </div>
-                            <div class="col-12 text-end">
-                                <button type="submit" class="btn btn-info text-white shadow-sm">
-                                    <i class="fas fa-save me-1"></i> Lưu cấu hình trả hàng
-                                </button>
-                            </div>
-                        </form>
+                    <div class="collapse" id="ghnConfigCollapse">
+                        <div class="card-body p-3">
+                            <form action="{{ route('admin.settings.update') }}" method="POST" class="row g-3">
+                                @csrf
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Người nhận</label>
+                                    <input type="text" name="return_receiver_name" class="form-control form-control-sm" value="{{ old('return_receiver_name', $returnReceiverName) }}" placeholder="Nhập tên người nhận hoàn trả">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Số điện thoại nhận hàng</label>
+                                    <input type="text" name="return_receiver_phone" class="form-control form-control-sm" value="{{ old('return_receiver_phone', $returnReceiverPhone) }}" placeholder="Nhập số điện thoại nhận hàng">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Địa chỉ nhận hàng hoàn trả</label>
+                                    <textarea name="return_receiver_address" class="form-control form-control-sm" rows="2" placeholder="Nhập địa chỉ chi tiết để khách gửi hàng trả lại">{{ old('return_receiver_address', $returnReceiverAddress) }}</textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Ghi chú cho khách</label>
+                                    <textarea name="return_receiver_note" class="form-control form-control-sm" rows="1" placeholder="Nhập hướng dẫn thêm cho khách">{{ old('return_receiver_note', $returnReceiverNote) }}</textarea>
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn btn-sm btn-info text-white shadow-sm">
+                                        <i class="fas fa-save me-1"></i> Lưu cấu hình
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
@@ -75,9 +78,6 @@
                         <a class="nav-link {{ request('status') === 'refunded' ? 'active alert-success' : '' }}" href="{{ route('admin.returns.index', ['status' => 'refunded']) }}">Đã hoàn tiền</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request('status') === 'exchanged' ? 'active alert-success' : '' }}" href="{{ route('admin.returns.index', ['status' => 'exchanged']) }}">Đã đổi hàng</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link {{ request('status') === 'rejected' ? 'active alert-danger' : '' }}" href="{{ route('admin.returns.index', ['status' => 'rejected']) }}">Từ chối</a>
                     </li>
                 </ul>
@@ -87,7 +87,6 @@
                         <tr>
                             <th>MÃ ĐH</th>
                             <th>KHÁCH HÀNG</th>
-                            <th>LOẠI</th>
                             <th>LÝ DO</th>
                             <th>TIỀN HOÀN</th>
                             <th>NGÀY YC</th>
@@ -103,9 +102,7 @@
                                     <strong>{{ $req->user->name }}</strong><br>
                                     <small class="text-muted">{{ $req->user->email }}</small>
                                 </td>
-                                <td>
-                                    <span class="badge {{ $req->type === 'exchange' ? 'bg-info' : 'bg-primary' }}">{{ $req->type_text }}</span>
-                                </td>
+
                                 <td>
                                     <span class="badge bg-light text-dark border">{{ $req->reason_type_text }}</span>
                                 </td>
@@ -281,7 +278,7 @@
                                                     <div class="card-body text-center">
                                                         <h6 class="fw-bold text-success mb-3">Hàng đã ở trong kho - Sẵn sàng hoàn tất</h6>
                                                         <button type="button" class="btn btn-success w-100 py-2" onclick="submitReturnAction({{ $req->id }}, '{{ route('admin.returns.complete', $req->id) }}', 'Cập nhật trạng thái và thông báo cho khách?')">
-                                                            BẤM VÀO ĐÂY ĐỂ XÁC NHẬN {{ $req->type === 'exchange' ? 'ĐỔI HÀNG' : 'HOÀN TIỀN' }}
+                                                            BẤM VÀO ĐÂY ĐỂ XÁC NHẬN HOÀN TIỀN
                                                         </button>
                                                     </div>
                                                 </div>

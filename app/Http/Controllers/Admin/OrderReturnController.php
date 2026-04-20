@@ -110,9 +110,7 @@ class OrderReturnController extends Controller
             $user = Auth::user();
             $this->returnService->complete($returnReq, $user);
 
-            $msg = ($returnReq->type === OrderReturnRequest::TYPE_EXCHANGE)
-                ? 'Đã hoàn tất quy trình đổi hàng cho khách.'
-                : 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.';
+            $msg = 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.';
 
             return redirect()->back()->with('success', $msg);
         } catch (\Exception $e) {
