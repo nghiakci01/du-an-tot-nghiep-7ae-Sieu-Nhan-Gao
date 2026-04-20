@@ -55,5 +55,8 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT_URL'),
     ],
 
+    'return' => [
+        'window_days' => env('RETURN_WINDOW_DAYS', 7), // Số ngày cho phép trả hàng
+    ],
 
 ];

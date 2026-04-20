@@ -32,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         \App\Models\Order::observe(\App\Observers\OrderObserver::class);
+        \App\Models\ProductVariant::observe(\App\Observers\ProductVariantObserver::class);
 
         try {
             // Share categories globally for header menu

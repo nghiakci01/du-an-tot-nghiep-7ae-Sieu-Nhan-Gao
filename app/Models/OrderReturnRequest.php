@@ -47,6 +47,7 @@ class OrderReturnRequest extends Model
         'processed_by',
         'processed_at',
         'tracking_code',
+        'inspection_date',
     ];
 
     protected $casts = [
@@ -74,6 +75,11 @@ class OrderReturnRequest extends Model
     public function items()
     {
         return $this->hasMany(OrderReturnItem::class, 'order_return_request_id');
+    }
+
+    public function histories()
+    {
+        return $this->hasMany(OrderReturnHistory::class, 'order_return_request_id');
     }
 
     public function isPending()
@@ -117,7 +123,7 @@ class OrderReturnRequest extends Model
     }
 
     /**
-     * Check if an order can be returned (within 7 days of completion)
+     * Check if an order can be returned (within configured days of completion)
      */
     public static function canBeReturned(Order $order)
     {
@@ -125,13 +131,14 @@ class OrderReturnRequest extends Model
             return false;
         }
 
-        // Ideally we check history for 'completed' date, fallback to updated_at
+        // Sử dụng completion_date từ history nếu có, fallback to updated_at
         $completionDate = $order->histories()
             ->where('new_status', Order::STATUS_COMPLETED)
             ->latest()
             ->first()?->created_at ?? $order->updated_at;
 
-        return $completionDate->diffInDays(now()) <= 7;
+        $windowDays = config('services.return.window_days', 7);
+        return $completionDate->diffInDays(now()) <= $windowDays;
     }
 
     public function getTypeTextAttribute()
@@ -181,7 +188,7 @@ class OrderReturnRequest extends Model
             default => 'bg-secondary'
         };
     }
-    
+
     public function getReturnMethodTextAttribute()
     {
         return match($this->return_method) {

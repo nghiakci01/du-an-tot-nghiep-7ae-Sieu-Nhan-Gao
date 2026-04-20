@@ -20,220 +20,219 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-header">
-                <h5>Thông tin Mã Giảm Giá</h5>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('admin.coupons.store') }}" method="POST">
-                    @csrf
-
-                    <div class="row">
+<form action="{{ route('admin.coupons.store') }}" method="POST" id="voucherForm">
+    @csrf
+    <div class="row">
+        <!-- Main Configuration (Left Column) -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h5 class="mb-0 fw-bold">Cấu hình chính</h5>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="row g-3">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="code">Mã Code <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('code') is-invalid @enderror" 
-                                       id="code" name="code" value="{{ old('code') }}" 
-                                       placeholder="VD: SUMMER2026" style="text-transform: uppercase;" required>
-                                @error('code')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="form-text text-muted">Mã sẽ tự động chuyển thành chữ in hoa</small>
-                            </div>
+                            <label for="code" class="form-label fw-bold">Mã Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('code') is-invalid @enderror" 
+                                   id="code" name="code" value="{{ old('code') }}" 
+                                   placeholder="VD: SUMMER2026" style="text-transform: uppercase;" required>
+                            @error('code')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text mt-1 text-muted small">Mã sẽ tự động chuyển thành chữ in hoa</div>
                         </div>
 
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="type">Loại Giảm Giá <span class="text-danger">*</span></label>
-                                <select class="form-control @error('type') is-invalid @enderror" 
-                                        id="type" name="type" required>
-                                    <option value="">-- Chọn loại --</option>
-                                    <option value="percentage" {{ old('type') == 'percentage' ? 'selected' : '' }}>Phần trăm (%)</option>
-                                    <option value="fixed" {{ old('type') == 'fixed' ? 'selected' : '' }}>Số tiền cố định (VNĐ)</option>
-                                </select>
-                                @error('type')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                            <label for="type" class="form-label fw-bold">Loại Giảm Giá <span class="text-danger">*</span></label>
+                            <select class="form-select @error('type') is-invalid @enderror" id="type" name="type" required>
+                                <option value="">-- Chọn loại --</option>
+                                <option value="percentage" {{ old('type') == 'percentage' ? 'selected' : '' }}>Phần trăm (%)</option>
+                                <option value="fixed" {{ old('type') == 'fixed' ? 'selected' : '' }}>Số tiền cố định (VNĐ)</option>
+                            </select>
+                            @error('type')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="value" class="form-label fw-bold">Giá trị giảm <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control @error('value') is-invalid @enderror" 
+                                       id="value" name="value" value="{{ old('value') }}" 
+                                       step="0.01" min="0" placeholder="0" required>
+                                <span class="input-group-text bg-light border-start-0" id="value-suffix">-</span>
                             </div>
+                            @error('value')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text mt-1 text-muted small" id="value-hint">Chọn loại giảm giá để xem hướng dẫn</div>
+                        </div>
+
+                        <div class="col-md-12 mt-4">
+                            <label for="description" class="form-label fw-bold">Mô tả (Không bắt buộc)</label>
+                            <textarea class="form-control @error('description') is-invalid @enderror" 
+                                      id="description" name="description" rows="3" 
+                                      placeholder="Mô tả về mã giảm giá này...">{{ old('description') }}</textarea>
+                            @error('description')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="row">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h5 class="mb-0 fw-bold">Điều kiện & Hạn chế</h5>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="row g-3">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="value">Giá trị <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control @error('value') is-invalid @enderror" 
-                                           id="value" name="value" value="{{ old('value') }}" 
-                                           step="0.01" min="0" required>
-                                    <span class="input-group-text" id="value-suffix">-</span>
-                                </div>
-                                @error('value')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                                <small class="form-text text-muted" id="value-hint">Chọn loại giảm giá trước</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="min_order_amount">Đơn hàng tối thiểu (VNĐ)</label>
+                            <label for="min_order_amount" class="form-label fw-bold">Giá trị đơn tối thiểu (VNĐ)</label>
+                            <div class="input-group">
                                 <input type="number" class="form-control @error('min_order_amount') is-invalid @enderror" 
                                        id="min_order_amount" name="min_order_amount" value="{{ old('min_order_amount') }}" 
                                        step="1000" min="0" placeholder="VD: 200000">
-                                @error('min_order_amount')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="form-text text-muted">Để trống nếu không giới hạn</small>
+                                <span class="input-group-text bg-light border-start-0">đ</span>
                             </div>
+                            @error('min_order_amount')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
-                    </div>
 
-                    <div class="row" id="max-discount-row" style="display: none;">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="max_discount_amount">Giảm tối đa (VNĐ)</label>
+                        <div class="col-md-6" id="max-discount-col" style="display: none;">
+                            <label for="max_discount_amount" class="form-label fw-bold">Giảm tối đa (VNĐ)</label>
+                            <div class="input-group">
                                 <input type="number" class="form-control @error('max_discount_amount') is-invalid @enderror" 
                                        id="max_discount_amount" name="max_discount_amount" value="{{ old('max_discount_amount') }}" 
                                        step="1000" min="0" placeholder="VD: 100000">
-                                @error('max_discount_amount')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="form-text text-muted">Chỉ áp dụng cho loại phần trăm</small>
+                                <span class="input-group-text bg-light border-start-0">đ</span>
+                            </div>
+                            @error('max_discount_amount')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text text-info small mt-1"><i class="ti ti-info-circle me-1"></i>Chỉ dùng cho %</div>
+                        </div>
+
+                        <div class="col-md-12 mt-4">
+                            <label for="user_id" class="form-label fw-bold">Áp dụng cho người dùng cụ thể</label>
+                            <select name="user_id" id="user_id" class="form-select select2 @error('user_id') is-invalid @enderror">
+                                <option value="">-- Công khai (Tất cả người dùng) --</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
+                                        {{ $user->name }} ({{ $user->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('user_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text mt-1 text-muted small">Để trống nếu mã này là công khai cho mọi người.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar (Right Column) -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4 sticky-lg-top" style="top: 2rem;">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h5 class="mb-0 fw-bold">Thời gian & Giới hạn</h5>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="row g-3">
+                        <div class="col-12 text-center py-3 bg-light border rounded mb-3">
+                            <div class="form-check form-switch d-inline-block">
+                                <input type="hidden" name="is_active" value="0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="is_active" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
+                                <label class="form-check-label fw-bold ms-1" for="is_active">Đang hoạt động</label>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="usage_limit">Giới hạn lượt dùng</label>
-                                <input type="number" class="form-control @error('usage_limit') is-invalid @enderror" 
-                                       id="usage_limit" name="usage_limit" value="{{ old('usage_limit') }}" 
-                                       min="1" placeholder="VD: 100">
-                                @error('usage_limit')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="form-text text-muted">Để trống nếu không giới hạn</small>
-                            </div>
+                        <div class="col-12">
+                            <label for="usage_limit" class="form-label fw-bold">Tổng lượt sử dụng</label>
+                            <input type="number" class="form-control @error('usage_limit') is-invalid @enderror" 
+                                   id="usage_limit" name="usage_limit" value="{{ old('usage_limit') }}" 
+                                   min="1" placeholder="Vô hạn nếu để trống">
+                            @error('usage_limit')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="start_date">Ngày bắt đầu</label>
-                                <input type="datetime-local" class="form-control @error('start_date') is-invalid @enderror" 
-                                       id="start_date" name="start_date" value="{{ old('start_date') }}">
-                                @error('start_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="col-12">
+                            <label for="start_date" class="form-label fw-bold">Thời gian bắt đầu</label>
+                            <input type="datetime-local" class="form-control @error('start_date') is-invalid @enderror" 
+                                   id="start_date" name="start_date" value="{{ old('start_date') }}">
+                            @error('start_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="end_date">Ngày kết thúc</label>
-                                <input type="datetime-local" class="form-control @error('end_date') is-invalid @enderror" 
-                                       id="end_date" name="end_date" value="{{ old('end_date') }}">
-                                @error('end_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="col-12">
+                            <label for="end_date" class="form-label fw-bold">Thời gian kết thúc</label>
+                            <input type="datetime-local" class="form-control @error('end_date') is-invalid @enderror" 
+                                   id="end_date" name="end_date" value="{{ old('end_date') }}">
+                            @error('end_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-12 mt-4 border-top pt-4">
+                            <button type="submit" class="btn btn-primary w-100 py-2 mb-2">Tạo mã giảm giá</button>
+                            <a href="{{ route('admin.coupons.index') }}" class="btn btn-outline-secondary w-100">Quay lại danh sách</a>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="description">Mô tả</label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" 
-                                  id="description" name="description" rows="3" 
-                                  placeholder="Mô tả về mã giảm giá này...">{{ old('description') }}</textarea>
-                        @error('description')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="user_id">Gán cho người dùng (Không bắt buộc)</label>
-                        <select name="user_id" id="user_id" class="form-control select2 @error('user_id') is-invalid @enderror">
-                            <option value="">-- Tất cả người dùng --</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
-                                    {{ $user->name }} ({{ $user->email }})
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('user_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="form-text text-muted">Nếu chọn người dùng, mã này sẽ chỉ hiển thị và áp dụng được cho người dùng đó.</small>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="is_active" 
-                                   name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
-                            <label class="custom-control-label" for="is_active">Kích hoạt</label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Tạo mã giảm giá</button>
-                        <a href="{{ route('admin.coupons.index') }}" class="btn btn-secondary">Hủy</a>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
 @endsection
 
 @section('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Select2
+$(document).ready(function() {
     $('.select2').select2({
-        placeholder: "-- Tất cả người dùng --",
+        placeholder: "-- Công khai --",
         allowClear: true,
-        width: '100%'
+        width: '100%',
+        theme: 'bootstrap-5'
     });
 
-    const typeSelect = document.getElementById('type');
-    const valueSuffix = document.getElementById('value-suffix');
-    const valueHint = document.getElementById('value-hint');
-    const maxDiscountRow = document.getElementById('max-discount-row');
-    const valueInput = document.getElementById('value');
+    const typeSelect = $('#type');
+    const valueSuffix = $('#value-suffix');
+    const valueHint = $('#value-hint');
+    const maxDiscountCol = $('#max-discount-col');
+    const valueInput = $('#value');
 
     function updateFormBasedOnType() {
-        const type = typeSelect.value;
+        const type = typeSelect.val();
         
         if (type === 'percentage') {
-            valueSuffix.textContent = '%';
-            valueHint.textContent = 'Nhập giá trị từ 0 đến 100';
-            valueInput.setAttribute('max', '100');
-            valueInput.setAttribute('placeholder', 'VD: 20');
-            maxDiscountRow.style.display = 'flex';
+            valueSuffix.text('%');
+            valueHint.text('Nhập giá trị từ 1 đến 100').removeClass('text-muted').addClass('text-info');
+            valueInput.attr('max', '100');
+            valueInput.attr('placeholder', 'VD: 20');
+            maxDiscountCol.fadeIn(200);
         } else if (type === 'fixed') {
-            valueSuffix.textContent = 'VNĐ';
-            valueHint.textContent = 'Nhập số tiền giảm (tối thiểu 1,000 VNĐ)';
-            valueInput.removeAttribute('max');
-            valueInput.setAttribute('placeholder', 'VD: 50000');
-            maxDiscountRow.style.display = 'none';
+            valueSuffix.text('đ');
+            valueHint.text('Nhập số tiền giảm (VD: 50.000đ)').removeClass('text-info').addClass('text-muted');
+            valueInput.removeAttr('max');
+            valueInput.attr('placeholder', 'VD: 50000');
+            maxDiscountCol.fadeOut(200);
         } else {
-            valueSuffix.textContent = '-';
-            valueHint.textContent = 'Chọn loại giảm giá trước';
-            valueInput.removeAttribute('max');
-            valueInput.setAttribute('placeholder', '');
-            maxDiscountRow.style.display = 'none';
+            valueSuffix.text('-');
+            valueHint.text('Hãy chọn loại giảm giá').removeClass('text-info').addClass('text-muted');
+            valueInput.removeAttr('max');
+            valueInput.attr('placeholder', '0');
+            maxDiscountCol.fadeOut(200);
         }
     }
 
-    typeSelect.addEventListener('change', updateFormBasedOnType);
-    
-    // Initialize on page load
+    typeSelect.on('change', updateFormBasedOnType);
     updateFormBasedOnType();
 });
 </script>

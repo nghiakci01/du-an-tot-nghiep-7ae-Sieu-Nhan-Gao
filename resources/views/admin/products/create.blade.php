@@ -85,7 +85,7 @@
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="short_description" class="form-label">Mô tả ngắn <small class="text-muted"></small></label>
-                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="short_description" name="short_description" rows="4" maxlength="500" placeholder="Nhập mô tả ngắn cho sản phẩm...">{{ old('short_description') }}</textarea>
+                        <textarea class="form-control @error('short_description') is-invalid @enderror" id="short_description" name="short_description" rows="4" maxlength="500" data-char-count="true" data-char-target="#short-char-count">{{ old('short_description') }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('short_description')
@@ -99,7 +99,7 @@
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="description" class="form-label">Mô tả chi tiết <small class="text-muted"></small></label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="5000" placeholder="Nhập mô tả chi tiết cho sản phẩm...">{{ old('description') }}</textarea>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="5" maxlength="5000" data-char-count="true" data-char-target="#char-count">{{ old('description') }}</textarea>
                         <div class="d-flex justify-content-between mt-1">
                             <div>
                                 @error('description')
@@ -342,27 +342,7 @@
         });
 
 
-        // Character counter for short description
-        const shortDescTextarea = document.getElementById('short_description');
-        const shortCharCount = document.getElementById('short-char-count');
-        
-        if (shortDescTextarea && shortCharCount) {
-            shortCharCount.textContent = shortDescTextarea.value.length;
-            shortDescTextarea.addEventListener('input', function() {
-                shortCharCount.textContent = this.value.length;
-            });
-        }
-
-        // Character counter for description
-        const descTextarea = document.getElementById('description');
-        const charCount = document.getElementById('char-count');
-        
-        if (descTextarea && charCount) {
-            charCount.textContent = descTextarea.value.length;
-            descTextarea.addEventListener('input', function() {
-                charCount.textContent = this.value.length;
-            });
-        }
+        // Character counters handled globally via [data-char-count="true"] in admin.blade.php
 
         // Gallery images preview
         const galleryInput = document.getElementById('gallery_images');
