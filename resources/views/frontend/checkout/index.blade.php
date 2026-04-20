@@ -636,8 +636,8 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
           + Thêm địa chỉ mới
         </button>
 
-        {{-- Add address form (hidden by default if addresses exist) --}}
-        <div id="modal-addr-new-form" class="{{ $userAddresses->isNotEmpty() ? 'd-none' : '' }}">
+        {{-- Add address form (hidden by default) --}}
+        <div id="modal-addr-new-form" class="d-none">
           <h5 id="modal-addr-form-title" class="mb-3" style="font-size:16px;font-weight:600;">Thêm địa chỉ giao hàng mới</h5>
           <form id="modal-new-addr-form-inner" novalidate>
             @csrf
@@ -908,13 +908,13 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
     if(modalDeleteBtn) modalDeleteBtn.classList.add('d-none');
     if(modalErrBox)    modalErrBox.textContent = '';
     const mProv = qs('#modal_province'), mComm = qs('#modal_commune');
-    if(mProv) mProv.innerHTML='<option value="">-- Định tỉnh trước --</option>';
+    if(mProv) mProv.innerHTML='<option value="">-- Đang tải… --</option>';
     if(mComm){ mComm.innerHTML='<option value="">-- Chọn tỉnh trước --</option>'; mComm.disabled=true; }
     bindCascade(mProv, mComm, '', '');
   }
 
-  const pageContainer = qs('.ck-page');
-  pageContainer?.addEventListener('click', function(e){
+  // Use document instead of pageContainer to include the modal (which is outside .ck-page)
+  document.addEventListener('click', function(e){
     const editBtn = e.target.closest('.addr-edit-btn');
     if(editBtn){
       e.stopPropagation(); const card = editBtn.closest('.mpick-card'); if(!card) return;
@@ -1079,10 +1079,28 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
     @auth
       const selCard = qs('.mpick-card.is-sel');
       if(selCard) applyAddrSelection(selCard);
+
+      // Re-bind when modal is shown to ensure race conditions with niceSelect/etc are resolved
+      const modalEl = document.getElementById('addr-pick-modal');
+      if(modalEl){
+        modalEl.addEventListener('shown.bs.modal', function () {
+          const mp = qs('#modal_province'), mc = qs('#modal_commune');
+          if(mp && (!mp.options || mp.options.length <= 1)){
+             bindCascade(mp, mc, '', '');
+          } else if(mp) {
+             syncNS(mp); if(mc) syncNS(mc);
+          }
+        });
+      }
     @endauth
   }
 
-  init();
+  // Ensure initialization runs after DOM and plugins are ready
+  if(window.jQuery) {
+    jQuery(document).ready(init);
+  } else {
+    document.addEventListener('DOMContentLoaded', init);
+  }
 })();
 </script>
 @endsection

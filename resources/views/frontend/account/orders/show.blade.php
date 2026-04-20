@@ -511,17 +511,53 @@
         </div>
         <div class="detail-body">
           <p class="small text-muted mb-3">Yêu cầu trả hàng của bạn đã được duyệt. Vui lòng gửi hàng về kho và nộp thông tin vận đơn tại đây.</p>
+          @if ($errors->any())
+              <div class="alert alert-danger p-2 small mb-3">
+                  <ul class="mb-0 ps-3">
+                      @foreach ($errors->all() as $error)
+                          <li>{{ $error }}</li>
+                      @endforeach
+                  </ul>
+              </div>
+          @endif
           <form action="{{ route('account.orders.return.shipping', $order->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
-              <label class="form-label small fw-bold">Thông tin vận chuyển</label>
-              <textarea name="shipping_info" class="form-control form-control-sm" rows="2" placeholder="VD: Giao hàng nhanh - Mã: 12345678" required></textarea>
+              <label class="form-label small fw-bold">Mã vận đơn / Đơn vị vận chuyển <span class="text-muted fw-normal">(không bắt buộc)</span></label>
+              <textarea name="shipping_info" class="form-control form-control-sm" rows="1" placeholder="VD: GHN - 12345678" style="border-radius: 8px;"></textarea>
             </div>
-            <div class="mb-3">
-              <label class="form-label small fw-bold">Ảnh minh chứng gửi hàng</label>
-              <input type="file" name="shipping_proof" class="form-control form-control-sm" accept="image/*" required>
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label small fw-bold">Ảnh minh chứng <span class="text-danger">*</span></label>
+                <input type="file" id="shipping_proof_input" name="shipping_proof[]" class="form-control form-control-sm @error('shipping_proof') is-invalid @enderror" accept="image/*" multiple required style="border-radius: 8px;">
+                @error('shipping_proof')
+                    <div class="invalid-feedback" style="font-size: 0.75rem;">{{ $message }}</div>
+                @enderror
+                @error('shipping_proof.*')
+                    <div class="text-danger mt-1" style="font-size: 0.7rem;">{{ $message }}</div>
+                @enderror
+              </div>
+              <div class="col-6">
+                <label class="form-label small fw-bold">Video minh chứng <span class="text-muted fw-normal">(nếu có)</span></label>
+                <input type="file" id="shipping_video_input" name="shipping_video[]" class="form-control form-control-sm @error('shipping_video') is-invalid @enderror" accept="video/*" multiple style="border-radius: 8px;">
+                @error('shipping_video')
+                    <div class="invalid-feedback" style="font-size: 0.75rem;">{{ $message }}</div>
+                @enderror
+                @error('shipping_video.*')
+                    <div class="text-danger mt-1" style="font-size: 0.7rem;">{{ $message }}</div>
+                @enderror
+              </div>
             </div>
-            <button type="submit" class="btn btn-warning rounded-pill w-100 py-2">
+
+            {{-- Live Preview Container --}}
+            <div id="shipment_preview_container" class="mb-3 d-none">
+              <label class="form-label small fw-bold text-primary mb-2 mt-2"><i class="bi bi-eye me-1"></i> Xem trước minh chứng:</label>
+              <div id="shipment_previews" class="d-flex flex-wrap gap-2 p-2 border rounded bg-white shadow-sm" style="min-height: 50px;">
+                <!-- Previews will be injected here -->
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-warning rounded-pill w-100 py-2 shadow-sm mt-2">
               <i class="bi bi-send me-1"></i> Xác nhận đã gửi hàng
             </button>
           </form>
@@ -681,6 +717,55 @@ document.querySelectorAll('#reviewModal .star-rating-order input').forEach(funct
   input.addEventListener('change', function() {
     document.getElementById('modalLikert').textContent = likertLabels[this.value];
   });
+});
+// Handle Shipment Proof Live Previews
+document.addEventListener('DOMContentLoaded', function() {
+    const imgInput = document.getElementById('shipping_proof_input');
+    const videoInput = document.getElementById('shipping_video_input');
+    const container = document.getElementById('shipment_preview_container');
+    const previewList = document.getElementById('shipment_previews');
+
+    function updatePreviews() {
+        previewList.innerHTML = '';
+        let hasFiles = false;
+
+        const handleFiles = (files, isVideo) => {
+            if (files.length > 0) hasFiles = true;
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                const wrapper = document.createElement('div');
+                wrapper.className = 'position-relative';
+                wrapper.style.width = '80px';
+                wrapper.style.height = '80px';
+                
+                if (!isVideo) {
+                    const img = document.createElement('img');
+                    img.className = 'img-thumbnail shadow-sm w-100 h-100';
+                    img.style.objectFit = 'cover';
+                    img.src = URL.createObjectURL(file);
+                    wrapper.appendChild(img);
+                } else {
+                    const vidPlaceholder = document.createElement('div');
+                    vidPlaceholder.className = 'img-thumbnail shadow-sm w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark text-white';
+                    vidPlaceholder.innerHTML = '<i class="bi bi-play-btn-fill fs-4"></i><span style="font-size:0.6rem">Video</span>';
+                    wrapper.appendChild(vidPlaceholder);
+                }
+                previewList.appendChild(wrapper);
+            });
+        };
+
+        if (imgInput) handleFiles(imgInput.files, false);
+        if (videoInput) handleFiles(videoInput.files, true);
+
+        if (hasFiles) {
+            container.classList.remove('d-none');
+        } else {
+            container.classList.add('d-none');
+        }
+    }
+
+    if (imgInput) imgInput.addEventListener('change', updatePreviews);
+    if (videoInput) videoInput.addEventListener('change', updatePreviews);
 });
 </script>
 <style>

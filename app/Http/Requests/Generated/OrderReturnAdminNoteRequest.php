@@ -14,7 +14,7 @@ class OrderReturnAdminNoteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'admin_note' => 'required|string|max:1000',
+            'admin_note' => 'nullable|string|max:1000',
         ];
     }
 }
