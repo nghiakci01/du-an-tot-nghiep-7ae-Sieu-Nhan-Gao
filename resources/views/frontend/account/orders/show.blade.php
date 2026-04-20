@@ -5,25 +5,27 @@
 @push('styles')
 <style>
 .order-show-wrapper {
-  background: #f5f5f7;
+  background: #fff;
   padding: 40px 0 60px;
   min-height: 80vh;
 }
 .detail-card {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid #000;
   overflow: hidden;
   margin-bottom: 20px;
 }
 .detail-header {
-  padding: 18px 24px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 15px 24px;
+  border-bottom: 1px solid #000;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: #f8f9fa;
 }
-.detail-header h5 { margin: 0; font-weight: 700; font-size: 1rem; }
+.detail-header h5 { margin: 0; font-weight: 700; font-size: 1rem; color: #000; }
 .detail-body { padding: 22px 24px; }
 
 /* Hero */
@@ -98,19 +100,19 @@
 /* Items */
 .item-row {
   display:flex; align-items:center; gap:14px;
-  padding:12px 0; border-bottom:1px solid #f5f5f5;
+  padding:12px 0; border-bottom:1px solid #ddd;
 }
 .item-row:last-child { border-bottom:none; }
-.item-img { width:60px; height:60px; object-fit:cover; border-radius:10px; border:1px solid #eee; flex-shrink:0; }
-.item-placeholder { width:60px; height:60px; border-radius:10px; background:#f2f2f2; display:flex; align-items:center; justify-content:center; color:#ccc; flex-shrink:0; }
+.item-img { width:60px; height:60px; object-fit:cover; border-radius:0; border:1px solid #000; flex-shrink:0; }
+.item-placeholder { width:60px; height:60px; border-radius:0; background:#f2f2f2; display:flex; align-items:center; justify-content:center; color:#ccc; flex-shrink:0; border: 1px solid #000; }
 
 /* Price rows */
-.p-row { display:flex; justify-content:space-between; padding:7px 0; font-size:0.9rem; border-bottom:1px solid #f8f8f8; }
+.p-row { display:flex; justify-content:space-between; padding:7px 0; font-size:0.9rem; border-bottom:1px solid #eee; }
 .p-row:last-child { border-bottom:none; }
-.p-row.total { border-top:2px solid #f0f0f0; margin-top:6px; padding-top:12px; font-size:1rem; }
+.p-row.total { border-top:1px solid #000; margin-top:6px; padding-top:12px; font-size:1rem; color: #000; }
 
 /* Info */
-.info-row { display:flex; justify-content:space-between; padding:7px 0; font-size:0.88rem; border-bottom:1px solid #f8f8f8; }
+.info-row { display:flex; justify-content:space-between; padding:7px 0; font-size:0.88rem; border-bottom:1px solid #eee; }
 .info-row:last-child { border-bottom:none; }
 
 /* History timeline */
@@ -121,13 +123,13 @@
   left:15px;
   top:32px;
   bottom:0;
-  width:2px;
-  background:#f0f0f0;
+  width:1px;
+  background:#000;
 }
 .timeline-dot {
   width:32px; height:32px;
-  border-radius:50%;
-  background:#1a1a2e;
+  border-radius:0;
+  background:#000;
   color:white;
   display:flex; align-items:center; justify-content:center;
   font-size:0.8rem;
@@ -135,19 +137,19 @@
 }
 
 /* Review */
-.review-card { border:1px solid #eee; border-radius:12px; overflow:hidden; margin-bottom:14px; }
-.review-card-head { background:#f9fafb; padding:14px 18px; display:flex; align-items:center; gap:12px; }
-.star-rating-order { display:inline-flex; flex-direction:row-reverse; gap:4px; margin-bottom:4px; }
-.star-rating-order input { display:none; }
-.star-rating-order label { font-size:28px; color:#ccc; cursor:pointer; transition:color 0.15s; margin:0; }
-.star-rating-order label:hover i,
-.star-rating-order label:hover ~ label i,
-.star-rating-order input:checked ~ label i { color:#f39c12 !important; }
-.star-rating-order label i { pointer-events:none; }
+.review-card { border:1px solid #000; border-radius:0; overflow:hidden; margin-bottom:14px; }
+.review-card-head { background:#f9fafb; padding:14px 18px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eee; }
 
 /* Buttons */
-.btn-primary-dark { background:#1a1a2e; color:white; border:none; border-radius:50px; padding:10px 28px; font-weight:600; transition:background .2s; }
-.btn-primary-dark:hover { background:#2d2d5e; color:white; }
+.btn-primary-dark { background:#000; color:white; border:none; border-radius:0; padding:10px 28px; font-weight:600; transition:background .2s; }
+.btn-primary-dark:hover { background:#333; color:white; }
+.btn-outline-dark, .btn-outline-danger, .btn-outline-warning { border-radius: 0 !important; }
+.btn-warning { background: #000 !important; color: #fff !important; border-radius: 0 !important; border: none !important; }
+.btn-warning:hover { background: #333 !important; }
+.btn-success { background: #000 !important; color: #fff !important; border-radius: 0 !important; border: 1px solid #000 !important; }
+.badge { border-radius: 0 !important; }
+.text-danger, .text-success, .text-info, .text-warning { color: #000 !important; }
+.bg-danger, .bg-success, .bg-info, .bg-warning { background: #000 !important; color: #fff !important; }
 
 /* Modal & Collapse */
 .history-toggle { cursor: pointer; border-radius: 12px; transition: all 0.2s; }
@@ -208,6 +210,7 @@
   @endif
 
   {{-- ===== HERO ===== --}}
+  @if(!$order->returnRequest)
   <div class="order-hero">
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
       <div>
@@ -234,29 +237,33 @@
     </div>
     @endif
   </div>
+  @endif
 
   <div class="row g-4">
     {{-- LEFT --}}
     <div class="col-lg-8">
 
       @if($order->returnRequest)
-      <div class="alert {{ $order->returnRequest->isRejected() ? 'alert-danger' : ($order->returnRequest->isCompleted() ? 'alert-success' : 'alert-warning') }} rounded-3 mb-4 shadow-sm border-0">
+      <div class="alert alert-light border border-dark rounded-0 mb-4 shadow-sm">
         <h6 class="fw-bold mb-2">
           <i class="bi bi-arrow-return-left me-2"></i>
           Yêu cầu {{ $order->returnRequest->type_text }}
         </h6>
-        <div class="small">
-          <div class="mb-1"><strong>Trạng thái:</strong> 
+        <div class="p-3" style="color: #000; font-size: 0.95rem;">
+          <div class="mb-2"><strong>Trạng thái:</strong> 
             <span class="badge {{ $order->returnRequest->status_badge }}">{{ $order->returnRequest->status_text }}</span>
           </div>
-          <div class="mb-1"><strong>Lý do:</strong> {{ $order->returnRequest->reason }}</div>
+          </div>
+          <div class="mb-2"><strong>Lý do:</strong> {{ $order->returnRequest->reason }}</div>
           
           @if($order->returnRequest->return_method)
-            <div class="mb-1 d-flex align-items-center">
+            <div class="mb-2 d-flex align-items-center">
                 <strong>Phương thức gửi trả:</strong> 
-                <span class="ms-1">{{ $order->returnRequest->return_method_text }}</span>
+                <span class="ms-1 fw-bold">{{ $order->returnRequest->return_method_text }}</span>
                 @if($order->returnRequest->isApproved())
-                    <a href="javascript:void(0)" onclick="document.getElementById('change-return-method').classList.toggle('d-none')" class="ms-2 badge bg-secondary text-decoration-none" style="font-size: 0.65rem; cursor:pointer;">Thay đổi</a>
+                    <button type="button" onclick="document.getElementById('change-return-method').classList.toggle('d-none')" class="ms-2 btn btn-dark btn-sm rounded-0 px-3" style="font-size: 0.75rem;">
+                        Thay đổi
+                    </button>
                 @endif
             </div>
           @endif
@@ -268,7 +275,7 @@
                 <form action="{{ route('account.orders.return.update_method', $order->id) }}" method="POST">
                     @csrf
                     <div class="d-flex gap-2">
-                        <button type="submit" name="return_method" value="at_home" class="btn {{ $order->returnRequest->return_method === 'at_home' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm rounded-pill flex-grow-1">
+                        <button type="submit" name="return_method" value="at_home" class="btn {{ $order->returnRequest->return_method === 'at_home' ? 'btn-dark' : 'btn-outline-dark' }} btn-sm rounded-0 flex-grow-1">
                             <i class="bi bi-house-door me-1"></i> Shipper lấy hàng
                         </button>
                         <button type="submit" name="return_method" value="at_post_office" class="btn {{ $order->returnRequest->return_method === 'at_post_office' ? 'btn-warning' : 'btn-outline-warning' }} btn-sm rounded-pill flex-grow-1" style="{{ $order->returnRequest->return_method === 'at_post_office' ? 'background-color: #f26522; border-color: #f26522; color: white;' : 'color: #f26522; border-color: #f26522;' }}">
@@ -298,39 +305,35 @@
       </div>
       @endif
 
-      @if($order->returnRequest && $order->returnRequest->isApproved())
-      <div class="detail-card border-info mb-4 shadow-sm">
-        <div class="detail-header bg-info text-white">
-          <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Thông tin nhận hàng hoàn trả</h5>
+      @if($order->returnRequest)
+      <div class="detail-card border-dark mb-4 shadow-sm">
+        <div class="detail-header bg-dark text-white">
+          <h5 class="mb-0 text-white py-1"><i class="bi bi-bank me-2"></i>Tài khoản hoàn tiền</h5>
         </div>
-        <div class="detail-body">
-          <div class="info-row">
-            <span class="text-muted">Người nhận</span>
-            <span class="fw-semibold text-end" style="max-width:60%;font-size:0.9rem;">{{ $returnShippingInfo['name'] }}</span>
-          </div>
-          @if($returnShippingInfo['phone'])
-          <div class="info-row">
-            <span class="text-muted">Số điện thoại</span>
-            <span class="text-end" style="max-width:60%;font-size:0.9rem;">
-              <a href="tel:{{ preg_replace('/\s+/', '', $returnShippingInfo['phone']) }}" class="text-decoration-none">{{ $returnShippingInfo['phone'] }}</a>
+        <div class="detail-body p-4" style="color: #000; font-size: 0.95rem;">
+          <div class="info-row border-bottom pb-2 mb-2">
+            <span class="text-muted">Ngân hàng</span>
+            <span class="fw-bold text-uppercase d-flex align-items-center">
+                @if($order->returnRequest->bank_bin)
+                    <img src="https://api.vietqr.io/img/{{ $order->returnRequest->bank_bin }}.png" style="height: 18px;" class="me-2" onerror="this.style.display='none'">
+                @endif
+                {{ $order->returnRequest->bank_name ?: '---' }}
             </span>
           </div>
-          @endif
+          <div class="info-row border-bottom pb-2 mb-2">
+            <span class="text-muted">Số tài khoản</span>
+            <span class="fw-bold fs-5">{{ $order->returnRequest->account_number ?: '---' }}</span>
+          </div>
           <div class="info-row">
-            <span class="text-muted">Địa chỉ</span>
-            <span class="text-end" style="max-width:60%;font-size:0.85rem;">{{ $returnShippingInfo['address'] }}</span>
+            <span class="text-muted">Chủ tài khoản</span>
+            <span class="fw-bold text-uppercase">{{ $order->returnRequest->account_name ?: '---' }}</span>
           </div>
-          @if($returnShippingInfo['note'])
-          <div class="mt-3 p-3 rounded" style="background:#f8fbff; border:1px dashed #cfe2ff;">
-            <small class="text-muted d-block mb-1">Ghi chú cho khách</small>
-            <div class="small">{{ $returnShippingInfo['note'] }}</div>
-          </div>
-          @endif
         </div>
       </div>
       @endif
 
       {{-- Items --}}
+      @if(!$order->returnRequest)
       <div class="detail-card">
         <div class="detail-header">
           <h5><i class="bi bi-bag me-2"></i>Sản phẩm đã đặt</h5>
@@ -357,14 +360,15 @@
               @endif
               <div class="text-muted small mt-1">{{ $item->quantity }} × {{ number_format($item->price) }}đ</div>
             </div>
-            <div class="fw-bold text-danger text-nowrap">{{ number_format($item->total) }}đ</div>
+            <div class="fw-bold text-dark text-nowrap">{{ number_format($item->total) }}đ</div>
           </div>
           @endforeach
         </div>
       </div>
+      @endif
 
       {{-- Order History --}}
-      @if($order->histories->count() > 0)
+      @if(!$order->returnRequest && $order->histories->count() > 0)
       <div class="detail-card">
         <div class="detail-header history-toggle" onclick="toggleOrderHistory()" role="button">
           <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Lịch sử đơn hàng</h5>
@@ -444,6 +448,7 @@
     <div class="col-lg-4">
 
       {{-- Payment Summary --}}
+      @if(!$order->returnRequest)
       <div class="detail-card">
         <div class="detail-header">
           <h5><i class="bi bi-receipt me-2"></i>Tóm tắt thanh toán</h5>
@@ -467,12 +472,14 @@
           @endif
           <div class="p-row total">
             <span class="fw-bold">Tổng thanh toán</span>
-            <span class="fw-bold text-danger">{{ number_format($displayTotal) }}đ</span>
+            <span class="fw-bold text-dark">{{ number_format($displayTotal) }}đ</span>
           </div>
         </div>
       </div>
+      @endif
 
       {{-- Shipping Info --}}
+      @if(!$order->returnRequest)
       <div class="detail-card">
         <div class="detail-header">
           <h5><i class="bi bi-geo-alt me-2"></i>Thông tin giao hàng</h5>
@@ -502,12 +509,13 @@
           </div>
         </div>
       </div>
+      @endif
 
       {{-- Return Shipping Action --}}
       @if($order->returnRequest && $order->returnRequest->isApproved())
-      <div class="detail-card border-warning bg-light-warning mb-3">
-        <div class="detail-header bg-warning text-white">
-          <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Gửi hàng hoàn trả</h5>
+      <div class="detail-card border-dark bg-white mb-3">
+        <div class="detail-header bg-dark text-white">
+          <h5 class="mb-0 text-white"><i class="bi bi-truck me-2"></i>Gửi hàng hoàn trả</h5>
         </div>
         <div class="detail-body">
           <p class="small text-muted mb-3">Yêu cầu trả hàng của bạn đã được duyệt. Vui lòng gửi hàng về kho và nộp thông tin vận đơn tại đây.</p>
@@ -567,7 +575,12 @@
 
       {{-- Actions --}}
       <div class="d-flex flex-column gap-2">
-        <a href="{{ route('account.index') }}?tab=orders" class="btn btn-outline-dark rounded-pill py-2">
+        @if($order->returnRequest && $order->returnRequest->isCompleted())
+          <a href="{{ route('account.index') }}?tab=orders" class="btn btn-dark rounded-0 py-2 fw-bold">
+            Hoàn thành
+          </a>
+        @endif
+        <a href="{{ route('account.index') }}?tab=orders" class="btn btn-outline-dark rounded-0 py-2">
           <i class="bi bi-arrow-left me-1"></i> Quay lại đơn hàng
         </a>
         @if($user && $order->status === \App\Models\Order::STATUS_PENDING)

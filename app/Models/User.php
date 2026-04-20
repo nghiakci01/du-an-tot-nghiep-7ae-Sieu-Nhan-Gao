@@ -32,6 +32,10 @@ class User extends Authenticatable
         'role',
         'avatar',
         'cart_data',
+        'bank_name',
+        'bank_bin',
+        'account_number',
+        'account_name',
     ];
 
     /**

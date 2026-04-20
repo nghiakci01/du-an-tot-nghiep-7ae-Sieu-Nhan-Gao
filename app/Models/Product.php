@@ -104,11 +104,11 @@ class Product extends Model
      */
     public function getImageUrlAttribute()
     {
-        if (!empty($this->image)) {
+        if (!empty($this->image) && file_exists(public_path('storage/' . $this->image))) {
             return asset('storage/'.$this->image);
         }
 
-        return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        return asset('frontend-assets/img/s-product/product.jpg') ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     }
 
     public function isOnFlashSale(): bool
