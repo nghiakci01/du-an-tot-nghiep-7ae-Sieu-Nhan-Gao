@@ -328,12 +328,26 @@ class AccountController extends Controller
             'status' => \App\Models\OrderReturnRequest::STATUS_SHIPPING_BACK,
         ];
 
+        $shippingProofs = [];
         if ($request->hasFile('shipping_proof')) {
-            $image = $request->file('shipping_proof');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             \Illuminate\Support\Facades\File::ensureDirectoryExists(public_path('uploads/returns'));
-            $image->move(public_path('uploads/returns'), $imageName);
-            $data['shipping_proof'] = 'uploads/returns/' . $imageName;
+            foreach ($request->file('shipping_proof') as $image) {
+                $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('uploads/returns'), $imageName);
+                $shippingProofs[] = 'uploads/returns/' . $imageName;
+            }
+            $data['shipping_proof'] = $shippingProofs;
+        }
+
+        $videoProofs = [];
+        if ($request->hasFile('shipping_video')) {
+            \Illuminate\Support\Facades\File::ensureDirectoryExists(public_path('uploads/returns/videos'));
+            foreach ($request->file('shipping_video') as $video) {
+                $videoName = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
+                $video->move(public_path('uploads/returns/videos'), $videoName);
+                $videoProofs[] = 'uploads/returns/videos/' . $videoName;
+            }
+            $data['video_proof'] = $videoProofs;
         }
 
         $returnRequest->update($data);

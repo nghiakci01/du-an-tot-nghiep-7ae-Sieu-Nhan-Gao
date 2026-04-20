@@ -24,7 +24,21 @@ class OrderReturnController extends Controller
         $query = OrderReturnRequest::with(['user', 'order']);
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $status = $request->status;
+            if ($status === 'processing') {
+                $query->whereIn('status', [
+                    OrderReturnRequest::STATUS_PENDING,
+                    OrderReturnRequest::STATUS_APPROVED,
+                    OrderReturnRequest::STATUS_SHIPPING_BACK
+                ]);
+            } elseif ($status === 'completed') {
+                $query->whereIn('status', [
+                    OrderReturnRequest::STATUS_REFUNDED,
+                    OrderReturnRequest::STATUS_EXCHANGED
+                ]);
+            } else {
+                $query->where('status', $status);
+            }
         }
 
         if ($request->filled('order_id')) {

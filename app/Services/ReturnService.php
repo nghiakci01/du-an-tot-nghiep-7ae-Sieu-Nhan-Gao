@@ -46,25 +46,14 @@ class ReturnService
                 'note' => 'Admin đã duyệt yêu cầu hoàn hàng: ' . $adminNote,
             ]);
 
-            $order = $returnRequest->order;
-            $oldStatus = $order->status;
 
-            $order->update(['status' => $newOrderStatus]);
-
-            \App\Models\OrderHistory::create([
-                'order_id'        => $order->id,
-                'user_id'         => $processor->id,
-                'previous_status' => $oldStatus,
-                'new_status'      => $newOrderStatus,
-                'note'            => 'Admin đã duyệt yêu cầu hoàn hàng: ' . $adminNote,
-            ]);
 
             Notification::send($returnRequest->user, new OrderReturnRequestStatusNotification($returnRequest, OrderReturnRequest::STATUS_APPROVED));
 
             // Gửi email thông báo
             Mail::to($returnRequest->user->email)->send(new ReturnStatusMail($returnRequest, OrderReturnRequest::STATUS_APPROVED));
 
-            Log::info("Hoàn trả #{$returnRequest->id} đã được duyệt, đơn hàng #{$order->id} chuyển sang {$newOrderStatus}.");
+            Log::info("Hoàn trả #{$returnRequest->id} đã được duyệt cho đơn hàng #{$returnRequest->order_id}.");
 
             return $returnRequest;
         });
@@ -183,7 +172,7 @@ class ReturnService
             // 2. Branch Logic based on Type
             if ($returnRequest->type === OrderReturnRequest::TYPE_EXCHANGE) {
                 $returnRequest->update([
-                    'status'        => OrderReturnRequest::STATUS_EXCHAGED ?? 'exchanged',
+                    'status'        => OrderReturnRequest::STATUS_EXCHANGED,
                     'refund_amount' => 0, // No monetary refund for exchange
                     'processed_by'  => $processor->id,
                     'processed_at'  => now(),
@@ -218,13 +207,13 @@ class ReturnService
 
                 // Refund dựa trên phương thức thanh toán gốc
                 $user = $returnRequest->user;
-                $paymentMethod = $returnRequest->order->payment_method ?? 'cod'; // Mặc định COD
+                $paymentMethod = strtolower($returnRequest->order->payment_method ?? 'cod');
 
                 if ($paymentMethod === 'vnpay') {
                     // TODO: Tích hợp VNPAY refund API
                     Log::warning("Cần hoàn tiền qua VNPAY cho yêu cầu #{$returnRequest->id}, số tiền: {$amount}");
                     throw new \Exception('Hoàn tiền qua VNPAY chưa được triển khai. Vui lòng xử lý thủ công.');
-                } elseif (in_array($paymentMethod, ['cod', 'bank_transfer'])) {
+                } elseif (in_array($paymentMethod, ['cod', 'bank_transfer', 'cash'])) {
                     // Hoàn vào ví
                     $oldBalance = $user->wallet_balance ?? 0;
                     $newBalance = $oldBalance + $amount;
@@ -240,8 +229,8 @@ class ReturnService
                         'reference_id'   => $returnRequest->id,
                     ]);
                 } else {
-                    Log::error("Phương thức thanh toán không xác định: {$paymentMethod} cho đơn hàng #{$returnRequest->order_id}");
-                    throw new \Exception('Phương thức thanh toán không được hỗ trợ cho hoàn tiền.');
+                    Log::error("Phương thức thanh toán không xác định: '{$paymentMethod}' cho đơn hàng #{$returnRequest->order_id}");
+                    throw new \Exception("Phương thức thanh toán '{$paymentMethod}' không được hỗ trợ cho hoàn tiền.");
                 }
             }
 
