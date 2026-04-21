@@ -24,7 +24,21 @@ class OrderReturnController extends Controller
         $query = OrderReturnRequest::with(['user', 'order']);
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $status = $request->status;
+            if ($status === 'processing') {
+                $query->whereIn('status', [
+                    OrderReturnRequest::STATUS_PENDING,
+                    OrderReturnRequest::STATUS_APPROVED,
+                    OrderReturnRequest::STATUS_SHIPPING_BACK
+                ]);
+            } elseif ($status === 'completed') {
+                $query->whereIn('status', [
+                    OrderReturnRequest::STATUS_REFUNDED,
+                    OrderReturnRequest::STATUS_EXCHANGED
+                ]);
+            } else {
+                $query->where('status', $status);
+            }
         }
 
         if ($request->filled('order_id')) {
@@ -33,8 +47,9 @@ class OrderReturnController extends Controller
 
         $requests = $query->latest()->paginate(15);
         $tab = $request->input('status', 'all');
+        $settings = \App\Models\Setting::all()->pluck('value', 'key');
 
-        return view('admin.returns.index', compact('requests', 'tab'));
+        return view('admin.returns.index', compact('requests', 'tab', 'settings'));
     }
 
     public function approve(\App\Http\Requests\Generated\OrderReturnAdminNoteRequest $request, $id)
@@ -109,13 +124,46 @@ class OrderReturnController extends Controller
             $user = Auth::user();
             $this->returnService->complete($returnReq, $user);
 
-            $msg = ($returnReq->type === OrderReturnRequest::TYPE_EXCHANGE)
-                ? 'Đã hoàn tất quy trình đổi hàng cho khách.'
-                : 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.';
+            $msg = 'Đã hoàn tất quy trình trả hàng và hoàn tiền cho khách.';
 
             return redirect()->back()->with('success', $msg);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
+    public function generateGhnCode($id)
+    {
+        try {
+            $returnRequest = OrderReturnRequest::with(['items.orderItem.product', 'order'])->findOrFail($id);
+            
+            // Check if GHN is enabled
+            $ghnProvider = app(\App\Services\Shipping\GhnShippingProvider::class);
+            
+            $result = $ghnProvider->createReturnOrder($returnRequest);
+            $trackingCode = data_get($result, 'data.order_code');
+
+            if ($trackingCode) {
+                $returnRequest->update(['tracking_code' => $trackingCode]);
+                
+                return response()->json([
+                    'success' => true,
+                    'tracking_code' => $trackingCode,
+                    'message' => 'Đã tạo mã vận đơn GHN thành công.'
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy mã vận đơn trong phản hồi từ GHN.'
+            ], 400);
+
+        } catch (\Exception $e) {
+            Log::error("GHN return code error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

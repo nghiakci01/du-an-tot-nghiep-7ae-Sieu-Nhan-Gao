@@ -333,17 +333,8 @@
                   return new bootstrap.Tooltip(tooltipTriggerEl);
               });
 
-              // the following block is commented out because jquery-pjax already executes scripts
-              // within the fragment, and manual eval causes double execution (e.g., double event binding)
-              /*
-              $('.pc-content script').each(function() {
-                  if (this.src) {
-                      $.getScript(this.src);
-                  } else {
-                      eval($(this).text());
-                  }
-              });
-              */
+              // Initialize character counters for newly loaded content
+              initGlobalCharCounters();
 
               // Nếu có sử dụng DataTables, cần re-init lại bảng
               if ($.fn.DataTable) {
@@ -351,6 +342,52 @@
               }
           });
       });
+
+      /**
+       * Global Character Counter System
+       * Handles real-time character counting for inputs with [data-char-count="true"]
+       * Supports Pjax via event delegation on document.
+       */
+      function initGlobalCharCounters() {
+          // Trigger initial count for elements that already have values
+          document.querySelectorAll('[data-char-count="true"]').forEach(el => {
+              updateCharCount(el);
+          });
+      }
+
+      function updateCharCount(input) {
+          const targetSelector = input.getAttribute('data-char-target');
+          const counter = document.querySelector(targetSelector);
+          if (!counter) return;
+
+          const length = input.value.length;
+          const max = parseInt(input.getAttribute('maxlength')) || 0;
+          
+          counter.textContent = length;
+
+          // Color feedback based on thresholds
+          if (max > 0) {
+              if (length >= max) {
+                  counter.classList.add('text-danger');
+                  counter.classList.remove('text-warning');
+              } else if (length >= max * 0.8) {
+                  counter.classList.add('text-warning');
+                  counter.classList.remove('text-danger');
+              } else {
+                  counter.classList.remove('text-danger', 'text-warning');
+              }
+          }
+      }
+
+      // Use event delegation to handle inputs even after Pjax updates
+      document.addEventListener('input', function(e) {
+          if (e.target.matches('[data-char-count="true"]')) {
+              updateCharCount(e.target);
+          }
+      });
+
+      // Initial run on first page load
+      document.addEventListener('DOMContentLoaded', initGlobalCharCounters);
   </script>
 
   {{--

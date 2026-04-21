@@ -37,6 +37,7 @@ class OrderReturnRequest extends Model
         'videos',
         'shipping_info',
         'shipping_proof',
+        'video_proof',
         'status',
         'admin_note',
         'refund_amount',
@@ -46,11 +47,15 @@ class OrderReturnRequest extends Model
         'account_name',
         'processed_by',
         'processed_at',
+        'tracking_code',
+        'inspection_date',
     ];
 
     protected $casts = [
         'images' => 'array',
         'videos' => 'array',
+        'shipping_proof' => 'array',
+        'video_proof' => 'array',
         'processed_at' => 'datetime',
         'refund_amount' => 'decimal:2',
     ];
@@ -73,6 +78,11 @@ class OrderReturnRequest extends Model
     public function items()
     {
         return $this->hasMany(OrderReturnItem::class, 'order_return_request_id');
+    }
+
+    public function histories()
+    {
+        return $this->hasMany(OrderReturnHistory::class, 'order_return_request_id');
     }
 
     public function isPending()
@@ -116,7 +126,7 @@ class OrderReturnRequest extends Model
     }
 
     /**
-     * Check if an order can be returned (within 7 days of completion)
+     * Check if an order can be returned (within configured days of completion)
      */
     public static function canBeReturned(Order $order)
     {
@@ -124,13 +134,14 @@ class OrderReturnRequest extends Model
             return false;
         }
 
-        // Ideally we check history for 'completed' date, fallback to updated_at
+        // Sử dụng completion_date từ history nếu có, fallback to updated_at
         $completionDate = $order->histories()
             ->where('new_status', Order::STATUS_COMPLETED)
             ->latest()
             ->first()?->created_at ?? $order->updated_at;
 
-        return $completionDate->diffInDays(now()) <= 7;
+        $windowDays = config('services.return.window_days', 7);
+        return $completionDate->diffInDays(now()) <= $windowDays;
     }
 
     public function getTypeTextAttribute()
@@ -156,13 +167,10 @@ class OrderReturnRequest extends Model
     public function getStatusTextAttribute()
     {
         return match($this->status) {
-            self::STATUS_PENDING => 'Chờ duyệt',
-            self::STATUS_APPROVED => 'Đã duyệt/Chờ hàng',
+            self::STATUS_PENDING, self::STATUS_APPROVED, self::STATUS_SHIPPING_BACK => 'Admin đã nhận',
             self::STATUS_REJECTED => 'Bị từ chối',
-            self::STATUS_SHIPPING_BACK => 'Đang gửi hàng về',
-            self::STATUS_RECEIVED => 'Đã nhận tại kho',
-            self::STATUS_REFUNDED => 'Đã hoàn tiền',
-            self::STATUS_EXCHANGED => 'Đã đổi hàng',
+            self::STATUS_RECEIVED => 'Đã nhận được hàng',
+            self::STATUS_REFUNDED, self::STATUS_EXCHANGED => 'Xác nhận đã chuyển khoản',
             default => 'Không xác định'
         };
     }
@@ -170,17 +178,14 @@ class OrderReturnRequest extends Model
     public function getStatusBadgeAttribute()
     {
         return match($this->status) {
-            self::STATUS_PENDING => 'bg-warning text-dark',
-            self::STATUS_APPROVED => 'bg-info',
+            self::STATUS_PENDING, self::STATUS_APPROVED, self::STATUS_SHIPPING_BACK => 'bg-info',
             self::STATUS_REJECTED => 'bg-danger',
-            self::STATUS_SHIPPING_BACK => 'bg-primary',
             self::STATUS_RECEIVED => 'bg-dark',
-            self::STATUS_REFUNDED => 'bg-success',
-            self::STATUS_EXCHANGED => 'bg-success',
+            self::STATUS_REFUNDED, self::STATUS_EXCHANGED => 'bg-success',
             default => 'bg-secondary'
         };
     }
-    
+
     public function getReturnMethodTextAttribute()
     {
         return match($this->return_method) {

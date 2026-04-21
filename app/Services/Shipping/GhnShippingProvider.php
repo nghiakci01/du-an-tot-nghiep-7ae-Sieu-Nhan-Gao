@@ -392,7 +392,6 @@ class GhnShippingProvider implements ShippingProviderInterface
             $extraWeight = ceil(($weight - 1000) / 1000);
             $baseFee += $extraWeight * 5000;
         }
-
         return [
             'provider' => 'ghn',
             'service_name' => 'Giao Hang Nhanh',
@@ -401,48 +400,36 @@ class GhnShippingProvider implements ShippingProviderInterface
         ];
     }
 
-    public function createShippingOrder(\App\Models\Order $order): array
+    protected function resolveAddressHeuristically(string $addressPart, array $config, string $explicitProvince = null): array
     {
-        $config = config('shipping.ghn', []);
-
-        if (!$this->canUseLiveApi($config)) {
-            Log::error('GHN Create Order failed: API not configured or disabled in config/shipping.php');
-            throw new \Exception('Chưa cấu hình API GHN hoặc chưa bật (enabled).');
-        }
-
-        // Parse address to get province, district, ward
-        // Format of shipping_address: "Address, Ward, District, Province - Phone - Name"
-        $addressFull = $order->shipping_address;
-        $addressPart = explode(' - ', $addressFull)[0] ?? '';
-        $parts = array_map('trim', explode(',', $addressPart));
+        // Phân tách địa chỉ hỗ trợ nhiều loại phân cách
+        $parts = array_map('trim', preg_split('/[,;\-\|]/', $addressPart, -1, PREG_SPLIT_NO_EMPTY));
         $normalizedParts = array_map([$this, 'normalize'], $parts);
 
         Log::debug('GHN Heuristic Parsing start', ['address' => $addressPart, 'parts' => $parts]);
 
-        // 1. Identify Province Candidates
-        // We fetch all provinces (cached) and check which one matches any part of the address
+        // 1. Xác định các Tỉnh/Thành tiềm năng
         $allProvinces = Cache::get('shipping.ghn.provinces');
         if (!is_array($allProvinces) || empty($allProvinces)) {
-            // Trigger a dummy lookup to load cache if empty
             $this->findProvinceId('Hanoi', $config);
             $allProvinces = Cache::get('shipping.ghn.provinces') ?: [];
         }
 
         $provinceCandidates = [];
         
-        // Priority: Check order->province first
-        if ($order->province) {
-            $pId = $this->findProvinceId($order->province, $config);
+        // Ưu tiên Tỉnh được chỉ định tường minh (nếu có)
+        if ($explicitProvince) {
+            $pId = $this->findProvinceId($explicitProvince, $config);
             if ($pId) {
                 $provinceCandidates[$pId] = [
                     'id' => $pId,
-                    'name' => $order->province,
-                    'score' => 100 // High base score for explicit field
+                    'name' => $explicitProvince,
+                    'score' => 100
                 ];
             }
         }
 
-        // Scan address parts for other province mentions
+        // Tìm trong các phần của địa chỉ
         foreach ($allProvinces as $province) {
             $pId = data_get($province, 'ProvinceID') ?? data_get($province, 'province_id');
             if (!$pId) continue;
@@ -473,14 +460,11 @@ class GhnShippingProvider implements ShippingProviderInterface
             throw new \Exception("Không thể nhận diện Tỉnh/Thành phố từ địa chỉ: $addressPart. Vui lòng kiểm tra lại thông tin Tỉnh/Thành.");
         }
 
-        // 2. Explore Paths and Score Them
+        // 2. Duyệt qua các nhánh Quận -> Phường và tính điểm
         $bestPath = null;
         $maxScore = -1;
 
-        // Sort candidates by score descending to find best province first
         uasort($provinceCandidates, fn($a, $b) => $b['score'] <=> $a['score']);
-        
-        // Limit to top 3 candidates to prevent excessive API calls
         $topCandidates = array_slice($provinceCandidates, 0, 3, true);
 
         foreach ($topCandidates as $pId => $pData) {
@@ -496,12 +480,11 @@ class GhnShippingProvider implements ShippingProviderInterface
                 $dMatchScore = 0;
                 foreach ($normalizedParts as $nPart) {
                     if ($this->matchesAnyName($nPart, $dNames)) {
-                        $dMatchScore = 50; // Found District match
+                        $dMatchScore = 50;
                         break;
                     }
                 }
 
-                // Optimization: If no district match, we still try because Ward might match
                 $wards = $this->getWardsByDistrictId($dId, $config);
                 foreach ($wards as $ward) {
                     $wCode = (string)data_get($ward, 'WardCode');
@@ -513,7 +496,7 @@ class GhnShippingProvider implements ShippingProviderInterface
                     $wMatchScore = 0;
                     foreach ($normalizedParts as $nPart) {
                         if ($this->matchesAnyName($nPart, $wNames)) {
-                            $wMatchScore = 150; // Found Ward match (High Priority)
+                            $wMatchScore = 150;
                             break;
                         }
                     }
@@ -521,6 +504,7 @@ class GhnShippingProvider implements ShippingProviderInterface
                     if ($dMatchScore > 0 || $wMatchScore > 0) {
                         $totalScore = $pData['score'] + $dMatchScore + $wMatchScore;
                         
+                        // Nếu Quận khớp nhưng Phường không khớp, ta vẫn lấy Phường đầu tiên làm fallback với điểm thấp hơn
                         if ($totalScore > $maxScore) {
                             $maxScore = $totalScore;
                             $bestPath = [
@@ -536,27 +520,33 @@ class GhnShippingProvider implements ShippingProviderInterface
                     }
                 }
             }
-            
-            // If we found a very strong match (>250), we can stop early
             if ($maxScore >= 250) break;
         }
 
         if (!$bestPath) {
-            // Final attempt: Search for ward globally in all candidate provinces (ignoring district part hierarchy)
-            Log::debug('GHN Heuristic falling back to global ward search');
-            // ... (Logic already covered by the loops above effectively) ...
-            
-            throw new \Exception("Không thể nhận diện Phường/Xã từ địa chỉ: $addressPart. Vui lòng đảm bảo thông tin Quận/Huyện và Phường/Xã khớp với Tỉnh/Thành.");
+            throw new \Exception("Không thể nhận diện Quận/Huyện hoặc Phường/Xã từ: $addressPart. Vui lòng đảm bảo địa chỉ có đủ Quận, Huyện (Ví dụ: Chùa Láng, Đống Đa, Hà Nội).");
         }
 
-        Log::info('GHN Address resolved using heuristic algorithm', $bestPath);
+        Log::info('GHN Address resolved heuristics', $bestPath);
+
+        return $bestPath;
+    }
+
+    public function createShippingOrder(\App\Models\Order $order): array
+    {
+        $config = config('shipping.ghn', []);
+        if (!$this->canUseLiveApi($config)) {
+            Log::error('GHN Create Order failed: API not configured or disabled in config/shipping.php');
+            throw new \Exception('Chưa cấu hình API GHN hoặc chưa bật (enabled).');
+        }
+
+        // Parse address using heuristic method
+        $addressPart = explode(' - ', $order->shipping_address)[0] ?? '';
+        $bestPath = $this->resolveAddressHeuristically($addressPart, $config, $order->province);
 
         $provinceId = $bestPath['province_id'];
         $districtId = $bestPath['district_id'];
         $wardCode = $bestPath['ward_code'];
-        $provinceNameFound = $bestPath['province_name'];
-        $districtNameFound = $bestPath['district_name'];
-        $wardNameFound = $bestPath['ward_name'];
 
         $weight = 500;
         $totalQuantity = $order->items->sum('quantity');
@@ -657,5 +647,112 @@ class GhnShippingProvider implements ShippingProviderInterface
             Log::error('GHN Cancel Order error: ' . $e->getMessage(), ['tracking_code' => $trackingCode]);
             return false;
         }
+    }
+
+    /**
+     * Tạo vận đơn thu hồi hàng (Return) trên hệ thống GHN
+     */
+    public function createReturnOrder(\App\Models\OrderReturnRequest $returnRequest): array
+    {
+        $config = config('shipping.ghn', []);
+
+        if (!$this->canUseLiveApi($config)) {
+            Log::error('GHN Create Return Order failed: API not configured.');
+            throw new \Exception('Chưa cấu hình API GHN hoặc chưa bật (enabled).');
+        }
+
+        $order = $returnRequest->order;
+        $settings = [
+            'name' => \App\Models\Setting::get('return_receiver_name'),
+            'phone' => \App\Models\Setting::get('return_receiver_phone'),
+            'address' => \App\Models\Setting::get('return_receiver_address'),
+        ];
+
+        if (!$settings['address']) {
+            throw new \Exception('Chưa cấu hình địa chỉ nhận hàng hoàn trả trong Settings.');
+        }
+
+        // --- 1. Resolve RECEIVER (Shop/Admin) ---
+        // Sử dụng thuật toán heuristic để nhận diện địa chỉ shop
+        try {
+            $shopDestination = $this->resolveAddressHeuristically($settings['address'], $config);
+        } catch (\Exception $e) {
+             throw new \Exception("Lỗi: Không thể nhận diện địa chỉ Shop từ Settings: " . $settings['address'] . ". Chi tiết: " . $e->getMessage());
+        }
+
+        // --- 2. Resolve SENDER (Customer) ---
+        $addressPart = explode(' - ', $order->shipping_address)[0] ?? '';
+        try {
+            $custDestination = $this->resolveAddressHeuristically($addressPart, $config, $order->province);
+        } catch (\Exception $e) {
+            // Với khách hàng, nếu không nhận diện được tự động thì vẫn cho phép tiếp tục nếu shop đã ok? 
+            // Không, cần địa chỉ gửi để lấy hàng hoặc tính phí.
+            $custDestination = null; 
+            Log::warning("GHN Return: Could not resolve customer address heuristically: " . $addressPart);
+        }
+
+        // --- 3. Build Payload ---
+        $weight = 500;
+        $totalReturnedQty = $returnRequest->items->sum('quantity');
+        if ($totalReturnedQty > 0) {
+            $weight = max(500, 200 + ($totalReturnedQty * 300));
+        }
+
+        $items = [];
+        foreach ($returnRequest->items as $item) {
+            $items[] = [
+                'name' => $item->orderItem->product->name ?? 'Sản phẩm hoàn trả',
+                'quantity' => (int) $item->quantity,
+                'weight' => 300,
+            ];
+        }
+
+        $payload = [
+            'payment_type_id' => 2, // Khách trả phí (như yêu cầu)
+            'note' => 'Hàng mẫu/Hàng hoàn trả từ đơn #' . $order->id,
+            'required_note' => 'CHOXEMHANGKHONGTHU',
+            'to_name' => $settings['name'] ?: 'Admin Elite',
+            'to_phone' => $settings['phone'] ?: '0123456789',
+            'to_address' => $settings['address'],
+            'to_ward_code' => $shopDestination['ward_code'],
+            'to_district_id' => $shopDestination['district_id'],
+            'weight' => $weight,
+            'length' => 20,
+            'width' => 20,
+            'height' => 10,
+            'service_type_id' => (int) ($config['service_type_id'] ?? 2),
+            'items' => $items,
+            'client_order_code' => 'RET-' . $returnRequest->id,
+        ];
+
+        // If we resolved customer location, add as pickup point
+        if ($custDestination) {
+            $payload['from_name'] = $order->name;
+            $payload['from_phone'] = $order->phone;
+            $payload['from_address'] = $addressPart;
+            $payload['from_district_id'] = $custDestination['district_id'];
+            $payload['from_ward_code'] = $custDestination['ward_code'];
+        }
+
+        $response = Http::timeout(10)
+            ->acceptJson()
+            ->withHeaders(array_filter([
+                'Token' => $config['token'] ?? null,
+                'ShopId' => (int) ($config['shop_id'] ?? 0),
+            ]))
+            ->post(rtrim($config['api_url'], '/') . '/shiip/public-api/v2/shipping-order/create', $payload);
+
+        if (!$response->successful()) {
+            throw new \Exception('GHN Error: ' . $response->body());
+        }
+
+        $data = $response->json();
+        $orderCode = data_get($data, 'data.order_code');
+
+        if (!$orderCode) {
+            throw new \Exception('GHN API không trả về mã vận đơn.');
+        }
+
+        return $data;
     }
 }

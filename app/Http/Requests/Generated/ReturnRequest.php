@@ -14,16 +14,16 @@ class ReturnRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => 'required|in:refund,exchange',
-            'reason_type' => 'required|in:wrong_size,disliked,defective,other',
-            'reason' => 'required|string|max:255',
+            'type' => 'required|in:refund',
+            'reason_type' => 'required|in:disliked,defective,other',
+            'reason' => 'required_if:reason_type,other|string|max:255',
             'return_method' => 'required|string|in:at_home,at_post_office',
             'note' => 'required|string|max:1000',
-            'images' => 'required|array|min:1',
+            'images' => 'required_if:reason_type,defective|array|min:1',
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'videos' => 'required|array|min:1',
+            'videos' => 'required_if:reason_type,defective|array|min:1',
             'videos.*' => 'required|file|mimes:mp4,mov,avi,webm|max:51200',
-            'items' => 'required|array',
+            'items' => 'nullable|array',
             'items.*.selected' => 'sometimes|boolean',
             'items.*.quantity' => 'sometimes|integer|min:1',
             'bank_name' => 'required_if:type,refund|nullable|string|max:255',

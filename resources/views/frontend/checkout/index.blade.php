@@ -201,6 +201,33 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
 .mpick-add-btn:hover { border-color:var(--ck-black); color:var(--ck-black); }
 .modal-addr-form { border-top:1px solid var(--ck-border); padding-top:20px; margin-top:6px; }
 .modal-addr-form .ck-label { font-size:11px; }
+/* vouchers */
+.ck-v-list { display:flex; flex-direction:column; gap:10px; margin-top:15px; }
+.v-card {
+  display:flex; align-items:center; gap:12px; padding:12px;
+  border:1.5px solid var(--ck-border); border-radius:10px;
+  position:relative; transition:all .2s; cursor:pointer;
+  background:#fff;
+}
+.v-card.selectable:hover { border-color:var(--ck-black); transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.05); }
+.v-card.is-sel { border-color:var(--ck-black); background:#fafafa; }
+.v-card.disabled { opacity:0.6; cursor:not-allowed; filter:grayscale(0.8); background:#f9fafb; }
+.v-icon-box {
+  width:40px; height:40px; border-radius:8px; background:#fff2eb;
+  color:#f26522; display:flex; align-items:center; justify-content:center;
+  font-size:18px; flex-shrink:0;
+}
+.v-card.disabled .v-icon-box { background:#f1f1f1; color:#999; }
+.v-info { flex:1; min-width:0; }
+.v-code { font-size:13px; font-weight:700; color:var(--ck-black); margin-bottom:1px; display:flex; align-items:center; gap:6px; }
+.v-desc { font-size:11.5px; color:var(--ck-gray); line-height:1.3; margin-bottom:2px; }
+.v-fail { font-size:10px; font-weight:600; color:var(--ck-red); text-transform:uppercase; letter-spacing:0.3px; }
+.v-apply-btn {
+  font-size:12px; font-weight:700; color:#f26522;
+  padding:4px 10px; border-radius:6px; background:#fff2eb;
+  transition:all .15s;
+}
+.v-card.selectable:hover .v-apply-btn { background:#f26522; color:#fff; }
 </style>
 @endpush
 
@@ -497,6 +524,39 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
               <button class="btn-cpn" id="btn-cpn" type="button" aria-label="Áp dụng mã">Áp dụng</button>
             </div>
             <div id="cpn-msg" aria-live="polite" style="font-size:12px;margin-bottom:8px;min-height:16px;"></div>
+
+            {{-- Available Vouchers List --}}
+            @if(isset($availableCoupons) && $availableCoupons->isNotEmpty())
+              <div class="mt-4">
+                <h4 style="font-size:13px; font-weight:700; color:var(--ck-black); margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                  <i class="bi bi-ticket-perforated"></i> Mã giảm giá của bạn
+                </h4>
+                <div class="ck-v-list">
+                  @foreach($availableCoupons as $v)
+                    <div class="v-card {{ $v->is_applicable ? 'selectable js-v-apply' : 'disabled' }}" 
+                         data-code="{{ $v->code }}"
+                         title="{{ !$v->is_applicable ? $v->failure_reason : '' }}">
+                      <div class="v-icon-box"><i class="bi bi-tag-fill"></i></div>
+                      <div class="v-info">
+                        <div class="v-code">
+                          {{ $v->code }}
+                          @if($v->is_applicable)
+                            <span class="badge rounded-pill bg-success" style="font-size:9px; font-weight:500;">Có thể áp dụng</span>
+                          @endif
+                        </div>
+                        <div class="v-desc">{{ $v->description ?: ('Giảm ' . $v->getFormattedValue() . ($v->min_order_amount > 0 ? ' cho đơn từ ₫' . number_format($v->min_order_amount, 0, ',', '.') : '')) }}</div>
+                        @if(!$v->is_applicable)
+                          <div class="v-fail"><i class="bi bi-exclamation-circle-fill me-1"></i>{{ $v->failure_reason }}</div>
+                        @endif
+                      </div>
+                      @if($v->is_applicable)
+                        <div class="v-apply-btn">Dùng ngay</div>
+                      @endif
+                    </div>
+                  @endforeach
+                </div>
+              </div>
+            @endif
           </div>
 
           <div class="sum-row"><span>Tạm tính</span><span>{{ number_format($total,0,',','.') }}đ</span></div>
@@ -574,8 +634,8 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
           + Thêm địa chỉ mới
         </button>
 
-        {{-- Add address form (hidden by default if addresses exist) --}}
-        <div id="modal-addr-new-form" class="{{ $userAddresses->isNotEmpty() ? 'd-none' : '' }}">
+        {{-- Add address form (hidden by default) --}}
+        <div id="modal-addr-new-form" class="d-none">
           <h5 id="modal-addr-form-title" class="mb-3" style="font-size:16px;font-weight:600;">Thêm địa chỉ giao hàng mới</h5>
           <form id="modal-new-addr-form-inner" novalidate>
             @csrf
@@ -852,13 +912,13 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
     if(modalDeleteBtn) modalDeleteBtn.classList.add('d-none');
     if(modalErrBox)    modalErrBox.textContent = '';
     const mProv = qs('#modal_province'), mComm = qs('#modal_commune');
-    if(mProv) mProv.innerHTML='<option value="">-- Định tỉnh trước --</option>';
+    if(mProv) mProv.innerHTML='<option value="">-- Đang tải… --</option>';
     if(mComm){ mComm.innerHTML='<option value="">-- Chọn tỉnh trước --</option>'; mComm.disabled=true; }
     bindCascade(mProv, mComm, '', '');
   }
 
-  const pageContainer = qs('.ck-page');
-  pageContainer?.addEventListener('click', function(e){
+  // Use document instead of pageContainer to include the modal (which is outside .ck-page)
+  document.addEventListener('click', function(e){
     const editBtn = e.target.closest('.addr-edit-btn');
     if(editBtn){
       e.stopPropagation(); const card = editBtn.closest('.mpick-card'); if(!card) return;
@@ -890,6 +950,13 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
 
     if(e.target.closest('#btn-cpn')){ handleApplyCoupon(); return; }
     if(e.target.closest('#btn-rm-cpn')){ handleRemoveCoupon(); return; }
+    const vCard = e.target.closest('.js-v-apply');
+    if(vCard){
+      const code = vCard.dataset.code;
+      if(qs('#cpn-input')) qs('#cpn-input').value = code;
+      handleApplyCoupon();
+      return;
+    }
     const rmItemBtn = e.target.closest('.sum-item-rm'); if(rmItemBtn){ handleRemoveItem(rmItemBtn); return; }
 
     const saveBtn = e.target.closest('#modal-save-addr-btn'); if(saveBtn) handleSaveAddress(saveBtn);
@@ -1012,6 +1079,38 @@ hr.sum-div { border:none; border-top:1px solid var(--ck-border); margin:12px 0; 
       [btn1, btn2].forEach(b=>{ if(b){ b.disabled=true; b.textContent='Đang xử lý…'; } });
     }
   });
+
+  function init(){
+    // Bind Guest Address (if exists)
+    const gP = qs('#g_province'), gC = qs('#g_commune');
+    if(gP && gC) bindCascade(gP, gC, '{{ old("province") }}', '{{ old("commune") }}');
+
+    // Initial Address Selection (if auth)
+    @auth
+      const selCard = qs('.mpick-card.is-sel');
+      if(selCard) applyAddrSelection(selCard);
+
+      // Re-bind when modal is shown to ensure race conditions with niceSelect/etc are resolved
+      const modalEl = document.getElementById('addr-pick-modal');
+      if(modalEl){
+        modalEl.addEventListener('shown.bs.modal', function () {
+          const mp = qs('#modal_province'), mc = qs('#modal_commune');
+          if(mp && (!mp.options || mp.options.length <= 1)){
+             bindCascade(mp, mc, '', '');
+          } else if(mp) {
+             syncNS(mp); if(mc) syncNS(mc);
+          }
+        });
+      }
+    @endauth
+  }
+
+  // Ensure initialization runs after DOM and plugins are ready
+  if(window.jQuery) {
+    jQuery(document).ready(init);
+  } else {
+    document.addEventListener('DOMContentLoaded', init);
+  }
 })();
 </script>
 @endsection

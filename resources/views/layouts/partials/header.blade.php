@@ -46,8 +46,8 @@
                                 @endif
                                 <!-- <li><a href="{{ route('account.orders') }}">{{ __('messages.my_orders') }}</a></li> -->
                                 <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-offcanvas').submit();">{{ __('messages.logout') }}</a></li>
-                                <form id="logout-form-offcanvas" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                             </ul>
+                            <form id="logout-form-offcanvas" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                         @endguest
                     </li> 
                 </ul>
@@ -286,8 +286,8 @@
                                                         <li><a href="{{ route('admin.dashboard') }}">{{ __('messages.admin') }}</a></li>
                                                     @endif  
                                                     <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('messages.logout') }}</a></li>
-                                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                                                 </ul>
+                                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                                             </li>
                                         @endguest 
                                     </ul>

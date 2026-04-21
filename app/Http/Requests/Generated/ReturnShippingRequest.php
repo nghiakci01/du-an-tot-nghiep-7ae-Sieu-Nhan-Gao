@@ -14,16 +14,20 @@ class ReturnShippingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shipping_info' => 'required|string|max:1000',
-            'shipping_proof' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'shipping_info' => 'nullable|string|max:1000',
+            'shipping_proof' => 'required|array|min:1',
+            'shipping_proof.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
+            'shipping_video' => 'nullable|array',
+            'shipping_video.*' => 'file|mimes:mp4,mov,avi,wmv|max:51200',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'shipping_info.required' => 'Vui lòng nhập thông tin vận chuyển (Mã vận đơn, đơn vị vận chuyển...).',
             'shipping_proof.required' => 'Vui lòng tải lên ảnh minh chứng đã gửi hàng.',
+            'shipping_video.mimes' => 'Video không đúng định dạng (mp4, mov, avi, wmv).',
+            'shipping_video.max' => 'Dung lượng video không được vượt quá 20MB.',
         ];
     }
 }

@@ -14,6 +14,12 @@ Route::get('/about', [App\Http\Controllers\Frontend\HomeController::class, 'abou
 Route::get('/news', [App\Http\Controllers\Frontend\HomeController::class, 'news'])->name('news');
 Route::get('/news/{slug}', [App\Http\Controllers\Frontend\HomeController::class, 'newsDetail'])->name('news.detail');
 
+// Policy & Info Pages
+Route::get('/delivery-information', [App\Http\Controllers\Frontend\HomeController::class, 'deliveryInfo'])->name('delivery-info');
+Route::get('/privacy-policy', [App\Http\Controllers\Frontend\HomeController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/terms-conditions', [App\Http\Controllers\Frontend\HomeController::class, 'termsConditions'])->name('terms-conditions');
+Route::get('/returns-policy', [App\Http\Controllers\Frontend\HomeController::class, 'returnsPolicy'])->name('returns-policy');
+
 // Search Routes
 Route::get('/search', [App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('search.index');
 Route::get('/search/suggestions', [App\Http\Controllers\Frontend\SearchController::class, 'suggestions'])->name('search.suggestions');
@@ -179,6 +185,20 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin']],
         Route::get('returns/{id}/reject', function() { return redirect()->route('admin.returns.index'); });
         Route::post('returns/{id}/complete', [App\Http\Controllers\Admin\OrderReturnController::class, 'complete'])->name('returns.complete');
         Route::get('returns/{id}/complete', function() { return redirect()->route('admin.returns.index'); });
+
+        // Order Returns Management
+        Route::get('returns', [App\Http\Controllers\Admin\OrderReturnController::class, 'index'])->name('returns.index');
+        Route::post('returns/{id}/approve', [App\Http\Controllers\Admin\OrderReturnController::class, 'approve'])->name('returns.approve');
+        Route::get('returns/{id}/approve', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/shipping', [App\Http\Controllers\Admin\OrderReturnController::class, 'markAsShipping'])->name('returns.shipping');
+        Route::get('returns/{id}/shipping', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/received', [App\Http\Controllers\Admin\OrderReturnController::class, 'markAsReceived'])->name('returns.received');
+        Route::get('returns/{id}/received', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/reject', [App\Http\Controllers\Admin\OrderReturnController::class, 'reject'])->name('returns.reject');
+        Route::get('returns/{id}/reject', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/complete', [App\Http\Controllers\Admin\OrderReturnController::class, 'complete'])->name('returns.complete');
+        Route::get('returns/{id}/complete', function() { return redirect()->route('admin.returns.index'); });
+        Route::post('returns/{id}/generate-ghn', [App\Http\Controllers\Admin\OrderReturnController::class, 'generateGhnCode'])->name('returns.generate_ghn');
 
         Route::delete('products/bulk-delete', [App\Http\Controllers\Admin\ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
         Route::delete('products/delete-all', [App\Http\Controllers\Admin\ProductController::class, 'deleteAll'])->name('products.delete-all');

@@ -23,8 +23,8 @@
                         <li><a href="{{ route('admin.dashboard') }}">{{ __('messages.admin') }}</a></li>
                     @endif  
                     <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); this.parentElement.nextElementSibling.submit();">{{ __('messages.logout') }}</a></li>
-                    <form action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                 </ul>
+                <form action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
             @endguest
         </li> 
     </ul>

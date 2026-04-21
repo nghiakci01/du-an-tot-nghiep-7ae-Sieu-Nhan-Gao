@@ -154,11 +154,11 @@ class AccountController extends Controller
             $user->avatar = 'avatars/' . $avatarName;
         }
 
-        if (!empty($validated['new_password'] ?? null)) {
-            if (! Hash::check($validated['current_password'] ?? '', $user->password)) {
+        if (!empty($request->validated()['new_password'] ?? null)) {
+            if (! Hash::check($request->validated()['current_password'] ?? '', $user->password)) {
                 return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
             }
-            $user->password = Hash::make($validated['new_password']);
+            $user->password = Hash::make($request->validated()['new_password']);
         }
 
         $user->save();
@@ -212,7 +212,15 @@ class AccountController extends Controller
         $order = $user->orders()->findOrFail($id);
 
         if (!\App\Models\OrderReturnRequest::canBeReturned($order)) {
-            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã hoàn thành và trong vòng 7 ngày kể từ lúc nhận hàng.');
+            return redirect()->back()->with('error', 'Chỉ có thể yêu cầu hoàn hàng cho đơn hàng đã hoàn thành và trong vòng ' . config('services.return.window_days', 7) . ' ngày kể từ lúc nhận hàng.');
+        }
+
+        // Kiểm tra giới hạn số lượng trả hàng (tối đa 3 lần/tháng)
+        $monthlyReturns = $user->returnRequests()
+            ->where('created_at', '>=', now()->startOfMonth())
+            ->count();
+        if ($monthlyReturns >= 3) {
+            return redirect()->back()->with('error', 'Bạn đã đạt giới hạn 3 yêu cầu trả hàng trong tháng này.');
         }
 
         if ($order->returnRequest) {
@@ -231,30 +239,21 @@ class AccountController extends Controller
             }
         }
 
-        // Filter selected items and calculate refund amount
+        // Force return all items strategy
         $selectedItems = [];
         $totalRefund = 0;
 
-        foreach ($request->items as $itemId => $data) {
-            if (isset($data['selected']) && $data['selected'] == 1) {
-                $orderItem = \App\Models\OrderItem::where('order_id', $order->id)->findOrFail($itemId);
-
-                $qty = (int) ($data['quantity'] ?? 1);
-                if ($qty > $orderItem->quantity) {
-                    return redirect()->back()->with('error', "Số lượng trả của sản phẩm {$orderItem->product_name} vượt quá số lượng đã mua.");
-                }
-
-                $selectedItems[] = [
-                    'order_item_id' => $itemId,
-                    'quantity' => $qty,
-                    'price' => $orderItem->price,
-                ];
-                $totalRefund += $qty * $orderItem->price;
-            }
+        foreach ($order->items as $item) {
+            $selectedItems[] = [
+                'order_item_id' => $item->id,
+                'quantity' => $item->quantity, // Return full quantity
+                'price' => $item->price,
+            ];
+            $totalRefund += $item->quantity * $item->price;
         }
 
         if (empty($selectedItems)) {
-            return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một sản phẩm để hoàn trả.');
+            return redirect()->back()->with('error', 'Đơn hàng này không có sản phẩm để hoàn trả.');
         }
 
         $imagePaths = [];
@@ -281,7 +280,7 @@ class AccountController extends Controller
             $returnRequest = \App\Models\OrderReturnRequest::create([
                 'user_id' => $user->id,
                 'order_id' => $order->id,
-                'type' => $request->type,
+                'type' => 'refund',
                 'reason_type' => $request->reason_type,
                 'reason' => $request->reason,
                 'return_method' => $request->return_method,
@@ -329,12 +328,26 @@ class AccountController extends Controller
             'status' => \App\Models\OrderReturnRequest::STATUS_SHIPPING_BACK,
         ];
 
+        $shippingProofs = [];
         if ($request->hasFile('shipping_proof')) {
-            $image = $request->file('shipping_proof');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             \Illuminate\Support\Facades\File::ensureDirectoryExists(public_path('uploads/returns'));
-            $image->move(public_path('uploads/returns'), $imageName);
-            $data['shipping_proof'] = 'uploads/returns/' . $imageName;
+            foreach ($request->file('shipping_proof') as $image) {
+                $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('uploads/returns'), $imageName);
+                $shippingProofs[] = 'uploads/returns/' . $imageName;
+            }
+            $data['shipping_proof'] = $shippingProofs;
+        }
+
+        $videoProofs = [];
+        if ($request->hasFile('shipping_video')) {
+            \Illuminate\Support\Facades\File::ensureDirectoryExists(public_path('uploads/returns/videos'));
+            foreach ($request->file('shipping_video') as $video) {
+                $videoName = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
+                $video->move(public_path('uploads/returns/videos'), $videoName);
+                $videoProofs[] = 'uploads/returns/videos/' . $videoName;
+            }
+            $data['video_proof'] = $videoProofs;
         }
 
         $returnRequest->update($data);

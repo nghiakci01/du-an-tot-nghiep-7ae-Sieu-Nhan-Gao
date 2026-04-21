@@ -182,6 +182,8 @@ class OrderController extends Controller
             Order::STATUS_SHIPPED => 'Đang giao hàng',
             Order::STATUS_COMPLETED => 'Hoàn thành',
             Order::STATUS_CANCELLED => 'Đã hủy',
+            Order::STATUS_FAILED => 'Thất bại',
+            Order::STATUS_RETURNED => 'Khách hoàn hàng',
             default => 'Không xác định',
         };
     }
