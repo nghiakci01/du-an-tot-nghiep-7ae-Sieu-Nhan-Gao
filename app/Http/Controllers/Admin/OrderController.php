@@ -239,6 +239,10 @@ class OrderController extends Controller
             return false;
         }
 
-        return $order->shipping_provider === 'ghn' || blank($order->shipping_provider);
+        // Chỉ tự động tạo nếu được chọn là GHN VÀ API đã được cấu hình
+        $config = config('shipping.ghn', []);
+        $isConfigured = (bool) ($config['enabled'] ?? false) && filled($config['token'] ?? null);
+
+        return ($order->shipping_provider === 'ghn' || blank($order->shipping_provider)) && $isConfigured;
     }
 }
