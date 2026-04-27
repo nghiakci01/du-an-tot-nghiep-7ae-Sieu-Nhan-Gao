@@ -123,7 +123,7 @@ class AccountController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => ['nullable', 'string', 'regex:/^(03|05|07|08|09)\d{8}$/'],
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -137,12 +137,12 @@ class AccountController extends Controller
             'phone.regex' => 'Số điện thoại phải bắt đầu bằng 03, 05, 07, 08 hoặc 09 và có đúng 10 chữ số.',
         ]);
 
-        $user->name = $request->name;
-        $user->phone = $request->phone;
-        $user->bank_name = $request->bank_name;
-        $user->bank_bin = $request->bank_bin;
-        $user->account_number = $request->account_number;
-        $user->account_name = $request->account_name;
+        $user->name = $validated['name'];
+        $user->phone = $validated['phone'];
+        $user->bank_name = $validated['bank_name'];
+        $user->bank_bin = $validated['bank_bin'];
+        $user->account_number = $validated['account_number'];
+        $user->account_name = $validated['account_name'];
 
         if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             if ($user->avatar) {
@@ -156,14 +156,14 @@ class AccountController extends Controller
 
         if (!empty($validated['new_password'] ?? null)) {
             if (! Hash::check($validated['current_password'] ?? '', $user->password)) {
-                return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
+                return redirect()->back()->withErrors(['current_password' => 'Mật khẩu hiện tại không chính xác.']);
             }
             $user->password = Hash::make($validated['new_password']);
         }
 
         $user->save();
 
-        return redirect()->back()->with('success', 'Information updated successfully!');
+        return redirect()->back()->with('success', 'Cập nhật thông tin cá nhân thành công!');
     }
 
     public function cancelOrder($id, \App\Services\OrderService $orderService)
@@ -173,7 +173,7 @@ class AccountController extends Controller
         $order = $user->orders()->findOrFail($id);
 
         if ($order->status !== Order::STATUS_PENDING) {
-            return redirect()->back()->with('error', 'Orders can only be cancelled when the status is Pending.');
+            return redirect()->back()->with('error', 'Chỉ có thể hủy đơn hàng khi trạng thái là Đang chờ xử lý.');
         }
 
         try {
